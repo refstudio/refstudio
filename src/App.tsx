@@ -3,6 +3,7 @@ import { GreetingPanel } from './GreetingPanel';
 import { useState } from 'react';
 import { EditorPanel } from './EditorPanel';
 import RichTextEditorPanel from './RichTextEditorPanel';
+import { ReferencesPanel } from './ReferencesPanel';
 
 function App() {
   const [selection, setSelection] = useState('');
@@ -20,7 +21,6 @@ function App() {
 
       <ResizeHandle />
       <AIPanel selection={selection} />
-      <Panel />
     </PanelGroup>
   );
 }
@@ -30,20 +30,6 @@ function AIPanel({ selection }: { selection: string }) {
     <Panel defaultSize={20} style={{ padding: 10 }}>
       <h1>AI</h1>
       <div>{selection}</div>
-    </Panel>
-  );
-}
-
-function ReferencesPanel() {
-  return (
-    <Panel defaultSize={20} style={{ padding: 10 }}>
-      <h1>References</h1>
-      <ul>
-        <li>Ref 1</li>
-        <li>Ref 2</li>
-        <li>Ref 3</li>
-        <li>Ref 4</li>
-      </ul>
     </Panel>
   );
 }
