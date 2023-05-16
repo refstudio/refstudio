@@ -2,6 +2,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { GreetingPanel } from './GreetingPanel';
 import { useState } from 'react';
 import { EditorPanel } from './EditorPanel';
+import RichTextEditorPanel from './RichTextEditorPanel';
 
 function App() {
   const [selection, setSelection] = useState('');
@@ -13,7 +14,10 @@ function App() {
     >
       <ReferencesPanel />
       <ResizeHandle />
-      <EditorPanel onSelection={setSelection} />
+
+      {/* <EditorPanel onSelection={setSelection} /> */}
+      <RichTextEditorPanel onSelection={setSelection} />
+
       <ResizeHandle />
       <AIPanel selection={selection} />
       <Panel />
@@ -23,7 +27,7 @@ function App() {
 
 function AIPanel({ selection }: { selection: string }) {
   return (
-    <Panel defaultSize={20}>
+    <Panel defaultSize={20} style={{ padding: 10 }}>
       <h1>AI</h1>
       <div>{selection}</div>
     </Panel>
@@ -32,7 +36,7 @@ function AIPanel({ selection }: { selection: string }) {
 
 function ReferencesPanel() {
   return (
-    <Panel defaultSize={20}>
+    <Panel defaultSize={20} style={{ padding: 10 }}>
       <h1>References</h1>
       <ul>
         <li>Ref 1</li>
@@ -49,8 +53,7 @@ function ResizeHandle() {
     <PanelResizeHandle
       style={{
         backgroundColor: '#EFEFEF',
-        marginLeft: 10,
-        marginRight: 10,
+
         display: 'flex',
         alignItems: 'center',
         width: 10,

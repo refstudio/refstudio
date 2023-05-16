@@ -65,7 +65,7 @@ export function EditorPanel({
   }
 
   return (
-    <Panel defaultSize={60}>
+    <Panel defaultSize={60} style={{ padding: 10 }}>
       <h1>Editor</h1>
       <LexicalComposer initialConfig={initialConfig}>
         <PlainTextPlugin
