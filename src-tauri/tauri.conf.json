@@ -39,11 +39,10 @@
     "windows": [
       {
         "fullscreen": false,
-        "resizable": true,
+        "resizable": false,
         "title": "refstudio",
-        "width": 800,
-        "height": 600,
-        "hiddenTitle": true
+        "width": 1280,
+        "height": 800
       }
     ]
   }
