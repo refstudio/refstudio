@@ -24,11 +24,15 @@ import {
   $createTextNode,
   $getRoot,
   $getSelection,
+  $getTextContent,
   EditorState,
+  LexicalEditor,
+  ParagraphNode,
 } from 'lexical';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 
 import './RichTextEditorPanel.css';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 
 function Placeholder() {
   return <div className="editor-placeholder">Enter some rich text...</div>;
@@ -44,6 +48,7 @@ const editorConfig: InitialConfigType = {
     HeadingNode,
     ListNode,
     ListItemNode,
+    ParagraphNode,
     QuoteNode,
     CodeNode,
     CodeHighlightNode,
@@ -63,21 +68,26 @@ export default function RichTextEditorPanel({
 }) {
   // When the editor changes, you can get notified via the
   // LexicalOnChangePlugin!
-  function onChange(editorState: EditorState) {
+  function onChange(editorState: EditorState, editor: LexicalEditor) {
     editorState.read(() => {
       // Read the contents of the EditorState here.
       const root = $getRoot();
       const selection = $getSelection();
+
       console.log(root, selection);
 
       const selectedText = selection?.getTextContent();
       selectedText && onSelection(selectedText);
     });
   }
+
   return (
     <Panel defaultSize={60} style={{ padding: 10 }}>
-      <h1>Editor</h1>
       <LexicalComposer initialConfig={editorConfig}>
+        <h1>
+          Editor
+          <UpdateButton />
+        </h1>
         <div className="editor-container">
           <ToolbarPlugin />
           <div className="editor-inner">
@@ -97,6 +107,17 @@ export default function RichTextEditorPanel({
       </LexicalComposer>
     </Panel>
   );
+}
+
+function UpdateButton() {
+  const [editor] = useLexicalComposerContext();
+
+  function editText() {
+    editor.update(() => {
+      $getSelection()?.insertText(` [Ref 1]`);
+    });
+  }
+  return <button onClick={editText}>update</button>;
 }
 
 function prepopulatedRichText() {
