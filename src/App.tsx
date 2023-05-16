@@ -1,40 +1,61 @@
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import { GreetingPanel } from './GreetingPanel';
 import { useState } from 'react';
-import { Panel, PanelGroup } from 'react-resizable-panels';
-import { invoke } from '@tauri-apps/api/tauri';
+import { EditorPanel } from './EditorPanel';
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState('');
-  const [name, setName] = useState('');
-
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    setGreetMsg(await invoke('greet', { name }));
-  }
-
+  const [selection, setSelection] = useState('');
   return (
-    <PanelGroup autoSaveId="example" direction="horizontal">
-      <Panel />
-      <Panel>
-        <div>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              greet();
-            }}
-          >
-            <input
-              id="greet-input"
-              onChange={(e) => setName(e.currentTarget.value)}
-              placeholder="Enter a name..."
-            />
-            <button type="submit">Greet</button>
-          </form>
-          <p>{greetMsg}</p>
-        </div>
-      </Panel>
+    <PanelGroup
+      autoSaveId="ref-studio"
+      direction="horizontal"
+      style={{ height: '100vh' }}
+    >
+      <ReferencesPanel />
+      <ResizeHandle />
+      <EditorPanel onSelection={setSelection} />
+      <ResizeHandle />
+      <AIPanel selection={selection} />
       <Panel />
     </PanelGroup>
   );
 }
 
+function AIPanel({ selection }: { selection: string }) {
+  return (
+    <Panel defaultSize={20}>
+      <h1>AI</h1>
+      <div>{selection}</div>
+    </Panel>
+  );
+}
+
+function ReferencesPanel() {
+  return (
+    <Panel defaultSize={20}>
+      <h1>References</h1>
+      <ul>
+        <li>Ref 1</li>
+        <li>Ref 2</li>
+        <li>Ref 3</li>
+        <li>Ref 4</li>
+      </ul>
+    </Panel>
+  );
+}
+
+function ResizeHandle() {
+  return (
+    <PanelResizeHandle
+      style={{
+        backgroundColor: '#EFEFEF',
+        marginLeft: 10,
+        marginRight: 10,
+        display: 'flex',
+        alignItems: 'center',
+        width: 10,
+      }}
+    ></PanelResizeHandle>
+  );
+}
 export default App;
