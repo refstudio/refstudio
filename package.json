@@ -11,7 +11,9 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@lexical/react": "^0.10.0",
     "@tauri-apps/api": "^1.2.0",
+    "lexical": "^0.10.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-resizable-panels": "^0.0.42"
