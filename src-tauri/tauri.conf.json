@@ -39,7 +39,7 @@
     "windows": [
       {
         "fullscreen": false,
-        "resizable": false,
+        "resizable": true,
         "title": "refstudio",
         "width": 1280,
         "height": 800
