@@ -633,9 +633,9 @@ export function ToolbarPlugin() {
             <i className="format underline" />
           </button>
           <button
-            onClick={() => {
-              editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough');
-            }}
+            onClick={() =>
+              editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough')
+            }
             className={
               'toolbar-item spaced ' + (isStrikethrough ? 'active' : '')
             }

@@ -62,13 +62,15 @@ const editorConfig: InitialConfigType = {
 };
 
 export default function RichTextEditorPanel({
+  onChange,
   onSelection,
 }: {
+  onChange: (editor: LexicalEditor) => any;
   onSelection: (selection: string) => any;
 }) {
   // When the editor changes, you can get notified via the
   // LexicalOnChangePlugin!
-  function onChange(editorState: EditorState, editor: LexicalEditor) {
+  function handleOnChange(editorState: EditorState, editor: LexicalEditor) {
     editorState.read(() => {
       // Read the contents of the EditorState here.
       const root = $getRoot();
@@ -100,7 +102,12 @@ export default function RichTextEditorPanel({
             <ListPlugin />
             <LinkPlugin />
             <AutoFocusPlugin />
-            <OnChangePlugin onChange={onChange} />
+            <OnChangePlugin
+              onChange={(state, editor) => {
+                handleOnChange(state, editor);
+                onChange(editor);
+              }}
+            />
             <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
           </div>
         </div>
