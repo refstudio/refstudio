@@ -32,6 +32,12 @@ import { ToolbarPlugin } from './../plugins/TollbarPlugin';
 import { useState } from 'react';
 import useDebounce from '../hooks/useDebounce';
 import { ReferenceNode } from '../lexical-nodes/ReferenceNode';
+import CollapsiblePlugin, {
+  CollapsibleNodes,
+} from '../plugins/CollapsiblePlugin';
+import { $createCollapsibleContainerNode } from '../plugins/CollapsiblePlugin/CollapsibleContainerNode';
+import { $createCollapsibleContentNode } from '../plugins/CollapsiblePlugin/CollapsibleContentNode';
+import { $createCollapsibleTitleNode } from '../plugins/CollapsiblePlugin/CollapsibleTitleNode';
 import { TreeViewPlugin } from './../plugins/TreeViewPlugin';
 import './EditorView.css';
 
@@ -59,6 +65,7 @@ const editorConfig: InitialConfigType = {
     AutoLinkNode,
     LinkNode,
     ReferenceNode,
+    ...CollapsibleNodes,
   ],
   editorState: prepopulatedRichText,
 };
@@ -81,7 +88,7 @@ export default function EditorView({
       const root = $getRoot();
       const selection = $getSelection();
 
-      console.log(root, selection);
+      // console.log(root, selection);
 
       const selectedText = selection?.getTextContent();
       selectedText && debouncedHandleSelection(selectedText);
@@ -112,6 +119,7 @@ export default function EditorView({
           <HistoryPlugin />
           <ListPlugin />
           <LinkPlugin />
+          <CollapsiblePlugin />
           <AutoFocusPlugin />
           <OnChangePlugin
             onChange={(state, editor) => {
@@ -130,37 +138,50 @@ export default function EditorView({
 function prepopulatedRichText() {
   const root = $getRoot();
   if (root.getFirstChild() === null) {
-    const paragraph = $createParagraphNode();
-    paragraph.append(
-      $createTextNode('The playground is a demo environment built with '),
-      $createTextNode('@lexical/react').toggleFormat('code'),
-      $createTextNode('.'),
-      $createTextNode(' Try typing in '),
-      $createTextNode('some text').toggleFormat('bold'),
-      $createTextNode(' with '),
-      $createTextNode('different').toggleFormat('italic'),
-      $createTextNode(' formats.'),
-    );
-    root.append(paragraph);
-    const paragraph2 = $createParagraphNode();
-    paragraph2.append(
-      $createTextNode(
-        'Make sure to check out the various plugins in the toolbar. You can also use #hashtags or @-mentions too!',
+    root.append(
+      $createParagraphNode().append(
+        $createTextNode('This editor is a demo environment built with '),
+        $createTextNode('@lexical/react').toggleFormat('code'),
+        $createTextNode('.'),
+        $createTextNode(' Try typing in '),
+        $createTextNode('some text').toggleFormat('bold'),
+        $createTextNode(' with '),
+        $createTextNode('different').toggleFormat('italic'),
+        $createTextNode(' formats.'),
       ),
     );
-    root.append(paragraph2);
-    const paragraph3 = $createParagraphNode();
-    paragraph3.append(
-      $createTextNode(`If you'd like to find out more about Lexical, you can:`),
-    );
-    root.append(paragraph3);
 
-    const paragraph4 = $createParagraphNode();
-    paragraph4.append(
-      $createTextNode(
-        `Lastly, we're constantly adding cool new features to this playground. So make sure you check back here when you next get a chance :).`,
+    root.append($createParagraphNode());
+
+    root.append(
+      $createParagraphNode().append(
+        $createTextNode(
+          'Make sure to check out the various plugins in the toolbar. You can also use the collapsible item to create collapsing sections with a title and content!',
+        ),
       ),
     );
-    root.append(paragraph4);
+
+    root.append(
+      $createParagraphNode(),
+      $createCollapsibleContainerNode(true).append(
+        $createCollapsibleTitleNode().append($createTextNode('Title')),
+        $createCollapsibleContentNode().append(
+          $createParagraphNode().append(
+            $createTextNode(
+              "Quick: do you have a plan to become proactive. Our end-to-end feature set is unparalleled in the DXP space. If all of this comes off as mixed-up to you, that's because it is! Quick: do you have a infinitely reconfigurable scheme for coping with emerging methodologies? Is it more important for something to be dynamic or to be best-of-breed? The portals factor can be summed up in one word: affiliate-based. If all of this comes off as mixed-up to you, that's because it is! What does the term 'structuring'. Our end-to-end feature set is unparalleled, but our newbie-proof administration and simple configuration. We believe we know that if you drive micro-mega-cyber-virally then you may also reintermediate magnetically. It sounds wonderful, but it's 100 percent accurate! The experiences factor is short-term. If you incentivize dynamically, you may also mesh iteravely. Without development, you will lack social networks. Our feature set is unparalleled, but our sexy raw bandwidth and easy operation is invariably considered a remarkable achievement. Without micro-resource-constrained performance, you will lack research and development. Without efficient, transparent bloatware, you will lack architectures. We pride ourselves not only on our robust iteration and user-proof configuration is usually considered an amazing achievement.",
+            ),
+          ),
+        ),
+      ),
+      $createParagraphNode(),
+    );
+
+    root.append(
+      $createParagraphNode().append(
+        $createTextNode(
+          `If you'd like to find out more about Lexical, you can use https://lexical.dev/`,
+        ),
+      ),
+    );
   }
 }

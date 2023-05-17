@@ -1,49 +1,50 @@
-import React from 'react';
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  CAN_REDO_COMMAND,
-  CAN_UNDO_COMMAND,
-  REDO_COMMAND,
-  UNDO_COMMAND,
-  SELECTION_CHANGE_COMMAND,
-  FORMAT_TEXT_COMMAND,
-  FORMAT_ELEMENT_COMMAND,
-  $getSelection,
-  $isRangeSelection,
-  $createParagraphNode,
-  $getNodeByKey,
-  RangeSelection,
-  NodeSelection,
-  GridSelection,
-} from 'lexical';
+  $createCodeNode,
+  $isCodeNode,
+  getCodeLanguages,
+  getDefaultCodeLanguage,
+} from '@lexical/code';
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link';
 import {
-  $isParentElementRTL,
-  $wrapNodes,
-  $isAtNodeEnd,
-} from '@lexical/selection';
-import { $getNearestNodeOfType, mergeRegister } from '@lexical/utils';
-import {
+  $isListNode,
   INSERT_ORDERED_LIST_COMMAND,
   INSERT_UNORDERED_LIST_COMMAND,
-  REMOVE_LIST_COMMAND,
-  $isListNode,
   ListNode,
+  REMOVE_LIST_COMMAND,
 } from '@lexical/list';
-import { createPortal } from 'react-dom';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import {
   $createHeadingNode,
   $createQuoteNode,
   $isHeadingNode,
 } from '@lexical/rich-text';
 import {
-  $createCodeNode,
-  $isCodeNode,
-  getDefaultCodeLanguage,
-  getCodeLanguages,
-} from '@lexical/code';
+  $isAtNodeEnd,
+  $isParentElementRTL,
+  $wrapNodes,
+} from '@lexical/selection';
+import { $getNearestNodeOfType, mergeRegister } from '@lexical/utils';
+import {
+  $createParagraphNode,
+  $getNodeByKey,
+  $getSelection,
+  $isRangeSelection,
+  CAN_REDO_COMMAND,
+  CAN_UNDO_COMMAND,
+  FORMAT_ELEMENT_COMMAND,
+  FORMAT_TEXT_COMMAND,
+  GridSelection,
+  LexicalEditor,
+  NodeSelection,
+  REDO_COMMAND,
+  RangeSelection,
+  SELECTION_CHANGE_COMMAND,
+  UNDO_COMMAND,
+} from 'lexical';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
+import { INSERT_COLLAPSIBLE_COMMAND } from './CollapsiblePlugin';
 import './TollbarPlugin.css';
 
 const LowPriority = 1;
@@ -75,7 +76,7 @@ function Divider() {
   return <div className="divider" />;
 }
 
-function positionEditorElement(editor, rect) {
+function positionEditorElement(editor: HTMLDivElement, rect: DOMRect | null) {
   if (rect === null) {
     editor.style.opacity = '0';
     editor.style.top = '-1000px';
@@ -89,7 +90,7 @@ function positionEditorElement(editor, rect) {
   }
 }
 
-function FloatingLinkEditor({ editor }) {
+function FloatingLinkEditor({ editor }: { editor: LexicalEditor }) {
   const editorRef = useRef(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const mouseDownRef = useRef(false);
@@ -697,7 +698,17 @@ export function ToolbarPlugin() {
             aria-label="Justify Align"
           >
             <i className="format justify-align" />
-          </button>{' '}
+          </button>
+          <Divider />
+          <button
+            onClick={() => {
+              editor.dispatchCommand(INSERT_COLLAPSIBLE_COMMAND, undefined);
+            }}
+            className="toolbar-item spaced"
+            aria-label="Add Collapsible"
+          >
+            <small>Collapsible</small>
+          </button>
         </>
       )}
     </div>
