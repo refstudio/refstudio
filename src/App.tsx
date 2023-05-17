@@ -19,7 +19,8 @@ function App() {
     if (!editorRef.current.main) return;
     editorRef.current.main.update(() => {
       $getSelection()?.insertNodes([
-        $createReferenceNode(reference).setFormat('bold'),
+        $createReferenceNode(reference),
+        // .setFormat('bold'),
         // $createTextNode(`[${referenceId}]`).setFormat('bold'),
       ]);
     });
