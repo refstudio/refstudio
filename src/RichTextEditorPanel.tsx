@@ -95,7 +95,7 @@ export default function RichTextEditorPanel({
           <button onClick={() => setVisibleTreeView(!visibleTreeView)}>
             TreeView
           </button>
-          <UpdateButton />
+          <AddTextButton />
         </h1>
         <div className="editor-container">
           <ToolbarPlugin />
@@ -124,15 +124,17 @@ export default function RichTextEditorPanel({
   );
 }
 
-function UpdateButton() {
+function AddTextButton() {
   const [editor] = useLexicalComposerContext();
 
   function editText() {
     editor.update(() => {
-      $getSelection()?.insertText(` [Ref 1]`);
+      $getSelection()?.insertNodes([
+        $createTextNode(' bold ').setFormat('bold'),
+      ]);
     });
   }
-  return <button onClick={editText}>update</button>;
+  return <button onClick={editText}>add text</button>;
 }
 
 function prepopulatedRichText() {
