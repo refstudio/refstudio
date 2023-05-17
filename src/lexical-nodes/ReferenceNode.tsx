@@ -1,20 +1,18 @@
-import { DecoratorNode, EditorConfig, LexicalNode, NodeKey } from 'lexical';
-import { ReactNode } from 'react';
-import { Reference } from '../Reference';
+import { EditorConfig, LexicalNode, NodeKey, TextNode } from 'lexical';
 import { ReferenceItem } from '../types/ReferenceItem';
 
-export class ReferenceNode extends DecoratorNode<ReactNode> {
+export class ReferenceNode extends TextNode {
   __ref: ReferenceItem;
-  //   __color: string;
+  __color: string;
 
   constructor(ref: ReferenceItem, key?: NodeKey) {
-    super(key);
+    super(`[${ref.id}]`, key);
     this.__ref = ref;
-    // this.__color = 'red';
+    this.__color = 'red';
   }
 
   static getType(): string {
-    return 'reference-node';
+    return 'reference-text-node';
   }
 
   static clone(node: ReferenceNode): ReferenceNode {
@@ -22,32 +20,22 @@ export class ReferenceNode extends DecoratorNode<ReactNode> {
   }
 
   createDOM(config: EditorConfig): HTMLElement {
-    // const element = super.createDOM(config);
-    // element.style.color = this.__color;
-    // return element;
-    return document.createElement('div');
+    const element = super.createDOM(config);
+    element.style.color = this.__color;
+    return element;
   }
 
-  updateDOM(
-    prevNode: ReferenceNode,
-    dom: HTMLElement,
-    config: EditorConfig,
-  ): false {
-    //     const isUpdated = super.updateDOM(prevNode, dom, config);
-    //     if (prevNode.__color !== this.__color) {
-    //       dom.style.color = this.__color;
-    //     }
-    //     return isUpdated;
-    return false;
-  }
-
-  decorate(): ReactNode {
-    return <Reference ref={this.__ref} />;
+  updateDOM(prevNode: ReferenceNode, dom: HTMLElement, config: EditorConfig) {
+    const isUpdated = super.updateDOM(prevNode, dom, config);
+    if (prevNode.__color !== this.__color) {
+      dom.style.color = this.__color;
+    }
+    return isUpdated;
   }
 }
 
 export function $createReferenceNode(ref: ReferenceItem): ReferenceNode {
-  return new ReferenceNode(ref);
+  return new ReferenceNode(ref).setMode('token');
 }
 
 export function $isReferenceNode(node?: LexicalNode): boolean {
