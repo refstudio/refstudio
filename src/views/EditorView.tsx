@@ -30,6 +30,7 @@ import {
 import { ToolbarPlugin } from './../plugins/TollbarPlugin';
 
 import { useState } from 'react';
+import useDebounce from '../hooks/useDebounce';
 import { TreeViewPlugin } from './../plugins/TreeViewPlugin';
 import './EditorView.css';
 
@@ -68,6 +69,7 @@ export default function EditorView({
   onSelection: (selection: string) => any;
 }) {
   const [visibleTreeView, setVisibleTreeView] = useState(false);
+  const debouncedHandleSelection = useDebounce(onSelection, 200);
 
   // When the editor changes, you can get notified via the
   // LexicalOnChangePlugin!
@@ -80,7 +82,7 @@ export default function EditorView({
       console.log(root, selection);
 
       const selectedText = selection?.getTextContent();
-      selectedText && onSelection(selectedText);
+      selectedText && debouncedHandleSelection(selectedText);
     });
   }
 
