@@ -39,7 +39,6 @@ import { $createCollapsibleContainerNode } from '../plugins/CollapsiblePlugin/Co
 import { $createCollapsibleContentNode } from '../plugins/CollapsiblePlugin/CollapsibleContentNode';
 import { $createCollapsibleTitleNode } from '../plugins/CollapsiblePlugin/CollapsibleTitleNode';
 import { TreeViewPlugin } from './../plugins/TreeViewPlugin';
-import './EditorView.css';
 
 function Placeholder() {
   return <div className="editor-placeholder">Enter some rich text...</div>;
@@ -108,14 +107,18 @@ export default function EditorView({
           </button>
         </span>
       </h1>
-      <div className="editor-container">
+      <div className="editor-container h-full">
         <ToolbarPlugin />
-        <div className="editor-inner">
+        <div className=" flex h-full flex-col">
           <RichTextPlugin
-            contentEditable={<ContentEditable className="editor-input" />}
+            contentEditable={
+              <ContentEditable className="w-full flex-grow p-2 leading-relaxed focus:outline-none" />
+            }
             placeholder={<Placeholder />}
             ErrorBoundary={LexicalErrorBoundary}
           />
+          {visibleTreeView && <TreeViewPlugin />}
+
           <HistoryPlugin />
           <ListPlugin />
           <LinkPlugin />
@@ -129,7 +132,6 @@ export default function EditorView({
           />
           <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
         </div>
-        {visibleTreeView && <TreeViewPlugin />}
       </div>
     </LexicalComposer>
   );

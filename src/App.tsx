@@ -32,12 +32,12 @@ function App() {
       direction="horizontal"
       style={{ height: '100vh' }}
     >
-      <Panel defaultSize={20} style={{ padding: 10 }}>
+      <Panel defaultSize={20} className="p-3">
         <FoldersView />
       </Panel>
       <VerticalResizeHandle />
 
-      <Panel defaultSize={60} style={{ padding: 10 }}>
+      <Panel defaultSize={60} className="p-3">
         <EditorView
           onChange={(editor) => (editorRef.current.main = editor)}
           onSelection={setSelection}
@@ -47,11 +47,11 @@ function App() {
       <VerticalResizeHandle />
       <Panel>
         <PanelGroup direction="vertical">
-          <Panel style={{ padding: 10 }}>
+          <Panel className="p-3">
             <ReferencesView onRefClicked={handleRefClicked} />
           </Panel>
           <HorizontalResizeHandle />
-          <Panel style={{ padding: 10 }}>
+          <Panel className="p-3">
             <AIView selection={selection} />
           </Panel>
         </PanelGroup>
