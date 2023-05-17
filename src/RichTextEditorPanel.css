@@ -1,7 +1,7 @@
 .editor-container {
     border-radius: 10px;
     border: solid 1px #ECECEC;
-    height: 80vh;
+    height: 50vh;
     display: grid;
     grid-template-rows: auto 1fr;
 }

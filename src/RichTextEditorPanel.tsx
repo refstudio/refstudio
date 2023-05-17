@@ -33,6 +33,8 @@ import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 
 import './RichTextEditorPanel.css';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { TreeViewPlugin } from './plugins/TreeViewPlugin';
+import { useState } from 'react';
 
 function Placeholder() {
   return <div className="editor-placeholder">Enter some rich text...</div>;
@@ -68,6 +70,8 @@ export default function RichTextEditorPanel({
   onChange: (editor: LexicalEditor) => any;
   onSelection: (selection: string) => any;
 }) {
+  const [visibleTreeView, setVisibleTreeView] = useState(true);
+
   // When the editor changes, you can get notified via the
   // LexicalOnChangePlugin!
   function handleOnChange(editorState: EditorState, editor: LexicalEditor) {
@@ -88,6 +92,9 @@ export default function RichTextEditorPanel({
       <LexicalComposer initialConfig={editorConfig}>
         <h1>
           Editor
+          <button onClick={() => setVisibleTreeView(!visibleTreeView)}>
+            TreeView
+          </button>
           <UpdateButton />
         </h1>
         <div className="editor-container">
@@ -110,6 +117,7 @@ export default function RichTextEditorPanel({
             />
             <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
           </div>
+          {visibleTreeView && <TreeViewPlugin />}
         </div>
       </LexicalComposer>
     </Panel>
