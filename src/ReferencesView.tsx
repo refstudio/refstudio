@@ -1,13 +1,11 @@
-import { Panel } from 'react-resizable-panels';
-
-export function ReferencesPanel({
+export function ReferencesView({
   onRefClicked,
 }: {
   onRefClicked?: (reference: string) => any;
 }) {
   const refs = ['Ref 1', 'Ref 2', 'Ref 3', 'Ref 4'];
   return (
-    <Panel defaultSize={20} style={{ padding: 10 }}>
+    <div>
       <h1>References</h1>
       <ul>
         {refs.map((ref) => (
@@ -20,6 +18,6 @@ export function ReferencesPanel({
           </li>
         ))}
       </ul>
-    </Panel>
+    </div>
   );
 }

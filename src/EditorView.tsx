@@ -1,40 +1,38 @@
-import { Panel } from 'react-resizable-panels';
+import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 import {
   InitialConfigType,
   LexicalComposer,
 } from '@lexical/react/LexicalComposer';
-import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
-import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
-import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
+import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
+import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 
-import { HeadingNode, QuoteNode } from '@lexical/rich-text';
-import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
-import { ListItemNode, ListNode } from '@lexical/list';
 import { CodeHighlightNode, CodeNode } from '@lexical/code';
 import { AutoLinkNode, LinkNode } from '@lexical/link';
+import { ListItemNode, ListNode } from '@lexical/list';
+import { TRANSFORMERS } from '@lexical/markdown';
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin';
-import { TRANSFORMERS } from '@lexical/markdown';
-import { ToolbarPlugin } from './plugins/TollbarPlugin';
+import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
+import { HeadingNode, QuoteNode } from '@lexical/rich-text';
+import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 import {
   $createParagraphNode,
   $createTextNode,
   $getRoot,
   $getSelection,
-  $getTextContent,
   EditorState,
   LexicalEditor,
   ParagraphNode,
 } from 'lexical';
-import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
+import { ToolbarPlugin } from './plugins/TollbarPlugin';
 
-import './RichTextEditorPanel.css';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { TreeViewPlugin } from './plugins/TreeViewPlugin';
 import { useState } from 'react';
+import './EditorView.css';
+import { TreeViewPlugin } from './plugins/TreeViewPlugin';
 
 function Placeholder() {
   return <div className="editor-placeholder">Enter some rich text...</div>;
@@ -63,7 +61,7 @@ const editorConfig: InitialConfigType = {
   editorState: prepopulatedRichText,
 };
 
-export default function RichTextEditorPanel({
+export default function EditorView({
   onChange,
   onSelection,
 }: {
@@ -88,39 +86,37 @@ export default function RichTextEditorPanel({
   }
 
   return (
-    <Panel defaultSize={60} style={{ padding: 10 }}>
-      <LexicalComposer initialConfig={editorConfig}>
-        <h1>
-          Editor
-          <button onClick={() => setVisibleTreeView(!visibleTreeView)}>
-            TreeView
-          </button>
-          <AddTextButton />
-        </h1>
-        <div className="editor-container">
-          <ToolbarPlugin />
-          <div className="editor-inner">
-            <RichTextPlugin
-              contentEditable={<ContentEditable className="editor-input" />}
-              placeholder={<Placeholder />}
-              ErrorBoundary={LexicalErrorBoundary}
-            />
-            <HistoryPlugin />
-            <ListPlugin />
-            <LinkPlugin />
-            <AutoFocusPlugin />
-            <OnChangePlugin
-              onChange={(state, editor) => {
-                handleOnChange(state, editor);
-                onChange(editor);
-              }}
-            />
-            <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
-          </div>
-          {visibleTreeView && <TreeViewPlugin />}
+    <LexicalComposer initialConfig={editorConfig}>
+      <h1>
+        Editor
+        <button onClick={() => setVisibleTreeView(!visibleTreeView)}>
+          TreeView
+        </button>
+        <AddTextButton />
+      </h1>
+      <div className="editor-container">
+        <ToolbarPlugin />
+        <div className="editor-inner">
+          <RichTextPlugin
+            contentEditable={<ContentEditable className="editor-input" />}
+            placeholder={<Placeholder />}
+            ErrorBoundary={LexicalErrorBoundary}
+          />
+          <HistoryPlugin />
+          <ListPlugin />
+          <LinkPlugin />
+          <AutoFocusPlugin />
+          <OnChangePlugin
+            onChange={(state, editor) => {
+              handleOnChange(state, editor);
+              onChange(editor);
+            }}
+          />
+          <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
         </div>
-      </LexicalComposer>
-    </Panel>
+        {visibleTreeView && <TreeViewPlugin />}
+      </div>
+    </LexicalComposer>
   );
 }
 

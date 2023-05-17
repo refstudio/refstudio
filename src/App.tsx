@@ -1,10 +1,10 @@
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { GreetingPanel } from './GreetingPanel';
+import { $getSelection, LexicalEditor } from 'lexical';
 import { useRef, useState } from 'react';
-import { EditorPanel } from './EditorPanel';
-import RichTextEditorPanel from './RichTextEditorPanel';
-import { ReferencesPanel } from './ReferencesPanel';
-import { $createParagraphNode, $getSelection, LexicalEditor } from 'lexical';
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import { AIView } from './AIView';
+import EditorView from './EditorView';
+import { FoldersView } from './FoldersView';
+import { ReferencesView } from './ReferencesView';
 
 function App() {
   const [selection, setSelection] = useState('');
@@ -32,31 +32,35 @@ function App() {
       direction="horizontal"
       style={{ height: '100vh' }}
     >
-      <ReferencesPanel onRefClicked={handleRefClicked} />
-      <ResizeHandle />
+      <Panel defaultSize={20} style={{ padding: 10 }}>
+        <FoldersView />
+      </Panel>
+      <VerticalResizeHandle />
 
-      {/* <EditorPanel onSelection={setSelection} /> */}
-      <RichTextEditorPanel
-        onChange={(editor) => (editorRef.current.main = editor)}
-        onSelection={setSelection}
-      />
+      <Panel defaultSize={60} style={{ padding: 10 }}>
+        <EditorView
+          onChange={(editor) => (editorRef.current.main = editor)}
+          onSelection={setSelection}
+        />
+      </Panel>
 
-      <ResizeHandle />
-      <AIPanel selection={selection} />
+      <VerticalResizeHandle />
+      <Panel>
+        <PanelGroup direction="vertical">
+          <Panel style={{ padding: 10 }}>
+            <AIView selection={selection} />
+          </Panel>
+          <HorizontalResizeHandle />
+          <Panel style={{ padding: 10 }}>
+            <ReferencesView onRefClicked={handleRefClicked} />
+          </Panel>
+        </PanelGroup>
+      </Panel>
     </PanelGroup>
   );
 }
 
-function AIPanel({ selection }: { selection: string }) {
-  return (
-    <Panel defaultSize={20} style={{ padding: 10 }}>
-      <h1>AI</h1>
-      <div>{selection}</div>
-    </Panel>
-  );
-}
-
-function ResizeHandle() {
+function VerticalResizeHandle() {
   return (
     <PanelResizeHandle
       style={{
@@ -65,6 +69,20 @@ function ResizeHandle() {
         display: 'flex',
         alignItems: 'center',
         width: 10,
+      }}
+    ></PanelResizeHandle>
+  );
+}
+
+function HorizontalResizeHandle() {
+  return (
+    <PanelResizeHandle
+      style={{
+        backgroundColor: '#EFEFEF',
+
+        display: 'flex',
+        alignItems: 'center',
+        height: 10,
       }}
     ></PanelResizeHandle>
   );
