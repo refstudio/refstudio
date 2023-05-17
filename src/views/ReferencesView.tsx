@@ -1,7 +1,9 @@
+import { ReferenceItem } from '../types/ReferenceItem';
+
 export function ReferencesView({
   onRefClicked,
 }: {
-  onRefClicked?: (referenceId: string, item: ReferenceItem) => any;
+  onRefClicked?: (item: ReferenceItem) => any;
 }) {
   return (
     <div>
@@ -15,7 +17,7 @@ export function ReferencesView({
           <li
             key={ref.id}
             className="mb-0 cursor-pointer p-1 hover:bg-slate-100"
-            onClick={() => onRefClicked && onRefClicked(ref.id, ref)}
+            onClick={() => onRefClicked && onRefClicked(ref)}
           >
             <strong>{ref.id}</strong> - {ref.title}
             <br />
@@ -31,9 +33,7 @@ export function ReferencesView({
   );
 }
 
-type ReferenceItem = (typeof REFS_DATABASE)[0];
-
-const REFS_DATABASE = [
+const REFS_DATABASE: ReferenceItem[] = [
   {
     id: 'ref1',
     title: 'Artificial Intelligence: A Modern Approach',

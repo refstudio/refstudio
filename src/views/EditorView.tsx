@@ -31,6 +31,7 @@ import { ToolbarPlugin } from './../plugins/TollbarPlugin';
 
 import { useState } from 'react';
 import useDebounce from '../hooks/useDebounce';
+import { ReferenceNode } from '../lexical-nodes/ReferenceNode';
 import { TreeViewPlugin } from './../plugins/TreeViewPlugin';
 import './EditorView.css';
 
@@ -57,6 +58,7 @@ const editorConfig: InitialConfigType = {
     TableRowNode,
     AutoLinkNode,
     LinkNode,
+    ReferenceNode,
   ],
   editorState: prepopulatedRichText,
 };

@@ -1,6 +1,8 @@
-import { $createTextNode, $getSelection, LexicalEditor } from 'lexical';
+import { $getSelection, LexicalEditor } from 'lexical';
 import { useRef, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import { $createReferenceNode } from './lexical-nodes/ReferenceNode';
+import { ReferenceItem } from './types/ReferenceItem';
 import { AIView } from './views/AIView';
 import EditorView from './views/EditorView';
 import { FoldersView } from './views/FoldersView';
@@ -13,11 +15,12 @@ function App() {
     main: null as LexicalEditor | null,
   });
 
-  function handleRefClicked(referenceId: string) {
+  function handleRefClicked(reference: ReferenceItem) {
     if (!editorRef.current.main) return;
     editorRef.current.main.update(() => {
       $getSelection()?.insertNodes([
-        $createTextNode(`[${referenceId}]`).setFormat('bold'),
+        $createReferenceNode(reference).setFormat('bold'),
+        // $createTextNode(`[${referenceId}]`).setFormat('bold'),
       ]);
     });
   }
