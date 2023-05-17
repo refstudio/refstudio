@@ -1,10 +1,10 @@
-import { $getSelection, LexicalEditor } from 'lexical';
+import { $createTextNode, $getSelection, LexicalEditor } from 'lexical';
 import { useRef, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { AIView } from './AIView';
-import EditorView from './EditorView';
-import { FoldersView } from './FoldersView';
-import { ReferencesView } from './ReferencesView';
+import { AIView } from './views/AIView';
+import EditorView from './views/EditorView';
+import { FoldersView } from './views/FoldersView';
+import { ReferencesView } from './views/ReferencesView';
 
 function App() {
   const [selection, setSelection] = useState('');
@@ -13,16 +13,12 @@ function App() {
     main: null as LexicalEditor | null,
   });
 
-  function handleRefClicked(reference: string) {
-    console.log('REF CLICKED', reference);
+  function handleRefClicked(referenceId: string) {
     if (!editorRef.current.main) return;
     editorRef.current.main.update(() => {
-      $getSelection()?.insertText(`[${reference}]`);
-
-      // const editor = editorRef.current.main;
-      // const state = editor?.getEditorState();
-      // const selection = state?._selection;
-      // if (selection) selection.insertText(`[${reference}`);
+      $getSelection()?.insertNodes([
+        $createTextNode(`[${referenceId}]`).setFormat('bold'),
+      ]);
     });
   }
 
@@ -48,11 +44,11 @@ function App() {
       <Panel>
         <PanelGroup direction="vertical">
           <Panel style={{ padding: 10 }}>
-            <AIView selection={selection} />
+            <ReferencesView onRefClicked={handleRefClicked} />
           </Panel>
           <HorizontalResizeHandle />
           <Panel style={{ padding: 10 }}>
-            <ReferencesView onRefClicked={handleRefClicked} />
+            <AIView selection={selection} />
           </Panel>
         </PanelGroup>
       </Panel>
@@ -62,29 +58,13 @@ function App() {
 
 function VerticalResizeHandle() {
   return (
-    <PanelResizeHandle
-      style={{
-        backgroundColor: '#EFEFEF',
-
-        display: 'flex',
-        alignItems: 'center',
-        width: 10,
-      }}
-    ></PanelResizeHandle>
+    <PanelResizeHandle className="flex w-1 items-center bg-gray-200 hover:bg-blue-100" />
   );
 }
 
 function HorizontalResizeHandle() {
   return (
-    <PanelResizeHandle
-      style={{
-        backgroundColor: '#EFEFEF',
-
-        display: 'flex',
-        alignItems: 'center',
-        height: 10,
-      }}
-    ></PanelResizeHandle>
+    <PanelResizeHandle className="flex h-1 items-center bg-gray-200 hover:bg-blue-100" />
   );
 }
 export default App;

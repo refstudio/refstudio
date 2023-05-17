@@ -27,12 +27,11 @@ import {
   LexicalEditor,
   ParagraphNode,
 } from 'lexical';
-import { ToolbarPlugin } from './plugins/TollbarPlugin';
+import { ToolbarPlugin } from './../plugins/TollbarPlugin';
 
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { useState } from 'react';
+import { TreeViewPlugin } from './../plugins/TreeViewPlugin';
 import './EditorView.css';
-import { TreeViewPlugin } from './plugins/TreeViewPlugin';
 
 function Placeholder() {
   return <div className="editor-placeholder">Enter some rich text...</div>;
@@ -68,7 +67,7 @@ export default function EditorView({
   onChange: (editor: LexicalEditor) => any;
   onSelection: (selection: string) => any;
 }) {
-  const [visibleTreeView, setVisibleTreeView] = useState(true);
+  const [visibleTreeView, setVisibleTreeView] = useState(false);
 
   // When the editor changes, you can get notified via the
   // LexicalOnChangePlugin!
@@ -87,12 +86,16 @@ export default function EditorView({
 
   return (
     <LexicalComposer initialConfig={editorConfig}>
-      <h1>
+      <h1 className="flex justify-between">
         Editor
-        <button onClick={() => setVisibleTreeView(!visibleTreeView)}>
-          TreeView
-        </button>
-        <AddTextButton />
+        <span className="flex gap-2 text-sm">
+          <button
+            className="rounded-md border bg-gray-400 px-1 py-0 text-white hover:bg-gray-500"
+            onClick={() => setVisibleTreeView(!visibleTreeView)}
+          >
+            Lexical Tree
+          </button>
+        </span>
       </h1>
       <div className="editor-container">
         <ToolbarPlugin />
@@ -118,19 +121,6 @@ export default function EditorView({
       </div>
     </LexicalComposer>
   );
-}
-
-function AddTextButton() {
-  const [editor] = useLexicalComposerContext();
-
-  function editText() {
-    editor.update(() => {
-      $getSelection()?.insertNodes([
-        $createTextNode(' bold ').setFormat('bold'),
-      ]);
-    });
-  }
-  return <button onClick={editText}>add text</button>;
 }
 
 function prepopulatedRichText() {
