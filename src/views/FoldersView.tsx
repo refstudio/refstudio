@@ -40,13 +40,9 @@ const FileTreeNode = ({ node }: { node: FileTreeNode }) => {
   );
 };
 
-const FileIcon = () => (
-  <span className="inline-flex px-1 font-mono font-bold">-</span>
-);
+const FileIcon = () => <span className="inline-flex px-1 font-mono font-bold">-</span>;
 
-const FolderIcon = () => (
-  <span className="inline-flex px-1 font-mono font-bold">+</span>
-);
+const FolderIcon = () => <span className="inline-flex px-1 font-mono font-bold">+</span>;
 
 type FileTree = typeof tree;
 type FileTreeNode = FileTree[0];

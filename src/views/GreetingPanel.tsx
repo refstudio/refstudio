@@ -1,6 +1,6 @@
+import { invoke } from '@tauri-apps/api/tauri';
 import { useState } from 'react';
 import { Panel } from 'react-resizable-panels';
-import { invoke } from '@tauri-apps/api/tauri';
 
 export function GreetingPanel() {
   const [greetMsg, setGreetMsg] = useState('');
@@ -20,11 +20,7 @@ export function GreetingPanel() {
             greet();
           }}
         >
-          <input
-            id="greet-input"
-            onChange={(e) => setName(e.currentTarget.value)}
-            placeholder="Enter a name..."
-          />
+          <input id="greet-input" onChange={(e) => setName(e.currentTarget.value)} placeholder="Enter a name..." />
           <button type="submit">Greet</button>
         </form>
         <p>{greetMsg}</p>

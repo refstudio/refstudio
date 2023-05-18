@@ -1,8 +1,5 @@
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
-import {
-  InitialConfigType,
-  LexicalComposer,
-} from '@lexical/react/LexicalComposer';
+import { InitialConfigType, LexicalComposer } from '@lexical/react/LexicalComposer';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
@@ -33,9 +30,7 @@ import { useState } from 'react';
 import useDebounce from '../hooks/useDebounce';
 import { ReferenceNode } from '../lexical-nodes/ReferenceNode';
 import AutoLinkPlugin from '../plugins/AutoLinkPlugin';
-import CollapsiblePlugin, {
-  CollapsibleNodes,
-} from '../plugins/CollapsiblePlugin';
+import CollapsiblePlugin, { CollapsibleNodes } from '../plugins/CollapsiblePlugin';
 import { $createCollapsibleContainerNode } from '../plugins/CollapsiblePlugin/CollapsibleContainerNode';
 import { $createCollapsibleContentNode } from '../plugins/CollapsiblePlugin/CollapsibleContentNode';
 import { $createCollapsibleTitleNode } from '../plugins/CollapsiblePlugin/CollapsibleTitleNode';
@@ -100,21 +95,14 @@ export default function EditorView({
       <h1 className="flex justify-between">
         Editor
         <span className="flex gap-2 text-sm">
-          <button
-            className="rounded-md border bg-gray-400 px-1 py-0 text-white hover:bg-gray-500"
-            onClick={() => setVisibleTreeView(!visibleTreeView)}
-          >
-            Lexical Tree
-          </button>
+          <ActionsButton text="Lexical Tree" onClick={() => setVisibleTreeView(!visibleTreeView)} />
         </span>
       </h1>
       <div className="editor-container h-full">
         <ToolbarPlugin />
         <div className=" flex h-full flex-col">
           <RichTextPlugin
-            contentEditable={
-              <ContentEditable className="w-full flex-grow p-2 leading-relaxed focus:outline-none" />
-            }
+            contentEditable={<ContentEditable className="w-full flex-grow p-2 leading-relaxed focus:outline-none" />}
             placeholder={<Placeholder />}
             ErrorBoundary={LexicalErrorBoundary}
           />
@@ -136,6 +124,14 @@ export default function EditorView({
         </div>
       </div>
     </LexicalComposer>
+  );
+}
+
+function ActionsButton({ text, onClick }: { text: string; onClick: () => any }) {
+  return (
+    <button className="rounded-md border bg-gray-400 px-1 py-0 text-white hover:bg-gray-500" onClick={onClick}>
+      {text}
+    </button>
   );
 }
 
@@ -182,9 +178,7 @@ function prepopulatedRichText() {
 
     root.append(
       $createParagraphNode().append(
-        $createTextNode(
-          `If you'd like to find out more about Lexical, you can use https://lexical.dev/`,
-        ),
+        $createTextNode(`If you'd like to find out more about Lexical, you can use https://lexical.dev/`),
       ),
     );
   }

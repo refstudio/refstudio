@@ -1,9 +1,4 @@
-import {
-  $createCodeNode,
-  $isCodeNode,
-  getCodeLanguages,
-  getDefaultCodeLanguage,
-} from '@lexical/code';
+import { $createCodeNode, $isCodeNode, getCodeLanguages, getDefaultCodeLanguage } from '@lexical/code';
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link';
 import {
   $isListNode,
@@ -13,16 +8,8 @@ import {
   REMOVE_LIST_COMMAND,
 } from '@lexical/list';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import {
-  $createHeadingNode,
-  $createQuoteNode,
-  $isHeadingNode,
-} from '@lexical/rich-text';
-import {
-  $isAtNodeEnd,
-  $isParentElementRTL,
-  $wrapNodes,
-} from '@lexical/selection';
+import { $createHeadingNode, $createQuoteNode, $isHeadingNode } from '@lexical/rich-text';
+import { $isAtNodeEnd, $isParentElementRTL, $wrapNodes } from '@lexical/selection';
 import { $getNearestNodeOfType, mergeRegister } from '@lexical/utils';
 import {
   $createParagraphNode,
@@ -49,15 +36,7 @@ import './TollbarPlugin.css';
 
 const LowPriority = 1;
 
-const supportedBlockTypes = new Set([
-  'paragraph',
-  'quote',
-  'code',
-  'h1',
-  'h2',
-  'ul',
-  'ol',
-]);
+const supportedBlockTypes = new Set(['paragraph', 'quote', 'code', 'h1', 'h2', 'ul', 'ol']);
 
 const blockTypeToBlockName = {
   code: 'Code Block',
@@ -84,9 +63,7 @@ function positionEditorElement(editor: HTMLDivElement, rect: DOMRect | null) {
   } else {
     editor.style.opacity = '1';
     editor.style.top = `${rect.top + rect.height + window.pageYOffset + 10}px`;
-    editor.style.left = `${
-      rect.left + window.pageXOffset - editor.offsetWidth / 2 + rect.width / 2
-    }px`;
+    editor.style.left = `${rect.left + window.pageXOffset - editor.offsetWidth / 2 + rect.width / 2}px`;
   }
 }
 
@@ -96,9 +73,7 @@ function FloatingLinkEditor({ editor }: { editor: LexicalEditor }) {
   const mouseDownRef = useRef(false);
   const [linkUrl, setLinkUrl] = useState('');
   const [isEditMode, setEditMode] = useState(false);
-  const [lastSelection, setLastSelection] = useState<
-    null | RangeSelection | NodeSelection | GridSelection
-  >(null);
+  const [lastSelection, setLastSelection] = useState<null | RangeSelection | NodeSelection | GridSelection>(null);
 
   const updateLinkEditor = useCallback(() => {
     const selection = $getSelection();
@@ -262,12 +237,7 @@ function getSelectedNode(selection) {
   }
 }
 
-function BlockOptionsDropdownList({
-  editor,
-  blockType,
-  toolbarRef,
-  setShowBlockOptionsDropDown,
-}) {
+function BlockOptionsDropdownList({ editor, blockType, toolbarRef, setShowBlockOptionsDropDown }) {
   const dropDownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -432,8 +402,7 @@ export function ToolbarPlugin() {
   const [canRedo, setCanRedo] = useState(false);
   const [blockType, setBlockType] = useState('paragraph');
   const [selectedElementKey, setSelectedElementKey] = useState('');
-  const [showBlockOptionsDropDown, setShowBlockOptionsDropDown] =
-    useState(false);
+  const [showBlockOptionsDropDown, setShowBlockOptionsDropDown] = useState(false);
   const [codeLanguage, setCodeLanguage] = useState('');
   const [isRTL, setIsRTL] = useState(false);
   const [isLink, setIsLink] = useState(false);
@@ -447,10 +416,7 @@ export function ToolbarPlugin() {
     const selection = $getSelection();
     if ($isRangeSelection(selection)) {
       const anchorNode = selection.anchor.getNode();
-      const element =
-        anchorNode.getKey() === 'root'
-          ? anchorNode
-          : anchorNode.getTopLevelElementOrThrow();
+      const element = anchorNode.getKey() === 'root' ? anchorNode : anchorNode.getTopLevelElementOrThrow();
       const elementKey = element.getKey();
       const elementDOM = editor.getElementByKey(elementKey);
       if (elementDOM !== null) {
@@ -460,9 +426,7 @@ export function ToolbarPlugin() {
           const type = parentList ? parentList.getTag() : element.getTag();
           setBlockType(type);
         } else {
-          const type = $isHeadingNode(element)
-            ? element.getTag()
-            : element.getType();
+          const type = $isHeadingNode(element) ? element.getTag() : element.getType();
           setBlockType(type);
           if ($isCodeNode(element)) {
             setCodeLanguage(element.getLanguage() || getDefaultCodeLanguage());
@@ -572,9 +536,7 @@ export function ToolbarPlugin() {
         <>
           <button
             className="toolbar-item block-controls"
-            onClick={() =>
-              setShowBlockOptionsDropDown(!showBlockOptionsDropDown)
-            }
+            onClick={() => setShowBlockOptionsDropDown(!showBlockOptionsDropDown)}
             aria-label="Formatting Options"
           >
             <span className={'icon block-type ' + blockType} />
@@ -634,12 +596,8 @@ export function ToolbarPlugin() {
             <i className="format underline" />
           </button>
           <button
-            onClick={() =>
-              editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough')
-            }
-            className={
-              'toolbar-item spaced ' + (isStrikethrough ? 'active' : '')
-            }
+            onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough')}
+            className={'toolbar-item spaced ' + (isStrikethrough ? 'active' : '')}
             aria-label="Format Strikethrough"
           >
             <i className="format strikethrough" />
@@ -660,8 +618,7 @@ export function ToolbarPlugin() {
           >
             <i className="format link" />
           </button>
-          {isLink &&
-            createPortal(<FloatingLinkEditor editor={editor} />, document.body)}
+          {isLink && createPortal(<FloatingLinkEditor editor={editor} />, document.body)}
           <Divider />
           <button
             onClick={() => {

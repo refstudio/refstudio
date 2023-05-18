@@ -27,21 +27,14 @@ function App() {
   }
 
   return (
-    <PanelGroup
-      autoSaveId="ref-studio"
-      direction="horizontal"
-      style={{ height: '100vh' }}
-    >
+    <PanelGroup autoSaveId="ref-studio" direction="horizontal" style={{ height: '100vh' }}>
       <Panel defaultSize={20} className="p-3">
         <FoldersView />
       </Panel>
       <VerticalResizeHandle />
 
       <Panel defaultSize={60} className="p-3">
-        <EditorView
-          onChange={(editor) => (editorRef.current.main = editor)}
-          onSelection={setSelection}
-        />
+        <EditorView onChange={(editor) => (editorRef.current.main = editor)} onSelection={setSelection} />
       </Panel>
 
       <VerticalResizeHandle />
@@ -61,14 +54,10 @@ function App() {
 }
 
 function VerticalResizeHandle() {
-  return (
-    <PanelResizeHandle className="flex w-1 items-center bg-gray-200 hover:bg-blue-100" />
-  );
+  return <PanelResizeHandle className="flex w-1 items-center bg-gray-200 hover:bg-blue-100" />;
 }
 
 function HorizontalResizeHandle() {
-  return (
-    <PanelResizeHandle className="flex h-1 items-center bg-gray-200 hover:bg-blue-100" />
-  );
+  return <PanelResizeHandle className="flex h-1 items-center bg-gray-200 hover:bg-blue-100" />;
 }
 export default App;

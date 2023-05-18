@@ -28,11 +28,7 @@ export class ReferenceNode extends DecoratorNode<ReactNode> {
     return document.createElement('div');
   }
 
-  updateDOM(
-    prevNode: ReferenceNode,
-    dom: HTMLElement,
-    config: EditorConfig,
-  ): false {
+  updateDOM(prevNode: ReferenceNode, dom: HTMLElement, config: EditorConfig): false {
     //     const isUpdated = super.updateDOM(prevNode, dom, config);
     //     if (prevNode.__color !== this.__color) {
     //       dom.style.color = this.__color;
