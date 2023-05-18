@@ -1,0 +1,17 @@
+.resizeHandle {
+    display: flex;
+    align-items: center;
+    background-color: rgb(229 231 235);
+}
+
+.resizeHandle:hover {
+    background-color: rgb(219 234 254);
+}
+
+.horizontalHandle {
+    height: 0.25rem;
+}
+
+.verticalHandle {
+    width: 0.25rem;
+}
