@@ -1,3 +1,5 @@
+import { cx } from '../cx';
+
 export function FoldersView() {
   return (
     <div>
@@ -9,7 +11,7 @@ export function FoldersView() {
 
 const FileTree = ({ tree }: { tree: FileTree }) => {
   return (
-    <div className="px-4">
+    <div>
       <ul>
         {tree.map((node, index) => (
           <FileTreeNode key={index} node={node} />
@@ -24,9 +26,24 @@ const FileTreeNode = ({ node }: { node: FileTreeNode }) => {
 
   return (
     <li>
-      <div className="mb-2 flex flex-row items-center">
+      <div
+        className={cx(
+          'overflow-hidden text-ellipsis whitespace-nowrap',
+          'mb-2 flex flex-row items-center', //
+          {
+            'bg-slate-100': node.selected,
+            'cursor-pointer hover:bg-slate-100': !isDirectory,
+          },
+        )}
+      >
         {isDirectory ? <FolderIcon /> : <FileIcon />}
-        <span>{node.name}</span>
+        <span
+          className={cx({
+            'font-bold': isDirectory,
+          })}
+        >
+          {node.name}
+        </span>
       </div>
 
       {isDirectory && (
@@ -40,9 +57,9 @@ const FileTreeNode = ({ node }: { node: FileTreeNode }) => {
   );
 };
 
-const FileIcon = () => <span className="inline-flex px-1 font-mono font-bold">-</span>;
+const FileIcon = () => <span className="inline-flex px-1 font-mono font-bold">&#xB7;</span>;
 
-const FolderIcon = () => <span className="inline-flex px-1 font-mono font-bold">+</span>;
+const FolderIcon = () => <span className="inline-flex px-1 font-mono font-bold"></span>;
 
 type FileTree = typeof tree;
 type FileTreeNode = FileTree[0];
@@ -50,35 +67,22 @@ type FileTreeNode = FileTree[0];
 const tree = [
   {
     name: 'file1.md',
+    selected: true,
   },
   {
     name: 'file2.txt',
   },
   {
-    name: 'folder1',
+    name: 'Uploads',
     children: [
       {
-        name: 'file3.txt',
+        name: 'Deep Learning.pdf',
       },
       {
-        name: 'file4.md',
+        name: 'Artificial Intelligence: A Modern Approach.pdf',
       },
       {
-        name: 'file5.md',
-      },
-    ],
-  },
-  {
-    name: 'folder2',
-    children: [
-      {
-        name: 'file6.md',
-      },
-      {
-        name: 'file7.txt',
-      },
-      {
-        name: 'file8.txt',
+        name: 'Pattern Recognition and Machine Learning.pdf',
       },
     ],
   },
