@@ -5,7 +5,7 @@ import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 
-import { CodeHighlightNode, CodeNode } from '@lexical/code';
+import { $createCodeNode, $isCodeNode, CodeHighlightNode, CodeNode } from '@lexical/code';
 import { AutoLinkNode, LinkNode } from '@lexical/link';
 import { ListItemNode, ListNode } from '@lexical/list';
 import { TRANSFORMERS } from '@lexical/markdown';
@@ -13,7 +13,7 @@ import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
-import { HeadingNode, QuoteNode } from '@lexical/rich-text';
+import { $createHeadingNode, HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 import {
   $createParagraphNode,
@@ -26,7 +26,10 @@ import {
 } from 'lexical';
 import { ToolbarPlugin } from './../plugins/TollbarPlugin';
 
-import { useState } from 'react';
+import { $convertFromMarkdownString, $convertToMarkdownString } from '@lexical/markdown';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
+import { useCallback, useState } from 'react';
 import useDebounce from '../hooks/useDebounce';
 import { ReferenceNode } from '../lexical-nodes/ReferenceNode';
 import AutoLinkPlugin from '../plugins/AutoLinkPlugin';
@@ -34,6 +37,7 @@ import CollapsiblePlugin, { CollapsibleNodes } from '../plugins/CollapsiblePlugi
 import { $createCollapsibleContainerNode } from '../plugins/CollapsiblePlugin/CollapsibleContainerNode';
 import { $createCollapsibleContentNode } from '../plugins/CollapsiblePlugin/CollapsibleContentNode';
 import { $createCollapsibleTitleNode } from '../plugins/CollapsiblePlugin/CollapsibleTitleNode';
+import { PLAYGROUND_TRANSFORMERS } from '../plugins/MarkdownTransformers';
 import { TreeViewPlugin } from './../plugins/TreeViewPlugin';
 
 function Placeholder() {
@@ -61,6 +65,7 @@ const editorConfig: InitialConfigType = {
     LinkNode,
     ReferenceNode,
     ...CollapsibleNodes,
+    HorizontalRuleNode,
   ],
   editorState: prepopulatedRichText,
 };
@@ -95,6 +100,7 @@ export default function EditorView({
       <h1 className="flex justify-between">
         Editor
         <span className="flex gap-2 text-sm">
+          <ToggleMarkdownButton />
           <ActionsButton text="Lexical Tree" onClick={() => setVisibleTreeView(!visibleTreeView)} />
         </span>
       </h1>
@@ -114,6 +120,7 @@ export default function EditorView({
           <CollapsiblePlugin />
           <AutoFocusPlugin />
           <AutoLinkPlugin />
+          <MarkdownShortcutPlugin />
           <OnChangePlugin
             onChange={(state, editor) => {
               handleOnChange(state, editor);
@@ -127,6 +134,26 @@ export default function EditorView({
   );
 }
 
+function ToggleMarkdownButton() {
+  const [editor] = useLexicalComposerContext();
+
+  const handleMarkdownToggle = useCallback(() => {
+    editor.update(() => {
+      const root = $getRoot();
+      const firstChild = root.getFirstChild();
+      if ($isCodeNode(firstChild) && firstChild.getLanguage() === 'markdown') {
+        $convertFromMarkdownString(firstChild.getTextContent(), PLAYGROUND_TRANSFORMERS);
+      } else {
+        const markdown = $convertToMarkdownString(PLAYGROUND_TRANSFORMERS);
+        root.clear().append($createCodeNode('markdown').append($createTextNode(markdown)));
+      }
+      root.selectEnd();
+    });
+  }, [editor]);
+
+  return <ActionsButton text="Markdown" onClick={handleMarkdownToggle} />;
+}
+
 function ActionsButton({ text, onClick }: { text: string; onClick: () => any }) {
   return (
     <button className="rounded-md border bg-gray-400 px-1 py-0 text-white hover:bg-gray-500" onClick={onClick}>
@@ -138,6 +165,7 @@ function ActionsButton({ text, onClick }: { text: string; onClick: () => any }) 
 function prepopulatedRichText() {
   const root = $getRoot();
   if (root.getFirstChild() === null) {
+    root.append($createHeadingNode('h1').append($createTextNode('Project X')));
     root.append(
       $createParagraphNode().append(
         $createTextNode('This editor is a demo environment built with '),
@@ -151,8 +179,6 @@ function prepopulatedRichText() {
       ),
     );
 
-    root.append($createParagraphNode());
-
     root.append(
       $createParagraphNode().append(
         $createTextNode(
@@ -160,6 +186,13 @@ function prepopulatedRichText() {
         ),
       ),
     );
+    root.append(
+      $createParagraphNode().append(
+        $createTextNode(`If you'd like to find out more about Lexical, you can use https://lexical.dev/`),
+      ),
+    );
+
+    root.append($createHeadingNode('h2').append($createTextNode('Collapsible')));
 
     root.append(
       $createParagraphNode(),
@@ -174,12 +207,6 @@ function prepopulatedRichText() {
         ),
       ),
       $createParagraphNode(),
-    );
-
-    root.append(
-      $createParagraphNode().append(
-        $createTextNode(`If you'd like to find out more about Lexical, you can use https://lexical.dev/`),
-      ),
     );
   }
 }

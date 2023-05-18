@@ -27,3 +27,6 @@ a {
     @apply text-blue-500 underline cursor-pointer hover:no-underline;
 }
 
+p {
+    @apply my-4;
+}
