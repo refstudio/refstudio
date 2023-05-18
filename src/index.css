@@ -30,3 +30,10 @@ a {
 p {
     @apply my-4;
 }
+
+ul {
+   @apply mb-4; 
+}
+ul li {
+    @apply ml-4 list-disc;
+}
