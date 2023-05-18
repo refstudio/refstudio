@@ -6,7 +6,7 @@ import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 
 import { $createCodeNode, $isCodeNode, CodeHighlightNode, CodeNode } from '@lexical/code';
-import { AutoLinkNode, LinkNode } from '@lexical/link';
+import { $createLinkNode, AutoLinkNode, LinkNode } from '@lexical/link';
 import { ListItemNode, ListNode } from '@lexical/list';
 import { TRANSFORMERS } from '@lexical/markdown';
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
@@ -188,7 +188,9 @@ function prepopulatedRichText() {
     );
     root.append(
       $createParagraphNode().append(
-        $createTextNode(`If you'd like to find out more about Lexical, you can use https://lexical.dev/`),
+        $createTextNode(`If you'd like to find out more about Lexical, you can use https://lexical.dev/ and their `),
+        $createLinkNode('https://playground.lexical.dev/').append($createTextNode('playground')),
+        $createTextNode(`.`),
       ),
     );
 
