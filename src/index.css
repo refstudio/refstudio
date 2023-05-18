@@ -22,3 +22,8 @@ h3 {
 h4 {
     @apply text-lg;
 }
+
+a {
+    @apply text-blue-500 underline cursor-pointer hover:no-underline;
+}
+

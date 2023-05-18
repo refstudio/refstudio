@@ -32,6 +32,7 @@ import { ToolbarPlugin } from './../plugins/TollbarPlugin';
 import { useState } from 'react';
 import useDebounce from '../hooks/useDebounce';
 import { ReferenceNode } from '../lexical-nodes/ReferenceNode';
+import AutoLinkPlugin from '../plugins/AutoLinkPlugin';
 import CollapsiblePlugin, {
   CollapsibleNodes,
 } from '../plugins/CollapsiblePlugin';
@@ -124,6 +125,7 @@ export default function EditorView({
           <LinkPlugin />
           <CollapsiblePlugin />
           <AutoFocusPlugin />
+          <AutoLinkPlugin />
           <OnChangePlugin
             onChange={(state, editor) => {
               handleOnChange(state, editor);
