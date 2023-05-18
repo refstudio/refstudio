@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "refstudio"
+version = "0.1.0"
+description = ""
+authors = ["Greg Reda <gjreda+github@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9,<3.12"
+
+
+[tool.poetry.group.dev.dependencies]
+pyinstaller = "^5.11.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

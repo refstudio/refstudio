@@ -159,6 +159,7 @@ $RECYCLE.BIN/
 
 ### Application Specific ###
 # prevent downloaded zip and txt files being added to repo
+.idea
 .vscode/
 .cache
 .yarn/cache

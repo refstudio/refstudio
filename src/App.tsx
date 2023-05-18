@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Panel, PanelGroup } from 'react-resizable-panels';
 import { invoke } from '@tauri-apps/api/tauri';
+import { Command } from '@tauri-apps/api/shell';
+
 
 function App() {
   const [greetMsg, setGreetMsg] = useState('');
@@ -8,7 +10,9 @@ function App() {
 
   async function greet() {
     // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    setGreetMsg(await invoke('greet', { name }));
+    const command = Command.sidecar("bin/python/main");
+    const output = await command.execute();
+    setGreetMsg(await invoke('greet', { name: name, sender: output.stdout }));
   }
 
   return (
