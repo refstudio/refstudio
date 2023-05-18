@@ -16,7 +16,7 @@ $ poetry install
 ```
 
 To compile the python sidecar as a binary:
-```python
+```
 $ yarn python
 ```
 This will generate the binary at `src-tauri/bin/python` and append the appropriate [target triple](https://tauri.app/v1/guides/building/sidecar) required by Tauri.
