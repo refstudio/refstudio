@@ -8,6 +8,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { CollapsibleBlockNode } from './CollapsibleBlock/nodes/CollapsibleBlock';
 import { CollapsibleBlockContentNode } from './CollapsibleBlock/nodes/CollapsibleBlockContent';
 import { CollapsibleBlockSummaryNode } from './CollapsibleBlock/nodes/CollapsibleBlockSummary';
+import { ReferenceNode } from './Reference/ReferenceNode';
 import useDebounce from './hooks/useDebounce';
 import { ReferenceItem } from './types/ReferenceItem';
 import { AIView } from './views/AIView';
@@ -24,6 +25,7 @@ function App() {
       CollapsibleBlockNode,
       CollapsibleBlockContentNode,
       CollapsibleBlockSummaryNode,
+      ReferenceNode,
       Color.configure({ types: [TextStyle.name, ListItem.name] }),
       TextStyle,
       StarterKit.configure({
@@ -47,9 +49,10 @@ function App() {
   this is a <em>basic</em> example of <strong>tiptap</strong>. Sure, there are all kind of basic text styles you’d probably expect from a text editor. But wait until you see the lists:
   </p>
   <ul>
-    <li>
-      That’s a bullet list with one …
-    </li>
+  <li>
+  That’s a bullet list with one …
+  <span data-type="mention" data-id="ref1" class="mention"></span>
+  </li>
     <li>
       … or two list items.
     </li>
@@ -76,8 +79,9 @@ display: none;
   });
 
   const handleReferenceClicked = (reference: ReferenceItem) => {
-    const transaction = editor?.state.tr.insertText(reference.id);
-    transaction && editor?.view.dispatch(transaction);
+    if (editor) {
+      editor.chain().insertContentAt(editor.state.selection.head, { type: ReferenceNode.name, attrs: { id: reference.id } }).run();
+    }
   }
 
   return (

@@ -15,3 +15,7 @@
 .verticalHandle {
     width: 0.25rem;
 }
+
+.reference {
+    font-weight: bold;
+}
