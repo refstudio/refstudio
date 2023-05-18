@@ -28,7 +28,7 @@ import { ToolbarPlugin } from './../plugins/TollbarPlugin';
 
 import { $convertFromMarkdownString, $convertToMarkdownString } from '@lexical/markdown';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
+import { $createHorizontalRuleNode, HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
 import { useCallback, useState } from 'react';
 import useDebounce from '../hooks/useDebounce';
 import { ReferenceNode } from '../lexical-nodes/ReferenceNode';
@@ -186,6 +186,8 @@ function prepopulatedRichText() {
         ),
       ),
     );
+    root.append($createHorizontalRuleNode());
+
     root.append(
       $createParagraphNode().append(
         $createTextNode(`If you'd like to find out more about Lexical, you can use https://lexical.dev/ and their `),
@@ -197,7 +199,6 @@ function prepopulatedRichText() {
     root.append($createHeadingNode('h2').append($createTextNode('Collapsible')));
 
     root.append(
-      $createParagraphNode(),
       $createCollapsibleContainerNode(true).append(
         $createCollapsibleTitleNode().append($createTextNode('Title')),
         $createCollapsibleContentNode().append(
