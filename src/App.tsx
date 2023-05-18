@@ -27,7 +27,7 @@ function App() {
   }
 
   return (
-    <PanelGroup autoSaveId="ref-studio" direction="horizontal" style={{ height: '100vh' }}>
+    <PanelGroup autoSaveId="ref-studio" direction="horizontal" className="min-h-screen">
       <Panel defaultSize={20} className="p-3">
         <FoldersView />
       </Panel>
