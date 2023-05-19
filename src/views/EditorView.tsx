@@ -158,7 +158,7 @@ interface TipTapProps {
   editor: Editor;
 }
 
-export default ({ editor }: TipTapProps) => {
+export const EditorView = ({ editor }: TipTapProps) => {
   return (
     <div>
       <MenuBar editor={editor} />
