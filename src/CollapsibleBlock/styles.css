@@ -48,7 +48,7 @@
 }
 
 .collapsible-block>button:before {
-  content: "\25b6";
+    content: "\25bc";
     display: flex;
     justify-content: center;
     align-items: center;
@@ -56,8 +56,8 @@
     height: 1.5em;
 }
 
-.collapsible-block>button.open:before{
-  content: "\25bc";
+.collapsible-block>button.folded:before{
+  content: "\25b6";
 }
 
 .collapsible-block .content {
