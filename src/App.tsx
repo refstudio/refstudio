@@ -102,11 +102,7 @@ function App() {
   };
 
   return (
-    <PanelGroup
-      autoSaveId="refstudio"
-      direction="horizontal"
-      className="h-full"
-    >
+    <PanelGroup autoSaveId="refstudio" direction="horizontal">
       <Panel defaultSize={20} collapsible className="overflow-scroll p-4">
         <FoldersView />
       </Panel>

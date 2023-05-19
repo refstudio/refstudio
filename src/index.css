@@ -40,3 +40,14 @@ p {
 .reference {
   font-weight: bold;
 }
+
+body {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+
+/* Make root full-height */
+body > div#root {
+  height: 100vh;
+}
