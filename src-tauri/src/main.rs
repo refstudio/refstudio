@@ -7,9 +7,15 @@ fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
 
+#[tauri::command]
+fn interact_with_ai(selection: &str) -> String {
+    format!("{}: {}", selection.len(), selection.to_uppercase())
+}
+
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![greet])
+        .invoke_handler(tauri::generate_handler!(interact_with_ai))
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
