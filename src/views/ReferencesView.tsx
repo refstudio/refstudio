@@ -17,17 +17,17 @@ export function ReferencesView({
             </p>
 
             <ul style={{ borderWidth: "1px" }}>
-                {REFS_DATABASE.map((ref) => (
+                {REFS_DATABASE.map((reference) => (
                     <li
-                        key={ref.id}
+                        key={reference.id}
                         style={{ marginBottom: "0px", cursor: "pointer", padding: "0.25rem" }}
-                        onClick={() => onRefClicked && onRefClicked(ref)}
+                        onClick={() => onRefClicked && onRefClicked(reference)}
                     >
-                        <strong>{ref.id}</strong> - {ref.title}
+                        <strong>{reference.id}</strong> - {reference.title}
                         <br />
                         <small>
                             <em>
-                                {ref.author}, {ref.year} by {ref.publisher}
+                                {reference.author}, {reference.year} by {reference.publisher}
                             </em>
                         </small>
                     </li>
