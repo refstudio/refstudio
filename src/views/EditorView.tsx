@@ -1,9 +1,23 @@
-import { Editor, EditorContent } from '@tiptap/react'
+import { Editor, EditorContent } from '@tiptap/react';
+import * as React from 'react';
 
 const MenuBar = ({ editor }: { editor: Editor }) => {
     if (!editor) {
         return null
     }
+
+    const [markdownMode, setMarkdownMode] = React.useState(false)
+
+    const handleToggleMarkdown = React.useCallback(() => {
+        if (!markdownMode) {
+            const markdown = editor.storage.markdown.getMarkdown();
+            editor.commands.setContent({ type: 'codeBlock', attrs: { language: 'markdown' }, content: [{ type: 'text', text: markdown }] });
+            setMarkdownMode(true)
+        } else {
+            editor.commands.setContent(editor.state.doc.child(0).content.firstChild?.text ?? '');
+            setMarkdownMode(false);
+        }
+    }, [editor, markdownMode]);
 
     return (
         <>
@@ -166,6 +180,11 @@ const MenuBar = ({ editor }: { editor: Editor }) => {
                 className={editor.isActive('textStyle', { color: '#958DF1' }) ? 'is-active' : ''}
             >
                 purple
+            </button>
+            <button
+                onClick={handleToggleMarkdown}
+            >
+                Toggle Markdown
             </button>
         </>
     )

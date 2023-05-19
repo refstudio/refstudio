@@ -961,6 +961,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tiptap/extension-code-block-lowlight@npm:^2.0.3":
+  version: 2.0.3
+  resolution: "@tiptap/extension-code-block-lowlight@npm:2.0.3"
+  peerDependencies:
+    "@tiptap/core": ^2.0.0
+    "@tiptap/extension-code-block": ^2.0.0
+    "@tiptap/pm": ^2.0.0
+  checksum: b243ca1390977cdc29057194ff54d6189c83b2b5c6a13b96b57eedaebd90d2b3fa1527b79123cc5c2800abd64913c27c405d605350373e76f4dd6d8140989146
+  languageName: node
+  linkType: hard
+
 "@tiptap/extension-code-block@npm:^2.0.3":
   version: 2.0.3
   resolution: "@tiptap/extension-code-block@npm:2.0.3"
@@ -1230,6 +1241,39 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/hast@npm:^2.0.0":
+  version: 2.3.4
+  resolution: "@types/hast@npm:2.3.4"
+  dependencies:
+    "@types/unist": "*"
+  checksum: fff47998f4c11e21a7454b58673f70478740ecdafd95aaf50b70a3daa7da9cdc57315545bf9c039613732c40b7b0e9e49d11d03fe9a4304721cdc3b29a88141e
+  languageName: node
+  linkType: hard
+
+"@types/linkify-it@npm:*":
+  version: 3.0.2
+  resolution: "@types/linkify-it@npm:3.0.2"
+  checksum: dff8f10fafb885422474e456596f12d518ec4cdd6c33cca7a08e7c86b912d301ed91cf5a7613e148c45a12600dc9ab3d85ad16d5b48dc1aaeda151a68f16b536
+  languageName: node
+  linkType: hard
+
+"@types/markdown-it@npm:^12.2.3":
+  version: 12.2.3
+  resolution: "@types/markdown-it@npm:12.2.3"
+  dependencies:
+    "@types/linkify-it": "*"
+    "@types/mdurl": "*"
+  checksum: 868824a3e4d00718ba9cd4762cf16694762a670860f4b402e6e9f952b6841a2027488bdc55d05c2b960bf5078df21a9d041270af7e8949514645fe88fdb722ac
+  languageName: node
+  linkType: hard
+
+"@types/mdurl@npm:*":
+  version: 1.0.2
+  resolution: "@types/mdurl@npm:1.0.2"
+  checksum: 79c7e523b377f53cf1f5a240fe23d0c6cae856667692bd21bf1d064eafe5ccc40ae39a2aa0a9a51e8c94d1307228c8f6b121e847124591a9a828c3baf65e86e2
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:^18.7.10":
   version: 18.16.1
   resolution: "@types/node@npm:18.16.1"
@@ -1289,6 +1333,13 @@ __metadata:
   version: 2.1.0
   resolution: "@types/throttle-debounce@npm:2.1.0"
   checksum: 70e219d000595108fce0dc624c8296e37cdb174b528e09c939da18e619da1c6df86b088659f5eb93cb146bd5fe2954597823c2e1f0849dc8f6585d87cbbf71b7
+  languageName: node
+  linkType: hard
+
+"@types/unist@npm:*":
+  version: 2.0.6
+  resolution: "@types/unist@npm:2.0.6"
+  checksum: 25cb860ff10dde48b54622d58b23e66214211a61c84c0f15f88d38b61aa1b53d4d46e42b557924a93178c501c166aa37e28d7f6d994aba13d24685326272d5db
   languageName: node
   linkType: hard
 
@@ -1913,12 +1964,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fault@npm:^2.0.0":
+  version: 2.0.1
+  resolution: "fault@npm:2.0.1"
+  dependencies:
+    format: ^0.2.0
+  checksum: c9b30f47d95769177130a9409976a899ed31eb598450fbad5b0d39f2f5f56d5f4a9ff9257e0bee8407cb0fc3ce37165657888c6aa6d78472e403893104329b72
+  languageName: node
+  linkType: hard
+
 "fill-range@npm:^7.0.1":
   version: 7.0.1
   resolution: "fill-range@npm:7.0.1"
   dependencies:
     to-regex-range: ^5.0.1
   checksum: cc283f4e65b504259e64fd969bcf4def4eb08d85565e906b7d36516e87819db52029a76b6363d0f02d0d532f0033c9603b9e2d943d56ee3b0d4f7ad3328ff917
+  languageName: node
+  linkType: hard
+
+"format@npm:^0.2.0":
+  version: 0.2.2
+  resolution: "format@npm:0.2.2"
+  checksum: 646a60e1336250d802509cf24fb801e43bd4a70a07510c816fa133aa42cdbc9c21e66e9cc0801bb183c5b031c9d68be62e7fbb6877756e52357850f92aa28799
   languageName: node
   linkType: hard
 
@@ -2039,6 +2106,13 @@ __metadata:
   version: 2.0.1
   resolution: "has-unicode@npm:2.0.1"
   checksum: 1eab07a7436512db0be40a710b29b5dc21fa04880b7f63c9980b706683127e3c1b57cb80ea96d47991bdae2dfe479604f6a1ba410106ee1046a41d1bd0814400
+  languageName: node
+  linkType: hard
+
+"highlight.js@npm:~11.8.0":
+  version: 11.8.0
+  resolution: "highlight.js@npm:11.8.0"
+  checksum: d2578a57aee7315946ff19379053fd0a28b127baabf7617ab1d28d62cdc4eaf3d75053569cb8479a5afdc7a68f1ba9a6c1d612d8ae399b4b9aa43093b4fb6831
   languageName: node
   linkType: hard
 
@@ -2324,6 +2398,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lowlight@npm:^2.9.0":
+  version: 2.9.0
+  resolution: "lowlight@npm:2.9.0"
+  dependencies:
+    "@types/hast": ^2.0.0
+    fault: ^2.0.0
+    highlight.js: ~11.8.0
+  checksum: 6fa0c747018a5ba4d226121c1018a891249b2614c6a62ff135c6f32c0c3c3fa248f76c019c1bb8a79cdcf3fef034b508afc2827db94283b493f30702f5503ab7
+  languageName: node
+  linkType: hard
+
 "lru-cache@npm:^5.1.1":
   version: 5.1.1
   resolution: "lru-cache@npm:5.1.1"
@@ -2386,6 +2471,13 @@ __metadata:
     socks-proxy-agent: ^7.0.0
     ssri: ^9.0.0
   checksum: 2332eb9a8ec96f1ffeeea56ccefabcb4193693597b132cd110734d50f2928842e22b84cfa1508e921b8385cdfd06dda9ad68645fed62b50fff629a580f5fb72c
+  languageName: node
+  linkType: hard
+
+"markdown-it-task-lists@npm:^2.1.1":
+  version: 2.1.1
+  resolution: "markdown-it-task-lists@npm:2.1.1"
+  checksum: 8fc634bfc28a47ed582ca1f68af306f86289bdca0ca654de835bc28ac2c0a286894285fab34af21ec3a87e86fd19236bb0562b2dcb4d2fd34a9c992e3d3f41c2
   languageName: node
   linkType: hard
 
@@ -3041,6 +3133,7 @@ __metadata:
   dependencies:
     "@tauri-apps/api": ^1.2.0
     "@tauri-apps/cli": ^1.2.3
+    "@tiptap/extension-code-block-lowlight": ^2.0.3
     "@tiptap/extension-color": ^2.0.3
     "@tiptap/extension-mention": ^2.0.3
     "@tiptap/extension-text-style": ^2.0.3
@@ -3054,10 +3147,12 @@ __metadata:
     "@vitejs/plugin-react": ^3.0.0
     husky: ^8.0.3
     lint-staged: ^13.2.0
+    lowlight: ^2.9.0
     prettier: ^2.8.7
     react: ^18.2.0
     react-dom: ^18.2.0
     react-resizable-panels: ^0.0.42
+    tiptap-markdown: ^0.7.2
     typescript: ^4.9.5
     vite: ^4.2.1
   languageName: unknown
@@ -3390,6 +3485,20 @@ __metadata:
   dependencies:
     "@popperjs/core": ^2.9.0
   checksum: cac955318a65288e8d2dca05059878b003c6e66f92c94f7810f5bc5448eb6646abdf7dacc9bd00020e2611592598d0aae3a28ec9a45349a159603c3fdddce5fb
+  languageName: node
+  linkType: hard
+
+"tiptap-markdown@npm:^0.7.2":
+  version: 0.7.2
+  resolution: "tiptap-markdown@npm:0.7.2"
+  dependencies:
+    "@types/markdown-it": ^12.2.3
+    markdown-it: ^13.0.1
+    markdown-it-task-lists: ^2.1.1
+    prosemirror-markdown: ^1.10.1
+  peerDependencies:
+    "@tiptap/core": ^2.0.3
+  checksum: e8ac822ee6c0562abdc3e9ef7ee77db097e4f2c60f46a6793cf96544e65dbe357c8dc368734b0d57ef32c58d146e70b815e86ee9b9eb4697856ae2f284813ecb
   languageName: node
   linkType: hard
 
