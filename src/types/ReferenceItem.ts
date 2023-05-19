@@ -1,7 +1,7 @@
-export type ReferenceItem = {
+export interface ReferenceItem {
     id: string;
     title: string;
     author: string;
-    year: string;
+    year: number;
     publisher: string;
   };
