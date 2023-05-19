@@ -9,33 +9,33 @@ import {
 
 export interface ReferencesListProps {
     items: ReferenceItem[]
-    command: (referenceItem: ReferenceItem) => any
+    command: (referenceItem: ReferenceItem) => void
 }
 
-export const ReferencesList = forwardRef((props: ReferencesListProps, ref) => {
+export const ReferencesList = forwardRef(({ items, command }: ReferencesListProps, ref) => {
     const [selectedIndex, setSelectedIndex] = useState(0)
 
     const selectItem = (index: number) => {
-        const item = props.items[index]
+        const item = items[index]
 
         if (item) {
-            props.command(item)
+            command(item)
         }
     }
 
     const upHandler = () => {
-        setSelectedIndex((selectedIndex + props.items.length - 1) % props.items.length)
+        setSelectedIndex((selectedIndex + items.length - 1) % items.length)
     }
 
     const downHandler = () => {
-        setSelectedIndex((selectedIndex + 1) % props.items.length)
+        setSelectedIndex((selectedIndex + 1) % items.length)
     }
 
     const enterHandler = () => {
         selectItem(selectedIndex)
     }
 
-    useEffect(() => setSelectedIndex(0), [props.items])
+    useEffect(() => setSelectedIndex(0), [items])
 
     useImperativeHandle(ref, () => ({
         onKeyDown: ({ event }: SuggestionKeyDownProps) => {
@@ -60,8 +60,8 @@ export const ReferencesList = forwardRef((props: ReferencesListProps, ref) => {
 
     return (
         <div className="items">
-            {props.items.length
-                ? props.items.map((item, index) => (
+            {items.length
+                ? items.map((item, index) => (
                     <button
                         className={`item ${index === selectedIndex ? 'is-selected' : ''}`}
                         key={index}
