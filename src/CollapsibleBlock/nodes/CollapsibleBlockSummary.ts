@@ -1,4 +1,4 @@
-import { mergeAttributes, Node } from '@tiptap/core'
+import { mergeAttributes, Node } from '@tiptap/core';
 
 export const CollapsibleBlockSummaryNode = Node.create({
   name: 'collapsibleSummary',
@@ -16,6 +16,6 @@ export const CollapsibleBlockSummaryNode = Node.create({
   },
 
   renderHTML({ HTMLAttributes }) {
-    return ['collapsible-summary', mergeAttributes(HTMLAttributes), 0]
+    return ['collapsible-summary', mergeAttributes(HTMLAttributes), 0];
   },
 })

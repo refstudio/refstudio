@@ -74,6 +74,6 @@
   outline: none;
 }
 
-.folded div div {
+.folded collapsible-content {
   display: none;
 }

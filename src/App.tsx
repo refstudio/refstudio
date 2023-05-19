@@ -1,3 +1,4 @@
+import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import Color from '@tiptap/extension-color';
 import ListItem from '@tiptap/extension-list-item';
 import TextStyle from '@tiptap/extension-text-style';
@@ -5,6 +6,7 @@ import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import * as React from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import { Markdown } from 'tiptap-markdown';
 import { CollapsibleBlockNode } from './CollapsibleBlock/nodes/CollapsibleBlock';
 import { CollapsibleBlockContentNode } from './CollapsibleBlock/nodes/CollapsibleBlockContent';
 import { CollapsibleBlockSummaryNode } from './CollapsibleBlock/nodes/CollapsibleBlockSummary';
@@ -16,6 +18,13 @@ import EditorView from './views/EditorView';
 import { FoldersView } from './views/FoldersView';
 import { ReferencesView } from './views/ReferencesView';
 
+
+import js from 'highlight.js/lib/languages/javascript';
+import markdown from 'highlight.js/lib/languages/markdown';
+import { lowlight } from 'lowlight';
+lowlight.registerLanguage('markdown', markdown);
+lowlight.registerLanguage('js', js);
+
 function App() {
   const [selection, setSelection] = React.useState('');
   const debouncedSelection = useDebounce(selection, 200);
@@ -26,6 +35,10 @@ function App() {
       CollapsibleBlockContentNode,
       CollapsibleBlockSummaryNode,
       ReferenceNode,
+      Markdown,
+      CodeBlockLowlight.configure({
+        lowlight,
+      }),
       Color.configure({ types: [TextStyle.name, ListItem.name] }),
       TextStyle,
       StarterKit.configure({
@@ -43,7 +56,7 @@ function App() {
   <h2>
     Hi there,
   </h2>
-  <collapsible-block folded="false">Collapsible 1<collapsible-block>collapsible 1.1</collapsible-block><collapsible-block>collapsible 1.2</collapsible-block></collapsible-block>
+  <collapsible-block folded="false"><em>Collapsible 1</em><collapsible-block>collapsible 1.1</collapsible-block>Text<collapsible-block>collapsible 1.2</collapsible-block></collapsible-block>
   <collapsible-block>Collapsible 2<collapsible-block>collapsible 2.1</collapsible-block></collapsible-block>
   <p>
   this is a <em>basic</em> example of <strong>tiptap</strong>. Sure, there are all kind of basic text styles you’d probably expect from a text editor. But wait until you see the lists:
@@ -80,6 +93,7 @@ display: none;
 
   const handleReferenceClicked = (reference: ReferenceItem) => {
     if (editor) {
+      console.log(editor.getJSON())
       editor.chain().insertContentAt(editor.state.selection.head, { type: ReferenceNode.name, attrs: { id: reference.id } }).run();
     }
   }
@@ -90,12 +104,12 @@ display: none;
       direction="horizontal"
       style={{ height: '100vh' }}
     >
-      <Panel defaultSize={20} style={{ padding: "0.75rem" }}>
+      <Panel defaultSize={20} style={{ padding: "0.75rem", overflow: 'scroll' }}>
         <FoldersView />
       </Panel>
       <VerticalResizeHandle />
 
-      <Panel defaultSize={60} style={{ padding: "0.75rem" }}>
+      <Panel defaultSize={60} style={{ padding: "0.75rem", overflow: 'scroll' }}>
         {editor && <EditorView
           editor={editor}
         />}
@@ -104,11 +118,11 @@ display: none;
       <VerticalResizeHandle />
       <Panel>
         <PanelGroup direction="vertical">
-          <Panel style={{ padding: "0.75rem" }}>
+          <Panel style={{ padding: "0.75rem", overflow: 'scroll' }}>
             <ReferencesView onRefClicked={handleReferenceClicked} />
           </Panel>
           <HorizontalResizeHandle />
-          <Panel style={{ padding: "0.75rem" }}>
+          <Panel style={{ padding: "0.75rem", overflow: 'scroll' }}>
             <AIView selection={debouncedSelection} />
           </Panel>
         </PanelGroup>

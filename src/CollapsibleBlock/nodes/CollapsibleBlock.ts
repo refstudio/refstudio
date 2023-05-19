@@ -8,7 +8,7 @@ export const CollapsibleBlockNode = Node.create({
 
   group: 'block',
 
-  content: 'collapsibleSummary collapsibleContent?',
+  content: 'collapsibleSummary collapsibleContent',
   draggable:true,
 
   parseHTML() {
