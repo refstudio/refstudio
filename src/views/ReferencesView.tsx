@@ -8,19 +8,13 @@ export function ReferencesView({
     return (
         <div>
             <h1>References</h1>
-            <p style={{
-                marginTop: "1rem",
-                marginBottom: "1rem",
-                fontStyle: "italic"
-            }}>
-                Click on a reference to add it to the document.
-            </p>
+            <p className="my-4 italic">Click on a reference to add it to the document.</p>
 
-            <ul style={{ borderWidth: "1px" }}>
+            <ul className="divide-y-2 border">
                 {REFS_DATABASE.map((reference) => (
                     <li
                         key={reference.id}
-                        style={{ marginBottom: "0px", cursor: "pointer", padding: "0.25rem" }}
+                        className="mb-0 cursor-pointer p-1 hover:bg-slate-100"
                         onClick={() => onRefClicked && onRefClicked(reference)}
                     >
                         <strong>{reference.id}</strong> - {reference.title}

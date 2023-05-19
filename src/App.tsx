@@ -91,38 +91,39 @@ function App() {
     onSelectionUpdate({ editor }) {
       const { from, to } = editor.view.state.selection;
       setSelection(editor.view.state.doc.textBetween(from, to));
-    }
+    },
   });
 
   const handleReferenceClicked = (reference: ReferenceItem) => {
-    editor?.commands.insertContentAt(editor.state.selection.head, { type: ReferenceNode.name, attrs: { id: reference.id } });
-  }
+    editor?.commands.insertContentAt(editor.state.selection.head, {
+      type: ReferenceNode.name,
+      attrs: { id: reference.id },
+    });
+  };
 
   return (
     <PanelGroup
-      autoSaveId="ref-studio"
+      autoSaveId="refstudio"
       direction="horizontal"
-      style={{ height: '100vh' }}
+      className="h-full"
     >
-      <Panel defaultSize={20} style={{ padding: "0.75rem", overflow: 'scroll' }}>
+      <Panel defaultSize={20} collapsible className="overflow-scroll p-4">
         <FoldersView />
       </Panel>
       <VerticalResizeHandle />
 
-      <Panel defaultSize={60} style={{ padding: "0.75rem", overflow: 'scroll' }}>
-        {editor && <EditorView
-          editor={editor}
-        />}
+      <Panel defaultSize={60} className="overflow-scroll p-3">
+        {editor && <EditorView editor={editor} />}
       </Panel>
 
       <VerticalResizeHandle />
       <Panel>
-        <PanelGroup direction="vertical">
-          <Panel style={{ padding: "0.75rem", overflow: 'scroll' }}>
+        <PanelGroup autoSaveId="rs-right-sidebar" direction="vertical">
+          <Panel className="overflow-scroll p-3">
             <ReferencesView onRefClicked={handleReferenceClicked} />
           </Panel>
           <HorizontalResizeHandle />
-          <Panel style={{ padding: "0.75rem", overflow: 'scroll' }}>
+          <Panel className="overflow-scroll p-3">
             <AIView selection={debouncedSelection} />
           </Panel>
         </PanelGroup>
@@ -133,13 +134,13 @@ function App() {
 
 function VerticalResizeHandle() {
   return (
-    <PanelResizeHandle className="resizeHandle verticalHandle" />
+    <PanelResizeHandle className="flex w-1 items-center bg-gray-200 hover:bg-blue-100" />
   );
 }
 
 function HorizontalResizeHandle() {
   return (
-    <PanelResizeHandle className="resizeHandle horizontalHandle" />
+    <PanelResizeHandle className="flex h-1 items-center bg-gray-200 hover:bg-blue-100" />
   );
 }
 

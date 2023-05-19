@@ -194,7 +194,7 @@ export default ({ editor }: TipTapProps) => {
     return (
         <div>
             <MenuBar editor={editor} />
-            <EditorContent style={{ paddingLeft: "1em", paddingRight: '1em' }} editor={editor} />
+            <EditorContent className='px-2' editor={editor} />
         </div>
     );
 }

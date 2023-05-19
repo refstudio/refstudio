@@ -21,21 +21,15 @@ export function AIView({ selection }: { selection: string | null }) {
     return (
         <div>
             <h1>AI Interactions</h1>
-            <p style={{
-                marginTop: "1rem",
-                marginBottom: "1rem",
-                fontStyle: 'italic'
-            }}>
-                Select some text in the editor to see it here.
-            </p>
+            <p className="my-4 italic">Select some text in the editor to see it here.</p>
 
             {selection && (
-                <div style={{ display: 'flex', flexDirection: "column", gap: "1rem" }}>
-                    <div style={{ borderWidth: "1px", borderColor: "rgb(254 249 195)", backgroundColor: "rgb(254 252 232)", padding: "1rem" }}>
+                <div className="flex flex-col gap-4">
+                    <div className="border border-yellow-100 bg-yellow-50 p-4">
                         {selection}
                     </div>
                     <strong>REPLY</strong>
-                    <div style={{ borderWidth: "1px", borderColor: 'rgb(220 252 231)', backgroundColor: "rgb(240 253 244)", padding: "1rem" }}>{reply}</div>
+                    <div className="border border-green-100 bg-green-50 p-4">{reply}</div>
                 </div>
             )}
         </div>
