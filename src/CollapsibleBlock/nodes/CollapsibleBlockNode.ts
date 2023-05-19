@@ -2,8 +2,11 @@ import { mergeAttributes, Node } from '@tiptap/core';
 import { ReactNodeViewRenderer } from '@tiptap/react';
 import { CollapsibleBlock } from '../CollapsibleBlock';
 
+export interface CollapsibleBlockNodeAttributes {
+  folded: boolean
+}
 
-export const CollapsibleBlockNode = Node.create({
+export const CollapsibleBlockNode = Node.create<{}, {}>({
   name: 'collapsibleBlock',
 
   group: 'block',
@@ -31,7 +34,7 @@ export const CollapsibleBlockNode = Node.create({
     return ['collapsible-block', mergeAttributes(HTMLAttributes), 0]
   },
 
-  addAttributes() {
+  addAttributes(): {[K in keyof CollapsibleBlockNodeAttributes]: { default: CollapsibleBlockNodeAttributes[K] }} {
     return {
       folded: {
         default: true,
