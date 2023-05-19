@@ -1,5 +1,5 @@
 import { SuggestionKeyDownProps } from '@tiptap/suggestion';
-import { ReferenceItem } from '../types/ReferenceItem';
+import { ReferenceItem } from '../../types/ReferenceItem';
 import './ReferencesList.css';
 
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';

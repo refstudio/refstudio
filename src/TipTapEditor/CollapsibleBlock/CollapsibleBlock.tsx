@@ -1,8 +1,8 @@
 import { Node } from '@tiptap/pm/model';
 import { NodeViewContent, NodeViewWrapper } from '@tiptap/react';
-import { cx } from '../cx';
+import { cx } from '../../cx';
+import './CollapsibleBlock.css';
 import { CollapsibleBlockNodeAttributes } from './nodes/CollapsibleBlockNode';
-import './styles.css';
 
 // The attributes in this interface must correspond to the attributes defined in the `addAttributes` method of CollapsibleBlockNode
 export interface CollapsibleBlockProps {

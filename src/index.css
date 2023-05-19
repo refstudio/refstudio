@@ -36,11 +36,6 @@ p {
   @apply my-4;
 }
 
-/* Note: This style is required by the (TipTap) ReferenceNode component  */
-.reference {
-  font-weight: bold;
-}
-
 body {
   width: 100%;
   height: 100%;
