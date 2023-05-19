@@ -2,10 +2,6 @@ import { Editor, EditorContent } from '@tiptap/react';
 import * as React from 'react';
 
 const MenuBar = ({ editor }: { editor: Editor }) => {
-    if (!editor) {
-        return null
-    }
-
     const [markdownMode, setMarkdownMode] = React.useState(false)
 
     const handleToggleMarkdown = React.useCallback(() => {
