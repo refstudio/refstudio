@@ -1,0 +1,28 @@
+.tree-view-output {
+  display: block;
+  background: #EFEFEFEF;
+  color: #303030;
+  width: 100%;
+  padding: 0;
+  font-size: 12px;
+  margin: 1px auto 10px auto;
+  position: relative;
+  overflow: scroll;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.debug-treetype-button {
+  border: 0;
+  padding: 0;
+  font-size: 12px;
+  top: 10px;
+  right: 85px;
+  position: absolute;
+  background: none;
+  color: black;
+}
+
+.debug-treetype-button:hover {
+  text-decoration: underline;
+}

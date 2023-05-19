@@ -13,6 +13,8 @@ function App() {
   const [selection, setSelection] = React.useState<string | null>(null);
   const debouncedSelection = useDebounce(selection, 200);
 
+  const [editor, setEditor] = React.useState<'TipTap' | 'Lexical'>('TipTap');
+
   const editorRef = React.useRef<EditorAPI>();
 
   const handleReferenceClicked = (reference: ReferenceItem) => {
@@ -22,12 +24,18 @@ function App() {
   return (
     <PanelGroup autoSaveId="refstudio" direction="horizontal">
       <Panel defaultSize={20} collapsible className="overflow-scroll p-4">
-        <FoldersView />
+        <FoldersView
+          onClick={() => setEditor(editor === 'TipTap' ? 'Lexical' : 'TipTap')}
+        />
       </Panel>
       <VerticalResizeHandle />
 
       <Panel defaultSize={60} className="overflow-scroll p-3">
-        <EditorView onSelectionChange={setSelection} editorRef={editorRef} />
+        <EditorView
+          editor={editor}
+          onSelectionChange={setSelection}
+          editorRef={editorRef}
+        />
       </Panel>
 
       <VerticalResizeHandle />

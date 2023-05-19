@@ -1,27 +1,39 @@
 import { cx } from '../cx';
 
-export function FoldersView() {
+export function FoldersView({ onClick = () => {} }) {
   return (
     <div>
       <h1>Project X</h1>
-      <FileTree tree={tree} />
+      <FileTree onClick={onClick} tree={tree} />
     </div>
   );
 }
 
-const FileTree = ({ tree }: { tree: FileTree }) => {
+const FileTree = ({
+  tree,
+  onClick,
+}: {
+  tree: FileTree;
+  onClick: () => void;
+}) => {
   return (
     <div>
       <ul>
         {tree.map((node, index) => (
-          <FileTreeNode key={index} node={node} />
+          <FileTreeNode onClick={onClick} key={index} node={node} />
         ))}
       </ul>
     </div>
   );
 };
 
-const FileTreeNode = ({ node }: { node: FileTreeNode }) => {
+const FileTreeNode = ({
+  node,
+  onClick,
+}: {
+  node: FileTreeNode;
+  onClick: () => void;
+}) => {
   const isDirectory = node.children && node.children.length > 0;
 
   return (
@@ -41,6 +53,7 @@ const FileTreeNode = ({ node }: { node: FileTreeNode }) => {
           className={cx({
             'font-bold': isDirectory,
           })}
+          onClick={onClick}
         >
           {node.name}
         </span>
@@ -49,7 +62,7 @@ const FileTreeNode = ({ node }: { node: FileTreeNode }) => {
       {isDirectory && (
         <ul className="list-disc">
           {node.children.map((childNode, index) => (
-            <FileTreeNode key={index} node={childNode} />
+            <FileTreeNode onClick={onClick} key={index} node={childNode} />
           ))}
         </ul>
       )}
@@ -70,11 +83,11 @@ type FileTreeNode = FileTree[0];
 
 const tree = [
   {
-    name: 'file1.md',
+    name: 'file1.tiptap',
     selected: true,
   },
   {
-    name: 'file2.txt',
+    name: 'file2.lexical',
   },
   {
     name: 'Uploads',
