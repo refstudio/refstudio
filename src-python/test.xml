@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xml:space="preserve" xmlns="http://www.tei-c.org/ns/1.0" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:schemaLocation="http://www.tei-c.org/ns/1.0 https://raw.githubusercontent.com/kermitt2/grobid/master/grobid-home/schemas/xsd/Grobid.xsd"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+	<teiHeader xml:lang="en">
+		<fileDesc>
+			<titleStmt>
+				<title level="a" type="main">Hidden Technical Debt in Machine Learning Systems</title>
+			</titleStmt>
+			<publicationStmt>
+				<publisher/>
+				<availability status="unknown"><licence/></availability>
+			</publicationStmt>
+			<sourceDesc>
+				<biblStruct>
+					<analytic>
+						<author>
+							<persName><forename type="first">D</forename><surname>Sculley</surname></persName>
+							<email>dsculley@google.com</email>
+						</author>
+						<author>
+							<persName><forename type="first">Gary</forename><surname>Holt</surname></persName>
+							<email>gholt@google.com</email>
+						</author>
+						<author>
+							<persName><forename type="first">Daniel</forename><surname>Golovin</surname></persName>
+						</author>
+						<author>
+							<persName><forename type="first">Eugene</forename><surname>Davydov</surname></persName>
+							<email>edavydov@google.com</email>
+						</author>
+						<author>
+							<persName><forename type="first">Todd</forename><surname>Phillips</surname></persName>
+							<email>toddphillips@google.com</email>
+						</author>
+						<author>
+							<persName><forename type="first">Dietmar</forename><surname>Ebner</surname></persName>
+							<email>ebner@google.com</email>
+						</author>
+						<author>
+							<persName><forename type="first">Vinay</forename><surname>Chaudhary</surname></persName>
+							<email>vchaudhary@google.com</email>
+						</author>
+						<author>
+							<persName><forename type="first">Michael</forename><surname>Young</surname></persName>
+							<email>mwyoung@google.com</email>
+						</author>
+						<author>
+							<persName><forename type="first">Jean-Franc ¸ois</forename><surname>Crespo</surname></persName>
+							<email>jfcrespo@google.com</email>
+						</author>
+						<author>
+							<persName><forename type="first">Dan</forename><surname>Dennison</surname></persName>
+							<email>dennison@google.com</email>
+						</author>
+						<title level="a" type="main">Hidden Technical Debt in Machine Learning Systems</title>
+					</analytic>
+					<monogr>
+						<imprint>
+							<date/>
+						</imprint>
+					</monogr>
+					<idno type="MD5">5FBCA494C0AAEE1C2C7498C9F584BB73</idno>
+				</biblStruct>
+			</sourceDesc>
+		</fileDesc>
+		<encodingDesc>
+			<appInfo>
+				<application version="0.7.3" ident="GROBID" when="2023-05-18T03:47+0000">
+					<desc>GROBID - A machine learning software for extracting information from scholarly documents</desc>
+					<ref target="https://github.com/kermitt2/grobid"/>
+				</application>
+			</appInfo>
+		</encodingDesc>
+		<profileDesc>
+			<abstract>
+				<p>Machine learning offers a fantastically powerful toolkit for building useful complex prediction systems quickly. This paper argues it is dangerous to think of these quick wins as coming for free. Using the software engineering framework of technical debt, we find it is common to incur massive ongoing maintenance costs in real-world ML systems. We explore several ML-specific risk factors to account for in system design. These include boundary erosion, entanglement, hidden feedback loops, undeclared consumers, data dependencies, configuration issues, changes in the external world, and a variety of system-level anti-patterns.</p>
+			</abstract>
+		</profileDesc>
+	</teiHeader>
+	<text xml:lang="en">
+	</text>
+</TEI>
