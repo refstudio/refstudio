@@ -13,7 +13,7 @@ import { CollapsibleBlockSummaryNode } from './CollapsibleBlock/nodes/Collapsibl
 import { ReferenceNode } from './Reference/ReferenceNode';
 import { ReferenceItem } from './types/ReferenceItem';
 import { AIView } from './views/AIView';
-import EditorView from './views/EditorView';
+import { EditorView } from './views/EditorView';
 import { FoldersView } from './views/FoldersView';
 import { ReferencesView } from './views/ReferencesView';
 
