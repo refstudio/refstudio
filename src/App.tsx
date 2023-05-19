@@ -7,8 +7,8 @@ import StarterKit from '@tiptap/starter-kit';
 import * as React from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Markdown } from 'tiptap-markdown';
-import { CollapsibleBlockNode } from './CollapsibleBlock/nodes/CollapsibleBlock';
 import { CollapsibleBlockContentNode } from './CollapsibleBlock/nodes/CollapsibleBlockContent';
+import { CollapsibleBlockNode } from './CollapsibleBlock/nodes/CollapsibleBlockNode';
 import { CollapsibleBlockSummaryNode } from './CollapsibleBlock/nodes/CollapsibleBlockSummary';
 import { ReferenceNode } from './Reference/ReferenceNode';
 import { ReferenceItem } from './types/ReferenceItem';
@@ -26,7 +26,7 @@ lowlight.registerLanguage('markdown', markdown);
 lowlight.registerLanguage('js', js);
 
 function App() {
-  const [selection, setSelection] = React.useState('');
+  const [selection, setSelection] = React.useState<string | null>(null);
   const debouncedSelection = useDebounce(selection, 200);
 
   const editor = useEditor({
