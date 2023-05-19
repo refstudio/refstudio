@@ -1,13 +1,21 @@
 import { invoke } from '@tauri-apps/api/tauri';
 import { useEffect, useState } from 'react';
 
-export function AIView({ selection }: { selection: string }) {
+export function AIView({ selection }: { selection: string | null }) {
     const [reply, setReply] = useState('');
 
     useEffect(() => {
-        invoke<string>('interact_with_ai', { selection })
-            .then(setReply)
-            .catch((reason) => setReply('ERROR: ' + reason));
+        if (selection) {
+            async function interactWithAi() {
+                try {
+                    const aiReply = await invoke<string>('interact_with_ai', { selection });
+                    setReply(aiReply);
+                } catch (reason) {
+                    setReply('ERROR: ' + reason);
+                }
+            }
+            interactWithAi().catch(console.error);
+        }
     }, [selection]);
 
     return (
