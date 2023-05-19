@@ -1,9 +1,9 @@
 /* Basic editor styles */
 .ProseMirror {
-    > * + * {
-      margin-top: 0.75em;
-    }
+  > * + * {
+    margin-top: 0.75em;
   }
+}
 
 .draggable-item {
   display: flex;
@@ -11,10 +11,7 @@
   margin: 0.5rem 0;
   border-radius: 0.5rem;
   background: white;
-  box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.05),
-    0px 10px 20px rgba(0, 0, 0, 0.1),
-  ;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05), 0px 10px 20px rgba(0, 0, 0, 0.1);
   border: gray;
 }
 
@@ -32,14 +29,14 @@
 }
 
 .collapsible-block {
-    display: flex;
-    margin: 1rem 0;
-    border: 1px solid black;
-    border-radius: 0.5rem;
-    padding: 0.5rem;
+  display: flex;
+  margin: 1rem 0;
+  border: 1px solid black;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
 }
 
-.collapsible-block>button {
+.collapsible-block > button {
   display: flex;
   cursor: pointer;
   background: transparent;
@@ -47,17 +44,17 @@
   padding: 0;
 }
 
-.collapsible-block>button:before {
-    content: "\25bc";
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 1.5em;
-    height: 1.5em;
+.collapsible-block > button:before {
+  content: '\25bc';
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 1.5em;
+  height: 1.5em;
 }
 
-.collapsible-block>button.folded:before{
-  content: "\25b6";
+.collapsible-block > button.folded:before {
+  content: '\25b6';
 }
 
 .collapsible-block .content {
