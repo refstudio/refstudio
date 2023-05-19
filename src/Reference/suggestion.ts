@@ -1,54 +1,60 @@
-import { ReactRenderer } from '@tiptap/react'
-import tippy from 'tippy.js'
-import ReferencesList from './ReferencesList'
+import { MentionOptions } from '@tiptap/extension-mention';
+import { ReactRenderer } from '@tiptap/react';
+import { SuggestionKeyDownProps } from '@tiptap/suggestion';
+import tippy from 'tippy.js';
+import { ReferencesList, ReferencesListProps } from './ReferencesList';
 
-export const suggestion  = {
-  items: ({ query }:any) => {
+export const suggestion: MentionOptions['suggestion'] = {
+    items: ({ query }) => {
     return [
       'ref1',
       'ref2',
     ]
       .filter(item => item.toLowerCase().startsWith(query.toLowerCase()))
+      .map(item => ({ id: item }))
       .slice(0, 5)
   },
 
   render: () => {
-    let component: any
-    let popup: any
+    let component: ReactRenderer<{onKeyDown: (e: SuggestionKeyDownProps) => boolean }, ReferencesListProps>
+    let popup: ReturnType<typeof tippy>
 
     return {
-      onStart: (props: any) => {
-        component = new ReactRenderer(ReferencesList, {
-          props,
-          editor: props.editor,
-        })
+      onStart: (props) => {
+        component = new ReactRenderer<{onKeyDown: (e: SuggestionKeyDownProps) => boolean }, ReferencesListProps>(
+          ReferencesList,
+          {
+            props,
+            editor: props.editor,
+          }
+        );
 
         if (!props.clientRect) {
-          return
+          return;
         }
 
         popup = tippy('body', {
-          getReferenceClientRect: props.clientRect,
+          getReferenceClientRect: props.clientRect as any,
           appendTo: () => document.body,
           content: component.element,
           showOnCreate: true,
           interactive: true,
           trigger: 'manual',
           placement: 'bottom-start',
-        })
+        });
       },
 
-      onUpdate(props: any) {
+      onUpdate(_props) {
       },
 
-      onKeyDown(props: any) {
+      onKeyDown(props) {
         if (props.event.key === 'Escape') {
           popup[0].hide()
 
           return true
         }
 
-        return component.ref?.onKeyDown(props)
+        return component.ref?.onKeyDown(props) ?? false;
       },
 
       onExit() {
@@ -57,4 +63,4 @@ export const suggestion  = {
       },
     }
   },
-}
+};

@@ -1,3 +1,5 @@
+import { SuggestionKeyDownProps } from '@tiptap/suggestion'
+import { ReferenceItem } from '../types/ReferenceItem'
 import './ReferencesList.css'
 
 import {
@@ -5,14 +7,19 @@ import {
     useState,
 } from 'react'
 
-export default forwardRef((props: { items: Array<string>, command: ({ id }: { id: string }) => any }, ref) => {
+export interface ReferencesListProps {
+    items: ReferenceItem[]
+    command: (referenceItem: ReferenceItem) => any
+}
+
+export const ReferencesList = forwardRef((props: ReferencesListProps, ref) => {
     const [selectedIndex, setSelectedIndex] = useState(0)
 
     const selectItem = (index: number) => {
         const item = props.items[index]
 
         if (item) {
-            props.command({ id: item })
+            props.command(item)
         }
     }
 
@@ -31,7 +38,7 @@ export default forwardRef((props: { items: Array<string>, command: ({ id }: { id
     useEffect(() => setSelectedIndex(0), [props.items])
 
     useImperativeHandle(ref, () => ({
-        onKeyDown: ({ event }: any) => {
+        onKeyDown: ({ event }: SuggestionKeyDownProps) => {
             if (event.key === 'ArrowUp') {
                 upHandler()
                 return true
@@ -60,7 +67,7 @@ export default forwardRef((props: { items: Array<string>, command: ({ id }: { id
                         key={index}
                         onClick={() => selectItem(index)}
                     >
-                        {item}
+                        {item.id}
                     </button>
                 ))
                 : <div className="item">No result</div>
