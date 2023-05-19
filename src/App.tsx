@@ -91,15 +91,12 @@ function App() {
     onSelectionUpdate({ editor }) {
       const { from, to } = editor.view.state.selection;
       setSelection(editor.view.state.doc.textBetween(from, to));
-    },
+    }
   });
 
   const handleReferenceClicked = (reference: ReferenceItem) => {
-    editor?.commands.insertContentAt(editor.state.selection.head, {
-      type: ReferenceNode.name,
-      attrs: { id: reference.id },
-    });
-  };
+    editor?.commands.insertContentAt(editor.state.selection.head, { type: ReferenceNode.name, attrs: { id: reference.id } });
+  }
 
   return (
     <PanelGroup
@@ -107,29 +104,25 @@ function App() {
       direction="horizontal"
       style={{ height: '100vh' }}
     >
-      <Panel
-        defaultSize={20}
-        style={{ padding: '0.75rem', overflow: 'scroll' }}
-      >
+      <Panel defaultSize={20} style={{ padding: "0.75rem", overflow: 'scroll' }}>
         <FoldersView />
       </Panel>
       <VerticalResizeHandle />
 
-      <Panel
-        defaultSize={60}
-        style={{ padding: '0.75rem', overflow: 'scroll' }}
-      >
-        {editor && <EditorView editor={editor} />}
+      <Panel defaultSize={60} style={{ padding: "0.75rem", overflow: 'scroll' }}>
+        {editor && <EditorView
+          editor={editor}
+        />}
       </Panel>
 
       <VerticalResizeHandle />
       <Panel>
         <PanelGroup direction="vertical">
-          <Panel style={{ padding: '0.75rem', overflow: 'scroll' }}>
+          <Panel style={{ padding: "0.75rem", overflow: 'scroll' }}>
             <ReferencesView onRefClicked={handleReferenceClicked} />
           </Panel>
           <HorizontalResizeHandle />
-          <Panel style={{ padding: '0.75rem', overflow: 'scroll' }}>
+          <Panel style={{ padding: "0.75rem", overflow: 'scroll' }}>
             <AIView selection={debouncedSelection} />
           </Panel>
         </PanelGroup>
@@ -139,11 +132,15 @@ function App() {
 }
 
 function VerticalResizeHandle() {
-  return <PanelResizeHandle className="resizeHandle verticalHandle" />;
+  return (
+    <PanelResizeHandle className="resizeHandle verticalHandle" />
+  );
 }
 
 function HorizontalResizeHandle() {
-  return <PanelResizeHandle className="resizeHandle horizontalHandle" />;
+  return (
+    <PanelResizeHandle className="resizeHandle horizontalHandle" />
+  );
 }
 
 export default App;

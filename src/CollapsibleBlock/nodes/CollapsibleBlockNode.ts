@@ -3,7 +3,7 @@ import { ReactNodeViewRenderer } from '@tiptap/react';
 import { CollapsibleBlock } from '../CollapsibleBlock';
 
 export interface CollapsibleBlockNodeAttributes {
-  folded: boolean;
+  folded: boolean
 }
 
 export const CollapsibleBlockNode = Node.create<{}, {}>({
@@ -12,47 +12,37 @@ export const CollapsibleBlockNode = Node.create<{}, {}>({
   group: 'block',
 
   content: 'collapsibleSummary collapsibleContent',
-  draggable: true,
+  draggable:true,
 
   parseHTML() {
     return [
       {
         tag: 'collapsible-block',
       },
-    ];
+    ]
   },
 
   addKeyboardShortcuts() {
     return {
       'Mod-Enter': () => {
-        return this.editor
-          .chain()
-          .insertContentAt(this.editor.state.selection.head, {
-            type: this.type.name,
-          })
-          .focus()
-          .run();
+        return this.editor.chain().insertContentAt(this.editor.state.selection.head, { type: this.type.name }).focus().run()
       },
-    };
+    }
   },
 
   renderHTML({ HTMLAttributes }) {
-    return ['collapsible-block', mergeAttributes(HTMLAttributes), 0];
+    return ['collapsible-block', mergeAttributes(HTMLAttributes), 0]
   },
 
-  addAttributes(): {
-    [K in keyof CollapsibleBlockNodeAttributes]: {
-      default: CollapsibleBlockNodeAttributes[K];
-    };
-  } {
+  addAttributes(): {[K in keyof CollapsibleBlockNodeAttributes]: { default: CollapsibleBlockNodeAttributes[K] }} {
     return {
       folded: {
         default: true,
-      },
-    };
+      }
+    }
   },
 
   addNodeView() {
-    return ReactNodeViewRenderer(CollapsibleBlock);
+    return ReactNodeViewRenderer(CollapsibleBlock)
   },
-});
+})

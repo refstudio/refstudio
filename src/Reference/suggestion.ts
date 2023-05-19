@@ -5,29 +5,29 @@ import tippy from 'tippy.js';
 import { ReferencesList, ReferencesListProps } from './ReferencesList';
 
 export const suggestion: MentionOptions['suggestion'] = {
-  items: ({ query }) => {
-    return ['ref1', 'ref2']
-      .filter((item) => item.toLowerCase().startsWith(query.toLowerCase()))
-      .map((item) => ({ id: item }))
-      .slice(0, 5);
+    items: ({ query }) => {
+    return [
+      'ref1',
+      'ref2',
+    ]
+      .filter(item => item.toLowerCase().startsWith(query.toLowerCase()))
+      .map(item => ({ id: item }))
+      .slice(0, 5)
   },
 
   render: () => {
-    let component: ReactRenderer<
-      { onKeyDown: (e: SuggestionKeyDownProps) => boolean },
-      ReferencesListProps
-    >;
-    let popup: ReturnType<typeof tippy>;
+    let component: ReactRenderer<{onKeyDown: (e: SuggestionKeyDownProps) => boolean }, ReferencesListProps>
+    let popup: ReturnType<typeof tippy>
 
     return {
       onStart: (props) => {
-        component = new ReactRenderer<
-          { onKeyDown: (e: SuggestionKeyDownProps) => boolean },
-          ReferencesListProps
-        >(ReferencesList, {
-          props,
-          editor: props.editor,
-        });
+        component = new ReactRenderer<{onKeyDown: (e: SuggestionKeyDownProps) => boolean }, ReferencesListProps>(
+          ReferencesList,
+          {
+            props,
+            editor: props.editor,
+          }
+        );
 
         if (!props.clientRect) {
           return;
@@ -44,22 +44,23 @@ export const suggestion: MentionOptions['suggestion'] = {
         });
       },
 
-      onUpdate(_props) {},
+      onUpdate(_props) {
+      },
 
       onKeyDown(props) {
         if (props.event.key === 'Escape') {
-          popup[0].hide();
+          popup[0].hide()
 
-          return true;
+          return true
         }
 
         return component.ref?.onKeyDown(props) ?? false;
       },
 
       onExit() {
-        popup[0].destroy();
-        component.destroy();
+        popup[0].destroy()
+        component.destroy()
       },
-    };
+    }
   },
 };
