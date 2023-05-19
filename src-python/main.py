@@ -1,8 +1,9 @@
 from pathlib import Path
+from grobid_tei_xml.types import GrobidDocument
 import grobid_tei_xml
 
 
-def parse_xml_file(filepath: Path) -> str:
+def parse_xml_file(filepath: Path) -> GrobidDocument:
     if filepath.suffix != ".xml":
         raise ValueError("Filepath must be a .xml file")
 
