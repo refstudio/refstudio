@@ -11,7 +11,6 @@ import { CollapsibleBlockNode } from './CollapsibleBlock/nodes/CollapsibleBlock'
 import { CollapsibleBlockContentNode } from './CollapsibleBlock/nodes/CollapsibleBlockContent';
 import { CollapsibleBlockSummaryNode } from './CollapsibleBlock/nodes/CollapsibleBlockSummary';
 import { ReferenceNode } from './Reference/ReferenceNode';
-import useDebounce from './hooks/useDebounce';
 import { ReferenceItem } from './types/ReferenceItem';
 import { AIView } from './views/AIView';
 import EditorView from './views/EditorView';
@@ -22,6 +21,7 @@ import { ReferencesView } from './views/ReferencesView';
 import js from 'highlight.js/lib/languages/javascript';
 import markdown from 'highlight.js/lib/languages/markdown';
 import { lowlight } from 'lowlight';
+import { useDebounce } from 'usehooks-ts';
 lowlight.registerLanguage('markdown', markdown);
 lowlight.registerLanguage('js', js);
 
