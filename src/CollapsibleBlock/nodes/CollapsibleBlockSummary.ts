@@ -12,10 +12,10 @@ export const CollapsibleBlockSummaryNode = Node.create({
       {
         tag: 'collapsible-summary',
       },
-    ]
+    ];
   },
 
   renderHTML({ HTMLAttributes }) {
     return ['collapsible-summary', mergeAttributes(HTMLAttributes), 0];
   },
-})
+});
