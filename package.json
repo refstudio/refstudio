@@ -8,7 +8,7 @@
     "build": "tsc && vite build",
     "fmt": "prettier --config package.json --write '**/*'",
     "preview": "vite preview",
-    "python": "poetry run pyinstaller src-python/main.py --noconfirm --distpath src-tauri/bin/python && poetry run python scripts/move_binary.py",
+    "python": "poetry run pyinstaller src-python/main.py --noconfirm --distpath src-tauri/bin/python && bash scripts/move_binary.sh",
     "tauri": "tauri"
   },
   "dependencies": {
