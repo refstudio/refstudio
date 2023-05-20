@@ -1,6 +1,9 @@
+from argparse import ArgumentParser
 from pathlib import Path
 from grobid_tei_xml.types import GrobidDocument
 import grobid_tei_xml
+import json
+import sys
 
 
 def parse_xml_file(filepath: Path) -> GrobidDocument:
@@ -13,12 +16,21 @@ def parse_xml_file(filepath: Path) -> GrobidDocument:
     return doc
 
 
-def main():
-    print("Tauri Sidecar!")
-    filepath = Path("src-python/test.xml")
-    reference = parse_xml_file(filepath)
-    print(f"Parsed reference paper: {reference.header.title}")
+def get_word_count(text: str) -> int:
+    return len(text.strip().split(" "))
+
+
+def main(text: str):
+    try:
+        data = {"num_words": get_word_count(text)}
+        print(json.dumps(data))
+    except:
+        print("Error processing text", file=sys.stderr)
 
 
 if __name__ == '__main__':
-    main()
+    parser = ArgumentParser()
+    parser.add_argument("--text", type=str)
+    args = parser.parse_args()
+
+    main(text=args.text)
