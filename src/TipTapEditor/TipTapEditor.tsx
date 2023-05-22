@@ -6,15 +6,15 @@ import { ReferenceNode } from './ReferenceBlock/ReferenceNode';
 import './TipTapEditor.css';
 import { EDITOR_EXTENSIONS, INITIAL_CONTENT } from './TipTapEditorConfigs';
 
-export function TipTapEditor({ editorRef, onSelectionChange }: EditorProps) {
+export function TipTapEditor({ editorRef, editorContent, onSelectionChange }: EditorProps) {
   const editor = useEditor({
     extensions: EDITOR_EXTENSIONS,
-    content: INITIAL_CONTENT,
+    content: editorContent || INITIAL_CONTENT,
     onSelectionUpdate({ editor }) {
       const { from, to } = editor.view.state.selection;
       onSelectionChange(editor.view.state.doc.textBetween(from, to));
     },
-  });
+  }, [editorContent, onSelectionChange]);
 
   useEffect(() => {
     if (!editor) return;
