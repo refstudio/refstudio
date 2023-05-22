@@ -1,10 +1,27 @@
+import * as React from 'react';
+import { FileUploader } from "react-drag-drop-files";
 import { cx } from '../cx';
 
 export function FoldersView() {
+  const [filesTree, setFilesTree] = React.useState(tree);
+  const handleChange = (files: FileList) => {
+    setFilesTree((_filesTree) => {
+      const updatedFilesTree = [..._filesTree];
+      for (const file of files) {
+        updatedFilesTree.push({ name: file.name });
+        file.arrayBuffer().then(console.log);
+      }
+      return updatedFilesTree;
+    });
+  };
+
   return (
-    <div>
-      <h1>Project X</h1>
-      <FileTree tree={tree} />
+    <div className="flex flex-col h-full justify-between">
+      <div>
+        <h1>Project X</h1>
+        <FileTree tree={filesTree} />
+      </div>
+      <FileUploader handleChange={handleChange} name="file" multiple label="Upload or drop a file right here" />
     </div>
   );
 }
