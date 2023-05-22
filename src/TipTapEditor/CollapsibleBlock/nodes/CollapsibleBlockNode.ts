@@ -7,7 +7,7 @@ export interface CollapsibleBlockNodeAttributes {
   folded: boolean;
 }
 
-export const CollapsibleBlockNode = Node.create<void, void>({
+export const CollapsibleBlockNode = Node.create({
   name: 'collapsibleBlock',
 
   group: 'block',
