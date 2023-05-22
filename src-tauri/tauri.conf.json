@@ -13,6 +13,16 @@
   "tauri": {
     "allowlist": {
       "all": false,
+      "path": {
+        "all": true
+      },
+      "fs": {
+        "all": true,
+        "scope": [
+          "$HOME/.ref-studio",
+          "$HOME/.ref-studio/**"
+        ]
+      },
       "shell": {
         "all": true,
         "execute": true,
