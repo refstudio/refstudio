@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "fmt": "prettier --config package.json --write '**/*'",
-    "lint:check": "eslint --ignore-path .eslintignore --ext .js,.ts,.tsx ./src",
+    "lint:check": "eslint --ext .js,.ts,.tsx ./src",
     "lint:fix": "eslint --fix --ext .js,.ts,.tsx ./src",
     "preview": "vite preview",
     "python": "poetry run pyinstaller src-python/main.py --noconfirm --distpath src-tauri/bin/python && poetry run python scripts/move_binary.py",
@@ -86,7 +86,10 @@
       "ecmaVersion": 12,
       "sourceType": "module"
     },
-    "plugins": ["@typescript-eslint", "simple-import-sort"],
+    "plugins": [
+      "@typescript-eslint",
+      "simple-import-sort"
+    ],
     "extends": [
       "eslint:recommended",
       "plugin:@typescript-eslint/recommended",
