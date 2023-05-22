@@ -1,9 +1,11 @@
+import './TipTapEditor.css';
+
 import { EditorContent, useEditor } from '@tiptap/react';
 import { useEffect } from 'react';
+
 import { EditorProps } from '../types/EditorProps';
 import { MenuBar } from './MenuBar';
 import { ReferenceNode } from './ReferenceBlock/ReferenceNode';
-import './TipTapEditor.css';
 import { EDITOR_EXTENSIONS, INITIAL_CONTENT } from './TipTapEditorConfigs';
 
 export function TipTapEditor({ editorRef, onSelectionChange }: EditorProps) {
@@ -26,7 +28,7 @@ export function TipTapEditor({ editorRef, onSelectionChange }: EditorProps) {
         });
       },
     };
-  }, [editor]);
+  }, [editor, editorRef]);
 
   if (!editor) return <div>...</div>;
 

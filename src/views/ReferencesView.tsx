@@ -1,16 +1,10 @@
 import { ReferenceItem } from '../types/ReferenceItem';
 
-export function ReferencesView({
-  onRefClicked,
-}: {
-  onRefClicked?: (item: ReferenceItem) => any;
-}) {
+export function ReferencesView({ onRefClicked }: { onRefClicked?: (item: ReferenceItem) => void }) {
   return (
     <div>
       <h1>References</h1>
-      <p className="my-4 italic">
-        Click on a reference to add it to the document.
-      </p>
+      <p className="my-4 italic">Click on a reference to add it to the document.</p>
 
       <ul className="divide-y-2 border">
         {REFS_DATABASE.map((reference) => (
