@@ -1,4 +1,4 @@
-import { invoke } from '@tauri-apps/api/tauri';
+import { Command } from '@tauri-apps/api/shell';
 import { useEffect, useState } from 'react';
 
 export function AIView({ selection }: { selection: string | null }) {
@@ -27,9 +27,12 @@ export function AIView({ selection }: { selection: string | null }) {
 
 async function interactWithAi(selection: string) {
   try {
-    const aiReply = await invoke<string>('interact_with_ai', {
-      selection,
-    });
+    const command = Command.sidecar('bin/python/main', ['--text', `${selection}`]);
+    const output = await command.execute();
+    if (output.stderr) throw new Error(output.stderr);
+
+    const response = JSON.parse(output.stdout);
+    const aiReply = response.num_words;
     return aiReply;
   } catch (reason) {
     throw new Error('ERROR: ' + reason);
