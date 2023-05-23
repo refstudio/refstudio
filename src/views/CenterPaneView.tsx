@@ -3,13 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { readFile } from '../filesystem';
 import { TipTapEditor } from '../TipTapEditor/TipTapEditor';
-import { EditorAPI } from '../types/EditorAPI';
-
-interface CenterPaneViewProps {
-  editorRef: React.MutableRefObject<EditorAPI | undefined>;
-  onSelectionChange(text: string): void;
-  file?: FileEntry
-}
+import { CenterPaneViewProps } from '../types/CenterPaneViewProps';
 
 function isTipTap(file?: FileEntry) {
   return file?.path.endsWith('.tiptap');
