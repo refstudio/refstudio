@@ -1,12 +1,13 @@
 import { FileEntry } from '@tauri-apps/api/fs';
 import { useEffect, useState } from 'react';
 import { FileUploader } from 'react-drag-drop-files';
+
 import { cx } from '../cx';
-import { ensureProjectFileStructure, readAllProjectFiles, readFile, uploadFiles } from '../filesystem';
+import { ensureProjectFileStructure, readAllProjectFiles, uploadFiles } from '../filesystem';
 
 const BASE_DIR = await ensureProjectFileStructure();
 
-export function FoldersView({ onClick }: { onClick?: (content: Uint8Array, fileEntry: FileEntry) => void }) {
+export function FoldersView({ onClick }: { onClick?: (fileEntry: FileEntry) => void }) {
   const [files, setFiles] = useState<FileEntry[]>([]);
   const [selectedFile, setSelectedFile] = useState<FileEntry>();
 
@@ -16,14 +17,14 @@ export function FoldersView({ onClick }: { onClick?: (content: Uint8Array, fileE
       const selected = files.find((f) => f.name?.endsWith('.tiptap'));
       if (selected) {
         setSelectedFile(selected); // We need this because we might be selecting a DOT_FILE
-        readFile(selected).then((content) => onClick && onClick(content, selected));
+        onClick?.(selected);
       }
     });
-  }, []);
+  }, [onClick]);
 
   function handleOnClick(file: FileEntry): void {
     setSelectedFile(file);
-    readFile(file).then((content) => onClick && onClick(content, file));
+    onClick?.(file);
   }
 
   const handleChange = (files: FileList) => {

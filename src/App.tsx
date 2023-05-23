@@ -1,40 +1,29 @@
+import { FileEntry } from '@tauri-apps/api/fs';
 import * as React from 'react';
+import { useCallback } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { useDebounce } from 'usehooks-ts';
 
 import { EditorAPI } from './types/EditorAPI';
 import { ReferenceItem } from './types/ReferenceItem';
 import { AIView } from './views/AIView';
-import { EditorView } from './views/EditorView';
+import { CenterPaneView } from './views/CenterPaneView';
 import { FoldersView } from './views/FoldersView';
 import { ReferencesView } from './views/ReferencesView';
-
-import { FileEntry } from '@tauri-apps/api/fs';
-
-function isTipTap(file?: FileEntry) {
-  return file?.path.endsWith('.tiptap');
-}
 
 function App() {
   const [selectedFile, setSelectedFile] = React.useState<FileEntry | undefined>();
 
   const [selection, setSelection] = React.useState<string | null>(null);
   const debouncedSelection = useDebounce(selection, 200);
-  const [editorContent, setEditorContent] = React.useState('');
   const editorRef = React.useRef<EditorAPI>();
   const handleReferenceClicked = (reference: ReferenceItem) => {
     editorRef.current?.insertReference(reference);
   };
 
-  function handleFolderClick(content: Uint8Array, file: FileEntry): void {
+  const handleFolderClick = useCallback((file: FileEntry) => {
     setSelectedFile(file);
-    if (isTipTap(file)) {
-      var stringContent = new TextDecoder('utf-8').decode(content);
-      setEditorContent(stringContent);
-    }
-  }
-
-  const showEditor = isTipTap(selectedFile);
+  }, []);
 
   return (
     <PanelGroup autoSaveId="refstudio" direction="horizontal">
@@ -44,15 +33,7 @@ function App() {
       <VerticalResizeHandle />
 
       <Panel defaultSize={60} className="overflow-scroll p-3">
-        {showEditor && (
-          <EditorView onSelectionChange={setSelection} editorRef={editorRef} editorContent={editorContent} />
-        )}
-        {!showEditor && (
-          <div>
-            <strong>FILE:</strong>
-            <div>{selectedFile?.name} at <code>{selectedFile?.path}</code></div>
-          </div>
-        )}
+        <CenterPaneView onSelectionChange={setSelection} editorRef={editorRef} file={selectedFile} />
       </Panel>
 
       <VerticalResizeHandle />
