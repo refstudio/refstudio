@@ -11,7 +11,7 @@
     "lint:check": "eslint --ext .js,.ts,.tsx ./src",
     "lint:fix": "eslint --fix --ext .js,.ts,.tsx ./src",
     "preview": "vite preview",
-    "python": "poetry run pyinstaller --onefile --noconfirm --hidden-import torch --collect-data torch --recursive-copy-metadata torch --hidden-import pyarrow --collect-data pyarrow --recursive-copy-metadata pyarrow --collect-binaries pyarrow --collect-submodules pyarrow --recursive-copy-metadata importlib_metadata --collect-data sentence-transformers --recursive-copy-metadata tqdm --recursive-copy-metadata sentence-transformers --distpath src-tauri/bin/python src-python/main.py && bash scripts/move_binary.sh",
+    "python": "poetry run pyinstaller --onefile --noconfirm --hidden-import torch --collect-data torch --recursive-copy-metadata torch --hidden-import pyarrow --collect-data pyarrow --recursive-copy-metadata pyarrow --collect-binaries pyarrow --collect-submodules pyarrow --recursive-copy-metadata importlib_metadata --recursive-copy-metadata tqdm --recursive-copy-metadata sentence-transformers --distpath src-tauri/bin/python src-python/main.py && bash scripts/move_binary.sh",
     "tauri": "tauri"
   },
   "dependencies": {
