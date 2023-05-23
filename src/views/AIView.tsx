@@ -12,6 +12,9 @@ export function AIView({ selection }: { selection: string | null }) {
             'bin/python/main', ["--text", `${selection}`]
           );
           const output = await command.execute();
+          if(output.stderr) {
+            return setReply(output.stderr)
+          }
           const response = JSON.parse(output.stdout);
           const aiReply = response.num_words;
 
