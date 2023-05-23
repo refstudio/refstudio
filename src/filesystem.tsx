@@ -11,11 +11,11 @@ import { appDataDir, join } from '@tauri-apps/api/path';
 
 import { INITIAL_CONTENT } from './TipTapEditor/TipTapEditorConfigs';
 
-const REF_STUDIO_DIR = '.ref-studio/project-x';
+const PROJECT_NAME = 'project-x';
 const UPLOADS_DIR = 'uploads';
 
 async function getBaseDir() {
-  return join(await appDataDir(), REF_STUDIO_DIR);
+  return join(await appDataDir(), PROJECT_NAME);
 }
 export async function ensureProjectFileStructure() {
   try {
