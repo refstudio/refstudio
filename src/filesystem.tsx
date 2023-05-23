@@ -1,7 +1,7 @@
 import {
   BaseDirectory,
-  FileEntry,
   createDir,
+  FileEntry,
   readBinaryFile,
   readDir,
   writeBinaryFile,
@@ -9,6 +9,7 @@ import {
 } from '@tauri-apps/api/fs';
 import { homeDir, join } from '@tauri-apps/api/path';
 import { Command } from '@tauri-apps/api/shell';
+
 import { INITIAL_CONTENT } from './TipTapEditor/TipTapEditorConfigs';
 
 const REF_STUDIO_DIR = '.ref-studio/project-x';
