@@ -173,3 +173,4 @@ $RECYCLE.BIN/
 
 # Tauri / Python
 src-tauri/bin
+main.spec
