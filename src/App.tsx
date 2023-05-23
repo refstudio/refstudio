@@ -1,13 +1,14 @@
 import * as React from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import { useDebounce } from 'usehooks-ts';
+
+import { EditorAPI } from './types/EditorAPI';
 import { ReferenceItem } from './types/ReferenceItem';
 import { AIView } from './views/AIView';
 import { EditorView } from './views/EditorView';
 import { FoldersView } from './views/FoldersView';
 import { ReferencesView } from './views/ReferencesView';
 
-import { useDebounce } from 'usehooks-ts';
-import { EditorAPI } from './types/EditorAPI';
 import { FileEntry } from '@tauri-apps/api/fs';
 
 function isTipTap(file?: FileEntry) {

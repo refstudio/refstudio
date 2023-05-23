@@ -1,0 +1,23 @@
+{
+  "editor.rulers": [120],
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[typescriptreact]": {
+    "editor.formatOnSave": true
+  },
+  "[typescript]": {
+    "editor.formatOnSave": true
+  },
+  "editor.codeActionsOnSave": [
+    // Run ESLint fixers _before_ prettier to ensure the user doesn't need to do multiple saves
+    "source.fixAll.eslint",
+    "source.fixAll.format",
+    "source.organizeImports"
+  ],
+  "explorer.excludeGitIgnore": true,
+  "search.exclude": {
+    ".yarn/**": true,
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/*.code-search": true
+  },
+}

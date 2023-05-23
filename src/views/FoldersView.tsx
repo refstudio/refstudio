@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { FileEntry } from '@tauri-apps/api/fs';
+import { useEffect, useState } from 'react';
 import { FileUploader } from 'react-drag-drop-files';
 import { cx } from '../cx';
-import { FileEntry } from '@tauri-apps/api/fs';
 import { ensureProjectFileStructure, readAllProjectFiles, readFile, uploadFiles } from '../filesystem';
 
 const BASE_DIR = await ensureProjectFileStructure();
