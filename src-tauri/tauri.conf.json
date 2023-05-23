@@ -19,8 +19,7 @@
       "fs": {
         "all": true,
         "scope": [
-          "$APPDATA/.ref-studio",
-          "$APPDATA/.ref-studio/**"
+          "$APPDATA/**"
         ]
       },
       "shell": {
