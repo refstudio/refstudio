@@ -7,6 +7,7 @@ import StarterKit from '@tiptap/starter-kit';
 import markdown from 'highlight.js/lib/languages/markdown';
 import { lowlight } from 'lowlight';
 import { Markdown } from 'tiptap-markdown';
+
 import { CollapsibleBlockContentNode } from './CollapsibleBlock/nodes/CollapsibleBlockContent';
 import { CollapsibleBlockNode } from './CollapsibleBlock/nodes/CollapsibleBlockNode';
 import { CollapsibleBlockSummaryNode } from './CollapsibleBlock/nodes/CollapsibleBlockSummary';

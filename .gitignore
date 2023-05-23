@@ -160,8 +160,17 @@ $RECYCLE.BIN/
 ### Application Specific ###
 # prevent downloaded zip and txt files being added to repo
 .idea
-.vscode/
 .cache
 .yarn/cache
 .yarn/install-state.gz
 .yarn/build-state.yml
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# Tauri / Python
+src-tauri/bin
+main.spec

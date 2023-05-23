@@ -2,6 +2,7 @@ import { MentionOptions } from '@tiptap/extension-mention';
 import { ReactRenderer } from '@tiptap/react';
 import { SuggestionKeyDownProps } from '@tiptap/suggestion';
 import tippy from 'tippy.js';
+
 import { ReferencesList, ReferencesListProps } from './ReferencesList';
 
 export const suggestion: MentionOptions['suggestion'] = {
@@ -13,28 +14,27 @@ export const suggestion: MentionOptions['suggestion'] = {
   },
 
   render: () => {
-    let component: ReactRenderer<
-      { onKeyDown: (e: SuggestionKeyDownProps) => boolean },
-      ReferencesListProps
-    >;
+    let component: ReactRenderer<{ onKeyDown: (e: SuggestionKeyDownProps) => boolean }, ReferencesListProps>;
     let popup: ReturnType<typeof tippy>;
 
     return {
       onStart: (props) => {
-        component = new ReactRenderer<
-          { onKeyDown: (e: SuggestionKeyDownProps) => boolean },
-          ReferencesListProps
-        >(ReferencesList, {
-          props,
-          editor: props.editor,
-        });
+        component = new ReactRenderer<{ onKeyDown: (e: SuggestionKeyDownProps) => boolean }, ReferencesListProps>(
+          ReferencesList,
+          {
+            props,
+            editor: props.editor,
+          },
+        );
 
         if (!props.clientRect) {
           return;
         }
 
+        // eslint-disable-next-line
+        // @ts-ignore
         popup = tippy('body', {
-          getReferenceClientRect: props.clientRect as any,
+          getReferenceClientRect: props.clientRect,
           appendTo: () => document.body,
           content: component.element,
           showOnCreate: true,
@@ -44,7 +44,7 @@ export const suggestion: MentionOptions['suggestion'] = {
         });
       },
 
-      onUpdate(_props) {},
+      // onUpdate(_props) {},
 
       onKeyDown(props) {
         if (props.event.key === 'Escape') {
