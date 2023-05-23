@@ -5,9 +5,9 @@ import {
   readBinaryFile,
   readDir,
   writeBinaryFile,
-  writeTextFile
+  writeTextFile,
 } from '@tauri-apps/api/fs';
-import { homeDir, join } from '@tauri-apps/api/path';
+import { appDataDir, join } from '@tauri-apps/api/path';
 
 import { INITIAL_CONTENT } from './TipTapEditor/TipTapEditorConfigs';
 
@@ -15,7 +15,7 @@ const REF_STUDIO_DIR = '.ref-studio/project-x';
 const UPLOADS_DIR = 'uploads';
 
 async function getBaseDir() {
-  return join(await homeDir(), REF_STUDIO_DIR);
+  return join(await appDataDir(), REF_STUDIO_DIR);
 }
 export async function ensureProjectFileStructure() {
   try {
