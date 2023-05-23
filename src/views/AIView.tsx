@@ -9,9 +9,11 @@ export function AIView({ selection }: { selection: string | null }) {
       async function interactWithAi() {
         try {
           const command = Command.sidecar(
-            'bin/python/main', ["--text", `${selection}`]
+            'bin/python/main', ["ai", "--text", `${selection}`]
           );
+          console.log(command);
           const output = await command.execute();
+          console.log(output);
           const response = JSON.parse(output.stdout);
           const aiReply = response.num_words;
 

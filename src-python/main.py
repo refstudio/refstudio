@@ -1,24 +1,12 @@
 from argparse import ArgumentParser
-from pathlib import Path
-from grobid_tei_xml.types import GrobidDocument
-import grobid_tei_xml
 import json
 import sys
 
-
-def parse_xml_file(filepath: Path) -> GrobidDocument:
-    if filepath.suffix != ".xml":
-        raise ValueError("Filepath must be a .xml file")
-
-    with open(filepath, "r") as f:
-        xml = f.read()
-        doc = grobid_tei_xml.parse_document_xml(xml)
-    return doc
+from sidecar import ingest
 
 
 def get_word_count(text: str) -> int:
     return len(text.strip().split(" "))
-
 
 def main(text: str):
     try:
@@ -29,8 +17,37 @@ def main(text: str):
 
 
 if __name__ == '__main__':
-    parser = ArgumentParser()
-    parser.add_argument("--text", type=str)
+    parser = ArgumentParser(description="CLI for Python sidecar")
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+    )
+    subparsers = parser.add_subparsers(
+        dest="command",
+    )
+    ingest_parser = subparsers.add_parser(
+        "ingest",
+        description="Ingest PDFs",
+    )
+    ingest_parser.add_argument(
+        "--pdf_directory",
+        type=str,
+    )
+
+    ai_parser = subparsers.add_parser(
+        "ai",
+        description="AI operations",
+    )
+    ai_parser.add_argument(
+        "--text",
+        type=str,
+    )
+
     args = parser.parse_args()
 
-    main(text=args.text)
+    if args.debug:
+        print(args)
+    if args.command == "ingest":
+        ingest.main(args.pdf_directory)
+    if args.command == "ai":
+        main(text=args.text)
