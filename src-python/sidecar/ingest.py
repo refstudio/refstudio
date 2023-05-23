@@ -105,6 +105,11 @@ class PDFIngestion:
         return chunks
 
     def create_and_persist_embeddings(self, references: dict):
+        for key in references.keys():
+            if key in self.lancedb.table_names():
+                logger.info(f"Table {key} already exists. Skipping...")
+                continue
+
         for file, reference_chunks in references.items():
             model = SentenceTransformer(MODEL_FOR_EMBEDDINGS)
             embeddings = model.encode(reference_chunks)
