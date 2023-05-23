@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { FileUploader } from 'react-drag-drop-files';
 import { cx } from '../cx';
 import { FileEntry } from '@tauri-apps/api/fs';
-import { ensureProjectFileStructure, readAllProjectFiles, readFile, uploadFiles } from '../filesystem';
+import { ensureProjectFileStructure, readAllProjectFiles, readFile, uploadFiles, runPDFIngestion } from '../filesystem';
 
 const BASE_DIR = await ensureProjectFileStructure();
 
@@ -31,6 +31,9 @@ export function FoldersView({ onClick }: { onClick?: (content: Uint8Array, fileE
       console.log('File uploaded with success');
       readAllProjectFiles().then(setFiles);
       console.log(files);
+    });
+    runPDFIngestion().then(() => {
+      console.log('PDFs ingested with success');
     });
   };
 

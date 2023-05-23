@@ -8,6 +8,7 @@ import {
   writeTextFile
 } from '@tauri-apps/api/fs';
 import { homeDir, join } from '@tauri-apps/api/path';
+import { Command } from '@tauri-apps/api/shell';
 import { INITIAL_CONTENT } from './TipTapEditor/TipTapEditorConfigs';
 
 const REF_STUDIO_DIR = '.ref-studio/project-x';
@@ -46,6 +47,15 @@ export async function uploadFiles(files: FileList) {
     const bytes = await file.arrayBuffer();
     await writeBinaryFile(path, bytes, { dir: BaseDirectory.Home });
   }
+}
+
+export async function runPDFIngestion() {
+  const uploadsDir = await join(await getBaseDir(), UPLOADS_DIR);
+  const command = Command.sidecar('bin/python/main', ['ingest', '--pdf_directory', `${uploadsDir.toString()}`]);
+  console.log('command', command)
+  const output = await command.execute();
+  if (output.stderr) throw new Error(output.stderr);
+  return output.stdout;
 }
 
 export async function readFile(file: FileEntry) {
