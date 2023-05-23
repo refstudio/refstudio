@@ -14,7 +14,6 @@ sentence-transformers = "^2.2.2"
 lancedb = "^0.1.2"
 wheel = "^0.40.0"
 
-
 [tool.poetry.group.dev.dependencies]
 pyinstaller = "^5.11.0"
 ipython = "^8.13.2"

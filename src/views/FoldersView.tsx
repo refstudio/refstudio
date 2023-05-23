@@ -108,6 +108,33 @@ const FileTreeNode = ({ file, onClick, selectedFile }: FileTreeBaseProps) => {
   );
 };
 
-const FileIcon = () => <span className="inline-flex pr-2">&mdash;</span>;
+const FileIcon = () => <span className="inline-flex px-1 font-mono font-bold">&#xB7;</span>;
 
-const FolderIcon = () => <span className="inline-flex pr-2">&mdash;</span>;
+const FolderIcon = () => <span className="inline-flex px-1 font-mono font-bold"></span>;
+
+type FileTree = typeof tree;
+type FileTreeNode = FileTree[0];
+
+const tree = [
+  {
+    name: 'file1.md',
+    selected: true,
+  },
+  {
+    name: 'file2.txt',
+  },
+  {
+    name: 'Uploads',
+    children: [
+      {
+        name: 'Deep Learning.pdf',
+      },
+      {
+        name: 'Artificial Intelligence: A Modern Approach.pdf',
+      },
+      {
+        name: 'Pattern Recognition and Machine Learning.pdf',
+      },
+    ],
+  },
+];

@@ -1,8 +1,7 @@
 from argparse import ArgumentParser
+from sidecar import ingest
 import json
 import sys
-
-from sidecar import ingest
 
 
 def get_word_count(text: str) -> int:
