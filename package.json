@@ -11,7 +11,7 @@
     "lint:check": "eslint --ext .js,.ts,.tsx ./src",
     "lint:fix": "eslint --fix --ext .js,.ts,.tsx ./src",
     "preview": "vite preview",
-    "python": "poetry run pyinstaller src-python/main.py --noconfirm --distpath src-tauri/bin/python && poetry run python scripts/move_binary.py",
+    "python": "poetry run pyinstaller src-python/main.py --noconfirm --distpath src-tauri/bin/python && bash scripts/move_binary.sh",
     "tauri": "tauri"
   },
   "dependencies": {

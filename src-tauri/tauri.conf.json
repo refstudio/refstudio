@@ -31,7 +31,8 @@
         "scope": [
           {
             "name": "bin/python/main",
-            "sidecar": true
+            "sidecar": true,
+            "args": true
           }
         ]
       }
