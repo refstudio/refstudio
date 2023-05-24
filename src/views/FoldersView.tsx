@@ -42,6 +42,16 @@ export function FoldersView({ onClick }: { onClick?: (fileEntry: FileEntry) => v
           Project X<code className="block text-xs font-normal">{BASE_DIR}</code>
         </h1>
         <FileTree root files={files} selectedFile={selectedFile} onClick={handleOnClick} />
+
+        {/* SAMPLE DEMO OF primary/secondary colors */}
+        <div className="my-4 flex space-x-2">
+          <span className="flex w-20 cursor-pointer bg-primary p-2 text-xs text-white hover:bg-primary-hover">
+            Primary
+          </span>
+          <span className="flex w-20 cursor-pointer bg-secondary p-2 text-xs text-white hover:bg-secondary-hover">
+            Secondary
+          </span>
+        </div>
       </div>
       <FileUploader handleChange={handleChange} name="file" multiple label="Upload or drop a file right here" />
     </div>
