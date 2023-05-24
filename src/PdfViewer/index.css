@@ -1,0 +1,4 @@
+.react-pdf__Page__canvas {
+  @apply ml-auto;
+  @apply mr-auto;
+}

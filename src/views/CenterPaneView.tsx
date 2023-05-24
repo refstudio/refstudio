@@ -2,11 +2,16 @@ import { FileEntry } from '@tauri-apps/api/fs';
 import { useEffect, useState } from 'react';
 
 import { readFile } from '../filesystem';
+import { PdfViewer } from '../PdfViewer';
 import { TipTapEditor } from '../TipTapEditor/TipTapEditor';
 import { CenterPaneViewProps } from '../types/CenterPaneViewProps';
 
 function isTipTap(file?: FileEntry) {
   return file?.path.endsWith('.tiptap');
+}
+
+function isPdf(file?: FileEntry) {
+  return file?.path.endsWith('.pdf');
 }
 
 export function CenterPaneView({ file, ...props }: CenterPaneViewProps) {
@@ -28,6 +33,8 @@ export function CenterPaneView({ file, ...props }: CenterPaneViewProps) {
   if (loading) return <div><strong>Loading...</strong></div>;
 
   if (file && isTipTap(file)) return <TipTapEditor {...props} editorContent={content} />;
+
+  if (file && isPdf(file)) return <PdfViewer file={file} />;
 
   return (
     <div>
