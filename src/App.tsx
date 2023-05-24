@@ -1,33 +1,39 @@
+import { FileEntry } from '@tauri-apps/api/fs';
 import * as React from 'react';
+import { useCallback } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { useDebounce } from 'usehooks-ts';
 
 import { EditorAPI } from './types/EditorAPI';
 import { ReferenceItem } from './types/ReferenceItem';
 import { AIView } from './views/AIView';
-import { EditorView } from './views/EditorView';
+import { CenterPaneView } from './views/CenterPaneView';
 import { FoldersView } from './views/FoldersView';
 import { ReferencesView } from './views/ReferencesView';
 
 function App() {
+  const [selectedFile, setSelectedFile] = React.useState<FileEntry | undefined>();
+
   const [selection, setSelection] = React.useState<string | null>(null);
   const debouncedSelection = useDebounce(selection, 200);
-
   const editorRef = React.useRef<EditorAPI>();
-
   const handleReferenceClicked = (reference: ReferenceItem) => {
     editorRef.current?.insertReference(reference);
   };
 
+  const handleFolderClick = useCallback((file: FileEntry) => {
+    setSelectedFile(file);
+  }, []);
+
   return (
     <PanelGroup autoSaveId="refstudio" direction="horizontal">
       <Panel defaultSize={20} collapsible className="overflow-scroll p-4">
-        <FoldersView />
+        <FoldersView onClick={handleFolderClick} />
       </Panel>
       <VerticalResizeHandle />
 
       <Panel defaultSize={60} className="overflow-scroll p-3">
-        <EditorView onSelectionChange={setSelection} editorRef={editorRef} />
+        <CenterPaneView onSelectionChange={setSelection} editorRef={editorRef} file={selectedFile} />
       </Panel>
 
       <VerticalResizeHandle />

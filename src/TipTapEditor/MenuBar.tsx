@@ -1,9 +1,12 @@
+import './MenuBar.css';
+
 import { Editor } from '@tiptap/react';
 import * as React from 'react';
 
+import { cx } from '../cx';
+
 export function MenuBar({ editor }: { editor: Editor }) {
   const [markdownMode, setMarkdownMode] = React.useState(false);
-
   const handleToggleMarkdown = React.useCallback(() => {
     if (!markdownMode) {
       const markdown = editor.storage.markdown.getMarkdown();
@@ -19,119 +22,171 @@ export function MenuBar({ editor }: { editor: Editor }) {
     }
   }, [editor, markdownMode]);
 
+  // We need this refresh to allow the UI to update on editor changes
+  const [refreshToggle, setRefreshToggle] = React.useState(true);
+  React.useEffect(() => {
+    const update = () => setRefreshToggle(!refreshToggle);
+    editor.on('update', update);
+    editor.on('selectionUpdate', update);
+    return () => {
+      editor.off('update', update);
+      editor.off('selectionUpdate', update);
+    };
+  }, [editor, refreshToggle]);
+
   return (
-    <menu className="menu-bar">
+    <menu className="toolbar menu-bar">
+      <button
+        onClick={() => editor.chain().focus().undo().run()}
+        disabled={!editor.can().chain().focus().undo().run()}
+        className="toolbar-item"
+      >
+        <i className="format undo" />
+      </button>
+
+      <button
+        onClick={() => editor.chain().focus().redo().run()}
+        disabled={!editor.can().chain().focus().redo().run()}
+        className={cx('toolbar-item')}
+      >
+        <i className="format redo" />
+      </button>
+      <Divider />
       <button
         onClick={() => editor.chain().focus().toggleBold().run()}
         disabled={!editor.can().chain().focus().toggleBold().run()}
-        className={editor.isActive('bold') ? 'is-active' : ''}
+        className={cx('toolbar-item', {
+          active: editor.isActive('bold'),
+        })}
       >
-        bold
+        <i className="format bold" />
       </button>
       <button
         onClick={() => editor.chain().focus().toggleItalic().run()}
         disabled={!editor.can().chain().focus().toggleItalic().run()}
-        className={editor.isActive('italic') ? 'is-active' : ''}
+        className={cx('toolbar-item', {
+          active: editor.isActive('italic'),
+        })}
       >
-        italic
+        <i className="format italic" />
       </button>
       <button
         onClick={() => editor.chain().focus().toggleStrike().run()}
         disabled={!editor.can().chain().focus().toggleStrike().run()}
-        className={editor.isActive('strike') ? 'is-active' : ''}
+        className={cx('toolbar-item', {
+          active: editor.isActive('strike'),
+        })}
       >
-        strike
+        <i className="format strikethrough" />
       </button>
       <button
         onClick={() => editor.chain().focus().toggleCode().run()}
         disabled={!editor.can().chain().focus().toggleCode().run()}
-        className={editor.isActive('code') ? 'is-active' : ''}
+        className={cx('toolbar-item', {
+          active: editor.isActive('code'),
+        })}
       >
-        code
+        <i className="format code" />
       </button>
-      <button onClick={() => editor.chain().focus().unsetAllMarks().run()}>clear marks</button>
-      <button onClick={() => editor.chain().focus().clearNodes().run()}>clear nodes</button>
-      <button
-        onClick={() => editor.chain().focus().setParagraph().run()}
-        className={editor.isActive('paragraph') ? 'is-active' : ''}
-      >
-        paragraph
-      </button>
+
+      <Divider />
+
       <button
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-        className={editor.isActive('heading', { level: 1 }) ? 'is-active' : ''}
+        className={cx('toolbar-item', {
+          active: editor.isActive('heading', { level: 1 }),
+        })}
       >
-        h1
+        <i className="format h1" />
       </button>
       <button
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-        className={editor.isActive('heading', { level: 2 }) ? 'is-active' : ''}
+        className={cx('toolbar-item', {
+          active: editor.isActive('heading', { level: 2 }),
+        })}
       >
-        h2
+        <i className="format h2" />
       </button>
       <button
         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-        className={editor.isActive('heading', { level: 3 }) ? 'is-active' : ''}
+        className={cx('toolbar-item', {
+          active: editor.isActive('heading', { level: 3 }),
+        })}
       >
-        h3
+        <i className="format h3" />
       </button>
       <button
-        onClick={() => editor.chain().focus().toggleHeading({ level: 4 }).run()}
-        className={editor.isActive('heading', { level: 4 }) ? 'is-active' : ''}
+        onClick={() => editor.chain().focus().setParagraph().run()}
+        className={cx('toolbar-item', {
+          active: editor.isActive('paragraph'),
+        })}
       >
-        h4
+        <i className="format paragraph" />
       </button>
-      <button
-        onClick={() => editor.chain().focus().toggleHeading({ level: 5 }).run()}
-        className={editor.isActive('heading', { level: 5 }) ? 'is-active' : ''}
-      >
-        h5
-      </button>
-      <button
-        onClick={() => editor.chain().focus().toggleHeading({ level: 6 }).run()}
-        className={editor.isActive('heading', { level: 6 }) ? 'is-active' : ''}
-      >
-        h6
-      </button>
+      <Divider />
+
       <button
         onClick={() => editor.chain().focus().toggleBulletList().run()}
-        className={editor.isActive('bulletList') ? 'is-active' : ''}
+        className={cx('toolbar-item', {
+          active: editor.isActive('bulletList'),
+        })}
       >
-        bullet list
+        <i className="format ul" />
       </button>
       <button
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
-        className={editor.isActive('orderedList') ? 'is-active' : ''}
+        className={cx('toolbar-item', {
+          active: editor.isActive('orderedList'),
+        })}
       >
-        ordered list
+        <i className="format ol" />
       </button>
-      <button
+      {/* <button
         onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-        className={editor.isActive('codeBlock') ? 'is-active' : ''}
+        className={cx('toolbar-item', {
+          active: editor.isActive('codeBlock'),
+        })}
       >
-        code block
-      </button>
-      <button
+        <i className="format code-block" />
+      </button> */}
+      {/* <button
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
-        className={editor.isActive('blockquote') ? 'is-active' : ''}
+        className={cx('toolbar-item', {
+          active: editor.isActive('blockquote'),
+        })}
       >
-        blockquote
+        <i className="format blockquote" />
+      </button> */}
+      {/* <button onClick={() => editor.chain().focus().setHorizontalRule().run()}>horizontal rule</button>
+      <button onClick={() => editor.chain().focus().setHardBreak().run()}>hard break</button> */}
+
+      <Divider />
+      <button onClick={handleToggleMarkdown} className="toolbar-item">
+        <i
+          className={cx('format', {
+            'journal-text': markdownMode,
+            'journal-code': !markdownMode,
+          })}
+        />
       </button>
-      <button onClick={() => editor.chain().focus().setHorizontalRule().run()}>horizontal rule</button>
-      <button onClick={() => editor.chain().focus().setHardBreak().run()}>hard break</button>
-      <button onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().chain().focus().undo().run()}>
-        undo
+
+      {/* <button onClick={() => editor.chain().focus().unsetAllMarks().run()} title="clear marks">
+        cm
       </button>
-      <button onClick={() => editor.chain().focus().redo().run()} disabled={!editor.can().chain().focus().redo().run()}>
-        redo
-      </button>
-      <button
+      <button onClick={() => editor.chain().focus().clearNodes().run()} title="clear nodes">
+        cn
+      </button> */}
+
+      {/* <button
         onClick={() => editor.chain().focus().setColor('#958DF1').run()}
-        className={editor.isActive('textStyle', { color: '#958DF1' }) ? 'is-active' : ''}
+        className={cx('toolbar-item', { active: editor.isActive('textStyle', { color: '#958DF1' }) })}
       >
         purple
-      </button>
-      <button onClick={handleToggleMarkdown}>Toggle Markdown</button>
+      </button> */}
     </menu>
   );
+}
+
+function Divider() {
+  return <div className="divider" />;
 }

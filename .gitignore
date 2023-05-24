@@ -164,6 +164,8 @@ $RECYCLE.BIN/
 .yarn/cache
 .yarn/install-state.gz
 .yarn/build-state.yml
+
+# VSCode config
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
