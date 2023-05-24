@@ -17,11 +17,6 @@ stream_handler = logging.StreamHandler()
 stream_handler.setLevel(logging.INFO)
 logger.addHandler(stream_handler)
 
-REF_STUDIO_DIR = Path(os.environ.get("REF_STUDIO_DIR", "~/.ref-studio/project-x")).expanduser()
-JSON_STORAGE_DIR = Path(os.path.join(REF_STUDIO_DIR, "storage"))
-LANCEDB_URI = Path(os.path.join(REF_STUDIO_DIR, ".lancedb"))
-
-GROBID_OUTPUT_DIR = Path(os.path.join(REF_STUDIO_DIR, "grobid"))
 GROBID_SERVER_URL = "https://kermitt2-grobid.hf.space"
 GROBID_TIMEOUT = 60 * 5
 
@@ -31,9 +26,11 @@ MODEL_FOR_EMBEDDINGS = "sentence-transformers/all-MiniLM-L6-v2"
 class PDFIngestion:
     def __init__(self, input_dir: Path):
         self.input_dir = input_dir
-        self.grobid_output_dir = GROBID_OUTPUT_DIR
-        self.storage_dir = JSON_STORAGE_DIR
-        self.lancedb = lancedb.connect(LANCEDB_URI)
+        self.grobid_output_dir = input_dir.parent.joinpath('grobid')
+        self.storage_dir = input_dir.parent.joinpath('storage')
+
+        lancedb_uri = input_dir.parent.joinpath('.lancedb')
+        self.lancedb = lancedb.connect(lancedb_uri)
 
     def _create_directories(self):
         if not self.grobid_output_dir.exists():
