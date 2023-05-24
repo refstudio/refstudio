@@ -1,10 +1,12 @@
 import { Action, configureStore, ThunkAction } from '@reduxjs/toolkit';
 
+import openedFilesSlice from '../features/openedFiles/openedFilesSlice';
 import selectionReducer from '../features/selection/selectionSlice';
 
 export const store = configureStore({
   reducer: {
     selection: selectionReducer,
+    openedFiles: openedFilesSlice,
   },
 });
 

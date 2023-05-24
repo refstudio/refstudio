@@ -9,7 +9,7 @@ import { setTextSelection } from '../features/selection/selectionSlice';
 import { EditorProps } from '../types/EditorProps';
 import { MenuBar } from './MenuBar';
 import { ReferenceNode } from './ReferenceBlock/ReferenceNode';
-import { EDITOR_EXTENSIONS, INITIAL_CONTENT } from './TipTapEditorConfigs';
+import { EDITOR_EXTENSIONS } from './TipTapEditorConfigs';
 
 export function TipTapEditor({ editorRef, editorContent }: EditorProps) {
   const [selection, setSelection] = useState('');
@@ -19,7 +19,7 @@ export function TipTapEditor({ editorRef, editorContent }: EditorProps) {
     setEditor(
       new Editor({
         extensions: EDITOR_EXTENSIONS,
-        content: editorContent ?? INITIAL_CONTENT,
+        content: editorContent,
         onSelectionUpdate({ editor }) {
           const { from, to } = editor.view.state.selection;
           const text = editor.view.state.doc.textBetween(from, to);

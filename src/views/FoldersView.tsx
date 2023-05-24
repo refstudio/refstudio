@@ -3,35 +3,35 @@ import { useEffect, useState } from 'react';
 import { FileUploader } from 'react-drag-drop-files';
 
 import { cx } from '../cx';
+import { openFile } from '../features/openedFiles/openedFilesSlice';
 import { ensureProjectFileStructure, readAllProjectFiles, uploadFiles } from '../filesystem';
+import { useAppDispatch, useAppSelector } from '../redux/hooks';
 
 const BASE_DIR = await ensureProjectFileStructure();
 
-export function FoldersView({ onClick }: { onClick?: (fileEntry: FileEntry) => void }) {
+export function FoldersView() {
+  const dispatch = useAppDispatch();
   const [files, setFiles] = useState<FileEntry[]>([]);
-  const [selectedFile, setSelectedFile] = useState<FileEntry>();
 
   useEffect(() => {
     readAllProjectFiles().then((files) => {
       setFiles(files);
       const selected = files.find((f) => f.name?.endsWith('.tiptap'));
       if (selected) {
-        setSelectedFile(selected); // We need this because we might be selecting a DOT_FILE
-        onClick?.(selected);
+        dispatch(
+          openFile({
+            type: 'TipTap',
+            entry: selected,
+            isDirectory: false,
+          }),
+        );
       }
     });
-  }, [onClick]);
-
-  function handleOnClick(file: FileEntry): void {
-    setSelectedFile(file);
-    onClick?.(file);
-  }
+  }, [dispatch]);
 
   const handleChange = (files: FileList) => {
     uploadFiles(files).then(() => {
-      console.log('File uploaded with success');
       readAllProjectFiles().then(setFiles);
-      console.log(files);
     });
   };
 
@@ -41,22 +41,14 @@ export function FoldersView({ onClick }: { onClick?: (fileEntry: FileEntry) => v
         <h1 className="flex flex-col">
           Project X<code className="block text-xs font-normal">{BASE_DIR}</code>
         </h1>
-        <FileTree root files={files} selectedFile={selectedFile} onClick={handleOnClick} />
+        <FileTree root files={files} />
       </div>
       <FileUploader handleChange={handleChange} name="file" multiple label="Upload or drop a file right here" />
     </div>
   );
 }
 
-interface FileTreeBaseProps {
-  root?: boolean;
-  files: FileEntry[];
-  file?: FileEntry;
-  selectedFile?: FileEntry;
-  onClick: (file: FileEntry) => void;
-}
-
-const FileTree = ({ files, root, ...props }: FileTreeBaseProps) => {
+function FileTree({ files, root = false }: { files: FileEntry[]; root?: boolean }) {
   return (
     <div>
       <ul
@@ -65,16 +57,33 @@ const FileTree = ({ files, root, ...props }: FileTreeBaseProps) => {
         })}
       >
         {files.map((file) => (
-          <FileTreeNode key={file.path} files={files} file={file} {...props} />
+          <FileTreeNode key={file.path} file={file} />
         ))}
       </ul>
     </div>
   );
-};
+}
 
-const FileTreeNode = ({ file, onClick, selectedFile }: FileTreeBaseProps) => {
+function FileTreeNode({ file }: { file: FileEntry }) {
+  const dispatch = useAppDispatch();
+  const selectedFile = useAppSelector((state) => state.openedFiles.selectedFile);
+
   if (!file) return null;
   const isFolder = Array.isArray(file.children);
+
+  function handleOnClick(file: FileEntry): void {
+    dispatch(
+      openFile({
+        type: file.name?.endsWith('.tiptap') //
+          ? 'TipTap'
+          : file.name?.endsWith('.pdf')
+          ? 'PDF'
+          : 'Unknown',
+        entry: file,
+        isDirectory: false,
+      }),
+    );
+  }
 
   // Hide DOT_FILES
   if (file.name?.startsWith('.')) return null;
@@ -86,11 +95,11 @@ const FileTreeNode = ({ file, onClick, selectedFile }: FileTreeBaseProps) => {
           'mb-1 py-1',
           'flex flex-row items-center', //
           {
-            'bg-slate-100': file.path === selectedFile?.path,
+            'bg-slate-100': file.path === selectedFile?.entry.path,
             'cursor-pointer hover:bg-slate-100': !isFolder,
           },
         )}
-        onClick={() => !isFolder && onClick(file)}
+        onClick={() => !isFolder && handleOnClick(file)}
       >
         {isFolder ? <FolderIcon /> : <FileIcon />}
         <span
@@ -102,13 +111,10 @@ const FileTreeNode = ({ file, onClick, selectedFile }: FileTreeBaseProps) => {
         </span>
       </div>
 
-      {isFolder && Array.isArray(file.children) && (
-        <FileTree files={file.children} onClick={onClick} selectedFile={selectedFile} />
-      )}
+      {isFolder && Array.isArray(file.children) && <FileTree files={file.children} />}
     </li>
   );
-};
+}
 
 const FileIcon = () => <span className="inline-flex pr-2">&mdash;</span>;
-
 const FolderIcon = () => <span className="inline-flex pr-2">&mdash;</span>;
