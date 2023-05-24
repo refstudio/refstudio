@@ -1,0 +1,40 @@
+from typing import List
+
+from .typing import Chunk
+
+MODEL_FOR_EMBEDDINGS = "sentence-transformers/all-MiniLM-L6-v2"
+
+
+def chunk_text(text: str, chunk_size: int = 1000, chunk_overlap: int = 200) -> List[Chunk]:
+    """
+    Chunk text into smaller pieces for embedding
+    :param text:
+    :param chunk_size:
+    :param chunk_overlap:
+    :return:
+    """
+    if not text:
+        return []
+
+    if len(text) < chunk_size:
+        return [Chunk(text=text)]
+
+    chunks = []
+    for i in range(0, len(text), chunk_size - chunk_overlap):
+        chunks.append(
+            Chunk(
+                text=text[i:i + chunk_size],
+            )
+        )
+    return chunks
+
+
+def embed_text(text: List[str]) -> List[float]:
+    """
+    Embed text using sentence-transformers
+    :param text:
+    :return:
+    """
+    from sentence_transformers import SentenceTransformer
+    model = SentenceTransformer(MODEL_FOR_EMBEDDINGS)
+    return model.encode(text)

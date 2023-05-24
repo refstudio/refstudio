@@ -1,13 +1,16 @@
+from dataclasses import asdict
 from typing import List
 from argparse import ArgumentParser
 from grobid_client.grobid_client import GrobidClient
 from pathlib import Path
-from sentence_transformers import SentenceTransformer
 import grobid_tei_xml
 import lancedb
 import logging
 import json
 import os
+
+from .shared import chunk_text, embed_text
+from .typing import Reference, Author
 
 
 logger = logging.getLogger(__name__)
@@ -20,19 +23,21 @@ logger.addHandler(stream_handler)
 GROBID_SERVER_URL = "https://kermitt2-grobid.hf.space"
 GROBID_TIMEOUT = 60 * 5
 
-MODEL_FOR_EMBEDDINGS = "sentence-transformers/all-MiniLM-L6-v2"
-
 
 class PDFIngestion:
     def __init__(self, input_dir: Path):
         self.input_dir = input_dir
+        self.project_name = input_dir.parent.name
+
+        # directories for storing intermediate files
         self.grobid_output_dir = input_dir.parent.joinpath('grobid')
         self.storage_dir = input_dir.parent.joinpath('storage')
 
-        lancedb_uri = input_dir.parent.joinpath('.lancedb')
-        self.lancedb = lancedb.connect(lancedb_uri)
+        # components for embeddings creation and storage
+        self.lancedb_uri = input_dir.parent.joinpath('.lancedb')
+        self.lancedb = lancedb.connect(self.lancedb_uri)
 
-    def _create_directories(self):
+    def _create_directories(self) -> None:
         if not self.grobid_output_dir.exists():
             self.grobid_output_dir.mkdir()
 
@@ -43,10 +48,10 @@ class PDFIngestion:
         self._create_directories()
         self.call_grobid_server()
         self.convert_grobid_xml_to_json()
-        references = self.chunk_references()
+        references = self.create_references()
         self.create_and_persist_embeddings(references)
 
-    def call_grobid_server(self):
+    def call_grobid_server(self) -> None:
         pdf_files = list(self.input_dir.glob("*.pdf"))
 
         # make sure there are PDFs to process
@@ -65,7 +70,7 @@ class PDFIngestion:
         )
         logger.info("Finished calling Grobid server")
 
-    def convert_grobid_xml_to_json(self):
+    def convert_grobid_xml_to_json(self) -> None:
         xml_files = list(self.grobid_output_dir.glob("*.xml"))
         logger.info(f"Found {len(xml_files)} xml files to parse")
 
@@ -78,48 +83,96 @@ class PDFIngestion:
                 doc = grobid_tei_xml.parse_document_xml(xml)
                 json.dump(doc.to_dict(), fout)
 
-    def chunk_references(self):
-        json_files = list(self.storage_dir.glob("*.json"))
-        logger.info(f"Found {len(json_files)} json files to chunk")
+    def _parse_header(self, document: dict) -> dict:
+        """
+        Parses the header of a document and returns a dictionary of the header fields
+        :param document: dict
+        :return: Dict[str, str]
+        """
+        header = document.get("header")
+        if not header:
+            return {}
 
-        references = {}
+        if header.get("authors"):
+            authors = [self._create_author(author) for author in header["authors"]]
+        else:
+            authors = []
+
+        return {
+            "title": header.get("title"),
+            "authors": authors,
+        }
+
+    def _create_author(self, author_dict: dict) -> Author:
+        return Author(
+            full_name=author_dict.get("full_name"),
+            given_name=author_dict.get("given_name"),
+            surname=author_dict.get("surname"),
+            email=author_dict.get("email"),
+        )
+
+    def create_references(self) -> List[Reference]:
+        """
+        Creates a list of Reference objects from the json files in the storage directory
+        :return: List[Reference]
+        """
+        json_files = list(self.storage_dir.glob("*.json"))
+        logger.info(f"Found {len(json_files)} json reference files")
+
+        references = []
         for file in json_files:
-            with open(file, "r") as fin:
+            with open(file, 'r') as fin:
                 doc = json.load(fin)
 
-            references[file.stem] = self.chunk_text(doc["body"])
+            header = self._parse_header(doc)
+            ref = Reference(
+                source_filename=file.name,
+                title=header.get("title"),
+                authors=header.get("authors"),
+                abstract=doc.get("abstract"),
+                contents=doc.get("body"),
+                chunks=chunk_text(doc.get("body"))
+            )
+            references.append(ref)
         return references
 
-    def chunk_text(
-            self,
-            text: str,
-            chunk_size: int = 2000,
-            chunk_overlap: int = 200
-    ) -> List[str]:
-        chunks = []
-        for i in range(0, len(text), chunk_size - chunk_overlap):
-            chunks.append(text[i:i + chunk_size])
-        return chunks
+    def _already_has_embeddings(self, ref: Reference) -> bool:
+        tables = self.lancedb.table_names()
 
-    def create_and_persist_embeddings(self, references: dict):
-        for key in references.keys():
-            if key in self.lancedb.table_names():
-                logger.info(f"Table {key} already exists. Skipping...")
+        if self.project_name not in tables:
+            return False
+
+        table = self.lancedb.open_table(self.project_name)
+        already_seen = set(table.to_pandas()["source_filename"].tolist())
+        return ref.source_filename in already_seen
+
+    def create_and_persist_embeddings(self, references: List[Reference]) -> None:
+        for ref in references:
+            if self._already_has_embeddings(ref):
+                logger.info(f"Reference {ref.title} already exists. Skipping...")
                 continue
 
-        for file, reference_chunks in references.items():
-            model = SentenceTransformer(MODEL_FOR_EMBEDDINGS)
-            embeddings = model.encode(reference_chunks)
+            embeddings = embed_text([c.text for c in ref.chunks])
+            authors = [asdict(a) for a in ref.authors]
 
-            mappings = []
-            for chunk, emb in zip(reference_chunks, embeddings):
-                mappings.append({
-                    "text": chunk,
+            rows = []
+            for chunk, emb in zip(ref.chunks, embeddings):
+                rows.append({
+                    "source_filename": ref.source_filename,
+                    "title": ref.title,
+                    "authors": authors,
+                    "abstract": ref.abstract,
+                    "text": chunk.text,
                     "vector": emb.tolist()
                 })
             logger.info(f"Created {len(embeddings)} embeddings")
 
-            table = self.lancedb.create_table(name=file, data=mappings)
+            if self.project_name not in self.lancedb.table_names():
+                table = self.lancedb.create_table(name=self.project_name, data=rows)
+            else:
+                table = self.lancedb.open_table(self.project_name)
+                table.add(data=rows)
+
             logger.info(f"Wrote {len(embeddings)} embeddings to {table.name} table")
 
 
