@@ -6,9 +6,7 @@ import * as React from 'react';
 import { cx } from '../cx';
 
 export function MenuBar({ editor }: { editor: Editor }) {
-  const [counter, setCounter] = React.useState(1);
   const [markdownMode, setMarkdownMode] = React.useState(false);
-
   const handleToggleMarkdown = React.useCallback(() => {
     if (!markdownMode) {
       const markdown = editor.storage.markdown.getMarkdown();
@@ -24,17 +22,17 @@ export function MenuBar({ editor }: { editor: Editor }) {
     }
   }, [editor, markdownMode]);
 
+  // We need this refresh to allow the UI to update on editor changes
+  const [refreshToggle, setRefreshToggle] = React.useState(true);
   React.useEffect(() => {
-    function update() {
-      setCounter(counter + 1);
-    }
+    const update = () => setRefreshToggle(!refreshToggle);
     editor.on('update', update);
     editor.on('selectionUpdate', update);
     return () => {
       editor.off('update', update);
       editor.off('selectionUpdate', update);
     };
-  }, [editor, counter]);
+  }, [editor, refreshToggle]);
 
   return (
     <menu className="toolbar menu-bar">
