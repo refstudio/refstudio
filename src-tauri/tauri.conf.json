@@ -18,10 +18,7 @@
       },
       "fs": {
         "all": true,
-        "scope": [
-          "$HOME/.ref-studio",
-          "$HOME/.ref-studio/**"
-        ]
+        "scope": ["$APPDATA/**"]
       },
       "shell": {
         "all": true,
@@ -39,16 +36,8 @@
     },
     "bundle": {
       "active": true,
-      "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
-      ],
-      "externalBin": [
-        "bin/python/main"
-      ],
+      "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
+      "externalBin": ["bin/python/main"],
       "identifier": "com.tauri.dev",
       "targets": "all"
     },
