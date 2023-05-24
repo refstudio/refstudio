@@ -1,9 +1,10 @@
-from argparse import ArgumentParser
-from pathlib import Path
-from grobid_tei_xml.types import GrobidDocument
-import grobid_tei_xml
 import json
 import sys
+from argparse import ArgumentParser
+from pathlib import Path
+
+import grobid_tei_xml
+from grobid_tei_xml.types import GrobidDocument
 
 
 def parse_xml_file(filepath: Path) -> GrobidDocument:
@@ -24,7 +25,7 @@ def main(text: str):
     try:
         data = {"num_words": get_word_count(text)}
         print(json.dumps(data))
-    except:
+    except Exception:
         print("Error processing text", file=sys.stderr)
 
 
