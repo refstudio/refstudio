@@ -15,6 +15,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^1.9.5",
     "@tauri-apps/api": "^1.2.0",
     "@tiptap/extension-code-block-lowlight": "^2.0.3",
     "@tiptap/extension-color": "^2.0.3",
@@ -31,6 +32,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-drag-drop-files": "^2.3.10",
+    "react-redux": "^8.0.5",
     "react-resizable-panels": "^0.0.42",
     "tailwindcss": "^3.3.2",
     "tiptap-markdown": "^0.7.2",

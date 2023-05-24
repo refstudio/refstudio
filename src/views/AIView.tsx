@@ -1,7 +1,10 @@
 import { Command } from '@tauri-apps/api/shell';
 import { useEffect, useState } from 'react';
 
-export function AIView({ selection }: { selection: string | null }) {
+import { useAppSelector } from '../redux/hooks';
+
+export function AIView() {
+  const selection = useAppSelector((state) => state.selection.text);
   const [reply, setReply] = useState('');
 
   useEffect(() => {
