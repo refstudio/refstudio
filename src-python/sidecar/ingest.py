@@ -1,3 +1,4 @@
+import sys
 from dataclasses import asdict
 from typing import List
 from argparse import ArgumentParser
@@ -9,7 +10,7 @@ import logging
 import json
 import os
 
-from .shared import chunk_text, embed_text
+from .shared import chunk_text, embed_text, HiddenPrints
 from .typing import Reference, Author
 
 
@@ -19,6 +20,7 @@ logger.setLevel(logging.INFO)
 stream_handler = logging.StreamHandler()
 stream_handler.setLevel(logging.INFO)
 logger.addHandler(stream_handler)
+logger.disabled = True
 
 GROBID_SERVER_URL = "https://kermitt2-grobid.hf.space"
 GROBID_TIMEOUT = 60 * 5
@@ -37,6 +39,15 @@ class PDFIngestion:
         self.lancedb_uri = input_dir.parent.joinpath('.lancedb')
         self.lancedb = lancedb.connect(self.lancedb_uri)
 
+    def run(self):
+        self._create_directories()
+        self.call_grobid_server()
+        self.convert_grobid_xml_to_json()
+        references = self.create_references()
+        self.create_and_persist_embeddings(references)
+        response = self.create_response_from_references(references)
+        sys.stdout.write(json.dumps(response))
+
     def _create_directories(self) -> None:
         if not self.grobid_output_dir.exists():
             self.grobid_output_dir.mkdir()
@@ -44,12 +55,24 @@ class PDFIngestion:
         if not self.storage_dir.exists():
             self.storage_dir.mkdir()
 
-    def run(self):
-        self._create_directories()
-        self.call_grobid_server()
-        self.convert_grobid_xml_to_json()
-        references = self.create_references()
-        self.create_and_persist_embeddings(references)
+    def get_files_to_ingest(self) -> List[Path]:
+        """
+        Determines which files need to be ingested
+        :return: bool
+        """
+        # fp.stem = fp.name without filetype extension
+        pdf_filestems = {fp.stem: fp for fp in self.input_dir.glob("*.pdf")}
+        json_filestems = {fp.stem: fp for fp in self.storage_dir.glob("*.json")}
+        needs_ingestion_filestems = set(pdf_filestems.keys()) - set(json_filestems.keys())
+
+        if not needs_ingestion_filestems:
+            logger.info("All pdf files have already been processed")
+            return []
+
+        filepaths_to_ingest = []
+        for stem in needs_ingestion_filestems:
+            filepaths_to_ingest.append(pdf_filestems[stem])
+        return filepaths_to_ingest
 
     def call_grobid_server(self) -> None:
         pdf_files = list(self.input_dir.glob("*.pdf"))
@@ -61,7 +84,13 @@ class PDFIngestion:
 
         logger.info(f"Found {len(pdf_files)} pdf files to process")
         logger.info("Calling Grobid server...")
-        client = GrobidClient(GROBID_SERVER_URL, timeout=GROBID_TIMEOUT)
+
+        with HiddenPrints():
+            # Grobid prints a message informing that the server is alive
+            # This is problematic since the sidecar communicates over stdout
+            # thus, HiddenPrint (https://stackoverflow.com/a/45669280)
+            client = GrobidClient(GROBID_SERVER_URL, timeout=GROBID_TIMEOUT)
+
         client.process(
             "processFulltextDocument",
             input_path=self.input_dir,
@@ -78,7 +107,10 @@ class PDFIngestion:
             with open(file, "r") as fin:
                 xml = fin.read()
 
-            json_filepath = os.path.join(self.storage_dir, f"{file.stem}.json")
+            # XML files written by Grobid have the filename structured as: {filename}.tei.xml
+            # We want to strip both the .tei and .xml extensions => {filename}.json
+            json_filename = f"{file.stem.rpartition('.tei')[0]}"
+            json_filepath = os.path.join(self.storage_dir, f"{json_filename}.json")
             with open(json_filepath, "w") as fout:
                 doc = grobid_tei_xml.parse_document_xml(xml)
                 json.dump(doc.to_dict(), fout)
@@ -135,6 +167,24 @@ class PDFIngestion:
             )
             references.append(ref)
         return references
+
+    def create_response_from_references(self, references: List[Reference]) -> dict:
+        """
+        Creates a Response object from a list of Reference objects
+        :param references: List[Reference]
+        :return: Response
+        """
+        prepared_references = []
+        for ref in references:
+            # no need to include reference abstract, contents, or chunks in response
+            prepared_references.append({
+                "title": ref.title,
+                "authors": [asdict(a) for a in ref.authors],
+            })
+        return {
+            "project_name": self.project_name,
+            "references": prepared_references
+        }
 
     def _already_has_embeddings(self, ref: Reference) -> bool:
         tables = self.lancedb.table_names()
