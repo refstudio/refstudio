@@ -4,4 +4,4 @@
 yarn lint:check
 # yarn test
 
-poetry run ruff src-python
+yarn pylint:check
