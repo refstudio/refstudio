@@ -1,5 +1,5 @@
 /** @type {import("@types/eslint").Linter.Config} */
-export default {
+module.exports = {
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 12,
