@@ -2,7 +2,6 @@ import { FileEntry } from '@tauri-apps/api/fs';
 import * as React from 'react';
 import { useCallback } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { useDebounce } from 'usehooks-ts';
 
 import { EditorAPI } from './types/EditorAPI';
 import { ReferenceItem } from './types/ReferenceItem';
@@ -14,8 +13,6 @@ import { ReferencesView } from './views/ReferencesView';
 function App() {
   const [selectedFile, setSelectedFile] = React.useState<FileEntry | undefined>();
 
-  const [selection, setSelection] = React.useState<string | null>(null);
-  const debouncedSelection = useDebounce(selection, 200);
   const editorRef = React.useRef<EditorAPI>();
   const handleReferenceClicked = (reference: ReferenceItem) => {
     editorRef.current?.insertReference(reference);
@@ -33,7 +30,7 @@ function App() {
       <VerticalResizeHandle />
 
       <Panel defaultSize={60} className="overflow-scroll p-3">
-        <CenterPaneView onSelectionChange={setSelection} editorRef={editorRef} file={selectedFile} />
+        <CenterPaneView editorRef={editorRef} file={selectedFile} />
       </Panel>
 
       <VerticalResizeHandle />
@@ -44,7 +41,7 @@ function App() {
           </Panel>
           <HorizontalResizeHandle />
           <Panel className="overflow-scroll p-3">
-            <AIView selection={debouncedSelection} />
+            <AIView />
           </Panel>
         </PanelGroup>
       </Panel>
