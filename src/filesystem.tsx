@@ -57,13 +57,13 @@ export async function readFile(file: FileEntry) {
 function sortedFileEntries(entries: FileEntry[]): FileEntry[] {
   return entries
     .sort((fileA, fileB) => {
-      if (fileA.children === null) {
+      if (fileA.children === undefined) {
         return -1;
       }
-      if (fileB.children === null) {
+      if (fileB.children === undefined) {
         return 1;
       }
-      return fileA.name?.localeCompare(fileB.name || '') || 0;
+      return fileA.name?.localeCompare(fileB.name ?? '') ?? 0;
     })
     .map((entry) => ({
       ...entry,

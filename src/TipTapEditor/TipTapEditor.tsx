@@ -15,9 +15,10 @@ export function TipTapEditor({ editorRef, editorContent, onSelectionChange }: Ed
       new Editor({
         extensions: EDITOR_EXTENSIONS,
         content: editorContent ?? INITIAL_CONTENT,
-        onSelectionUpdate({ editor }) {
-          const { from, to } = editor.view.state.selection;
-          onSelectionChange(editor.view.state.doc.textBetween(from, to));
+        onSelectionUpdate(update) {
+          const newEditor = update.editor;
+          const { from, to } = newEditor.view.state.selection;
+          onSelectionChange(newEditor.view.state.doc.textBetween(from, to));
         },
       }),
     );

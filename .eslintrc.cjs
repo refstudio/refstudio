@@ -29,7 +29,7 @@ module.exports = {
     'simple-import-sort/imports': 'error',
     'simple-import-sort/exports': 'error',
 
-    // Additional typescript-eslint settings.
+    // Some rule where we'd like to be more strict that typescript-eslint.
     '@typescript-eslint/member-delimiter-style': 'error',
     '@typescript-eslint/no-unused-expressions': 'error',
     '@typescript-eslint/quotes': ['error', 'single', { allowTemplateLiterals: true, avoidEscape: true }],
@@ -60,6 +60,13 @@ module.exports = {
       },
     ],
 
+    // Some rules where we'd like to be less strict.
+    // It would be nice to turn these on, but there are too many `any` types in @types files.
+    '@typescript-eslint/no-non-null-assertion': 'off',
+    '@typescript-eslint/restrict-template-expressions': 'off',
+    '@typescript-eslint/no-unsafe-member-access': 'off',
+    '@typescript-eslint/no-unsafe-call': 'off',
+
     'arrow-body-style': 'warn',
     'brace-style': ['error', '1tbs'],
     'comma-dangle': ['error', 'always-multiline'],
@@ -72,7 +79,6 @@ module.exports = {
     'no-bitwise': 'error',
     'no-caller': 'error',
     'no-cond-assign': 'error',
-    'no-console': 'error',
     'no-debugger': 'error',
     'no-declare': 'off',
     'no-empty': 'error',

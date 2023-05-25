@@ -9,7 +9,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
   const [markdownMode, setMarkdownMode] = React.useState(false);
   const handleToggleMarkdown = React.useCallback(() => {
     if (!markdownMode) {
-      const markdown = editor.storage.markdown.getMarkdown();
+      const markdown = editor.storage.markdown.getMarkdown() as string;
       editor.commands.setContent({
         type: 'codeBlock',
         attrs: { language: 'markdown' },

@@ -17,8 +17,8 @@ export function CenterPaneView({ file, ...props }: CenterPaneViewProps) {
     if (file && isTipTap(file)) {
       setLoading(true);
       (async () => {
-        const content = await readFile(file);
-        const textContent = new TextDecoder('utf-8').decode(content);
+        const newBytes = await readFile(file);
+        const textContent = new TextDecoder('utf-8').decode(newBytes);
         setContent(textContent);
         setLoading(false);
       })();

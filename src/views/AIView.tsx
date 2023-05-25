@@ -8,7 +8,9 @@ export function AIView({ selection }: { selection: string | null }) {
     if (!selection) {
       return;
     }
-    interactWithAi(selection).then(setReply).catch(console.error);
+    interactWithAi(selection)
+      .then((num) => setReply(String(num)))
+      .catch(console.error);
   }, [selection]);
 
   return (
@@ -27,6 +29,10 @@ export function AIView({ selection }: { selection: string | null }) {
   );
 }
 
+interface AIResponse {
+  num_words: number;
+}
+
 async function interactWithAi(selection: string) {
   try {
     const command = Command.sidecar('bin/python/main', ['--text', `${selection}`]);
@@ -35,10 +41,10 @@ async function interactWithAi(selection: string) {
       throw new Error(output.stderr);
     }
 
-    const response = JSON.parse(output.stdout);
+    const response = JSON.parse(output.stdout) as AIResponse;
     const aiReply = response.num_words;
     return aiReply;
   } catch (reason) {
-    throw new Error('ERROR: ' + reason);
+    throw new Error(`ERROR: ${reason}`);
   }
 }

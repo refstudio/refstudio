@@ -11,7 +11,7 @@ export function ReferencesView({ onRefClicked }: { onRefClicked?: (item: Referen
           <li
             className="mb-0 cursor-pointer p-1 hover:bg-slate-100"
             key={reference.id}
-            onClick={() => onRefClicked && onRefClicked(reference)}
+            onClick={() => onRefClicked?.(reference)}
           >
             <strong>{reference.id}</strong> - {reference.title}
             <br />

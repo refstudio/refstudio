@@ -12,14 +12,18 @@ export function FoldersView({ onClick }: { onClick?: (fileEntry: FileEntry) => v
   const [selectedFile, setSelectedFile] = useState<FileEntry>();
 
   useEffect(() => {
-    readAllProjectFiles().then((files) => {
-      setFiles(files);
-      const selected = files.find((f) => f.name?.endsWith('.tiptap'));
-      if (selected) {
-        setSelectedFile(selected); // We need this because we might be selecting a DOT_FILE
-        onClick?.(selected);
-      }
-    });
+    readAllProjectFiles()
+      .then((newFiles) => {
+        setFiles(newFiles);
+        const selected = newFiles.find((f) => f.name?.endsWith('.tiptap'));
+        if (selected) {
+          setSelectedFile(selected); // We need this because we might be selecting a DOT_FILE
+          onClick?.(selected);
+        }
+      })
+      .catch((e) => {
+        console.error(e);
+      });
   }, [onClick]);
 
   function handleOnClick(file: FileEntry): void {
@@ -27,12 +31,19 @@ export function FoldersView({ onClick }: { onClick?: (fileEntry: FileEntry) => v
     onClick?.(file);
   }
 
-  const handleChange = (files: FileList) => {
-    uploadFiles(files).then(() => {
-      console.log('File uploaded with success');
-      readAllProjectFiles().then(setFiles);
-      console.log(files);
-    });
+  const handleChange = (newFiles: FileList) => {
+    uploadFiles(newFiles)
+      .then(() => {
+        console.log('File uploaded with success');
+        return readAllProjectFiles();
+      })
+      .then((projectFiles) => {
+        setFiles(projectFiles);
+        console.log(newFiles);
+      })
+      .catch((e) => {
+        console.error(e);
+      });
   };
 
   return (
