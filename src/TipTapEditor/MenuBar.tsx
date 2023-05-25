@@ -35,7 +35,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
   }, [editor, refreshToggle]);
 
   return (
-    <menu className="toolbar menu-bar">
+    <menu className="toolbar menu-bar m-5 mb-0">
       <button
         onClick={() => editor.chain().focus().undo().run()}
         disabled={!editor.can().chain().focus().undo().run()}

@@ -25,12 +25,12 @@ export function CenterPaneView({ file, ...props }: CenterPaneViewProps) {
     }
   }, [file]);
 
-  if (loading) return <div><strong>Loading...</strong></div>;
+  if (loading) return <div className="p-3"><strong>Loading...</strong></div>;
 
   if (file && isTipTap(file)) return <TipTapEditor {...props} editorContent={content} />;
 
   return (
-    <div>
+    <div className='p-3'>
       <strong>FILE:</strong>
       <div>{file?.name} at <code>{file?.path}</code></div>
     </div>
