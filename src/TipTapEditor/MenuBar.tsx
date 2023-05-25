@@ -37,54 +37,54 @@ export function MenuBar({ editor }: { editor: Editor }) {
   return (
     <menu className="toolbar menu-bar">
       <button
-        onClick={() => editor.chain().focus().undo().run()}
-        disabled={!editor.can().chain().focus().undo().run()}
         className="toolbar-item"
+        disabled={!editor.can().chain().focus().undo().run()}
+        onClick={() => editor.chain().focus().undo().run()}
       >
         <i className="format undo" />
       </button>
 
       <button
-        onClick={() => editor.chain().focus().redo().run()}
-        disabled={!editor.can().chain().focus().redo().run()}
         className={cx('toolbar-item')}
+        disabled={!editor.can().chain().focus().redo().run()}
+        onClick={() => editor.chain().focus().redo().run()}
       >
         <i className="format redo" />
       </button>
       <Divider />
       <button
-        onClick={() => editor.chain().focus().toggleBold().run()}
-        disabled={!editor.can().chain().focus().toggleBold().run()}
         className={cx('toolbar-item', {
           active: editor.isActive('bold'),
         })}
+        disabled={!editor.can().chain().focus().toggleBold().run()}
+        onClick={() => editor.chain().focus().toggleBold().run()}
       >
         <i className="format bold" />
       </button>
       <button
-        onClick={() => editor.chain().focus().toggleItalic().run()}
-        disabled={!editor.can().chain().focus().toggleItalic().run()}
         className={cx('toolbar-item', {
           active: editor.isActive('italic'),
         })}
+        disabled={!editor.can().chain().focus().toggleItalic().run()}
+        onClick={() => editor.chain().focus().toggleItalic().run()}
       >
         <i className="format italic" />
       </button>
       <button
-        onClick={() => editor.chain().focus().toggleStrike().run()}
-        disabled={!editor.can().chain().focus().toggleStrike().run()}
         className={cx('toolbar-item', {
           active: editor.isActive('strike'),
         })}
+        disabled={!editor.can().chain().focus().toggleStrike().run()}
+        onClick={() => editor.chain().focus().toggleStrike().run()}
       >
         <i className="format strikethrough" />
       </button>
       <button
-        onClick={() => editor.chain().focus().toggleCode().run()}
-        disabled={!editor.can().chain().focus().toggleCode().run()}
         className={cx('toolbar-item', {
           active: editor.isActive('code'),
         })}
+        disabled={!editor.can().chain().focus().toggleCode().run()}
+        onClick={() => editor.chain().focus().toggleCode().run()}
       >
         <i className="format code" />
       </button>
@@ -92,52 +92,52 @@ export function MenuBar({ editor }: { editor: Editor }) {
       <Divider />
 
       <button
-        onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
         className={cx('toolbar-item', {
           active: editor.isActive('heading', { level: 1 }),
         })}
+        onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
       >
         <i className="format h1" />
       </button>
       <button
-        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
         className={cx('toolbar-item', {
           active: editor.isActive('heading', { level: 2 }),
         })}
+        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
       >
         <i className="format h2" />
       </button>
       <button
-        onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
         className={cx('toolbar-item', {
           active: editor.isActive('heading', { level: 3 }),
         })}
+        onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
       >
         <i className="format h3" />
       </button>
       <button
-        onClick={() => editor.chain().focus().setParagraph().run()}
         className={cx('toolbar-item', {
           active: editor.isActive('paragraph'),
         })}
+        onClick={() => editor.chain().focus().setParagraph().run()}
       >
         <i className="format paragraph" />
       </button>
       <Divider />
 
       <button
-        onClick={() => editor.chain().focus().toggleBulletList().run()}
         className={cx('toolbar-item', {
           active: editor.isActive('bulletList'),
         })}
+        onClick={() => editor.chain().focus().toggleBulletList().run()}
       >
         <i className="format ul" />
       </button>
       <button
-        onClick={() => editor.chain().focus().toggleOrderedList().run()}
         className={cx('toolbar-item', {
           active: editor.isActive('orderedList'),
         })}
+        onClick={() => editor.chain().focus().toggleOrderedList().run()}
       >
         <i className="format ol" />
       </button>
@@ -161,7 +161,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
       <button onClick={() => editor.chain().focus().setHardBreak().run()}>hard break</button> */}
 
       <Divider />
-      <button onClick={handleToggleMarkdown} className="toolbar-item">
+      <button className="toolbar-item" onClick={handleToggleMarkdown}>
         <i
           className={cx('format', {
             'journal-text': markdownMode,

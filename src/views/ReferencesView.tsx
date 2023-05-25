@@ -9,8 +9,8 @@ export function ReferencesView({ onRefClicked }: { onRefClicked?: (item: Referen
       <ul className="divide-y-2 border">
         {REFS_DATABASE.map((reference) => (
           <li
-            key={reference.id}
             className="mb-0 cursor-pointer p-1 hover:bg-slate-100"
+            key={reference.id}
             onClick={() => onRefClicked && onRefClicked(reference)}
           >
             <strong>{reference.id}</strong> - {reference.title}

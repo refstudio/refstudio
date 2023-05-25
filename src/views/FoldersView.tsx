@@ -41,9 +41,9 @@ export function FoldersView({ onClick }: { onClick?: (fileEntry: FileEntry) => v
         <h1 className="flex flex-col">
           Project X<code className="block text-xs font-normal">{BASE_DIR}</code>
         </h1>
-        <FileTree root files={files} selectedFile={selectedFile} onClick={handleOnClick} />
+        <FileTree files={files} root selectedFile={selectedFile} onClick={handleOnClick} />
       </div>
-      <FileUploader handleChange={handleChange} name="file" multiple label="Upload or drop a file right here" />
+      <FileUploader handleChange={handleChange} label="Upload or drop a file right here" multiple name="file" />
     </div>
   );
 }
@@ -56,28 +56,30 @@ interface FileTreeBaseProps {
   onClick: (file: FileEntry) => void;
 }
 
-const FileTree = ({ files, root, ...props }: FileTreeBaseProps) => {
-  return (
-    <div>
-      <ul
-        className={cx('', {
-          'ml-6': !root,
-        })}
-      >
-        {files.map((file) => (
-          <FileTreeNode key={file.path} files={files} file={file} {...props} />
-        ))}
-      </ul>
-    </div>
-  );
-};
+const FileTree = ({ files, root, ...props }: FileTreeBaseProps) => (
+  <div>
+    <ul
+      className={cx('', {
+        'ml-6': !root,
+      })}
+    >
+      {files.map((file) => (
+        <FileTreeNode file={file} files={files} key={file.path} {...props} />
+      ))}
+    </ul>
+  </div>
+);
 
 const FileTreeNode = ({ file, onClick, selectedFile }: FileTreeBaseProps) => {
-  if (!file) return null;
+  if (!file) {
+    return null;
+  }
   const isFolder = Array.isArray(file.children);
 
   // Hide DOT_FILES
-  if (file.name?.startsWith('.')) return null;
+  if (file.name?.startsWith('.')) {
+    return null;
+  }
 
   return (
     <li>
@@ -103,7 +105,7 @@ const FileTreeNode = ({ file, onClick, selectedFile }: FileTreeBaseProps) => {
       </div>
 
       {isFolder && Array.isArray(file.children) && (
-        <FileTree files={file.children} onClick={onClick} selectedFile={selectedFile} />
+        <FileTree files={file.children} selectedFile={selectedFile} onClick={onClick} />
       )}
     </li>
   );

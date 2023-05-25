@@ -11,21 +11,25 @@ import { EDITOR_EXTENSIONS, INITIAL_CONTENT } from './TipTapEditorConfigs';
 export function TipTapEditor({ editorRef, editorContent, onSelectionChange }: EditorProps) {
   const [editor, setEditor] = useState<Editor | null>(null);
   useEffect(() => {
-    setEditor(new Editor({
-      extensions: EDITOR_EXTENSIONS,
-      content: editorContent ?? INITIAL_CONTENT,
-      onSelectionUpdate({ editor }) {
-        const { from, to } = editor.view.state.selection;
-        onSelectionChange(editor.view.state.doc.textBetween(from, to));
-      },
-    }));
+    setEditor(
+      new Editor({
+        extensions: EDITOR_EXTENSIONS,
+        content: editorContent ?? INITIAL_CONTENT,
+        onSelectionUpdate({ editor }) {
+          const { from, to } = editor.view.state.selection;
+          onSelectionChange(editor.view.state.doc.textBetween(from, to));
+        },
+      }),
+    );
   }, [editorContent, onSelectionChange]);
 
   useEffect(() => {
-    if (!editor) return;
+    if (!editor) {
+      return;
+    }
     editorRef.current = {
       insertReference(reference) {
-        editor?.commands.insertContentAt(editor.state.selection.head, {
+        editor.commands.insertContentAt(editor.state.selection.head, {
           type: ReferenceNode.name,
           attrs: { id: reference.id },
         });
@@ -33,7 +37,9 @@ export function TipTapEditor({ editorRef, editorContent, onSelectionChange }: Ed
     };
   }, [editor, editorRef]);
 
-  if (!editor) return <div>...</div>;
+  if (!editor) {
+    return <div>...</div>;
+  }
 
   return (
     <div className="tiptap-editor">

@@ -5,7 +5,9 @@ export function AIView({ selection }: { selection: string | null }) {
   const [reply, setReply] = useState('');
 
   useEffect(() => {
-    if (!selection) return;
+    if (!selection) {
+      return;
+    }
     interactWithAi(selection).then(setReply).catch(console.error);
   }, [selection]);
 
@@ -29,7 +31,9 @@ async function interactWithAi(selection: string) {
   try {
     const command = Command.sidecar('bin/python/main', ['--text', `${selection}`]);
     const output = await command.execute();
-    if (output.stderr) throw new Error(output.stderr);
+    if (output.stderr) {
+      throw new Error(output.stderr);
+    }
 
     const response = JSON.parse(output.stdout);
     const aiReply = response.num_words;
