@@ -21,18 +21,25 @@ export function CenterPaneView({ file, ...props }: CenterPaneViewProps) {
         const textContent = new TextDecoder('utf-8').decode(content);
         setContent(textContent);
         setLoading(false);
-      })()
+      })();
     }
   }, [file]);
 
-  if (loading) return <div><strong>Loading...</strong></div>;
+  if (loading)
+    return (
+      <div>
+        <strong>Loading...</strong>
+      </div>
+    );
 
   if (file && isTipTap(file)) return <TipTapEditor {...props} editorContent={content} />;
 
   return (
     <div>
       <strong>FILE:</strong>
-      <div>{file?.name} at <code>{file?.path}</code></div>
+      <div>
+        {file?.name} at <code>{file?.path}</code>
+      </div>
     </div>
   );
 }

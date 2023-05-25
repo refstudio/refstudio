@@ -11,14 +11,16 @@ import { EDITOR_EXTENSIONS, INITIAL_CONTENT } from './TipTapEditorConfigs';
 export function TipTapEditor({ editorRef, editorContent, onSelectionChange }: EditorProps) {
   const [editor, setEditor] = useState<Editor | null>(null);
   useEffect(() => {
-    setEditor(new Editor({
-      extensions: EDITOR_EXTENSIONS,
-      content: editorContent ?? INITIAL_CONTENT,
-      onSelectionUpdate({ editor }) {
-        const { from, to } = editor.view.state.selection;
-        onSelectionChange(editor.view.state.doc.textBetween(from, to));
-      },
-    }));
+    setEditor(
+      new Editor({
+        extensions: EDITOR_EXTENSIONS,
+        content: editorContent ?? INITIAL_CONTENT,
+        onSelectionUpdate({ editor }) {
+          const { from, to } = editor.view.state.selection;
+          onSelectionChange(editor.view.state.doc.textBetween(from, to));
+        },
+      }),
+    );
   }, [editorContent, onSelectionChange]);
 
   useEffect(() => {
