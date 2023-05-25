@@ -62,13 +62,112 @@ module.exports = {
     '@typescript-eslint/unified-signatures': 'error',
     'arrow-body-style': 'warn',
     'brace-style': ['error', '1tbs'],
-    camelcase: 'off',
     'comma-dangle': ['error', 'always-multiline'],
-    complexity: 'off',
     'constructor-super': 'error',
     curly: 'error',
     'eol-last': 'error',
     eqeqeq: ['error', 'smart'],
     'guard-for-in': 'error',
+
+    'new-parens': 'error',
+    'no-bitwise': 'error',
+    'no-caller': 'error',
+    'no-cond-assign': 'error',
+    'no-console': 'error',
+    'no-debugger': 'error',
+    'no-declare': 'off',
+    '@typescript-eslint/no-redeclare': ['error'],
+    'no-empty': 'error',
+    'no-eval': 'error',
+    'no-fallthrough': 'off',
+    'no-invalid-this': 'off',
+    'no-multiple-empty-lines': 'error',
+    'no-new-wrappers': 'error',
+    'no-shadow': 'off',
+    '@typescript-eslint/no-shadow': [
+      'error',
+      {
+        hoist: 'all',
+      },
+    ],
+    'no-throw-literal': 'error',
+    'no-trailing-spaces': 'error',
+    'no-undef-init': 'error',
+    'no-underscore-dangle': 'error',
+    'no-unsafe-finally': 'error',
+    'no-unused-labels': 'error',
+    'no-var': 'error',
+    'object-shorthand': 'error',
+    'one-var': ['error', 'never'],
+    'prefer-arrow-callback': ['error', {allowNamedFunctions: true}],
+
+    'prefer-destructuring': [
+      'error',
+      {
+        VariableDeclarator: {
+          array: false,
+          object: true,
+        },
+        AssignmentExpression: {
+          array: false,
+          object: false,
+        },
+      },
+      {
+        enforceForRenamedProperties: false,
+      },
+    ],
+    'quote-props': ['error', 'as-needed'],
+    radix: 'error',
+    'space-before-function-paren': 'off',
+
+    'react/jsx-sort-props': [
+      'error',
+      {
+        callbacksLast: true,
+      },
+    ],
+    'react/jsx-curly-brace-presence': 'error',
+    'react/self-closing-comp': 'error',
+    'spaced-comment': [
+      'error',
+      'always',
+      {
+        markers: ['/'],
+      },
+    ],
+    'use-isnan': 'error',
+    'valid-typeof': 'off',
+    'no-return-await': 'warn',
+    '@typescript-eslint/prefer-for-of': 'error',
+    '@typescript-eslint/prefer-optional-chain': 'error',
+
+    '@typescript-eslint/ban-ts-comment': ['warn', {minimumDescriptionLength: 10}],
+    '@typescript-eslint/no-unnecessary-type-arguments': 'error',
+
+    '@typescript-eslint/no-unnecessary-condition': 'error',
+    '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'error',
+    '@typescript-eslint/no-throw-literal': 'error',
+    '@typescript-eslint/no-parameter-properties': 'error',
+    '@typescript-eslint/no-invalid-void-type': 'error',
+    '@typescript-eslint/no-confusing-non-null-assertion': 'error',
+    '@typescript-eslint/switch-exhaustiveness-check': 'error',
+    '@typescript-eslint/no-floating-promises': [
+      'error',
+      {
+        ignoreIIFE: true,
+      },
+    ],
+    '@typescript-eslint/promise-function-async': [
+      'error',
+      {
+        checkArrowFunctions: false,
+        checkFunctionDeclarations: true,
+        checkFunctionExpressions: true,
+        checkMethodDeclarations: true,
+      },
+    ],
+    '@typescript-eslint/prefer-ts-expect-error': 'error',
+    '@typescript-eslint/prefer-string-starts-ends-with': 'error',
   }
 };
