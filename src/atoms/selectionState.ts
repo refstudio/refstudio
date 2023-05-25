@@ -1,6 +1,3 @@
-import { atom } from 'recoil';
+import { atom } from 'jotai';
 
-export const selectionState = atom({
-  key: 'selectionState',
-  default: '',
-});
+export const selectionAtom = atom('');

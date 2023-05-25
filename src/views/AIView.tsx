@@ -1,14 +1,14 @@
 import { Command } from '@tauri-apps/api/shell';
+import { useAtom } from 'jotai';
 import { useEffect, useState } from 'react';
-import { useRecoilValue } from 'recoil';
 import { useDebounce } from 'usehooks-ts';
 
-import { selectionState } from '../atoms/selectionState';
+import { selectionAtom } from '../atoms/selectionState';
 
 export function AIView() {
   const [reply, setReply] = useState('');
 
-  const selection = useRecoilValue(selectionState);
+  const [selection] = useAtom(selectionAtom);
   const debouncedSelection = useDebounce(selection, 200);
 
   useEffect(() => {
