@@ -68,6 +68,7 @@ module.exports = {
     '@typescript-eslint/no-unsafe-member-access': 'off',
     '@typescript-eslint/no-unsafe-call': 'off',
 
+    // Built-in eslint rules where we'd like to be more strict.
     'arrow-body-style': 'warn',
     'brace-style': ['error', '1tbs'],
     'comma-dangle': ['error', 'always-multiline'],
