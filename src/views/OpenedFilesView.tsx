@@ -31,7 +31,7 @@ export function OpenedFilesView() {
             'border border-b-0 border-slate-400',
             'hover:bg-slate-100',
             {
-              'border-t-2 !border-t-primary bg-slate-100': openedFiles.selectedFile === fileInfo,
+              'border-t-2 !border-t-green-500 bg-slate-100': openedFiles.selectedFile === fileInfo,
             },
           )}
           key={fileInfo.entry.path}
