@@ -1,6 +1,5 @@
-
 .toolbar {
-  @apply flex items-stretch p-1 mb-4;
+  @apply flex items-stretch p-1;
   @apply bg-slate-100;
   @apply rounded-t-xl;
 }
@@ -8,7 +7,7 @@
 .toolbar button.toolbar-item {
   @apply !bg-transparent;
   @apply flex items-center;
-  @apply border-0 p-2 rounded-lg cursor-pointer
+  @apply cursor-pointer rounded-lg border-0 p-2;
 }
 
 .toolbar button.toolbar-item:disabled {
@@ -32,7 +31,6 @@
 
 .toolbar button.toolbar-item.active {
   @apply !bg-slate-200;
-  
 }
 
 .toolbar button.toolbar-item.active i {
@@ -48,7 +46,6 @@
   background-color: #eee;
   margin: 0 4px;
 }
-
 
 .toolbar i.undo {
   background-image: url(images/icons/arrow-counterclockwise.svg);
