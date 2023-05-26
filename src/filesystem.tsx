@@ -18,6 +18,9 @@ const UPLOADS_DIR = 'uploads';
 async function getBaseDir() {
   return join(await appDataDir(), PROJECT_NAME);
 }
+async function getUploadsDir() {
+  return join(await getBaseDir(), UPLOADS_DIR);
+}
 export async function ensureProjectFileStructure() {
   try {
     const baseDir = await getBaseDir();
@@ -51,12 +54,13 @@ export async function uploadFiles(files: FileList) {
 }
 
 export async function runPDFIngestion() {
-  const uploadsDir = await join(await getBaseDir(), UPLOADS_DIR);
+  const uploadsDir = await getUploadsDir();
   const command = Command.sidecar('bin/python/main', ['ingest', '--pdf_directory', `${uploadsDir.toString()}`]);
-  console.log('command', command)
+  console.log('command', command);
   const output = await command.execute();
-  if (output.stderr) throw new Error(output.stderr);
-  return output.stdout;
+  const response = JSON.parse(output.stdout);
+  console.log('response', response);
+  return response;
 }
 
 export async function readFile(file: FileEntry) {

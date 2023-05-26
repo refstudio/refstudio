@@ -1,3 +1,4 @@
+import hashlib
 import os
 import sys
 from typing import List
@@ -5,6 +6,15 @@ from typing import List
 from .typing import Chunk
 
 MODEL_FOR_EMBEDDINGS = "sentence-transformers/all-MiniLM-L6-v2"
+
+
+def get_filename_md5(filename: str) -> str:
+    """
+    Get the MD5 hash of a filename
+    :param filename: str
+    :return: str
+    """
+    return hashlib.md5(filename.encode()).hexdigest()
 
 
 def chunk_text(text: str, chunk_size: int = 1000, chunk_overlap: int = 200) -> List[Chunk]:

@@ -35,7 +35,6 @@ export function FoldersView({ onClick }: { onClick?: (fileEntry: FileEntry) => v
     });
     runPDFIngestion().then(() => {
       console.log('PDFs ingested with success');
-      readAllProjectFiles().then(setFiles);
     });
   };
 

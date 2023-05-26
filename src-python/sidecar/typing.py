@@ -5,6 +5,7 @@ from typing import List, Dict, Any
 @dataclass
 class Reference:
     source_filename: str
+    filename_md5: str
     title: str
     abstract: str
     contents: str

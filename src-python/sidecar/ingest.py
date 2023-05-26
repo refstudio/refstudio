@@ -10,8 +10,15 @@ import logging
 import json
 import os
 
-from .shared import chunk_text, embed_text, HiddenPrints
+from .shared import get_filename_md5, chunk_text, embed_text, HiddenPrints
 from .typing import Reference, Author
+
+
+# parallelism within tokenizers has been causing an inconsistent
+# issue when coupled with Tauri and PyInstaller
+# setting to false fixes the issue for now, but we should investigate
+# https://github.com/refstudio/refstudio/issues/56
+os.environ['TOKENIZERS_PARALLELISM'] = 'false'
 
 
 logger = logging.getLogger(__name__)
@@ -156,9 +163,12 @@ class PDFIngestion:
             with open(file, 'r') as fin:
                 doc = json.load(fin)
 
+            source_pdf = f"{file.stem}.pdf"
             header = self._parse_header(doc)
+
             ref = Reference(
-                source_filename=file.name,
+                source_filename=source_pdf,
+                filename_md5=get_filename_md5(source_pdf),
                 title=header.get("title"),
                 authors=header.get("authors"),
                 abstract=doc.get("abstract"),
@@ -178,6 +188,8 @@ class PDFIngestion:
         for ref in references:
             # no need to include reference abstract, contents, or chunks in response
             prepared_references.append({
+                "source_filename": ref.source_filename,
+                "filename_md5": ref.filename_md5,
                 "title": ref.title,
                 "authors": [asdict(a) for a in ref.authors],
             })
