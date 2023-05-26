@@ -78,10 +78,11 @@ export const PdfViewer = ({ file, pdfViewerRef }: PdfViewerProps) => {
   if (isFileLoading) return <div><strong>Loading</strong></div>;
 
   return (
-    <div ref={containerRef}>
+    <div className="pdf-viewer flex flex-col h-full" ref={containerRef}>
       <Document
         file={fileContent}
         onLoadSuccess={onDocumentLoadSuccess}
+        className="flex-1 overflow-scroll"
       >
         {numPages && Array.from(new Array(numPages), (_, index) => (
           <Page key={`page_${index + 1}`} pageNumber={index + 1} width={pdfViewerWidth} />
