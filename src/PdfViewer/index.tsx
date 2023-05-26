@@ -2,7 +2,7 @@ import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
 import { FileEntry } from "@tauri-apps/api/fs";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Document, Page } from "react-pdf";
 
 import { readFile } from "../filesystem";
@@ -25,12 +25,16 @@ export const PdfViewer = ({ file, pdfViewerRef }: PdfViewerProps) => {
 
   const updateTimeoutRef = useRef<NodeJS.Timeout>();
 
+
   const updateWidth = useCallback(() => {
     clearTimeout(updateTimeoutRef.current);
     updateTimeoutRef.current = setTimeout(() => {
       setPdfViewerWidth(containerRef.current?.getBoundingClientRect().width);
     }, 200);
   }, [updateTimeoutRef]);
+
+  // Update viewer's width on mount
+  useLayoutEffect(updateWidth, [updateWidth]);
 
   // Update viewer's width on window resize
   useEffect(() => {
