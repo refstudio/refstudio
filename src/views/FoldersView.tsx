@@ -37,7 +37,7 @@ export function FoldersView({ onClick }: { onClick?: (fileEntry: FileEntry) => v
 
   return (
     <div className="flex h-full flex-col justify-between">
-      <div>
+      <div className="flex h-full w-full flex-1 flex-col">
         <h1 className="flex flex-col">
           Project X<code className="block text-xs font-normal">{BASE_DIR}</code>
         </h1>
@@ -58,7 +58,7 @@ interface FileTreeBaseProps {
 
 const FileTree = ({ files, root, ...props }: FileTreeBaseProps) => {
   return (
-    <div>
+    <div className="flex-1 overflow-scroll">
       <ul
         className={cx('', {
           'ml-6': !root,

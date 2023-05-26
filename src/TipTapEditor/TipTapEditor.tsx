@@ -38,9 +38,9 @@ export function TipTapEditor({ editorRef, editorContent, onSelectionChange }: Ed
   if (!editor) return <div>...</div>;
 
   return (
-    <div className="tiptap-editor">
+    <div className="tiptap-editor flex h-full flex-col">
       <MenuBar editor={editor} />
-      <EditorContent className="px-2" editor={editor} />
+      <EditorContent className="flex-1 overflow-scroll pl-5 pr-2 pt-4" editor={editor} />
     </div>
   );
 }

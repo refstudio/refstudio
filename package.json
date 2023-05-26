@@ -9,11 +9,15 @@
     "build": "tsc && vite build",
     "prettier:check": "prettier --config package.json --check 'src/**'",
     "prettier:fix": "prettier --config package.json --write 'src/**'",
+    "pylint:check": "poetry run ruff check ./src-python",
+    "pylint:fix": "poetry run ruff check --fix ./src-python",
     "lint:check": "eslint --ext .js,.ts,.tsx ./src",
     "lint:fix": "eslint --fix --ext .js,.ts,.tsx ./src",
     "preview": "vite preview",
     "python": "poetry run pyinstaller src-python/main.py --noconfirm --distpath src-tauri/bin/python && bash scripts/move_binary.sh",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:dev:debug": "DEV_TOOLS=1 tauri dev"
   },
   "dependencies": {
     "@tauri-apps/api": "^1.2.0",
