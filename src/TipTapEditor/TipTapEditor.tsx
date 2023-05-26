@@ -1,7 +1,7 @@
 import './TipTapEditor.css';
 
 import { Editor, EditorContent } from '@tiptap/react';
-import { useAtom } from 'jotai';
+import { useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 
 import { selectionAtom } from '../atoms/selectionState';
@@ -12,7 +12,7 @@ import { EDITOR_EXTENSIONS, INITIAL_CONTENT } from './TipTapEditorConfigs';
 
 export function TipTapEditor({ editorRef, editorContent }: EditorProps) {
   const [editor, setEditor] = useState<Editor | null>(null);
-  const [, setSelection] = useAtom(selectionAtom);
+  const setSelection = useSetAtom(selectionAtom);
 
   useEffect(() => {
     setEditor(
