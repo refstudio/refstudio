@@ -8,6 +8,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "fmt": "prettier --config package.json --write '**/*'",
+    "pylint:check": "poetry run ruff check ./src-python",
+    "pylint:fix": "poetry run ruff check --fix ./src-python",
     "lint:check": "eslint --ext .js,.ts,.tsx ./src",
     "lint:fix": "eslint --fix --ext .js,.ts,.tsx ./src",
     "preview": "vite preview",
