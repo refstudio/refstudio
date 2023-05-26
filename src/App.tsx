@@ -6,6 +6,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { useDebounce } from 'usehooks-ts';
 
 import { EditorAPI } from './types/EditorAPI';
+import { PdfViewerAPI } from './types/PdfViewerAPI';
 import { ReferenceItem } from './types/ReferenceItem';
 import { AIView } from './views/AIView';
 import { CenterPaneView } from './views/CenterPaneView';
@@ -22,7 +23,8 @@ function App() {
 
   const [selection, setSelection] = React.useState<string | null>(null);
   const debouncedSelection = useDebounce(selection, 200);
-  const editorRef = React.useRef<EditorAPI>();
+  const editorRef = React.useRef<EditorAPI>(null);
+  const pdfViewerRef = React.useRef<PdfViewerAPI>(null);
   const handleReferenceClicked = (reference: ReferenceItem) => {
     editorRef.current?.insertReference(reference);
   };
@@ -31,6 +33,10 @@ function App() {
     setSelectedFile(file);
   }, []);
 
+  const handleCenterPanelResize = () => {
+    pdfViewerRef.current?.updateWidth();
+  }
+
   return (
     <PanelGroup autoSaveId="refstudio" direction="horizontal">
       <Panel defaultSize={20} collapsible className="overflow-scroll p-4">
@@ -38,9 +44,8 @@ function App() {
       </Panel>
       <VerticalResizeHandle />
 
-      {/* Not sure about this hack */}
-      <Panel defaultSize={60} className="overflow-scroll p-3" style={{ overflow: 'scroll' }}>
-        <CenterPaneView onSelectionChange={setSelection} editorRef={editorRef} file={selectedFile} />
+      <Panel defaultSize={60} className="overflow-scroll p-3" onResize={handleCenterPanelResize}>
+        <CenterPaneView onSelectionChange={setSelection} editorRef={editorRef} pdfViewerRef={pdfViewerRef} file={selectedFile} />
       </Panel>
 
       <VerticalResizeHandle />
