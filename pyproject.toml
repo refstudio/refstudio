@@ -22,3 +22,6 @@ ruff = "^0.0.270"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 120  # same length we have prettier/JS set to
