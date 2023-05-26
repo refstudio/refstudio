@@ -39,28 +39,28 @@ function App() {
 
   return (
     <PanelGroup autoSaveId="refstudio" direction="horizontal">
-      <Panel defaultSize={20} collapsible className="overflow-scroll p-4">
+      <Panel defaultSize={20} collapsible className="p-4">
         <FoldersView onClick={handleFolderClick} />
       </Panel>
       <VerticalResizeHandle />
 
-      <Panel defaultSize={60} className="overflow-scroll p-3" onResize={handleCenterPanelResize}>
+      <Panel defaultSize={60} onResize={handleCenterPanelResize}>
         <CenterPaneView onSelectionChange={setSelection} editorRef={editorRef} pdfViewerRef={pdfViewerRef} file={selectedFile} />
       </Panel>
 
       <VerticalResizeHandle />
       <Panel>
         <PanelGroup autoSaveId="rs-right-sidebar" direction="vertical">
-          <Panel className="overflow-scroll p-3">
+          <Panel className="p-3">
             <ReferencesView onRefClicked={handleReferenceClicked} />
           </Panel>
           <HorizontalResizeHandle />
-          <Panel className="overflow-scroll p-3">
+          <Panel className="p-3">
             <AIView selection={debouncedSelection} />
           </Panel>
         </PanelGroup>
       </Panel>
-    </PanelGroup>
+    </PanelGroup >
   );
 }
 
