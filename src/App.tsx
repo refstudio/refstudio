@@ -1,9 +1,10 @@
 import { FileEntry } from '@tauri-apps/api/fs';
-import * as React from 'react';
-import { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { useDebounce } from 'usehooks-ts';
 
+import { PanelWrapper } from './Components/PanelWrapper';
+import { PrimarySideBar, PrimarySideBarPane } from './Components/PrimarySideBar';
 import { EditorAPI } from './types/EditorAPI';
 import { ReferenceItem } from './types/ReferenceItem';
 import { AIView } from './views/AIView';
@@ -12,6 +13,8 @@ import { FoldersView } from './views/FoldersView';
 import { ReferencesView } from './views/ReferencesView';
 
 function App() {
+  const [primaryPane, setPrimaryPane] = useState<PrimarySideBarPane>('Explorer');
+
   const [selectedFile, setSelectedFile] = React.useState<FileEntry | undefined>();
 
   const [selection, setSelection] = React.useState<string | null>(null);
@@ -27,8 +30,18 @@ function App() {
 
   return (
     <PanelGroup autoSaveId="refstudio" direction="horizontal">
-      <Panel defaultSize={20} collapsible className="p-4">
-        <FoldersView onClick={handleFolderClick} />
+      <PrimarySideBar activePane={primaryPane} onClick={setPrimaryPane} />
+      <Panel defaultSize={20} collapsible>
+        {primaryPane === 'Explorer' && (
+          <PanelWrapper title="Explorer">
+            <FoldersView onClick={handleFolderClick} />
+          </PanelWrapper>
+        )}
+        {primaryPane === 'References' && (
+          <PanelWrapper title="References">
+            <ReferencesView onRefClicked={handleReferenceClicked} />
+          </PanelWrapper>
+        )}
       </Panel>
       <VerticalResizeHandle />
 
@@ -37,27 +50,17 @@ function App() {
       </Panel>
 
       <VerticalResizeHandle />
-      <Panel>
-        <PanelGroup autoSaveId="rs-right-sidebar" direction="vertical">
-          <Panel className="p-3">
-            <ReferencesView onRefClicked={handleReferenceClicked} />
-          </Panel>
-          <HorizontalResizeHandle />
-          <Panel className="p-3">
-            <AIView selection={debouncedSelection} />
-          </Panel>
-        </PanelGroup>
+      <Panel collapsible>
+        <PanelWrapper title="AI">
+          <AIView selection={debouncedSelection} />
+        </PanelWrapper>
       </Panel>
-    </PanelGroup >
+    </PanelGroup>
   );
 }
 
 function VerticalResizeHandle() {
   return <PanelResizeHandle className="flex w-1 items-center bg-gray-200 hover:bg-blue-100" />;
-}
-
-function HorizontalResizeHandle() {
-  return <PanelResizeHandle className="flex h-1 items-center bg-gray-200 hover:bg-blue-100" />;
 }
 
 export default App;

@@ -36,14 +36,15 @@ export function FoldersView({ onClick }: { onClick?: (fileEntry: FileEntry) => v
   };
 
   return (
-    <div className="flex h-full flex-col justify-between">
-      <div className='flex-1 flex flex-col h-full w-full'>
-        <h1 className="flex flex-col">
-          Project X<code className="block text-xs font-normal">{BASE_DIR}</code>
-        </h1>
+    <div className="flex h-full flex-col justify-between px-2 pt-2">
+      <div className="flex h-full w-full flex-1 flex-col">
+        <div className="mb-2 flex flex-col text-sm font-bold uppercase">Project X</div>
         <FileTree root files={files} selectedFile={selectedFile} onClick={handleOnClick} />
       </div>
-      <FileUploader handleChange={handleChange} name="file" multiple label="Upload or drop a file right here" />
+      <div>
+        <FileUploader handleChange={handleChange} name="file" multiple label="Upload or drop a file right here" />
+        <code className="mb-auto block text-xs font-normal">{BASE_DIR}</code>
+      </div>
     </div>
   );
 }
