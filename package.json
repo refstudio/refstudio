@@ -8,11 +8,15 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "fmt": "prettier --config package.json --write '**/*'",
+    "pylint:check": "poetry run ruff check ./src-python",
+    "pylint:fix": "poetry run ruff check --fix ./src-python",
     "lint:check": "eslint --ext .js,.ts,.tsx ./src",
     "lint:fix": "eslint --fix --ext .js,.ts,.tsx ./src",
     "preview": "vite preview",
     "python": "poetry run pyinstaller --onefile --noconfirm --hidden-import torch --collect-data torch --recursive-copy-metadata torch --hidden-import pyarrow --collect-data pyarrow --recursive-copy-metadata pyarrow --collect-binaries pyarrow --collect-submodules pyarrow --recursive-copy-metadata importlib_metadata --recursive-copy-metadata tqdm --recursive-copy-metadata sentence-transformers --distpath src-tauri/bin/python src-python/main.py && bash scripts/move_binary.sh",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:dev:debug": "DEV_TOOLS=1 tauri dev"
   },
   "dependencies": {
     "@tauri-apps/api": "^1.2.0",

@@ -1,7 +1,8 @@
-from argparse import ArgumentParser
-from sidecar import ingest
 import json
 import sys
+from argparse import ArgumentParser
+
+from sidecar import ingest
 
 
 def get_word_count(text: str) -> int:
@@ -11,7 +12,7 @@ def main(text: str):
     try:
         data = {"num_words": get_word_count(text)}
         print(json.dumps(data))
-    except:
+    except Exception:
         print("Error processing text", file=sys.stderr)
 
 

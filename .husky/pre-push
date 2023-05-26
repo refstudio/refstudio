@@ -4,3 +4,4 @@
 yarn lint:check
 # yarn test
 
+yarn pylint:check
