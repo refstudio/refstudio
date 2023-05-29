@@ -37,12 +37,17 @@ function App() {
 
   const handleCloseFile = useCallback(
     (fileToClose: FileEntry) => {
-      const shouldUpdateActiveFile = fileToClose.path === activeFile?.path;
-      const open = openFiles.filter((file) => file.path !== fileToClose.path);
-      setOpenFiles(open);
+      const newOpenFiles = openFiles.filter((file) => file.path !== fileToClose.path);
+      setOpenFiles(newOpenFiles);
 
-      if (shouldUpdateActiveFile && open.length > 0) {
-        setActiveFile(openFiles[0]);
+      if (newOpenFiles.length === 0) {
+        setActiveFile(undefined);
+      } else {
+        const shouldUpdateActiveFile = fileToClose.path === activeFile?.path;
+        const [firstFile] = newOpenFiles;
+        if (shouldUpdateActiveFile && newOpenFiles.length > 0) {
+          setActiveFile(firstFile);
+        }
       }
     },
     [activeFile, openFiles],
