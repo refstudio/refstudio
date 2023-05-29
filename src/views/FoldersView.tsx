@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { FileUploader } from 'react-drag-drop-files';
 
 import { cx } from '../cx';
-import { ensureProjectFileStructure, readAllProjectFiles, uploadFiles } from '../filesystem';
+import { ensureProjectFileStructure, readAllProjectFiles, runPDFIngestion, uploadFiles } from '../filesystem';
 
 const BASE_DIR = await ensureProjectFileStructure();
 
@@ -31,20 +31,20 @@ export function FoldersView({ onClick }: { onClick?: (fileEntry: FileEntry) => v
     onClick?.(file);
   }
 
-  const handleChange = (newFiles: FileList) => {
-    uploadFiles(newFiles)
-      .then(() => {
-        console.log('File uploaded with success');
-        return readAllProjectFiles();
-      })
-      .then((projectFiles) => {
-        setFiles(projectFiles);
-        console.log(newFiles);
-      })
-      .catch((e) => {
-        console.error(e);
-      });
-  };
+  async function handleChange(uploadedFiles: FileList) {
+    try {
+      await uploadFiles(uploadedFiles);
+      console.log('File uploaded with success');
+
+      const projectFiles = await readAllProjectFiles();
+      setFiles(projectFiles);
+
+      await runPDFIngestion();
+      console.log('PDFs ingested with success');
+    } catch (err) {
+      console.error('Error uploading references', err);
+    }
+  }
 
   return (
     <div className="flex h-full flex-col justify-between px-2 pt-2">

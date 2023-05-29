@@ -37,7 +37,7 @@ interface AIResponse {
 
 async function interactWithAi(selection: string) {
   try {
-    const command = Command.sidecar('bin/python/main', ['--text', `${selection}`]);
+    const command = Command.sidecar('bin/python/main', ['ai', '--text', `${selection}`]);
     const output = await command.execute();
     if (output.stderr) {
       throw new Error(output.stderr);
