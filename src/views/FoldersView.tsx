@@ -45,10 +45,10 @@ export function FoldersView({ onClick }: { onClick?: (fileEntry: FileEntry) => v
 
         {/* SAMPLE DEMO OF primary/secondary colors */}
         <div className="my-4 flex space-x-2">
-          <span className="flex w-20 cursor-pointer bg-primary p-2 text-xs text-white hover:bg-primary-hover">
+          <span className="flex w-20 cursor-pointer bg-primary p-2 text-xs hover:bg-primary-hover hover:text-white">
             Primary
           </span>
-          <span className="flex w-20 cursor-pointer bg-secondary p-2 text-xs text-white hover:bg-secondary-hover">
+          <span className="flex w-20 cursor-pointer bg-secondary p-2 text-xs hover:bg-secondary-hover hover:text-white">
             Secondary
           </span>
         </div>

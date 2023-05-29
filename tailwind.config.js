@@ -6,13 +6,14 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Using modern `hsl`
         primary: {
-          DEFAULT: "#58c380",
-          hover: "#1C9358"
+          DEFAULT: 'hsl(var(--color-primary) / <alpha-value>)',
+          hover: 'hsl(var(--color-primary-hover) / <alpha-value>)'
         },
         secondary: {
-          DEFAULT: "#88D9E6",
-          hover: "#46C4D8"
+          DEFAULT: 'hsl(var(--color-secondary) / <alpha-value>)',
+          hover: 'hsl(var(--color-secondary-hover) / <alpha-value>)'
         }
       }
     },
