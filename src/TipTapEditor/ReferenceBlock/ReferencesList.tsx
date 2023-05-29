@@ -14,7 +14,7 @@ export const ReferencesList = forwardRef(({ items, command }: ReferencesListProp
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const selectItem = (index: number) => {
-    const item = items[index];
+    const item = items[index] as ReferenceItem | undefined;
 
     if (item) {
       command(item);

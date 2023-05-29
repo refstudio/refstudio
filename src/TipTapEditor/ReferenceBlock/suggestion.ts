@@ -6,12 +6,11 @@ import tippy from 'tippy.js';
 import { ReferencesList, ReferencesListProps } from './ReferencesList';
 
 export const suggestion: MentionOptions['suggestion'] = {
-  items: ({ query }) => {
-    return ['ref1', 'ref2']
+  items: ({ query }) =>
+    ['ref1', 'ref2']
       .filter((item) => item.toLowerCase().startsWith(query.toLowerCase()))
       .map((item) => ({ id: item }))
-      .slice(0, 5);
-  },
+      .slice(0, 5),
 
   render: () => {
     let component: ReactRenderer<{ onKeyDown: (e: SuggestionKeyDownProps) => boolean }, ReferencesListProps>;

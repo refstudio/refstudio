@@ -17,22 +17,32 @@ export function CenterPaneView({ file, ...props }: CenterPaneViewProps) {
     if (file && isTipTap(file)) {
       setLoading(true);
       (async () => {
-        const content = await readFile(file);
-        const textContent = new TextDecoder('utf-8').decode(content);
+        const newBytes = await readFile(file);
+        const textContent = new TextDecoder('utf-8').decode(newBytes);
         setContent(textContent);
         setLoading(false);
-      })()
+      })();
     }
   }, [file]);
 
-  if (loading) return <div className="p-3"><strong>Loading...</strong></div>;
+  if (loading) {
+    return (
+      <div className="p-3">
+        <strong>Loading...</strong>
+      </div>
+    );
+  }
 
-  if (file && isTipTap(file)) return <TipTapEditor {...props} editorContent={content} />;
+  if (file && isTipTap(file)) {
+    return <TipTapEditor {...props} editorContent={content} />;
+  }
 
   return (
-    <div className='p-3'>
+    <div className="p-3">
       <strong>FILE:</strong>
-      <div>{file?.name} at <code>{file?.path}</code></div>
+      <div>
+        {file?.name} at <code>{file?.path}</code>
+      </div>
     </div>
   );
 }

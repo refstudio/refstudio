@@ -12,14 +12,18 @@ export function FoldersView({ onClick }: { onClick?: (fileEntry: FileEntry) => v
   const [selectedFile, setSelectedFile] = useState<FileEntry>();
 
   useEffect(() => {
-    readAllProjectFiles().then((files) => {
-      setFiles(files);
-      const selected = files.find((f) => f.name?.endsWith('.tiptap'));
-      if (selected) {
-        setSelectedFile(selected); // We need this because we might be selecting a DOT_FILE
-        onClick?.(selected);
-      }
-    });
+    readAllProjectFiles()
+      .then((newFiles) => {
+        setFiles(newFiles);
+        const selected = newFiles.find((f) => f.name?.endsWith('.tiptap'));
+        if (selected) {
+          setSelectedFile(selected); // We need this because we might be selecting a DOT_FILE
+          onClick?.(selected);
+        }
+      })
+      .catch((e) => {
+        console.error(e);
+      });
   }, [onClick]);
 
   function handleOnClick(file: FileEntry): void {
@@ -27,26 +31,30 @@ export function FoldersView({ onClick }: { onClick?: (fileEntry: FileEntry) => v
     onClick?.(file);
   }
 
-  const handleChange = (files: FileList) => {
-    uploadFiles(files).then(() => {
+  async function handleChange(uploadedFiles: FileList) {
+    try {
+      await uploadFiles(uploadedFiles);
       console.log('File uploaded with success');
-      readAllProjectFiles().then(setFiles);
-      console.log(files);
-    });
-    runPDFIngestion().then(() => {
+
+      const projectFiles = await readAllProjectFiles();
+      setFiles(projectFiles);
+
+      await runPDFIngestion();
       console.log('PDFs ingested with success');
-    });
-  };
+    } catch (err) {
+      console.error('Error uploading references', err);
+    }
+  }
 
   return (
     <div className="flex h-full flex-col justify-between">
-      <div className='flex-1 flex flex-col h-full w-full'>
+      <div className="flex h-full w-full flex-1 flex-col">
         <h1 className="flex flex-col">
           Project X<code className="block text-xs font-normal">{BASE_DIR}</code>
         </h1>
-        <FileTree root files={files} selectedFile={selectedFile} onClick={handleOnClick} />
+        <FileTree files={files} root selectedFile={selectedFile} onClick={handleOnClick} />
       </div>
-      <FileUploader handleChange={handleChange} name="file" multiple label="Upload or drop a file right here" />
+      <FileUploader handleChange={handleChange} label="Upload or drop a file right here" multiple name="file" />
     </div>
   );
 }
@@ -59,28 +67,30 @@ interface FileTreeBaseProps {
   onClick: (file: FileEntry) => void;
 }
 
-const FileTree = ({ files, root, ...props }: FileTreeBaseProps) => {
-  return (
-    <div className="flex-1 overflow-scroll">
-      <ul
-        className={cx('', {
-          'ml-6': !root,
-        })}
-      >
-        {files.map((file) => (
-          <FileTreeNode key={file.path} files={files} file={file} {...props} />
-        ))}
-      </ul>
-    </div>
-  );
-};
+const FileTree = ({ files, root, ...props }: FileTreeBaseProps) => (
+  <div className="flex-1 overflow-scroll">
+    <ul
+      className={cx('', {
+        'ml-6': !root,
+      })}
+    >
+      {files.map((file) => (
+        <FileTreeNode file={file} files={files} key={file.path} {...props} />
+      ))}
+    </ul>
+  </div>
+);
 
 const FileTreeNode = ({ file, onClick, selectedFile }: FileTreeBaseProps) => {
-  if (!file) return null;
+  if (!file) {
+    return null;
+  }
   const isFolder = Array.isArray(file.children);
 
   // Hide DOT_FILES
-  if (file.name?.startsWith('.')) return null;
+  if (file.name?.startsWith('.')) {
+    return null;
+  }
 
   return (
     <li>
@@ -106,7 +116,7 @@ const FileTreeNode = ({ file, onClick, selectedFile }: FileTreeBaseProps) => {
       </div>
 
       {isFolder && Array.isArray(file.children) && (
-        <FileTree files={file.children} onClick={onClick} selectedFile={selectedFile} />
+        <FileTree files={file.children} selectedFile={selectedFile} onClick={onClick} />
       )}
     </li>
   );
