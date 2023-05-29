@@ -14,20 +14,20 @@ export function PrimarySideBar({
   return (
     <div className="flex flex-col bg-black text-white">
       <VscFiles
-        size={60}
-        onClick={() => onClick('Explorer')}
         className={cx('p-4 hover:opacity-100', {
           'border-l-2 border-l-transparent opacity-50': activePane !== 'Explorer',
           'border-l-2 border-l-blue-500 opacity-100': activePane === 'Explorer',
         })}
+        size={60}
+        onClick={() => onClick('Explorer')}
       />
       <VscLibrary
-        size={60}
-        onClick={() => onClick('References')}
         className={cx('p-4 hover:opacity-100', {
           'border-l-2 border-l-transparent opacity-50': activePane !== 'References',
           'border-l-2 border-l-blue-500 opacity-100': activePane === 'References',
         })}
+        size={60}
+        onClick={() => onClick('References')}
       />
     </div>
   );
