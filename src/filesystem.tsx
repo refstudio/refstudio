@@ -58,7 +58,7 @@ export async function runPDFIngestion() {
   const command = Command.sidecar('bin/python/main', ['ingest', '--pdf_directory', `${uploadsDir.toString()}`]);
   console.log('command', command);
   const output = await command.execute();
-  const response = JSON.parse(output.stdout);
+  const response = JSON.parse(output.stdout) as object; // TODO: adopt a better type here :-)
   console.log('response', response);
   return response;
 }
