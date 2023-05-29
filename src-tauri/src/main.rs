@@ -16,13 +16,14 @@ fn interact_with_ai(selection: &str) -> String {
 }
 
 use tauri::Manager;
+use std::env;
 
 fn main() {
     tauri::Builder::default()
         .setup(|app| {
             #[cfg(debug_assertions)] // only include this code on debug builds
             {
-                let dev_tools_visible = false;
+                let dev_tools_visible = env::var("DEV_TOOLS").is_ok();
                 if dev_tools_visible {
                     app.get_window("main").unwrap().open_devtools();
                 };

@@ -27,7 +27,7 @@ export function CenterPaneView({ file, ...props }: CenterPaneViewProps) {
 
   if (loading) {
     return (
-      <div>
+      <div className="p-3">
         <strong>Loading...</strong>
       </div>
     );
@@ -38,7 +38,7 @@ export function CenterPaneView({ file, ...props }: CenterPaneViewProps) {
   }
 
   return (
-    <div>
+    <div className="p-3">
       <strong>FILE:</strong>
       <div>
         {file?.name} at <code>{file?.path}</code>
