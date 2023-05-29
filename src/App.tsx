@@ -13,9 +13,10 @@ import { FoldersView } from './views/FoldersView';
 import { ReferencesView } from './views/ReferencesView';
 
 function App() {
-  const [primaryPane, setPrimaryPane] = useState<PrimarySideBarPane>('Explorer');
+  const [openFiles, setOpenFiles] = React.useState<FileEntry[]>([]);
+  const [activeFile, setActiveFile] = React.useState<FileEntry | undefined>();
 
-  const [selectedFile, setSelectedFile] = React.useState<FileEntry | undefined>();
+  const [primaryPane, setPrimaryPane] = useState<PrimarySideBarPane>('Explorer');
 
   const [selection, setSelection] = React.useState<string | null>(null);
   const debouncedSelection = useDebounce(selection, 200);
@@ -24,9 +25,28 @@ function App() {
     editorRef.current?.insertReference(reference);
   };
 
-  const handleFolderClick = useCallback((file: FileEntry) => {
-    setSelectedFile(file);
-  }, []);
+  const handleFileClick = useCallback(
+    (file: FileEntry) => {
+      setActiveFile(file);
+      if (!openFiles.some((f) => f.path === file.path)) {
+        setOpenFiles([...openFiles, file]);
+      }
+    },
+    [openFiles],
+  );
+
+  const handleCloseFile = useCallback(
+    (fileToClose: FileEntry) => {
+      const shouldUpdateActiveFile = fileToClose.path === activeFile?.path;
+      const open = openFiles.filter((file) => file.path !== fileToClose.path);
+      setOpenFiles(open);
+
+      if (shouldUpdateActiveFile && open.length > 0) {
+        setActiveFile(openFiles[0]);
+      }
+    },
+    [activeFile, openFiles],
+  );
 
   return (
     <PanelGroup autoSaveId="refstudio" direction="horizontal">
@@ -34,7 +54,7 @@ function App() {
       <Panel collapsible defaultSize={20}>
         {primaryPane === 'Explorer' && (
           <PanelWrapper title="Explorer">
-            <FoldersView selectedFile={selectedFile} onClick={handleFolderClick} />
+            <FoldersView activeFile={activeFile} openFiles={openFiles} onClick={handleFileClick} />
           </PanelWrapper>
         )}
         {primaryPane === 'References' && (
@@ -46,7 +66,14 @@ function App() {
       <VerticalResizeHandle />
 
       <Panel defaultSize={60}>
-        <CenterPaneView editorRef={editorRef} file={selectedFile} onSelectionChange={setSelection} />
+        <CenterPaneView
+          activeFile={activeFile}
+          editorRef={editorRef}
+          openFiles={openFiles}
+          onCloseFile={handleCloseFile}
+          onSelectFile={setActiveFile}
+          onSelectionChange={setSelection}
+        />
       </Panel>
 
       <VerticalResizeHandle />

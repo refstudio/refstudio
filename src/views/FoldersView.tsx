@@ -7,26 +7,20 @@ import { cx } from '../cx';
 import { readAllProjectFiles } from '../filesystem';
 
 export function FoldersView({
-  selectedFile,
+  activeFile,
+  openFiles,
   onClick,
 }: {
-  selectedFile?: FileEntry;
+  activeFile?: FileEntry;
+  openFiles: FileEntry[];
   onClick?: (fileEntry: FileEntry) => void;
 }) {
   const [files, setFiles] = useState<FileEntry[]>([]);
 
   useEffect(() => {
     (async function refreshProjectTree() {
-      try {
-        const newFiles = await readAllProjectFiles();
-        setFiles(newFiles);
-        const selected = newFiles.find((f) => f.name?.endsWith('.tiptap'));
-        if (selected) {
-          onClick?.(selected);
-        }
-      } catch (e) {
-        console.error(e);
-      }
+      const newFiles = await readAllProjectFiles();
+      setFiles(newFiles);
     })();
   }, [setFiles, onClick]);
 
@@ -37,10 +31,10 @@ export function FoldersView({
   return (
     <>
       <PanelSection title="Open Files">
-        {selectedFile && <FileTree files={[selectedFile]} root selectedFile={selectedFile} onClick={handleOnClick} />}
+        {activeFile && <FileTree files={openFiles} root selectedFile={activeFile} onClick={handleOnClick} />}
       </PanelSection>
       <PanelSection title="Project X">
-        <FileTree files={files} root selectedFile={selectedFile} onClick={handleOnClick} />
+        <FileTree files={files} root selectedFile={activeFile} onClick={handleOnClick} />
       </PanelSection>
     </>
   );

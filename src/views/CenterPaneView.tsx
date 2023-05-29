@@ -1,58 +1,127 @@
 import { FileEntry } from '@tauri-apps/api/fs';
 import { useEffect, useState } from 'react';
 
-import { readFile, readFileAsText } from '../filesystem';
+import { TabPane } from '../Components/TabPane';
+import { cx } from '../cx';
+import { readFileAsText } from '../filesystem';
 import { TipTapEditor } from '../TipTapEditor/TipTapEditor';
-import { CenterPaneViewProps } from '../types/CenterPaneViewProps';
+import { EditorAPI } from '../types/EditorAPI';
+import { EditorProps } from '../types/EditorProps';
 
-function isTipTap(file?: FileEntry) {
-  return file?.path.endsWith('.tiptap');
+interface CenterPaneViewProps {
+  activeFile?: FileEntry;
+  openFiles: FileEntry[];
+  onCloseFile(file?: FileEntry): void;
+  onSelectFile(file?: FileEntry): void;
+  editorRef: React.MutableRefObject<EditorAPI | undefined>;
+  onSelectionChange(text: string): void;
 }
 
-export function CenterPaneView({ file, ...props }: CenterPaneViewProps) {
-  const [loading, setLoading] = useState(true);
-  const [content, setContent] = useState<string | null>(null);
+export function CenterPaneView({
+  activeFile,
+  openFiles,
+  onSelectFile,
+  onCloseFile,
+  editorRef,
+  onSelectionChange,
+}: CenterPaneViewProps) {
+  const items = openFiles.map((file) => ({
+    key: file.path,
+    text: file.name ?? '-',
+    value: file.path,
+  }));
 
-  useEffect(() => {
-    if (file && isTipTap(file)) {
-      setLoading(true);
-      (async () => {
-        const newBytes = await readFile(file);
-        const textContent = new TextDecoder('utf-8').decode(newBytes);
-        setContent(textContent);
-        setLoading(false);
-      })();
-    }
-  }, [file]);
+  return (
+    <div className="grid h-full grid-rows-[auto_1fr]">
+      <TabPane
+        items={items}
+        value={activeFile?.path ?? ''}
+        onClick={(path) => onSelectFile(openFiles.find((f) => f.path === path))}
+        onCloseClick={(path) => onCloseFile(openFiles.find((f) => f.path === path))}
+      />
+      <div className="flex h-full w-full overflow-scroll">
+        <CenterPaneViewContent activeFile={activeFile} editorRef={editorRef} onSelectionChange={onSelectionChange} />
+      </div>
+    </div>
+  );
+}
 
-  if (loading) {
+export function CenterPaneViewContent({
+  activeFile,
+  editorRef,
+  onSelectionChange,
+}: Pick<CenterPaneViewProps, 'activeFile' | 'editorRef' | 'onSelectionChange'>) {
+  if (!activeFile) {
+    return <EmptyView />;
+  }
+
+  if (activeFile.path.endsWith('.xml')) {
+    return <TextView file={activeFile} />;
+  }
+
+  if (activeFile.path.endsWith('.json')) {
+    return <TextView file={activeFile} textFormatter={(input) => JSON.stringify(JSON.parse(input), null, 2)} />;
+  }
+
+  if (activeFile.path.endsWith('.pdf')) {
     return (
-      <div className="p-3">
-        <strong>Loading...</strong>
+      <div>
+        <strong>FILE:</strong>
+        <div>
+          {activeFile.name} at <code>{activeFile.path}</code>
+        </div>
       </div>
     );
   }
 
-  if (file && isTipTap(file)) {
-    return <TipTapEditor {...props} editorContent={content} />;
-  }
+  // Use TipTap editor by default!
+  return <TipTapView editorRef={editorRef} file={activeFile} onSelectionChange={onSelectionChange} />;
+}
 
-  if (file?.path.endsWith('.xml')) {
-    return <TextView file={file} />;
-  }
-
-  if (file?.path.endsWith('.json')) {
-    return <TextView file={file} textFormatter={(input) => JSON.stringify(JSON.parse(input), null, 2)} />;
-  }
-
+function EmptyView() {
   return (
-    <div className="p-3">
-      <strong>FILE:</strong>
-      <div>
-        {file?.name} at <code>{file?.path}</code>
+    <div className="flex w-full flex-col items-center justify-center gap-2 bg-slate-300">
+      <div className="relative border border-slate-500 text-8xl font-extrabold">
+        <EmptyViewLetter className="bg-slate-500 text-slate-200" letter="R" />
+        <EmptyViewLetter className="bg-slate-200 text-slate-500" letter="S" />
       </div>
+      <span className="text-sm italic">No file selected.</span>
     </div>
   );
+}
+
+function EmptyViewLetter({ letter, className = '' }: { letter: string; className?: string }) {
+  return (
+    <div className={cx('inline-flex w-[80px] items-center justify-center text-center', className)}>
+      <span>{letter}</span>
+    </div>
+  );
+}
+
+function TipTapView({
+  file,
+  editorRef,
+  onSelectionChange,
+}: {
+  file: FileEntry;
+} & Omit<EditorProps, 'editorContent'>) {
+  const [loading, setLoading] = useState(true);
+  const [content, setContent] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLoading(true);
+    (async () => {
+      const textContent = await readFileAsText(file);
+      setContent(textContent);
+      setLoading(false);
+    })();
+  }, [file]);
+
+  if (loading) {
+    return <strong>Loading...</strong>;
+  }
+
+  return <TipTapEditor editorContent={content} editorRef={editorRef} onSelectionChange={onSelectionChange} />;
 }
 
 function TextView({
@@ -72,7 +141,7 @@ function TextView({
   }, [file, textFormatter]);
 
   return (
-    <div className="ml-1 h-full overflow-scroll p-2">
+    <div className="ml-1 h-full w-full overflow-scroll p-2">
       <pre className="text-xs">{content}</pre>
     </div>
   );

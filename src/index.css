@@ -46,3 +46,11 @@ body {
 body > div#root {
   height: 100vh;
 }
+
+.x-hide-scrollbars::-webkit-scrollbar,
+[data-overflow-viewport]::-webkit-scrollbar {
+  height: 0px;
+  width: 0px;
+  background-color: transparent;
+}
+

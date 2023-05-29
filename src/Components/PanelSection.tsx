@@ -7,7 +7,7 @@ export function PanelSection({ title, children }: { title: string; children: Rea
   return (
     <div className="flex flex-col overflow-scroll px-2 pt-2">
       <div
-        className="mb-2 flex cursor-pointer flex-row items-center gap-1 text-sm font-bold uppercase"
+        className="mb-2 flex cursor-pointer select-none flex-row items-center gap-1 text-sm font-bold uppercase"
         onClick={() => setExpanded(!expanded)}
       >
         {expanded && <VscChevronDown />}
