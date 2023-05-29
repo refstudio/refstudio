@@ -2,9 +2,9 @@ import { ReferenceItem } from '../types/ReferenceItem';
 
 export function ReferencesView({ onRefClicked }: { onRefClicked?: (item: ReferenceItem) => void }) {
   return (
-    <div className='flex flex-col h-full w-full'>
+    <div className="flex h-full w-full flex-col">
       <h1>References</h1>
-      <div className='flex-1 overflow-scroll'>
+      <div className="flex-1 overflow-scroll">
         <p className="my-4 italic">Click on a reference to add it to the document.</p>
 
         <ul className="divide-y-2 border">

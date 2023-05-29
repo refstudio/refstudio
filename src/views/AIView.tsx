@@ -10,9 +10,9 @@ export function AIView({ selection }: { selection: string | null }) {
   }, [selection]);
 
   return (
-    <div className='flex flex-col h-full w-full'>
+    <div className="flex h-full w-full flex-col">
       <h1>AI Interactions</h1>
-      <div className='flex-1 overflow-scroll'>
+      <div className="flex-1 overflow-scroll">
         <p className="my-4 italic">Select some text in the editor to see it here.</p>
 
         {selection && (

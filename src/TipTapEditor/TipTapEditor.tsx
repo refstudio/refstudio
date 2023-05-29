@@ -11,14 +11,16 @@ import { EDITOR_EXTENSIONS, INITIAL_CONTENT } from './TipTapEditorConfigs';
 export function TipTapEditor({ editorRef, editorContent, onSelectionChange }: EditorProps) {
   const [editor, setEditor] = useState<Editor | null>(null);
   useEffect(() => {
-    setEditor(new Editor({
-      extensions: EDITOR_EXTENSIONS,
-      content: editorContent ?? INITIAL_CONTENT,
-      onSelectionUpdate({ editor }) {
-        const { from, to } = editor.view.state.selection;
-        onSelectionChange(editor.view.state.doc.textBetween(from, to));
-      },
-    }));
+    setEditor(
+      new Editor({
+        extensions: EDITOR_EXTENSIONS,
+        content: editorContent ?? INITIAL_CONTENT,
+        onSelectionUpdate({ editor }) {
+          const { from, to } = editor.view.state.selection;
+          onSelectionChange(editor.view.state.doc.textBetween(from, to));
+        },
+      }),
+    );
   }, [editorContent, onSelectionChange]);
 
   useEffect(() => {
@@ -36,9 +38,9 @@ export function TipTapEditor({ editorRef, editorContent, onSelectionChange }: Ed
   if (!editor) return <div>...</div>;
 
   return (
-    <div className="tiptap-editor flex flex-col h-full">
+    <div className="tiptap-editor flex h-full flex-col">
       <MenuBar editor={editor} />
-      <EditorContent className="pt-4 pl-5 pr-2 flex-1 overflow-scroll" editor={editor} />
+      <EditorContent className="flex-1 overflow-scroll pl-5 pr-2 pt-4" editor={editor} />
     </div>
   );
 }

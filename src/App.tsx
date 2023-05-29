@@ -48,7 +48,7 @@ function App() {
           </Panel>
         </PanelGroup>
       </Panel>
-    </PanelGroup >
+    </PanelGroup>
   );
 }
 
