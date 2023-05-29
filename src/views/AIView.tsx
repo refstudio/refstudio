@@ -1,6 +1,8 @@
 import { Command } from '@tauri-apps/api/shell';
 import { useEffect, useState } from 'react';
 
+import { PanelSection } from '../Components/PanelSection';
+
 export function AIView({ selection }: { selection: string | null }) {
   const [reply, setReply] = useState('');
 
@@ -14,20 +16,17 @@ export function AIView({ selection }: { selection: string | null }) {
   }, [selection]);
 
   return (
-    <div className="flex h-full w-full flex-1 flex-col overflow-scroll px-2 pt-2">
-      <div className="mb-2 flex flex-col text-sm font-bold uppercase">Selection</div>
-      <div className="flex-1 overflow-scroll">
-        <p className="my-4 italic">Select some text in the editor to see it here.</p>
+    <PanelSection title="Selection">
+      <p className="my-4 italic">Select some text in the editor to see it here.</p>
 
-        {selection && (
-          <div className="flex flex-col gap-4">
-            <div className="border border-yellow-100 bg-yellow-50 p-4">{selection}</div>
-            <strong>REPLY</strong>
-            <div className="border border-green-100 bg-green-50 p-4">{reply}</div>
-          </div>
-        )}
-      </div>
-    </div>
+      {selection && (
+        <div className="flex flex-col gap-4">
+          <div className="border border-yellow-100 bg-yellow-50 p-4">{selection}</div>
+          <strong>REPLY</strong>
+          <div className="border border-green-100 bg-green-50 p-4">{reply}</div>
+        </div>
+      )}
+    </PanelSection>
   );
 }
 

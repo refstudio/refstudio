@@ -6,7 +6,7 @@ export function PanelWrapper({ title, children }: { title: string; children: Rea
       <div className="select-none border-b-2 border-t-2 border-slate-300 p-2 text-sm text-black">
         {title.toUpperCase()}
       </div>
-      <div className="h-full">{children}</div>
+      <div className="flex h-full flex-col gap-1">{children}</div>
     </div>
   );
 }

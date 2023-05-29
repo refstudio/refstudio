@@ -1,28 +1,51 @@
+import { FileUploader } from 'react-drag-drop-files';
+
+import { PanelSection } from '../Components/PanelSection';
+import { ensureProjectFileStructure, runPDFIngestion, uploadFiles } from '../filesystem';
 import { ReferenceItem } from '../types/ReferenceItem';
 
+const BASE_DIR = await ensureProjectFileStructure();
+
 export function ReferencesView({ onRefClicked }: { onRefClicked?: (item: ReferenceItem) => void }) {
+  async function handleChange(uploadedFiles: FileList) {
+    try {
+      await uploadFiles(uploadedFiles);
+      console.log('File uploaded with success');
+
+      await runPDFIngestion();
+      console.log('PDFs ingested with success');
+    } catch (err) {
+      console.error('Error uploading references', err);
+    }
+  }
+
   return (
-    <div className="flex h-full w-full flex-1 flex-col overflow-scroll px-2 pt-2">
-      <div className="mb-2 flex flex-col text-sm font-bold uppercase">Library</div>
-      <ul className="space-y-2">
-        {REFS_DATABASE.map((reference) => (
-          <li
-            className="mb-0 cursor-pointer p-1 hover:bg-slate-200"
-            key={reference.id}
-            onClick={() => onRefClicked?.(reference)}
-          >
-            <strong>{reference.id}</strong> - {reference.title}
-            <br />
-            <small>
-              <em>
-                {reference.author}, {reference.year} by {reference.publisher}
-              </em>
-            </small>
-          </li>
-        ))}
-      </ul>
-      <p className="my-4 text-sm italic">Click on a reference to add it to the document.</p>
-    </div>
+    <>
+      <PanelSection title="Library">
+        <ul className="space-y-2">
+          {REFS_DATABASE.map((reference) => (
+            <li
+              className="mb-0 cursor-pointer p-1 hover:bg-slate-200"
+              key={reference.id}
+              onClick={() => onRefClicked?.(reference)}
+            >
+              <strong>{reference.id}</strong> - {reference.title}
+              <br />
+              <small>
+                <em>
+                  {reference.author}, {reference.year} by {reference.publisher}
+                </em>
+              </small>
+            </li>
+          ))}
+        </ul>
+        <p className="my-4 text-sm italic">Click on a reference to add it to the document.</p>
+      </PanelSection>
+      <PanelSection title="Upload">
+        <FileUploader handleChange={handleChange} label="Upload or drop a file right here" multiple name="file" />
+        <code className="mb-auto mt-10 block text-xs font-normal">{BASE_DIR}</code>
+      </PanelSection>
+    </>
   );
 }
 
