@@ -31,7 +31,7 @@ function App() {
   return (
     <PanelGroup autoSaveId="refstudio" direction="horizontal">
       <PrimarySideBar activePane={primaryPane} onClick={setPrimaryPane} />
-      <Panel defaultSize={20} collapsible>
+      <Panel collapsible defaultSize={20}>
         {primaryPane === 'Explorer' && (
           <PanelWrapper title="Explorer">
             <FoldersView onClick={handleFolderClick} />
@@ -46,7 +46,7 @@ function App() {
       <VerticalResizeHandle />
 
       <Panel defaultSize={60}>
-        <CenterPaneView onSelectionChange={setSelection} editorRef={editorRef} file={selectedFile} />
+        <CenterPaneView editorRef={editorRef} file={selectedFile} onSelectionChange={setSelection} />
       </Panel>
 
       <VerticalResizeHandle />

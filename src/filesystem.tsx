@@ -57,14 +57,16 @@ export async function readFile(file: FileEntry) {
 function sortedFileEntries(entries: FileEntry[]): FileEntry[] {
   return entries
     .sort((fileA, fileB) => {
-      if (fileA.children === null) return -1;
-      if (fileB.children === null) return 1;
-      return fileA.name?.localeCompare(fileB.name || '') || 0;
+      if (fileA.children === undefined) {
+        return -1;
+      }
+      if (fileB.children === undefined) {
+        return 1;
+      }
+      return fileA.name?.localeCompare(fileB.name ?? '') ?? 0;
     })
-    .map((entry) => {
-      return {
-        ...entry,
-        children: entry.children ? sortedFileEntries(entry.children) : entry.children,
-      };
-    });
+    .map((entry) => ({
+      ...entry,
+      children: entry.children ? sortedFileEntries(entry.children) : entry.children,
+    }));
 }

@@ -5,12 +5,16 @@ export function AIView({ selection }: { selection: string | null }) {
   const [reply, setReply] = useState('');
 
   useEffect(() => {
-    if (!selection) return;
-    interactWithAi(selection).then(setReply).catch(console.error);
+    if (!selection) {
+      return;
+    }
+    interactWithAi(selection)
+      .then((num) => setReply(String(num)))
+      .catch(console.error);
   }, [selection]);
 
   return (
-    <div className="flex h-full w-full flex-col px-2 pt-2">
+    <div className="flex h-full w-full flex-1 flex-col overflow-scroll px-2 pt-2">
       <div className="mb-2 flex flex-col text-sm font-bold uppercase">Selection</div>
       <div className="flex-1 overflow-scroll">
         <p className="my-4 italic">Select some text in the editor to see it here.</p>
@@ -27,16 +31,22 @@ export function AIView({ selection }: { selection: string | null }) {
   );
 }
 
+interface AIResponse {
+  num_words: number;
+}
+
 async function interactWithAi(selection: string) {
   try {
     const command = Command.sidecar('bin/python/main', ['--text', `${selection}`]);
     const output = await command.execute();
-    if (output.stderr) throw new Error(output.stderr);
+    if (output.stderr) {
+      throw new Error(output.stderr);
+    }
 
-    const response = JSON.parse(output.stdout);
+    const response = JSON.parse(output.stdout) as AIResponse;
     const aiReply = response.num_words;
     return aiReply;
   } catch (reason) {
-    throw new Error('ERROR: ' + reason);
+    throw new Error(`ERROR: ${reason}`);
   }
 }

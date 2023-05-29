@@ -25,15 +25,14 @@ export const CollapsibleBlockNode = Node.create({
 
   addKeyboardShortcuts() {
     return {
-      'Mod-Enter': () => {
-        return this.editor
+      'Mod-Enter': () =>
+        this.editor
           .chain()
           .insertContentAt(this.editor.state.selection.head, {
             type: this.type.name,
           })
           .focus()
-          .run();
-      },
+          .run(),
     };
   },
 
