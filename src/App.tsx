@@ -27,13 +27,13 @@ function App() {
 
   return (
     <PanelGroup autoSaveId="refstudio" direction="horizontal">
-      <Panel defaultSize={20} collapsible className="p-4">
+      <Panel className="p-4" collapsible defaultSize={20}>
         <FoldersView onClick={handleFolderClick} />
       </Panel>
       <VerticalResizeHandle />
 
       <Panel defaultSize={60}>
-        <CenterPaneView onSelectionChange={setSelection} editorRef={editorRef} file={selectedFile} />
+        <CenterPaneView editorRef={editorRef} file={selectedFile} onSelectionChange={setSelection} />
       </Panel>
 
       <VerticalResizeHandle />
