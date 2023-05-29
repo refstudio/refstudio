@@ -1,6 +1,6 @@
 .collapsible-block {
   /* @apply debug; */
-  @apply flex my-2 p-2 pl-0 rounded-lg;
+  @apply my-2 flex rounded-lg p-2 pl-0;
   /* @apply border border-gray-300;  */
   @apply relative;
 }
@@ -8,9 +8,9 @@
 .collapsible-block > .drag-handle {
   /* @apply invisible; */
   @apply flex flex-shrink-0 flex-grow-0;
-  @apply absolute -left-4 top-3 mr-1 w-4 h-4;
+  @apply absolute -left-4 top-3 mr-1 h-4 w-4;
   @apply cursor-grab;
-  @apply bg-no-repeat bg-contain bg-center;
+  @apply bg-contain bg-center bg-no-repeat;
   background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 16"><path fill-opacity="0.2" d="M4 14c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zM2 6C.9 6 0 6.9 0 8s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6C.9 0 0 .9 0 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" /></svg>');
 }
 
@@ -19,12 +19,12 @@
 }
 
 .collapsible-block > button {
-  @apply flex cursor-pointer bg-transparent border-0 p-0;
+  @apply flex cursor-pointer border-0 bg-transparent p-0;
 }
 
 .collapsible-block > button:before {
   content: '\25bc';
-  @apply flex justify-center items-center w-6 h-6; 
+  @apply flex h-6 w-6 items-center justify-center;
 }
 
 .collapsible-block > button.folded:before {
