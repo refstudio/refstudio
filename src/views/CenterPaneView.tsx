@@ -1,7 +1,7 @@
 import { FileEntry } from '@tauri-apps/api/fs';
 import { useEffect, useState } from 'react';
 
-import { readFile } from '../filesystem';
+import { readFile, readFileAsText } from '../filesystem';
 import { TipTapEditor } from '../TipTapEditor/TipTapEditor';
 import { CenterPaneViewProps } from '../types/CenterPaneViewProps';
 
@@ -37,12 +37,43 @@ export function CenterPaneView({ file, ...props }: CenterPaneViewProps) {
     return <TipTapEditor {...props} editorContent={content} />;
   }
 
+  if (file?.path.endsWith('.xml')) {
+    return <TextView file={file} />;
+  }
+
+  if (file?.path.endsWith('.json')) {
+    return <TextView file={file} textFormatter={(input) => JSON.stringify(JSON.parse(input), null, 2)} />;
+  }
+
   return (
     <div className="p-3">
       <strong>FILE:</strong>
       <div>
         {file?.name} at <code>{file?.path}</code>
       </div>
+    </div>
+  );
+}
+
+function TextView({
+  file,
+  textFormatter = (text) => text,
+}: {
+  file: FileEntry;
+  textFormatter?: (input: string) => string;
+}) {
+  const [content, setContent] = useState('Loading...');
+
+  useEffect(() => {
+    (async () => {
+      const text = await readFileAsText(file);
+      setContent(textFormatter(text));
+    })();
+  }, [file, textFormatter]);
+
+  return (
+    <div className="ml-1 h-full overflow-scroll p-2">
+      <pre className="text-xs">{content}</pre>
     </div>
   );
 }

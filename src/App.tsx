@@ -34,7 +34,7 @@ function App() {
       <Panel collapsible defaultSize={20}>
         {primaryPane === 'Explorer' && (
           <PanelWrapper title="Explorer">
-            <FoldersView onClick={handleFolderClick} />
+            <FoldersView selectedFile={selectedFile} onClick={handleFolderClick} />
           </PanelWrapper>
         )}
         {primaryPane === 'References' && (

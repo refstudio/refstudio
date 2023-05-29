@@ -1,38 +1,43 @@
 import { FileEntry } from '@tauri-apps/api/fs';
 import { useEffect, useState } from 'react';
+import { VscFile, VscFolder } from 'react-icons/vsc';
 
 import { PanelSection } from '../Components/PanelSection';
 import { cx } from '../cx';
 import { readAllProjectFiles } from '../filesystem';
 
-export function FoldersView({ onClick }: { onClick?: (fileEntry: FileEntry) => void }) {
+export function FoldersView({
+  selectedFile,
+  onClick,
+}: {
+  selectedFile?: FileEntry;
+  onClick?: (fileEntry: FileEntry) => void;
+}) {
   const [files, setFiles] = useState<FileEntry[]>([]);
-  const [selectedFile, setSelectedFile] = useState<FileEntry>();
 
   useEffect(() => {
-    readAllProjectFiles()
-      .then((newFiles) => {
+    (async function refreshProjectTree() {
+      try {
+        const newFiles = await readAllProjectFiles();
         setFiles(newFiles);
         const selected = newFiles.find((f) => f.name?.endsWith('.tiptap'));
         if (selected) {
-          setSelectedFile(selected); // We need this because we might be selecting a DOT_FILE
           onClick?.(selected);
         }
-      })
-      .catch((e) => {
+      } catch (e) {
         console.error(e);
-      });
-  }, [onClick]);
+      }
+    })();
+  }, [setFiles, onClick]);
 
   function handleOnClick(file: FileEntry): void {
-    setSelectedFile(file);
     onClick?.(file);
   }
 
   return (
     <>
       <PanelSection title="Open Files">
-        <div />
+        {selectedFile && <FileTree files={[selectedFile]} root selectedFile={selectedFile} onClick={handleOnClick} />}
       </PanelSection>
       <PanelSection title="Project X">
         <FileTree files={files} root selectedFile={selectedFile} onClick={handleOnClick} />
@@ -50,9 +55,10 @@ interface FileTreeBaseProps {
 }
 
 const FileTree = ({ files, root, ...props }: FileTreeBaseProps) => (
-  <div className="xflex-1 overflow-scroll">
+  <div className="overflow-scroll">
     <ul
       className={cx('', {
+        'ml-4': root,
         'ml-6': !root,
       })}
     >
@@ -79,17 +85,18 @@ const FileTreeNode = ({ file, onClick, selectedFile }: FileTreeBaseProps) => {
       <div
         className={cx(
           'mb-1 py-1',
-          'flex flex-row items-center', //
+          'flex flex-row items-center gap-1', //
           {
             'bg-slate-100': file.path === selectedFile?.path,
             'cursor-pointer hover:bg-slate-100': !isFolder,
           },
         )}
+        title={selectedFile?.name}
         onClick={() => !isFolder && onClick(file)}
       >
-        {isFolder ? <FolderIcon /> : <FileIcon />}
+        {isFolder ? <VscFolder className="shrink-0" /> : <VscFile className="shrink-0" />}
         <span
-          className={cx({
+          className={cx('flex-1 truncate', {
             'font-bold': isFolder,
           })}
         >
@@ -103,7 +110,3 @@ const FileTreeNode = ({ file, onClick, selectedFile }: FileTreeBaseProps) => {
     </li>
   );
 };
-
-const FileIcon = () => <span className="inline-flex pr-2">&mdash;</span>;
-
-const FolderIcon = () => <span className="inline-flex pr-2">&mdash;</span>;

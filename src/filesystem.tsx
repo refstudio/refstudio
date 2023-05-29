@@ -4,6 +4,7 @@ import {
   FileEntry,
   readBinaryFile,
   readDir,
+  readTextFile,
   writeBinaryFile,
   writeTextFile,
 } from '@tauri-apps/api/fs';
@@ -66,6 +67,10 @@ export async function runPDFIngestion() {
 export async function readFile(file: FileEntry) {
   const content = await readBinaryFile(file.path);
   return content;
+}
+
+export async function readFileAsText(file: FileEntry) {
+  return readTextFile(file.path);
 }
 
 function sortedFileEntries(entries: FileEntry[]): FileEntry[] {
