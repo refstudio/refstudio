@@ -22,7 +22,7 @@ interface CenterPaneViewProps {
   onSelectionChange(text: string): void;
 }
 
-export function CenterPaneView({
+export function CenterView({
   files,
   filesDispatch,
 
@@ -30,87 +30,84 @@ export function CenterPaneView({
   pdfViewerRef,
   onSelectionChange,
 }: CenterPaneViewProps) {
-  const leftPane = files.openFiles.filter((entry) => entry.pane === 'LEFT');
-  const rightPane = files.openFiles.filter((entry) => entry.pane === 'RIGHT');
-  const someRight = rightPane.length > 0;
+  const someRight = files.openFiles.some((e) => e.pane === 'RIGHT');
+  return (
+    <PanelGroup direction="horizontal">
+      <Panel>
+        <CenterViewPanel
+          editorRef={editorRef}
+          files={files}
+          filesDispatch={filesDispatch}
+          pane="LEFT"
+          pdfViewerRef={pdfViewerRef}
+          onSelectionChange={onSelectionChange}
+        />
+      </Panel>
+      {someRight && <VerticalResizeHandle />}
+      {someRight && (
+        <Panel>
+          <CenterViewPanel
+            editorRef={editorRef}
+            files={files}
+            filesDispatch={filesDispatch}
+            pane="RIGHT"
+            pdfViewerRef={pdfViewerRef}
+            onSelectionChange={onSelectionChange}
+          />
+        </Panel>
+      )}
+    </PanelGroup>
+  );
+}
 
-  const activeLeftEntry = files.openFiles.find((e) => e.pane === 'LEFT' && e.active);
-  const activeRightEntry = files.openFiles.find((e) => e.pane === 'RIGHT' && e.active);
-
-  const leftItems = leftPane.map((entry) => ({
+export function CenterViewPanel({
+  files,
+  filesDispatch,
+  pane,
+  editorRef,
+  pdfViewerRef,
+  onSelectionChange,
+}: { pane: FilesState['openFiles'][0]['pane'] } & CenterPaneViewProps) {
+  const paneOpenFiles = files.openFiles.filter((entry) => entry.pane === pane);
+  const activeEntry = paneOpenFiles.find((e) => e.active);
+  const items = paneOpenFiles.map((entry) => ({
     key: entry.file.path,
     text: entry.file.name ?? '-',
     value: entry.file.path,
   }));
-  const rightItems = rightPane.map((entry) => ({
-    key: entry.file.path,
-    text: entry.file.name ?? '-',
-    value: entry.file.path,
-  }));
 
-  function handleTabClick(path: string, pane: FilesState['openFiles'][0]['pane']) {
-    const fileToClose = files.openFiles.find((f) => f.file.path === path)?.file;
+  function handleTabClick(path: string) {
+    const fileToClose = paneOpenFiles.find((f) => f.file.path === path)?.file;
     if (!fileToClose) {
       return;
     }
     filesDispatch({ type: 'OPEN_FILE', payload: { file: fileToClose, pane } });
   }
-  function handleTabCloseClick(path: string, pane: FilesState['openFiles'][0]['pane']) {
-    const fileToClose = files.openFiles.find((f) => f.file.path === path)?.file;
+  function handleTabCloseClick(path: string) {
+    const fileToClose = paneOpenFiles.find((f) => f.file.path === path)?.file;
     if (!fileToClose) {
       return;
     }
     filesDispatch({ type: 'CLOSE_FILE', payload: { file: fileToClose, pane } });
   }
 
-  // useEffect(() => {
-  //   setRightItems(openFiles.filter((file) => file.path.endsWith('.pdf')).map((file) => file.path));
-  // }, [openFiles]);
-
   return (
-    <PanelGroup direction="horizontal">
-      {/* LEFT PANEL */}
-      <Panel>
-        <div className="grid h-full grid-rows-[auto_1fr]">
-          <TabPane
-            items={leftItems}
-            value={activeLeftEntry?.file.path ?? ''}
-            onClick={(path) => handleTabClick(path, 'LEFT')}
-            onCloseClick={(path) => handleTabCloseClick(path, 'LEFT')}
-          />
-          <div className="flex h-full w-full overflow-scroll">
-            <CenterPaneViewContent
-              activeFile={activeLeftEntry?.file}
-              editorRef={editorRef}
-              pdfViewerRef={pdfViewerRef}
-              onSelectionChange={onSelectionChange}
-            />
-          </div>
-        </div>
-      </Panel>
-      {someRight && <VerticalResizeHandle />}
-      {/* RIGHT PANEL */}
-      {someRight && (
-        <Panel>
-          <div className="grid h-full grid-rows-[auto_1fr]">
-            <TabPane
-              items={rightItems}
-              value={activeRightEntry?.file.path ?? ''}
-              onClick={(path) => handleTabClick(path, 'RIGHT')}
-              onCloseClick={(path) => handleTabCloseClick(path, 'RIGHT')}
-            />
-            <div className="flex h-full w-full overflow-scroll">
-              <CenterPaneViewContent
-                activeFile={activeRightEntry?.file}
-                editorRef={editorRef}
-                pdfViewerRef={pdfViewerRef}
-                onSelectionChange={onSelectionChange}
-              />
-            </div>
-          </div>
-        </Panel>
-      )}
-    </PanelGroup>
+    <div className="grid h-full grid-rows-[auto_1fr]">
+      <TabPane
+        items={items}
+        value={activeEntry?.file.path ?? ''}
+        onClick={(path) => handleTabClick(path)}
+        onCloseClick={(path) => handleTabCloseClick(path)}
+      />
+      <div className="flex h-full w-full overflow-scroll">
+        <CenterPaneViewContent
+          activeFile={activeEntry?.file}
+          editorRef={editorRef}
+          pdfViewerRef={pdfViewerRef}
+          onSelectionChange={onSelectionChange}
+        />
+      </div>
+    </div>
   );
 }
 

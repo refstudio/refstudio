@@ -10,7 +10,7 @@ import { EditorAPI } from './types/EditorAPI';
 import { PdfViewerAPI } from './types/PdfViewerAPI';
 import { ReferenceItem } from './types/ReferenceItem';
 import { AIView } from './views/AIView';
-import { CenterPaneView } from './views/CenterPaneView';
+import { CenterView } from './views/CenterView';
 import { FoldersView } from './views/FoldersView';
 import { ReferencesView } from './views/ReferencesView';
 
@@ -49,7 +49,7 @@ function App() {
       <VerticalResizeHandle />
 
       <Panel defaultSize={60} onResize={handleCenterPanelResize}>
-        <CenterPaneView
+        <CenterView
           editorRef={editorRef}
           files={files}
           filesDispatch={dispatch}

@@ -60,7 +60,6 @@ export function FoldersView({
           selectedFiles={files.openFiles.filter((e) => e.active).map((e) => e.file)}
           onClick={handleOnClick}
         />
-        <pre className="text-xs">{JSON.stringify(files, null, 2)}</pre>
       </PanelSection>
     </>
   );
