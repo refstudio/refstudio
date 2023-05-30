@@ -23,7 +23,7 @@ jobs:
         uses: rlespinasse/github-slug-action@4.0.0
       - name: Release
         uses: ridedott/release-me-action@v3.6.25
-        if: ${{ env.GITHUB_REF_SLUG == 'main' }}
+        if: ${{ github.ref_name == 'main' }}
         env:
           GITHUB_TOKEN: ${{ steps.release_token.outputs.token }}
   bundle-sources:
@@ -44,6 +44,7 @@ jobs:
     - name: Install dependencies
       run: yarn install --immutable
     - name: Set up Python
+      id: setup-python
       uses: actions/setup-python@v4
       with:
         python-version: 3.11
