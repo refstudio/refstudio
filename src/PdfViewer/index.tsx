@@ -92,7 +92,7 @@ export function PdfViewer({ file, pdfViewerRef }: PdfViewerProps) {
 
   return (
     <div className="pdf-viewer flex h-full flex-col" ref={containerRef}>
-      <Document className="flex-1 overflow-scroll" file={fileContent} onLoadSuccess={onDocumentLoadSuccess}>
+      <Document className="flex-1 overflow-scroll" externalLinkTarget="_blank" file={fileContent} onLoadSuccess={onDocumentLoadSuccess}>
         {numPages &&
           Array.from(new Array(numPages), (_, index) => (
             <Page key={`page_${index + 1}`} pageNumber={index + 1} width={pdfViewerWidth} />
