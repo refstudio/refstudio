@@ -11,7 +11,7 @@ $ poetry run python main.py ai --text "Hello, world!"
 # {"num_words": 2}
 ```
 
-Running the tests:
+Running the tests from this directory:
 ```bash
 $ poetry run pytest --cov=. tests
 ```

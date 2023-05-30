@@ -22,6 +22,11 @@ To compile the python sidecar as a binary:
 $ yarn python
 ```
 
+Assuming you are in the root project directory (`refstudio`), you can run the Python tests and generate a coverage report by:
+```bash
+$ poetry run pytest --cov=python python/tests
+```
+
 This will generate the binary at `src-tauri/bin/python` and append the appropriate [target triple](https://tauri.app/v1/guides/building/sidecar) required by Tauri.
 
 

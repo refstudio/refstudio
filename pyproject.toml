@@ -27,4 +27,5 @@ build-backend = "poetry.core.masonry.api"
 line-length = 120  # same length we have prettier/JS set to
 
 [tool.coverage.run]
+source = ["python"]
 omit = ["*/tests/*"]
