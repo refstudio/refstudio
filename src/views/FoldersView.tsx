@@ -4,37 +4,63 @@ import { VscFile, VscFolder } from 'react-icons/vsc';
 
 import { PanelSection } from '../Components/PanelSection';
 import { cx } from '../cx';
+import { FilesAction, FilesState } from '../filesReducer';
 import { readAllProjectFiles } from '../filesystem';
 
 export function FoldersView({
-  activeFile,
-  openFiles,
-  onClick,
+  files,
+  filesDispatch,
 }: {
-  activeFile?: FileEntry;
-  openFiles: FileEntry[];
-  onClick?: (fileEntry: FileEntry) => void;
+  files: FilesState;
+  filesDispatch: React.Dispatch<FilesAction>;
 }) {
-  const [files, setFiles] = useState<FileEntry[]>([]);
+  const [allFiles, setFiles] = useState<FileEntry[]>([]);
 
   useEffect(() => {
     (async function refreshProjectTree() {
       const newFiles = await readAllProjectFiles();
       setFiles(newFiles);
     })();
-  }, [setFiles, onClick]);
+  }, [setFiles]);
 
   function handleOnClick(file: FileEntry): void {
-    onClick?.(file);
+    filesDispatch({ type: 'OPEN_FILE', payload: { file, pane: file.path.endsWith('.pdf') ? 'RIGHT' : 'LEFT' } });
   }
+
+  const leftPane = files.openFiles.filter((entry) => entry.pane === 'LEFT');
+  const rightPane = files.openFiles.filter((entry) => entry.pane === 'RIGHT');
+  const someRight = rightPane.length > 0;
 
   return (
     <>
       <PanelSection title="Open Files">
-        {activeFile && <FileTree files={openFiles} root selectedFile={activeFile} onClick={handleOnClick} />}
+        {someRight && <div className="ml-4 text-xs font-bold">LEFT</div>}
+        {leftPane.length > 0 && (
+          <FileTree
+            files={leftPane.map((entry) => entry.file)}
+            root
+            selectedFiles={leftPane.filter((entry) => entry.active).map((e) => e.file)}
+            onClick={handleOnClick}
+          />
+        )}
+        {someRight && <div className="ml-4 text-xs font-bold">RIGHT</div>}
+        {rightPane.length > 0 && (
+          <FileTree
+            files={rightPane.map((entry) => entry.file)}
+            root
+            selectedFiles={rightPane.filter((entry) => entry.active).map((e) => e.file)}
+            onClick={handleOnClick}
+          />
+        )}
       </PanelSection>
       <PanelSection title="Project X">
-        <FileTree files={files} root selectedFile={activeFile} onClick={handleOnClick} />
+        <FileTree
+          files={allFiles}
+          root
+          selectedFiles={files.openFiles.filter((e) => e.active).map((e) => e.file)}
+          onClick={handleOnClick}
+        />
+        <pre className="text-xs">{JSON.stringify(files, null, 2)}</pre>
       </PanelSection>
     </>
   );
@@ -44,7 +70,7 @@ interface FileTreeBaseProps {
   root?: boolean;
   files: FileEntry[];
   file?: FileEntry;
-  selectedFile?: FileEntry;
+  selectedFiles: FileEntry[];
   onClick: (file: FileEntry) => void;
 }
 
@@ -63,7 +89,7 @@ const FileTree = ({ files, root, ...props }: FileTreeBaseProps) => (
   </div>
 );
 
-const FileTreeNode = ({ file, onClick, selectedFile }: FileTreeBaseProps) => {
+const FileTreeNode = ({ file, onClick, selectedFiles }: FileTreeBaseProps) => {
   if (!file) {
     return null;
   }
@@ -81,11 +107,11 @@ const FileTreeNode = ({ file, onClick, selectedFile }: FileTreeBaseProps) => {
           'mb-1 py-1',
           'flex flex-row items-center gap-1', //
           {
-            'bg-slate-100': file.path === selectedFile?.path,
+            'bg-slate-100': selectedFiles.some((f) => f.path === file.path),
             'cursor-pointer hover:bg-slate-100': !isFolder,
           },
         )}
-        title={selectedFile?.name}
+        title={file.name}
         onClick={() => !isFolder && onClick(file)}
       >
         {isFolder ? <VscFolder className="shrink-0" /> : <VscFile className="shrink-0" />}
@@ -99,7 +125,7 @@ const FileTreeNode = ({ file, onClick, selectedFile }: FileTreeBaseProps) => {
       </div>
 
       {isFolder && Array.isArray(file.children) && (
-        <FileTree files={file.children} selectedFile={selectedFile} onClick={onClick} />
+        <FileTree files={file.children} selectedFiles={selectedFiles} onClick={onClick} />
       )}
     </li>
   );

@@ -1,10 +1,11 @@
-import { FileEntry } from '@tauri-apps/api/fs';
-import React, { useCallback, useState } from 'react';
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import React, { useReducer, useState } from 'react';
+import { Panel, PanelGroup } from 'react-resizable-panels';
 import { useDebounce } from 'usehooks-ts';
 
 import { PanelWrapper } from './Components/PanelWrapper';
 import { PrimarySideBar, PrimarySideBarPane } from './Components/PrimarySideBar';
+import { VerticalResizeHandle } from './Components/VerticalResizeHandle';
+import { defaultFilesState, filesReducer } from './filesReducer';
 import { EditorAPI } from './types/EditorAPI';
 import { ReferenceItem } from './types/ReferenceItem';
 import { AIView } from './views/AIView';
@@ -13,8 +14,7 @@ import { FoldersView } from './views/FoldersView';
 import { ReferencesView } from './views/ReferencesView';
 
 function App() {
-  const [openFiles, setOpenFiles] = React.useState<FileEntry[]>([]);
-  const [activeFile, setActiveFile] = React.useState<FileEntry | undefined>();
+  const [files, dispatch] = useReducer(filesReducer, defaultFilesState());
 
   const [primaryPane, setPrimaryPane] = useState<PrimarySideBarPane>('Explorer');
 
@@ -25,41 +25,13 @@ function App() {
     editorRef.current?.insertReference(reference);
   };
 
-  const handleFileClick = useCallback(
-    (file: FileEntry) => {
-      setActiveFile(file);
-      if (!openFiles.some((f) => f.path === file.path)) {
-        setOpenFiles([...openFiles, file]);
-      }
-    },
-    [openFiles],
-  );
-
-  const handleCloseFile = useCallback(
-    (fileToClose: FileEntry) => {
-      const newOpenFiles = openFiles.filter((file) => file.path !== fileToClose.path);
-      setOpenFiles(newOpenFiles);
-
-      if (newOpenFiles.length === 0) {
-        setActiveFile(undefined);
-      } else {
-        const shouldUpdateActiveFile = fileToClose.path === activeFile?.path;
-        const [firstFile] = newOpenFiles;
-        if (shouldUpdateActiveFile && newOpenFiles.length > 0) {
-          setActiveFile(firstFile);
-        }
-      }
-    },
-    [activeFile, openFiles],
-  );
-
   return (
     <PanelGroup autoSaveId="refstudio" direction="horizontal">
       <PrimarySideBar activePane={primaryPane} onClick={setPrimaryPane} />
       <Panel collapsible defaultSize={20}>
         {primaryPane === 'Explorer' && (
           <PanelWrapper title="Explorer">
-            <FoldersView activeFile={activeFile} openFiles={openFiles} onClick={handleFileClick} />
+            <FoldersView files={files} filesDispatch={dispatch} />
           </PanelWrapper>
         )}
         {primaryPane === 'References' && (
@@ -71,14 +43,7 @@ function App() {
       <VerticalResizeHandle />
 
       <Panel defaultSize={60}>
-        <CenterPaneView
-          activeFile={activeFile}
-          editorRef={editorRef}
-          openFiles={openFiles}
-          onCloseFile={handleCloseFile}
-          onSelectFile={setActiveFile}
-          onSelectionChange={setSelection}
-        />
+        <CenterPaneView editorRef={editorRef} files={files} filesDispatch={dispatch} onSelectionChange={setSelection} />
       </Panel>
 
       <VerticalResizeHandle />
@@ -89,10 +54,6 @@ function App() {
       </Panel>
     </PanelGroup>
   );
-}
-
-function VerticalResizeHandle() {
-  return <PanelResizeHandle className="flex w-1 items-center bg-gray-200 hover:bg-blue-100" />;
 }
 
 export default App;

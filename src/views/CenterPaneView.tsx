@@ -1,56 +1,120 @@
 import { FileEntry } from '@tauri-apps/api/fs';
 import { useEffect, useState } from 'react';
+import { Panel, PanelGroup } from 'react-resizable-panels';
 
 import { TabPane } from '../Components/TabPane';
+import { VerticalResizeHandle } from '../Components/VerticalResizeHandle';
 import { cx } from '../cx';
+import { FilesAction, FilesState } from '../filesReducer';
 import { readFileAsText } from '../filesystem';
 import { TipTapEditor } from '../TipTapEditor/TipTapEditor';
 import { EditorAPI } from '../types/EditorAPI';
 import { EditorProps } from '../types/EditorProps';
 
 interface CenterPaneViewProps {
-  activeFile?: FileEntry;
-  openFiles: FileEntry[];
-  onCloseFile(file?: FileEntry): void;
-  onSelectFile(file?: FileEntry): void;
+  files: FilesState;
+  filesDispatch: React.Dispatch<FilesAction>;
+
   editorRef: React.MutableRefObject<EditorAPI | undefined>;
   onSelectionChange(text: string): void;
 }
 
 export function CenterPaneView({
-  activeFile,
-  openFiles,
-  onSelectFile,
-  onCloseFile,
+  files,
+  filesDispatch,
+
   editorRef,
   onSelectionChange,
 }: CenterPaneViewProps) {
-  const items = openFiles.map((file) => ({
-    key: file.path,
-    text: file.name ?? '-',
-    value: file.path,
+  const leftPane = files.openFiles.filter((entry) => entry.pane === 'LEFT');
+  const rightPane = files.openFiles.filter((entry) => entry.pane === 'RIGHT');
+  const someRight = rightPane.length > 0;
+
+  const activeLeftEntry = files.openFiles.find((e) => e.pane === 'LEFT' && e.active);
+  const activeRightEntry = files.openFiles.find((e) => e.pane === 'RIGHT' && e.active);
+
+  const leftItems = leftPane.map((entry) => ({
+    key: entry.file.path,
+    text: entry.file.name ?? '-',
+    value: entry.file.path,
+  }));
+  const rightItems = rightPane.map((entry) => ({
+    key: entry.file.path,
+    text: entry.file.name ?? '-',
+    value: entry.file.path,
   }));
 
+  function handleTabClick(path: string, pane: FilesState['openFiles'][0]['pane']) {
+    const fileToClose = files.openFiles.find((f) => f.file.path === path)?.file;
+    if (!fileToClose) {
+      return;
+    }
+    filesDispatch({ type: 'OPEN_FILE', payload: { file: fileToClose, pane } });
+  }
+  function handleTabCloseClick(path: string, pane: FilesState['openFiles'][0]['pane']) {
+    const fileToClose = files.openFiles.find((f) => f.file.path === path)?.file;
+    if (!fileToClose) {
+      return;
+    }
+    filesDispatch({ type: 'CLOSE_FILE', payload: { file: fileToClose, pane } });
+  }
+
+  // useEffect(() => {
+  //   setRightItems(openFiles.filter((file) => file.path.endsWith('.pdf')).map((file) => file.path));
+  // }, [openFiles]);
+
   return (
-    <div className="grid h-full grid-rows-[auto_1fr]">
-      <TabPane
-        items={items}
-        value={activeFile?.path ?? ''}
-        onClick={(path) => onSelectFile(openFiles.find((f) => f.path === path))}
-        onCloseClick={(path) => onCloseFile(openFiles.find((f) => f.path === path))}
-      />
-      <div className="flex h-full w-full overflow-scroll">
-        <CenterPaneViewContent activeFile={activeFile} editorRef={editorRef} onSelectionChange={onSelectionChange} />
-      </div>
-    </div>
+    <PanelGroup direction="horizontal">
+      {/* LEFT PANEL */}
+      <Panel>
+        <div className="grid h-full grid-rows-[auto_1fr]">
+          <TabPane
+            items={leftItems}
+            value={activeLeftEntry?.file.path ?? ''}
+            onClick={(path) => handleTabClick(path, 'LEFT')}
+            onCloseClick={(path) => handleTabCloseClick(path, 'LEFT')}
+          />
+          <div className="flex h-full w-full overflow-scroll">
+            <CenterPaneViewContent
+              activeFile={activeLeftEntry?.file}
+              editorRef={editorRef}
+              onSelectionChange={onSelectionChange}
+            />
+          </div>
+        </div>
+      </Panel>
+      {someRight && <VerticalResizeHandle />}
+      {/* RIGHT PANEL */}
+      {someRight && (
+        <Panel>
+          <div className="grid h-full grid-rows-[auto_1fr]">
+            <TabPane
+              items={rightItems}
+              value={activeRightEntry?.file.path ?? ''}
+              onClick={(path) => handleTabClick(path, 'RIGHT')}
+              onCloseClick={(path) => handleTabCloseClick(path, 'RIGHT')}
+            />
+            <div className="flex h-full w-full overflow-scroll">
+              <CenterPaneViewContent
+                activeFile={activeRightEntry?.file}
+                editorRef={editorRef}
+                onSelectionChange={onSelectionChange}
+              />
+            </div>
+          </div>
+        </Panel>
+      )}
+    </PanelGroup>
   );
 }
 
-export function CenterPaneViewContent({
-  activeFile,
-  editorRef,
-  onSelectionChange,
-}: Pick<CenterPaneViewProps, 'activeFile' | 'editorRef' | 'onSelectionChange'>) {
+interface CenterPaneViewContentProps {
+  activeFile?: FileEntry;
+  editorRef: React.MutableRefObject<EditorAPI | undefined>;
+  onSelectionChange(text: string): void;
+}
+
+export function CenterPaneViewContent({ activeFile, editorRef, onSelectionChange }: CenterPaneViewContentProps) {
   if (!activeFile) {
     return <EmptyView />;
   }
