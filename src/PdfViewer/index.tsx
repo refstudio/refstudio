@@ -2,7 +2,7 @@ import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
 import { FileEntry } from '@tauri-apps/api/fs';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 
 import { readFile } from '../filesystem';
@@ -26,30 +26,32 @@ export function PdfViewer({ file, pdfViewerRef }: PdfViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [pdfViewerWidth, setPdfViewerWidth] = useState<number>();
 
-  const updateWidth = useDebouncedCallback(() => {
+  const updateWidth = useCallback(() => {
     setPdfViewerWidth(containerRef.current?.getBoundingClientRect().width);
-  }, 200);
+  }, []);
+
+  const debouncedUpdateWidth = useDebouncedCallback(updateWidth, 200);
 
   // Update viewer's width on mount
-  useLayoutEffect(updateWidth, [updateWidth]);
+  useLayoutEffect(debouncedUpdateWidth, [debouncedUpdateWidth]);
 
   // Update viewer's width on window resize
   useEffect(() => {
-    window.addEventListener('resize', updateWidth);
+    window.addEventListener('resize', debouncedUpdateWidth);
 
     return () => {
-      window.removeEventListener('resize', updateWidth);
+      window.removeEventListener('resize', debouncedUpdateWidth);
     };
-  }, [updateWidth]);
+  }, [debouncedUpdateWidth]);
 
   // Update viewer's width on panel resize
   useEffect(() => {
-    pdfViewerRef.current = { updateWidth };
+    pdfViewerRef.current = { updateWidth: debouncedUpdateWidth };
 
     return () => {
       pdfViewerRef.current = null;
     };
-  }, [pdfViewerRef, updateWidth]);
+  }, [pdfViewerRef, debouncedUpdateWidth]);
 
   useEffect(() => {
     setNumPages(null);
