@@ -2,7 +2,6 @@ import json
 import logging
 import os
 import sys
-from argparse import ArgumentParser
 from dataclasses import asdict
 from pathlib import Path
 from typing import List
