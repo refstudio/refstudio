@@ -38,7 +38,7 @@ jobs:
         run: yarn run lint:check
   prettier:
     needs: setup
-    runs-on: ubuntu-last
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3.5.2
