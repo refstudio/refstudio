@@ -8,6 +8,7 @@ import {
   writeTextFile,
 } from '@tauri-apps/api/fs';
 import { appDataDir, join } from '@tauri-apps/api/path';
+import { Command } from '@tauri-apps/api/shell';
 
 import { INITIAL_CONTENT } from './TipTapEditor/TipTapEditorConfigs';
 
@@ -16,6 +17,9 @@ const UPLOADS_DIR = 'uploads';
 
 async function getBaseDir() {
   return join(await appDataDir(), PROJECT_NAME);
+}
+async function getUploadsDir() {
+  return join(await getBaseDir(), UPLOADS_DIR);
 }
 export async function ensureProjectFileStructure() {
   try {
@@ -49,6 +53,16 @@ export async function uploadFiles(files: FileList) {
   }
 }
 
+export async function runPDFIngestion() {
+  const uploadsDir = await getUploadsDir();
+  const command = Command.sidecar('bin/python/main', ['ingest', '--pdf_directory', `${uploadsDir.toString()}`]);
+  console.log('command', command);
+  const output = await command.execute();
+  const response = JSON.parse(output.stdout) as object; // TODO: adopt a better type here :-)
+  console.log('response', response);
+  return response;
+}
+
 export async function readFile(file: FileEntry) {
   const content = await readBinaryFile(file.path);
   return content;
@@ -57,14 +71,16 @@ export async function readFile(file: FileEntry) {
 function sortedFileEntries(entries: FileEntry[]): FileEntry[] {
   return entries
     .sort((fileA, fileB) => {
-      if (fileA.children === null) return -1;
-      if (fileB.children === null) return 1;
-      return fileA.name?.localeCompare(fileB.name || '') || 0;
+      if (fileA.children === undefined) {
+        return -1;
+      }
+      if (fileB.children === undefined) {
+        return 1;
+      }
+      return fileA.name?.localeCompare(fileB.name ?? '') ?? 0;
     })
-    .map((entry) => {
-      return {
-        ...entry,
-        children: entry.children ? sortedFileEntries(entry.children) : entry.children,
-      };
-    });
+    .map((entry) => ({
+      ...entry,
+      children: entry.children ? sortedFileEntries(entry.children) : entry.children,
+    }));
 }

@@ -12,6 +12,7 @@ $ yarn install
 For running the python sidecar, you will need to [install poetry](https://python-poetry.org/).
 
 Once you have poetry installed, you can install the python dependencies via:
+
 ```bash
 $ poetry install
 ```
@@ -20,6 +21,7 @@ To compile the python sidecar as a binary:
 ```bash
 $ yarn python
 ```
+
 This will generate the binary at `src-tauri/bin/python` and append the appropriate [target triple](https://tauri.app/v1/guides/building/sidecar) required by Tauri.
 
 
@@ -27,7 +29,6 @@ This will generate the binary at `src-tauri/bin/python` and append the appropria
 
 You should then be able to launch the app via:
 ```bash
-$ yarn tauri dev
 $ yarn tauri:dev
 ```
 
@@ -38,3 +39,4 @@ To automatically open the browser devtools you can launch the app via:
 ```bash
 $ yarn tauri:dev:debug
 ```
+

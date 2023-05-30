@@ -22,24 +22,36 @@ export function CenterPaneView({ file, pdfViewerRef, ...props }: CenterPaneViewP
     if (file && isTipTap(file)) {
       setLoading(true);
       (async () => {
-        const content = await readFile(file);
-        const textContent = new TextDecoder('utf-8').decode(content);
+        const newBytes = await readFile(file);
+        const textContent = new TextDecoder('utf-8').decode(newBytes);
         setContent(textContent);
         setLoading(false);
-      })()
+      })();
     }
   }, [file]);
 
-  if (loading) return <div className="p-3"><strong>Loading...</strong></div>;
+  if (loading) {
+    return (
+      <div className="p-3">
+        <strong>Loading...</strong>
+      </div>
+    );
+  }
 
-  if (file && isTipTap(file)) return <TipTapEditor {...props} editorContent={content} />;
+  if (file && isTipTap(file)) {
+    return <TipTapEditor {...props} editorContent={content} />;
+  }
 
-  if (file && isPdf(file)) return <PdfViewer file={file} pdfViewerRef={pdfViewerRef} />;
+  if (file && isPdf(file)) {
+    return <PdfViewer file={file} pdfViewerRef={pdfViewerRef} />;
+  }
 
   return (
-    <div className='p-3'>
+    <div className="p-3">
       <strong>FILE:</strong>
-      <div>{file?.name} at <code>{file?.path}</code></div>
+      <div>
+        {file?.name} at <code>{file?.path}</code>
+      </div>
     </div>
   );
 }

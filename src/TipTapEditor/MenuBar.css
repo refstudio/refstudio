@@ -1,5 +1,5 @@
 .toolbar {
-  @apply flex items-stretch p-1;
+  @apply mb-4 flex items-stretch p-1;
   @apply bg-slate-100;
   @apply rounded-t-xl;
 }

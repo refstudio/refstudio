@@ -7,13 +7,16 @@
     "postinstall": "husky install",
     "dev": "vite",
     "build": "tsc && vite build",
-    "fmt": "prettier --config package.json --write '**/*'",
+    "check": "yarn prettier:check && yarn pylint:check && yarn lint:check",
+    "fix": "yarn prettier:fix && yarn pylint:fix && yarn lint:fix",
+    "prettier:check": "prettier --config package.json --check 'src/**'",
+    "prettier:fix": "prettier --config package.json --write 'src/**'",
     "pylint:check": "poetry run ruff check ./src-python",
     "pylint:fix": "poetry run ruff check --fix ./src-python",
     "lint:check": "eslint --ext .js,.ts,.tsx ./src",
     "lint:fix": "eslint --fix --ext .js,.ts,.tsx ./src",
     "preview": "vite preview",
-    "python": "poetry run pyinstaller src-python/main.py --noconfirm --distpath src-tauri/bin/python && bash scripts/move_binary.sh",
+    "python": "poetry run pyinstaller --onefile --noconfirm --hidden-import torch --collect-data torch --recursive-copy-metadata torch --hidden-import pyarrow --collect-data pyarrow --recursive-copy-metadata pyarrow --collect-binaries pyarrow --collect-submodules pyarrow --recursive-copy-metadata importlib_metadata --recursive-copy-metadata tqdm --recursive-copy-metadata sentence-transformers --distpath src-tauri/bin/python src-python/main.py && bash scripts/move_binary.sh",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "tauri:dev:debug": "DEV_TOOLS=1 tauri dev"
@@ -55,22 +58,10 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-simple-import-sort": "^10.0.0",
     "husky": "^8.0.0",
-    "lint-staged": "^13.2.0",
     "prettier": "^2.8.8",
     "prettier-plugin-tailwindcss": "^0.3.0",
     "typescript": "^4.9.5",
     "vite": "^4.2.1"
-  },
-  "lint-staged": {
-    "*.{js,ts,tsx}": [
-      "eslint --fix",
-      "prettier --config package.json --write",
-      "git add"
-    ],
-    "*.*": [
-      "prettier --config package.json --write",
-      "git add"
-    ]
   },
   "prettier": {
     "bracketSpacing": true,
@@ -81,36 +72,5 @@
     "trailingComma": "all",
     "useTabs": false,
     "overrides": []
-  },
-  "eslintConfig": {
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-      "ecmaVersion": 12,
-      "sourceType": "module"
-    },
-    "plugins": [
-      "@typescript-eslint",
-      "simple-import-sort"
-    ],
-    "extends": [
-      "eslint:recommended",
-      "plugin:@typescript-eslint/recommended",
-      "plugin:react/recommended",
-      "plugin:react-hooks/recommended"
-    ],
-    "rules": {
-      "simple-import-sort/imports": "error",
-      "simple-import-sort/exports": "error",
-      "react/react-in-jsx-scope": "off"
-    },
-    "settings": {
-      "react": {
-        "version": "18"
-      }
-    },
-    "env": {
-      "browser": true,
-      "es2021": true
-    }
   }
 }

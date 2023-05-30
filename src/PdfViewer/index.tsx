@@ -1,11 +1,11 @@
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
-import { FileEntry } from "@tauri-apps/api/fs";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { FileEntry } from '@tauri-apps/api/fs';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 
-import { readFile } from "../filesystem";
+import { readFile } from '../filesystem';
 import { PdfViewerAPI } from '../types/PdfViewerAPI';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -56,7 +56,7 @@ export function PdfViewer({ file, pdfViewerRef }: PdfViewerProps) {
 
     return () => {
       pdfViewerRef.current = null;
-    }
+    };
   }, [pdfViewerRef, updateWidth]);
 
   useEffect(() => {
@@ -75,23 +75,27 @@ export function PdfViewer({ file, pdfViewerRef }: PdfViewerProps) {
           setError('Unknown error');
         }
       }
-    })()
+    })();
   }, [file]);
 
-  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
-    setNumPages(numPages);
+  const onDocumentLoadSuccess = (pdf: { numPages: number }) => {
+    setNumPages(pdf.numPages);
+  };
+
+  if (error) {
+    return <div>An error occured while opening the selected file: {error}</div>;
   }
 
-  if (error) return <div>An error occured while opening the selected file: {error}</div>;
-
-  if (isFileLoading) return <div><strong>Loading</strong></div>;
+  if (isFileLoading) {
+    return <div><strong>Loading</strong></div>;
+  }
 
   return (
     <div className="pdf-viewer flex flex-col h-full" ref={containerRef}>
       <Document
+        className="flex-1 overflow-scroll"
         file={fileContent}
         onLoadSuccess={onDocumentLoadSuccess}
-        className="flex-1 overflow-scroll"
       >
         {numPages && Array.from(new Array(numPages), (_, index) => (
           <Page key={`page_${index + 1}`} pageNumber={index + 1} width={pdfViewerWidth} />

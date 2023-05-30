@@ -29,17 +29,17 @@ function App() {
 
   const handleCenterPanelResize = () => {
     pdfViewerRef.current?.updateWidth();
-  }
+  };
 
   return (
     <PanelGroup autoSaveId="refstudio" direction="horizontal">
-      <Panel defaultSize={20} collapsible className="p-4">
+      <Panel className="p-4" collapsible defaultSize={20}>
         <FoldersView onClick={handleFolderClick} />
       </Panel>
       <VerticalResizeHandle />
 
       <Panel defaultSize={60} onResize={handleCenterPanelResize}>
-        <CenterPaneView onSelectionChange={setSelection} editorRef={editorRef} pdfViewerRef={pdfViewerRef} file={selectedFile} />
+        <CenterPaneView editorRef={editorRef} file={selectedFile} pdfViewerRef={pdfViewerRef} onSelectionChange={setSelection} />
       </Panel>
 
       <VerticalResizeHandle />
@@ -54,7 +54,7 @@ function App() {
           </Panel>
         </PanelGroup>
       </Panel>
-    </PanelGroup >
+    </PanelGroup>
   );
 }
 
