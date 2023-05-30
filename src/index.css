@@ -38,8 +38,7 @@ p {
 
 body {
   /* This overflow setting prevents the app to display that extra content on scroll (like pull to refresh) */
-  @apply w-full h-full overflow-hidden;
-  
+  @apply h-full w-full overflow-hidden;
 }
 
 /* Make root full-height */
