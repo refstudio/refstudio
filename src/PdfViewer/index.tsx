@@ -2,10 +2,11 @@ import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
 import { FileEntry } from '@tauri-apps/api/fs';
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 
 import { readFile } from '../filesystem';
+import { useDebouncedCallback } from '../hooks/useDebouncedCallback';
 import { PdfViewerAPI } from '../types/PdfViewerAPI';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).toString();
@@ -25,14 +26,9 @@ export function PdfViewer({ file, pdfViewerRef }: PdfViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [pdfViewerWidth, setPdfViewerWidth] = useState<number>();
 
-  const updateTimeoutRef = useRef<NodeJS.Timeout>();
-
-  const updateWidth = useCallback(() => {
-    clearTimeout(updateTimeoutRef.current);
-    updateTimeoutRef.current = setTimeout(() => {
-      setPdfViewerWidth(containerRef.current?.getBoundingClientRect().width);
-    }, 200);
-  }, [updateTimeoutRef]);
+  const updateWidth = useDebouncedCallback(() => {
+    setPdfViewerWidth(containerRef.current?.getBoundingClientRect().width);
+  }, 200);
 
   // Update viewer's width on mount
   useLayoutEffect(updateWidth, [updateWidth]);
