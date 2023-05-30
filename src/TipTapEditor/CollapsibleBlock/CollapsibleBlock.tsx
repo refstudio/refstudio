@@ -21,7 +21,7 @@ export const CollapsibleBlock = (props: CollapsibleBlockProps) => {
   return (
     <NodeViewWrapper>
       <div className="draggable-item collapsible-block flex flex-row items-start">
-        <div className="drag-handle" contentEditable="false" draggable="true" data-drag-handle />
+        <div className="drag-handle" contentEditable="false" data-drag-handle draggable="true" />
         <button
           className={cx({
             folded: props.node.attrs.folded,
