@@ -1,0 +1,19 @@
+name: commit-lint
+run-name: Commit lint
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+jobs:
+  commitlint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.5.2
+        with:
+          fetch-depth: 0
+      - name: Commit Lint
+        uses: wagoid/commitlint-github-action@v5.4.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

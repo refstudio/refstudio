@@ -1,0 +1,111 @@
+name: node-continuous-integration
+run-name: Continuous Integration for Node.js
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.5.2
+      - name: Setup Node.js
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: 'lts/*'
+          cache: 'yarn'
+      - name: Install Node.js dependencies
+        run: yarn install --immutable
+        env:
+          YARN_CHECKSUM_BEHAVIOR: update
+          YARN_ENABLE_SCRIPTS: 0
+  eslint:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.5.2
+      - name: Setup Node.js
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: 'lts/*'
+          cache: 'yarn'
+      - name: Install dependencies
+        run: yarn install --immutable
+      - name: ESLint
+        run: yarn run lint:check
+  prettier:
+    needs: setup
+    runs-on: ubuntu-last
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.5.2
+      - name: Setup Node.js
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: 'lts/*'
+          cache: 'yarn'
+      - name: Install dependencies
+        run: yarn install --immutable
+      - name: Prettier
+        run: yarn run prettier:check
+  constraints:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.5.2
+      - name: Setup Node.js
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: 'lts/*'
+          cache: 'yarn'
+      - name: Constraints
+        run: yarn constraints
+  # test:
+  #   needs: setup
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3.5.2
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: 'lts/*'
+  #         cache: 'yarn'
+  #     - name: Install dependencies
+  #       run: yarn install --immutable
+  #     - name: Test
+  #       run: yarn run test --testLocationInResults --ci --json --outputFile="coverage.json"
+  #       # this is not working well
+  #     - name: Download Coverage Artifact
+  #       uses: actions/download-artifact@v3.0.2
+  #       continue-on-error: true
+  #       with:
+  #         name: coverage
+  #         path: base-coverage.json
+  #     - name: Fallback coverage report
+  #       run: |
+  #         [ -e "base-coverage.json" ] || cp coverage.json base-coverage.json
+  #     - name: Jest coverage report
+  #       if: github.event_name == 'pull_request'
+  #       uses: ArtiomTr/jest-coverage-report-action@v2.0-rc.6
+  #       with:
+  #         github-token: ${{ secrets.GITHUB_TOKEN }}
+  #         coverage-file: coverage.json
+  #         base-coverage-file: base-coverage.json
+  #         skip-step: all
+  #         annotations: none
+  #         icons: ascii
+  #     - name: Set base coverage report
+  #       if: github.event_name != 'pull_request'
+  #       run: cp coverage.json base-coverage.json
+  #     - name: Upload Coverage Artifact
+  #       uses: actions/upload-artifact@v3.1.2
+  #       if: github.event_name != 'pull_request'
+  #       with:
+  #         name: coverage
+  #         path: base-coverage.json
+  #         retention-days: 90
