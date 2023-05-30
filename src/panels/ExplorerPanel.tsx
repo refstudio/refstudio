@@ -2,12 +2,13 @@ import { FileEntry } from '@tauri-apps/api/fs';
 import { useEffect, useState } from 'react';
 import { VscFile, VscFolder } from 'react-icons/vsc';
 
-import { PanelSection } from '../Components/PanelSection';
+import { PanelSection } from '../components/PanelSection';
+import { PanelWrapper } from '../components/PanelWrapper';
 import { cx } from '../cx';
 import { FilesAction, FilesState } from '../filesReducer';
 import { readAllProjectFiles } from '../filesystem';
 
-export function FoldersView({
+export function ExplorerPanel({
   files,
   filesDispatch,
 }: {
@@ -32,7 +33,7 @@ export function FoldersView({
   const someRight = rightPane.length > 0;
 
   return (
-    <>
+    <PanelWrapper title="Explorer">
       <PanelSection title="Open Files">
         {someRight && <div className="ml-4 text-xs font-bold">LEFT</div>}
         {leftPane.length > 0 && (
@@ -53,7 +54,7 @@ export function FoldersView({
           />
         )}
       </PanelSection>
-      <PanelSection title="Project X">
+      <PanelSection grow title="Project X">
         <FileTree
           files={allFiles}
           root
@@ -61,7 +62,7 @@ export function FoldersView({
           onClick={handleOnClick}
         />
       </PanelSection>
-    </>
+    </PanelWrapper>
   );
 }
 

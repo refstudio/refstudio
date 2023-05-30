@@ -89,7 +89,7 @@ export function PdfViewer({ file, pdfViewerRef }: PdfViewerProps) {
   }
 
   return (
-    <div className="pdf-viewer flex h-full flex-col" ref={containerRef}>
+    <div className="pdf-viewer flex h-full w-full flex-col" ref={containerRef}>
       <Document
         className="flex-1 overflow-scroll"
         externalLinkTarget="_blank"

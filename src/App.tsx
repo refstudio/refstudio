@@ -2,17 +2,16 @@ import React, { useCallback, useReducer, useState } from 'react';
 import { Panel, PanelGroup } from 'react-resizable-panels';
 import { useDebounce } from 'usehooks-ts';
 
-import { PanelWrapper } from './Components/PanelWrapper';
-import { PrimarySideBar, PrimarySideBarPane } from './Components/PrimarySideBar';
-import { VerticalResizeHandle } from './Components/VerticalResizeHandle';
+import { PrimarySideBar, PrimarySideBarPane } from './components/PrimarySideBar';
+import { VerticalResizeHandle } from './components/VerticalResizeHandle';
 import { defaultFilesState, filesReducer } from './filesReducer';
+import { AIPanel } from './panels/AIPanel';
+import { CenterPanel } from './panels/CenterPanel';
+import { ExplorerPanel } from './panels/ExplorerPanel';
+import { ReferencesPanel } from './panels/ReferencesPanel';
 import { EditorAPI } from './types/EditorAPI';
 import { PdfViewerAPI } from './types/PdfViewerAPI';
 import { ReferenceItem } from './types/ReferenceItem';
-import { AIView } from './views/AIView';
-import { CenterView } from './views/CenterView';
-import { FoldersView } from './views/FoldersView';
-import { ReferencesView } from './views/ReferencesView';
 
 function App() {
   const [files, dispatch] = useReducer(filesReducer, defaultFilesState());
@@ -27,29 +26,21 @@ function App() {
     editorRef.current?.insertReference(reference);
   };
 
-  const handleCenterPanelResize = useCallback(() => {
+  const updatePDFViewerWidth = useCallback(() => {
     pdfViewerRef.current?.updateWidth();
   }, [pdfViewerRef]);
 
   return (
-    <PanelGroup autoSaveId="refstudio" direction="horizontal">
+    <PanelGroup autoSaveId="refstudio" className="h-full" direction="horizontal" onLayout={updatePDFViewerWidth}>
       <PrimarySideBar activePane={primaryPane} onClick={setPrimaryPane} />
       <Panel collapsible defaultSize={20}>
-        {primaryPane === 'Explorer' && (
-          <PanelWrapper title="Explorer">
-            <FoldersView files={files} filesDispatch={dispatch} />
-          </PanelWrapper>
-        )}
-        {primaryPane === 'References' && (
-          <PanelWrapper title="References">
-            <ReferencesView onRefClicked={handleReferenceClicked} />
-          </PanelWrapper>
-        )}
+        {primaryPane === 'Explorer' && <ExplorerPanel files={files} filesDispatch={dispatch} />}
+        {primaryPane === 'References' && <ReferencesPanel onRefClicked={handleReferenceClicked} />}
       </Panel>
       <VerticalResizeHandle />
 
-      <Panel defaultSize={60} onResize={handleCenterPanelResize}>
-        <CenterView
+      <Panel defaultSize={60}>
+        <CenterPanel
           editorRef={editorRef}
           files={files}
           filesDispatch={dispatch}
@@ -60,9 +51,7 @@ function App() {
 
       <VerticalResizeHandle />
       <Panel collapsible>
-        <PanelWrapper title="AI">
-          <AIView selection={debouncedSelection} />
-        </PanelWrapper>
+        <AIPanel selection={debouncedSelection} />
       </Panel>
     </PanelGroup>
   );

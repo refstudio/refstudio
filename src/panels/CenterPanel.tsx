@@ -1,9 +1,9 @@
 import { FileEntry } from '@tauri-apps/api/fs';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Panel, PanelGroup } from 'react-resizable-panels';
 
-import { TabPane } from '../Components/TabPane';
-import { VerticalResizeHandle } from '../Components/VerticalResizeHandle';
+import { TabPane } from '../components/TabPane';
+import { VerticalResizeHandle } from '../components/VerticalResizeHandle';
 import { cx } from '../cx';
 import { FilesAction, FilesState } from '../filesReducer';
 import { readFileAsText } from '../filesystem';
@@ -13,28 +13,25 @@ import { EditorAPI } from '../types/EditorAPI';
 import { EditorProps } from '../types/EditorProps';
 import { PdfViewerAPI } from '../types/PdfViewerAPI';
 
-interface CenterPaneViewProps {
+interface CenterPanelProps {
   files: FilesState;
   filesDispatch: React.Dispatch<FilesAction>;
-
   editorRef: React.MutableRefObject<EditorAPI | null>;
   pdfViewerRef: React.MutableRefObject<PdfViewerAPI | null>;
   onSelectionChange(text: string): void;
 }
 
-export function CenterView({
-  files,
-  filesDispatch,
-
-  editorRef,
-  pdfViewerRef,
-  onSelectionChange,
-}: CenterPaneViewProps) {
+export function CenterPanel({ files, filesDispatch, editorRef, pdfViewerRef, onSelectionChange }: CenterPanelProps) {
   const someRight = files.openFiles.some((e) => e.pane === 'RIGHT');
+
+  const updatePDFViewerWidth = useCallback(() => {
+    pdfViewerRef.current?.updateWidth();
+  }, [pdfViewerRef]);
+
   return (
-    <PanelGroup direction="horizontal">
+    <PanelGroup direction="horizontal" onLayout={updatePDFViewerWidth}>
       <Panel>
-        <CenterViewPanel
+        <CenterPanelPane
           editorRef={editorRef}
           files={files}
           filesDispatch={filesDispatch}
@@ -46,7 +43,7 @@ export function CenterView({
       {someRight && <VerticalResizeHandle />}
       {someRight && (
         <Panel>
-          <CenterViewPanel
+          <CenterPanelPane
             editorRef={editorRef}
             files={files}
             filesDispatch={filesDispatch}
@@ -60,14 +57,14 @@ export function CenterView({
   );
 }
 
-export function CenterViewPanel({
+export function CenterPanelPane({
   files,
   filesDispatch,
   pane,
   editorRef,
   pdfViewerRef,
   onSelectionChange,
-}: { pane: FilesState['openFiles'][0]['pane'] } & CenterPaneViewProps) {
+}: { pane: FilesState['openFiles'][0]['pane'] } & CenterPanelProps) {
   const paneOpenFiles = files.openFiles.filter((entry) => entry.pane === pane);
   const activeEntry = paneOpenFiles.find((e) => e.active);
   const items = paneOpenFiles.map((entry) => ({
@@ -92,7 +89,7 @@ export function CenterViewPanel({
   }
 
   return (
-    <div className="grid h-full grid-rows-[auto_1fr]">
+    <div className="h-full grid-rows-[auto_1fr] ">
       <TabPane
         items={items}
         value={activeEntry?.file.path ?? ''}

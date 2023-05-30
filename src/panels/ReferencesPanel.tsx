@@ -1,12 +1,13 @@
 import { FileUploader } from 'react-drag-drop-files';
 
-import { PanelSection } from '../Components/PanelSection';
+import { PanelSection } from '../components/PanelSection';
+import { PanelWrapper } from '../components/PanelWrapper';
 import { ensureProjectFileStructure, runPDFIngestion, uploadFiles } from '../filesystem';
 import { ReferenceItem } from '../types/ReferenceItem';
 
 const BASE_DIR = await ensureProjectFileStructure();
 
-export function ReferencesView({ onRefClicked }: { onRefClicked?: (item: ReferenceItem) => void }) {
+export function ReferencesPanel({ onRefClicked }: { onRefClicked?: (item: ReferenceItem) => void }) {
   async function handleChange(uploadedFiles: FileList) {
     try {
       await uploadFiles(uploadedFiles);
@@ -20,7 +21,7 @@ export function ReferencesView({ onRefClicked }: { onRefClicked?: (item: Referen
   }
 
   return (
-    <>
+    <PanelWrapper title="References">
       <PanelSection title="Library">
         <ul className="space-y-2">
           {REFS_DATABASE.map((reference) => (
@@ -45,7 +46,7 @@ export function ReferencesView({ onRefClicked }: { onRefClicked?: (item: Referen
         <FileUploader handleChange={handleChange} label="Upload or drop a file right here" multiple name="file" />
         <code className="mb-auto mt-10 block text-xs font-normal">{BASE_DIR}</code>
       </PanelSection>
-    </>
+    </PanelWrapper>
   );
 }
 

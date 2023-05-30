@@ -1,9 +1,10 @@
 import { Command } from '@tauri-apps/api/shell';
 import { useEffect, useState } from 'react';
 
-import { PanelSection } from '../Components/PanelSection';
+import { PanelSection } from '../components/PanelSection';
+import { PanelWrapper } from '../components/PanelWrapper';
 
-export function AIView({ selection }: { selection: string | null }) {
+export function AIPanel({ selection }: { selection: string | null }) {
   const [reply, setReply] = useState('');
 
   useEffect(() => {
@@ -16,17 +17,19 @@ export function AIView({ selection }: { selection: string | null }) {
   }, [selection]);
 
   return (
-    <PanelSection title="Selection">
-      <p className="my-4 italic">Select some text in the editor to see it here.</p>
+    <PanelWrapper title="AI">
+      <PanelSection title="Selection">
+        <p className="my-4 italic">Select some text in the editor to see it here.</p>
 
-      {selection && (
-        <div className="flex flex-col gap-4">
-          <div className="border border-yellow-100 bg-yellow-50 p-4">{selection}</div>
-          <strong>REPLY</strong>
-          <div className="border border-green-100 bg-green-50 p-4">{reply}</div>
-        </div>
-      )}
-    </PanelSection>
+        {selection && (
+          <div className="flex flex-col gap-4">
+            <div className="border border-yellow-100 bg-yellow-50 p-4">{selection}</div>
+            <strong>REPLY</strong>
+            <div className="border border-green-100 bg-green-50 p-4">{reply}</div>
+          </div>
+        )}
+      </PanelSection>
+    </PanelWrapper>
   );
 }
 
