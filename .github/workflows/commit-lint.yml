@@ -4,7 +4,11 @@ on:
   push:
     branches:
       - main
-  pull_request:
+  merge_group:
+    branches:
+      - main
+    types:
+      - checks_requested
 jobs:
   commitlint:
     runs-on: ubuntu-latest
