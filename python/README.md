@@ -7,13 +7,13 @@ This is the backend for refstudio. It is written in Python and runs as a [Tauri 
 
 Running the sidecar:
 ```bash
-$ poetry run python -m sidecar --text "Hello, world!"
+$ poetry run python main.py ai --text "Hello, world!"
 # {"num_words": 2}
 ```
 
 Running the tests:
 ```bash
-$ poetry run pytest --cov=sidecar tests
+$ poetry run pytest --cov=. tests
 ```
 
 Building the sidecar binary:

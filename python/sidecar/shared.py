@@ -8,6 +8,10 @@ from .typing import Chunk
 MODEL_FOR_EMBEDDINGS = "sentence-transformers/all-MiniLM-L6-v2"
 
 
+def get_word_count(text: str) -> int:
+    return len(text.strip().split(" "))
+
+
 def get_filename_md5(filename: str) -> str:
     """
     Get the MD5 hash of a filename
