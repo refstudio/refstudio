@@ -7,15 +7,18 @@ import { VerticalResizeHandle } from '../Components/VerticalResizeHandle';
 import { cx } from '../cx';
 import { FilesAction, FilesState } from '../filesReducer';
 import { readFileAsText } from '../filesystem';
+import { PdfViewer } from '../PdfViewer';
 import { TipTapEditor } from '../TipTapEditor/TipTapEditor';
 import { EditorAPI } from '../types/EditorAPI';
 import { EditorProps } from '../types/EditorProps';
+import { PdfViewerAPI } from '../types/PdfViewerAPI';
 
 interface CenterPaneViewProps {
   files: FilesState;
   filesDispatch: React.Dispatch<FilesAction>;
 
-  editorRef: React.MutableRefObject<EditorAPI | undefined>;
+  editorRef: React.MutableRefObject<EditorAPI | null>;
+  pdfViewerRef: React.MutableRefObject<PdfViewerAPI | null>;
   onSelectionChange(text: string): void;
 }
 
@@ -24,6 +27,7 @@ export function CenterPaneView({
   filesDispatch,
 
   editorRef,
+  pdfViewerRef,
   onSelectionChange,
 }: CenterPaneViewProps) {
   const leftPane = files.openFiles.filter((entry) => entry.pane === 'LEFT');
@@ -78,6 +82,7 @@ export function CenterPaneView({
             <CenterPaneViewContent
               activeFile={activeLeftEntry?.file}
               editorRef={editorRef}
+              pdfViewerRef={pdfViewerRef}
               onSelectionChange={onSelectionChange}
             />
           </div>
@@ -98,6 +103,7 @@ export function CenterPaneView({
               <CenterPaneViewContent
                 activeFile={activeRightEntry?.file}
                 editorRef={editorRef}
+                pdfViewerRef={pdfViewerRef}
                 onSelectionChange={onSelectionChange}
               />
             </div>
@@ -110,11 +116,17 @@ export function CenterPaneView({
 
 interface CenterPaneViewContentProps {
   activeFile?: FileEntry;
-  editorRef: React.MutableRefObject<EditorAPI | undefined>;
+  editorRef: React.MutableRefObject<EditorAPI | null>;
+  pdfViewerRef: React.MutableRefObject<PdfViewerAPI | null>;
   onSelectionChange(text: string): void;
 }
 
-export function CenterPaneViewContent({ activeFile, editorRef, onSelectionChange }: CenterPaneViewContentProps) {
+export function CenterPaneViewContent({
+  activeFile,
+  editorRef,
+  pdfViewerRef,
+  onSelectionChange,
+}: CenterPaneViewContentProps) {
   if (!activeFile) {
     return <EmptyView />;
   }
@@ -128,14 +140,7 @@ export function CenterPaneViewContent({ activeFile, editorRef, onSelectionChange
   }
 
   if (activeFile.path.endsWith('.pdf')) {
-    return (
-      <div>
-        <strong>FILE:</strong>
-        <div>
-          {activeFile.name} at <code>{activeFile.path}</code>
-        </div>
-      </div>
-    );
+    return <PdfViewer file={activeFile} pdfViewerRef={pdfViewerRef} />;
   }
 
   // Use TipTap editor by default!

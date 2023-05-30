@@ -1,4 +1,4 @@
-import React, { useReducer, useState } from 'react';
+import React, { useCallback, useReducer, useState } from 'react';
 import { Panel, PanelGroup } from 'react-resizable-panels';
 import { useDebounce } from 'usehooks-ts';
 
@@ -7,6 +7,7 @@ import { PrimarySideBar, PrimarySideBarPane } from './Components/PrimarySideBar'
 import { VerticalResizeHandle } from './Components/VerticalResizeHandle';
 import { defaultFilesState, filesReducer } from './filesReducer';
 import { EditorAPI } from './types/EditorAPI';
+import { PdfViewerAPI } from './types/PdfViewerAPI';
 import { ReferenceItem } from './types/ReferenceItem';
 import { AIView } from './views/AIView';
 import { CenterPaneView } from './views/CenterPaneView';
@@ -20,10 +21,15 @@ function App() {
 
   const [selection, setSelection] = React.useState<string | null>(null);
   const debouncedSelection = useDebounce(selection, 200);
-  const editorRef = React.useRef<EditorAPI>();
+  const editorRef = React.useRef<EditorAPI>(null);
+  const pdfViewerRef = React.useRef<PdfViewerAPI>(null);
   const handleReferenceClicked = (reference: ReferenceItem) => {
     editorRef.current?.insertReference(reference);
   };
+
+  const handleCenterPanelResize = useCallback(() => {
+    pdfViewerRef.current?.updateWidth();
+  }, [pdfViewerRef]);
 
   return (
     <PanelGroup autoSaveId="refstudio" direction="horizontal">
@@ -42,8 +48,14 @@ function App() {
       </Panel>
       <VerticalResizeHandle />
 
-      <Panel defaultSize={60}>
-        <CenterPaneView editorRef={editorRef} files={files} filesDispatch={dispatch} onSelectionChange={setSelection} />
+      <Panel defaultSize={60} onResize={handleCenterPanelResize}>
+        <CenterPaneView
+          editorRef={editorRef}
+          files={files}
+          filesDispatch={dispatch}
+          pdfViewerRef={pdfViewerRef}
+          onSelectionChange={setSelection}
+        />
       </Panel>
 
       <VerticalResizeHandle />
