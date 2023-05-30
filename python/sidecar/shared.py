@@ -51,6 +51,9 @@ def embed_text(text: List[str]) -> List[float]:
     :param text:
     :return:
     """
+    if not isinstance(text, list):
+        raise ValueError("text must be a list of strings")
+
     from sentence_transformers import SentenceTransformer
     model = SentenceTransformer(MODEL_FOR_EMBEDDINGS)
     return model.encode(text)
