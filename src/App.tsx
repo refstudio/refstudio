@@ -1,7 +1,6 @@
 import { FileEntry } from '@tauri-apps/api/fs';
 import * as React from 'react';
 import { useCallback } from 'react';
-import { pdfjs } from 'react-pdf';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { useDebounce } from 'usehooks-ts';
 
@@ -12,11 +11,6 @@ import { AIView } from './views/AIView';
 import { CenterPaneView } from './views/CenterPaneView';
 import { FoldersView } from './views/FoldersView';
 import { ReferencesView } from './views/ReferencesView';
-
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.js',
-  import.meta.url,
-).toString();
 
 function App() {
   const [selectedFile, setSelectedFile] = React.useState<FileEntry | undefined>();

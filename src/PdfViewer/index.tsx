@@ -3,17 +3,22 @@ import 'react-pdf/dist/esm/Page/TextLayer.css';
 
 import { FileEntry } from "@tauri-apps/api/fs";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Document, Page } from "react-pdf";
+import { Document, Page, pdfjs } from 'react-pdf';
 
 import { readFile } from "../filesystem";
 import { PdfViewerAPI } from '../types/PdfViewerAPI';
 
-export interface PdfViewerProps {
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.js',
+  import.meta.url,
+).toString();
+
+interface PdfViewerProps {
   file: FileEntry;
   pdfViewerRef: React.MutableRefObject<PdfViewerAPI | null>;
 }
 
-export const PdfViewer = ({ file, pdfViewerRef }: PdfViewerProps) => {
+export function PdfViewer({ file, pdfViewerRef }: PdfViewerProps) {
   const [numPages, setNumPages] = useState<number | null>(null);
 
   const [fileContent, setFileContent] = useState<{ data: Uint8Array } | null>(null);
