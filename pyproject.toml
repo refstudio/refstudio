@@ -18,6 +18,7 @@ pytest = "^7.3.1"
 pytest-cov = "^4.1.0"
 ruff = "^0.0.270"
 pyinstaller = "^5.11.0"
+ipdb = "^0.13.13"
 
 [build-system]
 requires = ["poetry-core"]

@@ -226,6 +226,19 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
+name = "ipdb"
+version = "0.13.13"
+description = "IPython-enabled pdb"
+category = "dev"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+
+[package.dependencies]
+decorator = {version = "*", markers = "python_version > \"3.6\""}
+ipython = {version = ">=7.31.1", markers = "python_version > \"3.6\""}
+tomli = {version = "*", markers = "python_version > \"3.6\" and python_version < \"3.11\""}
+
+[[package]]
 name = "ipython"
 version = "8.13.2"
 description = "IPython: Productive Interactive Computing"
@@ -1060,7 +1073,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9, <3.12"  # pyinstaller requires Python <3.12
-content-hash = "8dad08466f2495d0cc0cd54c3fed5fbee2ae76f12e846069db17f5091143bf16"
+content-hash = "07d44acf6376c878e76c976f01228f7bc9e4ce38d891eb880dfbd6f1ee5c1afa"
 
 [metadata.files]
 altgraph = [
@@ -1269,6 +1282,10 @@ idna = [
 iniconfig = [
     {file = "iniconfig-2.0.0-py3-none-any.whl", hash = "sha256:b6a85871a79d2e3b22d2d1b94ac2824226a63c6b741c88f7ae975f18b6778374"},
     {file = "iniconfig-2.0.0.tar.gz", hash = "sha256:2d91e135bf72d31a410b17c16da610a82cb55f6b0477d1a902134b24a455b8b3"},
+]
+ipdb = [
+    {file = "ipdb-0.13.13-py3-none-any.whl", hash = "sha256:45529994741c4ab6d2388bfa5d7b725c2cf7fe9deffabdb8a6113aa5ed449ed4"},
+    {file = "ipdb-0.13.13.tar.gz", hash = "sha256:e3ac6018ef05126d442af680aad863006ec19d02290561ac88b8b1c0b0cfc726"},
 ]
 ipython = [
     {file = "ipython-8.13.2-py3-none-any.whl", hash = "sha256:ffca270240fbd21b06b2974e14a86494d6d29290184e788275f55e0b55914926"},
