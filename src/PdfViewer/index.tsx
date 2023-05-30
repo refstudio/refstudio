@@ -8,10 +8,7 @@ import { Document, Page, pdfjs } from 'react-pdf';
 import { readFile } from '../filesystem';
 import { PdfViewerAPI } from '../types/PdfViewerAPI';
 
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.js',
-  import.meta.url,
-).toString();
+pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).toString();
 
 interface PdfViewerProps {
   file: FileEntry;
@@ -29,7 +26,6 @@ export function PdfViewer({ file, pdfViewerRef }: PdfViewerProps) {
   const [pdfViewerWidth, setPdfViewerWidth] = useState<number>();
 
   const updateTimeoutRef = useRef<NodeJS.Timeout>();
-
 
   const updateWidth = useCallback(() => {
     clearTimeout(updateTimeoutRef.current);
@@ -87,19 +83,20 @@ export function PdfViewer({ file, pdfViewerRef }: PdfViewerProps) {
   }
 
   if (isFileLoading) {
-    return <div><strong>Loading</strong></div>;
+    return (
+      <div>
+        <strong>Loading</strong>
+      </div>
+    );
   }
 
   return (
-    <div className="pdf-viewer flex flex-col h-full" ref={containerRef}>
-      <Document
-        className="flex-1 overflow-scroll"
-        file={fileContent}
-        onLoadSuccess={onDocumentLoadSuccess}
-      >
-        {numPages && Array.from(new Array(numPages), (_, index) => (
-          <Page key={`page_${index + 1}`} pageNumber={index + 1} width={pdfViewerWidth} />
-        ))}
+    <div className="pdf-viewer flex h-full flex-col" ref={containerRef}>
+      <Document className="flex-1 overflow-scroll" file={fileContent} onLoadSuccess={onDocumentLoadSuccess}>
+        {numPages &&
+          Array.from(new Array(numPages), (_, index) => (
+            <Page key={`page_${index + 1}`} pageNumber={index + 1} width={pdfViewerWidth} />
+          ))}
       </Document>
     </div>
   );

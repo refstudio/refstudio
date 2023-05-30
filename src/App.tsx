@@ -39,7 +39,12 @@ function App() {
       <VerticalResizeHandle />
 
       <Panel defaultSize={60} onResize={handleCenterPanelResize}>
-        <CenterPaneView editorRef={editorRef} file={selectedFile} pdfViewerRef={pdfViewerRef} onSelectionChange={setSelection} />
+        <CenterPaneView
+          editorRef={editorRef}
+          file={selectedFile}
+          pdfViewerRef={pdfViewerRef}
+          onSelectionChange={setSelection}
+        />
       </Panel>
 
       <VerticalResizeHandle />
