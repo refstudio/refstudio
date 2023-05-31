@@ -2,6 +2,9 @@
 
 ### Testing ###
 /coverage
+.coverage
+.coverage.*
+.pytest_cache
 
 ### Production ###
 /build
@@ -176,3 +179,4 @@ $RECYCLE.BIN/
 # Tauri / Python
 src-tauri/bin
 main.spec
+__pycache__
