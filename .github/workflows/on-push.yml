@@ -8,13 +8,25 @@ on:
 
 jobs:
   setup-js:
-    uses: ./.github/jobs/warm-up-node.yml
-  
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-node
+
   setup-rust:
-    uses: ./.github/jobs/warm-up-rust.yml
-  
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-rust
+
   setup-python:
-    uses: ./.github/jobs/warm-up-python.yml
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-python
 
   # commitlint:
   #   runs-on: ubuntu-latest

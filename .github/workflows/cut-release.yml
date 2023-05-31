@@ -1,7 +1,7 @@
 name: Cut Release
 
 on:
-  - repository_dispatch
+  repository_dispatch:
 
 jobs:
   create-release:
