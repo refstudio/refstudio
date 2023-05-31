@@ -5,7 +5,7 @@ export const CollapsibleBlockSummaryNode = Node.create({
 
   group: 'block',
 
-  content: 'text*',
+  content: 'paragraph',
 
   parseHTML() {
     return [
