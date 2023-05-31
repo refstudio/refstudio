@@ -19,20 +19,22 @@ export function TipTapEditor({ editorRef, editorContent }: EditorProps) {
       new Editor({
         extensions: EDITOR_EXTENSIONS,
         content: editorContent ?? INITIAL_CONTENT,
-        onSelectionUpdate({ editor }) {
-          const { from, to } = editor.view.state.selection;
-          const text = editor.view.state.doc.textBetween(from, to);
-          setSelection(text);
+        onSelectionUpdate(update) {
+          const newEditor = update.editor;
+          const { from, to } = newEditor.view.state.selection;
+          onSelectionChange(newEditor.view.state.doc.textBetween(from, to));
         },
       }),
     );
-  }, [editorContent, setSelection]);
+  }, [editorContent, onSelectionChange]);
 
   useEffect(() => {
-    if (!editor) return;
+    if (!editor) {
+      return;
+    }
     editorRef.current = {
       insertReference(reference) {
-        editor?.commands.insertContentAt(editor.state.selection.head, {
+        editor.commands.insertContentAt(editor.state.selection.head, {
           type: ReferenceNode.name,
           attrs: { id: reference.id },
         });
@@ -40,12 +42,14 @@ export function TipTapEditor({ editorRef, editorContent }: EditorProps) {
     };
   }, [editor, editorRef]);
 
-  if (!editor) return <div>...</div>;
+  if (!editor) {
+    return <div>...</div>;
+  }
 
   return (
-    <div className="tiptap-editor flex flex-col h-full">
+    <div className="tiptap-editor flex h-full flex-col">
       <MenuBar editor={editor} />
-      <EditorContent className="pt-4 pl-5 pr-2 flex-1 overflow-scroll" editor={editor} />
+      <EditorContent className="flex-1 overflow-scroll pl-5 pr-2 pt-4" editor={editor} />
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { FileEntry } from '@tauri-apps/api/fs';
 import { useEffect, useState } from 'react';
 
 import { readFile } from '../filesystem';
+import { PdfViewer } from '../PdfViewer';
 import { TipTapEditor } from '../TipTapEditor/TipTapEditor';
 import { CenterPaneViewProps } from '../types/CenterPaneViewProps';
 
@@ -9,7 +10,11 @@ function isTipTap(file?: FileEntry) {
   return file?.path.endsWith('.tiptap');
 }
 
-export function CenterPaneView({ file, ...props }: CenterPaneViewProps) {
+function isPdf(file?: FileEntry) {
+  return file?.path.endsWith('.pdf');
+}
+
+export function CenterPaneView({ file, pdfViewerRef, ...props }: CenterPaneViewProps) {
   const [loading, setLoading] = useState(true);
   const [content, setContent] = useState<string | null>(null);
 
@@ -17,22 +22,29 @@ export function CenterPaneView({ file, ...props }: CenterPaneViewProps) {
     if (file && isTipTap(file)) {
       setLoading(true);
       (async () => {
-        const content = await readFile(file);
-        const textContent = new TextDecoder('utf-8').decode(content);
+        const newBytes = await readFile(file);
+        const textContent = new TextDecoder('utf-8').decode(newBytes);
         setContent(textContent);
         setLoading(false);
       })();
     }
   }, [file]);
 
-  if (loading)
+  if (loading) {
     return (
-      <div>
+      <div className="p-3">
         <strong>Loading...</strong>
       </div>
     );
+  }
 
-  if (file && isTipTap(file)) return <TipTapEditor {...props} editorContent={content} />;
+  if (file && isTipTap(file)) {
+    return <TipTapEditor {...props} editorContent={content} />;
+  }
+
+  if (file && isPdf(file)) {
+    return <PdfViewer file={file} pdfViewerRef={pdfViewerRef} />;
+  }
 
   return (
     <div className="p-3">

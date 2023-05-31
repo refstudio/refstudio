@@ -12,9 +12,13 @@ export function AIView() {
   const debouncedSelection = useDebounce(selection, 200);
 
   useEffect(() => {
-    if (!debouncedSelection) return;
-    interactWithAi(debouncedSelection).then(setReply).catch(console.error);
-  }, [debouncedSelection]);
+    if (!selection) {
+      return;
+    }
+    interactWithAi(selection)
+      .then((num) => setReply(String(num)))
+      .catch(console.error);
+  }, [selection]);
 
   return (
     <div className="flex h-full w-full flex-col">
@@ -34,16 +38,22 @@ export function AIView() {
   );
 }
 
+interface AIResponse {
+  num_words: number;
+}
+
 async function interactWithAi(selection: string) {
   try {
-    const command = Command.sidecar('bin/python/main', ['--text', `${selection}`]);
+    const command = Command.sidecar('bin/python/main', ['ai', '--text', `${selection}`]);
     const output = await command.execute();
-    if (output.stderr) throw new Error(output.stderr);
+    if (output.stderr) {
+      throw new Error(output.stderr);
+    }
 
-    const response = JSON.parse(output.stdout);
+    const response = JSON.parse(output.stdout) as AIResponse;
     const aiReply = response.num_words;
     return aiReply;
   } catch (reason) {
-    throw new Error('ERROR: ' + reason);
+    throw new Error(`ERROR: ${reason}`);
   }
 }
