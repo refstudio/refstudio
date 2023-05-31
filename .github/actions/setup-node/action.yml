@@ -7,5 +7,6 @@ runs:
       node-version: 'lts/*'
       cache: 'yarn'
   - run: yarn install --immutable
+    shell: 'bash'
     env:
       YARN_ENABLE_SCRIPTS: 0

@@ -8,13 +8,13 @@ on:
 
 jobs:
   setup-js:
-    uses: ./.github/workflows/warm-up-node.yml
+    uses: ./.github/jobs/warm-up-node.yml
   
   setup-rust:
-    uses: ./.github/workflows/warm-up-rust.yml
+    uses: ./.github/jobs/warm-up-rust.yml
   
   setup-python:
-    uses: ./.github/workflows/warm-up-python.yml
+    uses: ./.github/jobs/warm-up-python.yml
 
   # commitlint:
   #   runs-on: ubuntu-latest
