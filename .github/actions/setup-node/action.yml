@@ -1,0 +1,11 @@
+name: 'Setup Node.js'
+runs:
+  using: 'composite'
+  steps:
+  - uses: actions/setup-node@v3.6.0
+    with:
+      node-version: 'lts/*'
+      cache: 'yarn'
+  - run: yarn install --immutable
+    env:
+      YARN_ENABLE_SCRIPTS: 0

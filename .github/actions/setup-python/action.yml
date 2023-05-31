@@ -1,0 +1,19 @@
+name: 'Setup Python'
+runs:
+  using: 'composite'
+  steps:
+  - uses: actions/setup-python@v4
+    id: setup-python
+  - uses: snok/install-poetry@v1
+    with:
+      virtualenvs-create: true
+      virtualenvs-in-project: true
+      installer-parallel: true
+  - id: cached-poetry-dependencies
+    uses: actions/cache@v3
+    with:
+      path: .venv
+      key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+  - if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+    run: poetry install --no-interaction --no-root
+  - run: poetry install --no-interaction

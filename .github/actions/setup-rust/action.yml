@@ -1,0 +1,8 @@
+name: 'Setup Node.js'
+runs:
+  using: 'composite'
+  steps:
+  - uses: dtolnay/rust-toolchain@stable
+  - uses: swatinem/rust-cache@v2
+    with:
+      workspaces: './src-tauri -> target'
