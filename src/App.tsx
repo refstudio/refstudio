@@ -2,7 +2,6 @@ import { FileEntry } from '@tauri-apps/api/fs';
 import * as React from 'react';
 import { useCallback } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { useDebounce } from 'usehooks-ts';
 
 import { EditorAPI } from './types/EditorAPI';
 import { PdfViewerAPI } from './types/PdfViewerAPI';
@@ -15,8 +14,6 @@ import { ReferencesView } from './views/ReferencesView';
 function App() {
   const [selectedFile, setSelectedFile] = React.useState<FileEntry | undefined>();
 
-  const [selection, setSelection] = React.useState<string | null>(null);
-  const debouncedSelection = useDebounce(selection, 200);
   const editorRef = React.useRef<EditorAPI>(null);
   const pdfViewerRef = React.useRef<PdfViewerAPI>(null);
   const handleReferenceClicked = (reference: ReferenceItem) => {
@@ -39,23 +36,18 @@ function App() {
       <VerticalResizeHandle />
 
       <Panel defaultSize={60} onResize={handleCenterPanelResize}>
-        <CenterPaneView
-          editorRef={editorRef}
-          file={selectedFile}
-          pdfViewerRef={pdfViewerRef}
-          onSelectionChange={setSelection}
-        />
+        <CenterPaneView editorRef={editorRef} file={selectedFile} pdfViewerRef={pdfViewerRef} />
       </Panel>
 
       <VerticalResizeHandle />
       <Panel>
         <PanelGroup autoSaveId="rs-right-sidebar" direction="vertical">
-          <Panel className="p-3">
+          <Panel>
             <ReferencesView onRefClicked={handleReferenceClicked} />
           </Panel>
           <HorizontalResizeHandle />
-          <Panel className="p-3">
-            <AIView selection={debouncedSelection} />
+          <Panel>
+            <AIView />
           </Panel>
         </PanelGroup>
       </Panel>

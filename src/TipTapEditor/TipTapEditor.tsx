@@ -1,15 +1,24 @@
 import './TipTapEditor.css';
 
 import { Editor, EditorContent } from '@tiptap/react';
+import { useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 
-import { EditorProps } from '../types/EditorProps';
+import { selectionAtom } from '../atoms/selectionState';
+import { EditorAPI } from '../types/EditorAPI';
 import { MenuBar } from './MenuBar';
 import { ReferenceNode } from './ReferenceBlock/ReferenceNode';
 import { EDITOR_EXTENSIONS, INITIAL_CONTENT } from './TipTapEditorConfigs';
 
-export function TipTapEditor({ editorRef, editorContent, onSelectionChange }: EditorProps) {
+interface EditorProps {
+  editorRef: React.MutableRefObject<EditorAPI | null>;
+  editorContent: string | null;
+}
+
+export function TipTapEditor({ editorRef, editorContent }: EditorProps) {
   const [editor, setEditor] = useState<Editor | null>(null);
+  const setSelection = useSetAtom(selectionAtom);
+
   useEffect(() => {
     setEditor(
       new Editor({
@@ -18,11 +27,12 @@ export function TipTapEditor({ editorRef, editorContent, onSelectionChange }: Ed
         onSelectionUpdate(update) {
           const newEditor = update.editor;
           const { from, to } = newEditor.view.state.selection;
-          onSelectionChange(newEditor.view.state.doc.textBetween(from, to));
+          const text = newEditor.view.state.doc.textBetween(from, to);
+          setSelection(text);
         },
       }),
     );
-  }, [editorContent, onSelectionChange]);
+  }, [editorContent, setSelection]);
 
   useEffect(() => {
     if (!editor) {

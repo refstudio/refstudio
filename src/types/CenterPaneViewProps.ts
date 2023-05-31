@@ -7,5 +7,4 @@ export interface CenterPaneViewProps {
   editorRef: React.MutableRefObject<EditorAPI | null>;
   pdfViewerRef: React.MutableRefObject<PdfViewerAPI | null>;
   file?: FileEntry;
-  onSelectionChange(text: string): void;
 }

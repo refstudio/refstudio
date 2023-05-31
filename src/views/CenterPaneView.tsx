@@ -14,7 +14,7 @@ function isPdf(file?: FileEntry) {
   return file?.path.endsWith('.pdf');
 }
 
-export function CenterPaneView({ file, pdfViewerRef, ...props }: CenterPaneViewProps) {
+export function CenterPaneView({ file, pdfViewerRef, editorRef }: CenterPaneViewProps) {
   const [loading, setLoading] = useState(true);
   const [content, setContent] = useState<string | null>(null);
 
@@ -39,7 +39,7 @@ export function CenterPaneView({ file, pdfViewerRef, ...props }: CenterPaneViewP
   }
 
   if (file && isTipTap(file)) {
-    return <TipTapEditor {...props} editorContent={content} />;
+    return <TipTapEditor editorContent={content} editorRef={editorRef} />;
   }
 
   if (file && isPdf(file)) {
