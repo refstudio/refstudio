@@ -2,15 +2,12 @@ import json
 import sys
 from argparse import ArgumentParser
 
-from sidecar import ingest
+from sidecar import ingest, shared
 
-
-def get_word_count(text: str) -> int:
-    return len(text.strip().split(" "))
 
 def main(text: str):
     try:
-        data = {"num_words": get_word_count(text)}
+        data = {"num_words": shared.get_word_count(text)}
         print(json.dumps(data))
     except Exception:
         print("Error processing text", file=sys.stderr)

@@ -1,18 +1,17 @@
+import json
+import logging
+import os
 import sys
 from dataclasses import asdict
-from typing import List
-from argparse import ArgumentParser
-from grobid_client.grobid_client import GrobidClient
 from pathlib import Path
+from typing import List
+
 import grobid_tei_xml
 import lancedb
-import logging
-import json
-import os
+from grobid_client.grobid_client import GrobidClient
 
-from .shared import get_filename_md5, chunk_text, embed_text, HiddenPrints
-from .typing import Reference, Author
-
+from .shared import HiddenPrints, chunk_text, embed_text, get_filename_md5
+from .typing import Author, Reference
 
 # parallelism within tokenizers has been causing an inconsistent
 # issue when coupled with Tauri and PyInstaller
@@ -244,11 +243,3 @@ def main(pdf_directory: str):
     logger.info(f"PDF directory => {pdf_directory}")
     ingest = PDFIngestion(input_dir=pdf_directory)
     ingest.run()
-
-
-if __name__ == '__main__':
-    parser = ArgumentParser()
-    parser.add_argument("--pdf_directory", type=str)
-    args = parser.parse_args()
-
-    main(args.pdf_directory)
