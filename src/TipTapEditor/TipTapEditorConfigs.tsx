@@ -24,18 +24,20 @@ export const EDITOR_EXTENSIONS: Extensions = [
   Markdown,
   CodeBlockLowlight.configure({
     lowlight,
+    defaultLanguage: 'markdown',
   }),
   Color.configure({ types: [TextStyle.name, ListItem.name] }),
   TextStyle,
   StarterKit.configure({
     bulletList: {
       keepMarks: true,
-      keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+      keepAttributes: false,
     },
     orderedList: {
       keepMarks: true,
-      keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+      keepAttributes: false,
     },
+    codeBlock: false,
   }),
 ];
 export const INITIAL_CONTENT = `
