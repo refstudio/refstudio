@@ -1,6 +1,5 @@
 import React, { useCallback, useReducer, useState } from 'react';
 import { Panel, PanelGroup } from 'react-resizable-panels';
-import { useDebounce } from 'usehooks-ts';
 
 import { PrimarySideBar, PrimarySideBarPane } from './components/PrimarySideBar';
 import { VerticalResizeHandle } from './components/VerticalResizeHandle';
@@ -18,8 +17,6 @@ function App() {
 
   const [primaryPane, setPrimaryPane] = useState<PrimarySideBarPane>('Explorer');
 
-  const [selection, setSelection] = React.useState<string | null>(null);
-  const debouncedSelection = useDebounce(selection, 200);
   const editorRef = React.useRef<EditorAPI>(null);
   const pdfViewerRef = React.useRef<PdfViewerAPI>(null);
   const handleReferenceClicked = (reference: ReferenceItem) => {
@@ -40,18 +37,12 @@ function App() {
       <VerticalResizeHandle />
 
       <Panel defaultSize={60}>
-        <CenterPanel
-          editorRef={editorRef}
-          files={files}
-          filesDispatch={dispatch}
-          pdfViewerRef={pdfViewerRef}
-          onSelectionChange={setSelection}
-        />
+        <CenterPanel editorRef={editorRef} files={files} filesDispatch={dispatch} pdfViewerRef={pdfViewerRef} />
       </Panel>
 
       <VerticalResizeHandle />
       <Panel collapsible>
-        <AIPanel selection={debouncedSelection} />
+        <AIPanel />
       </Panel>
     </PanelGroup>
   );

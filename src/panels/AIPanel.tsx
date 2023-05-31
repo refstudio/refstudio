@@ -1,11 +1,17 @@
 import { Command } from '@tauri-apps/api/shell';
+import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
+import { useDebounce } from 'usehooks-ts';
 
+import { selectionAtom } from '../atoms/selectionState';
 import { PanelSection } from '../components/PanelSection';
 import { PanelWrapper } from '../components/PanelWrapper';
 
-export function AIPanel({ selection }: { selection: string | null }) {
+export function AIPanel() {
   const [reply, setReply] = useState('');
+
+  const selection = useAtomValue(selectionAtom);
+  const debouncedSelection = useDebounce(selection, 200);
 
   useEffect(() => {
     if (!selection) {
@@ -23,7 +29,7 @@ export function AIPanel({ selection }: { selection: string | null }) {
 
         {selection && (
           <div className="flex flex-col gap-4">
-            <div className="border border-yellow-100 bg-yellow-50 p-4">{selection}</div>
+            <div className="border border-yellow-100 bg-yellow-50 p-4">{debouncedSelection}</div>
             <strong>REPLY</strong>
             <div className="border border-green-100 bg-green-50 p-4">{reply}</div>
           </div>

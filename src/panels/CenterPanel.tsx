@@ -2,7 +2,7 @@ import { FileEntry } from '@tauri-apps/api/fs';
 import { useCallback, useEffect, useState } from 'react';
 import { Panel, PanelGroup } from 'react-resizable-panels';
 
-import { TabPane } from '../components/TabPane';
+import { TabPane } from '../Components/TabPane';
 import { VerticalResizeHandle } from '../components/VerticalResizeHandle';
 import { cx } from '../cx';
 import { FilesAction, FilesState } from '../filesReducer';
@@ -10,7 +10,6 @@ import { readFileAsText } from '../filesystem';
 import { PdfViewer } from '../PdfViewer';
 import { TipTapEditor } from '../TipTapEditor/TipTapEditor';
 import { EditorAPI } from '../types/EditorAPI';
-import { EditorProps } from '../types/EditorProps';
 import { PdfViewerAPI } from '../types/PdfViewerAPI';
 
 interface CenterPanelProps {
@@ -18,10 +17,9 @@ interface CenterPanelProps {
   filesDispatch: React.Dispatch<FilesAction>;
   editorRef: React.MutableRefObject<EditorAPI | null>;
   pdfViewerRef: React.MutableRefObject<PdfViewerAPI | null>;
-  onSelectionChange(text: string): void;
 }
 
-export function CenterPanel({ files, filesDispatch, editorRef, pdfViewerRef, onSelectionChange }: CenterPanelProps) {
+export function CenterPanel({ files, filesDispatch, editorRef, pdfViewerRef }: CenterPanelProps) {
   const someRight = files.openFiles.some((e) => e.pane === 'RIGHT');
 
   const updatePDFViewerWidth = useCallback(() => {
@@ -37,7 +35,6 @@ export function CenterPanel({ files, filesDispatch, editorRef, pdfViewerRef, onS
           filesDispatch={filesDispatch}
           pane="LEFT"
           pdfViewerRef={pdfViewerRef}
-          onSelectionChange={onSelectionChange}
         />
       </Panel>
       {someRight && <VerticalResizeHandle />}
@@ -49,7 +46,6 @@ export function CenterPanel({ files, filesDispatch, editorRef, pdfViewerRef, onS
             filesDispatch={filesDispatch}
             pane="RIGHT"
             pdfViewerRef={pdfViewerRef}
-            onSelectionChange={onSelectionChange}
           />
         </Panel>
       )}
@@ -63,7 +59,6 @@ export function CenterPanelPane({
   pane,
   editorRef,
   pdfViewerRef,
-  onSelectionChange,
 }: { pane: FilesState['openFiles'][0]['pane'] } & CenterPanelProps) {
   const paneOpenFiles = files.openFiles.filter((entry) => entry.pane === pane);
   const activeEntry = paneOpenFiles.find((e) => e.active);
@@ -97,12 +92,7 @@ export function CenterPanelPane({
         onCloseClick={(path) => handleTabCloseClick(path)}
       />
       <div className="flex h-full w-full overflow-scroll">
-        <CenterPaneViewContent
-          activeFile={activeEntry?.file}
-          editorRef={editorRef}
-          pdfViewerRef={pdfViewerRef}
-          onSelectionChange={onSelectionChange}
-        />
+        <CenterPaneViewContent activeFile={activeEntry?.file} editorRef={editorRef} pdfViewerRef={pdfViewerRef} />
       </div>
     </div>
   );
@@ -112,15 +102,9 @@ interface CenterPaneViewContentProps {
   activeFile?: FileEntry;
   editorRef: React.MutableRefObject<EditorAPI | null>;
   pdfViewerRef: React.MutableRefObject<PdfViewerAPI | null>;
-  onSelectionChange(text: string): void;
 }
 
-export function CenterPaneViewContent({
-  activeFile,
-  editorRef,
-  pdfViewerRef,
-  onSelectionChange,
-}: CenterPaneViewContentProps) {
+export function CenterPaneViewContent({ activeFile, editorRef, pdfViewerRef }: CenterPaneViewContentProps) {
   if (!activeFile) {
     return <EmptyView />;
   }
@@ -138,7 +122,7 @@ export function CenterPaneViewContent({
   }
 
   // Use TipTap editor by default!
-  return <TipTapView editorRef={editorRef} file={activeFile} onSelectionChange={onSelectionChange} />;
+  return <TipTapView editorRef={editorRef} file={activeFile} />;
 }
 
 function EmptyView() {
@@ -161,13 +145,7 @@ function EmptyViewLetter({ letter, className = '' }: { letter: string; className
   );
 }
 
-function TipTapView({
-  file,
-  editorRef,
-  onSelectionChange,
-}: {
-  file: FileEntry;
-} & Omit<EditorProps, 'editorContent'>) {
+function TipTapView({ file, editorRef }: { file: FileEntry; editorRef: React.MutableRefObject<EditorAPI | null> }) {
   const [loading, setLoading] = useState(true);
   const [content, setContent] = useState<string | null>(null);
 
@@ -184,7 +162,7 @@ function TipTapView({
     return <strong>Loading...</strong>;
   }
 
-  return <TipTapEditor editorContent={content} editorRef={editorRef} onSelectionChange={onSelectionChange} />;
+  return <TipTapEditor editorContent={content} editorRef={editorRef} />;
 }
 
 function TextView({
