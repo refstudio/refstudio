@@ -13,9 +13,7 @@
 }
 
 .collapsible-block {
-  /* @apply debug; */
-  @apply my-2 flex rounded-lg p-2 pl-0;
-  /* @apply border border-gray-300;  */
+  @apply my-2 flex rounded-lg pt-2;
   @apply relative;
 }
 

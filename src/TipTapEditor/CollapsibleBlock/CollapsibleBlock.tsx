@@ -20,15 +20,19 @@ export interface CollapsibleBlockProps {
 
 export const CollapsibleBlock = (props: CollapsibleBlockProps) => {
   const handleButtonClick = () => {
-    const { folded } = props.node.attrs;
+    const {
+      node,
+      node: {
+        attrs: { folded },
+      },
+    } = props;
     const currentNodePos = props.getPos();
 
     props.editor
       .chain()
       // Add or remove empty content block
-      .command(({ tr, commands }) => {
-        const node = tr.doc.nodeAt(currentNodePos);
-        if (node && node.type.name === 'collapsibleBlock' && node.childCount > 0) {
+      .command(({ commands }) => {
+        if (node.childCount > 0) {
           const collapsibleBlockSummary = node.child(0);
           const summaryNodeSize = collapsibleBlockSummary.nodeSize;
           // If the node is folded with only a summary, unfolding it adds an empty content node
@@ -52,8 +56,28 @@ export const CollapsibleBlock = (props: CollapsibleBlockProps) => {
         }
         return true;
       })
+      // Update focus when the cursor is in the collapsible content and the user tries to fold the block
+      .command(({ commands, state }) => {
+        if (!folded && node.childCount >= 2) {
+          const summarySize = node.child(0).nodeSize;
+          const contentSize = node.child(1).nodeSize;
+          const contentNodeBeginPos = currentNodePos + summarySize + 1;
+          const contentNodeEndPos = contentNodeBeginPos + contentSize;
+          const { ranges } = state.selection;
+          if (
+            ranges.some(
+              ({ $from, $to }) =>
+                (contentNodeBeginPos <= $from.pos && $from.pos < contentNodeEndPos) ||
+                (contentNodeBeginPos <= $to.pos && $to.pos < contentNodeEndPos),
+            )
+          ) {
+            return commands.focus(currentNodePos + summarySize - 1);
+          }
+        }
+        return true;
+      })
       .run();
-    // Toggle tge folded attribute of the node
+    // Toggle the folded attribute of the node
     props.updateAttributes({
       folded: !props.node.attrs.folded,
     });
