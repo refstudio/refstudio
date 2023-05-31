@@ -12,7 +12,7 @@ export const CollapsibleBlockNode = Node.create({
 
   group: 'block',
 
-  content: 'collapsibleSummary collapsibleContent',
+  content: 'collapsibleSummary collapsibleContent?',
   draggable: true,
 
   parseHTML() {
@@ -56,3 +56,9 @@ export const CollapsibleBlockNode = Node.create({
     return ReactNodeViewRenderer(CollapsibleBlock);
   },
 });
+
+export const emptyCollapsibleBlock: JSONContent = {
+  type: CollapsibleBlockNode.name,
+  attrs: { folded: true },
+  content: [{ type: CollapsibleBlockSummaryNode.name, content: [{ type: 'paragraph' }] }],
+};
