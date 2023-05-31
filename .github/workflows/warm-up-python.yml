@@ -1,7 +1,7 @@
 name: WarmUp Python Environment
 
 on:
-  warm-up-python:
+  workflow_call:
 
 jobs:
   warm-up-python:
