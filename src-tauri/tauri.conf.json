@@ -18,27 +18,26 @@
       },
       "fs": {
         "all": true,
-        "scope": ["$APPDATA/**"]
+        "scope": [
+          "$APPDATA/**",
+          "$RESOURCE/**"
+        ]
       },
       "shell": {
         "all": true,
         "execute": true,
         "open": true,
-        "sidecar": true,
-        "scope": [
-          {
-            "name": "bin/python/main",
-            "sidecar": true,
-            "args": true
-          }
-        ]
+        "sidecar": false
       }
     },
     "bundle": {
       "active": true,
       "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
-      "externalBin": ["bin/python/main"],
+      "externalBin": [],
       "identifier": "com.tauri.dev",
+      "resources": [
+        "bin/python/**"
+      ],
       "targets": "all"
     },
     "security": {
