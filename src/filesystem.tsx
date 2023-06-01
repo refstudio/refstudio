@@ -55,7 +55,7 @@ export async function uploadFiles(files: FileList) {
 
 export async function runPDFIngestion() {
   const uploadsDir = await getUploadsDir();
-  const command = Command.sidecar('bin/python/main', ['ingest', '--pdf_directory', `${uploadsDir.toString()}`]);
+  const command = new Command('ingest-pdfs', ['ingest', '--pdf_directory', `${uploadsDir.toString()}`]);
   console.log('command', command);
   const output = await command.execute();
   const response = JSON.parse(output.stdout) as object; // TODO: adopt a better type here :-)

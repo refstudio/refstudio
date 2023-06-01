@@ -37,6 +37,11 @@
             "name": "word-count",
             "cmd": "$RESOURCE/bin/python/main-aarch64-apple-darwin/main",
             "args": true
+          },
+          {
+            "name": "ingest-pdfs",
+            "cmd": "$RESOURCE/bin/python/main-aarch64-apple-darwin/main",
+            "args": true
           }
         ]
       }
