@@ -37,6 +37,8 @@ jobs:
         uses: ./.github/actions/setup-rust
       - name: Setup Python
         uses: ./.github/actions/setup-python
+        with:
+          python-version: "3.11"
       - name: Install build dependencies
         run: |
           sudo apt-get update
