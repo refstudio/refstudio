@@ -22,6 +22,11 @@ def _copy_fixture_to_temp_dir(source_path: Path, write_path: Path) -> None:
 
 
 def test_main(monkeypatch, tmp_path, capsys):
+    # directories where ingest will write files
+    grobid_output_dir = tmp_path.joinpath(".grobid")
+    json_storage_dir = tmp_path.joinpath(".storage")
+    embeddings_storage_dir = tmp_path.joinpath(".lancedb")
+
     # copy test pdf to temp dir
     test_pdf = FIXTURES_DIR.joinpath("pdf", "test.pdf")
     write_path = tmp_path.joinpath("uploads", "test.pdf")
@@ -32,7 +37,7 @@ def test_main(monkeypatch, tmp_path, capsys):
     # mock this by copying the test xml to the output directory
     def mock_grobid_client_process(*args, **kwargs):
         test_xml = FIXTURES_DIR.joinpath("xml", "test.tei.xml")
-        write_path = tmp_path.joinpath("grobid", "test.tei.xml")
+        write_path = grobid_output_dir.joinpath("test.tei.xml")
         _copy_fixture_to_temp_dir(test_xml, write_path)
 
     monkeypatch.setattr(ingest.GrobidClient, "process", mock_grobid_client_process)
@@ -50,10 +55,10 @@ def test_main(monkeypatch, tmp_path, capsys):
 
     # check that the expected directories and files were created
     # grobid output
-    assert tmp_path.joinpath("grobid").exists()
-    assert tmp_path.joinpath("grobid", "test.tei.xml").exists()
+    assert grobid_output_dir.exists()
+    assert grobid_output_dir.joinpath("test.tei.xml").exists()
     # json creation and storage
-    assert tmp_path.joinpath("storage").exists()
-    assert tmp_path.joinpath("storage", "test.json").exists()
+    assert json_storage_dir.exists()
+    assert json_storage_dir.joinpath("test.json").exists()
     # embeddings creation and storage
-    assert tmp_path.joinpath(".lancedb").exists()
+    assert embeddings_storage_dir.exists()
