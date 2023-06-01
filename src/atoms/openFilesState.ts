@@ -132,5 +132,5 @@ function closeFileAction(state: OpenFilesState, pane: PaneId, file: FileEntry) {
 function splitFileAction(state: OpenFilesState, file: FileEntry, fromPane: PaneId, toPane: PaneId) {
   const afterClose = closeFileAction(state, fromPane, file);
   const afterOpenAction = openFileAction(afterClose, toPane, file);
-  return activateFileAction(afterOpenAction, toPane, file);
+  return activateFileAction(afterOpenAction, toPane, file.path);
 }
