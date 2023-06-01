@@ -27,7 +27,18 @@
         "all": true,
         "execute": true,
         "open": true,
-        "sidecar": false
+        "scope": [
+          {
+            "name": "echo-something",
+            "cmd": "echo",
+            "args": true
+          },
+          {
+            "name": "word-count",
+            "cmd": "$RESOURCE/bin/python/main-aarch64-apple-darwin/main",
+            "args": true
+          }
+        ]
       }
     },
     "bundle": {
@@ -36,7 +47,7 @@
       "externalBin": [],
       "identifier": "com.tauri.dev",
       "resources": [
-        "bin/python/**"
+        "bin/*"
       ],
       "targets": "all"
     },

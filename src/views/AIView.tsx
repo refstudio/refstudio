@@ -44,8 +44,11 @@ interface AIResponse {
 
 async function interactWithAi(selection: string) {
   try {
-    const command = Command.sidecar('bin/python/main', ['ai', '--text', `${selection}`]);
+    const command = new Command('word-count', ['ai', '--text', `${selection}`]);
+    console.log('command', command);
     const output = await command.execute();
+    console.log('output', output);
+
     if (output.stderr) {
       throw new Error(output.stderr);
     }
