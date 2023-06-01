@@ -1,9 +1,10 @@
 name: 'Setup Python'
+inputs:
+    python-version:
+      description: "Python version"
+      required: true
 runs:
   using: 'composite'
-  inputs:
-    python-version:
-      required: true
   steps:
   - name: Setup Python ${{ inputs.python-version }}
     uses: actions/setup-python@v4
