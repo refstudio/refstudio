@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Panel, PanelGroup } from 'react-resizable-panels';
 
 import { activateFileInPaneAtom, closeFileInPaneAtom, leftPaneAtom, rightPaneAtom } from '../atoms/openFilesState';
-import { TabPane } from '../Components/TabPane';
+import { TabPane } from '../components/TabPane';
 import { VerticalResizeHandle } from '../components/VerticalResizeHandle';
 import { cx } from '../cx';
 import { readFileAsText } from '../filesystem';
