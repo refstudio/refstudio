@@ -3,7 +3,7 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback, useEffect, useState } from 'react';
 import { Panel, PanelGroup } from 'react-resizable-panels';
 
-import { closeFileInPaneAtom, leftPaneAtom, openFileInPaneAtom, rightPaneAtom } from '../atoms/openFilesState';
+import { activateFileInPaneAtom, closeFileInPaneAtom, leftPaneAtom, rightPaneAtom } from '../atoms/openFilesState';
 import { TabPane } from '../Components/TabPane';
 import { VerticalResizeHandle } from '../components/VerticalResizeHandle';
 import { cx } from '../cx';
@@ -21,7 +21,7 @@ interface CenterPanelProps {
 export function CenterPanel({ editorRef, pdfViewerRef }: CenterPanelProps) {
   const left = useAtomValue(leftPaneAtom);
   const right = useAtomValue(rightPaneAtom);
-  const openFileInPane = useSetAtom(openFileInPaneAtom);
+  const activateFileInPane = useSetAtom(activateFileInPaneAtom);
   const closeFileInPane = useSetAtom(closeFileInPaneAtom);
 
   const updatePDFViewerWidth = useCallback(() => {
@@ -36,7 +36,7 @@ export function CenterPanel({ editorRef, pdfViewerRef }: CenterPanelProps) {
             activeFile={left.active}
             editorRef={editorRef}
             files={left.files}
-            handleTabClick={(path) => openFileInPane({ pane: left.id, file: path })}
+            handleTabClick={(path) => activateFileInPane({ pane: left.id, path })}
             handleTabCloseClick={(path) => closeFileInPane({ pane: left.id, path })}
             pdfViewerRef={pdfViewerRef}
           />
@@ -48,7 +48,7 @@ export function CenterPanel({ editorRef, pdfViewerRef }: CenterPanelProps) {
               activeFile={right.active}
               editorRef={editorRef}
               files={right.files}
-              handleTabClick={(path) => openFileInPane({ pane: right.id, file: path })}
+              handleTabClick={(path) => activateFileInPane({ pane: right.id, path })}
               handleTabCloseClick={(path) => closeFileInPane({ pane: right.id, path })}
               pdfViewerRef={pdfViewerRef}
             />

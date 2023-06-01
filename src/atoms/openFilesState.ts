@@ -6,8 +6,8 @@ export const DEFAULT_PANE: PaneId = 'LEFT';
 type FileId = string;
 
 interface OpenFilesState {
-  files: Record<FileId, FileEntry>; // We need undefined bc of the lookup
-  panes: Record<PaneId, PaneState>; // We know we will only have values (not undefined)
+  files: Record<FileId, FileEntry>;
+  panes: Record<PaneId, PaneState>;
 }
 
 interface PaneState {
@@ -40,26 +40,21 @@ function getPane(get: Getter, paneId: PaneId) {
   const pane = panes[paneId];
   return {
     id: pane.id,
-    files: Array.from(pane.openFiles)
-      .map((id) => files[id] as FileEntry | undefined)
-      .filter((f) => f) as FileEntry[],
+    files: pane.openFiles.map((id) => files[id] as FileEntry | undefined).filter((f) => f) as FileEntry[],
     active: pane.activeFile ? files[pane.activeFile] : undefined,
   };
 }
 
-export const openFileInPaneAtom = atom(null, (get, set, update: { pane?: PaneId; file: string | FileEntry }) => {
+export const openFileInPaneAtom = atom(null, (get, set, update: { pane: PaneId; file: FileEntry }) => {
   const state = get(openFilesAtom);
-  const fileEntry =
-    typeof update.file === 'string'
-      ? (state.files[update.file] as FileEntry | undefined) // read from the open files
-      : update.file;
+  const updatedState = openFileAction(state, update.pane, update.file);
+  set(openFilesAtom, updatedState);
+});
 
-  if (fileEntry === undefined) {
-    console.warn('Cannot find the file ', update.file);
-  } else {
-    const updatedState = openFileAction(state, update.pane ?? DEFAULT_PANE, fileEntry);
-    set(openFilesAtom, updatedState);
-  }
+export const activateFileInPaneAtom = atom(null, (get, set, update: { pane: PaneId; path: string }) => {
+  const state = get(openFilesAtom);
+  const updatedState = activateFileAction(state, update.pane, update.path);
+  set(openFilesAtom, updatedState);
 });
 
 export const closeFileInPaneAtom = atom(null, (get, set, update: { pane: PaneId; path: string }) => {
@@ -109,14 +104,14 @@ function openFileAction(state: OpenFilesState, pane: PaneId, file: FileEntry) {
   return newState;
 }
 
-function activateFileAction(state: OpenFilesState, pane: PaneId, file: FileEntry) {
+function activateFileAction(state: OpenFilesState, pane: PaneId, path: string) {
   return {
     ...state,
     panes: {
       ...state.panes,
       [pane]: {
         ...state.panes[pane],
-        activeFile: file.path,
+        activeFile: path,
       },
     },
   };

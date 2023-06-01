@@ -3,7 +3,14 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import { VscFile, VscFolder, VscSplitHorizontal } from 'react-icons/vsc';
 
-import { leftPaneAtom, openFileInPaneAtom, rightPaneAtom, splitFileToPaneAtom } from '../atoms/openFilesState';
+import {
+  activateFileInPaneAtom,
+  DEFAULT_PANE,
+  leftPaneAtom,
+  openFileInPaneAtom,
+  rightPaneAtom,
+  splitFileToPaneAtom,
+} from '../atoms/openFilesState';
 import { PanelSection } from '../components/PanelSection';
 import { PanelWrapper } from '../components/PanelWrapper';
 import { cx } from '../cx';
@@ -12,6 +19,7 @@ import { readAllProjectFiles } from '../filesystem';
 export function ExplorerPanel() {
   const left = useAtomValue(leftPaneAtom);
   const right = useAtomValue(rightPaneAtom);
+  const activateFileInPane = useSetAtom(activateFileInPaneAtom);
   const openFileInPane = useSetAtom(openFileInPaneAtom);
   const splitFileToPane = useSetAtom(splitFileToPaneAtom);
 
@@ -23,10 +31,12 @@ export function ExplorerPanel() {
     })();
   }, [setFiles]);
 
+  const hasRightPanelFiles = right.files.length > 0;
+
   return (
     <PanelWrapper title="Explorer">
       <PanelSection title="Open Files">
-        {right.files.length > 0 && <div className="ml-4 text-xs font-bold">LEFT</div>}
+        {hasRightPanelFiles && <div className="ml-4 text-xs font-bold">LEFT</div>}
         {left.files.length > 0 && (
           <FileTree
             files={left.files}
@@ -35,17 +45,17 @@ export function ExplorerPanel() {
                 title="Move to RIGHT split pane"
                 onClick={(evt) => {
                   evt.stopPropagation();
-                  splitFileToPane({ file, fromPane: 'LEFT', toPane: 'RIGHT' });
+                  splitFileToPane({ file, fromPane: left.id, toPane: 'RIGHT' });
                 }}
               />
             )}
             root
             selectedFiles={left.active ? [left.active] : []}
-            onClick={(file) => openFileInPane({ pane: 'LEFT', file })}
+            onClick={(file) => activateFileInPane({ pane: left.id, path: file.path })}
           />
         )}
-        {right.files.length > 0 && <div className="ml-4 text-xs font-bold">RIGHT</div>}
-        {right.files.length > 0 && (
+        {hasRightPanelFiles && <div className="ml-4 text-xs font-bold">RIGHT</div>}
+        {hasRightPanelFiles && (
           <FileTree
             files={right.files}
             rightAction={(file) => (
@@ -54,13 +64,13 @@ export function ExplorerPanel() {
                 onClick={(evt) => {
                   evt.preventDefault();
                   evt.stopPropagation();
-                  splitFileToPane({ file, fromPane: 'RIGHT', toPane: 'LEFT' });
+                  splitFileToPane({ file, fromPane: right.id, toPane: 'LEFT' });
                 }}
               />
             )}
             root
             selectedFiles={right.active ? [right.active] : []}
-            onClick={(file) => openFileInPane({ pane: 'RIGHT', file })}
+            onClick={(file) => activateFileInPane({ pane: right.id, path: file.path })}
           />
         )}
       </PanelSection>
@@ -69,7 +79,7 @@ export function ExplorerPanel() {
           files={allFiles}
           root
           selectedFiles={[left.active, right.active].filter((file) => file).map((file) => file!)}
-          onClick={(file) => openFileInPane({ file })}
+          onClick={(file) => openFileInPane({ pane: DEFAULT_PANE, file })}
         />
       </PanelSection>
     </PanelWrapper>
