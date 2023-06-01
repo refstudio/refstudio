@@ -97,9 +97,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: PyTest
-        run: |
-          source $VENV
-          pytest
+        run: poetry run pytest
 
   # constraints:
   #   needs: setup-js
