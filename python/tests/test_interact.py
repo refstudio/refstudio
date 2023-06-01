@@ -30,7 +30,7 @@ def test_summarize(monkeypatch, capsys):
     
     monkeypatch.setattr(interact.Chat, "call_model", mock_call_model)
 
-    response = interact.summarize("This is a test")
+    _ = interact.summarize("This is a test")
     captured = capsys.readouterr()
     output = json.loads(captured.out)
 
