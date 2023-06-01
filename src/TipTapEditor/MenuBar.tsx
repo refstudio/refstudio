@@ -35,7 +35,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
   }, [editor, refreshToggle]);
 
   return (
-    <menu className="toolbar menu-bar x-hide-scrollbars m-5 mb-0 overflow-x-scroll">
+    <menu className="toolbar menu-bar x-hide-scrollbars">
       <button
         className="toolbar-item"
         disabled={!editor.can().chain().focus().undo().run()}
