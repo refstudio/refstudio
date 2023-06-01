@@ -9,7 +9,7 @@ export function TabPane({
   onCloseClick,
 }: {
   items: { key: string; text: string; value: string }[];
-  value: string;
+  value?: string;
   onClick(value: string): void;
   onCloseClick(value: string): void;
 }) {

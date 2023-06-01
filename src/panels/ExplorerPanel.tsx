@@ -1,22 +1,20 @@
 import { FileEntry } from '@tauri-apps/api/fs';
+import { useAtom, useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { VscFile, VscFolder } from 'react-icons/vsc';
 
+import { leftPaneAtom, openFileAction, openFilesAtom, rightPaneAtom } from '../atoms/openFilesState';
 import { PanelSection } from '../components/PanelSection';
 import { PanelWrapper } from '../components/PanelWrapper';
 import { cx } from '../cx';
-import { FilesAction, FilesState } from '../filesReducer';
 import { readAllProjectFiles } from '../filesystem';
 
-export function ExplorerPanel({
-  files,
-  filesDispatch,
-}: {
-  files: FilesState;
-  filesDispatch: React.Dispatch<FilesAction>;
-}) {
-  const [allFiles, setFiles] = useState<FileEntry[]>([]);
+export function ExplorerPanel() {
+  const [openFiles, setOpenFiles] = useAtom(openFilesAtom);
+  const left = useAtomValue(leftPaneAtom);
+  const right = useAtomValue(rightPaneAtom);
 
+  const [allFiles, setFiles] = useState<FileEntry[]>([]);
   useEffect(() => {
     (async function refreshProjectTree() {
       const newFiles = await readAllProjectFiles();
@@ -25,40 +23,32 @@ export function ExplorerPanel({
   }, [setFiles]);
 
   function handleOnClick(file: FileEntry): void {
-    filesDispatch({ type: 'OPEN_FILE', payload: { file, pane: file.path.endsWith('.pdf') ? 'RIGHT' : 'LEFT' } });
+    const paneId = file.path.endsWith('.pdf') ? 'RIGHT' : 'LEFT';
+    setOpenFiles(openFileAction(openFiles, paneId, file));
   }
-
-  const leftPane = files.openFiles.filter((entry) => entry.pane === 'LEFT');
-  const rightPane = files.openFiles.filter((entry) => entry.pane === 'RIGHT');
-  const someRight = rightPane.length > 0;
 
   return (
     <PanelWrapper title="Explorer">
       <PanelSection title="Open Files">
-        {someRight && <div className="ml-4 text-xs font-bold">LEFT</div>}
-        {leftPane.length > 0 && (
-          <FileTree
-            files={leftPane.map((entry) => entry.file)}
-            root
-            selectedFiles={leftPane.filter((entry) => entry.active).map((e) => e.file)}
-            onClick={handleOnClick}
-          />
+        {right.files.length > 0 && <div className="ml-4 text-xs font-bold">LEFT</div>}
+        {left.files.length > 0 && (
+          <FileTree files={left.files} root selectedFiles={left.active ? [left.active] : []} onClick={handleOnClick} />
         )}
-        {someRight && <div className="ml-4 text-xs font-bold">RIGHT</div>}
-        {rightPane.length > 0 && (
+        {right.files.length > 0 && <div className="ml-4 text-xs font-bold">RIGHT</div>}
+        {right.files.length > 0 && (
           <FileTree
-            files={rightPane.map((entry) => entry.file)}
+            files={right.files}
             root
-            selectedFiles={rightPane.filter((entry) => entry.active).map((e) => e.file)}
+            selectedFiles={right.active ? [right.active] : []}
             onClick={handleOnClick}
           />
         )}
       </PanelSection>
-      <PanelSection grow title="Project X">
+      <PanelSection title="Project X">
         <FileTree
           files={allFiles}
           root
-          selectedFiles={files.openFiles.filter((e) => e.active).map((e) => e.file)}
+          selectedFiles={[left.active, right.active].filter((file) => file).map((file) => file!)}
           onClick={handleOnClick}
         />
       </PanelSection>

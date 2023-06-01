@@ -1,11 +1,19 @@
 import { FileEntry } from '@tauri-apps/api/fs';
+import { useAtom, useAtomValue } from 'jotai';
 import { useCallback, useEffect, useState } from 'react';
 import { Panel, PanelGroup } from 'react-resizable-panels';
 
+import {
+  activateFileAction,
+  closeFileAction,
+  leftPaneAtom,
+  openFilesAtom,
+  PaneId,
+  rightPaneAtom,
+} from '../atoms/openFilesState';
 import { TabPane } from '../Components/TabPane';
 import { VerticalResizeHandle } from '../components/VerticalResizeHandle';
 import { cx } from '../cx';
-import { FilesAction, FilesState } from '../filesReducer';
 import { readFileAsText } from '../filesystem';
 import { PdfViewer } from '../PdfViewer';
 import { TipTapEditor } from '../TipTapEditor/TipTapEditor';
@@ -13,86 +21,93 @@ import { EditorAPI } from '../types/EditorAPI';
 import { PdfViewerAPI } from '../types/PdfViewerAPI';
 
 interface CenterPanelProps {
-  files: FilesState;
-  filesDispatch: React.Dispatch<FilesAction>;
   editorRef: React.MutableRefObject<EditorAPI | null>;
   pdfViewerRef: React.MutableRefObject<PdfViewerAPI | null>;
 }
 
-export function CenterPanel({ files, filesDispatch, editorRef, pdfViewerRef }: CenterPanelProps) {
-  const someRight = files.openFiles.some((e) => e.pane === 'RIGHT');
+export function CenterPanel({ editorRef, pdfViewerRef }: CenterPanelProps) {
+  const [openFiles, setOpenFiles] = useAtom(openFilesAtom);
+  const left = useAtomValue(leftPaneAtom);
+  const right = useAtomValue(rightPaneAtom);
+
+  const handleTabClick = (pane: PaneId) => (path: string) => {
+    const file = openFiles.files[path];
+    if (file) {
+      setOpenFiles(activateFileAction(openFiles, pane, file));
+    }
+  };
+
+  const handleTabCloseClick = (pane: PaneId) => (path: string) => {
+    const file = openFiles.files[path];
+    if (file) {
+      setOpenFiles(closeFileAction(openFiles, pane, file));
+    }
+  };
 
   const updatePDFViewerWidth = useCallback(() => {
     pdfViewerRef.current?.updateWidth();
   }, [pdfViewerRef]);
 
+  const leftFiles = left.files;
+  const rightFiles = right.files;
+
   return (
-    <PanelGroup direction="horizontal" onLayout={updatePDFViewerWidth}>
-      <Panel>
-        <CenterPanelPane
-          editorRef={editorRef}
-          files={files}
-          filesDispatch={filesDispatch}
-          pane="LEFT"
-          pdfViewerRef={pdfViewerRef}
-        />
-      </Panel>
-      {someRight && <VerticalResizeHandle />}
-      {someRight && (
+    <>
+      <PanelGroup direction="horizontal" onLayout={updatePDFViewerWidth}>
         <Panel>
           <CenterPanelPane
+            activeFile={left.active}
             editorRef={editorRef}
-            files={files}
-            filesDispatch={filesDispatch}
-            pane="RIGHT"
+            files={leftFiles}
+            handleTabClick={handleTabClick('LEFT')}
+            handleTabCloseClick={handleTabCloseClick('LEFT')}
             pdfViewerRef={pdfViewerRef}
           />
         </Panel>
-      )}
-    </PanelGroup>
+        {right.files.length > 0 && <VerticalResizeHandle />}
+        {right.files.length > 0 && (
+          <Panel>
+            <CenterPanelPane
+              activeFile={right.active}
+              editorRef={editorRef}
+              files={rightFiles}
+              handleTabClick={handleTabClick('RIGHT')}
+              handleTabCloseClick={handleTabCloseClick('RIGHT')}
+              pdfViewerRef={pdfViewerRef}
+            />
+          </Panel>
+        )}
+      </PanelGroup>
+    </>
   );
+}
+
+interface CenterPanelPaneProps {
+  files: FileEntry[];
+  activeFile?: FileEntry;
+  handleTabClick(path: string): void;
+  handleTabCloseClick(path: string): void;
 }
 
 export function CenterPanelPane({
   files,
-  filesDispatch,
-  pane,
+  activeFile,
+  handleTabClick,
+  handleTabCloseClick,
   editorRef,
   pdfViewerRef,
-}: { pane: FilesState['openFiles'][0]['pane'] } & CenterPanelProps) {
-  const paneOpenFiles = files.openFiles.filter((entry) => entry.pane === pane);
-  const activeEntry = paneOpenFiles.find((e) => e.active);
-  const items = paneOpenFiles.map((entry) => ({
-    key: entry.file.path,
-    text: entry.file.name ?? '-',
-    value: entry.file.path,
+}: CenterPanelPaneProps & CenterPanelProps) {
+  const items = files.map((file) => ({
+    key: file.path,
+    text: file.name ?? '',
+    value: file.path,
   }));
-
-  function handleTabClick(path: string) {
-    const fileToClose = paneOpenFiles.find((f) => f.file.path === path)?.file;
-    if (!fileToClose) {
-      return;
-    }
-    filesDispatch({ type: 'OPEN_FILE', payload: { file: fileToClose, pane } });
-  }
-  function handleTabCloseClick(path: string) {
-    const fileToClose = paneOpenFiles.find((f) => f.file.path === path)?.file;
-    if (!fileToClose) {
-      return;
-    }
-    filesDispatch({ type: 'CLOSE_FILE', payload: { file: fileToClose, pane } });
-  }
 
   return (
     <div className="h-full grid-rows-[auto_1fr] ">
-      <TabPane
-        items={items}
-        value={activeEntry?.file.path ?? ''}
-        onClick={(path) => handleTabClick(path)}
-        onCloseClick={(path) => handleTabCloseClick(path)}
-      />
+      <TabPane items={items} value={activeFile?.path} onClick={handleTabClick} onCloseClick={handleTabCloseClick} />
       <div className="flex h-full w-full overflow-scroll">
-        <CenterPaneViewContent activeFile={activeEntry?.file} editorRef={editorRef} pdfViewerRef={pdfViewerRef} />
+        <CenterPaneViewContent activeFile={activeFile} editorRef={editorRef} pdfViewerRef={pdfViewerRef} />
       </div>
     </div>
   );
