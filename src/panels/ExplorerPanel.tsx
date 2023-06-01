@@ -1,18 +1,19 @@
 import { FileEntry } from '@tauri-apps/api/fs';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
-import { VscFile, VscFolder } from 'react-icons/vsc';
+import { VscFile, VscFolder, VscSplitHorizontal } from 'react-icons/vsc';
 
-import { leftPaneAtom, openFileAction, openFilesAtom, rightPaneAtom } from '../atoms/openFilesState';
+import { leftPaneAtom, openFileInPaneAtom, rightPaneAtom, splitFileToPaneAtom } from '../atoms/openFilesState';
 import { PanelSection } from '../components/PanelSection';
 import { PanelWrapper } from '../components/PanelWrapper';
 import { cx } from '../cx';
 import { readAllProjectFiles } from '../filesystem';
 
 export function ExplorerPanel() {
-  const [openFiles, setOpenFiles] = useAtom(openFilesAtom);
   const left = useAtomValue(leftPaneAtom);
   const right = useAtomValue(rightPaneAtom);
+  const openFileInPane = useSetAtom(openFileInPaneAtom);
+  const splitFileToPane = useSetAtom(splitFileToPaneAtom);
 
   const [allFiles, setFiles] = useState<FileEntry[]>([]);
   useEffect(() => {
@@ -22,25 +23,44 @@ export function ExplorerPanel() {
     })();
   }, [setFiles]);
 
-  function handleOnClick(file: FileEntry): void {
-    const paneId = file.path.endsWith('.pdf') ? 'RIGHT' : 'LEFT';
-    setOpenFiles(openFileAction(openFiles, paneId, file));
-  }
-
   return (
     <PanelWrapper title="Explorer">
       <PanelSection title="Open Files">
         {right.files.length > 0 && <div className="ml-4 text-xs font-bold">LEFT</div>}
         {left.files.length > 0 && (
-          <FileTree files={left.files} root selectedFiles={left.active ? [left.active] : []} onClick={handleOnClick} />
+          <FileTree
+            files={left.files}
+            rightAction={(file) => (
+              <VscSplitHorizontal
+                title="Move to RIGHT split pane"
+                onClick={(evt) => {
+                  evt.stopPropagation();
+                  splitFileToPane({ file, fromPane: 'LEFT', toPane: 'RIGHT' });
+                }}
+              />
+            )}
+            root
+            selectedFiles={left.active ? [left.active] : []}
+            onClick={(file) => openFileInPane({ pane: 'LEFT', file })}
+          />
         )}
         {right.files.length > 0 && <div className="ml-4 text-xs font-bold">RIGHT</div>}
         {right.files.length > 0 && (
           <FileTree
             files={right.files}
+            rightAction={(file) => (
+              <VscSplitHorizontal
+                title="Move to LEFT split pane"
+                onClick={(evt) => {
+                  evt.preventDefault();
+                  evt.stopPropagation();
+                  splitFileToPane({ file, fromPane: 'RIGHT', toPane: 'LEFT' });
+                }}
+              />
+            )}
             root
             selectedFiles={right.active ? [right.active] : []}
-            onClick={handleOnClick}
+            onClick={(file) => openFileInPane({ pane: 'RIGHT', file })}
           />
         )}
       </PanelSection>
@@ -49,7 +69,7 @@ export function ExplorerPanel() {
           files={allFiles}
           root
           selectedFiles={[left.active, right.active].filter((file) => file).map((file) => file!)}
-          onClick={handleOnClick}
+          onClick={(file) => openFileInPane({ file })}
         />
       </PanelSection>
     </PanelWrapper>
@@ -62,6 +82,7 @@ interface FileTreeBaseProps {
   file?: FileEntry;
   selectedFiles: FileEntry[];
   onClick: (file: FileEntry) => void;
+  rightAction?: (file: FileEntry) => React.ReactNode;
 }
 
 const FileTree = ({ files, root, ...props }: FileTreeBaseProps) => (
@@ -79,7 +100,7 @@ const FileTree = ({ files, root, ...props }: FileTreeBaseProps) => (
   </div>
 );
 
-const FileTreeNode = ({ file, onClick, selectedFiles }: FileTreeBaseProps) => {
+const FileTreeNode = ({ file, onClick, rightAction, selectedFiles }: FileTreeBaseProps) => {
   if (!file) {
     return null;
   }
@@ -96,6 +117,7 @@ const FileTreeNode = ({ file, onClick, selectedFiles }: FileTreeBaseProps) => {
         className={cx(
           'mb-1 py-1',
           'flex flex-row items-center gap-1', //
+          'group',
           {
             'bg-slate-100': selectedFiles.some((f) => f.path === file.path),
             'cursor-pointer hover:bg-slate-100': !isFolder,
@@ -112,10 +134,13 @@ const FileTreeNode = ({ file, onClick, selectedFiles }: FileTreeBaseProps) => {
         >
           {file.name}
         </span>
+        {rightAction && (
+          <div className="mr-2 hidden p-0.5 hover:bg-gray-200 group-hover:block">{rightAction(file)}</div>
+        )}
       </div>
 
       {isFolder && Array.isArray(file.children) && (
-        <FileTree files={file.children} selectedFiles={selectedFiles} onClick={onClick} />
+        <FileTree files={file.children} rightAction={rightAction} selectedFiles={selectedFiles} onClick={onClick} />
       )}
     </li>
   );

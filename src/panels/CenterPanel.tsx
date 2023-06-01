@@ -1,16 +1,9 @@
 import { FileEntry } from '@tauri-apps/api/fs';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback, useEffect, useState } from 'react';
 import { Panel, PanelGroup } from 'react-resizable-panels';
 
-import {
-  activateFileAction,
-  closeFileAction,
-  leftPaneAtom,
-  openFilesAtom,
-  PaneId,
-  rightPaneAtom,
-} from '../atoms/openFilesState';
+import { closeFileInPaneAtom, leftPaneAtom, openFileInPaneAtom, rightPaneAtom } from '../atoms/openFilesState';
 import { TabPane } from '../Components/TabPane';
 import { VerticalResizeHandle } from '../components/VerticalResizeHandle';
 import { cx } from '../cx';
@@ -26,30 +19,14 @@ interface CenterPanelProps {
 }
 
 export function CenterPanel({ editorRef, pdfViewerRef }: CenterPanelProps) {
-  const [openFiles, setOpenFiles] = useAtom(openFilesAtom);
   const left = useAtomValue(leftPaneAtom);
   const right = useAtomValue(rightPaneAtom);
-
-  const handleTabClick = (pane: PaneId) => (path: string) => {
-    const file = openFiles.files[path];
-    if (file) {
-      setOpenFiles(activateFileAction(openFiles, pane, file));
-    }
-  };
-
-  const handleTabCloseClick = (pane: PaneId) => (path: string) => {
-    const file = openFiles.files[path];
-    if (file) {
-      setOpenFiles(closeFileAction(openFiles, pane, file));
-    }
-  };
+  const openFileInPane = useSetAtom(openFileInPaneAtom);
+  const closeFileInPane = useSetAtom(closeFileInPaneAtom);
 
   const updatePDFViewerWidth = useCallback(() => {
     pdfViewerRef.current?.updateWidth();
   }, [pdfViewerRef]);
-
-  const leftFiles = left.files;
-  const rightFiles = right.files;
 
   return (
     <>
@@ -58,9 +35,9 @@ export function CenterPanel({ editorRef, pdfViewerRef }: CenterPanelProps) {
           <CenterPanelPane
             activeFile={left.active}
             editorRef={editorRef}
-            files={leftFiles}
-            handleTabClick={handleTabClick('LEFT')}
-            handleTabCloseClick={handleTabCloseClick('LEFT')}
+            files={left.files}
+            handleTabClick={(path) => openFileInPane({ pane: left.id, file: path })}
+            handleTabCloseClick={(path) => closeFileInPane({ pane: left.id, path })}
             pdfViewerRef={pdfViewerRef}
           />
         </Panel>
@@ -70,9 +47,9 @@ export function CenterPanel({ editorRef, pdfViewerRef }: CenterPanelProps) {
             <CenterPanelPane
               activeFile={right.active}
               editorRef={editorRef}
-              files={rightFiles}
-              handleTabClick={handleTabClick('RIGHT')}
-              handleTabCloseClick={handleTabCloseClick('RIGHT')}
+              files={right.files}
+              handleTabClick={(path) => openFileInPane({ pane: right.id, file: path })}
+              handleTabCloseClick={(path) => closeFileInPane({ pane: right.id, path })}
               pdfViewerRef={pdfViewerRef}
             />
           </Panel>
