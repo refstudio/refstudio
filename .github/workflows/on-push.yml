@@ -23,10 +23,15 @@ jobs:
 
   setup-python:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11"]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - uses: ./.github/actions/setup-python
+        with:
+          python-version: ${{ matrix.python-version }}
 
   # commitlint:
   #   runs-on: ubuntu-latest
@@ -65,22 +70,32 @@ jobs:
   pylint:
     needs: setup-python
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11"]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup Python
         uses: ./.github/actions/setup-python
+        with:
+          python-version: ${{ matrix.python-version }}
       - name: PyLint
         run: poetry run ruff check ./python
 
   pytest:
     needs: setup-python
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11"]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup Python
         uses: ./.github/actions/setup-python
+        with:
+          python-version: ${{ matrix.python-version }}
       - name: PyTest
         run: poetry run pytest
 

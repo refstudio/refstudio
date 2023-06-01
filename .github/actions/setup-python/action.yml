@@ -1,8 +1,14 @@
 name: 'Setup Python'
 runs:
   using: 'composite'
+  inputs:
+    python-version:
+      required: true
   steps:
-  - uses: actions/setup-python@v4
+  - name: Setup Python ${{ inputs.python-version }}
+    uses: actions/setup-python@v4
+    with:
+      python-version: ${{ inputs.python-version }}
     id: setup-python
   - uses: snok/install-poetry@v1
     with:
