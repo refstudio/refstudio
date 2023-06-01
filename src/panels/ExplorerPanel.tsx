@@ -11,8 +11,8 @@ import {
   rightPaneAtom,
   splitFileToPaneAtom,
 } from '../atoms/openFilesState';
-import { PanelSection } from '../components/PanelSection';
-import { PanelWrapper } from '../components/PanelWrapper';
+import { PanelSection } from '../Components/PanelSection';
+import { PanelWrapper } from '../Components/PanelWrapper';
 import { cx } from '../cx';
 import { readAllProjectFiles } from '../filesystem';
 

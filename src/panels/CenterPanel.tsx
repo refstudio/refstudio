@@ -1,13 +1,14 @@
 import { FileEntry } from '@tauri-apps/api/fs';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { useCallback, useEffect, useState } from 'react';
+import React, { useCallback } from 'react';
 import { Panel, PanelGroup } from 'react-resizable-panels';
 
 import { activateFileInPaneAtom, closeFileInPaneAtom, leftPaneAtom, rightPaneAtom } from '../atoms/openFilesState';
-import { TabPane } from '../components/TabPane';
+import { TabPane } from '../Components/TabPane';
 import { VerticalResizeHandle } from '../components/VerticalResizeHandle';
 import { cx } from '../cx';
 import { readFileAsText } from '../filesystem';
+import { usePromise } from '../hooks/use-promise';
 import { PdfViewer } from '../PdfViewer';
 import { TipTapEditor } from '../TipTapEditor/TipTapEditor';
 import { EditorAPI } from '../types/EditorAPI';
@@ -138,22 +139,16 @@ function EmptyViewLetter({ letter, className = '' }: { letter: string; className
 }
 
 function TipTapView({ file, editorRef }: { file: FileEntry; editorRef: React.MutableRefObject<EditorAPI | null> }) {
-  const [loading, setLoading] = useState(true);
-  const [content, setContent] = useState<string | null>(null);
+  const loadFile = React.useCallback(() => readFileAsText(file), [file]);
+  const contentState = usePromise(loadFile);
 
-  useEffect(() => {
-    setLoading(true);
-    (async () => {
-      const textContent = await readFileAsText(file);
-      setContent(textContent);
-      setLoading(false);
-    })();
-  }, [file]);
-
-  if (loading) {
+  if (contentState.state === 'loading') {
     return <strong>Loading...</strong>;
+  } else if (contentState.state === 'error') {
+    return <strong>Error: {String(contentState.error)}</strong>;
   }
 
+  const content = contentState.data;
   return <TipTapEditor editorContent={content} editorRef={editorRef} />;
 }
 
@@ -164,14 +159,18 @@ function TextView({
   file: FileEntry;
   textFormatter?: (input: string) => string;
 }) {
-  const [content, setContent] = useState('Loading...');
-
-  useEffect(() => {
-    (async () => {
-      const text = await readFileAsText(file);
-      setContent(textFormatter(text));
-    })();
+  const loadFile = React.useCallback(async () => {
+    const text = await readFileAsText(file);
+    return textFormatter(text);
   }, [file, textFormatter]);
+  const contentState = usePromise(loadFile);
+
+  const content =
+    contentState.state === 'error'
+      ? `Error: ${contentState.error}`
+      : contentState.state === 'loading'
+      ? 'Loading…'
+      : contentState.data;
 
   return (
     <div className="ml-1 h-full w-full overflow-scroll p-2">

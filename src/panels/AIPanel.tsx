@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react';
 import { useDebounce } from 'usehooks-ts';
 
 import { selectionAtom } from '../atoms/selectionState';
-import { PanelSection } from '../components/PanelSection';
-import { PanelWrapper } from '../components/PanelWrapper';
+import { PanelSection } from '../Components/PanelSection';
+import { PanelWrapper } from '../Components/PanelWrapper';
 
 export function AIPanel() {
   const [reply, setReply] = useState('');
