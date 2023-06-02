@@ -19,10 +19,10 @@ export function ReferencesView({ onRefClicked }: ReferencesViewProps) {
       <div className="flex-1 overflow-scroll flex flex-col">
         <p className="my-4 italic">Click on a reference to add it to the document.</p>
 
-        <ul className="divide-y-2 border">
+        <ul className="divide-y-2">
           {references.map((reference) => (
             <li
-              className="mb-0 cursor-pointer p-1 hover:bg-slate-100 overflow-x-hidden text-ellipsis"
+              className="mb-0 border-y cursor-pointer p-1 hover:bg-slate-100 overflow-x-hidden text-ellipsis"
               key={reference.id}
               onClick={() => onRefClicked(reference)}
             >
