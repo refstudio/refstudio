@@ -82,7 +82,7 @@ jobs:
       - name: Setup Python
         uses: ./.github/actions/setup-python
       - name: PyTest
-        run: poetry run pytest
+        run: poetry run pytest python/tests
 
   # constraints:
   #   needs: setup-js
