@@ -1,0 +1,24 @@
+.items {
+  @apply bg-white;
+  @apply rounded-lg;
+  @apply border-black;
+  @apply overflow-auto;
+  @apply relative;
+  @apply text-sm;
+  @apply z-10;
+  @apply shadow-xl;
+  @apply flex;
+  @apply flex-col;
+}
+
+.item {
+  @apply p-1;
+  @apply cursor-pointer;
+  @apply select-none;
+  @apply w-full;
+  @apply text-left;
+}
+
+.selected {
+  @apply bg-slate-200;
+}

@@ -11,7 +11,7 @@ import { Markdown } from 'tiptap-markdown';
 import { CollapsibleBlockContentNode } from './CollapsibleBlock/nodes/CollapsibleBlockContent';
 import { CollapsibleBlockNode } from './CollapsibleBlock/nodes/CollapsibleBlockNode';
 import { CollapsibleBlockSummaryNode } from './CollapsibleBlock/nodes/CollapsibleBlockSummary';
-import { ReferenceNode } from './ReferenceBlock/ReferenceNode';
+import { ReferenceNode } from './ReferenceNode/ReferenceNode';
 lowlight.registerLanguage('markdown', markdown);
 
 export const EDITOR_EXTENSIONS: Extensions = [
@@ -57,7 +57,6 @@ export const INITIAL_CONTENT = `
   <ul>
     <li>
       That’s a bullet list with one …
-      <span data-type="mention" data-id="ref1" class="mention"></span>
     </li>
     <li>… or two list items.</li>
   </ul>
