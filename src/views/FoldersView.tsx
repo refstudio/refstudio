@@ -1,7 +1,9 @@
 import { FileEntry } from '@tauri-apps/api/fs';
+import { useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import { FileUploader } from 'react-drag-drop-files';
 
+import { addPdfIngestionProcessAtom, removePdfIngestionProcessAtom, setReferencesAtom } from '../atoms/referencesState';
 import { cx } from '../cx';
 import { ensureProjectFileStructure, readAllProjectFiles, runPDFIngestion, uploadFiles } from '../filesystem';
 
@@ -10,6 +12,9 @@ const BASE_DIR = await ensureProjectFileStructure();
 export function FoldersView({ onClick }: { onClick?: (fileEntry: FileEntry) => void }) {
   const [files, setFiles] = useState<FileEntry[]>([]);
   const [selectedFile, setSelectedFile] = useState<FileEntry>();
+  const setReferences = useSetAtom(setReferencesAtom);
+  const addPdfIngestionProcess = useSetAtom(addPdfIngestionProcessAtom);
+  const removePdfIngestionProcess = useSetAtom(removePdfIngestionProcessAtom);
 
   useEffect(() => {
     readAllProjectFiles()
@@ -32,17 +37,25 @@ export function FoldersView({ onClick }: { onClick?: (fileEntry: FileEntry) => v
   }
 
   async function handleChange(uploadedFiles: FileList) {
+    // Using the current timestamp as the processId
+    const processId = Date.now().toString();
     try {
+      addPdfIngestionProcess(processId);
+
       await uploadFiles(uploadedFiles);
       console.log('File uploaded with success');
 
       const projectFiles = await readAllProjectFiles();
       setFiles(projectFiles);
 
-      await runPDFIngestion();
+      const references = await runPDFIngestion();
       console.log('PDFs ingested with success');
+
+      setReferences(references);
     } catch (err) {
       console.error('Error uploading references', err);
+    } finally {
+      removePdfIngestionProcess(processId);
     }
   }
 
