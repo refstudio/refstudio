@@ -37,12 +37,18 @@ p {
 }
 
 body {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
+  /* This overflow setting prevents the app to display that extra content on scroll (like pull to refresh) */
+  @apply h-full w-full overflow-hidden;
 }
 
 /* Make root full-height */
 body > div#root {
   height: 100vh;
+}
+
+.x-hide-scrollbars::-webkit-scrollbar,
+[data-overflow-viewport]::-webkit-scrollbar {
+  height: 0px;
+  width: 0px;
+  background-color: transparent;
 }

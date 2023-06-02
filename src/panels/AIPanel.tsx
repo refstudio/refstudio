@@ -4,8 +4,10 @@ import { useEffect, useState } from 'react';
 import { useDebounce } from 'usehooks-ts';
 
 import { selectionAtom } from '../atoms/selectionState';
+import { PanelSection } from '../components/PanelSection';
+import { PanelWrapper } from '../components/PanelWrapper';
 
-export function AIView() {
+export function AIPanel() {
   const [reply, setReply] = useState('');
 
   const selection = useAtomValue(selectionAtom);
@@ -21,9 +23,8 @@ export function AIView() {
   }, [selection]);
 
   return (
-    <div className="flex h-full w-full flex-col">
-      <h1>AI Interactions</h1>
-      <div className="flex-1 overflow-scroll">
+    <PanelWrapper title="AI">
+      <PanelSection title="Selection">
         <p className="my-4 italic">Select some text in the editor to see it here.</p>
 
         {selection && (
@@ -33,8 +34,8 @@ export function AIView() {
             <div className="border border-green-100 bg-green-50 p-4">{reply}</div>
           </div>
         )}
-      </div>
-    </div>
+      </PanelSection>
+    </PanelWrapper>
   );
 }
 
