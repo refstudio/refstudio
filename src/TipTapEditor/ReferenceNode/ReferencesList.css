@@ -1,5 +1,5 @@
 .items {
-  @apply bg-white;
+  @apply bg-slate-100;
   @apply rounded-lg;
   @apply border-black;
   @apply overflow-auto;

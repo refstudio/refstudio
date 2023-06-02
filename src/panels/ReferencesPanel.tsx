@@ -65,7 +65,11 @@ export function ReferencesPanel({ onRefClicked }: ReferencesPanelProps) {
           ))}
         </ul>
         <p className="my-4 text-sm italic">Click on a reference to add it to the document.</p>
-        {isPdfIngestionLoading && <Spinner />}
+        {isPdfIngestionLoading && (
+          <div className="flex w-full flex-col justify-center">
+            <Spinner />
+          </div>
+        )}
       </PanelSection>
       <PanelSection title="Upload">
         <FileUploader handleChange={handleChange} label="Upload or drop a file right here" multiple name="file" />
