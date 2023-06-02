@@ -5,7 +5,7 @@ import { FileEntry } from '@tauri-apps/api/fs';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 
-import { readEntryFileAsBinary } from '../filesystem';
+import { readFileEntryAsBinary } from '../filesystem';
 import { useDebouncedCallback } from '../hooks/useDebouncedCallback';
 import { usePromise } from '../hooks/usePromise';
 import { PdfViewerAPI } from '../types/PdfViewerAPI';
@@ -18,7 +18,7 @@ interface PdfViewerProps {
 }
 
 export function PdfViewer({ file, pdfViewerRef }: PdfViewerProps) {
-  const loadFile = useCallback(() => readEntryFileAsBinary(file), [file]);
+  const loadFile = useCallback(() => readFileEntryAsBinary(file), [file]);
   const loadFileState = usePromise(loadFile);
 
   const [numPages, setNumPages] = useState<number | null>(null);

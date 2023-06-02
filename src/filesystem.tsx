@@ -64,7 +64,7 @@ export async function runPDFIngestion() {
   return response;
 }
 
-export async function readEntryFileAsBinary(file: FileEntry) {
+export async function readFileEntryAsBinary(file: FileEntry) {
   return readBinaryFile(file.path);
 }
 
