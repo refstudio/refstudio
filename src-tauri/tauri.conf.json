@@ -29,17 +29,7 @@
         "open": true,
         "scope": [
           {
-            "name": "echo-something",
-            "cmd": "echo",
-            "args": true
-          },
-          {
-            "name": "word-count",
-            "cmd": "$RESOURCE/bin/python/main-aarch64-apple-darwin/main",
-            "args": true
-          },
-          {
-            "name": "ingest-pdfs",
+            "name": "call-sidecar",
             "cmd": "$RESOURCE/bin/python/main-aarch64-apple-darwin/main",
             "args": true
           }
