@@ -1,8 +1,13 @@
-
 import { useAtomValue, useSetAtom } from 'jotai';
 import { FileUploader } from 'react-drag-drop-files';
 
-import { addPdfIngestionProcessAtom, getReferencesAtom, isPdfIngestionRunningAtom, removePdfIngestionProcessAtom, setReferencesAtom } from '../atoms/referencesState';
+import {
+  addPdfIngestionProcessAtom,
+  getReferencesAtom,
+  isPdfIngestionRunningAtom,
+  removePdfIngestionProcessAtom,
+  setReferencesAtom,
+} from '../atoms/referencesState';
 import { PanelSection } from '../components/PanelSection';
 import { PanelWrapper } from '../components/PanelWrapper';
 import { Spinner } from '../components/Spinner';
@@ -34,7 +39,6 @@ export function ReferencesPanel({ onRefClicked }: ReferencesPanelProps) {
       const updatedReferences = await runPDFIngestion();
       setReferences(updatedReferences);
       console.log('PDFs ingested with success');
-
     } catch (err) {
       console.error('Error uploading references', err);
     } finally {
@@ -48,16 +52,14 @@ export function ReferencesPanel({ onRefClicked }: ReferencesPanelProps) {
         <ul className="space-y-2">
           {references.map((reference) => (
             <li
-              className="mb-0 cursor-pointer p-1 hover:bg-slate-200 overflow-x-hidden text-ellipsis"
+              className="mb-0 cursor-pointer overflow-x-hidden text-ellipsis p-1 hover:bg-slate-200"
               key={reference.id}
               onClick={() => onRefClicked(reference)}
             >
               <strong>{reference.title}</strong>
               <br />
               <small>
-                <em className="whitespace-nowrap">
-                  {reference.authors.map(({ fullName }) => fullName).join(', ')}
-                </em>
+                <em className="whitespace-nowrap">{reference.authors.map(({ fullName }) => fullName).join(', ')}</em>
               </small>
             </li>
           ))}

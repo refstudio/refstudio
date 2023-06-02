@@ -10,7 +10,6 @@ import { getReferencesAtom } from '../../atoms/referencesState';
 import { cx } from '../../cx';
 import { ReferenceItem } from '../../types/ReferenceItem';
 
-
 export type ReferenceListProps = SuggestionProps<{ id: string; label: string }>;
 
 export const ReferencesList = forwardRef((props: ReferenceListProps, ref) => {
@@ -18,10 +17,13 @@ export const ReferencesList = forwardRef((props: ReferenceListProps, ref) => {
   console.log(clientRect?.());
   const [selectedIndex, setSelectedIndex] = useState(0);
   const references = useAtomValue(getReferencesAtom);
-  const queriedReferences = useMemo(() => Object.values(references)
-    .filter((referenceItem) => referenceItem.title.toLowerCase().includes(query.toLowerCase()))
-    .slice(0, 5)
-    , [references, query]);
+  const queriedReferences = useMemo(
+    () =>
+      Object.values(references)
+        .filter((referenceItem) => referenceItem.title.toLowerCase().includes(query.toLowerCase()))
+        .slice(0, 5),
+    [references, query],
+  );
   const referenceElement = useMemo(
     () => (clientRect ? { getBoundingClientRect: () => clientRect()! } : null),
     [clientRect],
@@ -34,11 +36,11 @@ export const ReferencesList = forwardRef((props: ReferenceListProps, ref) => {
   };
 
   const handleArrowUp = useCallback(() => {
-    setSelectedIndex(currentIndex => (currentIndex + queriedReferences.length - 1) % queriedReferences.length);
+    setSelectedIndex((currentIndex) => (currentIndex + queriedReferences.length - 1) % queriedReferences.length);
   }, [queriedReferences.length]);
 
   const handleArrowDown = useCallback(() => {
-    setSelectedIndex(currentIndex => (currentIndex + 1) % queriedReferences.length);
+    setSelectedIndex((currentIndex) => (currentIndex + 1) % queriedReferences.length);
   }, [queriedReferences.length]);
 
   useEffect(() => {
@@ -72,12 +74,7 @@ export const ReferencesList = forwardRef((props: ReferenceListProps, ref) => {
   });
 
   return createPortal(
-    <div
-      className="items"
-      ref={setPopperElement}
-      style={styles.popper}
-      {...attributes.popper}
-    >
+    <div className="items" ref={setPopperElement} style={styles.popper} {...attributes.popper}>
       {queriedReferences.length ? (
         queriedReferences.map(({ id, title }, index) => (
           <button
@@ -91,13 +88,12 @@ export const ReferencesList = forwardRef((props: ReferenceListProps, ref) => {
       ) : (
         <div className="item">No result</div>
       )}
-    </div >,
+    </div>,
     document.body,
   );
 });
 
 ReferencesList.displayName = 'ReferencesList';
-
 
 export function getReferenceLabel(referenceItem: ReferenceItem): string {
   return `[${referenceItem.authors.map(({ surname }) => surname).join(';')}]`;
