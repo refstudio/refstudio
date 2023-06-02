@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import List
 
 import grobid_tei_xml
-import lancedb
 from grobid_client.grobid_client import GrobidClient
 
 from .shared import HiddenPrints, chunk_text, get_filename_md5
