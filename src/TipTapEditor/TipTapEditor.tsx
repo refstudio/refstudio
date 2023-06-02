@@ -54,9 +54,9 @@ export function TipTapEditor({ editorRef, editorContent }: EditorProps) {
   }
 
   return (
-    <div className="tiptap-editor flex h-full flex-col">
+    <div className="flex h-full w-full flex-col">
       <MenuBar editor={editor} />
-      <EditorContent className="flex-1 overflow-scroll pl-5 pr-2 pt-4" editor={editor} />
+      <EditorContent className="tiptap-editor flex-1 overflow-y-scroll pl-5 pr-2 pt-4" editor={editor} />
     </div>
   );
 }
