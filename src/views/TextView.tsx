@@ -20,7 +20,7 @@ export function TextView({
   }, [file, textFormatter]);
 
   return (
-    <div className="ml-1 h-full w-full overflow-scroll p-2">
+    <div className="ml-1 h-full w-full overflow-y-auto p-2">
       <pre className="text-xs">{content}</pre>
     </div>
   );

@@ -80,9 +80,9 @@ export function MainPanelPane({
   }));
 
   return (
-    <div className="h-full grid-rows-[auto_1fr] ">
+    <div className="h-full grid-cols-1 grid-rows-[auto_1fr]">
       <TabPane items={items} value={activeFile?.path} onClick={handleTabClick} onCloseClick={handleTabCloseClick} />
-      <div className="flex h-full w-full overflow-scroll">
+      <div className="flex h-full w-full overflow-hidden">
         <MainPaneViewContent activeFile={activeFile} editorRef={editorRef} pdfViewerRef={pdfViewerRef} />
       </div>
     </div>

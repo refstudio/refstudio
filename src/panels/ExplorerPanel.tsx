@@ -1,7 +1,7 @@
 import { FileEntry } from '@tauri-apps/api/fs';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
-import { VscFile, VscFolder, VscSplitHorizontal } from 'react-icons/vsc';
+import { VscSplitHorizontal } from 'react-icons/vsc';
 
 import {
   activateFileInPaneAtom,
@@ -11,9 +11,9 @@ import {
   rightPaneAtom,
   splitFileToPaneAtom,
 } from '../atoms/openFilesState';
+import { FileTree } from '../components/FileTree';
 import { PanelSection } from '../components/PanelSection';
 import { PanelWrapper } from '../components/PanelWrapper';
-import { cx } from '../cx';
 import { readAllProjectFiles } from '../filesystem';
 import { isNonNullish } from '../lib/isNonNullish';
 
@@ -86,68 +86,3 @@ export function ExplorerPanel() {
     </PanelWrapper>
   );
 }
-
-interface FileTreeBaseProps {
-  root?: boolean;
-  files: FileEntry[];
-  file?: FileEntry;
-  selectedFiles: FileEntry[];
-  onClick: (file: FileEntry) => void;
-  rightAction?: (file: FileEntry) => React.ReactNode;
-}
-
-const FileTree = ({ files, root, ...props }: FileTreeBaseProps) => (
-  <div className="overflow-scroll">
-    <ul className={root ? 'ml-4' : 'ml-6'}>
-      {files.map((file) => (
-        <FileTreeNode file={file} files={files} key={file.path} {...props} />
-      ))}
-    </ul>
-  </div>
-);
-
-const FileTreeNode = ({ file, onClick, rightAction, selectedFiles }: FileTreeBaseProps) => {
-  if (!file) {
-    return null;
-  }
-  const isFolder = !!file.children;
-
-  // Hide DOT_FILES
-  if (file.name?.startsWith('.')) {
-    return null;
-  }
-
-  return (
-    <li>
-      <div
-        className={cx(
-          'mb-1 py-1',
-          'flex flex-row items-center gap-1', //
-          'group',
-          {
-            'bg-slate-100': selectedFiles.some((f) => f.path === file.path),
-            'cursor-pointer hover:bg-slate-100': !isFolder,
-          },
-        )}
-        title={file.name}
-        onClick={() => !isFolder && onClick(file)}
-      >
-        {isFolder ? <VscFolder className="shrink-0" /> : <VscFile className="shrink-0" />}
-        <span
-          className={cx('flex-1 truncate', {
-            'font-bold': isFolder,
-          })}
-        >
-          {file.name}
-        </span>
-        {rightAction && (
-          <div className="mr-2 hidden p-0.5 hover:bg-gray-200 group-hover:block">{rightAction(file)}</div>
-        )}
-      </div>
-
-      {isFolder && (
-        <FileTree files={file.children!} rightAction={rightAction} selectedFiles={selectedFiles} onClick={onClick} />
-      )}
-    </li>
-  );
-};

@@ -16,9 +16,9 @@ export function PanelSection({
 
   return (
     <div
-      className={cx('flex flex-col overflow-hidden px-2', {
+      className={cx('flex flex-col px-2', {
         'flex-shrink-0': !grow, // Take the component's height without shrinking
-        'flex-grow': grow, // Can grow
+        'flex-grow overflow-hidden': grow, // Can grow
       })}
     >
       <div
@@ -32,7 +32,7 @@ export function PanelSection({
         <span className="font-bold uppercase">{title}</span>
         <div className="ml-auto text-xs">{/* NOTE: This is the placeholder for actions */}</div>
       </div>
-      {expanded && <div className="overflow-scroll">{children}</div>}
+      {expanded && <div className={cx({ 'overflow-y-auto': grow })}>{children}</div>}
     </div>
   );
 }
