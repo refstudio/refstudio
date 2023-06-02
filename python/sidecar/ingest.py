@@ -38,8 +38,8 @@ class PDFIngestion:
         self.project_name = input_dir.parent.name
 
         # directories for storing intermediate files
-        self.grobid_output_dir = input_dir.parent.joinpath('grobid')
-        self.storage_dir = input_dir.parent.joinpath('storage')
+        self.grobid_output_dir = input_dir.parent.joinpath('.grobid')
+        self.storage_dir = input_dir.parent.joinpath('.storage')
 
         # components for embeddings creation and storage
         self.lancedb_uri = input_dir.parent.joinpath('.lancedb')
