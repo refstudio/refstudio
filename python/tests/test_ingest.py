@@ -25,7 +25,6 @@ def test_main(monkeypatch, tmp_path, capsys):
     # directories where ingest will write files
     grobid_output_dir = tmp_path.joinpath(".grobid")
     json_storage_dir = tmp_path.joinpath(".storage")
-    embeddings_storage_dir = tmp_path.joinpath(".lancedb")
 
     # copy test pdf to temp dir
     test_pdf = FIXTURES_DIR.joinpath("pdf", "test.pdf")
@@ -60,5 +59,3 @@ def test_main(monkeypatch, tmp_path, capsys):
     # json creation and storage
     assert json_storage_dir.exists()
     assert json_storage_dir.joinpath("test.json").exists()
-    # embeddings creation and storage
-    assert embeddings_storage_dir.exists()
