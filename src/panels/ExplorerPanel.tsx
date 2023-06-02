@@ -15,6 +15,7 @@ import { PanelSection } from '../components/PanelSection';
 import { PanelWrapper } from '../components/PanelWrapper';
 import { cx } from '../cx';
 import { readAllProjectFiles } from '../filesystem';
+import { isNonNullish } from '../lib/isNonNullish';
 
 export function ExplorerPanel() {
   const left = useAtomValue(leftPaneAtom);
@@ -29,7 +30,7 @@ export function ExplorerPanel() {
       const newFiles = await readAllProjectFiles();
       setFiles(newFiles);
     })();
-  }, [setFiles]);
+  }, []);
 
   const hasRightPanelFiles = right.files.length > 0;
 
@@ -74,11 +75,11 @@ export function ExplorerPanel() {
           />
         )}
       </PanelSection>
-      <PanelSection title="Project X">
+      <PanelSection grow title="Project X">
         <FileTree
           files={allFiles}
           root
-          selectedFiles={[left.active, right.active].filter((file) => file).map((file) => file!)}
+          selectedFiles={[left.active, right.active].filter(isNonNullish)}
           onClick={(file) => openFileInPane({ pane: DEFAULT_PANE, file })}
         />
       </PanelSection>
@@ -97,12 +98,7 @@ interface FileTreeBaseProps {
 
 const FileTree = ({ files, root, ...props }: FileTreeBaseProps) => (
   <div className="overflow-scroll">
-    <ul
-      className={cx('', {
-        'ml-4': root,
-        'ml-6': !root,
-      })}
-    >
+    <ul className={root ? 'ml-4' : 'ml-6'}>
       {files.map((file) => (
         <FileTreeNode file={file} files={files} key={file.path} {...props} />
       ))}
@@ -114,7 +110,7 @@ const FileTreeNode = ({ file, onClick, rightAction, selectedFiles }: FileTreeBas
   if (!file) {
     return null;
   }
-  const isFolder = Array.isArray(file.children);
+  const isFolder = !!file.children;
 
   // Hide DOT_FILES
   if (file.name?.startsWith('.')) {
@@ -149,8 +145,8 @@ const FileTreeNode = ({ file, onClick, rightAction, selectedFiles }: FileTreeBas
         )}
       </div>
 
-      {isFolder && Array.isArray(file.children) && (
-        <FileTree files={file.children} rightAction={rightAction} selectedFiles={selectedFiles} onClick={onClick} />
+      {isFolder && (
+        <FileTree files={file.children!} rightAction={rightAction} selectedFiles={selectedFiles} onClick={onClick} />
       )}
     </li>
   );

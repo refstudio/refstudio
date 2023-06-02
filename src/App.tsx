@@ -4,8 +4,8 @@ import { Panel, PanelGroup } from 'react-resizable-panels';
 import { PrimarySideBar, PrimarySideBarPane } from './components/PrimarySideBar';
 import { VerticalResizeHandle } from './components/VerticalResizeHandle';
 import { AIPanel } from './panels/AIPanel';
-import { CenterPanel } from './panels/CenterPanel';
 import { ExplorerPanel } from './panels/ExplorerPanel';
+import { MainPanel } from './panels/MainPanel';
 import { ReferencesPanel } from './panels/ReferencesPanel';
 import { EditorAPI } from './types/EditorAPI';
 import { PdfViewerAPI } from './types/PdfViewerAPI';
@@ -34,7 +34,7 @@ function App() {
       <VerticalResizeHandle />
 
       <Panel defaultSize={60}>
-        <CenterPanel editorRef={editorRef} pdfViewerRef={pdfViewerRef} />
+        <MainPanel editorRef={editorRef} pdfViewerRef={pdfViewerRef} />
       </Panel>
 
       <VerticalResizeHandle />

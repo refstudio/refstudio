@@ -18,7 +18,7 @@ export function PanelSection({
     <div
       className={cx('flex flex-col overflow-hidden px-2', {
         'flex-shrink-0': !grow, // Take the component's height without shrinking
-        'flex-grow': grow, // Can grpow
+        'flex-grow': grow, // Can grow
       })}
     >
       <div

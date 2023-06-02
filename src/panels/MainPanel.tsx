@@ -1,24 +1,25 @@
 import { FileEntry } from '@tauri-apps/api/fs';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import { Panel, PanelGroup } from 'react-resizable-panels';
 
 import { activateFileInPaneAtom, closeFileInPaneAtom, leftPaneAtom, rightPaneAtom } from '../atoms/openFilesState';
 import { TabPane } from '../components/TabPane';
 import { VerticalResizeHandle } from '../components/VerticalResizeHandle';
-import { cx } from '../cx';
-import { readFileAsText } from '../filesystem';
-import { PdfViewer } from '../PdfViewer';
-import { TipTapEditor } from '../TipTapEditor/TipTapEditor';
 import { EditorAPI } from '../types/EditorAPI';
 import { PdfViewerAPI } from '../types/PdfViewerAPI';
+import { EmptyView } from '../views/EmptyView';
+import { PdfViewer } from '../views/PdfViewer';
+import { TextView } from '../views/TextView';
+import { TipTapView } from '../views/TipTapView';
 
-interface CenterPanelProps {
+interface MainPanelProps {
   editorRef: React.MutableRefObject<EditorAPI | null>;
   pdfViewerRef: React.MutableRefObject<PdfViewerAPI | null>;
 }
 
-export function CenterPanel({ editorRef, pdfViewerRef }: CenterPanelProps) {
+export function MainPanel(props: MainPanelProps) {
+  const { pdfViewerRef } = props;
   const left = useAtomValue(leftPaneAtom);
   const right = useAtomValue(rightPaneAtom);
   const activateFileInPane = useSetAtom(activateFileInPaneAtom);
@@ -32,25 +33,23 @@ export function CenterPanel({ editorRef, pdfViewerRef }: CenterPanelProps) {
     <>
       <PanelGroup direction="horizontal" onLayout={updatePDFViewerWidth}>
         <Panel>
-          <CenterPanelPane
+          <MainPanelPane
             activeFile={left.active}
-            editorRef={editorRef}
             files={left.files}
             handleTabClick={(path) => activateFileInPane({ pane: left.id, path })}
             handleTabCloseClick={(path) => closeFileInPane({ pane: left.id, path })}
-            pdfViewerRef={pdfViewerRef}
+            {...props}
           />
         </Panel>
         {right.files.length > 0 && <VerticalResizeHandle />}
         {right.files.length > 0 && (
           <Panel>
-            <CenterPanelPane
+            <MainPanelPane
               activeFile={right.active}
-              editorRef={editorRef}
               files={right.files}
               handleTabClick={(path) => activateFileInPane({ pane: right.id, path })}
               handleTabCloseClick={(path) => closeFileInPane({ pane: right.id, path })}
-              pdfViewerRef={pdfViewerRef}
+              {...props}
             />
           </Panel>
         )}
@@ -59,21 +58,21 @@ export function CenterPanel({ editorRef, pdfViewerRef }: CenterPanelProps) {
   );
 }
 
-interface CenterPanelPaneProps {
-  files: FileEntry[];
+interface MainPanelPaneProps {
+  files: readonly FileEntry[];
   activeFile?: FileEntry;
   handleTabClick(path: string): void;
   handleTabCloseClick(path: string): void;
 }
 
-export function CenterPanelPane({
+export function MainPanelPane({
   files,
   activeFile,
   handleTabClick,
   handleTabCloseClick,
   editorRef,
   pdfViewerRef,
-}: CenterPanelPaneProps & CenterPanelProps) {
+}: MainPanelPaneProps & MainPanelProps) {
   const items = files.map((file) => ({
     key: file.path,
     text: file.name ?? '',
@@ -84,19 +83,19 @@ export function CenterPanelPane({
     <div className="h-full grid-rows-[auto_1fr] ">
       <TabPane items={items} value={activeFile?.path} onClick={handleTabClick} onCloseClick={handleTabCloseClick} />
       <div className="flex h-full w-full overflow-scroll">
-        <CenterPaneViewContent activeFile={activeFile} editorRef={editorRef} pdfViewerRef={pdfViewerRef} />
+        <MainPaneViewContent activeFile={activeFile} editorRef={editorRef} pdfViewerRef={pdfViewerRef} />
       </div>
     </div>
   );
 }
 
-interface CenterPaneViewContentProps {
+interface MainPaneViewContentProps {
   activeFile?: FileEntry;
   editorRef: React.MutableRefObject<EditorAPI | null>;
   pdfViewerRef: React.MutableRefObject<PdfViewerAPI | null>;
 }
 
-export function CenterPaneViewContent({ activeFile, editorRef, pdfViewerRef }: CenterPaneViewContentProps) {
+export function MainPaneViewContent({ activeFile, editorRef, pdfViewerRef }: MainPaneViewContentProps) {
   if (!activeFile) {
     return <EmptyView />;
   }
@@ -115,67 +114,4 @@ export function CenterPaneViewContent({ activeFile, editorRef, pdfViewerRef }: C
 
   // Use TipTap editor by default!
   return <TipTapView editorRef={editorRef} file={activeFile} />;
-}
-
-function EmptyView() {
-  return (
-    <div className="flex w-full flex-col items-center justify-center gap-2 bg-slate-300">
-      <div className="relative border border-slate-500 text-8xl font-extrabold">
-        <EmptyViewLetter className="bg-slate-500 text-slate-200" letter="R" />
-        <EmptyViewLetter className="bg-slate-200 text-slate-500" letter="S" />
-      </div>
-      <span className="text-sm italic">No file selected.</span>
-    </div>
-  );
-}
-
-function EmptyViewLetter({ letter, className = '' }: { letter: string; className?: string }) {
-  return (
-    <div className={cx('inline-flex w-[80px] items-center justify-center text-center', className)}>
-      <span>{letter}</span>
-    </div>
-  );
-}
-
-function TipTapView({ file, editorRef }: { file: FileEntry; editorRef: React.MutableRefObject<EditorAPI | null> }) {
-  const [loading, setLoading] = useState(true);
-  const [content, setContent] = useState<string | null>(null);
-
-  useEffect(() => {
-    setLoading(true);
-    (async () => {
-      const textContent = await readFileAsText(file);
-      setContent(textContent);
-      setLoading(false);
-    })();
-  }, [file]);
-
-  if (loading) {
-    return <strong>Loading...</strong>;
-  }
-
-  return <TipTapEditor editorContent={content} editorRef={editorRef} />;
-}
-
-function TextView({
-  file,
-  textFormatter = (text) => text,
-}: {
-  file: FileEntry;
-  textFormatter?: (input: string) => string;
-}) {
-  const [content, setContent] = useState('Loading...');
-
-  useEffect(() => {
-    (async () => {
-      const text = await readFileAsText(file);
-      setContent(textFormatter(text));
-    })();
-  }, [file, textFormatter]);
-
-  return (
-    <div className="ml-1 h-full w-full overflow-scroll p-2">
-      <pre className="text-xs">{content}</pre>
-    </div>
-  );
 }

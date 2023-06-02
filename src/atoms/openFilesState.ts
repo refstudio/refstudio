@@ -1,6 +1,8 @@
 import { FileEntry } from '@tauri-apps/api/fs';
 import { atom, Getter } from 'jotai';
 
+import { isNonNullish } from '../lib/isNonNullish';
+
 export type PaneId = 'LEFT' | 'RIGHT';
 export const DEFAULT_PANE: PaneId = 'LEFT';
 type FileId = string;
@@ -22,12 +24,10 @@ export const openFilesAtom = atom<OpenFilesState>({
     LEFT: {
       id: 'LEFT',
       openFiles: [],
-      activeFile: undefined,
     },
     RIGHT: {
       id: 'RIGHT',
       openFiles: [],
-      activeFile: undefined,
     },
   },
 });
@@ -40,50 +40,17 @@ function getPane(get: Getter, paneId: PaneId) {
   const pane = panes[paneId];
   return {
     id: pane.id,
-    files: pane.openFiles.map((id) => files[id] as FileEntry | undefined).filter((f) => f) as FileEntry[],
+    files: pane.openFiles.map((id) => files[id]).filter(isNonNullish),
     active: pane.activeFile ? files[pane.activeFile] : undefined,
   };
 }
 
 export const openFileInPaneAtom = atom(null, (get, set, update: { pane: PaneId; file: FileEntry }) => {
+  const { pane, file } = update;
+
   const state = get(openFilesAtom);
-  const updatedState = openFileAction(state, update.pane, update.file);
-  set(openFilesAtom, updatedState);
-});
-
-export const activateFileInPaneAtom = atom(null, (get, set, update: { pane: PaneId; path: string }) => {
-  const state = get(openFilesAtom);
-  const updatedState = activateFileAction(state, update.pane, update.path);
-  set(openFilesAtom, updatedState);
-});
-
-export const closeFileInPaneAtom = atom(null, (get, set, update: { pane: PaneId; path: string }) => {
-  const state = get(openFilesAtom);
-  const { pane, path } = update;
-  const file = state.files[path] as FileEntry | undefined;
-  if (file === undefined) {
-    console.warn('Cannot find the file ', path);
-  } else {
-    const updatedState = closeFileAction(state, pane, file);
-    set(openFilesAtom, updatedState);
-  }
-});
-
-export const splitFileToPaneAtom = atom(
-  null,
-  (get, set, update: { fromPane: PaneId; toPane: PaneId; file: FileEntry }) => {
-    const state = get(openFilesAtom);
-    const { fromPane, toPane, file } = update;
-    const updatedState = splitFileAction(state, file, fromPane, toPane);
-    set(openFilesAtom, updatedState);
-  },
-);
-
-/** ############################################################################################
- * state mutation utilities
- ############################################################################################ */
-function openFileAction(state: OpenFilesState, pane: PaneId, file: FileEntry) {
   const isFileOpenInPane = state.panes[pane].openFiles.includes(file.path);
+
   const newState: OpenFilesState = {
     ...state,
     files: {
@@ -101,11 +68,21 @@ function openFileAction(state: OpenFilesState, pane: PaneId, file: FileEntry) {
       },
     },
   };
-  return newState;
-}
 
-function activateFileAction(state: OpenFilesState, pane: PaneId, path: string) {
-  return {
+  set(openFilesAtom, newState);
+});
+
+export const activateFileInPaneAtom = atom(null, (get, set, update: { pane: PaneId; path: string }) => {
+  const { pane, path } = update;
+
+  const state = get(openFilesAtom);
+  const isFileOpenInPane = state.panes[pane].openFiles.includes(path);
+  if (!isFileOpenInPane) {
+    console.warn('Cannot find the file ', path);
+    return;
+  }
+
+  const newState = {
     ...state,
     panes: {
       ...state.panes,
@@ -115,22 +92,36 @@ function activateFileAction(state: OpenFilesState, pane: PaneId, path: string) {
       },
     },
   };
-}
+  set(openFilesAtom, newState);
+});
 
-function closeFileAction(state: OpenFilesState, pane: PaneId, file: FileEntry) {
-  const newState = {
-    ...state,
-  };
-  const panesPane = newState.panes[pane];
-  panesPane.openFiles = panesPane.openFiles.filter((f) => f !== file.path);
-  if (panesPane.activeFile === file.path) {
-    panesPane.activeFile = [...panesPane.openFiles][0];
+export const closeFileInPaneAtom = atom(null, (get, set, update: { pane: PaneId; path: string }) => {
+  const { pane, path } = update;
+
+  const state = get(openFilesAtom);
+  const file = state.files[path] as FileEntry | undefined;
+  if (file === undefined) {
+    console.warn('Cannot find the file ', path);
+    return;
+  } else {
+    const newState = {
+      ...state,
+    };
+    const panesPane = newState.panes[pane];
+    panesPane.openFiles = panesPane.openFiles.filter((f) => f !== file.path);
+    if (panesPane.activeFile === file.path) {
+      panesPane.activeFile = [...panesPane.openFiles][0];
+    }
+    set(openFilesAtom, newState);
   }
-  return newState;
-}
+});
 
-function splitFileAction(state: OpenFilesState, file: FileEntry, fromPane: PaneId, toPane: PaneId) {
-  const afterClose = closeFileAction(state, fromPane, file);
-  const afterOpenAction = openFileAction(afterClose, toPane, file);
-  return activateFileAction(afterOpenAction, toPane, file.path);
-}
+export const splitFileToPaneAtom = atom(
+  null,
+  (_, set, update: { fromPane: PaneId; toPane: PaneId; file: FileEntry }) => {
+    const { fromPane, toPane, file } = update;
+    set(closeFileInPaneAtom, { pane: fromPane, path: file.path });
+    set(openFileInPaneAtom, { pane: toPane, file });
+    set(activateFileInPaneAtom, { pane: toPane, path: file.path });
+  },
+);

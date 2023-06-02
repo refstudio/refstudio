@@ -64,12 +64,11 @@ export async function runPDFIngestion() {
   return response;
 }
 
-export async function readFile(file: FileEntry) {
-  const content = await readBinaryFile(file.path);
-  return content;
+export async function readEntryFileAsBinary(file: FileEntry) {
+  return readBinaryFile(file.path);
 }
 
-export async function readFileAsText(file: FileEntry) {
+export async function readFileEntryAsText(file: FileEntry) {
   return readTextFile(file.path);
 }
 

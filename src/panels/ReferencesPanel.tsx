@@ -22,7 +22,7 @@ export function ReferencesPanel({ onRefClicked }: { onRefClicked?: (item: Refere
 
   return (
     <PanelWrapper title="References">
-      <PanelSection title="Library">
+      <PanelSection grow title="Library">
         <ul className="space-y-2">
           {REFS_DATABASE.map((reference) => (
             <li
