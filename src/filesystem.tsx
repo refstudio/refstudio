@@ -9,11 +9,8 @@ import {
   writeTextFile,
 } from '@tauri-apps/api/fs';
 import { appDataDir, join } from '@tauri-apps/api/path';
-import { Command } from '@tauri-apps/api/shell';
 
 import { INITIAL_CONTENT } from './TipTapEditor/TipTapEditorConfigs';
-import { PdfIngestionResponse } from './types/PdfIngestion';
-import { ReferenceItem } from './types/ReferenceItem';
 
 const PROJECT_NAME = 'project-x';
 const UPLOADS_DIR = 'uploads';
@@ -21,7 +18,7 @@ const UPLOADS_DIR = 'uploads';
 async function getBaseDir() {
   return join(await appDataDir(), PROJECT_NAME);
 }
-async function getUploadsDir() {
+export async function getUploadsDir() {
   return join(await getBaseDir(), UPLOADS_DIR);
 }
 export async function ensureProjectFileStructure() {
@@ -56,16 +53,6 @@ export async function uploadFiles(files: FileList) {
   }
 }
 
-export async function runPDFIngestion(): Promise<ReferenceItem[]> {
-  const uploadsDir = await getUploadsDir();
-  const command = new Command('call-sidecar', ['ingest', '--pdf_directory', `${uploadsDir.toString()}`]);
-  console.log('command', command);
-  const output = await command.execute();
-  const response = JSON.parse(output.stdout) as PdfIngestionResponse;
-  console.log('response', response);
-  return parsePdfIngestionResponse(response);
-}
-
 export async function readFileEntryAsBinary(file: FileEntry) {
   return readBinaryFile(file.path);
 }
@@ -89,12 +76,4 @@ function sortedFileEntries(entries: FileEntry[]): FileEntry[] {
       ...entry,
       children: entry.children ? sortedFileEntries(entry.children) : entry.children,
     }));
-}
-
-function parsePdfIngestionResponse(response: PdfIngestionResponse): ReferenceItem[] {
-  return response.references.map((reference) => ({
-    id: reference.filename_md5,
-    title: reference.title ?? reference.source_filename.replace('.pdf', ''),
-    authors: reference.authors.map((author) => ({ fullName: author.full_name, surname: author.surname })),
-  }));
 }
