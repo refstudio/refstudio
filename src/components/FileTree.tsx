@@ -30,7 +30,7 @@ function FileTreeNode({ file, onClick, rightAction, selectedFiles }: FileTreeBas
   const { isFolder } = file;
 
   // Hide DOT_FILES
-  if (file.name.startsWith('.')) {
+  if (file.isDotfile) {
     return null;
   }
 
