@@ -5,8 +5,6 @@ from typing import List
 
 from .typing import Chunk
 
-MODEL_FOR_EMBEDDINGS = "sentence-transformers/all-MiniLM-L6-v2"
-
 
 def get_word_count(text: str) -> int:
     return len(text.strip().split(" "))
@@ -43,20 +41,6 @@ def chunk_text(text: str, chunk_size: int = 1000, chunk_overlap: int = 200) -> L
             )
         )
     return chunks
-
-
-def embed_text(text: List[str]) -> List[float]:
-    """
-    Embed text using sentence-transformers
-    :param text:
-    :return:
-    """
-    if not isinstance(text, list):
-        raise ValueError("text must be a list of strings")
-
-    from sentence_transformers import SentenceTransformer
-    model = SentenceTransformer(MODEL_FOR_EMBEDDINGS)
-    return model.encode(text)
 
 
 class HiddenPrints:
