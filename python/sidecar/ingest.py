@@ -7,18 +7,10 @@ from pathlib import Path
 from typing import List
 
 import grobid_tei_xml
-import lancedb
 from grobid_client.grobid_client import GrobidClient
 
-from .shared import HiddenPrints, chunk_text, embed_text, get_filename_md5
+from .shared import HiddenPrints, chunk_text, get_filename_md5
 from .typing import Author, Reference
-
-# parallelism within tokenizers has been causing an inconsistent
-# issue when coupled with Tauri and PyInstaller
-# setting to false fixes the issue for now, but we should investigate
-# https://github.com/refstudio/refstudio/issues/56
-os.environ['TOKENIZERS_PARALLELISM'] = 'false'
-
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -41,16 +33,11 @@ class PDFIngestion:
         self.grobid_output_dir = input_dir.parent.joinpath('.grobid')
         self.storage_dir = input_dir.parent.joinpath('.storage')
 
-        # components for embeddings creation and storage
-        self.lancedb_uri = input_dir.parent.joinpath('.lancedb')
-        self.lancedb = lancedb.connect(self.lancedb_uri)
-
     def run(self):
         self._create_directories()
         self.call_grobid_server()
         self.convert_grobid_xml_to_json()
         references = self.create_references()
-        self.create_and_persist_embeddings(references)
         response = self.create_response_from_references(references)
         sys.stdout.write(json.dumps(response))
 
@@ -196,45 +183,6 @@ class PDFIngestion:
             "project_name": self.project_name,
             "references": prepared_references
         }
-
-    def _already_has_embeddings(self, ref: Reference) -> bool:
-        tables = self.lancedb.table_names()
-
-        if self.project_name not in tables:
-            return False
-
-        table = self.lancedb.open_table(self.project_name)
-        already_seen = set(table.to_pandas()["source_filename"].tolist())
-        return ref.source_filename in already_seen
-
-    def create_and_persist_embeddings(self, references: List[Reference]) -> None:
-        for ref in references:
-            if self._already_has_embeddings(ref):
-                logger.info(f"Reference {ref.title} already exists. Skipping...")
-                continue
-
-            embeddings = embed_text([c.text for c in ref.chunks])
-            authors = [asdict(a) for a in ref.authors]
-
-            rows = []
-            for chunk, emb in zip(ref.chunks, embeddings):
-                rows.append({
-                    "source_filename": ref.source_filename,
-                    "title": ref.title,
-                    "authors": authors,
-                    "abstract": ref.abstract,
-                    "text": chunk.text,
-                    "vector": emb.tolist()
-                })
-            logger.info(f"Created {len(embeddings)} embeddings")
-
-            if self.project_name not in self.lancedb.table_names():
-                table = self.lancedb.create_table(name=self.project_name, data=rows)
-            else:
-                table = self.lancedb.open_table(self.project_name)
-                table.add(data=rows)
-
-            logger.info(f"Wrote {len(embeddings)} embeddings to {table.name} table")
 
 
 def main(pdf_directory: str):
