@@ -1,4 +1,3 @@
-import { FileEntry } from '@tauri-apps/api/fs';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback } from 'react';
 import { Panel, PanelGroup } from 'react-resizable-panels';
@@ -7,6 +6,7 @@ import { activateFileInPaneAtom, closeFileInPaneAtom, leftPaneAtom, rightPaneAto
 import { TabPane } from '../components/TabPane';
 import { VerticalResizeHandle } from '../components/VerticalResizeHandle';
 import { EditorAPI } from '../types/EditorAPI';
+import { FileEntry } from '../types/FileEntry';
 import { PdfViewerAPI } from '../types/PdfViewerAPI';
 import { EmptyView } from '../views/EmptyView';
 import { PdfViewer } from '../views/PdfViewer';
@@ -75,7 +75,7 @@ export function MainPanelPane({
 }: MainPanelPaneProps & MainPanelProps) {
   const items = files.map((file) => ({
     key: file.path,
-    text: file.name ?? '',
+    text: file.name,
     value: file.path,
   }));
 
