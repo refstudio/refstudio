@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from sidecar import prompts
 
 load_dotenv()
-openai.api_key = os.environ["OPENAI_API_KEY"]
+openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 
 def summarize(text: str, n_options: int = 1) -> str:
