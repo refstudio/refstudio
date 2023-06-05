@@ -14,7 +14,6 @@ export type ReferenceListProps = SuggestionProps<{ id: string; label: string }>;
 
 export const ReferencesList = forwardRef((props: ReferenceListProps, ref) => {
   const { command, clientRect, query } = props;
-  console.log(clientRect?.());
   const [selectedIndex, setSelectedIndex] = useState(0);
   const references = useAtomValue(getReferencesAtom);
   const queriedReferences = useMemo(

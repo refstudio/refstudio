@@ -1,13 +1,8 @@
 import { useAtomValue, useSetAtom } from 'jotai';
+import { useState } from 'react';
 import { FileUploader } from 'react-drag-drop-files';
 
-import {
-  addPdfIngestionProcessAtom,
-  getReferencesAtom,
-  isPdfIngestionRunningAtom,
-  removePdfIngestionProcessAtom,
-  setReferencesAtom,
-} from '../atoms/referencesState';
+import { getReferencesAtom, setReferencesAtom } from '../atoms/referencesState';
 import { PanelSection } from '../components/PanelSection';
 import { PanelWrapper } from '../components/PanelWrapper';
 import { Spinner } from '../components/Spinner';
@@ -23,26 +18,24 @@ interface ReferencesPanelProps {
 export function ReferencesPanel({ onRefClicked }: ReferencesPanelProps) {
   const references = useAtomValue(getReferencesAtom);
   const setReferences = useSetAtom(setReferencesAtom);
-  const isPdfIngestionLoading = useAtomValue(isPdfIngestionRunningAtom);
-  const addPdfIngestionProcess = useSetAtom(addPdfIngestionProcessAtom);
-  const removePdfIngestionProcess = useSetAtom(removePdfIngestionProcessAtom);
+
+  const [isPdfIngestionRunning, setIsPdfIngestionRunning] = useState(false);
 
   async function handleChange(uploadedFiles: FileList) {
-    // Using the current timestamp as the processId
-    const processId = Date.now().toString();
     try {
-      addPdfIngestionProcess(processId);
-
+      // Upload files
       await uploadFiles(uploadedFiles);
       console.log('File uploaded with success');
 
+      // Ingest files
+      setIsPdfIngestionRunning(true);
       const updatedReferences = await runPDFIngestion();
       setReferences(updatedReferences);
       console.log('PDFs ingested with success');
     } catch (err) {
       console.error('Error uploading references', err);
     } finally {
-      removePdfIngestionProcess(processId);
+      setIsPdfIngestionRunning(false);
     }
   }
 
@@ -64,7 +57,7 @@ export function ReferencesPanel({ onRefClicked }: ReferencesPanelProps) {
             </li>
           ))}
         </ul>
-        {isPdfIngestionLoading && (
+        {isPdfIngestionRunning && (
           <div className="flex w-full flex-col justify-center">
             <Spinner />
           </div>
@@ -72,7 +65,13 @@ export function ReferencesPanel({ onRefClicked }: ReferencesPanelProps) {
         <p className="my-4 text-sm italic">Click on a reference to add it to the document.</p>
       </PanelSection>
       <PanelSection title="Upload">
-        <FileUploader handleChange={handleChange} label="Upload or drop a file right here" multiple name="file" />
+        <FileUploader
+          disabled={isPdfIngestionRunning}
+          handleChange={handleChange}
+          label="Upload or drop a file right here"
+          multiple
+          name="file"
+        />
         <code className="mb-auto mt-10 block text-xs font-normal">{BASE_DIR}</code>
       </PanelSection>
     </PanelWrapper>
