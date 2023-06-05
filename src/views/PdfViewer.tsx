@@ -5,8 +5,9 @@ import { FileEntry } from '@tauri-apps/api/fs';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 
-import { readFile } from '../filesystem';
+import { readFileEntryAsBinary } from '../filesystem';
 import { useDebouncedCallback } from '../hooks/useDebouncedCallback';
+import { usePromise } from '../hooks/usePromise';
 import { PdfViewerAPI } from '../types/PdfViewerAPI';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).toString();
@@ -17,11 +18,10 @@ interface PdfViewerProps {
 }
 
 export function PdfViewer({ file, pdfViewerRef }: PdfViewerProps) {
-  const [numPages, setNumPages] = useState<number | null>(null);
+  const loadFile = useCallback(() => readFileEntryAsBinary(file), [file]);
+  const loadFileState = usePromise(loadFile);
 
-  const [fileContent, setFileContent] = useState<{ data: Uint8Array } | null>(null);
-  const [isFileLoading, setIsFileLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [numPages, setNumPages] = useState<number | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [pdfViewerWidth, setPdfViewerWidth] = useState<number>();
@@ -53,47 +53,28 @@ export function PdfViewer({ file, pdfViewerRef }: PdfViewerProps) {
     };
   }, [pdfViewerRef, debouncedUpdateWidth]);
 
-  useEffect(() => {
-    setNumPages(null);
-    setIsFileLoading(true);
-    (async () => {
-      try {
-        const content = await readFile(file);
-        setFileContent({ data: content });
-        setIsFileLoading(false);
-      } catch (err) {
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          console.error(err);
-          setError('Unknown error');
-        }
-      }
-    })();
-  }, [file]);
-
   const onDocumentLoadSuccess = (pdf: { numPages: number }) => {
     setNumPages(pdf.numPages);
   };
 
-  if (error) {
-    return <div>An error occured while opening the selected file: {error}</div>;
-  }
-
-  if (isFileLoading) {
+  if (loadFileState.state === 'loading') {
     return (
       <div>
-        <strong>Loading</strong>
+        <strong>Loading ...</strong>
       </div>
     );
   }
 
+  if (loadFileState.state === 'error') {
+    return <div>An error occured while opening the selected file: {String(loadFileState.error)}</div>;
+  }
+
   return (
-    <div className="pdf-viewer flex h-full flex-col" ref={containerRef}>
+    <div className="pdf-viewer flex h-full w-full flex-col" ref={containerRef}>
       <Document
-        className="flex-1 overflow-scroll"
+        className="flex-1 overflow-y-auto"
         externalLinkTarget="_blank"
-        file={fileContent}
+        file={{ data: loadFileState.data }}
         onLoadSuccess={onDocumentLoadSuccess}
       >
         {numPages &&

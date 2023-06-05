@@ -1,0 +1,122 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  setup-js:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-node
+
+  # setup-rust:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+  #     - uses: ./.github/actions/setup-rust
+
+  setup-python:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-python
+
+  # commitlint:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+  #       with:
+  #         fetch-depth: 0
+  #     - name: Commit Lint
+  #       uses: wagoid/commitlint-github-action@v5.4.1
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  eslint:
+    needs: setup-js
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node
+      - name: ESLint
+        run: yarn run lint:check
+
+  typescript:
+    needs: setup-js
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node
+      - name: Typescript Check
+        run: yarn run ts:check
+
+  prettier:
+    needs: setup-js
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node
+      - name: Prettier
+        run: yarn run prettier:check
+
+  pylint:
+    needs: setup-python
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: ./.github/actions/setup-python
+      - name: PyLint
+        run: poetry run ruff check ./python
+
+  pytest:
+    needs: setup-python
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: ./.github/actions/setup-python
+      - name: PyTest
+        run: poetry run pytest python/tests
+
+  # constraints:
+  #   needs: setup-js
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+  #     - name: Setup Node.js
+  #       uses: ./.github/actions/setup-node
+  #     - name: Constraints
+  #       run: yarn constraints
+
+  # jest:
+  #   needs: [setup-js, setup-python, setup-rust]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+  #     - name: Setup Node.js
+  #       uses: ./.github/actions/setup-node
+  #     - name: Setup Rust
+  #       uses: ./.github/actions/setup-rust
+  #     - name: Setup Python
+  #       uses: ./.github/actions/setup-python
+  #     - name: Jest
+  #       run: yarn run jest
