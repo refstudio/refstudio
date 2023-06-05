@@ -100,15 +100,15 @@ export function MainPaneViewContent({ activeFile, editorRef, pdfViewerRef }: Mai
     return <EmptyView />;
   }
 
-  if (activeFile.path.endsWith('.xml')) {
+  if (activeFile.fileExtension === 'xml') {
     return <TextView file={activeFile} />;
   }
 
-  if (activeFile.path.endsWith('.json')) {
+  if (activeFile.fileExtension === 'json') {
     return <TextView file={activeFile} textFormatter={(input) => JSON.stringify(JSON.parse(input), null, 2)} />;
   }
 
-  if (activeFile.path.endsWith('.pdf')) {
+  if (activeFile.fileExtension === 'pdf') {
     return <PdfViewer file={activeFile} pdfViewerRef={pdfViewerRef} />;
   }
 

@@ -43,7 +43,7 @@ export async function ensureProjectFileStructure() {
 }
 export async function readAllProjectFiles() {
   const entries = await readDir(await getBaseDir(), { recursive: true });
-  const fileEntries = entries.map(convertToFileEntry);
+  const fileEntries = entries.map(convertTauriFileEntryToFileEntry);
   return sortedFileEntries(fileEntries);
 }
 
@@ -74,20 +74,26 @@ export async function readFileEntryAsText(file: FileEntry) {
   return readTextFile(file.path);
 }
 
-function convertToFileEntry(entry: TauriFileEntry): FileEntry {
+function convertTauriFileEntryToFileEntry(entry: TauriFileEntry): FileEntry {
   const isFolder = !!entry.children;
+
+  const name = entry.name ?? '';
+  const fileExtension = name.split('.').pop()?.toLowerCase() ?? '';
+
   if (isFolder) {
     return {
-      name: entry.name ?? '',
+      name,
       path: entry.path,
+      fileExtension,
       isFolder,
       isFile: !isFolder,
-      children: entry.children!.map(convertToFileEntry),
+      children: entry.children!.map(convertTauriFileEntryToFileEntry),
     };
   } else {
     return {
-      name: entry.name ?? '',
+      name,
       path: entry.path,
+      fileExtension,
       isFolder,
       isFile: !isFolder,
     };

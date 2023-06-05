@@ -1,6 +1,7 @@
 interface FileEntryBase {
   name: string;
   path: string;
+  fileExtension: string;
 }
 
 interface FileFileEntry extends FileEntryBase {
