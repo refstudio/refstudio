@@ -78,20 +78,19 @@ function convertTauriFileEntryToFileEntry(entry: TauriFileEntry): FileEntry {
   const isFolder = !!entry.children;
 
   const name = entry.name ?? '';
-  const fileExtension = name.split('.').pop()?.toLowerCase() ?? '';
   const isDotfile = name.startsWith('.');
 
   if (isFolder) {
     return {
       name,
       path: entry.path,
-      fileExtension,
       isFolder,
       isFile: !isFolder,
       isDotfile,
       children: entry.children!.map(convertTauriFileEntryToFileEntry),
     };
   } else {
+    const fileExtension = name.split('.').pop()?.toLowerCase() ?? '';
     return {
       name,
       path: entry.path,

@@ -96,7 +96,7 @@ interface MainPaneViewContentProps {
 }
 
 export function MainPaneViewContent({ activeFile, editorRef, pdfViewerRef }: MainPaneViewContentProps) {
-  if (!activeFile) {
+  if (!activeFile || activeFile.isFolder) {
     return <EmptyView />;
   }
 
