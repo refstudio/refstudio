@@ -7,7 +7,7 @@ import { selectionAtom } from '../atoms/selectionState';
 import { PanelSection } from '../components/PanelSection';
 import { PanelWrapper } from '../components/PanelWrapper';
 
-export function AIPanel() {
+export function AIPanel({ onCloseClick }: { onCloseClick?: () => void }) {
   const [reply, setReply] = useState('');
 
   const selection = useAtomValue(selectionAtom);
@@ -23,7 +23,7 @@ export function AIPanel() {
   }, [selection]);
 
   return (
-    <PanelWrapper title="AI">
+    <PanelWrapper close title="AI" onCloseClick={onCloseClick}>
       <PanelSection title="Selection">
         <p className="my-4 italic">Select some text in the editor to see it here.</p>
 
