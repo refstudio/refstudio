@@ -1,6 +1,6 @@
 import './TipTapEditor.css';
 
-import { Editor, EditorContent } from '@tiptap/react';
+import { BubbleMenu, Editor, EditorContent } from '@tiptap/react';
 import { useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 
@@ -25,12 +25,6 @@ export function TipTapEditor({ editorRef, editorContent }: EditorProps) {
       new Editor({
         extensions: EDITOR_EXTENSIONS,
         content: editorContent ?? INITIAL_CONTENT,
-        onSelectionUpdate(update) {
-          const newEditor = update.editor;
-          const { from, to } = newEditor.view.state.selection;
-          const text = newEditor.view.state.doc.textBetween(from, to);
-          setSelection(text);
-        },
       }),
     );
   }, [editorContent, setSelection]);
@@ -49,6 +43,15 @@ export function TipTapEditor({ editorRef, editorContent }: EditorProps) {
     };
   }, [editor, editorRef]);
 
+  const handleSendToAi = () => {
+    if (!editor) {
+      return;
+    }
+    const { from, to } = editor.view.state.selection;
+    const text = editor.view.state.doc.textBetween(from, to);
+    setSelection(text);
+  };
+
   if (!editor) {
     return <div>...</div>;
   }
@@ -56,6 +59,13 @@ export function TipTapEditor({ editorRef, editorContent }: EditorProps) {
   return (
     <div className="flex h-full w-full flex-col">
       <MenuBar editor={editor} />
+      <BubbleMenu
+        className="rounded-md bg-slate-200 p-1"
+        editor={editor}
+        tippyOptions={{ duration: 100, placement: 'top' }}
+      >
+        <button onClick={handleSendToAi}>Send to AI</button>
+      </BubbleMenu>
       <EditorContent className="tiptap-editor flex-1 overflow-y-scroll pl-5 pr-2 pt-4" editor={editor} />
     </div>
   );

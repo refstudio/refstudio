@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@tauri-apps/api": "^1.2.0",
+    "@tiptap/extension-bubble-menu": "^2.0.3",
     "@tiptap/extension-code-block-lowlight": "^2.0.3",
     "@tiptap/extension-color": "^2.0.3",
     "@tiptap/extension-mention": "^2.0.3",

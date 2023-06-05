@@ -1,3 +1,4 @@
+import BubbleMenu from '@tiptap/extension-bubble-menu';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import Color from '@tiptap/extension-color';
 import ListItem from '@tiptap/extension-list-item';
@@ -37,6 +38,7 @@ export const EDITOR_EXTENSIONS: Extensions = [
       keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
     },
   }),
+  BubbleMenu,
 ];
 export const INITIAL_CONTENT = `
   <h2>Hi there,</h2>
