@@ -7,7 +7,8 @@ import { useEffect, useState } from 'react';
 import { selectionAtom } from '../atoms/selectionState';
 import { EditorAPI } from '../types/EditorAPI';
 import { MenuBar } from './MenuBar';
-import { ReferenceNode } from './ReferenceBlock/ReferenceNode';
+import { ReferenceNode } from './ReferenceNode/ReferenceNode';
+import { getReferenceLabel } from './ReferenceNode/ReferencesList';
 import { EDITOR_EXTENSIONS, INITIAL_CONTENT } from './TipTapEditorConfigs';
 
 interface EditorProps {
@@ -42,7 +43,7 @@ export function TipTapEditor({ editorRef, editorContent }: EditorProps) {
       insertReference(reference) {
         editor.commands.insertContentAt(editor.state.selection.head, {
           type: ReferenceNode.name,
-          attrs: { id: reference.id },
+          attrs: { id: reference.id, label: getReferenceLabel(reference) },
         });
       },
     };
