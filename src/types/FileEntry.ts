@@ -2,6 +2,7 @@ interface FileEntryBase {
   name: string;
   path: string;
   fileExtension: string;
+  isDotfile: boolean;
 }
 
 interface FileFileEntry extends FileEntryBase {
