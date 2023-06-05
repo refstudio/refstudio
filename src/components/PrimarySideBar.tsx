@@ -8,7 +8,7 @@ export function PrimarySideBar({
   activePane,
   onClick,
 }: {
-  activePane: PrimarySideBarPane;
+  activePane: PrimarySideBarPane | null;
   onClick: (clicked: PrimarySideBarPane) => void;
 }) {
   return (
