@@ -83,10 +83,13 @@ function RightPanelWrapper() {
   if (closed) {
     return (
       <div className="absolute bottom-0 right-0 flex border border-slate-300 bg-slate-100 px-4 py-2">
-        <div className="flex w-60 items-center justify-between">
+        <div
+          className="flex w-60 cursor-pointer select-none items-center justify-between"
+          onClick={() => setClosed(false)}
+        >
           <div>AI</div>
           <div>
-            <VscChevronUp onClick={() => setClosed(false)} />
+            <VscChevronUp />
           </div>
         </div>
       </div>

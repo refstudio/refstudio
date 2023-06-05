@@ -23,7 +23,7 @@ export function AIPanel({ onCloseClick }: { onCloseClick?: () => void }) {
   }, [selection]);
 
   return (
-    <PanelWrapper close title="AI" onCloseClick={onCloseClick}>
+    <PanelWrapper closable title="AI" onCloseClick={onCloseClick}>
       <PanelSection title="Selection">
         <p className="my-4 italic">Select some text in the editor to see it here.</p>
 
