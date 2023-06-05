@@ -43,7 +43,7 @@ export function TipTapEditor({ editorRef, editorContent }: EditorProps) {
     };
   }, [editor, editorRef]);
 
-  const handleSendToAi = () => {
+  const handleSendSelectionToAi = () => {
     if (!editor) {
       return;
     }
@@ -64,7 +64,7 @@ export function TipTapEditor({ editorRef, editorContent }: EditorProps) {
         editor={editor}
         tippyOptions={{ duration: 100, placement: 'top' }}
       >
-        <button onClick={handleSendToAi}>Send to AI</button>
+        <button onClick={handleSendSelectionToAi}>Send to AI</button>
       </BubbleMenu>
       <EditorContent className="tiptap-editor flex-1 overflow-y-scroll pl-5 pr-2 pt-4" editor={editor} />
     </div>
