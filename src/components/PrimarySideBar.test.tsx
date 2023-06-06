@@ -1,4 +1,4 @@
-import { render, screen } from '../utils/test-utils';
+import { render, screen, userEvent } from '../utils/test-utils';
 import { PrimarySideBar } from './PrimarySideBar';
 
 describe('PrimarySideBar', () => {
@@ -19,5 +19,14 @@ describe('PrimarySideBar', () => {
     render(<PrimarySideBar activePane="References" onClick={() => 0} />);
     expect(screen.getByRole('menubar')).toBeDefined();
     expect(screen.getByRole('menuitem', { name: 'Explorer' })).toHaveClass('opacity-50');
+  });
+
+  it('should call onClick with pane name', async () => {
+    const fn = vi.fn();
+    render(<PrimarySideBar activePane="References" onClick={fn} />);
+
+    await userEvent.setup().click(screen.getByRole('menuitem', { name: 'Explorer' }));
+    expect(fn).toBeCalled();
+    expect(fn).toBeCalledWith('Explorer');
   });
 });
