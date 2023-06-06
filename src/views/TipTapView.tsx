@@ -1,4 +1,3 @@
-
 import { TipTapEditor } from '../TipTapEditor/TipTapEditor';
 import { EditorAPI } from '../types/EditorAPI';
 import { TipTapFileContent } from '../types/FileContent';
