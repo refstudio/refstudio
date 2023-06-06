@@ -21,7 +21,6 @@
     "test": "vitest run",
     "test:watch": "vitest --watch",
     "coverage": "vitest run --coverage",
-    "coverage:html": "vitest run --coverage --reporter html",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "tauri:dev:debug": "DEV_TOOLS=1 tauri dev"
