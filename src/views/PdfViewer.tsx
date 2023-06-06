@@ -1,13 +1,13 @@
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
-import { FileEntry } from '@tauri-apps/api/fs';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 
 import { readFileEntryAsBinary } from '../filesystem';
 import { useDebouncedCallback } from '../hooks/useDebouncedCallback';
 import { usePromise } from '../hooks/usePromise';
+import { FileEntry } from '../types/FileEntry';
 import { PdfViewerAPI } from '../types/PdfViewerAPI';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).toString();
