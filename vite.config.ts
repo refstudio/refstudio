@@ -27,6 +27,9 @@ export default defineConfig(async () => ({
   test: {
     coverage: {
       provider: 'c8',
+      // Instrument all files: https://github.com/bcoe/c8#checking-for-full-source-coverage-using---all
+      all: true,
+      include: ['src/**'],
     },
     globals: true,
     environment: 'jsdom',
