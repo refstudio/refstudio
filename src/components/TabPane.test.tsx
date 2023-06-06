@@ -44,7 +44,7 @@ describe('TabPane component', () => {
     );
     expect(screen.getAllByRole('tablist').length).toBe(1);
     expect(screen.getAllByRole('tab').length).toBe(2);
-    expect(screen.getByRole('tab', { selected: true, name: 'File 1.txt' })).toBeDefined();
+    expect(screen.getByRole('tab', { selected: true, name: 'File 1.txt' })).toBeInTheDocument();
   });
 
   it('should call onClick when clicked', async () => {
