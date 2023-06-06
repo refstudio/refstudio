@@ -1,27 +1,15 @@
-import { useEffect, useState } from 'react';
-
-import { readFileEntryAsText } from '../filesystem';
-import { FileEntry } from '../types/FileEntry';
+import { JsonFileContent, XmlFileContent } from '../types/FileContent';
 
 export function TextView({
   file,
   textFormatter = (text) => text,
 }: {
-  file: FileEntry;
+  file: XmlFileContent | JsonFileContent;
   textFormatter?: (input: string) => string;
 }) {
-  const [content, setContent] = useState('Loading...');
-
-  useEffect(() => {
-    (async () => {
-      const text = await readFileEntryAsText(file);
-      setContent(textFormatter(text));
-    })();
-  }, [file, textFormatter]);
-
   return (
     <div className="ml-1 h-full w-full overflow-y-auto p-2">
-      <pre className="text-xs">{content}</pre>
+      <pre className="text-xs">{textFormatter(file.textContent)}</pre>
     </div>
   );
 }

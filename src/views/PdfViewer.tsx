@@ -4,23 +4,18 @@ import 'react-pdf/dist/esm/Page/TextLayer.css';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 
-import { readFileEntryAsBinary } from '../filesystem';
 import { useDebouncedCallback } from '../hooks/useDebouncedCallback';
-import { usePromise } from '../hooks/usePromise';
-import { FileEntry } from '../types/FileEntry';
+import { PdfFileContent } from '../types/FileContent';
 import { PdfViewerAPI } from '../types/PdfViewerAPI';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).toString();
 
 interface PdfViewerProps {
-  file: FileEntry;
+  file: PdfFileContent;
   pdfViewerRef: React.MutableRefObject<PdfViewerAPI | null>;
 }
 
 export function PdfViewer({ file, pdfViewerRef }: PdfViewerProps) {
-  const loadFile = useCallback(() => readFileEntryAsBinary(file), [file]);
-  const loadFileState = usePromise(loadFile);
-
   const [numPages, setNumPages] = useState<number | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -57,24 +52,12 @@ export function PdfViewer({ file, pdfViewerRef }: PdfViewerProps) {
     setNumPages(pdf.numPages);
   };
 
-  if (loadFileState.state === 'loading') {
-    return (
-      <div>
-        <strong>Loading ...</strong>
-      </div>
-    );
-  }
-
-  if (loadFileState.state === 'error') {
-    return <div>An error occured while opening the selected file: {String(loadFileState.error)}</div>;
-  }
-
   return (
     <div className="pdf-viewer flex h-full w-full flex-col" ref={containerRef}>
       <Document
         className="flex-1 overflow-y-auto"
         externalLinkTarget="_blank"
-        file={{ data: loadFileState.data }}
+        file={{ data: file.binaryContent }}
         onLoadSuccess={onDocumentLoadSuccess}
       >
         {numPages &&
