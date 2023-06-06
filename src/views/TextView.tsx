@@ -1,7 +1,7 @@
-import { FileEntry } from '@tauri-apps/api/fs';
 import { useEffect, useState } from 'react';
 
 import { readFileEntryAsText } from '../filesystem';
+import { FileEntry } from '../types/FileEntry';
 
 export function TextView({
   file,

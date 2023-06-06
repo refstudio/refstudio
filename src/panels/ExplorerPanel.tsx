@@ -1,4 +1,3 @@
-import { FileEntry } from '@tauri-apps/api/fs';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import { VscSplitHorizontal } from 'react-icons/vsc';
@@ -16,6 +15,7 @@ import { PanelSection } from '../components/PanelSection';
 import { PanelWrapper } from '../components/PanelWrapper';
 import { readAllProjectFiles } from '../filesystem';
 import { isNonNullish } from '../lib/isNonNullish';
+import { FileEntry } from '../types/FileEntry';
 
 export function ExplorerPanel() {
   const left = useAtomValue(leftPaneAtom);
