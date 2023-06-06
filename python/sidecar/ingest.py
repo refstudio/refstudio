@@ -84,12 +84,18 @@ class PDFIngestion:
             # thus, HiddenPrint (https://stackoverflow.com/a/45669280)
             client = GrobidClient(GROBID_SERVER_URL, timeout=GROBID_TIMEOUT)
 
-        client.process(
-            "processFulltextDocument",
-            input_path=self.input_dir,
-            output=self.grobid_output_dir,
-            force=True
-        )
+            # If an error occurs during processing, the Grobid Server will
+            # print out error messages to stdout, rather than using HTTP status codes
+            # or raising an exception. So this line also needs to be wrapped
+            # in HiddenPrints.
+            # Grobid will still create the output file, even if an error occurs,
+            # however it will be a txt file with a name like {filename}_{errorcode}.txt
+            client.process(
+                "processFulltextDocument",
+                input_path=self.input_dir,
+                output=self.grobid_output_dir,
+                force=True
+            )
         logger.info("Finished calling Grobid server")
 
     def convert_grobid_xml_to_json(self) -> None:
