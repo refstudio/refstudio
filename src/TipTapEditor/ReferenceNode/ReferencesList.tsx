@@ -9,6 +9,7 @@ import { usePopper } from 'react-popper';
 import { getReferencesAtom } from '../../atoms/referencesState';
 import { cx } from '../../cx';
 import { ReferenceItem } from '../../types/ReferenceItem';
+import { getReferenceFilter } from './utils';
 
 export type ReferenceListProps = SuggestionProps<{ id: string; label: string }>;
 
@@ -16,12 +17,14 @@ export const ReferencesList = forwardRef((props: ReferenceListProps, ref) => {
   const { command, clientRect, query } = props;
   const [selectedIndex, setSelectedIndex] = useState(0);
   const references = useAtomValue(getReferencesAtom);
+
+  const referenceFilter = useMemo(() => getReferenceFilter(query), [query]);
   const queriedReferences = useMemo(
     () =>
-      Object.values(references)
-        .filter((referenceItem) => referenceItem.title.toLowerCase().includes(query.toLowerCase()))
+      references
+        .filter(referenceFilter)
         .slice(0, 5),
-    [references, query],
+    [references, referenceFilter],
   );
   const referenceElement = useMemo(
     () => (clientRect ? { getBoundingClientRect: () => clientRect()! } : null),
