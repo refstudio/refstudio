@@ -1,4 +1,4 @@
-export interface PdfIngestionResponse {
+export interface RawPdfIngestionResponse {
   project_name: string;
   references: RawReference[];
 }
