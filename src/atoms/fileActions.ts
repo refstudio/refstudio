@@ -1,7 +1,7 @@
 import { atom } from 'jotai';
 
 import { FileEntry } from '../types/FileEntry';
-import { _activePaneAtom } from './core/activePaneAtom';
+import { _activePaneAtom, _activePaneIdAtom } from './core/activePaneAtom';
 import { FileId, PaneFileId, PaneId } from './core/atom.types';
 import { _fileContentAtom, _loadFileInMemory, _unloadFileFromMemory } from './core/fileContentAtom';
 import { _addFileEntry, _removeFileEntry } from './core/fileEntryAtom';
@@ -82,4 +82,8 @@ export const splitFileToPaneAtom = atom(null, (_get, set, { fileId, fromPaneId, 
   set(_removeFileFromPane, { paneId: fromPaneId, fileId });
   set(_addFileToPane, { paneId: toPaneId, fileId });
   set(_selectFileInPaneAtom, { paneId: toPaneId, fileId });
+});
+
+export const focusPaneAtom = atom(null, (_get, set, paneId: PaneId) => {
+  set(_activePaneIdAtom, paneId);
 });

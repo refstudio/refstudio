@@ -6,3 +6,7 @@ export interface PaneFileId {
   paneId: PaneId;
   fileId: FileId;
 }
+export interface PaneState {
+  openFiles: FileId[];
+  activeFile?: FileId;
+}

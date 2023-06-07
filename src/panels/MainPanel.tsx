@@ -5,7 +5,7 @@ import { Panel, PanelGroup } from 'react-resizable-panels';
 
 import { FileId } from '../atoms/core/atom.types';
 import { _selectFileInPaneAtom } from '../atoms/core/paneGroupAtom';
-import { closeFileFromPaneAtom, leftPaneAtom, rightPaneAtom } from '../atoms/fileActions';
+import { closeFileFromPaneAtom, focusPaneAtom, leftPaneAtom, rightPaneAtom } from '../atoms/fileActions';
 import { Spinner } from '../components/Spinner';
 import { TabPane } from '../components/TabPane';
 import { VerticalResizeHandle } from '../components/VerticalResizeHandle';
@@ -29,6 +29,7 @@ export function MainPanel(props: MainPanelProps) {
   const right = useAtomValue(rightPaneAtom);
   const activateFileInPane = useSetAtom(_selectFileInPaneAtom);
   const closeFileInPane = useSetAtom(closeFileFromPaneAtom);
+  const focusPane = useSetAtom(focusPaneAtom);
 
   const updatePDFViewerWidth = useCallback(() => {
     pdfViewerRef.current?.updateWidth();
@@ -44,6 +45,7 @@ export function MainPanel(props: MainPanelProps) {
             files={left.files}
             handleTabClick={(path) => activateFileInPane({ paneId: left.id, fileId: path })}
             handleTabCloseClick={(path) => closeFileInPane({ paneId: left.id, fileId: path })}
+            onPaneFocused={() => focusPane('LEFT')}
             {...props}
           />
         </Panel>
@@ -56,6 +58,7 @@ export function MainPanel(props: MainPanelProps) {
               files={right.files}
               handleTabClick={(path) => activateFileInPane({ paneId: right.id, fileId: path })}
               handleTabCloseClick={(path) => closeFileInPane({ paneId: right.id, fileId: path })}
+              onPaneFocused={() => focusPane('RIGHT')}
               {...props}
             />
           </Panel>
@@ -71,6 +74,7 @@ interface MainPanelPaneProps {
   activeFileAtom?: Atom<Loadable<Promise<FileContent>>>;
   handleTabClick(path: string): void;
   handleTabCloseClick(path: string): void;
+  onPaneFocused(): void;
 }
 
 export function MainPanelPane({
@@ -80,6 +84,7 @@ export function MainPanelPane({
   handleTabClick,
   handleTabCloseClick,
   editorRef,
+  onPaneFocused,
   pdfViewerRef,
 }: MainPanelPaneProps & MainPanelProps) {
   const items = files.map((file) => ({
@@ -89,7 +94,7 @@ export function MainPanelPane({
   }));
 
   return (
-    <div className="h-full grid-cols-1 grid-rows-[auto_1fr]">
+    <div className="h-full grid-cols-1 grid-rows-[auto_1fr]" onClick={onPaneFocused} onFocus={onPaneFocused}>
       <TabPane items={items} value={activeFile?.path} onClick={handleTabClick} onCloseClick={handleTabCloseClick} />
       <div className="flex h-full w-full overflow-hidden">
         {activeFile && activeFileAtom ? (

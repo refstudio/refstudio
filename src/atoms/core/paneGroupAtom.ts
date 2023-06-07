@@ -3,16 +3,10 @@ import { atom, Getter } from 'jotai';
 
 import { isNonNullish } from '../../lib/isNonNullish';
 import { _activePaneIdAtom } from './activePaneAtom';
-import { FileId, PaneFileId, PaneId } from './atom.types';
+import { PaneFileId, PaneId, PaneState } from './atom.types';
 import { _fileContentAtom } from './fileContentAtom';
 import { _fileEntryAtom } from './fileEntryAtom';
 
-export const DEFAULT_PANE: PaneId = 'LEFT';
-
-export interface PaneState {
-  openFiles: FileId[];
-  activeFile?: FileId;
-}
 type PaneGroupState = Record<PaneId, PaneState>;
 
 // Base atom

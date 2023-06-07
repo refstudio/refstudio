@@ -1,8 +1,10 @@
 /* eslint-disable no-underscore-dangle */
 import { atom } from 'jotai';
 
-import { PaneId } from './atom.types';
-import { _paneGroupAtom, DEFAULT_PANE, PaneState } from './paneGroupAtom';
+import { PaneId, PaneState } from './atom.types';
+import { _paneGroupAtom } from './paneGroupAtom';
+
+const DEFAULT_PANE: PaneId = 'LEFT';
 
 export const _activePaneIdAtom = atom<PaneId>(DEFAULT_PANE);
 
