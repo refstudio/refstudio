@@ -27,7 +27,7 @@ export function PrimarySideBar({
           onClick={(evt) => {
             evt.preventDefault();
             evt.stopPropagation();
-            onClick('References');
+            onClick(pane);
           }}
         />
       ))}
