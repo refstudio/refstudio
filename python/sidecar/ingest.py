@@ -4,7 +4,7 @@ import os
 import sys
 from dataclasses import asdict
 from pathlib import Path
-from typing import List
+from typing import Dict, List
 
 import grobid_tei_xml
 from grobid_client.grobid_client import GrobidClient
@@ -12,13 +12,21 @@ from grobid_client.grobid_client import GrobidClient
 from .shared import HiddenPrints, chunk_text, get_filename_md5
 from .typing import Author, Reference
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logging.root.setLevel(logging.NOTSET)
 
-stream_handler = logging.StreamHandler()
-stream_handler.setLevel(logging.INFO)
-logger.addHandler(stream_handler)
-logger.disabled = True
+logger = logging.getLogger(__name__)
+handler = logging.FileHandler(
+    os.path.join(
+        os.environ.get("SIDECAR_LOG_DIR", "/tmp"), "refstudio-sidecar.log"
+    )
+)
+handler.setLevel(logging.INFO)
+
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+
+logger.addHandler(handler)
+logger.disabled = os.environ.get("SIDECAR_ENABLE_LOGGING", "false").lower() == "true"
 
 GROBID_SERVER_URL = "https://kermitt2-grobid.hf.space"
 GROBID_TIMEOUT = 60 * 5
@@ -34,12 +42,16 @@ class PDFIngestion:
         self.storage_dir = input_dir.parent.joinpath('.storage')
 
     def run(self):
+        logger.info(f"Starting ingestion for project: {self.project_name}")
+        logger.info(f"Input directory: {self.input_dir}")
         self._create_directories()
         self.call_grobid_server()
         self.convert_grobid_xml_to_json()
         references = self.create_references()
         response = self.create_response_from_references(references)
         sys.stdout.write(json.dumps(response))
+        logger.info(f"Finished ingestion for project: {self.project_name}")
+        logger.info(f"Response: {response}")
 
     def _create_directories(self) -> None:
         if not self.grobid_output_dir.exists():
@@ -97,6 +109,33 @@ class PDFIngestion:
                 force=True
             )
         logger.info("Finished calling Grobid server")
+        _ = self._get_grobid_output_statuses()
+    
+    def _get_grobid_output_statuses(self) -> Dict[Path, str]:
+        """
+        Determines the status of Grobid output files.
+        """
+        # xml files represent Grobid parsing successes - {filename}.tei.xml
+        xml_filestems = [
+            f.stem.rpartition(".")[0] for f in self.grobid_output_dir.glob("*.xml")
+        ]
+        # txt files represent Grobid parsing failures - {filename}_{error}.txt
+        txt_filestems = [
+            f.stem.rpartition("_")[0] for f in self.grobid_output_dir.glob("*.txt")
+        ]
+
+        statuses = {}
+        for file in self.input_dir.glob("*.pdf"):
+            if file.stem in xml_filestems:
+                logger.info(f"Grobid successfully parsed file: {file.name}")
+                statuses[file.name] = "success"
+            elif file.stem in txt_filestems:
+                logger.warning(f"Grobid failed to parse file: {file.name}")
+                statuses[file.name] = "failure"
+            else:
+                logger.warning(f"Grobid did not create an output file: {file.name}")
+                statuses[file.name] = "not_found"
+        return statuses
 
     def convert_grobid_xml_to_json(self) -> None:
         xml_files = list(self.grobid_output_dir.glob("*.xml"))
@@ -177,6 +216,8 @@ class PDFIngestion:
 
         references = []
         for file in json_files:
+            logger.info(f"Creating Reference from file: {file.name}")
+
             with open(file, 'r') as fin:
                 doc = json.load(fin)
 
@@ -220,7 +261,5 @@ class PDFIngestion:
 
 def main(pdf_directory: str):
     pdf_directory = Path(pdf_directory)
-
-    logger.info(f"PDF directory => {pdf_directory}")
     ingest = PDFIngestion(input_dir=pdf_directory)
     ingest.run()
