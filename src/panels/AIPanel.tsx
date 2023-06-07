@@ -7,16 +7,16 @@ import { selectionAtom } from '../atoms/selectionState';
 import { PanelSection } from '../components/PanelSection';
 import { PanelWrapper } from '../components/PanelWrapper';
 
-export function AIPanel() {
+export function AIPanel({ onCloseClick }: { onCloseClick?: () => void }) {
   const selection = useAtomValue(selectionAtom);
   const debouncedSelection = useDebounce(selection, 200);
+
+  const [rewriteReply, setRewriteReply] = useState('');
+  const [loadingRewrite, setLoadingRewrite] = useState(false);
 
   useEffect(() => {
     setRewriteReply('');
   }, [debouncedSelection]);
-
-  const [rewriteReply, setRewriteReply] = useState('');
-  const [loadingRewrite, setLoadingRewrite] = useState(false);
 
   function handleRewriteClick() {
     (async function run() {
@@ -33,7 +33,7 @@ export function AIPanel() {
   }
 
   return (
-    <PanelWrapper title="AI">
+    <PanelWrapper closable title="AI" onCloseClick={onCloseClick}>
       <PanelSection title="Selection">
         <p className="my-4 italic">Select some text in the editor to see it here.</p>
 
