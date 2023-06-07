@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { VscChevronUp } from 'react-icons/vsc';
 import { ImperativePanelHandle, Panel, PanelGroup } from 'react-resizable-panels';
 
@@ -79,28 +79,34 @@ function LeftSidePanelWrapper({ onRefClicked }: { onRefClicked(item: ReferenceIt
 
 function RightPanelWrapper() {
   const [closed, setClosed] = React.useState(false);
+  const panelRef = React.useRef<ImperativePanelHandle>(null);
 
-  if (closed) {
-    return (
-      <div className="absolute bottom-0 right-0 flex border border-slate-300 bg-slate-100 px-4 py-2">
-        <div
-          className="flex w-60 cursor-pointer select-none items-center justify-between"
-          onClick={() => setClosed(false)}
-        >
-          <div>AI</div>
-          <div>
-            <VscChevronUp />
-          </div>
-        </div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (closed) {
+      panelRef.current?.collapse();
+    } else {
+      panelRef.current?.expand();
+    }
+  }, [panelRef, closed]);
 
   return (
     <>
       <VerticalResizeHandle />
-      <Panel>
+      <Panel collapsible ref={panelRef} onCollapse={setClosed}>
         <AIPanel onCloseClick={() => setClosed(true)} />
+        {closed && (
+          <div className="absolute bottom-0 right-0 flex border border-slate-300 bg-slate-100 px-4 py-2">
+            <div
+              className="flex w-60 cursor-pointer select-none items-center justify-between"
+              onClick={() => setClosed(false)}
+            >
+              <div>AI</div>
+              <div>
+                <VscChevronUp />
+              </div>
+            </div>
+          </div>
+        )}
       </Panel>
     </>
   );
