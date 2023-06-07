@@ -40,7 +40,7 @@ class Chat:
         response = openai.ChatCompletion.create(
             model=os.environ["OPENAI_CHAT_MODEL"],
             messages=messages,
-            n=1,  # number of completions to generate
+            n=self.n_options,  # number of completions to generate
             temperature=0,  # 0 = no randomness, deterministic
             max_tokens=200,
         )
