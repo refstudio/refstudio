@@ -269,7 +269,7 @@ class PDFIngestion:
             ref = Reference(
                 source_filename=source_pdf,
                 filename_md5=get_filename_md5(source_pdf),
-                citation_key=
+                citation_key=None,  # TODO create citation keys
                 title=header.get("title"),
                 authors=header.get("authors"),
                 published_date=pub_date,
