@@ -1,4 +1,3 @@
-import { FileEntry } from '@tauri-apps/api/fs';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback } from 'react';
 import { Panel, PanelGroup } from 'react-resizable-panels';
@@ -7,6 +6,7 @@ import { activateFileInPaneAtom, closeFileInPaneAtom, leftPaneAtom, rightPaneAto
 import { TabPane } from '../components/TabPane';
 import { VerticalResizeHandle } from '../components/VerticalResizeHandle';
 import { EditorAPI } from '../types/EditorAPI';
+import { FileEntry } from '../types/FileEntry';
 import { PdfViewerAPI } from '../types/PdfViewerAPI';
 import { EmptyView } from '../views/EmptyView';
 import { PdfViewer } from '../views/PdfViewer';
@@ -75,7 +75,7 @@ export function MainPanelPane({
 }: MainPanelPaneProps & MainPanelProps) {
   const items = files.map((file) => ({
     key: file.path,
-    text: file.name ?? '',
+    text: file.name,
     value: file.path,
   }));
 
@@ -96,19 +96,19 @@ interface MainPaneViewContentProps {
 }
 
 export function MainPaneViewContent({ activeFile, editorRef, pdfViewerRef }: MainPaneViewContentProps) {
-  if (!activeFile) {
+  if (!activeFile || activeFile.isFolder) {
     return <EmptyView />;
   }
 
-  if (activeFile.path.endsWith('.xml')) {
+  if (activeFile.fileExtension === 'xml') {
     return <TextView file={activeFile} />;
   }
 
-  if (activeFile.path.endsWith('.json')) {
+  if (activeFile.fileExtension === 'json') {
     return <TextView file={activeFile} textFormatter={(input) => JSON.stringify(JSON.parse(input), null, 2)} />;
   }
 
-  if (activeFile.path.endsWith('.pdf')) {
+  if (activeFile.fileExtension === 'pdf') {
     return <PdfViewer file={activeFile} pdfViewerRef={pdfViewerRef} />;
   }
 
