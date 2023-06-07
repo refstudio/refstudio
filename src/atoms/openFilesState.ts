@@ -1,7 +1,7 @@
-import { FileEntry } from '@tauri-apps/api/fs';
 import { atom, Getter } from 'jotai';
 
 import { isNonNullish } from '../lib/isNonNullish';
+import { FileEntry } from '../types/FileEntry';
 
 export type PaneId = 'LEFT' | 'RIGHT';
 export const DEFAULT_PANE: PaneId = 'LEFT';

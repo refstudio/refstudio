@@ -18,17 +18,19 @@
       },
       "fs": {
         "all": true,
-        "scope": ["$APPDATA/**"]
+        "scope": [
+          "$APPDATA/**",
+          "$RESOURCE/**"
+        ]
       },
       "shell": {
         "all": true,
         "execute": true,
         "open": true,
-        "sidecar": true,
         "scope": [
           {
-            "name": "bin/python/main",
-            "sidecar": true,
+            "name": "call-sidecar",
+            "cmd": "$RESOURCE/bin/python/main-aarch64-apple-darwin/main",
             "args": true
           }
         ]
@@ -37,8 +39,11 @@
     "bundle": {
       "active": true,
       "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
-      "externalBin": ["bin/python/main"],
+      "externalBin": [],
       "identifier": "com.tauri.dev",
+      "resources": [
+        "bin/*"
+      ],
       "targets": "all"
     },
     "security": {

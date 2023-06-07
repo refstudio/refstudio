@@ -17,7 +17,7 @@
     "lint:fix": "eslint --fix --ext .js,.ts,.tsx ./src",
     "ts:check": "tsc --noEmit",
     "preview": "vite preview",
-    "python": "bash scripts/remove_binary.sh && poetry run pyinstaller --onefile --noconfirm --distpath src-tauri/bin/python python/main.py && bash scripts/move_binary.sh",
+    "python": "bash scripts/remove_binary.sh && poetry run pyinstaller --noconfirm --hidden-import torch --collect-data torch --recursive-copy-metadata torch --hidden-import pyarrow --collect-data pyarrow --recursive-copy-metadata pyarrow --collect-binaries pyarrow --collect-submodules pyarrow --recursive-copy-metadata tqdm --recursive-copy-metadata sentence-transformers --distpath src-tauri/bin/python python/main.py && bash scripts/move_binary.sh",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "tauri:dev:debug": "DEV_TOOLS=1 tauri dev"
@@ -42,6 +42,7 @@
     "react-drag-drop-files": "^2.3.10",
     "react-icons": "^4.8.0",
     "react-pdf": "^6.2.2",
+    "react-popper": "^2.3.0",
     "react-resizable-panels": "^0.0.42",
     "tailwindcss": "^3.3.2",
     "tiptap-markdown": "^0.7.2",
