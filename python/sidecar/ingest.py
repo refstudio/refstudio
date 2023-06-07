@@ -84,12 +84,18 @@ class PDFIngestion:
             # thus, HiddenPrint (https://stackoverflow.com/a/45669280)
             client = GrobidClient(GROBID_SERVER_URL, timeout=GROBID_TIMEOUT)
 
-        client.process(
-            "processFulltextDocument",
-            input_path=self.input_dir,
-            output=self.grobid_output_dir,
-            force=True
-        )
+            # If an error occurs during processing, the Grobid Server will
+            # print out error messages to stdout, rather than using HTTP status codes
+            # or raising an exception. So this line also needs to be wrapped
+            # in HiddenPrints.
+            # Grobid will still create the output file, even if an error occurs,
+            # however it will be a txt file with a name like {filename}_{errorcode}.txt
+            client.process(
+                "processFulltextDocument",
+                input_path=self.input_dir,
+                output=self.grobid_output_dir,
+                force=True
+            )
         logger.info("Finished calling Grobid server")
 
     def convert_grobid_xml_to_json(self) -> None:
@@ -107,7 +113,7 @@ class PDFIngestion:
             with open(json_filepath, "w") as fout:
                 doc = grobid_tei_xml.parse_document_xml(xml)
                 json.dump(doc.to_dict(), fout)
-
+    
     def _parse_header(self, document: dict) -> dict:
         """
         Parses the header of a document and returns a dictionary of the header fields
@@ -135,6 +141,31 @@ class PDFIngestion:
             surname=author_dict.get("surname"),
             email=author_dict.get("email"),
         )
+    
+    def _create_references_for_grobid_failures(self) -> List[Reference]:
+        """
+        Creates Reference objects for PDFs that Grobid was unable to parse.
+        We want the output of PDF Ingestion to contain _all_ PDF References, even
+        if Grobid was unable to parse them. This allows the frontend to inform the
+        user which PDFs we were unable to parse.
+
+        In cases where Grobid was unable to parse the PDF, a TXT file is created
+        in the same output directory where the XML file would have been created.
+        The TXT file is named as {pdf_filename}_{error_code}.txt.
+        """
+        txt_files = list(self.grobid_output_dir.glob("*.txt"))
+        logger.info(f"Found {len(txt_files)} txt files from Grobid parsing errors")
+
+        references = []
+        for file in txt_files:
+            source_pdf = f"{file.stem.rpartition('_')[0]}.pdf"
+            references.append(
+                Reference(
+                    source_filename=source_pdf,
+                    filename_md5=get_filename_md5(source_pdf),
+                )
+            )
+        return references
 
     def create_references(self) -> List[Reference]:
         """
@@ -162,7 +193,9 @@ class PDFIngestion:
                 chunks=chunk_text(doc.get("body"))
             )
             references.append(ref)
-        return references
+
+        failures = self._create_references_for_grobid_failures()
+        return references + failures
 
     def create_response_from_references(self, references: List[Reference]) -> dict:
         """
