@@ -1,7 +1,7 @@
-import { FileEntry } from '@tauri-apps/api/fs';
 import { VscFile, VscFolder } from 'react-icons/vsc';
 
 import { cx } from '../cx';
+import { FileEntry } from '../types/FileEntry';
 
 interface FileTreeBaseProps {
   root?: boolean;
@@ -26,10 +26,11 @@ function FileTreeNode({ file, onClick, rightAction, selectedFiles }: FileTreeBas
   if (!file) {
     return null;
   }
-  const isFolder = !!file.children;
+
+  const { isFolder } = file;
 
   // Hide DOT_FILES
-  if (file.name?.startsWith('.')) {
+  if (file.isDotfile) {
     return null;
   }
 
@@ -57,7 +58,7 @@ function FileTreeNode({ file, onClick, rightAction, selectedFiles }: FileTreeBas
       </div>
 
       {isFolder && (
-        <FileTree files={file.children!} rightAction={rightAction} selectedFiles={selectedFiles} onClick={onClick} />
+        <FileTree files={file.children} rightAction={rightAction} selectedFiles={selectedFiles} onClick={onClick} />
       )}
     </li>
   );

@@ -1,10 +1,10 @@
-import { FileEntry } from '@tauri-apps/api/fs';
 import { useCallback } from 'react';
 
 import { readFileEntryAsText } from '../filesystem';
 import { usePromise } from '../hooks/usePromise';
 import { TipTapEditor } from '../TipTapEditor/TipTapEditor';
 import { EditorAPI } from '../types/EditorAPI';
+import { FileEntry } from '../types/FileEntry';
 
 export function TipTapView({
   file,

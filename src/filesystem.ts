@@ -1,7 +1,7 @@
 import {
   BaseDirectory,
   createDir,
-  FileEntry,
+  FileEntry as TauriFileEntry,
   readBinaryFile,
   readDir,
   readTextFile,
@@ -11,6 +11,7 @@ import {
 import { appDataDir, join } from '@tauri-apps/api/path';
 
 import { INITIAL_CONTENT } from './TipTapEditor/TipTapEditorConfigs';
+import { FileEntry } from './types/FileEntry';
 
 const PROJECT_NAME = 'project-x';
 const UPLOADS_DIR = 'uploads';
@@ -41,7 +42,8 @@ export async function ensureProjectFileStructure() {
 }
 export async function readAllProjectFiles() {
   const entries = await readDir(await getBaseDir(), { recursive: true });
-  return sortedFileEntries(entries);
+  const fileEntries = entries.map(convertTauriFileEntryToFileEntry);
+  return sortedFileEntries(fileEntries);
 }
 
 export async function uploadFiles(files: FileList) {
@@ -61,19 +63,53 @@ export async function readFileEntryAsText(file: FileEntry) {
   return readTextFile(file.path);
 }
 
+function convertTauriFileEntryToFileEntry(entry: TauriFileEntry): FileEntry {
+  const isFolder = !!entry.children;
+
+  const name = entry.name ?? '';
+  const isDotfile = name.startsWith('.');
+
+  if (isFolder) {
+    return {
+      name,
+      path: entry.path,
+      isFolder,
+      isFile: !isFolder,
+      isDotfile,
+      children: entry.children!.map(convertTauriFileEntryToFileEntry),
+    };
+  } else {
+    const fileExtension = name.split('.').pop()?.toLowerCase() ?? '';
+    return {
+      name,
+      path: entry.path,
+      fileExtension,
+      isFolder,
+      isDotfile,
+      isFile: !isFolder,
+    };
+  }
+}
+
 function sortedFileEntries(entries: FileEntry[]): FileEntry[] {
   return entries
     .sort((fileA, fileB) => {
-      if (fileA.children === undefined) {
+      if (fileA.isFile) {
         return -1;
       }
-      if (fileB.children === undefined) {
+      if (fileB.isFile) {
         return 1;
       }
-      return fileA.name?.localeCompare(fileB.name ?? '') ?? 0;
+      return fileA.name.localeCompare(fileB.name);
     })
-    .map((entry) => ({
-      ...entry,
-      children: entry.children ? sortedFileEntries(entry.children) : entry.children,
-    }));
+    .map((entry) => {
+      if (entry.isFile) {
+        return entry;
+      } else {
+        return {
+          ...entry,
+          children: sortedFileEntries(entry.children),
+        };
+      }
+    });
 }
