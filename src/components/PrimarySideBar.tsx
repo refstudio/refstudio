@@ -1,5 +1,6 @@
-import { VscFiles } from 'react-icons/vsc';
+import { VscFiles, VscLibrary } from 'react-icons/vsc';
 
+import { IconType } from 'react-icons';
 import { cx } from '../cx';
 
 export type PrimarySideBarPane = 'Explorer' | 'References';
@@ -11,11 +12,14 @@ export function PrimarySideBar({
   activePane: PrimarySideBarPane | null;
   onClick: (clicked: PrimarySideBarPane) => void;
 }) {
-  const panes: PrimarySideBarPane[] = ['Explorer', 'References'];
+  const panes: { pane: PrimarySideBarPane; Icon: IconType }[] = [
+    { pane: 'Explorer', Icon: VscFiles },
+    { pane: 'References', Icon: VscLibrary },
+  ];
   return (
     <div className="flex select-none flex-col bg-black text-white" role="menubar">
-      {panes.map((pane) => (
-        <VscFiles
+      {panes.map(({ pane, Icon }) => (
+        <Icon
           aria-label={pane}
           className={cx('p-4 hover:opacity-100', {
             'border-l-2 border-l-transparent opacity-50': activePane !== pane,
