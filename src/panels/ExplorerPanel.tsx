@@ -2,13 +2,13 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import { VscSplitHorizontal } from 'react-icons/vsc';
 
+import { _selectFileInPaneAtom } from '../atoms/core/paneGroupAtom';
 import {
   leftPaneAtom,
   openFileAtom,
   rightPaneAtom,
-  selectFileInPaneAtom,
   splitFileToPaneAtom,
-} from '../atoms/filesState';
+} from '../atoms/fileActions';
 import { FileTree } from '../components/FileTree';
 import { PanelSection } from '../components/PanelSection';
 import { PanelWrapper } from '../components/PanelWrapper';
@@ -19,7 +19,7 @@ import { FileEntry } from '../types/FileEntry';
 export function ExplorerPanel() {
   const left = useAtomValue(leftPaneAtom);
   const right = useAtomValue(rightPaneAtom);
-  const selectFileInPane = useSetAtom(selectFileInPaneAtom);
+  const selectFileInPane = useSetAtom(_selectFileInPaneAtom);
   const openFile = useSetAtom(openFileAtom);
   const splitFileToPane = useSetAtom(splitFileToPaneAtom);
 

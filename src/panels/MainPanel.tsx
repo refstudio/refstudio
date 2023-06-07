@@ -3,7 +3,9 @@ import { Loadable } from 'jotai/vanilla/utils/loadable';
 import { useCallback } from 'react';
 import { Panel, PanelGroup } from 'react-resizable-panels';
 
-import { closeFileFromPaneAtom, FileId, leftPaneAtom, rightPaneAtom, selectFileInPaneAtom } from '../atoms/filesState';
+import { FileId } from '../atoms/core/atom.types';
+import { _selectFileInPaneAtom } from '../atoms/core/paneGroupAtom';
+import { closeFileFromPaneAtom, leftPaneAtom, rightPaneAtom } from '../atoms/fileActions';
 import { Spinner } from '../components/Spinner';
 import { TabPane } from '../components/TabPane';
 import { VerticalResizeHandle } from '../components/VerticalResizeHandle';
@@ -25,7 +27,7 @@ export function MainPanel(props: MainPanelProps) {
   const { pdfViewerRef } = props;
   const left = useAtomValue(leftPaneAtom);
   const right = useAtomValue(rightPaneAtom);
-  const activateFileInPane = useSetAtom(selectFileInPaneAtom);
+  const activateFileInPane = useSetAtom(_selectFileInPaneAtom);
   const closeFileInPane = useSetAtom(closeFileFromPaneAtom);
 
   const updatePDFViewerWidth = useCallback(() => {

@@ -12,7 +12,8 @@ import { appDataDir, join } from '@tauri-apps/api/path';
 import { Command } from '@tauri-apps/api/shell';
 
 import { INITIAL_CONTENT } from './TipTapEditor/TipTapEditorConfigs';
-import { FileEntry } from './types/FileEntry';
+import { FileContent } from './types/FileContent';
+import { FileEntry, FileFileEntry } from './types/FileEntry';
 import { PdfIngestionResponse } from './types/PdfIngestion';
 import { ReferenceItem } from './types/ReferenceItem';
 
@@ -68,12 +69,25 @@ export async function runPDFIngestion(): Promise<ReferenceItem[]> {
   return parsePdfIngestionResponse(response);
 }
 
-export async function readFileEntryAsBinary(file: FileEntry) {
-  return readBinaryFile(file.path);
-}
-
-export async function readFileEntryAsText(file: FileEntry) {
-  return readTextFile(file.path);
+export async function readFileContent(file: FileFileEntry): Promise<FileContent> {
+  switch (file.fileExtension) {
+    case 'xml': {
+      const textContent = await readTextFile(file.path);
+      return { type: 'XML', textContent };
+    }
+    case 'json': {
+      const textContent = await readTextFile(file.path);
+      return { type: 'JSON', textContent };
+    }
+    case 'pdf': {
+      const binaryContent = await readBinaryFile(file.path);
+      return { type: 'PDF', binaryContent };
+    }
+    default: {
+      const textContent = await readTextFile(file.path);
+      return { type: 'TIPTAP', textContent };
+    }
+  }
 }
 
 function convertTauriFileEntryToFileEntry(entry: TauriFileEntry): FileEntry {
