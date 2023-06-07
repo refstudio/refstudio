@@ -20,6 +20,7 @@ export function TabPane({
         'border-b border-b-slate-200',
         'x-hide-scrollbars overflow-x-scroll',
       )}
+      role="tablist"
     >
       {items.map((item) => (
         <TabItem
@@ -47,6 +48,7 @@ export function TabItem({
 }) {
   return (
     <div
+      aria-selected={active}
       className={cx(
         'inline-flex items-center justify-between gap-2 px-2 pb-1 pt-2',
         'cursor-pointer select-none whitespace-nowrap',
@@ -57,6 +59,7 @@ export function TabItem({
           'border-t-2 border-t-blue-300 bg-slate-200': active,
         },
       )}
+      role="tab"
       onClick={(e) => {
         e.preventDefault();
         onClick();
@@ -65,6 +68,7 @@ export function TabItem({
       <span>{content}</span>
       <VscClose
         className="invisible group-hover:visible"
+        role="button"
         onClick={(e) => {
           e.stopPropagation();
           onCloseClick();
