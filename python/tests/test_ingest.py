@@ -26,19 +26,20 @@ def test_main(monkeypatch, tmp_path, capsys):
     grobid_output_dir = tmp_path.joinpath(".grobid")
     json_storage_dir = tmp_path.joinpath(".storage")
 
-    # copy test pdf to temp dir
-    test_pdf = FIXTURES_DIR.joinpath("pdf", "test.pdf")
-    write_path = tmp_path.joinpath("uploads", "test.pdf")
-    _copy_fixture_to_temp_dir(test_pdf, write_path)
+    # copy test PDFs to temp dir
+    for pdf in FIXTURES_DIR.joinpath("pdf").glob("*.pdf"):
+        write_path = tmp_path.joinpath("uploads", pdf.name)
+        _copy_fixture_to_temp_dir(pdf, write_path)
 
     # grobid server takes an input directory of PDFs
-    # and writes {pdfname.tei.xml} files to an output directory
+    # if grobid successfully parses the file, it creates a {pdfname}.tei.xml file
+    # if grobid fails to parse the file, it creates a {pdfname}_{errorcode}.txt file
     # mock this by copying the test xml to the output directory
     def mock_grobid_client_process(*args, **kwargs):
-        test_xml = FIXTURES_DIR.joinpath("xml", "test.tei.xml")
-        write_path = grobid_output_dir.joinpath("test.tei.xml")
-        _copy_fixture_to_temp_dir(test_xml, write_path)
-
+        for file_ in FIXTURES_DIR.joinpath("xml").glob("*"):
+            write_path = grobid_output_dir.joinpath(file_.name)
+            _copy_fixture_to_temp_dir(file_, write_path)
+    
     monkeypatch.setattr(ingest.GrobidClient, "process", mock_grobid_client_process)
 
     pdf_directory = tmp_path.joinpath("uploads")
@@ -47,15 +48,29 @@ def test_main(monkeypatch, tmp_path, capsys):
     # check that the expected output was printed to stdout
     captured = capsys.readouterr()
     output = json.loads(captured.out)
-    assert len(output['references']) == 1
-    assert output['references'][0]['title'] == "A Few Useful Things to Know about Machine Learning"
-    assert len(output['references'][0]['authors']) == 1
-    assert output['references'][0]['authors'][0]['full_name'] == "Pedro Domingos"
+
+    # project name is the name of the parent directory of the input directory
+    assert output['project_name'] == tmp_path.name
+
+    # check that the expected number of references were parsed
+    assert len(output['references']) == 2
+
+    # sort references by source_filename so list order is consistent
+    references = sorted(output['references'], key=lambda x: x['source_filename'])
+
+    # check that grobid-fails.pdf is contained in the reference output
+    assert references[0]['source_filename'] == "grobid-fails.pdf"
+
+    # check that test.pdf was parsed correctly
+    assert references[1]['title'] == "A Few Useful Things to Know about Machine Learning"
+    assert len(references[1]['authors']) == 1
+    assert references[1]['authors'][0]['full_name'] == "Pedro Domingos"
 
     # check that the expected directories and files were created
     # grobid output
     assert grobid_output_dir.exists()
     assert grobid_output_dir.joinpath("test.tei.xml").exists()
-    # json creation and storage
+    assert grobid_output_dir.joinpath("grobid-fails_500.txt").exists()
+    # json creation and storage - successfully parsed references are stored as json
     assert json_storage_dir.exists()
     assert json_storage_dir.joinpath("test.json").exists()

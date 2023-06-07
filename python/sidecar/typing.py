@@ -1,14 +1,14 @@
 from dataclasses import dataclass, field
-from typing import List, Dict, Any
+from typing import Any, Dict, List, Optional
 
 
 @dataclass
 class Reference:
     source_filename: str
     filename_md5: str
-    title: str
-    abstract: str
-    contents: str
+    title: Optional[str] = None
+    abstract: Optional[str] = None
+    contents: Optional[str] = None
     authors: List["Author"] = field(default_factory=list)
     chunks: List["Chunk"] = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)
