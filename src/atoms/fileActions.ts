@@ -87,3 +87,14 @@ export const splitFileToPaneAtom = atom(null, (_get, set, { fileId, fromPaneId, 
 export const focusPaneAtom = atom(null, (_get, set, paneId: PaneId) => {
   set(_activePaneIdAtom, paneId);
 });
+
+export const selectFileInPaneAtom = atom(null, (get, set, paneFileId: PaneFileId) => {
+  const { fileId, paneId } = paneFileId;
+  const panes = get(_paneGroupAtom);
+  if (!panes[paneId].openFiles.includes(fileId)) {
+    console.warn('File not open in the given pane ', fileId, paneId);
+    return;
+  }
+
+  set(_selectFileInPaneAtom, paneFileId);
+});

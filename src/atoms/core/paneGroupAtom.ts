@@ -71,11 +71,6 @@ export const _removeFileFromPane = atom(null, (get, set, { fileId, paneId }: Pan
  */
 export const _selectFileInPaneAtom = atom(null, (get, set, { fileId, paneId }: PaneFileId) => {
   const panes = get(_paneGroupAtom);
-  if (!panes[paneId].openFiles.includes(fileId)) {
-    console.warn('File not open in the given pane ', fileId, paneId);
-    return;
-  }
-
   set(_activePaneIdAtom, paneId);
   set(_paneGroupAtom, {
     ...panes,

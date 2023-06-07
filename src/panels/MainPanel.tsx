@@ -4,8 +4,7 @@ import { useCallback } from 'react';
 import { Panel, PanelGroup } from 'react-resizable-panels';
 
 import { FileId } from '../atoms/core/atom.types';
-import { _selectFileInPaneAtom } from '../atoms/core/paneGroupAtom';
-import { closeFileFromPaneAtom, focusPaneAtom, leftPaneAtom, rightPaneAtom } from '../atoms/fileActions';
+import { closeFileFromPaneAtom, focusPaneAtom, leftPaneAtom, rightPaneAtom, selectFileInPaneAtom } from '../atoms/fileActions';
 import { Spinner } from '../components/Spinner';
 import { TabPane } from '../components/TabPane';
 import { VerticalResizeHandle } from '../components/VerticalResizeHandle';
@@ -27,7 +26,7 @@ export function MainPanel(props: MainPanelProps) {
   const { pdfViewerRef } = props;
   const left = useAtomValue(leftPaneAtom);
   const right = useAtomValue(rightPaneAtom);
-  const activateFileInPane = useSetAtom(_selectFileInPaneAtom);
+  const activateFileInPane = useSetAtom(selectFileInPaneAtom);
   const closeFileInPane = useSetAtom(closeFileFromPaneAtom);
   const focusPane = useSetAtom(focusPaneAtom);
 
