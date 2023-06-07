@@ -4,7 +4,13 @@ import { useCallback } from 'react';
 import { Panel, PanelGroup } from 'react-resizable-panels';
 
 import { FileId } from '../atoms/core/atom.types';
-import { closeFileFromPaneAtom, focusPaneAtom, leftPaneAtom, rightPaneAtom, selectFileInPaneAtom } from '../atoms/fileActions';
+import {
+  closeFileFromPaneAtom,
+  focusPaneAtom,
+  leftPaneAtom,
+  rightPaneAtom,
+  selectFileInPaneAtom,
+} from '../atoms/fileActions';
 import { Spinner } from '../components/Spinner';
 import { TabPane } from '../components/TabPane';
 import { VerticalResizeHandle } from '../components/VerticalResizeHandle';
