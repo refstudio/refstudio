@@ -6,7 +6,7 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: 'module',
   },
-  plugins: ['@typescript-eslint', 'simple-import-sort'],
+  plugins: ['@typescript-eslint', 'simple-import-sort', 'jest-dom', 'testing-library'],
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
@@ -15,6 +15,8 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:react/jsx-runtime',
     'plugin:react-hooks/recommended',
+    'plugin:jest-dom/recommended',
+    'plugin:testing-library/react'
   ],
   settings: {
     react: {
@@ -124,5 +126,14 @@ module.exports = {
     ],
     'react/jsx-curly-brace-presence': 'error',
     'react/self-closing-comp': 'error',
+    // Testing library rules
+    'testing-library/prefer-user-event': 'error',
+    "testing-library/no-render-in-setup": "error",
+    "testing-library/no-wait-for-empty-callback": "error",
+    "testing-library/prefer-explicit-assert": "error",
+    "testing-library/prefer-presence-queries": "error",
+    "testing-library/prefer-screen-queries": "error",
+    "testing-library/prefer-wait-for": "error"
+
   },
 };

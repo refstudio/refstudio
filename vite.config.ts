@@ -1,5 +1,5 @@
-import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
 
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
@@ -23,5 +23,19 @@ export default defineConfig(async () => ({
     minify: !process.env.TAURI_DEBUG ? 'esbuild' : false,
     // produce sourcemaps for debug builds
     sourcemap: !!process.env.TAURI_DEBUG,
+  },
+  test: {
+    coverage: {
+      provider: 'c8',
+      // Instrument all files: https://github.com/bcoe/c8#checking-for-full-source-coverage-using---all
+      all: true,
+      include: ['src/**'],
+    },
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/test/setup.ts',
+    // you might want to disable it, if you don't have tests that rely on CSS
+    // since parsing CSS is slow
+    css: true,
   },
 }));
