@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 
@@ -9,6 +10,7 @@ class Reference:
     title: Optional[str] = None
     abstract: Optional[str] = None
     contents: Optional[str] = None
+    published_date: Optional[datetime] = None
     authors: List["Author"] = field(default_factory=list)
     chunks: List["Chunk"] = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)
@@ -23,9 +25,9 @@ class Affiliation:
 @dataclass
 class Author:
     full_name: str
-    given_name: str
-    surname: str
-    email: str
+    given_name: Optional[str] = None
+    surname: Optional[str] = None
+    email: Optional[str] = None
 
 
 @dataclass
