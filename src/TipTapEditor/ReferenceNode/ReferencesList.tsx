@@ -20,10 +20,7 @@ export const ReferencesList = forwardRef((props: ReferenceListProps, ref) => {
 
   const referenceFilter = useMemo(() => getReferenceFilter(query), [query]);
   const queriedReferences = useMemo(
-    () =>
-      references
-        .filter(referenceFilter)
-        .slice(0, 5),
+    () => references.filter(referenceFilter).slice(0, 5),
     [references, referenceFilter],
   );
   const referenceElement = useMemo(
