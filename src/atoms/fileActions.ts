@@ -67,6 +67,13 @@ export const closeFileFromPaneAtom = atom(null, (get, set, { fileId, paneId }: P
     set(_removeFileEntry, fileId);
     set(_unloadFileFromMemory, fileId);
   }
+
+  // Select another file in the pane, if there are any
+  const updatedPanes = get(_paneGroupAtom);
+  const updatedOpenFiles = updatedPanes[paneId].openFiles;
+  if (updatedOpenFiles.length > 0) {
+    set(_selectFileInPaneAtom, { fileId: updatedOpenFiles[updatedOpenFiles.length - 1], paneId });
+  }
 });
 
 export const leftPaneAtom = atom((get) => getPane(get, 'LEFT'));

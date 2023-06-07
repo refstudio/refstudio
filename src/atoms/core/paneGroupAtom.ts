@@ -9,7 +9,16 @@ import { _fileEntryAtom } from './fileEntryAtom';
 
 type PaneGroupState = Record<PaneId, PaneState>;
 
-// Base atom
+/**
+ * This atom contains data about the panes: the list of open files and the active file
+ *
+ * 3 action atoms are available:
+ *  - `_addFileToPane` to add a file to the list of open files of the given pane; please note that this atom does not check that file exists or is loaded in memory
+ *  - `_removeFileFromPane` to remove a file from the list of open files
+ *  - `_selectFileInPaneAtom` to update the active file of the pane; please note that this atom does not check that the file is actually open in the pane
+ *
+ * NOTE: This is a core atom file and it should never been used outside of the `atoms` directory of this project
+ */
 export const _paneGroupAtom = atom<PaneGroupState>({
   LEFT: {
     openFiles: [],
@@ -32,9 +41,6 @@ export function getPane(get: Getter, paneId: PaneId) {
   };
 }
 
-/**
- * Add file to a given pane
- */
 export const _addFileToPane = atom(null, (get, set, { fileId, paneId }: PaneFileId) => {
   const panes = get(_paneGroupAtom);
   set(_paneGroupAtom, {
@@ -48,9 +54,6 @@ export const _addFileToPane = atom(null, (get, set, { fileId, paneId }: PaneFile
   });
 });
 
-/**
- * Remove file from a given pane
- */
 export const _removeFileFromPane = atom(null, (get, set, { fileId, paneId }: PaneFileId) => {
   const panes = get(_paneGroupAtom);
   const updatedOpenFiles = panes[paneId].openFiles.filter((_fileId) => _fileId !== fileId);
@@ -61,14 +64,8 @@ export const _removeFileFromPane = atom(null, (get, set, { fileId, paneId }: Pan
       openFiles: updatedOpenFiles,
     },
   });
-  if (updatedOpenFiles.length > 0) {
-    set(_selectFileInPaneAtom, { fileId: updatedOpenFiles[updatedOpenFiles.length - 1], paneId });
-  }
 });
 
-/**
- * Select a file in the given pane, the file must already be in the pane
- */
 export const _selectFileInPaneAtom = atom(null, (get, set, { fileId, paneId }: PaneFileId) => {
   const panes = get(_paneGroupAtom);
   set(_activePaneIdAtom, paneId);

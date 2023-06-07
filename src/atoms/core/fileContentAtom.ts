@@ -10,10 +10,18 @@ import { FileId } from './atom.types';
 
 type FileContentState = Map<FileId, Atom<Loadable<Promise<FileContent>>>>;
 
-// Base atom
+/**
+ * This atom stores the atoms containing the content of open files.
+ * Each fileContent atom is a loadable atom, asynchronously reading files
+ *
+ * 2 action atoms are available:
+ *  - `_loadFileInMemory` to load file content in memory when opening a file
+ *  - `_unloadFileFromMemory` to remove the content from memory when closing the file
+ *
+ * NOTE: This is a core atom file and it should never been used outside of the `atoms` directory of this project
+ */
 export const _fileContentAtom = atom<FileContentState>(new Map());
 
-// Action atoms
 export const _loadFileInMemory = atom(null, (get, set, file: FileFileEntry) => {
   const currentOpenFiles = get(_fileContentAtom);
   const updatedMap = new Map(currentOpenFiles);
