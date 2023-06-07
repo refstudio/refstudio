@@ -2,11 +2,12 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { useState } from 'react';
 import { FileUploader } from 'react-drag-drop-files';
 
+import { runPDFIngestion } from '../api/ingestion';
 import { getReferencesAtom, setReferencesAtom } from '../atoms/referencesState';
 import { PanelSection } from '../components/PanelSection';
 import { PanelWrapper } from '../components/PanelWrapper';
 import { Spinner } from '../components/Spinner';
-import { ensureProjectFileStructure, runPDFIngestion, uploadFiles } from '../filesystem';
+import { ensureProjectFileStructure, uploadFiles } from '../filesystem';
 import { ReferenceItem } from '../types/ReferenceItem';
 
 const BASE_DIR = await ensureProjectFileStructure();
