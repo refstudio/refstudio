@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 
 from sidecar import shared
 from sidecar.typing import Author, Reference
@@ -6,6 +6,13 @@ from sidecar.typing import Author, Reference
 
 def test_get_word_count():
     assert shared.get_word_count("Hello World") == 2
+
+
+def test_parse_date():
+    # Grobid returns dates in ISO 8601 YYYY-mm-dd format
+    # so this is all this function needs to support for now
+    assert shared.parse_date("2019-01-01") == date(2019, 1, 1)
+    assert shared.parse_date("abc") is None
 
 
 def test_get_filename_md5():

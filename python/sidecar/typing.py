@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Optional
 class Reference:
     source_filename: str
     filename_md5: str
+    citation_key: str
     title: Optional[str] = None
     abstract: Optional[str] = None
     contents: Optional[str] = None

@@ -1,6 +1,7 @@
 import hashlib
 import os
 import sys
+from datetime import datetime
 from typing import List
 
 from .typing import Author, Chunk, Reference
@@ -8,6 +9,22 @@ from .typing import Author, Chunk, Reference
 
 def get_word_count(text: str) -> int:
     return len(text.strip().split(" "))
+
+
+def parse_date(date_str: str) -> datetime:
+    """
+    Parse a YYYY-mm-dd date string into a datetime object.
+    Grobid used ISO 8601 format: https://grobid.readthedocs.io/en/latest/training/date/
+    :param date_str: str
+    :return: datetime
+    """
+    # Since Grobid returns dates in ISO 8601 YYYY-mm-dd format,
+    # this function only needs to support that format for now, but ...
+    # TODO: support more date formats
+    try:
+        return datetime.strptime(date_str, "%Y-%m-%d").date()
+    except ValueError:
+        return None
 
 
 def get_filename_md5(filename: str) -> str:
@@ -20,6 +37,11 @@ def get_filename_md5(filename: str) -> str:
 
 
 def get_first_author_surname(authors: List[Author]) -> str:
+    """
+    Get the surname of the first author in a list of authors
+    :param authors: List[Author]
+    :return: str
+    """
     if not authors:
         return None
     

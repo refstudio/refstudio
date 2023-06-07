@@ -3,11 +3,13 @@ import logging
 import os
 import sys
 from dataclasses import asdict
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, List
 
 import grobid_tei_xml
 from grobid_client.grobid_client import GrobidClient
+from sidecar import shared
 
 from .shared import HiddenPrints, chunk_text, get_filename_md5
 from .typing import Author, Reference
@@ -171,6 +173,7 @@ class PDFIngestion:
         return {
             "title": header.get("title"),
             "authors": authors,
+            "published_date": header.get("date"),
         }
 
     def _create_author(self, author_dict: dict) -> Author:
@@ -205,6 +208,44 @@ class PDFIngestion:
                 )
             )
         return references
+    
+    def _create_citation_keys(self, references: List[Reference]) -> str:
+        """
+        Creates unique citation keys for a list of Reference objects based on Pandoc
+        citation key formatting rules.
+
+        Because citation keys are unique, we need to create them after all References
+        have been created. This is because the citation key is based on the Reference's
+        author surname and published date. If two References have the same author surname
+        and published date, then the citation key is appended with a, b, c, etc.
+
+        If a Reference does not have an author surname or published date, then the citation
+        key becomes "untitled" and is appended with 1, 2, 3, etc.
+
+        Examples:
+        1. Two References with different author surnames and different published year:
+            - (Smith, 2018) and (Jones, 2020) => citation keys: smith2018 and jones2020
+        2. Two References with different author surnames and no published year:
+            - (Smith, None) and (Jones, None) => citation keys: smith and jones
+        3. Two References with the same author surname but different published years:
+            - (Smith, 2020) and (Smith, 2021) => citation keys: smith2020 and smith2021
+        4. Two References with the same author surname and published year:
+            - (Smith, 2020) and (Smith, 2020) => citation keys: smith2020a and smith2020b
+        5. Two References with the same author surname and no published year:
+            - (Smith, None) and (Smith, None) => citation keys: smitha and smithb 
+        6. Two References with no author surname and different published years:
+            - (None, 2020) and (None, 2021) => citation keys: untitled2020 and untitled2021
+        7. Two References with no author surname and no published year:
+            - (None, None) and (None, None) => citation keys: untitled1 and untitled2
+
+        :param ref: List[Reference]
+        :return: str
+
+        https://quarto.org/docs/authoring/footnotes-and-citations.html#sec-citations
+        """
+        for ref in references:
+            ref.citation_key = shared.create_citation_key(ref)
+            # TODO finish this function
 
     def create_references(self) -> List[Reference]:
         """
@@ -223,12 +264,15 @@ class PDFIngestion:
 
             source_pdf = f"{file.stem}.pdf"
             header = self._parse_header(doc)
+            pub_date = shared.parse_date(header.get("published_date", ""))
 
             ref = Reference(
                 source_filename=source_pdf,
                 filename_md5=get_filename_md5(source_pdf),
+                citation_key=
                 title=header.get("title"),
                 authors=header.get("authors"),
+                published_date=pub_date,
                 abstract=doc.get("abstract"),
                 contents=doc.get("body"),
                 chunks=chunk_text(doc.get("body"))
@@ -236,7 +280,8 @@ class PDFIngestion:
             references.append(ref)
 
         failures = self._create_references_for_grobid_failures()
-        return references + failures
+        references = references + failures
+        return references
 
     def create_response_from_references(self, references: List[Reference]) -> dict:
         """
@@ -252,6 +297,7 @@ class PDFIngestion:
                 "filename_md5": ref.filename_md5,
                 "title": ref.title,
                 "authors": [asdict(a) for a in ref.authors],
+                "published_date": ref.published_date,
             })
         return {
             "project_name": self.project_name,
