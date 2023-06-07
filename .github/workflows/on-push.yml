@@ -106,7 +106,7 @@ jobs:
   #     - name: Constraints
   #       run: yarn constraints
 
-  test-js:
+  vitest:
     needs: setup-js
     runs-on: ubuntu-latest
     steps:
