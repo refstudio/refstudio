@@ -25,6 +25,7 @@ class Affiliation(JsonSchemaMixin):
 
 @dataclass
 class Author(JsonSchemaMixin):
+    """The author of a paper."""
     full_name: str
     given_name: str
     surname: str
