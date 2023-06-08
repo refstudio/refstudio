@@ -31,10 +31,11 @@ export function TipTapEditor({ editorRef, editorContent }: EditorProps) {
           const text = newEditor.view.state.doc.textBetween(from, to);
           setSelection(text);
         },
-      editorProps: {
-        transformPasted,
-      },
-    });
+        editorProps: {
+          transformPasted,
+        },
+      }),
+    );
   }, [editorContent, setSelection]);
 
   useEffect(() => {
