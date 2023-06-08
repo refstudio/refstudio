@@ -34,7 +34,6 @@ class Author(JsonSchemaMixin):
 @dataclass
 class Chunk(JsonSchemaMixin):
     text: str
-    """The chunk of text being processed."""
     vector: List[float] = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)
 
