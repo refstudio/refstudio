@@ -21,6 +21,8 @@ def parse_date(date_str: str) -> datetime:
     # Since Grobid returns dates in ISO 8601 YYYY-mm-dd format,
     # this function only needs to support that format for now, but ...
     # TODO: support more date formats
+    if not date_str:
+        return None
     try:
         return datetime.strptime(date_str, "%Y-%m-%d").date()
     except ValueError:
