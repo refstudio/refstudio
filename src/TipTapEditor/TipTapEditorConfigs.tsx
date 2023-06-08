@@ -91,8 +91,8 @@ export function transformPasted(slice: Slice) {
 
 function stripTransparentMarksFromFragment(fragment: Fragment) {
   const updatedNodes: Node[] = [];
-  fragment.forEach(node => {
-    updatedNodes.push(node.mark(node.marks.filter(mark => mark.attrs.color !== 'transparent')));
+  fragment.forEach((node) => {
+    updatedNodes.push(node.mark(node.marks.filter((mark) => mark.attrs.color !== 'transparent')));
   });
   return Fragment.fromArray(updatedNodes);
 }
