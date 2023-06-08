@@ -1,13 +1,13 @@
 import { getUploadsDir } from '../filesystem';
 import { ReferenceItem } from '../types/ReferenceItem';
+import { IngestResponse } from './cli';
 import { callSidecar } from './sidecar';
-import { RawPdfIngestionResponse } from './types';
 
-function parsePdfIngestionResponse(response: RawPdfIngestionResponse): ReferenceItem[] {
+function parsePdfIngestionResponse(response: IngestResponse): ReferenceItem[] {
   return response.references.map((reference) => ({
     id: reference.filename_md5,
     title: reference.title ?? reference.source_filename.replace('.pdf', ''),
-    authors: reference.authors.map((author) => ({ fullName: author.full_name, surname: author.surname })),
+    authors: (reference.authors ?? []).map((author) => ({ fullName: author.full_name, surname: author.surname })),
   }));
 }
 
