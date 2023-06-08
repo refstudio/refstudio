@@ -28,6 +28,7 @@ export function AIPanel({ onCloseClick }: { onCloseClick?: () => void }) {
             >
               REWRITE
             </button>
+            {rewriteCallState.state === 'error' && <span className="bg-red-50">{String(rewriteCallState.error)}</span>}
             {rewriteCallState.state === 'loading' && <span>Processing...</span>}
             {rewriteCallState.state === 'ok' && (
               <>
@@ -50,6 +51,7 @@ async function askForRewrite(selection: string) {
     console.log('command', command);
     const output = await command.execute();
     if (output.stderr) {
+      console.log('throwing', output.stderr);
       throw new Error(output.stderr);
     }
     console.log('output: ', output.stdout);

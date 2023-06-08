@@ -27,7 +27,7 @@ class Chat:
         response = self.call_model(messages)
         response = self.prepare_choices_for_client(response)
         return response
-    
+
     def prepare_choices_for_client(self, response: dict) -> list:
         choices = []
         for choice in response["choices"]:
@@ -35,7 +35,7 @@ class Chat:
                 {'index': choice["index"], 'text': choice["message"]["content"]}
             )
         return choices
-    
+
     def call_model(self, messages: list):
         response = openai.ChatCompletion.create(
             model=os.environ["OPENAI_CHAT_MODEL"],
