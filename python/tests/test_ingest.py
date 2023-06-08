@@ -60,11 +60,13 @@ def test_main(monkeypatch, tmp_path, capsys):
 
     # check that grobid-fails.pdf is contained in the reference output
     assert references[0]['source_filename'] == "grobid-fails.pdf"
+    assert references[0]['citation_key'] == "untitled"
 
     # check that test.pdf was parsed correctly
     assert references[1]['title'] == "A Few Useful Things to Know about Machine Learning"
     assert len(references[1]['authors']) == 1
     assert references[1]['authors'][0]['full_name'] == "Pedro Domingos"
+    assert references[1]['citation_key'] == "domingos"
 
     # check that the expected directories and files were created
     # grobid output

@@ -204,6 +204,7 @@ class PDFIngestion:
                 Reference(
                     source_filename=source_pdf,
                     filename_md5=get_filename_md5(source_pdf),
+                    citation_key="untitled",
                 )
             )
         return references
@@ -268,7 +269,7 @@ class PDFIngestion:
             ref = Reference(
                 source_filename=source_pdf,
                 filename_md5=get_filename_md5(source_pdf),
-                citation_key=None,  # TODO create citation keys
+                citation_key=None,  # shared.create_citation_key takes a Reference as input
                 title=header.get("title"),
                 authors=header.get("authors"),
                 published_date=pub_date,
@@ -276,11 +277,17 @@ class PDFIngestion:
                 contents=doc.get("body"),
                 chunks=chunk_text(doc.get("body"))
             )
+            ref.citation_key = shared.create_citation_key(ref)
             references.append(ref)
 
         failures = self._create_references_for_grobid_failures()
-        references = references + failures
-        return references
+
+        msg = (
+            f"Created {len(references)} Reference objects: "
+            f"{len(references)} successful Grobid parses, {len(failures)} Grobid failures"
+        )
+        logger.info(msg)
+        return references + failures
 
     def create_response_from_references(self, references: List[Reference]) -> dict:
         """
@@ -294,6 +301,7 @@ class PDFIngestion:
             prepared_references.append({
                 "source_filename": ref.source_filename,
                 "filename_md5": ref.filename_md5,
+                "citation_key": ref.citation_key,
                 "title": ref.title,
                 "authors": [asdict(a) for a in ref.authors],
                 "published_date": ref.published_date,
