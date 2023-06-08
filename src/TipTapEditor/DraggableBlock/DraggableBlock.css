@@ -16,6 +16,14 @@
   @apply visible;
 }
 
+.draggable-block.selected > .content {
+  background-color: #e2edfb;
+}
+
+.draggable-block.selected:not(:has(.draggable-block.selected)) > .drag-handle {
+  @apply visible;
+}
+
 .draggable-block > .content {
   @apply flex-1;
 }

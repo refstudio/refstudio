@@ -1,4 +1,4 @@
-.items {
+.references {
   @apply bg-slate-100;
   @apply rounded-lg;
   @apply border-black;
@@ -11,7 +11,7 @@
   @apply flex-col;
 }
 
-.item {
+.reference {
   @apply p-1;
   @apply cursor-pointer;
   @apply select-none;
@@ -19,6 +19,6 @@
   @apply text-left;
 }
 
-.selected {
+.reference.selected {
   @apply bg-slate-200;
 }

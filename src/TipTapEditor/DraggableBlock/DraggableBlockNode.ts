@@ -9,6 +9,7 @@ export const DraggableBlockNode = Node.create({
   content: 'block',
   defining: true,
   draggable: true,
+  selectable: true,
 
   parseHTML() {
     return [
