@@ -25,5 +25,5 @@
 }
 
 .draggable-block > .content {
-  @apply flex-1;
+  @apply flex-1 rounded-sm px-3;
 }

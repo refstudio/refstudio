@@ -20,19 +20,6 @@ export const CollapsibleBlockNode = Node.create({
     ];
   },
 
-  addKeyboardShortcuts() {
-    return {
-      'Mod-Enter': () =>
-        this.editor
-          .chain()
-          .insertContentAt(this.editor.state.selection.head, {
-            type: this.type.name,
-          })
-          .focus()
-          .run(),
-    };
-  },
-
   renderHTML({ HTMLAttributes }) {
     return ['collapsible-block', mergeAttributes(HTMLAttributes), 0];
   },
