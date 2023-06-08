@@ -2,7 +2,7 @@
 
 import { Command } from '@tauri-apps/api/shell';
 
-import { CliSchema } from './cli';
+import { CliSchema } from './types';
 
 export async function callSidecar<T extends keyof CliSchema>(subcommand: T, args: string[]): Promise<CliSchema[T]> {
   const command = new Command('call-sidecar', [subcommand, ...args]);

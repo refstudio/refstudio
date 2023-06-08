@@ -4,7 +4,7 @@ set -o errexit
 set -x
 
 poetry run python python/generate_schema.py > python/cli.schema.json
-yarn run json2ts python/cli.schema.json --no-additionalProperties > src/api/cli.ts
+yarn run json2ts python/cli.schema.json --no-additionalProperties > src/api/types.ts
 
 # Fail on CI if there are any diffs.
-git diff --exit-code python/cli.schema.json src/api/cli.ts
+git diff --exit-code python/cli.schema.json src/api/types.ts

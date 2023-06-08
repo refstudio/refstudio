@@ -1,7 +1,7 @@
 import { getUploadsDir } from '../filesystem';
 import { ReferenceItem } from '../types/ReferenceItem';
-import { IngestResponse } from './cli';
 import { callSidecar } from './sidecar';
+import { IngestResponse } from './types';
 
 function parsePdfIngestionResponse(response: IngestResponse): ReferenceItem[] {
   return response.references.map((reference) => ({
