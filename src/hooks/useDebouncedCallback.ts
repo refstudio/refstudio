@@ -2,6 +2,7 @@ import { useCallback, useRef } from 'react';
 
 /**
  * Returns a callback that will only call the passed function when it has not been called for the specified time
+ *
  * @param func The function to be called
  * @param ms The debounce time
  * @returns The debounced callback
