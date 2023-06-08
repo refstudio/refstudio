@@ -1,6 +1,6 @@
 import json
 
-from sidecar import rewriter
+from sidecar import rewrite
 
 
 def test_summarize(monkeypatch, capsys):
@@ -28,9 +28,9 @@ def test_summarize(monkeypatch, capsys):
         }
         return response
     
-    monkeypatch.setattr(rewriter.Rewriter, "call_model", mock_call_model)
+    monkeypatch.setattr(rewrite.Rewriter, "call_model", mock_call_model)
 
-    _ = rewriter.summarize("This is a test")
+    _ = rewrite.summarize("This is a test")
     captured = capsys.readouterr()
     output = json.loads(captured.out)
 
