@@ -5,6 +5,19 @@
   @apply mx-1 my-1 rounded-lg bg-gray-200 px-2 py-1 hover:bg-gray-500 hover:text-white;
 }
 
+.tiptap-editor ul,
+ol {
+  @apply pl-3;
+}
+
+.tiptap-editor ul > li {
+  @apply list-disc;
+}
+
+.tiptap-editor ol > li {
+  @apply list-decimal;
+}
+
 .tiptap-editor .ProseMirror-focused {
   outline: none;
 }
