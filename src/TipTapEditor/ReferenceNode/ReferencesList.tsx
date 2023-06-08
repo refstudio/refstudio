@@ -6,10 +6,9 @@ import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useSt
 import { createPortal } from 'react-dom';
 import { usePopper } from 'react-popper';
 
-import { getReferencesAtom } from '../../atoms/referencesState';
+import { getReferencesAtom, getReferencesFuseAtom } from '../../atoms/referencesState';
 import { cx } from '../../cx';
 import { ReferenceItem } from '../../types/ReferenceItem';
-import { getReferenceFilter } from './utils';
 
 export type ReferenceListProps = SuggestionProps<{ id: string; label: string }>;
 
@@ -17,11 +16,17 @@ export const ReferencesList = forwardRef((props: ReferenceListProps, ref) => {
   const { command, clientRect, query } = props;
   const [selectedIndex, setSelectedIndex] = useState(0);
   const references = useAtomValue(getReferencesAtom);
+  const referenceFuses = useAtomValue(getReferencesFuseAtom);
 
-  const referenceFilter = useMemo(() => getReferenceFilter(query), [query]);
   const queriedReferences = useMemo(
-    () => references.filter(referenceFilter).slice(0, 5),
-    [references, referenceFilter],
+    () =>
+      query.length > 0
+        ? referenceFuses
+            .search(query)
+            .slice(0, 5)
+            .map(({ item }) => item)
+        : references,
+    [referenceFuses, references, query],
   );
   const referenceElement = useMemo(
     () => (clientRect ? { getBoundingClientRect: () => clientRect()! } : null),

@@ -1,3 +1,4 @@
+import Fuse from 'fuse.js';
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 
@@ -26,3 +27,10 @@ export const setReferencesAtom = atom(null, (_get, set, references: ReferenceIte
   });
   set(referencesAtom, updatedReferences);
 });
+
+export const getReferencesFuseAtom = atom(
+  (get) =>
+    new Fuse(get(getReferencesAtom), {
+      keys: ['title', 'authors.fullName'],
+    }),
+);
