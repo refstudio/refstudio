@@ -2,11 +2,11 @@
 import json
 import sys
 
-from main import get_arg_parser
+from sidecar import cli
 from sidecar.typing import CliCommands
 
 if __name__ == '__main__':
-    parser = get_arg_parser()
+    parser = cli.get_arg_parser()
     commands = [*parser._get_positional_actions()[0].choices.keys()]
     cli_schema = CliCommands.json_schema()
 

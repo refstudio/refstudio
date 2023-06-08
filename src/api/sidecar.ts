@@ -8,6 +8,10 @@ export async function callSidecar<T extends keyof CliSchema>(subcommand: T, args
   const command = new Command('call-sidecar', [subcommand, ...args]);
   console.log('command', command);
   const output = await command.execute();
+  if (output.stderr) {
+    throw new Error(output.stderr);
+  }
+  console.log('output: ', output.stdout);
   const response = JSON.parse(output.stdout) as CliSchema[T];
   console.log('response', response);
   return response;

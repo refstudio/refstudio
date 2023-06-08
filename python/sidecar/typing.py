@@ -6,6 +6,7 @@ from dataclasses_jsonschema import JsonSchemaMixin
 
 @dataclass
 class Reference(JsonSchemaMixin):
+    """A reference for an academic paper / PDF"""
     source_filename: str
     filename_md5: str
     title: Optional[str] = None

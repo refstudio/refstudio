@@ -20,7 +20,7 @@ export interface IngestResponse {
   references: Reference[];
 }
 /**
- * Reference(source_filename: str, filename_md5: str, title: Optional[str] = None, abstract: Optional[str] = None, contents: Optional[str] = None, authors: List[ForwardRef('Author')] = <factory>, chunks: List[ForwardRef('Chunk')] = <factory>, metadata: Dict[str, Any] = <factory>)
+ * A reference for an academic paper / PDF
  */
 export interface Reference {
   source_filename: string;
