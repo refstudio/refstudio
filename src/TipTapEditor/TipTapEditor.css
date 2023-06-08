@@ -4,7 +4,7 @@
 
 .tiptap-editor ul,
 ol {
-  @apply pl-3;
+  @apply list-inside;
 }
 
 .tiptap-editor ul > li {
