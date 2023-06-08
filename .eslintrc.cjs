@@ -158,5 +158,22 @@ module.exports = {
         minimumLengthForMultiline: 80,
       },
     ],
+    'jsdoc/no-restricted-syntax': [
+      'error',
+      {
+        contexts: [
+          {
+            // See https://github.com/estree/estree/blob/master/es5.md
+            context:
+              'ReturnStatement,IfStatement,ForStatement,WhileStatement,SwitchStatement,' +
+              'VariableDeclaration[kind="let"],TryStatement,CatchClause,BreakStatement,' +
+              'ContinueStatement,SwitchCase,ForInStatement,DoWhileStatement,ArrayExpression,' +
+              'UpdateExpression,UnaryExpression,MemberExpression,CallExpression,NewExpression,' +
+              'ForOfStatement',
+            message: 'Use an implementation comment (//) instead of a JSDoc comment (/** ... */).',
+          },
+        ],
+      },
+    ],
   },
 };
