@@ -2,7 +2,7 @@ import json
 import sys
 from argparse import ArgumentParser
 
-from sidecar import ingest, interact, shared
+from sidecar import ingest, rewriter, shared
 
 
 def main(text: str):
@@ -47,4 +47,4 @@ if __name__ == '__main__':
     if args.command == "ingest":
         ingest.main(args.pdf_directory)
     if args.command == "rewrite":
-        interact.summarize(args.text)
+        rewriter.summarize(args.text)

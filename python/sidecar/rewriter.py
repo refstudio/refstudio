@@ -12,12 +12,12 @@ openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 def summarize(text: str, n_options: int = 1) -> str:
     prompt = prompts.create_prompt_for_summarize(text)
-    chat = Chat(prompt, n_options)
+    chat = Rewriter(prompt, n_options)
     response = chat.get_response()
     sys.stdout.write(json.dumps(response))
 
 
-class Chat:
+class Rewriter:
     def __init__(self, text: str, n_options: int = 1):
         self.text = text
         self.n_options = int(n_options)
