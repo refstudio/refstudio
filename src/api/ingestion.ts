@@ -1,7 +1,6 @@
-import { Command } from '@tauri-apps/api/shell';
-
 import { getUploadsDir } from '../filesystem';
 import { ReferenceItem } from '../types/ReferenceItem';
+import { callSidecar } from './sidecar';
 import { RawPdfIngestionResponse } from './types';
 
 function parsePdfIngestionResponse(response: RawPdfIngestionResponse): ReferenceItem[] {
@@ -14,10 +13,6 @@ function parsePdfIngestionResponse(response: RawPdfIngestionResponse): Reference
 
 export async function runPDFIngestion(): Promise<ReferenceItem[]> {
   const uploadsDir = await getUploadsDir();
-  const command = new Command('call-sidecar', ['ingest', '--pdf_directory', `${uploadsDir.toString()}`]);
-  console.log('command', command);
-  const output = await command.execute();
-  const response = JSON.parse(output.stdout) as RawPdfIngestionResponse;
-  console.log('response', response);
+  const response = await callSidecar('ingest', ['--pdf_directory', String(uploadsDir)]);
   return parsePdfIngestionResponse(response);
 }
