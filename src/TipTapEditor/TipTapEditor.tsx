@@ -21,18 +21,17 @@ export function TipTapEditor({ editorRef, editorContent }: EditorProps) {
   const setSelection = useSetAtom(selectionAtom);
 
   useEffect(() => {
-    setEditor(
-      new Editor({
-        extensions: EDITOR_EXTENSIONS,
-        content: editorContent ?? INITIAL_CONTENT,
-        onSelectionUpdate(update) {
-          const newEditor = update.editor;
-          const { from, to } = newEditor.view.state.selection;
-          const text = newEditor.view.state.doc.textBetween(from, to);
-          setSelection(text);
-        },
-      }),
-    );
+    const newEditor = new Editor({
+      extensions: EDITOR_EXTENSIONS,
+      content: editorContent ?? INITIAL_CONTENT,
+      onSelectionUpdate(update) {
+        const updatedEditor = update.editor;
+        const { from, to } = updatedEditor.view.state.selection;
+        const text = updatedEditor.view.state.doc.textBetween(from, to);
+        setSelection(text);
+      },
+    });
+    setEditor(newEditor);
   }, [editorContent, setSelection]);
 
   useEffect(() => {
@@ -56,7 +55,7 @@ export function TipTapEditor({ editorRef, editorContent }: EditorProps) {
   return (
     <div className="flex h-full w-full flex-col">
       <MenuBar editor={editor} />
-      <EditorContent className="tiptap-editor flex-1 overflow-y-scroll pl-5 pr-2 pt-4" editor={editor} />
+      <EditorContent className="tiptap-editor flex-1 overflow-y-scroll pr-2 pt-4" editor={editor} />
     </div>
   );
 }

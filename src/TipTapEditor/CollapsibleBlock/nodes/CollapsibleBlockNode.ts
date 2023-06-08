@@ -9,11 +9,8 @@ export interface CollapsibleBlockNodeAttributes {
 
 export const CollapsibleBlockNode = Node.create({
   name: 'collapsibleBlock',
-
   group: 'block',
-
   content: 'collapsibleSummary collapsibleContent',
-  draggable: true,
 
   parseHTML() {
     return [

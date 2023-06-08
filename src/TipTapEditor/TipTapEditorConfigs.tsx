@@ -11,16 +11,12 @@ import { Markdown } from 'tiptap-markdown';
 import { CollapsibleBlockContentNode } from './CollapsibleBlock/nodes/CollapsibleBlockContent';
 import { CollapsibleBlockNode } from './CollapsibleBlock/nodes/CollapsibleBlockNode';
 import { CollapsibleBlockSummaryNode } from './CollapsibleBlock/nodes/CollapsibleBlockSummary';
+import { DraggableBlockNode } from './DraggableBlock/DraggableBlockNode';
 import { ReferenceNode } from './ReferenceNode/ReferenceNode';
+import { RefStudioDocument } from './RefStudioDocument';
 lowlight.registerLanguage('markdown', markdown);
 
 export const EDITOR_EXTENSIONS: Extensions = [
-  // Custom extensions
-  CollapsibleBlockNode,
-  CollapsibleBlockContentNode,
-  CollapsibleBlockSummaryNode,
-  ReferenceNode,
-
   Markdown,
   CodeBlockLowlight.configure({
     lowlight,
@@ -30,13 +26,22 @@ export const EDITOR_EXTENSIONS: Extensions = [
   StarterKit.configure({
     bulletList: {
       keepMarks: true,
-      keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+      keepAttributes: false,
     },
+    codeBlock: false,
+    document: false,
     orderedList: {
       keepMarks: true,
-      keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+      keepAttributes: false,
     },
   }),
+  // Custom extensions
+  CollapsibleBlockNode,
+  CollapsibleBlockContentNode,
+  CollapsibleBlockSummaryNode,
+  DraggableBlockNode,
+  ReferenceNode,
+  RefStudioDocument,
 ];
 export const INITIAL_CONTENT = `
   <h2>Hi there,</h2>

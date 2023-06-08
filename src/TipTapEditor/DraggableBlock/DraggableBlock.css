@@ -1,0 +1,21 @@
+.draggable-block {
+  @apply flex flex-row items-start gap-1;
+  @apply px-[2px] py-[3px];
+}
+
+.draggable-block > .drag-handle {
+  @apply invisible;
+  @apply flex flex-shrink-0 flex-grow-0;
+  @apply mt-1 h-4 w-4;
+  @apply cursor-grab;
+  @apply bg-contain bg-center bg-no-repeat;
+  background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 16"><path fill-opacity="0.2" d="M4 14c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zM2 6C.9 6 0 6.9 0 8s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6C.9 0 0 .9 0 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" /></svg>');
+}
+
+.draggable-block:hover:not(:has(.draggable-block:hover)) > .drag-handle {
+  @apply visible;
+}
+
+.draggable-block > .content {
+  @apply flex-1;
+}
