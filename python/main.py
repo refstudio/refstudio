@@ -2,7 +2,7 @@ import json
 import sys
 from argparse import ArgumentParser
 
-from sidecar import ingest, shared
+from sidecar import ingest, interact, shared
 
 
 def main(text: str):
@@ -32,8 +32,8 @@ if __name__ == '__main__':
     )
 
     ai_parser = subparsers.add_parser(
-        "ai",
-        description="AI operations",
+        "rewrite",
+        description="Rewrites a block of text in a more concise manner",
     )
     ai_parser.add_argument(
         "--text",
@@ -46,5 +46,5 @@ if __name__ == '__main__':
         print(args)
     if args.command == "ingest":
         ingest.main(args.pdf_directory)
-    if args.command == "ai":
-        main(text=args.text)
+    if args.command == "rewrite":
+        interact.summarize(args.text)
