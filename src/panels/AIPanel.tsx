@@ -1,7 +1,7 @@
-import { Command } from '@tauri-apps/api/shell';
 import { useAtomValue } from 'jotai';
 import { useDebounce } from 'usehooks-ts';
 
+import { callSidecar } from '../api/sidecar';
 import { selectionAtom } from '../atoms/selectionState';
 import { PanelSection } from '../components/PanelSection';
 import { PanelWrapper } from '../components/PanelWrapper';
@@ -47,15 +47,7 @@ export function AIPanel({ onCloseClick }: { onCloseClick?: () => void }) {
 
 async function askForRewrite(selection: string) {
   try {
-    const command = new Command('call-sidecar', ['rewrite', '--text', `${selection}`]);
-    console.log('command', command);
-    const output = await command.execute();
-    if (output.stderr) {
-      console.log('throwing', output.stderr);
-      throw new Error(output.stderr);
-    }
-    console.log('output: ', output.stdout);
-    const response = JSON.parse(output.stdout) as { index: number; text: string }[];
+    const response = await callSidecar('rewrite', ['--text', selection]);
     const aiReply = response[0].text;
     return aiReply;
   } catch (reason) {
