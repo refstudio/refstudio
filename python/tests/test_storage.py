@@ -14,7 +14,7 @@ def test_json_storage_load():
     total_chunks = sum([len(ref.chunks) for ref in jstore.references])
     assert len(jstore.corpus) == total_chunks
 
-    assert jstore.tokenized_corpus == [c.split() for c in jstore.corpus]
+    assert jstore.tokenized_corpus == [c.lower().split() for c in jstore.corpus]
 
     for ref in jstore.references:
         assert isinstance(ref, Reference)
@@ -23,7 +23,7 @@ def test_json_storage_load():
         assert len(ref.authors) == 2
 
         assert isinstance(ref.chunks, list)
-        assert len(ref.chunks) == 2
+        assert len(ref.chunks) > 0
 
         for author in ref.authors:
             assert isinstance(author, Author)

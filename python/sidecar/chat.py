@@ -1,22 +1,37 @@
+import json
 import os
+import sys
+from pathlib import Path
 
 import openai
 from dotenv import load_dotenv
 from sidecar import prompts
 from sidecar.ranker import BM25Ranker
 from sidecar.storage import JsonStorage
+from sidecar.typing import ChatResponseChoice
 
 load_dotenv()
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 
-def ask_question(input_text: str, n_options: int = 1):
-    fp = "/Users/greg/Library/Application Support/com.tauri.dev/project-x/.storage/references.json"
-    storage = JsonStorage(filepath=fp)
+# TODO - move this into settings or env vars
+REFERENCES_STORAGE_PATH = Path(
+    "~/Library/Application Support/com.tauri.dev/project-x/.storage/references.json"
+).expanduser()
+
+
+# TODO - remove storage_path from this function
+# it's only hear to make testing easier for right now
+def ask_question(
+        input_text: str,
+        n_options: int = 1,
+        storage_path: str = REFERENCES_STORAGE_PATH,
+    ):
+    storage = JsonStorage(filepath=storage_path)
     storage.load()
     ranker = BM25Ranker(storage=storage)
     chat = Chat(input_text=input_text, storage=storage, ranker=ranker)
-    response = chat.ask_question(n_options=n_options)
-    return response
+    choices = chat.ask_question(n_options=n_options)
+    sys.stdout.write(json.dumps([c.to_dict() for c in choices]))
 
 
 class Chat:
@@ -50,9 +65,16 @@ class Chat:
         ]
         return messages
     
-    def ask_question(self, n_options: int = 1):
+    def prepare_choices_for_client(self, response: dict) -> list[ChatResponseChoice]:
+        return [
+            ChatResponseChoice(index=choice['index'], text=choice["message"]["content"])
+            for choice in response['choices']
+        ]
+    
+    def ask_question(self, n_options: int = 1) -> dict:
         docs = self.get_relevant_documents()
         prompt = prompts.create_prompt_for_chat(query=self.input_text, context=docs)
         messages = self.prepare_messages_for_chat(text=prompt)
         response = self.call_model(messages=messages, n_options=n_options)
-        return response
+        choices = self.prepare_choices_for_client(response=response)
+        return choices

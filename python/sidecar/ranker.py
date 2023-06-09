@@ -14,7 +14,7 @@ class BM25Ranker:
         :param limit: int
         :return: list
         """
-        tokenized_query = query.split()
+        tokenized_query = query.lower().split()
         docs = self.ranker.get_top_n(tokenized_query, self.storage.corpus, n=limit)
         return docs
     

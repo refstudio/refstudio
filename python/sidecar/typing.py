@@ -45,6 +45,12 @@ class RewriteChoice(JsonSchemaMixin):
 
 
 @dataclass
+class ChatResponseChoice(JsonSchemaMixin):
+    index: int
+    text: str
+
+
+@dataclass
 class CliCommands(JsonSchemaMixin):
     ingest: IngestResponse
     rewrite: list[RewriteChoice]
