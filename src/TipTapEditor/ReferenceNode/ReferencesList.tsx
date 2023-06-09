@@ -1,14 +1,16 @@
 import './ReferencesList.css';
 
 import { SuggestionKeyDownProps, SuggestionProps } from '@tiptap/suggestion';
+import Fuse from 'fuse.js';
 import { useAtomValue } from 'jotai';
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { usePopper } from 'react-popper';
 
-import { getReferencesAtom, getReferencesFuseAtom } from '../../atoms/referencesState';
+import { getReferencesAtom } from '../../atoms/referencesState';
 import { cx } from '../../cx';
 import { ReferenceItem } from '../../types/ReferenceItem';
+import { fuseOptions } from './config';
 
 export type ReferenceListProps = SuggestionProps<{ id: string; label: string }>;
 
@@ -16,17 +18,18 @@ export const ReferencesList = forwardRef((props: ReferenceListProps, ref) => {
   const { command, clientRect, query } = props;
   const [selectedIndex, setSelectedIndex] = useState(0);
   const references = useAtomValue(getReferencesAtom);
-  const referenceFuses = useAtomValue(getReferencesFuseAtom);
+
+  const referencesFuse = useMemo(() => new Fuse(references, fuseOptions), [references]);
 
   const queriedReferences = useMemo(
     () =>
       query.length > 0
-        ? referenceFuses
+        ? referencesFuse
             .search(query)
             .slice(0, 5)
             .map(({ item }) => item)
         : references,
-    [referenceFuses, references, query],
+    [referencesFuse, references, query],
   );
   const referenceElement = useMemo(
     () => (clientRect ? { getBoundingClientRect: () => clientRect()! } : null),
