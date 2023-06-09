@@ -90,6 +90,8 @@ export function transformPasted(slice: Slice) {
 }
 
 function stripTransparentMarksFromFragment(fragment: Fragment) {
+  // The following code is basically a fragment.map but Fragment class is not iterable and does not have a map method
+  // so we have to use this forEach loop instead
   const updatedNodes: Node[] = [];
   fragment.forEach((node) => {
     updatedNodes.push(node.mark(node.marks.filter((mark) => mark.attrs.color !== 'transparent')));
