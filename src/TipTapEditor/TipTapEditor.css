@@ -5,9 +5,8 @@
   @apply mx-1 my-1 rounded-lg bg-gray-200 px-2 py-1 hover:bg-gray-500 hover:text-white;
 }
 
-.tiptap-editor ul,
-ol {
-  @apply pl-3;
+.tiptap-editor ul, .tiptap-editor ol {
+  @apply ml-7;
 }
 
 .tiptap-editor ul > li {
@@ -16,6 +15,10 @@ ol {
 
 .tiptap-editor ol > li {
   @apply list-decimal;
+}
+
+.tiptap-editor ul > li > p, .tiptap-editor ol > li > p {
+  @apply my-1;
 }
 
 .tiptap-editor .ProseMirror-focused {
