@@ -5,7 +5,6 @@
 .tiptap-editor ul,
 .tiptap-editor ol {
   @apply list-inside;
-  @apply ml-7;
 }
 
 .tiptap-editor ul > li {
@@ -14,11 +13,6 @@
 
 .tiptap-editor ol > li {
   @apply list-decimal;
-}
-
-.tiptap-editor ul > li > p,
-.tiptap-editor ol > li > p {
-  @apply my-1;
 }
 
 .tiptap-editor .ProseMirror-focused {
