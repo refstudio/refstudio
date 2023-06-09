@@ -30,4 +30,4 @@ class JsonStorage:
         for ref in self.references:
             for chunk in ref.chunks:
                 self.corpus.append(chunk.text)
-                self.tokenized_corpus.append(chunk.text.split())
+                self.tokenized_corpus.append(chunk.text.lower().split())
