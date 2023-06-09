@@ -5,7 +5,8 @@
   @apply mx-1 my-1 rounded-lg bg-gray-200 px-2 py-1 hover:bg-gray-500 hover:text-white;
 }
 
-.tiptap-editor ul, .tiptap-editor ol {
+.tiptap-editor ul,
+.tiptap-editor ol {
   @apply ml-7;
 }
 
@@ -17,7 +18,8 @@
   @apply list-decimal;
 }
 
-.tiptap-editor ul > li > p, .tiptap-editor ol > li > p {
+.tiptap-editor ul > li > p,
+.tiptap-editor ol > li > p {
   @apply my-1;
 }
 
