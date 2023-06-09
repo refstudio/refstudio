@@ -49,7 +49,7 @@ export function MainPanel(props: MainPanelProps) {
             handleTabClick={(path) => selectFileInPane({ paneId: left.id, fileId: path })}
             handleTabCloseClick={(path) => closeFileInPane({ paneId: left.id, fileId: path })}
             pane={left}
-            onPaneFocused={() => focusPane('LEFT')}
+            onPaneFocused={() => focusPane(left.id)}
             {...props}
           />
         </Panel>
@@ -60,7 +60,7 @@ export function MainPanel(props: MainPanelProps) {
               handleTabClick={(path) => selectFileInPane({ paneId: right.id, fileId: path })}
               handleTabCloseClick={(path) => closeFileInPane({ paneId: right.id, fileId: path })}
               pane={right}
-              onPaneFocused={() => focusPane('RIGHT')}
+              onPaneFocused={() => focusPane(right.id)}
               {...props}
             />
           </Panel>
