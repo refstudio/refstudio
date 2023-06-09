@@ -1,6 +1,6 @@
 import json
 
-from sidecar import chat, storage
+from sidecar import chat
 
 
 def test_chat_ask_question(monkeypatch, capsys):

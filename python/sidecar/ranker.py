@@ -1,4 +1,4 @@
-from rank_bm25 import BM25Okapi, BM25Plus
+from rank_bm25 import BM25Plus
 from sidecar.storage import JsonStorage
 
 
