@@ -21,28 +21,26 @@ export const ReferencesList = forwardRef((props: ReferenceListProps, ref) => {
 
   const referencesFuse = useMemo(() => new Fuse(references, fuseOptions), [references]);
 
-  const queriedReferences = useMemo(
-    () => {
-      if (query.length > 0) {
-        return referencesFuse
-          .search(query)
-          .slice(0, 5)
-          .map(({ item }) => item);
-      } else {
-        // Fallback to references list because fuse.search with an empty query returns an empty list,
-        // which is not the expected behaviour for the selector
-        return references;
-      }
-    }, [referencesFuse, references, query]);
+  const queriedReferences = useMemo(() => {
+    if (query.length > 0) {
+      return referencesFuse
+        .search(query)
+        .slice(0, 5)
+        .map(({ item }) => item);
+    } else {
+      // Fallback to references list because fuse.search with an empty query returns an empty list,
+      // which is not the expected behaviour for the selector
+      return references;
+    }
+  }, [referencesFuse, references, query]);
 
-  const referenceElement = useMemo(
-    () => {
-      if (clientRect) {
-        return { getBoundingClientRect: () => clientRect()! };
-      } else {
-        return null;
-      }
-    }, [clientRect]);
+  const referenceElement = useMemo(() => {
+    if (clientRect) {
+      return { getBoundingClientRect: () => clientRect()! };
+    } else {
+      return null;
+    }
+  }, [clientRect]);
 
   const handleSelect = (index: number) => {
     const referenceItem = queriedReferences[index];
