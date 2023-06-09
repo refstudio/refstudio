@@ -56,7 +56,7 @@ export function TabItem({
         'group',
         {
           'border-t-2 border-t-slate-200 hover:bg-slate-100': !active,
-          'border-t-2 border-t-blue-300 bg-slate-200': active,
+          'border-t-2 border-t-primary bg-slate-200': active,
         },
       )}
       role="tab"
