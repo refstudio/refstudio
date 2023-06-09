@@ -18,3 +18,7 @@ ol {
 .tiptap-editor .ProseMirror-focused {
   outline: none;
 }
+
+.tiptap-editor {
+  @apply flex-1 overflow-y-scroll pl-1 pr-2 pt-2;
+}

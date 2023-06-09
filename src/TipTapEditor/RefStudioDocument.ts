@@ -6,6 +6,7 @@ export const RefStudioDocument = Document.extend({
     return {
       'Mod-Enter': ({ editor }) => {
         console.log(editor.getJSON());
+        console.log(editor.state.selection);
         return true;
       },
     };
