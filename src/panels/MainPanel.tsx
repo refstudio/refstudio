@@ -140,7 +140,9 @@ export function MainPaneViewContent({ activeFileAtom, editorRef, pdfViewerRef }:
       return <PdfViewer file={data} pdfViewerRef={pdfViewerRef} />;
     case 'tiptap':
       return <TipTapView editorRef={editorRef} file={data} />;
-    default:
+    default: {
       assertNever(data);
+      return null;
+    }
   }
 }
