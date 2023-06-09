@@ -1,21 +1,13 @@
 import { atom } from 'jotai';
 
-import { FileEntry } from '../types/FileEntry';
-import { _activePaneAtom, _activePaneIdAtom } from './core/activePaneAtom';
-import { FileId, PaneFileId, PaneId } from './core/atom.types';
-import { _fileContentAtom, _loadFileInMemory, _unloadFileFromMemory } from './core/fileContentAtom';
-import { _addFileEntry, _removeFileEntry } from './core/fileEntryAtom';
-import {
-  _addFileToPane,
-  _paneGroupAtom,
-  _removeFileFromPane,
-  _selectFileInPaneAtom,
-  getPane,
-} from './core/paneGroupAtom';
+import { _activePaneAtom, _activePaneIdAtom } from './core/activePane';
+import { _fileContentAtom, _loadFile, _unloadFile } from './core/fileContent';
+import { _addFileEntry, _removeFileEntry } from './core/fileEntry';
+import { _addFileToPane, _paneGroupAtom, _removeFileFromPane, _selectFileInPaneAtom, getPane } from './core/paneGroup';
+import { FileEntry, FileId } from './types/FileEntry';
+import { PaneFileId, PaneId } from './types/PaneGroup';
 
-/**
- * Open a file in the active pane
- */
+/** Open a file in the active pane */
 export const openFileAtom = atom(null, (get, set, file: FileEntry) => {
   if (file.isFolder) {
     console.warn('Cannot open directory ', file.path);
@@ -24,7 +16,7 @@ export const openFileAtom = atom(null, (get, set, file: FileEntry) => {
   // Load file in memory
   const currentOpenFiles = get(_fileContentAtom);
   if (!currentOpenFiles.has(file.path)) {
-    set(_loadFileInMemory, file);
+    set(_loadFile, file);
   }
 
   // Add to file entries atom
@@ -41,20 +33,9 @@ export const openFileAtom = atom(null, (get, set, file: FileEntry) => {
   set(_selectFileInPaneAtom, { fileId, paneId: activePane.id });
 });
 
-/**
- * Removes file from the given pane and unload content from memory if the file is not open in another pane
- */
+/** Removes file from the given pane and unload content from memory if the file is not open in another pane */
 export const closeFileFromPaneAtom = atom(null, (get, set, { fileId, paneId }: PaneFileId) => {
-  const currentOpenFiles = get(_fileContentAtom);
-  if (!currentOpenFiles.has(fileId)) {
-    console.warn('File is not open ', fileId);
-    return;
-  }
   const panes = get(_paneGroupAtom);
-  if (!panes[paneId].openFiles.includes(fileId)) {
-    console.warn('File is not open in the given pane ', fileId, paneId);
-    return;
-  }
 
   set(_removeFileFromPane, { fileId, paneId });
 
@@ -65,7 +46,7 @@ export const closeFileFromPaneAtom = atom(null, (get, set, { fileId, paneId }: P
       .every(([, pane]) => !pane.openFiles.includes(fileId)) // Check that the file was not open in any other pane
   ) {
     set(_removeFileEntry, fileId);
-    set(_unloadFileFromMemory, fileId);
+    set(_unloadFile, fileId);
   }
 
   // Select another file in the pane, if there are any
@@ -96,12 +77,5 @@ export const focusPaneAtom = atom(null, (_get, set, paneId: PaneId) => {
 });
 
 export const selectFileInPaneAtom = atom(null, (get, set, paneFileId: PaneFileId) => {
-  const { fileId, paneId } = paneFileId;
-  const panes = get(_paneGroupAtom);
-  if (!panes[paneId].openFiles.includes(fileId)) {
-    console.warn('File not open in the given pane ', fileId, paneId);
-    return;
-  }
-
   set(_selectFileInPaneAtom, paneFileId);
 });

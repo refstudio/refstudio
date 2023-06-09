@@ -1,4 +1,4 @@
-import { JsonFileContent, XmlFileContent } from '../types/FileContent';
+import { JsonFileContent, XmlFileContent } from '../atoms/types/FileContent';
 
 export function TextView({
   file,

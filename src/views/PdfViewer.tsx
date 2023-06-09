@@ -4,8 +4,8 @@ import 'react-pdf/dist/esm/Page/TextLayer.css';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 
+import { PdfFileContent } from '../atoms/types/FileContent';
 import { useDebouncedCallback } from '../hooks/useDebouncedCallback';
-import { PdfFileContent } from '../types/FileContent';
 import { PdfViewerAPI } from '../types/PdfViewerAPI';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).toString();

@@ -9,12 +9,12 @@ import {
   selectFileInPaneAtom,
   splitFileToPaneAtom,
 } from '../atoms/fileActions';
+import { FileEntry } from '../atoms/types/FileEntry';
 import { FileTree } from '../components/FileTree';
 import { PanelSection } from '../components/PanelSection';
 import { PanelWrapper } from '../components/PanelWrapper';
 import { readAllProjectFiles } from '../filesystem';
 import { isNonNullish } from '../lib/isNonNullish';
-import { FileEntry } from '../types/FileEntry';
 
 export function ExplorerPanel() {
   const left = useAtomValue(leftPaneAtom);

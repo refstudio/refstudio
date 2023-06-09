@@ -1,20 +1,20 @@
 export interface TipTapFileContent {
-  type: 'TIPTAP';
+  type: 'tiptap';
   textContent: string;
 }
 
 export interface PdfFileContent {
-  type: 'PDF';
+  type: 'pdf';
   binaryContent: Uint8Array;
 }
 
 export interface XmlFileContent {
-  type: 'XML';
+  type: 'xml';
   textContent: string;
 }
 
 export interface JsonFileContent {
-  type: 'JSON';
+  type: 'json';
   textContent: string;
 }
 

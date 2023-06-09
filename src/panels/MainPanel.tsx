@@ -3,7 +3,6 @@ import { Loadable } from 'jotai/vanilla/utils/loadable';
 import { useCallback } from 'react';
 import { Panel, PanelGroup } from 'react-resizable-panels';
 
-import { FileId } from '../atoms/core/atom.types';
 import {
   closeFileFromPaneAtom,
   focusPaneAtom,
@@ -11,13 +10,15 @@ import {
   rightPaneAtom,
   selectFileInPaneAtom,
 } from '../atoms/fileActions';
+import { FileContent } from '../atoms/types/FileContent';
+import { FileId } from '../atoms/types/FileEntry';
+import { PaneContent } from '../atoms/types/PaneGroup';
 import { Spinner } from '../components/Spinner';
 import { TabPane } from '../components/TabPane';
 import { VerticalResizeHandle } from '../components/VerticalResizeHandle';
 import { EditorAPI } from '../types/EditorAPI';
-import { FileContent } from '../types/FileContent';
-import { FileEntry } from '../types/FileEntry';
 import { PdfViewerAPI } from '../types/PdfViewerAPI';
+import { assertNever } from '../utils/assertNever';
 import { EmptyView } from '../views/EmptyView';
 import { PdfViewer } from '../views/PdfViewer';
 import { TextView } from '../views/TextView';
@@ -32,7 +33,7 @@ export function MainPanel(props: MainPanelProps) {
   const { pdfViewerRef } = props;
   const left = useAtomValue(leftPaneAtom);
   const right = useAtomValue(rightPaneAtom);
-  const activateFileInPane = useSetAtom(selectFileInPaneAtom);
+  const selectFileInPane = useSetAtom(selectFileInPaneAtom);
   const closeFileInPane = useSetAtom(closeFileFromPaneAtom);
   const focusPane = useSetAtom(focusPaneAtom);
 
@@ -45,11 +46,9 @@ export function MainPanel(props: MainPanelProps) {
       <PanelGroup direction="horizontal" onLayout={updatePDFViewerWidth}>
         <Panel>
           <MainPanelPane
-            activeFile={left.activeFile}
-            activeFileAtom={left.activeFileAtom}
-            files={left.files}
-            handleTabClick={(path) => activateFileInPane({ paneId: left.id, fileId: path })}
+            handleTabClick={(path) => selectFileInPane({ paneId: left.id, fileId: path })}
             handleTabCloseClick={(path) => closeFileInPane({ paneId: left.id, fileId: path })}
+            pane={left}
             onPaneFocused={() => focusPane('LEFT')}
             {...props}
           />
@@ -58,11 +57,9 @@ export function MainPanel(props: MainPanelProps) {
         {right.files.length > 0 && (
           <Panel>
             <MainPanelPane
-              activeFile={right.activeFile}
-              activeFileAtom={right.activeFileAtom}
-              files={right.files}
-              handleTabClick={(path) => activateFileInPane({ paneId: right.id, fileId: path })}
+              handleTabClick={(path) => selectFileInPane({ paneId: right.id, fileId: path })}
               handleTabCloseClick={(path) => closeFileInPane({ paneId: right.id, fileId: path })}
+              pane={right}
               onPaneFocused={() => focusPane('RIGHT')}
               {...props}
             />
@@ -74,24 +71,21 @@ export function MainPanel(props: MainPanelProps) {
 }
 
 interface MainPanelPaneProps {
-  files: readonly FileEntry[];
-  activeFile?: FileEntry;
-  activeFileAtom?: Atom<Loadable<Promise<FileContent>>>;
+  pane: PaneContent;
   handleTabClick(path: string): void;
   handleTabCloseClick(path: string): void;
   onPaneFocused(): void;
 }
 
 export function MainPanelPane({
-  files,
-  activeFile,
-  activeFileAtom,
+  pane,
   handleTabClick,
   handleTabCloseClick,
   editorRef,
   onPaneFocused,
   pdfViewerRef,
 }: MainPanelPaneProps & MainPanelProps) {
+  const { files, activeFile, activeFileContent } = pane;
   const items = files.map((file) => ({
     key: file.path,
     text: file.name,
@@ -102,9 +96,9 @@ export function MainPanelPane({
     <div className="h-full grid-cols-1 grid-rows-[auto_1fr]" onClick={onPaneFocused} onFocus={onPaneFocused}>
       <TabPane items={items} value={activeFile?.path} onClick={handleTabClick} onCloseClick={handleTabCloseClick} />
       <div className="flex h-full w-full overflow-hidden">
-        {activeFile && activeFileAtom ? (
+        {activeFile && activeFileContent ? (
           <MainPaneViewContent
-            activeFileAtom={activeFileAtom}
+            activeFileAtom={activeFileContent}
             editorRef={editorRef}
             fileId={activeFile.path}
             pdfViewerRef={pdfViewerRef}
@@ -135,20 +129,18 @@ export function MainPaneViewContent({ activeFileAtom, editorRef, pdfViewerRef }:
     return <strong>Error: {String(loadableFileContent.error)}</strong>;
   }
 
-  if (loadableFileContent.data.type === 'XML') {
-    return <TextView file={loadableFileContent.data} />;
-  }
+  const { data } = loadableFileContent;
 
-  if (loadableFileContent.data.type === 'JSON') {
-    return (
-      <TextView file={loadableFileContent.data} textFormatter={(input) => JSON.stringify(JSON.parse(input), null, 2)} />
-    );
+  switch (data.type) {
+    case 'xml':
+      return <TextView file={data} />;
+    case 'json':
+      return <TextView file={data} textFormatter={(input) => JSON.stringify(JSON.parse(input), null, 2)} />;
+    case 'pdf':
+      return <PdfViewer file={data} pdfViewerRef={pdfViewerRef} />;
+    case 'tiptap':
+      return <TipTapView editorRef={editorRef} file={data} />;
+    default:
+      assertNever(data);
   }
-
-  if (loadableFileContent.data.type === 'PDF') {
-    return <PdfViewer file={loadableFileContent.data} pdfViewerRef={pdfViewerRef} />;
-  }
-
-  // Use TipTap editor by default!
-  return <TipTapView editorRef={editorRef} file={loadableFileContent.data} />;
 }

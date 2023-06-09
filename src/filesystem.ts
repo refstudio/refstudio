@@ -10,9 +10,9 @@ import {
 } from '@tauri-apps/api/fs';
 import { appDataDir, join } from '@tauri-apps/api/path';
 
+import { FileContent } from './atoms/types/FileContent';
+import { FileEntry, FileFileEntry } from './atoms/types/FileEntry';
 import { INITIAL_CONTENT } from './TipTapEditor/TipTapEditorConfigs';
-import { FileContent } from './types/FileContent';
-import { FileEntry, FileFileEntry } from './types/FileEntry';
 
 const PROJECT_NAME = 'project-x';
 const UPLOADS_DIR = 'uploads';
@@ -60,19 +60,19 @@ export async function readFileContent(file: FileFileEntry): Promise<FileContent>
   switch (file.fileExtension) {
     case 'xml': {
       const textContent = await readTextFile(file.path);
-      return { type: 'XML', textContent };
+      return { type: 'xml', textContent };
     }
     case 'json': {
       const textContent = await readTextFile(file.path);
-      return { type: 'JSON', textContent };
+      return { type: 'json', textContent };
     }
     case 'pdf': {
       const binaryContent = await readBinaryFile(file.path);
-      return { type: 'PDF', binaryContent };
+      return { type: 'pdf', binaryContent };
     }
     default: {
       const textContent = await readTextFile(file.path);
-      return { type: 'TIPTAP', textContent };
+      return { type: 'tiptap', textContent };
     }
   }
 }
