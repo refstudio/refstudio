@@ -9,7 +9,7 @@ import { EditorAPI } from '../types/EditorAPI';
 import { MenuBar } from './MenuBar';
 import { ReferenceNode } from './ReferenceNode/ReferenceNode';
 import { getReferenceLabel } from './ReferenceNode/ReferencesList';
-import { EDITOR_EXTENSIONS, INITIAL_CONTENT } from './TipTapEditorConfigs';
+import { EDITOR_EXTENSIONS, INITIAL_CONTENT, transformPasted } from './TipTapEditorConfigs';
 
 interface EditorProps {
   editorRef: React.MutableRefObject<EditorAPI | null>;
@@ -21,18 +21,23 @@ export function TipTapEditor({ editorRef, editorContent }: EditorProps) {
   const setSelection = useSetAtom(selectionAtom);
 
   useEffect(() => {
-    setEditor(
-      new Editor({
-        extensions: EDITOR_EXTENSIONS,
-        content: editorContent ?? INITIAL_CONTENT,
-        onSelectionUpdate(update) {
-          const newEditor = update.editor;
-          const { from, to } = newEditor.view.state.selection;
-          const text = newEditor.view.state.doc.textBetween(from, to);
-          setSelection(text);
-        },
-      }),
-    );
+    const newEditor = new Editor({
+      extensions: EDITOR_EXTENSIONS,
+      content: editorContent ?? INITIAL_CONTENT,
+      onSelectionUpdate(update) {
+        const updatedEditor = update.editor;
+        const { from, to } = updatedEditor.view.state.selection;
+        const text = updatedEditor.view.state.doc.textBetween(from, to);
+        setSelection(text);
+      },
+      editorProps: {
+        transformPasted,
+      },
+    });
+    setEditor(newEditor);
+    return () => {
+      newEditor.destroy();
+    };
   }, [editorContent, setSelection]);
 
   useEffect(() => {
