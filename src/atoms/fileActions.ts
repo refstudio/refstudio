@@ -1,9 +1,9 @@
 import { atom } from 'jotai';
 
-import { _activePaneAtom, _activePaneIdAtom } from './core/activePane';
-import { _fileContentAtom, _loadFile, _unloadFile } from './core/fileContent';
-import { _addFileEntry, _removeFileEntry } from './core/fileEntry';
-import { _addFileToPane, _paneGroupAtom, _removeFileFromPane, _selectFileInPaneAtom, getPane } from './core/paneGroup';
+import { activePaneAtom, activePaneIdAtom } from './core/activePane';
+import { fileContentAtom, loadFile, unloadFile } from './core/fileContent';
+import { addFileEntry, removeFileEntry } from './core/fileEntry';
+import { addFileToPane, getPane, paneGroupAtom, removeFileFromPane, selectFileInPaneAtom } from './core/paneGroup';
 import { FileEntry, FileId } from './types/FileEntry';
 import { PaneFileId, PaneId } from './types/PaneGroup';
 
@@ -14,30 +14,30 @@ export const openFileAtom = atom(null, (get, set, file: FileEntry) => {
     return;
   }
   // Load file in memory
-  const currentOpenFiles = get(_fileContentAtom);
+  const currentOpenFiles = get(fileContentAtom);
   if (!currentOpenFiles.has(file.path)) {
-    set(_loadFile, file);
+    set(loadFile, file);
   }
 
   // Add to file entries atom
-  set(_addFileEntry, file);
+  set(addFileEntry, file);
 
   // Add file to panes state
-  const activePane = get(_activePaneAtom);
+  const activePane = get(activePaneAtom);
   const fileId = file.path;
   if (!activePane.openFiles.includes(fileId)) {
-    set(_addFileToPane, { fileId, paneId: activePane.id });
+    set(addFileToPane, { fileId, paneId: activePane.id });
   }
 
   // Select file in pane
-  set(_selectFileInPaneAtom, { fileId, paneId: activePane.id });
+  set(selectFileInPaneAtom, { fileId, paneId: activePane.id });
 });
 
 /** Removes file from the given pane and unload content from memory if the file is not open in another pane */
 export const closeFileFromPaneAtom = atom(null, (get, set, { fileId, paneId }: PaneFileId) => {
-  const panes = get(_paneGroupAtom);
+  const panes = get(paneGroupAtom);
 
-  set(_removeFileFromPane, { fileId, paneId });
+  set(removeFileFromPane, { fileId, paneId });
 
   // Unload file from memory if the file is no longer open anywhere
   if (
@@ -45,15 +45,15 @@ export const closeFileFromPaneAtom = atom(null, (get, set, { fileId, paneId }: P
       .filter(([_paneId]) => _paneId !== paneId) // Keep only other panes
       .every(([, pane]) => !pane.openFiles.includes(fileId)) // Check that the file was not open in any other pane
   ) {
-    set(_removeFileEntry, fileId);
-    set(_unloadFile, fileId);
+    set(removeFileEntry, fileId);
+    set(unloadFile, fileId);
   }
 
   // Select another file in the pane, if there are any
-  const updatedPanes = get(_paneGroupAtom);
+  const updatedPanes = get(paneGroupAtom);
   const updatedOpenFiles = updatedPanes[paneId].openFiles;
   if (updatedOpenFiles.length > 0) {
-    set(_selectFileInPaneAtom, { fileId: updatedOpenFiles[updatedOpenFiles.length - 1], paneId });
+    set(selectFileInPaneAtom, { fileId: updatedOpenFiles[updatedOpenFiles.length - 1], paneId });
   }
 });
 
@@ -67,15 +67,15 @@ interface SplitFilePayload {
 }
 
 export const splitFileToPaneAtom = atom(null, (_get, set, { fileId, fromPaneId, toPaneId }: SplitFilePayload) => {
-  set(_removeFileFromPane, { paneId: fromPaneId, fileId });
-  set(_addFileToPane, { paneId: toPaneId, fileId });
-  set(_selectFileInPaneAtom, { paneId: toPaneId, fileId });
+  set(removeFileFromPane, { paneId: fromPaneId, fileId });
+  set(addFileToPane, { paneId: toPaneId, fileId });
+  set(selectFileInPaneAtom, { paneId: toPaneId, fileId });
 });
 
 export const focusPaneAtom = atom(null, (_get, set, paneId: PaneId) => {
-  set(_activePaneIdAtom, paneId);
+  set(activePaneIdAtom, paneId);
 });
 
 export const selectFileInPaneAtom = atom(null, (get, set, paneFileId: PaneFileId) => {
-  set(_selectFileInPaneAtom, paneFileId);
+  set(selectFileInPaneAtom, paneFileId);
 });
