@@ -18,17 +18,11 @@ class Reference(JsonSchemaMixin):
 
 
 @dataclass
-class Affiliation(JsonSchemaMixin):
-    institution: str
-    department: str
-
-
-@dataclass
 class Author(JsonSchemaMixin):
-    full_name: str
-    given_name: str
-    surname: str
-    email: str
+    full_name: str | None = None
+    given_name: str | None = None
+    surname: str | None = None
+    email: str | None = None
 
 
 @dataclass
