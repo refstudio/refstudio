@@ -2,7 +2,6 @@ import json
 import logging
 import os
 import sys
-from dataclasses import asdict
 from pathlib import Path
 from typing import Dict, List
 
@@ -10,7 +9,7 @@ import grobid_tei_xml
 from grobid_client.grobid_client import GrobidClient
 
 from .shared import HiddenPrints, chunk_text, get_filename_md5
-from .typing import Author, Reference
+from .typing import Author, IngestResponse, Reference
 
 logging.root.setLevel(logging.NOTSET)
 
@@ -49,7 +48,7 @@ class PDFIngestion:
         self.convert_grobid_xml_to_json()
         references = self.create_references()
         response = self.create_response_from_references(references)
-        sys.stdout.write(json.dumps(response))
+        sys.stdout.write(response.to_json())
         logger.info(f"Finished ingestion for project: {self.project_name}")
         logger.info(f"Response: {response}")
 
@@ -110,7 +109,7 @@ class PDFIngestion:
             )
         logger.info("Finished calling Grobid server")
         _ = self._get_grobid_output_statuses()
-    
+
     def _get_grobid_output_statuses(self) -> Dict[Path, str]:
         """
         Determines the status of Grobid output files.
@@ -152,7 +151,7 @@ class PDFIngestion:
             with open(json_filepath, "w") as fout:
                 doc = grobid_tei_xml.parse_document_xml(xml)
                 json.dump(doc.to_dict(), fout)
-    
+
     def _parse_header(self, document: dict) -> dict:
         """
         Parses the header of a document and returns a dictionary of the header fields
@@ -180,7 +179,7 @@ class PDFIngestion:
             surname=author_dict.get("surname"),
             email=author_dict.get("email"),
         )
-    
+
     def _create_references_for_grobid_failures(self) -> List[Reference]:
         """
         Creates Reference objects for PDFs that Grobid was unable to parse.
@@ -238,25 +237,16 @@ class PDFIngestion:
         failures = self._create_references_for_grobid_failures()
         return references + failures
 
-    def create_response_from_references(self, references: List[Reference]) -> dict:
+    def create_response_from_references(self, references: List[Reference]) -> IngestResponse:
         """
         Creates a Response object from a list of Reference objects
         :param references: List[Reference]
         :return: Response
         """
-        prepared_references = []
-        for ref in references:
-            # no need to include reference abstract, contents, or chunks in response
-            prepared_references.append({
-                "source_filename": ref.source_filename,
-                "filename_md5": ref.filename_md5,
-                "title": ref.title,
-                "authors": [asdict(a) for a in ref.authors],
-            })
-        return {
-            "project_name": self.project_name,
-            "references": prepared_references
-        }
+        return IngestResponse(
+            project_name=self.project_name,
+            references=references,
+        )
 
 
 def main(pdf_directory: str):
