@@ -2,14 +2,13 @@ import json
 import logging
 import os
 import sys
-from dataclasses import asdict
 from pathlib import Path
 
 import grobid_tei_xml
 from grobid_client.grobid_client import GrobidClient
 
 from .shared import HiddenPrints, chunk_text, get_filename_md5
-from .typing import Author, Reference
+from .typing import Author, IngestResponse, Reference
 
 logging.root.setLevel(logging.NOTSET)
 
@@ -49,7 +48,7 @@ class PDFIngestion:
         references = self.create_references()
         self.save_references(references)
         response = self.create_response_from_references(references)
-        sys.stdout.write(json.dumps(response))
+        sys.stdout.write(response.to_json())
         logger.info(f"Finished ingestion for project: {self.project_name}")
         logger.info(f"Response: {response}")
 
@@ -152,7 +151,7 @@ class PDFIngestion:
             with open(json_filepath, "w") as fout:
                 doc = grobid_tei_xml.parse_document_xml(xml)
                 json.dump(doc.to_dict(), fout)
-    
+
     def _parse_header(self, document: dict) -> dict:
         """
         Parses the header of a document and returns a dictionary of the header fields
@@ -253,29 +252,20 @@ class PDFIngestion:
         filepath = os.path.join(self.storage_dir, "references.json")
         logger.info(f"Saving references to file: {filepath}")
 
-        contents = [asdict(ref) for ref in references]
+        contents = [ref.to_dict() for ref in references]
         with open(filepath, "w") as fout:
             json.dump(contents, fout)
 
-    def create_response_from_references(self, references: list[Reference]) -> dict:
+    def create_response_from_references(self, references: list[Reference]) -> IngestResponse:
         """
         Creates a Response object from a list of Reference objects
         :param references: List[Reference]
         :return: Response
         """
-        prepared_references = []
-        for ref in references:
-            # no need to include reference abstract, contents, or chunks in response
-            prepared_references.append({
-                "source_filename": ref.source_filename,
-                "filename_md5": ref.filename_md5,
-                "title": ref.title,
-                "authors": [asdict(a) for a in ref.authors],
-            })
-        return {
-            "project_name": self.project_name,
-            "references": prepared_references
-        }
+        return IngestResponse(
+            project_name=self.project_name,
+            references=references,
+        )
 
 
 def main(pdf_directory: str):

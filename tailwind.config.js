@@ -4,7 +4,19 @@ import plugin from 'tailwindcss/plugin';
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        // Using modern `hsl`
+        primary: {
+          DEFAULT: 'hsl(var(--color-primary) / <alpha-value>)',
+          hover: 'hsl(var(--color-primary-hover) / <alpha-value>)'
+        },
+        secondary: {
+          DEFAULT: 'hsl(var(--color-secondary) / <alpha-value>)',
+          hover: 'hsl(var(--color-secondary-hover) / <alpha-value>)'
+        }
+      }
+    },
   },
   plugins: [debugPlugin()],
 };
