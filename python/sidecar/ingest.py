@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import sys
+from dataclasses import asdict
 from pathlib import Path
 
 import grobid_tei_xml
@@ -252,7 +253,7 @@ class PDFIngestion:
         filepath = os.path.join(self.storage_dir, "references.json")
         logger.info(f"Saving references to file: {filepath}")
 
-        contents = [ref.to_dict() for ref in references]
+        contents = [asdict(ref) for ref in references]
         with open(filepath, "w") as fout:
             json.dump(contents, fout)
 
