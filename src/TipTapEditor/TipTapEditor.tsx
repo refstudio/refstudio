@@ -9,7 +9,7 @@ import { EditorAPI } from '../types/EditorAPI';
 import { MenuBar } from './MenuBar';
 import { ReferenceNode } from './ReferenceNode/ReferenceNode';
 import { getReferenceLabel } from './ReferenceNode/ReferencesList';
-import { EDITOR_EXTENSIONS, INITIAL_CONTENT } from './TipTapEditorConfigs';
+import { EDITOR_EXTENSIONS, INITIAL_CONTENT, transformPasted } from './TipTapEditorConfigs';
 
 interface EditorProps {
   editorRef: React.MutableRefObject<EditorAPI | null>;
@@ -30,8 +30,14 @@ export function TipTapEditor({ editorRef, editorContent }: EditorProps) {
         const text = updatedEditor.view.state.doc.textBetween(from, to);
         setSelection(text);
       },
+      editorProps: {
+        transformPasted,
+      },
     });
     setEditor(newEditor);
+    return () => {
+      newEditor.destroy();
+    };
   }, [editorContent, setSelection]);
 
   useEffect(() => {
