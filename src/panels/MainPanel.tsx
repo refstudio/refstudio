@@ -100,7 +100,7 @@ export function MainPanelPane({ pane, editorRef, pdfViewerRef }: MainPanelPanePr
 }
 
 interface MainPaneViewContentProps {
-  activeFileAtom: Atom<Loadable<Promise<FileContent>>>;
+  activeFileAtom: Atom<Loadable<FileContent>>;
   editorRef: React.MutableRefObject<EditorAPI | null>;
   fileId: FileId;
   pdfViewerRef: React.MutableRefObject<PdfViewerAPI | null>;
