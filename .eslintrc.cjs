@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /** @type {import("@types/eslint").Linter.Config} */
 module.exports = {
   parser: '@typescript-eslint/parser',
@@ -6,7 +7,14 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: 'module',
   },
-  plugins: ['@typescript-eslint', 'simple-import-sort'],
+  plugins: [
+    '@typescript-eslint',
+    'simple-import-sort',
+    'jest-dom',
+    'testing-library',
+    'eslint-plugin-import',
+    'jsdoc',
+  ],
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
@@ -15,6 +23,8 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:react/jsx-runtime',
     'plugin:react-hooks/recommended',
+    'plugin:jest-dom/recommended',
+    'plugin:testing-library/react',
   ],
   settings: {
     react: {
@@ -124,5 +134,46 @@ module.exports = {
     ],
     'react/jsx-curly-brace-presence': 'error',
     'react/self-closing-comp': 'error',
+    'testing-library/prefer-user-event': 'error',
+    'testing-library/no-render-in-setup': 'error',
+    'testing-library/no-wait-for-empty-callback': 'error',
+    'testing-library/prefer-explicit-assert': 'error',
+    'testing-library/prefer-presence-queries': 'error',
+    'testing-library/prefer-screen-queries': 'error',
+    'testing-library/prefer-wait-for': 'error',
+    'jsdoc/check-alignment': 'error',
+    'jsdoc/check-indentation': 'off',
+    'jsdoc/tag-lines': [
+      'error',
+      'any',
+      {
+        startLines: 1,
+      },
+    ],
+    'jsdoc/multiline-blocks': [
+      'error',
+      {
+        noZeroLineText: true,
+        noMultilineBlocks: true,
+        minimumLengthForMultiline: 80,
+      },
+    ],
+    'jsdoc/no-restricted-syntax': [
+      'error',
+      {
+        contexts: [
+          {
+            // See https://github.com/estree/estree/blob/master/es5.md
+            context:
+              'ReturnStatement,IfStatement,ForStatement,WhileStatement,SwitchStatement,' +
+              'VariableDeclaration[kind="let"],TryStatement,CatchClause,BreakStatement,' +
+              'ContinueStatement,SwitchCase,ForInStatement,DoWhileStatement,ArrayExpression,' +
+              'UpdateExpression,UnaryExpression,MemberExpression,CallExpression,NewExpression,' +
+              'ForOfStatement',
+            message: 'Use an implementation comment (//) instead of a JSDoc comment (/** ... */).',
+          },
+        ],
+      },
+    ],
   },
 };

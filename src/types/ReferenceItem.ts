@@ -1,7 +1,10 @@
 export interface ReferenceItem {
   id: string;
   title: string;
-  author: string;
-  year: number;
-  publisher: string;
+  authors: Author[];
+}
+
+interface Author {
+  fullName: string;
+  surname: string;
 }

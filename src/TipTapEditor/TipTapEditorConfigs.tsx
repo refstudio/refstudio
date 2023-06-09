@@ -2,6 +2,7 @@ import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import Color from '@tiptap/extension-color';
 import ListItem from '@tiptap/extension-list-item';
 import TextStyle from '@tiptap/extension-text-style';
+import { Fragment, Node, Slice } from '@tiptap/pm/model';
 import { Extensions } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import markdown from 'highlight.js/lib/languages/markdown';
@@ -11,16 +12,10 @@ import { Markdown } from 'tiptap-markdown';
 import { CollapsibleBlockContentNode } from './CollapsibleBlock/nodes/CollapsibleBlockContent';
 import { CollapsibleBlockNode } from './CollapsibleBlock/nodes/CollapsibleBlockNode';
 import { CollapsibleBlockSummaryNode } from './CollapsibleBlock/nodes/CollapsibleBlockSummary';
-import { ReferenceNode } from './ReferenceBlock/ReferenceNode';
+import { ReferenceNode } from './ReferenceNode/ReferenceNode';
 lowlight.registerLanguage('markdown', markdown);
 
 export const EDITOR_EXTENSIONS: Extensions = [
-  // Custom extensions
-  CollapsibleBlockNode,
-  CollapsibleBlockContentNode,
-  CollapsibleBlockSummaryNode,
-  ReferenceNode,
-
   Markdown,
   CodeBlockLowlight.configure({
     lowlight,
@@ -37,6 +32,12 @@ export const EDITOR_EXTENSIONS: Extensions = [
       keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
     },
   }),
+
+  // Custom extensions
+  CollapsibleBlockNode,
+  CollapsibleBlockContentNode,
+  CollapsibleBlockSummaryNode,
+  ReferenceNode,
 ];
 export const INITIAL_CONTENT = `
   <h2>Hi there,</h2>
@@ -57,7 +58,6 @@ export const INITIAL_CONTENT = `
   <ul>
     <li>
       That’s a bullet list with one …
-      <span data-type="mention" data-id="ref1" class="mention"></span>
     </li>
     <li>… or two list items.</li>
   </ul>
@@ -84,3 +84,17 @@ export const INITIAL_CONTENT = `
     — Mom
   </blockquote>
 `;
+
+export function transformPasted(slice: Slice) {
+  return new Slice(stripTransparentMarksFromFragment(slice.content), slice.openStart, slice.openEnd);
+}
+
+function stripTransparentMarksFromFragment(fragment: Fragment) {
+  // The following code is basically a fragment.map but Fragment class is not iterable and does not have a map method
+  // so we have to use this forEach loop instead
+  const updatedNodes: Node[] = [];
+  fragment.forEach((node) => {
+    updatedNodes.push(node.mark(node.marks.filter((mark) => mark.attrs.color !== 'transparent')));
+  });
+  return Fragment.fromArray(updatedNodes);
+}

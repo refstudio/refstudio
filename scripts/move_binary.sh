@@ -11,7 +11,6 @@ fi
 SOURCE_PATH="src-tauri/bin/python/main"
 TARGET_PATH="src-tauri/bin/python/main-$TARGET"
 
-
 mkdir -p $TARGET_PATH
 cp -r $SOURCE_PATH/* $TARGET_PATH/.
 echo "Moved python binaries to $TARGET_PATH"

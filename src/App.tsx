@@ -1,63 +1,115 @@
-import { FileEntry } from '@tauri-apps/api/fs';
-import * as React from 'react';
-import { useCallback } from 'react';
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { useDebounce } from 'usehooks-ts';
+import React, { useCallback, useEffect, useState } from 'react';
+import { VscChevronUp } from 'react-icons/vsc';
+import { ImperativePanelHandle, Panel, PanelGroup } from 'react-resizable-panels';
 
+import { PrimarySideBar, PrimarySideBarPane } from './components/PrimarySideBar';
+import { VerticalResizeHandle } from './components/VerticalResizeHandle';
+import { AIPanel } from './panels/AIPanel';
+import { ExplorerPanel } from './panels/ExplorerPanel';
+import { MainPanel } from './panels/MainPanel';
+import { ReferencesPanel } from './panels/ReferencesPanel';
 import { EditorAPI } from './types/EditorAPI';
+import { PdfViewerAPI } from './types/PdfViewerAPI';
 import { ReferenceItem } from './types/ReferenceItem';
-import { AIView } from './views/AIView';
-import { CenterPaneView } from './views/CenterPaneView';
-import { FoldersView } from './views/FoldersView';
-import { ReferencesView } from './views/ReferencesView';
 
 function App() {
-  const [selectedFile, setSelectedFile] = React.useState<FileEntry | undefined>();
+  const editorRef = React.useRef<EditorAPI>(null);
 
-  const [selection, setSelection] = React.useState<string | null>(null);
-  const debouncedSelection = useDebounce(selection, 200);
-  const editorRef = React.useRef<EditorAPI>();
-  const handleReferenceClicked = (reference: ReferenceItem) => {
-    editorRef.current?.insertReference(reference);
-  };
-
-  const handleFolderClick = useCallback((file: FileEntry) => {
-    setSelectedFile(file);
-  }, []);
+  const pdfViewerRef = React.useRef<PdfViewerAPI>(null);
+  const updatePDFViewerWidth = useCallback(() => {
+    pdfViewerRef.current?.updateWidth();
+  }, [pdfViewerRef]);
 
   return (
-    <PanelGroup autoSaveId="refstudio" direction="horizontal">
-      <Panel className="p-4" collapsible defaultSize={20}>
-        <FoldersView onClick={handleFolderClick} />
-      </Panel>
-      <VerticalResizeHandle />
-
+    <PanelGroup
+      autoSaveId="refstudio"
+      className="relative h-full"
+      direction="horizontal"
+      onLayout={updatePDFViewerWidth}
+    >
+      <LeftSidePanelWrapper onRefClicked={(reference) => editorRef.current?.insertReference(reference)} />
       <Panel defaultSize={60}>
-        <CenterPaneView editorRef={editorRef} file={selectedFile} onSelectionChange={setSelection} />
+        <MainPanel editorRef={editorRef} pdfViewerRef={pdfViewerRef} />
       </Panel>
-
-      <VerticalResizeHandle />
-      <Panel>
-        <PanelGroup autoSaveId="rs-right-sidebar" direction="vertical">
-          <Panel className="p-3">
-            <ReferencesView onRefClicked={handleReferenceClicked} />
-          </Panel>
-          <HorizontalResizeHandle />
-          <Panel className="p-3">
-            <AIView selection={debouncedSelection} />
-          </Panel>
-        </PanelGroup>
-      </Panel>
+      <RightPanelWrapper />
     </PanelGroup>
   );
 }
 
-function VerticalResizeHandle() {
-  return <PanelResizeHandle className="flex w-1 items-center bg-gray-200 hover:bg-blue-100" />;
+function LeftSidePanelWrapper({ onRefClicked }: { onRefClicked(item: ReferenceItem): void }) {
+  const leftPanelRef = React.useRef<ImperativePanelHandle>(null);
+  const [primaryPaneCollapsed, setPrimaryPaneCollapsed] = useState(false);
+  const [primaryPane, setPrimaryPane] = useState<PrimarySideBarPane>('Explorer');
+
+  function handleSideBarClick(selectedPane: PrimarySideBarPane) {
+    if (selectedPane === primaryPane) {
+      // Toggle collapsing
+      setPrimaryPaneCollapsed(!primaryPaneCollapsed);
+    } else {
+      // Always open the sidebar
+      setPrimaryPaneCollapsed(false);
+    }
+    setPrimaryPane(selectedPane);
+  }
+
+  React.useEffect(() => {
+    if (primaryPaneCollapsed) {
+      leftPanelRef.current?.collapse();
+    } else {
+      leftPanelRef.current?.expand();
+    }
+  }, [leftPanelRef, primaryPaneCollapsed]);
+
+  return (
+    <>
+      <PrimarySideBar activePane={primaryPaneCollapsed ? null : primaryPane} onClick={handleSideBarClick} />
+      <Panel
+        collapsible
+        defaultSize={20}
+        ref={leftPanelRef}
+        onCollapse={(collapsed) => setPrimaryPaneCollapsed(collapsed)}
+      >
+        {primaryPane === 'Explorer' && <ExplorerPanel />}
+        {primaryPane === 'References' && <ReferencesPanel onRefClicked={onRefClicked} />}
+      </Panel>
+      <VerticalResizeHandle />
+    </>
+  );
 }
 
-function HorizontalResizeHandle() {
-  return <PanelResizeHandle className="flex h-1 items-center bg-gray-200 hover:bg-blue-100" />;
+function RightPanelWrapper() {
+  const [closed, setClosed] = React.useState(false);
+  const panelRef = React.useRef<ImperativePanelHandle>(null);
+
+  useEffect(() => {
+    if (closed) {
+      panelRef.current?.collapse();
+    } else {
+      panelRef.current?.expand();
+    }
+  }, [panelRef, closed]);
+
+  return (
+    <>
+      <VerticalResizeHandle />
+      <Panel collapsible ref={panelRef} onCollapse={setClosed}>
+        <AIPanel onCloseClick={() => setClosed(true)} />
+        {closed && (
+          <div className="absolute bottom-0 right-0 flex border border-slate-300 bg-slate-100 px-4 py-2">
+            <div
+              className="flex w-60 cursor-pointer select-none items-center justify-between"
+              onClick={() => setClosed(false)}
+            >
+              <div>AI</div>
+              <div>
+                <VscChevronUp />
+              </div>
+            </div>
+          </div>
+        )}
+      </Panel>
+    </>
+  );
 }
 
 export default App;
