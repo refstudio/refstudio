@@ -6,7 +6,7 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: 'module',
   },
-  plugins: ['@typescript-eslint', 'simple-import-sort', 'jest-dom', 'testing-library'],
+  plugins: ['@typescript-eslint', 'simple-import-sort', 'jest-dom', 'testing-library', 'eslint-plugin-import'],
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
@@ -16,7 +16,8 @@ module.exports = {
     'plugin:react/jsx-runtime',
     'plugin:react-hooks/recommended',
     'plugin:jest-dom/recommended',
-    'plugin:testing-library/react'
+    'plugin:testing-library/react',
+    'plugin:import/typescript',
   ],
   settings: {
     react: {
@@ -133,7 +134,17 @@ module.exports = {
     "testing-library/prefer-explicit-assert": "error",
     "testing-library/prefer-presence-queries": "error",
     "testing-library/prefer-screen-queries": "error",
-    "testing-library/prefer-wait-for": "error"
-
+    "testing-library/prefer-wait-for": "error",
+    'import/no-restricted-paths': [
+      'error',
+      {
+        zones: [
+          {
+            from: './src/atoms/core',
+            target: './src/!(atoms)/**/*'
+          }
+        ]
+      }
+    ]
   },
 };
