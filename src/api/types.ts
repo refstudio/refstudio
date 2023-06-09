@@ -25,28 +25,11 @@ export interface IngestResponse {
 export interface Reference {
   source_filename: string;
   filename_md5: string;
-  title?: string;
-  abstract?: string;
-  contents?: string;
-  authors?: Author[];
-  chunks?: Chunk[];
-  metadata?: {};
-}
-/**
- * Author(full_name: str, given_name: str, surname: str, email: str)
- */
-export interface Author {
-  full_name: string;
-  given_name: string;
-  surname: string;
-  email: string;
-}
-/**
- * Chunk(text: str, vector: List[float] = <factory>, metadata: Dict[str, Any] = <factory>)
- */
-export interface Chunk {
-  text: string;
-  vector?: number[];
+  title?: unknown;
+  abstract?: unknown;
+  contents?: unknown;
+  authors?: unknown[];
+  chunks?: unknown[];
   metadata?: {};
 }
 /**

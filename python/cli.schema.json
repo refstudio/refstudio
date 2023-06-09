@@ -50,27 +50,17 @@
         "filename_md5": {
           "type": "string"
         },
-        "title": {
-          "type": "string"
-        },
-        "abstract": {
-          "type": "string"
-        },
-        "contents": {
-          "type": "string"
-        },
+        "title": {},
+        "abstract": {},
+        "contents": {},
         "authors": {
           "type": "array",
-          "items": {
-            "$ref": "#/definitions/Author"
-          },
+          "items": {},
           "default": []
         },
         "chunks": {
           "type": "array",
-          "items": {
-            "$ref": "#/definitions/Chunk"
-          },
+          "items": {},
           "default": []
         },
         "metadata": {
@@ -79,53 +69,6 @@
         }
       },
       "description": "A reference for an academic paper / PDF"
-    },
-    "Author": {
-      "type": "object",
-      "required": [
-        "full_name",
-        "given_name",
-        "surname",
-        "email"
-      ],
-      "properties": {
-        "full_name": {
-          "type": "string"
-        },
-        "given_name": {
-          "type": "string"
-        },
-        "surname": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string"
-        }
-      },
-      "description": "Author(full_name: str, given_name: str, surname: str, email: str)"
-    },
-    "Chunk": {
-      "type": "object",
-      "required": [
-        "text"
-      ],
-      "properties": {
-        "text": {
-          "type": "string"
-        },
-        "vector": {
-          "type": "array",
-          "items": {
-            "type": "number"
-          },
-          "default": []
-        },
-        "metadata": {
-          "type": "object",
-          "default": {}
-        }
-      },
-      "description": "Chunk(text: str, vector: List[float] = <factory>, metadata: Dict[str, Any] = <factory>)"
     },
     "RewriteChoice": {
       "type": "object",
