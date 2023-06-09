@@ -1,12 +1,9 @@
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
-from dataclasses_jsonschema import JsonSchemaMixin
-
 
 @dataclass
-class Reference(JsonSchemaMixin):
-    """A reference for an academic paper / PDF"""
+class Reference:
     source_filename: str
     filename_md5: str
     title: Optional[str] = None
@@ -18,13 +15,13 @@ class Reference(JsonSchemaMixin):
 
 
 @dataclass
-class Affiliation(JsonSchemaMixin):
+class Affiliation:
     institution: str
     department: str
 
 
 @dataclass
-class Author(JsonSchemaMixin):
+class Author:
     full_name: str
     given_name: str
     surname: str
@@ -32,25 +29,7 @@ class Author(JsonSchemaMixin):
 
 
 @dataclass
-class Chunk(JsonSchemaMixin):
+class Chunk:
     text: str
     vector: List[float] = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)
-
-
-@dataclass
-class IngestResponse(JsonSchemaMixin):
-    project_name: str
-    references: list[Reference]
-
-
-@dataclass
-class RewriteChoice(JsonSchemaMixin):
-    index: int
-    text: str
-
-
-@dataclass
-class CliCommands(JsonSchemaMixin):
-    ingest: IngestResponse
-    rewrite: list[RewriteChoice]
