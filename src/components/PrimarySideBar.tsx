@@ -23,7 +23,7 @@ export function PrimarySideBar({
           aria-label={pane}
           className={cx('p-4 hover:opacity-100', {
             'border-l-2 border-l-transparent opacity-50': activePane !== pane,
-            'border-l-2 border-l-blue-500 opacity-100': activePane === pane,
+            'border-l-2 border-l-primary opacity-100': activePane === pane,
           })}
           key={pane}
           role="menuitem"

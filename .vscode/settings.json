@@ -13,6 +13,12 @@
   "[typescript]": {
     "editor.formatOnSave": true
   },
+  "[css]": {
+    "editor.formatOnSave": true
+  },
+  "[postcss]": {
+    "editor.formatOnSave": true
+  },
   "editor.codeActionsOnSave": [
     // Run ESLint fixers _before_ prettier to ensure the user doesn't need to do multiple saves
     "source.fixAll.eslint",
