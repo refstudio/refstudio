@@ -32,9 +32,7 @@ export function getPane(get: Getter, paneId: PaneId): PaneContent {
   };
 }
 
-/**
- * Updates a given pane with partial attributes
- */
+/** Updates a given pane with partial attributes */
 export const updatePaneGroup = atom(
   null,
   (get, set, { paneId, ...update }: { paneId: PaneId } & Partial<PaneState>) => {
