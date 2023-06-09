@@ -12,6 +12,7 @@ module.exports = {
     'simple-import-sort',
     'jest-dom',
     'testing-library',
+    'eslint-plugin-import',
     'jsdoc',
   ],
   extends: [
@@ -133,7 +134,6 @@ module.exports = {
     ],
     'react/jsx-curly-brace-presence': 'error',
     'react/self-closing-comp': 'error',
-    // Testing library rules
     'testing-library/prefer-user-event': 'error',
     'testing-library/no-render-in-setup': 'error',
     'testing-library/no-wait-for-empty-callback': 'error',
