@@ -6,14 +6,14 @@
  */
 
 /**
- * CliCommands(ingest: sidecar.typing.IngestResponse, rewrite: list[sidecar.typing.RewriteChoice])
+ * CliCommands(ingest: sidecar.typing.IngestResponse, rewrite: List[sidecar.typing.RewriteChoice])
  */
 export interface CliSchema {
   ingest: IngestResponse;
   rewrite: RewriteChoice[];
 }
 /**
- * IngestResponse(project_name: str, references: list[sidecar.typing.Reference])
+ * IngestResponse(project_name: str, references: List[sidecar.typing.Reference])
  */
 export interface IngestResponse {
   project_name: string;
@@ -28,8 +28,25 @@ export interface Reference {
   title?: string;
   abstract?: string;
   contents?: string;
-  authors?: unknown[];
-  chunks?: unknown[];
+  authors?: Author[];
+  chunks?: Chunk[];
+  metadata?: {};
+}
+/**
+ * Author(full_name: str, given_name: str, surname: str, email: str)
+ */
+export interface Author {
+  full_name: string;
+  given_name: string;
+  surname: string;
+  email: string;
+}
+/**
+ * Chunk(text: str, vector: List[float] = <factory>, metadata: Dict[str, Any] = <factory>)
+ */
+export interface Chunk {
+  text: string;
+  vector?: number[];
   metadata?: {};
 }
 /**

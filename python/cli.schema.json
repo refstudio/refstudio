@@ -15,7 +15,7 @@
       }
     }
   },
-  "description": "CliCommands(ingest: sidecar.typing.IngestResponse, rewrite: list[sidecar.typing.RewriteChoice])",
+  "description": "CliCommands(ingest: sidecar.typing.IngestResponse, rewrite: List[sidecar.typing.RewriteChoice])",
   "$schema": "http://json-schema.org/draft-06/schema#",
   "definitions": {
     "IngestResponse": {
@@ -35,7 +35,7 @@
           }
         }
       },
-      "description": "IngestResponse(project_name: str, references: list[sidecar.typing.Reference])"
+      "description": "IngestResponse(project_name: str, references: List[sidecar.typing.Reference])"
     },
     "Reference": {
       "type": "object",
@@ -61,12 +61,16 @@
         },
         "authors": {
           "type": "array",
-          "items": {},
+          "items": {
+            "$ref": "#/definitions/Author"
+          },
           "default": []
         },
         "chunks": {
           "type": "array",
-          "items": {},
+          "items": {
+            "$ref": "#/definitions/Chunk"
+          },
           "default": []
         },
         "metadata": {
@@ -75,6 +79,53 @@
         }
       },
       "description": "A reference for an academic paper / PDF"
+    },
+    "Author": {
+      "type": "object",
+      "required": [
+        "full_name",
+        "given_name",
+        "surname",
+        "email"
+      ],
+      "properties": {
+        "full_name": {
+          "type": "string"
+        },
+        "given_name": {
+          "type": "string"
+        },
+        "surname": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        }
+      },
+      "description": "Author(full_name: str, given_name: str, surname: str, email: str)"
+    },
+    "Chunk": {
+      "type": "object",
+      "required": [
+        "text"
+      ],
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "vector": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "default": []
+        },
+        "metadata": {
+          "type": "object",
+          "default": {}
+        }
+      },
+      "description": "Chunk(text: str, vector: List[float] = <factory>, metadata: Dict[str, Any] = <factory>)"
     },
     "RewriteChoice": {
       "type": "object",

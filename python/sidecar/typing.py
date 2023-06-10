@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any, Dict, List, Optional
 
 from dataclasses_jsonschema import JsonSchemaMixin
 
@@ -12,9 +12,9 @@ class Reference(JsonSchemaMixin):
     title: Optional[str] = None
     abstract: Optional[str] = None
     contents: Optional[str] = None
-    authors: list["Author"] = field(default_factory=list)
-    chunks: list["Chunk"] = field(default_factory=list)
-    metadata: dict[str, Any] = field(default_factory=dict)
+    authors: List["Author"] = field(default_factory=list)
+    chunks: List["Chunk"] = field(default_factory=list)
+    metadata: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -28,14 +28,14 @@ class Author(JsonSchemaMixin):
 @dataclass
 class Chunk(JsonSchemaMixin):
     text: str
-    vector: list[float] = field(default_factory=list)
-    metadata: dict[str, Any] = field(default_factory=dict)
+    vector: List[float] = field(default_factory=list)
+    metadata: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
 class IngestResponse(JsonSchemaMixin):
     project_name: str
-    references: list[Reference]
+    references: List[Reference]
 
 
 @dataclass
@@ -53,4 +53,4 @@ class ChatResponseChoice(JsonSchemaMixin):
 @dataclass
 class CliCommands(JsonSchemaMixin):
     ingest: IngestResponse
-    rewrite: list[RewriteChoice]
+    rewrite: List[RewriteChoice]
