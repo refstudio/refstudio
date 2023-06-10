@@ -19,10 +19,10 @@ class Reference(JsonSchemaMixin):
 
 @dataclass
 class Author(JsonSchemaMixin):
-    full_name: str | None = None
-    given_name: str | None = None
-    surname: str | None = None
-    email: str | None = None
+    full_name: str
+    given_name: str
+    surname: str
+    email: str
 
 
 @dataclass
