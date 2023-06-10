@@ -49,7 +49,7 @@ class PDFIngestion:
         references = self.create_references()
         self.save_references(references)
         response = self.create_response_from_references(references)
-        sys.stdout.write(response.to_json())
+        sys.stdout.write(json.dumps(asdict(response)))
         logger.info(f"Finished ingestion for project: {self.project_name}")
         logger.info(f"Response: {response}")
 
