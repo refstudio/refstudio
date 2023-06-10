@@ -6,14 +6,14 @@
  */
 
 /**
- * CliCommands(ingest: sidecar.typing.IngestResponse, rewrite: List[sidecar.typing.RewriteChoice])
+ * CliCommands(ingest: sidecar.typing.IngestResponse, rewrite: list[sidecar.typing.RewriteChoice])
  */
 export interface CliSchema {
   ingest: IngestResponse;
   rewrite: RewriteChoice[];
 }
 /**
- * IngestResponse(project_name: str, references: List[sidecar.typing.Reference])
+ * IngestResponse(project_name: str, references: list[sidecar.typing.Reference])
  */
 export interface IngestResponse {
   project_name: string;

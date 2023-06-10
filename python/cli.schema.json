@@ -15,7 +15,7 @@
       }
     }
   },
-  "description": "CliCommands(ingest: sidecar.typing.IngestResponse, rewrite: List[sidecar.typing.RewriteChoice])",
+  "description": "CliCommands(ingest: sidecar.typing.IngestResponse, rewrite: list[sidecar.typing.RewriteChoice])",
   "$schema": "http://json-schema.org/draft-06/schema#",
   "definitions": {
     "IngestResponse": {
@@ -35,7 +35,7 @@
           }
         }
       },
-      "description": "IngestResponse(project_name: str, references: List[sidecar.typing.Reference])"
+      "description": "IngestResponse(project_name: str, references: list[sidecar.typing.Reference])"
     },
     "Reference": {
       "type": "object",

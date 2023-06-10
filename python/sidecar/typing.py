@@ -35,7 +35,7 @@ class Chunk(JsonSchemaMixin):
 @dataclass
 class IngestResponse(JsonSchemaMixin):
     project_name: str
-    references: List[Reference]
+    references: list[Reference]
 
 
 @dataclass
@@ -53,4 +53,4 @@ class ChatResponseChoice(JsonSchemaMixin):
 @dataclass
 class CliCommands(JsonSchemaMixin):
     ingest: IngestResponse
-    rewrite: List[RewriteChoice]
+    rewrite: list[RewriteChoice]
