@@ -25,9 +25,9 @@ export interface IngestResponse {
 export interface Reference {
   source_filename: string;
   filename_md5: string;
-  title?: unknown;
-  abstract?: unknown;
-  contents?: unknown;
+  title?: string;
+  abstract?: string;
+  contents?: string;
   authors?: unknown[];
   chunks?: unknown[];
   metadata?: {};

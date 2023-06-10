@@ -50,9 +50,15 @@
         "filename_md5": {
           "type": "string"
         },
-        "title": {},
-        "abstract": {},
-        "contents": {},
+        "title": {
+          "type": "string"
+        },
+        "abstract": {
+          "type": "string"
+        },
+        "contents": {
+          "type": "string"
+        },
         "authors": {
           "type": "array",
           "items": {},

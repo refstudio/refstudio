@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Optional
 
 from dataclasses_jsonschema import JsonSchemaMixin
 
@@ -9,9 +9,9 @@ class Reference(JsonSchemaMixin):
     """A reference for an academic paper / PDF"""
     source_filename: str
     filename_md5: str
-    title: str | None = None
-    abstract: str | None = None
-    contents: str | None = None
+    title: Optional[str] = None
+    abstract: Optional[str] = None
+    contents: Optional[str] = None
     authors: list["Author"] = field(default_factory=list)
     chunks: list["Chunk"] = field(default_factory=list)
     metadata: dict[str, Any] = field(default_factory=dict)
