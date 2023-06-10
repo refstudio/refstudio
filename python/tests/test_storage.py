@@ -1,9 +1,11 @@
+from pathlib import Path
+
 from sidecar import storage
 from sidecar.typing import Author, Chunk, Reference
 
 
 def test_json_storage_load():
-    fp = "tests/fixtures/data/references.json"
+    fp = Path(__file__).parent.joinpath("fixtures/data/references.json")
     jstore = storage.JsonStorage(filepath=fp)
     jstore.load()
 

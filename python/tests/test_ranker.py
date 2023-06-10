@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from sidecar import storage
 from sidecar.ranker import BM25Ranker
 
@@ -6,7 +8,7 @@ def test_bm25_ranker():
     # the corpus is made up of two references
     # one reference is about Chicago
     # one reference is about baseball
-    fp = "tests/fixtures/data/references.json"
+    fp = Path(__file__).parent.joinpath("fixtures/data/references.json")
     jstore = storage.JsonStorage(filepath=fp)
     jstore.load()
 
