@@ -7,6 +7,7 @@ import { addFileToPane, getPane, paneGroupAtom, removeFileFromPane, selectFileIn
 import { FileEntry, FileFileEntry, FileId } from './types/FileEntry';
 import { PaneFileId, PaneId } from './types/PaneGroup';
 
+export { activePaneAtom } from './core/activePane';
 export { selectFileInPaneAtom } from './core/paneGroup';
 
 /** Open a file in the a pane (depending on the file extension) */
@@ -78,6 +79,12 @@ export const splitFileToPaneAtom = atom(null, (_get, set, { fileId, fromPaneId, 
 
 export const focusPaneAtom = atom(null, (_get, set, paneId: PaneId) => {
   set(activePaneIdAtom, paneId);
+});
+
+export const closeAllFilesAtom = atom(null, (get, set) => {
+  const panes = get(paneGroupAtom);
+  panes.LEFT.openFiles.forEach((file) => set(closeFileFromPaneAtom, { fileId: file, paneId: 'LEFT' }));
+  panes.RIGHT.openFiles.forEach((file) => set(closeFileFromPaneAtom, { fileId: file, paneId: 'RIGHT' }));
 });
 
 function targetPaneIdFor(file: FileFileEntry): PaneId {
