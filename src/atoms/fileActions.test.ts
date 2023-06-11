@@ -234,9 +234,6 @@ describe('fileActions', () => {
   });
 });
 
-const PDF_FILE = makeFile('file.pdf');
-const TXT_FILE = makeFile('file.txt');
-
 function makeFile(name: string, extension?: string): FileFileEntry {
   name = extension ? name + '.' + extension : name;
   return {
