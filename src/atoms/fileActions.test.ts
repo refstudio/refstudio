@@ -12,6 +12,7 @@ import {
   leftPaneAtom,
   openFileAtom,
   rightPaneAtom,
+  selectFileInPaneAtom,
   splitFileToPaneAtom,
 } from './fileActions';
 import { FileFileEntry, FolderFileEntry } from './types/FileEntry';
@@ -130,6 +131,20 @@ describe('fileActions', () => {
     expect(leftPane.current.files).toContainEqual(fileA);
     expect(leftPane.current.files).toContainEqual(fileB);
     expect(leftPane.current.files).not.toContainEqual(fileC);
+  });
+
+  test('should not fail trying to select file that is not opened in pane', () => {
+    const store = createStore();
+    const { result: selectFileInPane } = renderHook(() => useSetAtom(selectFileInPaneAtom, { store }));
+    const { result: leftPane } = renderHook(() => useAtomValue(leftPaneAtom, { store }));
+
+    const fileA = makeFile('fileA.txt');
+
+    act(() => {
+      selectFileInPane.current({ paneId: leftPane.current.id, fileId: fileA.path });
+    });
+
+    expect(leftPane.current.files).not.toContainEqual(fileA);
   });
 
   test('should close all opened files with closeAllFilesAtom', () => {

@@ -27,12 +27,8 @@ export const openFileAtom = atom(null, (get, set, file: FileEntry) => {
 
   // Add file to panes state
   const targetPaneId = targetPaneIdFor(file);
-  const panes = get(paneGroupAtom);
-  const targetPane = panes[targetPaneId];
   const fileId = file.path;
-  if (!targetPane.openFiles.includes(fileId)) {
-    set(addFileToPane, { fileId, paneId: targetPaneId });
-  }
+  set(addFileToPane, { fileId, paneId: targetPaneId });
 
   // Select file in pane
   set(selectFileInPaneAtom, { fileId, paneId: targetPaneId });
