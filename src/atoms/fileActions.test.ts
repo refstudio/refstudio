@@ -3,6 +3,7 @@ import { createStore, useAtomValue, useSetAtom } from 'jotai';
 import { describe, expect, test } from 'vitest';
 
 import { readFileContent } from '../filesystem';
+import { pendingAsyncSideEffects } from '../utils/test-utils';
 import {
   activePaneAtom,
   closeAllFilesAtom,
@@ -276,24 +277,18 @@ describe('fileActions', () => {
       openFile.current(fileA);
     });
 
-    const { activeFileContent } = leftPane.current;
-    expect(activeFileContent).toBeDefined();
-    const { result: activeFile } = renderHook(() => useAtomValue(activeFileContent!, { store }));
+    expect(leftPane.current.activeFileContent).toBeDefined();
+    const { result: activeFile } = renderHook(() => useAtomValue(leftPane.current.activeFileContent!, { store }));
 
     expect(activeFile.current.state).toBe('loading');
 
-    await act(async () =>
-      // Allow the jotai store to load the file
-      // This is better than: `new Promise((resolve) => setTimeout(resolve, 1));`
-      Promise.resolve(),
-    );
+    await pendingAsyncSideEffects();
     expect(mockedReadFileContent.mock.calls).toHaveLength(1);
 
-    if (activeFile.current.state === 'hasData') {
-      expect(activeFile.current.data).toEqual({ type: 'tiptap', textContent: 'some content' });
-    } else {
+    if (activeFile.current.state !== 'hasData') {
       fail('Data should be available');
     }
+    expect(activeFile.current.data).toEqual({ type: 'tiptap', textContent: 'some content' });
   });
 });
 
