@@ -54,3 +54,4 @@ class ChatResponseChoice(JsonSchemaMixin):
 class CliCommands(JsonSchemaMixin):
     ingest: IngestResponse
     rewrite: list[RewriteChoice]
+    chat: list[ChatResponseChoice]
