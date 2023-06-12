@@ -70,7 +70,6 @@ export const DraggableBlockNode = Node.create({
             const node = $from.node(i);
             preNode = node.type.create(node.attrs, preNode, node.marks);
           }
-          console.log(preNode);
 
           // Create a new draggable block, containing text after the selection
           const postNode = this.type.create(
