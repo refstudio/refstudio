@@ -2,6 +2,7 @@ import { act, renderHook } from '@testing-library/react';
 import { createStore, useAtomValue, useSetAtom } from 'jotai';
 import { describe, expect, test } from 'vitest';
 
+import { readFileContent } from '../filesystem';
 import {
   activePaneAtom,
   closeAllFilesAtom,
@@ -14,6 +15,8 @@ import {
 } from './fileActions';
 import { FileFileEntry, FolderFileEntry } from './types/FileEntry';
 import { PaneId } from './types/PaneGroup';
+
+vi.mock('../filesystem');
 
 describe('fileActions', () => {
   test('should be empty by default', () => {
@@ -255,6 +258,38 @@ describe('fileActions', () => {
     });
 
     expect(activePane.current.id).toBe(paneToFocus);
+  });
+
+  test('should read file content on openFile', async () => {
+    const store = createStore();
+    const { result: openFile } = renderHook(() => useSetAtom(openFileAtom, { store }));
+    const { result: leftPane } = renderHook(() => useAtomValue(leftPaneAtom, { store }));
+
+    const mockedReadFileContent = vi.mocked(readFileContent).mockResolvedValue({
+      type: 'tiptap',
+      textContent: 'some content',
+    });
+
+    const fileA = makeFile('fileA.txt');
+
+    act(() => {
+      openFile.current(fileA);
+    });
+
+    const { activeFileContent } = leftPane.current;
+    expect(activeFileContent).toBeDefined();
+    const { result: activeFile } = renderHook(() => useAtomValue(activeFileContent!, { store }));
+
+    expect(activeFile.current.state).toBe('loading');
+
+    await new Promise((resolve) => setTimeout(resolve, 1));
+    expect(mockedReadFileContent.mock.calls).toHaveLength(1);
+
+    if (activeFile.current.state === 'hasData') {
+      expect(activeFile.current.data).toEqual({ type: 'tiptap', textContent: 'some content' });
+    } else {
+      fail('Data should be available');
+    }
   });
 });
 
