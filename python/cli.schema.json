@@ -1,147 +1,167 @@
 {
+  "title": "CliCommands",
   "type": "object",
-  "required": [
-    "ingest",
-    "rewrite"
-  ],
   "properties": {
     "ingest": {
       "$ref": "#/definitions/IngestResponse"
     },
     "rewrite": {
+      "title": "Rewrite",
       "type": "array",
       "items": {
         "$ref": "#/definitions/RewriteChoice"
       }
     }
   },
-  "description": "CliCommands(ingest: sidecar.typing.IngestResponse, rewrite: list[sidecar.typing.RewriteChoice])",
-  "$schema": "http://json-schema.org/draft-06/schema#",
+  "required": [
+    "ingest",
+    "rewrite"
+  ],
   "definitions": {
-    "IngestResponse": {
+    "Author": {
+      "title": "Author",
       "type": "object",
+      "properties": {
+        "full_name": {
+          "title": "Full Name",
+          "type": "string"
+        },
+        "given_name": {
+          "title": "Given Name",
+          "type": "string"
+        },
+        "surname": {
+          "title": "Surname",
+          "type": "string"
+        },
+        "email": {
+          "title": "Email",
+          "type": "string"
+        }
+      },
       "required": [
-        "project_name",
-        "references"
-      ],
+        "full_name",
+        "given_name",
+        "surname",
+        "email"
+      ]
+    },
+    "Chunk": {
+      "title": "Chunk",
+      "type": "object",
+      "properties": {
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "vector": {
+          "title": "Vector",
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "metadata": {
+          "title": "Metadata",
+          "default": {},
+          "type": "object"
+        }
+      },
+      "required": [
+        "text"
+      ]
+    },
+    "Reference": {
+      "title": "Reference",
+      "description": "A reference for an academic paper / PDF",
+      "type": "object",
+      "properties": {
+        "source_filename": {
+          "title": "Source Filename",
+          "type": "string"
+        },
+        "filename_md5": {
+          "title": "Filename Md5",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "abstract": {
+          "title": "Abstract",
+          "type": "string"
+        },
+        "contents": {
+          "title": "Contents",
+          "type": "string"
+        },
+        "authors": {
+          "title": "Authors",
+          "default": [],
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Author"
+          }
+        },
+        "chunks": {
+          "title": "Chunks",
+          "default": [],
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Chunk"
+          }
+        },
+        "metadata": {
+          "title": "Metadata",
+          "default": {},
+          "type": "object"
+        }
+      },
+      "required": [
+        "source_filename",
+        "filename_md5"
+      ]
+    },
+    "IngestResponse": {
+      "title": "IngestResponse",
+      "type": "object",
       "properties": {
         "project_name": {
+          "title": "Project Name",
           "type": "string"
         },
         "references": {
+          "title": "References",
           "type": "array",
           "items": {
             "$ref": "#/definitions/Reference"
           }
         }
       },
-      "description": "IngestResponse(project_name: str, references: list[sidecar.typing.Reference])"
-    },
-    "Reference": {
-      "type": "object",
       "required": [
-        "source_filename",
-        "filename_md5"
-      ],
-      "properties": {
-        "source_filename": {
-          "type": "string"
-        },
-        "filename_md5": {
-          "type": "string"
-        },
-        "title": {
-          "type": "string"
-        },
-        "abstract": {
-          "type": "string"
-        },
-        "contents": {
-          "type": "string"
-        },
-        "authors": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Author"
-          },
-          "default": []
-        },
-        "chunks": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Chunk"
-          },
-          "default": []
-        },
-        "metadata": {
-          "type": "object",
-          "default": {}
-        }
-      },
-      "description": "A reference for an academic paper / PDF"
-    },
-    "Author": {
-      "type": "object",
-      "required": [
-        "full_name",
-        "given_name",
-        "surname",
-        "email"
-      ],
-      "properties": {
-        "full_name": {
-          "type": "string"
-        },
-        "given_name": {
-          "type": "string"
-        },
-        "surname": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string"
-        }
-      },
-      "description": "Author(full_name: str, given_name: str, surname: str, email: str)"
-    },
-    "Chunk": {
-      "type": "object",
-      "required": [
-        "text"
-      ],
-      "properties": {
-        "text": {
-          "type": "string"
-        },
-        "vector": {
-          "type": "array",
-          "items": {
-            "type": "number"
-          },
-          "default": []
-        },
-        "metadata": {
-          "type": "object",
-          "default": {}
-        }
-      },
-      "description": "Chunk(text: str, vector: List[float] = <factory>, metadata: Dict[str, Any] = <factory>)"
+        "project_name",
+        "references"
+      ]
     },
     "RewriteChoice": {
+      "title": "RewriteChoice",
       "type": "object",
-      "required": [
-        "index",
-        "text"
-      ],
       "properties": {
         "index": {
+          "title": "Index",
           "type": "integer"
         },
         "text": {
+          "title": "Text",
           "type": "string"
         }
       },
-      "description": "RewriteChoice(index: int, text: str)"
+      "required": [
+        "index",
+        "text"
+      ]
     }
   }
 }

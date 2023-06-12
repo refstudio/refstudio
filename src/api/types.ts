@@ -5,54 +5,60 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
-/**
- * CliCommands(ingest: sidecar.typing.IngestResponse, rewrite: list[sidecar.typing.RewriteChoice])
- */
-export interface CliSchema {
+export type ProjectName = string;
+export type SourceFilename = string;
+export type FilenameMd5 = string;
+export type Title = string;
+export type Abstract = string;
+export type Contents = string;
+export type FullName = string;
+export type GivenName = string;
+export type Surname = string;
+export type Email = string;
+export type Authors = Author[];
+export type Text = string;
+export type Vector = number[];
+export type Chunks = Chunk[];
+export type References = Reference[];
+export type Index = number;
+export type Text1 = string;
+export type Rewrite = RewriteChoice[];
+
+export interface CliCommands {
   ingest: IngestResponse;
-  rewrite: RewriteChoice[];
+  rewrite: Rewrite;
 }
-/**
- * IngestResponse(project_name: str, references: list[sidecar.typing.Reference])
- */
 export interface IngestResponse {
-  project_name: string;
-  references: Reference[];
+  project_name: ProjectName;
+  references: References;
 }
 /**
  * A reference for an academic paper / PDF
  */
 export interface Reference {
-  source_filename: string;
-  filename_md5: string;
-  title?: string;
-  abstract?: string;
-  contents?: string;
-  authors?: Author[];
-  chunks?: Chunk[];
-  metadata?: {};
+  source_filename: SourceFilename;
+  filename_md5: FilenameMd5;
+  title?: Title;
+  abstract?: Abstract;
+  contents?: Contents;
+  authors?: Authors;
+  chunks?: Chunks;
+  metadata?: Metadata1;
 }
-/**
- * Author(full_name: str, given_name: str, surname: str, email: str)
- */
 export interface Author {
-  full_name: string;
-  given_name: string;
-  surname: string;
-  email: string;
+  full_name: FullName;
+  given_name: GivenName;
+  surname: Surname;
+  email: Email;
 }
-/**
- * Chunk(text: str, vector: List[float] = <factory>, metadata: Dict[str, Any] = <factory>)
- */
 export interface Chunk {
-  text: string;
-  vector?: number[];
-  metadata?: {};
+  text: Text;
+  vector?: Vector;
+  metadata?: Metadata;
 }
-/**
- * RewriteChoice(index: int, text: str)
- */
+export interface Metadata {}
+export interface Metadata1 {}
 export interface RewriteChoice {
-  index: number;
-  text: string;
+  index: Index;
+  text: Text1;
 }
