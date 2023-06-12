@@ -5914,13 +5914,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-resizable-panels@npm:^0.0.42":
-  version: 0.0.42
-  resolution: "react-resizable-panels@npm:0.0.42"
+"react-resizable-panels@npm:^0.0.51":
+  version: 0.0.51
+  resolution: "react-resizable-panels@npm:0.0.51"
   peerDependencies:
     react: ^16.14.0 || ^17.0.0 || ^18.0.0
     react-dom: ^16.14.0 || ^17.0.0 || ^18.0.0
-  checksum: 229322d1c130916bb79a5a74d6860ff5d613e60da56e483bd599fa1e5ca1a2319c75d709d60f5cd72fba68a8125448aaddb2d30d2e32fef9d7eaa8ee826e2cda
+  checksum: 8ed1a33a2d0c2a4b78bbfb93e08bbff2df8a4925da08139b501fcf4d21d42f42a7b1c93bf8fa62b7dfc44529ec3030b8f3dba00e32d0b993d1a865bf0f24fcee
   languageName: node
   linkType: hard
 
@@ -6022,7 +6022,7 @@ __metadata:
     react-icons: ^4.8.0
     react-pdf: ^6.2.2
     react-popper: ^2.3.0
-    react-resizable-panels: ^0.0.42
+    react-resizable-panels: ^0.0.51
     tailwindcss: ^3.3.2
     tiptap-markdown: ^0.7.2
     typescript: ^4.9.5
