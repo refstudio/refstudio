@@ -1,5 +1,5 @@
 import { Node } from '@tiptap/core';
-import { Fragment, Node as NodeType, Slice } from '@tiptap/pm/model';
+import { Fragment, Slice } from '@tiptap/pm/model';
 import { NodeSelection, TextSelection } from '@tiptap/pm/state';
 import { ReplaceStep } from '@tiptap/pm/transform';
 import { mergeAttributes, ReactNodeViewRenderer } from '@tiptap/react';
@@ -44,110 +44,62 @@ export const DraggableBlockNode = Node.create({
       splitDraggableBlock:
         () =>
         ({ tr, state, dispatch }) => {
-          const { $from, $to } = state.selection;
-          const selection = state.selection as NodeSelection | Selection;
+          const { selection } = state;
+          const { $from, $to } = selection;
 
-          if (('node' in selection && selection.node.isBlock) || $from.depth < 2) {
+          if (('node' in selection && (selection as NodeSelection).node.isBlock) || $from.depth < 2) {
             return false;
           }
 
-          const grandParent = $from.node(-1);
-          if (grandParent.type.name !== this.type.name) {
+          let draggableBlockDepth = $from.depth;
+          while (draggableBlockDepth > 0 && $from.node(draggableBlockDepth).type.name !== this.type.name) {
+            draggableBlockDepth -= 1;
+          }
+          // If selection does not belong to a draggable block, this command does not run
+          if (draggableBlockDepth === 0) {
             return false;
           }
 
-          /* We have
-          <...>
-            <collapsibleBlock>
-              <block>...</block>
-            </collapsibleBlock>
-          </...>
-          
-          Splitting it should result in
-          <...>
-            <collapsibleBlock>
-              <block>...</block>
-            </collapsibleBlock>
-            <collapsibleBlock>
-              <block>...</block>
-            </collapsibleBlock>
-          </...> */
+          // Create a copy of the block, sliced to before the selection
+          let preNode = $from.parent.type.create(
+            $from.parent.attrs,
+            $from.parent.slice(0, $from.parentOffset).content,
+            $from.parent.marks,
+          );
+          for (let i = $from.depth - 1; i >= draggableBlockDepth; i--) {
+            const node = $from.node(i);
+            preNode = node.type.create(node.attrs, preNode, node.marks);
+          }
+          console.log(preNode);
+
+          // Create a new draggable block, containing text after the selection
+          const postNode = this.type.create(
+            null,
+            $to.parent.type.create($to.parent.attrs, $to.parent.slice($to.parentOffset).content, $to.parent.marks),
+          );
+
           if (dispatch) {
-            // const preNode = grandParent.type.create(
-            //   grandParent.attrs,
-            //   $from.parent.type.create(
-            //     $from.parent.attrs,
-            //     $from.parent.slice(0, $from.parentOffset).content,
-            //     $from.parent.marks,
-            //   ),
-            //   grandParent.marks,
-            // );
-            // content.push(preNode);
+            const fromPos = $from.pos;
 
-            // const postNode = grandParent.type.create(
-            //   grandParent.attrs,
-            //   $to.parent.type.create(
-            //     $to.parent.attrs,
-            //     $to.node($from.depth).slice($to.parentOffset).content,
-            //     $to.parent.marks,
-            //   ),
-            //   grandParent.marks,
-            // );
-            // content.push(postNode);
+            tr.deleteSelection();
 
-            // const fragment = Fragment.from(content);
-            // console.log(fragment)
-            // const slice = new Slice(fragment, 0, 0);
+            // Get updated position, after selection has been deleted
+            const updatedFromPos = tr.mapping.map(fromPos);
+            const resolvedFromPos = tr.doc.resolve(updatedFromPos);
 
-            // console.log($from.sharedDepth($to.before($to.depth)))
-
-            // const grandParentStart = $from.before(-1);
-            // const grandParentEnd = $to.after(-1);
-
-            // const step = new ReplaceStep(grandParentStart, grandParentEnd, slice);
-            // tr.step(step);
-
-            const preNode = grandParent.type.create(
-              grandParent.attrs,
-              $from.parent.type.create(
-                $from.parent.attrs,
-                $from.parent.slice(0, $from.parentOffset).content,
-                $from.parent.marks,
-              ),
-              grandParent.marks,
-            );
-            const postNode = grandParent.type.create(
-              grandParent.attrs,
-              $from.parent.type.create(
-                $from.parent.attrs,
-                $to.parent.slice($to.parentOffset).content,
-                $from.parent.marks,
-              ),
-              grandParent.marks,
-            );
-
-            const sharedDepth = $from.sharedDepth($to.before($to.depth + 1));
-
-            let content: NodeType | NodeType[] = [preNode, postNode];
-            for (let i = $from.depth - 2; i > sharedDepth; i--) {
-              const parent = $from.node(i);
-              content = parent.type.create(parent.attrs, content, parent.marks);
-            }
-
-            const start = sharedDepth === $from.depth ? $from.before(-1) : $from.before(sharedDepth + 1);
-            const end = sharedDepth === $from.depth ? $to.after(-1) : $to.after(sharedDepth + 1);
-
-            const fragment = Fragment.from(content);
+            const fragment = Fragment.from([preNode, postNode]);
             const slice = new Slice(fragment, 0, 0);
+
+            const start = resolvedFromPos.before(draggableBlockDepth);
+            const end = resolvedFromPos.after(draggableBlockDepth);
 
             const step = new ReplaceStep(start, end, slice);
             tr.step(step);
 
-            tr.setSelection(TextSelection.near(tr.doc.resolve(start + preNode.nodeSize + 2)));
+            tr.setSelection(TextSelection.near(tr.doc.resolve(tr.mapping.map(start) + preNode.nodeSize)));
 
             dispatch(tr);
           }
-
           return true;
         },
     };
