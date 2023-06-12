@@ -6,11 +6,12 @@
  */
 
 /**
- * CliCommands(ingest: sidecar.typing.IngestResponse, rewrite: list[sidecar.typing.RewriteChoice])
+ * CliCommands(ingest: sidecar.typing.IngestResponse, rewrite: list[sidecar.typing.RewriteChoice], chat: list[sidecar.typing.ChatResponseChoice])
  */
 export interface CliSchema {
   ingest: IngestResponse;
   rewrite: RewriteChoice[];
+  chat: ChatResponseChoice[];
 }
 /**
  * IngestResponse(project_name: str, references: list[sidecar.typing.Reference])
@@ -53,6 +54,13 @@ export interface Chunk {
  * RewriteChoice(index: int, text: str)
  */
 export interface RewriteChoice {
+  index: number;
+  text: string;
+}
+/**
+ * ChatResponseChoice(index: int, text: str)
+ */
+export interface ChatResponseChoice {
   index: number;
   text: string;
 }
