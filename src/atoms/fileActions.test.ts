@@ -1,9 +1,8 @@
-import { act, renderHook } from '@testing-library/react';
-import { Atom, createStore, useAtomValue, useSetAtom, WritableAtom } from 'jotai';
+import { act, renderHook } from '@testing-library/react-hooks';
+import { createStore, useAtomValue } from 'jotai';
 import { describe, expect, test } from 'vitest';
 
 import { readFileContent } from '../filesystem';
-import { pendingAsyncSideEffects } from '../utils/test-utils';
 import {
   activePaneAtom,
   closeAllFilesAtom,
@@ -15,6 +14,7 @@ import {
   selectFileInPaneAtom,
   splitFileToPaneAtom,
 } from './fileActions';
+import { runGetAtomHook, runSetAtomHook } from './test-utils';
 import { FileFileEntry, FolderFileEntry } from './types/FileEntry';
 import { PaneId } from './types/PaneGroup';
 
@@ -338,11 +338,14 @@ describe('fileActions', () => {
     });
 
     expect(leftPane.current.activeFileContent).toBeDefined();
-    const activeFile = runGetAtomHook(leftPane.current.activeFileContent!, store);
+    const { result: activeFile, waitForNextUpdate } = renderHook(() =>
+      useAtomValue(leftPane.current.activeFileContent!, { store }),
+    );
 
     expect(activeFile.current.state).toBe('loading');
 
-    await pendingAsyncSideEffects();
+    await waitForNextUpdate();
+
     expect(mockedReadFileContent.mock.calls).toHaveLength(1);
 
     if (activeFile.current.state !== 'hasData') {
@@ -351,17 +354,6 @@ describe('fileActions', () => {
     expect(activeFile.current.data).toEqual({ type: 'tiptap', textContent: 'some content' });
   });
 });
-
-function runGetAtomHook<T>(atom: Atom<T>, store: ReturnType<typeof createStore>) {
-  return renderHook(() => useAtomValue(atom, { store })).result;
-}
-
-function runSetAtomHook<Value, Args extends unknown[], Result>(
-  atom: WritableAtom<Value, Args, Result>,
-  store: ReturnType<typeof createStore>,
-) {
-  return renderHook(() => useSetAtom(atom, { store })).result;
-}
 
 function makeFile(name: string): FileFileEntry {
   return {
