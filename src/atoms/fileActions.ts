@@ -10,7 +10,7 @@ import { PaneFileId, PaneId } from './types/PaneGroup';
 export { activePaneAtom } from './core/activePane';
 export { selectFileInPaneAtom } from './core/paneGroup';
 
-/** Open a file in the a pane (depending on the file extension) */
+/** Open a file in a pane (depending on the file extension) */
 export const openFileAtom = atom(null, (get, set, file: FileEntry) => {
   if (file.isFolder) {
     console.warn('Cannot open directory ', file.path);
