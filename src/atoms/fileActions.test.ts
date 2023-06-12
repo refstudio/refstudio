@@ -282,7 +282,11 @@ describe('fileActions', () => {
 
     expect(activeFile.current.state).toBe('loading');
 
-    await new Promise((resolve) => setTimeout(resolve, 1));
+    await act(async () =>
+      // Allow the jotai store to load the file
+      // This is better than: `new Promise((resolve) => setTimeout(resolve, 1));`
+      Promise.resolve(),
+    );
     expect(mockedReadFileContent.mock.calls).toHaveLength(1);
 
     if (activeFile.current.state === 'hasData') {
