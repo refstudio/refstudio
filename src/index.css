@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    /* https://tailwindcss.com/docs/customizing-colors#using-css-variables */
+    --color-primary: 151deg 54% 69%;
+    --color-primary-hover: 152deg 54% 48%;
+    --color-secondary: 193deg 37% 69%;
+    --color-secondary-hover: 193deg 37% 48%;
+  }
+}
+
 h1,
 h2,
 h3,
@@ -9,7 +19,6 @@ h4,
 h5,
 h6 {
   @apply font-bold;
-  @apply mb-4;
 }
 
 h1 {
@@ -30,10 +39,6 @@ h4 {
 
 a {
   @apply cursor-pointer text-blue-500 underline hover:no-underline;
-}
-
-p {
-  @apply my-4;
 }
 
 body {

@@ -1,13 +1,10 @@
-.tiptap-editor {
-  /* @apply debug-blue; */
-}
 .tiptap-editor menu.menu-bar button {
   @apply mx-1 my-1 rounded-lg bg-gray-200 px-2 py-1 hover:bg-gray-500 hover:text-white;
 }
 
 .tiptap-editor ul,
-ol {
-  @apply pl-3;
+.tiptap-editor ol {
+  @apply ml-7;
 }
 
 .tiptap-editor ul > li {
@@ -20,4 +17,8 @@ ol {
 
 .tiptap-editor .ProseMirror-focused {
   outline: none;
+}
+
+.tiptap-editor {
+  @apply flex-1 overflow-y-scroll pl-1 pr-2 pt-2;
 }

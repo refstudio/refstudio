@@ -5,15 +5,11 @@ import { ReferenceItem } from '../types/ReferenceItem';
 
 type ReferencesState = Record<string, ReferenceItem>;
 
-/**
- * INTERNAL ATOMS
- */
+/** INTERNAL ATOMS */
 // This is the internal representation of the references and is not exposed so that all business logic lives in this file to enable us to easily change the structure and/or switch to another state management library
 const referencesAtom = atomWithStorage<ReferencesState>('references', {});
 
-/**
- * EXTERNAL ATOMS
- */
+/** EXTERNAL ATOMS */
 
 export const getReferencesAtom = atom((get) => Object.values(get(referencesAtom)));
 

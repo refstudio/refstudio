@@ -5,6 +5,7 @@ import sys
 import openai
 from dotenv import load_dotenv
 from sidecar import prompts
+from sidecar.typing import RewriteChoice
 
 load_dotenv()
 openai.api_key = os.environ.get("OPENAI_API_KEY")
@@ -12,12 +13,12 @@ openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 def summarize(text: str, n_options: int = 1) -> str:
     prompt = prompts.create_prompt_for_summarize(text)
-    chat = Chat(prompt, n_options)
+    chat = Rewriter(prompt, n_options)
     response = chat.get_response()
-    sys.stdout.write(json.dumps(response))
+    sys.stdout.write(json.dumps([r.to_dict() for r in response]))
 
 
-class Chat:
+class Rewriter:
     def __init__(self, text: str, n_options: int = 1):
         self.text = text
         self.n_options = int(n_options)
@@ -27,15 +28,13 @@ class Chat:
         response = self.call_model(messages)
         response = self.prepare_choices_for_client(response)
         return response
-    
-    def prepare_choices_for_client(self, response: dict) -> list:
-        choices = []
-        for choice in response["choices"]:
-            choices.append(
-                {'index': choice["index"], 'text': choice["message"]["content"]}
-            )
-        return choices
-    
+
+    def prepare_choices_for_client(self, response: dict) -> list[RewriteChoice]:
+        return [
+            RewriteChoice(index=choice['index'], text=choice["message"]["content"])
+            for choice in response['choices']
+        ]
+
     def call_model(self, messages: list):
         response = openai.ChatCompletion.create(
             model=os.environ["OPENAI_CHAT_MODEL"],

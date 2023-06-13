@@ -1,7 +1,7 @@
 import { VscFile, VscFolder } from 'react-icons/vsc';
 
+import { FileEntry } from '../atoms/types/FileEntry';
 import { cx } from '../cx';
-import { FileEntry } from '../types/FileEntry';
 
 interface FileTreeBaseProps {
   root?: boolean;

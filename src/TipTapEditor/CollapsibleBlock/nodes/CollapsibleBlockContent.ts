@@ -3,7 +3,7 @@ import { mergeAttributes, Node } from '@tiptap/core';
 export const CollapsibleBlockContentNode = Node.create({
   name: 'collapsibleContent',
   group: 'block',
-  content: 'block+',
+  content: 'draggableBlock+',
 
   parseHTML() {
     return [
