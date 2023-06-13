@@ -2,7 +2,7 @@ import { Node } from '@tiptap/core';
 import { Fragment, Slice } from '@tiptap/pm/model';
 import { NodeSelection, TextSelection } from '@tiptap/pm/state';
 import { ReplaceStep } from '@tiptap/pm/transform';
-import { mergeAttributes, ReactNodeViewRenderer } from '@tiptap/react';
+import { ReactNodeViewRenderer } from '@tiptap/react';
 
 import { DraggableBlock } from './DraggableBlock';
 

@@ -1,4 +1,4 @@
-import { mergeAttributes, Node } from '@tiptap/core';
+import { Node } from '@tiptap/core';
 import { ReactNodeViewRenderer } from '@tiptap/react';
 
 import { CollapsibleBlock } from '../CollapsibleBlock';
@@ -21,7 +21,7 @@ export const CollapsibleBlockNode = Node.create({
   },
 
   renderHTML({ HTMLAttributes }) {
-    return ['collapsible-block', mergeAttributes(HTMLAttributes), 0];
+    return ['collapsible-block', HTMLAttributes, 0];
   },
 
   addAttributes(): {
