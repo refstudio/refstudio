@@ -77,3 +77,9 @@ export const splitFileToPaneAtom = atom(null, (_get, set, { fileId, fromPaneId, 
 export const focusPaneAtom = atom(null, (_get, set, paneId: PaneId) => {
   set(activePaneIdAtom, paneId);
 });
+
+export const closeAllFilesAtom = atom(null, (get, set) => {
+  const panes = get(paneGroupAtom);
+  panes.LEFT.openFiles.forEach((file) => set(closeFileFromPaneAtom, { fileId: file, paneId: 'LEFT' }));
+  panes.RIGHT.openFiles.forEach((file) => set(closeFileFromPaneAtom, { fileId: file, paneId: 'RIGHT' }));
+});
