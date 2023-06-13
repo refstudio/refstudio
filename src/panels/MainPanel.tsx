@@ -38,17 +38,24 @@ export function MainPanel(props: MainPanelProps) {
     pdfViewerRef.current?.updateWidth();
   }, [pdfViewerRef]);
 
+  const showRight = right.files.length > 0;
+  const showLeft = left.files.length > 0 || !showRight;
+
   return (
     <>
-      <PanelGroup direction="horizontal" onLayout={updatePDFViewerWidth}>
-        <Panel>
-          <MainPanelPane pane={left} {...props} />
-        </Panel>
-        {right.files.length > 0 && <VerticalResizeHandle />}
-        {right.files.length > 0 && (
-          <Panel>
-            <MainPanelPane pane={right} {...props} />
+      <PanelGroup autoSaveId="mainPanel" direction="horizontal" onLayout={updatePDFViewerWidth}>
+        {showLeft && (
+          <Panel order={1}>
+            <MainPanelPane pane={left} {...props} />
           </Panel>
+        )}
+        {showRight && (
+          <>
+            <VerticalResizeHandle />
+            <Panel order={2}>
+              <MainPanelPane pane={right} {...props} />
+            </Panel>
+          </>
         )}
       </PanelGroup>
     </>

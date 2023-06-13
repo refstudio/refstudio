@@ -13,17 +13,11 @@
   "[typescript]": {
     "editor.formatOnSave": true
   },
-  "[css]": {
-    "editor.formatOnSave": true
-  },
-  "[postcss]": {
-    "editor.formatOnSave": true
-  },
   "editor.codeActionsOnSave": [
     // Run ESLint fixers _before_ prettier to ensure the user doesn't need to do multiple saves
+    "source.organizeImports",
     "source.fixAll.eslint",
     "source.fixAll.format",
-    "source.organizeImports"
   ],
   "explorer.excludeGitIgnore": true,
   "search.exclude": {
