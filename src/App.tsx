@@ -4,7 +4,6 @@ import { ImperativePanelHandle, Panel, PanelGroup } from 'react-resizable-panels
 
 import { PrimarySideBar, PrimarySideBarPane } from './components/PrimarySideBar';
 import { VerticalResizeHandle } from './components/VerticalResizeHandle';
-import { cx } from './cx';
 import { AIPanel } from './panels/AIPanel';
 import { ExplorerPanel } from './panels/ExplorerPanel';
 import { MainPanel } from './panels/MainPanel';
@@ -15,7 +14,6 @@ import { PdfViewerAPI } from './types/PdfViewerAPI';
 import { ReferenceItem } from './types/ReferenceItem';
 
 function App() {
-  const [settingsVisible, setSettingsVisible] = useState(false);
   const editorRef = React.useRef<EditorAPI>(null);
 
   const pdfViewerRef = React.useRef<PdfViewerAPI>(null);
@@ -27,9 +25,7 @@ function App() {
     <>
       <PanelGroup
         autoSaveId="refstudio"
-        className={cx('relative h-full', {
-          'pointer-events-none select-none opacity-25': settingsVisible,
-        })}
+        className="relative h-full"
         direction="horizontal"
         onLayout={updatePDFViewerWidth}
       >
@@ -39,7 +35,7 @@ function App() {
         </Panel>
         <RightPanelWrapper />
       </PanelGroup>
-      <Settings onToggle={setSettingsVisible} />
+      <Settings />
     </>
   );
 }
