@@ -1,8 +1,8 @@
 import { Node } from '@tiptap/core';
 import { Fragment, Slice } from '@tiptap/pm/model';
-import { NodeSelection, TextSelection } from '@tiptap/pm/state';
+import { TextSelection } from '@tiptap/pm/state';
 import { ReplaceStep } from '@tiptap/pm/transform';
-import { ReactNodeViewRenderer } from '@tiptap/react';
+import { isNodeSelection, ReactNodeViewRenderer } from '@tiptap/react';
 
 import { DraggableBlock } from './DraggableBlock';
 
@@ -43,11 +43,11 @@ export const DraggableBlockNode = Node.create({
       ...this.parent?.(),
       splitDraggableBlock:
         () =>
-        ({ tr, state, dispatch }) => {
-          const { selection } = state;
+        ({ tr, dispatch }) => {
+          const { selection } = tr;
           const { $from, $to } = selection;
 
-          if (('node' in selection && (selection as NodeSelection).node.isBlock) || $from.depth < 2) {
+          if ((isNodeSelection(selection) && selection.node.isBlock) || $from.depth < 2) {
             return false;
           }
 

@@ -30,6 +30,7 @@ export const EDITOR_EXTENSIONS: Extensions = [
       keepMarks: true,
       keepAttributes: false,
     },
+    blockquote: false,
     codeBlock: false,
     document: false,
     orderedList: {
