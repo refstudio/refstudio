@@ -61,10 +61,7 @@ export const CollapsibleBlock = ({ editor, getPos, node, updateAttributes }: Col
 
   return (
     <NodeViewWrapper as={'collapsible-block' as ElementType}>
-      <button
-        className={cx({ folded })}
-        onClick={handleButtonClick}
-      />
+      <button className={cx({ folded })} onClick={handleButtonClick} />
 
       <NodeViewContent className={cx('content', { folded })} />
     </NodeViewWrapper>
