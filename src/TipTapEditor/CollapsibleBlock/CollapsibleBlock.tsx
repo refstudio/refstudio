@@ -2,6 +2,7 @@ import './CollapsibleBlock.css';
 
 import { Node } from '@tiptap/pm/model';
 import { NodeViewContent, NodeViewWrapper } from '@tiptap/react';
+import { ElementType } from 'react';
 
 import { cx } from '../../cx';
 import { CollapsibleBlockNodeAttributes } from './nodes/CollapsibleBlockNode';
@@ -19,18 +20,15 @@ export const CollapsibleBlock = (props: CollapsibleBlockProps) => {
     });
   };
   return (
-    <NodeViewWrapper>
-      <div className="draggable-item collapsible-block flex flex-row items-start">
-        <div className="drag-handle" contentEditable="false" data-drag-handle draggable="true" />
-        <button
-          className={cx({
-            folded: props.node.attrs.folded,
-          })}
-          onClick={handleButtonClick}
-        />
+    <NodeViewWrapper as={'collapsible-block' as ElementType}>
+      <button
+        className={cx({
+          folded: props.node.attrs.folded,
+        })}
+        onClick={handleButtonClick}
+      />
 
-        <NodeViewContent className={cx('content', { folded: props.node.attrs.folded })} />
-      </div>
+      <NodeViewContent className={cx('content', { folded: props.node.attrs.folded })} />
     </NodeViewWrapper>
   );
 };

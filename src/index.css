@@ -19,7 +19,6 @@ h4,
 h5,
 h6 {
   @apply font-bold;
-  @apply mb-4;
 }
 
 h1 {
@@ -40,10 +39,6 @@ h4 {
 
 a {
   @apply cursor-pointer text-blue-500 underline hover:no-underline;
-}
-
-p {
-  @apply my-4;
 }
 
 body {
