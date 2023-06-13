@@ -2,8 +2,8 @@ import json
 import logging
 import os
 import sys
+from dataclasses import asdict
 from pathlib import Path
-from typing import Dict, List
 
 import grobid_tei_xml
 from grobid_client.grobid_client import GrobidClient
@@ -47,6 +47,7 @@ class PDFIngestion:
         self.call_grobid_server()
         self.convert_grobid_xml_to_json()
         references = self.create_references()
+        self.save_references(references)
         response = self.create_response_from_references(references)
         sys.stdout.write(response.to_json())
         logger.info(f"Finished ingestion for project: {self.project_name}")
@@ -59,7 +60,7 @@ class PDFIngestion:
         if not self.storage_dir.exists():
             self.storage_dir.mkdir()
 
-    def get_files_to_ingest(self) -> List[Path]:
+    def get_files_to_ingest(self) -> list[Path]:
         """
         Determines which files need to be ingested
         :return: bool
@@ -109,8 +110,8 @@ class PDFIngestion:
             )
         logger.info("Finished calling Grobid server")
         _ = self._get_grobid_output_statuses()
-
-    def _get_grobid_output_statuses(self) -> Dict[Path, str]:
+    
+    def _get_grobid_output_statuses(self) -> dict[Path, str]:
         """
         Determines the status of Grobid output files.
         """
@@ -179,8 +180,8 @@ class PDFIngestion:
             surname=author_dict.get("surname"),
             email=author_dict.get("email"),
         )
-
-    def _create_references_for_grobid_failures(self) -> List[Reference]:
+    
+    def _create_references_for_grobid_failures(self) -> list[Reference]:
         """
         Creates Reference objects for PDFs that Grobid was unable to parse.
         We want the output of PDF Ingestion to contain _all_ PDF References, even
@@ -205,12 +206,20 @@ class PDFIngestion:
             )
         return references
 
-    def create_references(self) -> List[Reference]:
+    def create_references(self) -> list[Reference]:
         """
         Creates a list of Reference objects from the json files in the storage directory
         :return: List[Reference]
         """
         json_files = list(self.storage_dir.glob("*.json"))
+
+        # Remove references.json from the list of files to parse
+        try:
+            fp = self.storage_dir.joinpath("references.json")
+            json_files.remove(fp)
+        except ValueError:
+            pass
+
         logger.info(f"Found {len(json_files)} json reference files")
 
         references = []
@@ -236,8 +245,19 @@ class PDFIngestion:
 
         failures = self._create_references_for_grobid_failures()
         return references + failures
+    
+    def save_references(self, references: list[Reference]) -> None:
+        """
+        Saves a list of Reference objects to the filesystem
+        """
+        filepath = os.path.join(self.storage_dir, "references.json")
+        logger.info(f"Saving references to file: {filepath}")
 
-    def create_response_from_references(self, references: List[Reference]) -> IngestResponse:
+        contents = [asdict(ref) for ref in references]
+        with open(filepath, "w") as fout:
+            json.dump(contents, fout)
+
+    def create_response_from_references(self, references: list[Reference]) -> IngestResponse:
         """
         Creates a Response object from a list of Reference objects
         :param references: List[Reference]

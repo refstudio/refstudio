@@ -18,12 +18,6 @@ class Reference(JsonSchemaMixin):
 
 
 @dataclass
-class Affiliation(JsonSchemaMixin):
-    institution: str
-    department: str
-
-
-@dataclass
 class Author(JsonSchemaMixin):
     full_name: str
     given_name: str
@@ -51,6 +45,13 @@ class RewriteChoice(JsonSchemaMixin):
 
 
 @dataclass
+class ChatResponseChoice(JsonSchemaMixin):
+    index: int
+    text: str
+
+
+@dataclass
 class CliCommands(JsonSchemaMixin):
     ingest: IngestResponse
     rewrite: list[RewriteChoice]
+    chat: list[ChatResponseChoice]

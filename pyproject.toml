@@ -11,6 +11,7 @@ grobid-tei-xml = "^0.1.3"
 grobid-client-python = "^0.0.5"
 openai = "^0.27.7"
 python-dotenv = "^1.0.0"
+rank-bm25 = "^0.2.2"
 dataclasses-jsonschema = "^2.16.0"
 
 [tool.poetry.group.dev.dependencies]
