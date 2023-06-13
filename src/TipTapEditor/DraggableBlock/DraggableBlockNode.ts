@@ -8,7 +8,7 @@ import { DraggableBlock } from './DraggableBlock';
 
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
-    splitDraggableBlock: {
+    draggableBlock: {
       splitDraggableBlock: () => ReturnType;
     };
   }
@@ -25,13 +25,13 @@ export const DraggableBlockNode = Node.create({
   parseHTML() {
     return [
       {
-        tag: 'div[data-type="draggable-block"]',
+        tag: 'draggable-block',
       },
     ];
   },
 
   renderHTML({ HTMLAttributes }) {
-    return ['div', mergeAttributes(HTMLAttributes, { 'data-type': 'draggable-block' }), 0];
+    return ['draggable-block', HTMLAttributes, 0];
   },
 
   addNodeView() {
