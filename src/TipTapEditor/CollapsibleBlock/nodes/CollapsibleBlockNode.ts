@@ -1,5 +1,7 @@
 import { Node } from '@tiptap/core';
+import { Fragment, Slice } from '@tiptap/pm/model';
 import { TextSelection } from '@tiptap/pm/state';
+import { ReplaceStep } from '@tiptap/pm/transform';
 import { InputRule, ReactNodeViewRenderer } from '@tiptap/react';
 
 import { CollapsibleBlock } from '../CollapsibleBlock';
@@ -12,7 +14,6 @@ declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     collapsibleBlock: {
       setCollapsibleBlock: () => ReturnType;
-      toggleCollapsibleBlock: () => ReturnType;
       unsetCollapsibleBlock: () => ReturnType;
     };
   }
@@ -65,8 +66,12 @@ export const CollapsibleBlockNode = Node.create({
         ({ tr, dispatch, editor }) => {
           if (!('collapsibleSummary' in editor.schema.nodes)) {
             console.warn(
-              'Collapsible summary can not be found in the schema. Did you forget to add it to configuration?',
+              'Collapsible summary node can not be found in the schema. Did you forget to add it to the configuration?',
             );
+            return false;
+          }
+
+          if (!tr.selection.empty) {
             return false;
           }
 
@@ -89,13 +94,59 @@ export const CollapsibleBlockNode = Node.create({
           }
           return true;
         },
-      toggleCollapsibleBlock:
+      unsetCollapsibleBlock:
         () =>
-        ({ tr, dispatch }) => {
-          const { selection } = tr;
+        ({ editor, dispatch, tr }) => {
+          if (!('draggableBlock' in editor.schema.nodes)) {
+            console.warn(
+              'Draggable block node can not be found in the schema. Did you forget to add it to the configuration?',
+            );
+            return false;
+          }
+          if (!('paragraph' in editor.schema.nodes)) {
+            console.warn(
+              'Paragraph node can not be found in the schema. Did you forget to add it to the configuration?',
+            );
+            return false;
+          }
+
+          if (!tr.selection.empty) {
+            return false;
+          }
+
+          const { $from } = tr.selection;
+          if ($from.depth < 1) {
+            return false;
+          }
+
+          const collapsibleNode = $from.node(-1);
+          if (collapsibleNode.type.name !== this.type.name) {
+            return false;
+          }
 
           if (dispatch) {
-            //
+            const summary = collapsibleNode.child(0).content;
+            const paragraph = [editor.schema.nodes.paragraph.createChecked(null, summary)];
+            const content = [editor.schema.nodes.draggableBlock.createChecked(null, paragraph)];
+
+            if (collapsibleNode.childCount === 2) {
+              collapsibleNode.child(1).forEach((node) => {
+                content.push(node);
+              });
+            }
+            const fragment = Fragment.from(content);
+            const slice = new Slice(fragment, 0, 0);
+
+            const start = $from.before(-2);
+            const end = $from.after(-2);
+
+            const step = new ReplaceStep(start, end, slice);
+            tr.step(step);
+
+            // + 2 to account for <collapsibleBlock> and <collapsibleSummary> opening tags, that have been removed
+            tr.setSelection(TextSelection.near(tr.doc.resolve(start + $from.parentOffset + 2)));
+
+            dispatch(tr);
           }
           return true;
         },
