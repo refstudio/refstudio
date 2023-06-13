@@ -17,6 +17,10 @@ collapsible-block > button.folded:before {
   content: '\25b6';
 }
 
+collapsible-block:not(:has(collapsible-content)) > button:before {
+  color: #93928e;
+}
+
 collapsible-block .content {
   @apply flex-1;
 }
