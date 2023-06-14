@@ -103,22 +103,33 @@ export const CollapsibleBlockNode = Node.create({
             return false;
           }
 
-          const collapsibleBlock = tr.doc.resolve(pos + 1).parent;
+      toggleCollapsedCollapsibleBlock:
+        (pos) =>
+        ({ editor, dispatch, tr }) => {
+          const resolvedPos = tr.doc.resolve(pos);
 
-          if (collapsibleBlock.type.name !== this.type.name) {
+          const collapsibleSummaryParent = findParentNodeClosestToPos(
+            resolvedPos,
+            (node) => node.type.name === editor.schema.nodes.collapsibleSummary.name,
+          );
+          if (!collapsibleSummaryParent) {
             return false;
           }
+
+          const { depth } = collapsibleSummaryParent;
+          const collapsibleBlock = resolvedPos.node(depth - 1);
+          const collapsibleBlockStartPos = resolvedPos.before(depth - 1);
 
           const { folded } = collapsibleBlock.attrs;
 
           if (dispatch) {
-            tr.setNodeAttribute(pos, 'folded', !folded);
+            tr.setNodeAttribute(collapsibleBlockStartPos, 'folded', !folded);
             if (!folded) {
               // Reset selection if it was inside the content
               if (collapsibleBlock.childCount === 2) {
                 const { from, to } = tr.selection;
 
-                const contentStart = pos + collapsibleBlock.child(0).nodeSize;
+                const contentStart = collapsibleBlockStartPos + collapsibleBlock.child(0).nodeSize;
                 const contentEnd = contentStart + collapsibleBlock.child(1).nodeSize;
 
                 // If the intervals [from, to] and [contentStart, contentEnd] overlap,
@@ -129,7 +140,7 @@ export const CollapsibleBlockNode = Node.create({
               }
               // If the block was unfolded and with empty content block, remove the content block
               if (collapsibleBlock.childCount === 2 && collapsibleBlock.child(1).nodeSize === 6) {
-                const start = pos + 1 + collapsibleBlock.child(0).nodeSize;
+                const start = collapsibleBlockStartPos + 1 + collapsibleBlock.child(0).nodeSize;
                 const end = start + 6;
 
                 tr.delete(start, end);
@@ -141,7 +152,7 @@ export const CollapsibleBlockNode = Node.create({
               const draggableBlock = editor.schema.nodes.draggableBlock.createChecked(null, emptyParagraph);
               const contentBlock = editor.schema.nodes.collapsibleContent.createChecked(null, draggableBlock);
 
-              const posAfterSummary = pos + collapsibleBlock.nodeSize - 1;
+              const posAfterSummary = collapsibleBlockStartPos + collapsibleBlock.nodeSize - 1;
 
               tr.insert(posAfterSummary, contentBlock);
               dispatch(tr);
@@ -208,6 +219,17 @@ export const CollapsibleBlockNode = Node.create({
     };
   },
 
+  addKeyboardShortcuts() {
+    return {
+      'Mod-Enter': ({ editor }) => {
+        if (!editor.state.selection.empty) {
+          return false;
+        }
+        return editor.commands.toggleCollapsedCollapsibleBlock(editor.state.selection.from);
+      },
+    };
+  },
+
   addInputRules() {
     return [
       new InputRule({
@@ -227,7 +249,7 @@ export const CollapsibleBlockNode = Node.create({
               return true;
             })
             .setCollapsibleBlock()
-            .setTextSelection(from)
+            .setTextSelection(from + 1)
             .run();
         },
       }),
