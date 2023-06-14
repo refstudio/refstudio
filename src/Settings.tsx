@@ -3,11 +3,15 @@ import { useEffect, useState } from 'react';
 import { VscClose } from 'react-icons/vsc';
 
 import { cx } from './cx';
+import { getSettings, initSettings } from './settings/settings';
 
 // Tauri HOTKEYS
 // https://github.com/tauri-apps/global-hotkey/blob/0b91f4beb998526103447d890ed8eeddc0397b7d/src/hotkey.rs#L164
 const SETTINGS_SHORTCUT_TOGGLE = 'Cmd+,';
-const SETTINGS_SHORTCUT_CLOSE = 'Esc';
+const SETTINGS_SHORTCUT_CLOSE = 'Shift+Esc';
+
+// Ensure settings are configured and loaded
+await initSettings();
 
 export function Settings({ open = false, onToggle }: { open?: boolean; onToggle(open: boolean): void }) {
   const [pane, selectPane] = useState('user-account');
@@ -113,12 +117,18 @@ function ToDoSettings({ header, message }: { header: string; message: string }) 
 }
 
 function OpenAiSettings() {
+  const settings = getSettings();
+
   return (
     <SettingsPane header="Open AI">
       <form>
         <fieldset className="space-y-2">
           <label>API Key</label>
-          <input className="w-full border px-2 py-0.5" />
+          <input
+            className="w-full border px-2 py-0.5"
+            value={settings.getCache('openAI.apiKey')}
+            onChange={(e) => settings.setCache('openAI.apiKey', e.currentTarget.value)}
+          />
           <p className="text-sm text-slate-500">
             You need to configure the API to use the <em>rewrite</em> and <em>chat</em> operations.
           </p>

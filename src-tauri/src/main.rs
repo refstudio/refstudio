@@ -3,22 +3,16 @@
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
-fn greet(name: &str, sender: &str) -> String {
-    format!(
-        "Hello, {}! You've been greeted from Rust! Signed, {}",
-        name, sender
-    )
-}
-
-#[tauri::command]
-fn interact_with_ai(selection: &str) -> String {
-    format!("{}: {}", selection.len(), selection.to_uppercase())
+fn get_environment_variable(name: &str) -> String {
+  std::env::var(name).unwrap_or_else(|_| "".to_string())
 }
 
 use tauri::Manager;
 use std::env;
+use dotenv::dotenv;
 
 fn main() {
+    dotenv().ok();
     tauri::Builder::default()
         .setup(|app| {
             #[cfg(debug_assertions)] // only include this code on debug builds
@@ -30,8 +24,7 @@ fn main() {
             }
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![greet])
-        .invoke_handler(tauri::generate_handler!(interact_with_ai))
+        .invoke_handler(tauri::generate_handler![get_environment_variable])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
