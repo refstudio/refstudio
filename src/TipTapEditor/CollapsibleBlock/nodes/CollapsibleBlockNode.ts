@@ -14,6 +14,7 @@ declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     collapsibleBlock: {
       setCollapsibleBlock: () => ReturnType;
+      toggleCollapsedCollapsibleBlock: (pos: number) => ReturnType;
       unsetCollapsibleBlock: () => ReturnType;
     };
   }
@@ -91,6 +92,60 @@ export const CollapsibleBlockNode = Node.create({
 
             tr.replaceRangeWith($from.before(-1), $from.after(-1), collapsibleBlock);
             dispatch(tr);
+          }
+          return true;
+        },
+      toggleCollapsedCollapsibleBlock:
+        (pos) =>
+        ({ editor, dispatch, tr }) => {
+          if (!('collapsibleContent' in editor.schema.nodes)) {
+            console.warn();
+            return false;
+          }
+
+          const collapsibleBlock = tr.doc.resolve(pos + 1).parent;
+
+          if (collapsibleBlock.type.name !== this.type.name) {
+            return false;
+          }
+
+          const { folded } = collapsibleBlock.attrs;
+
+          if (dispatch) {
+            tr.setNodeAttribute(pos, 'folded', !folded);
+            if (!folded) {
+              // Reset selection if it was inside the content
+              if (collapsibleBlock.childCount === 2) {
+                const { from, to } = tr.selection;
+
+                const contentStart = pos + collapsibleBlock.child(0).nodeSize;
+                const contentEnd = contentStart + collapsibleBlock.child(1).nodeSize;
+
+                // If the intervals [from, to] and [contentStart, contentEnd] overlap,
+                // ie. part of the content is selected
+                if (from <= contentEnd && contentStart <= to) {
+                  tr.setSelection(TextSelection.near(tr.doc.resolve(contentStart), -1));
+                }
+              }
+              // If the block was unfolded and with empty content block, remove the content block
+              if (collapsibleBlock.childCount === 2 && collapsibleBlock.child(1).nodeSize === 6) {
+                const start = pos + 1 + collapsibleBlock.child(0).nodeSize;
+                const end = start + 6;
+
+                tr.delete(start, end);
+              }
+              // If the collapsible block does not have content, add an empty content block
+            } else if (collapsibleBlock.childCount === 1) {
+              // If the collapsible block does not have content, add an empty content block
+              const emptyParagraph = editor.schema.nodes.paragraph.createChecked();
+              const draggableBlock = editor.schema.nodes.draggableBlock.createChecked(null, emptyParagraph);
+              const contentBlock = editor.schema.nodes.collapsibleContent.createChecked(null, draggableBlock);
+
+              const posAfterSummary = pos + collapsibleBlock.nodeSize - 1;
+
+              tr.insert(posAfterSummary, contentBlock);
+              dispatch(tr);
+            }
           }
           return true;
         },
