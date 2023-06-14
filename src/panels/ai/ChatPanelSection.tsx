@@ -29,7 +29,7 @@ export function ChatPanelSection() {
     //     'Hidden feedback loops in machine learning refer to situations where two systems indirectly influence each other through the world, leading to changes in behavior that may not be immediately visible. These loops may exist between completely disjoint systems and can make analyzing the effect of proposed changes extremely difficult, adding cost to even simple improvements. It is recommended to look carefully for hidden feedback loops and remove them whenever feasible.',
     // },
   ]);
-  const [currentChatThreadItem, setCurrentChatThreadItem] = useState<ChatThreadItem | null>();
+  const [currentChatThreadItem, setCurrentChatThreadItem] = useState<ChatThreadItem | null>(null);
 
   function handleKeyDown(evt: React.KeyboardEvent<HTMLTextAreaElement>): void {
     if (!evt.shiftKey && evt.code === 'Enter') {
@@ -48,7 +48,7 @@ export function ChatPanelSection() {
     chatWithAI(question)
       .then((reply) => {
         setChatThread([...chatThread, { id: String(chatThread.length + 1), question: text, answer: reply[0] }]);
-        setCurrentChatThreadItem(undefined);
+        setCurrentChatThreadItem(null);
       })
       .catch((err) => {
         console.error('Error calling chat', err);
