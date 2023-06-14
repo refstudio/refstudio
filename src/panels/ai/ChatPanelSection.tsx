@@ -29,7 +29,7 @@ export function ChatPanelSection() {
     //     'Hidden feedback loops in machine learning refer to situations where two systems indirectly influence each other through the world, leading to changes in behavior that may not be immediately visible. These loops may exist between completely disjoint systems and can make analyzing the effect of proposed changes extremely difficult, adding cost to even simple improvements. It is recommended to look carefully for hidden feedback loops and remove them whenever feasible.',
     // },
   ]);
-  const [currentChatThreadItem, setCurrentChatThreadItem] = useState<ChatThreadItem | undefined>();
+  const [currentChatThreadItem, setCurrentChatThreadItem] = useState<ChatThreadItem | null>();
 
   function handleKeyDown(evt: React.KeyboardEvent<HTMLTextAreaElement>): void {
     if (!evt.shiftKey && evt.code === 'Enter') {
@@ -65,7 +65,7 @@ export function ChatPanelSection() {
         <div className="flex grow gap-2 rounded-xl border border-slate-200 p-2 shadow-lg shadow-slate-200">
           <textarea
             className="grow resize-none p-2 outline-none"
-            disabled={currentChatThreadItem !== undefined}
+            disabled={!!currentChatThreadItem}
             placeholder="Send a message."
             rows={3}
             value={text}
@@ -113,8 +113,7 @@ function ChatThreadItemBlock({ text, actor }: { text?: string; actor: 'user' | '
         {actor === 'ai' && <VscWand size="24" />}
       </div>
       <div>
-        {text !== undefined && <div>{text}</div>}
-        {text === undefined && <div>...</div>}
+        <div>{text ?? '...'}</div>
       </div>
     </div>
   );
