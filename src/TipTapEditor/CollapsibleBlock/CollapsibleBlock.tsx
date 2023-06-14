@@ -24,10 +24,38 @@ export const CollapsibleBlock = ({ editor, getPos, node, updateAttributes }: Col
       console.warn();
       return;
     }
-    // If the collapsible block does not have content, add an empty content block
-    if (folded && node.childCount === 1) {
+
+    if (!folded) {
       editor.commands.command(({ dispatch, tr }) => {
         if (dispatch) {
+          // Reset selection if it was inside the content
+          if (node.childCount === 2) {
+            const { from, to } = tr.selection;
+
+            const contentStart = getPos() + node.child(0).nodeSize;
+            const contentEnd = contentStart + node.child(1).nodeSize;
+
+            // If the intervals [from, to] and [contentStart, contentEnd] overlap, ie part of the content is selected
+            if (from <= contentEnd && contentStart <= to) {
+              tr.setSelection(TextSelection.near(tr.doc.resolve(contentStart), -1));
+            }
+          }
+          // If the block was unfolded and with empty content block, remove the content block
+          if (node.childCount === 2 && node.child(1).nodeSize === 6) {
+            const start = getPos() + 1 + node.child(0).nodeSize;
+            const end = start + 6;
+
+            tr.delete(start, end);
+          }
+          dispatch(tr);
+        }
+        return true;
+      });
+      // If the collapsible block does not have content, add an empty content block
+    } else if (node.childCount === 1) {
+      editor.commands.command(({ dispatch, tr }) => {
+        if (dispatch) {
+          // If the collapsible block does not have content, add an empty content block
           const emptyParagraph = editor.schema.nodes.paragraph.createChecked();
           const draggableBlock = editor.schema.nodes.draggableBlock.createChecked(null, emptyParagraph);
           const contentBlock = editor.schema.nodes.collapsibleContent.createChecked(null, draggableBlock);
@@ -35,19 +63,6 @@ export const CollapsibleBlock = ({ editor, getPos, node, updateAttributes }: Col
           const pos = getPos() + node.nodeSize - 1;
 
           tr.insert(pos, contentBlock);
-          tr.setSelection(TextSelection.near(tr.doc.resolve(pos)));
-          dispatch(tr);
-        }
-        return true;
-      });
-      // If the block was collapsed and with empty content block, remove the content block
-    } else if (!folded && node.childCount === 2 && node.child(1).nodeSize === 6) {
-      editor.commands.command(({ dispatch, tr }) => {
-        if (dispatch) {
-          const start = getPos() + node.child(0).nodeSize;
-          const end = start + 8;
-
-          tr.delete(start, end);
           dispatch(tr);
         }
         return true;

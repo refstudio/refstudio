@@ -58,7 +58,7 @@ export const INITIAL_CONTENT = `
       <p>Text</p>
       <collapsible-block folded="true">
         <collapsible-summary>collapsible 1.2</collapsible-summary
-        ><collapsible-content><p></p></collapsible-content></collapsible-block
+        ></collapsible-block
     ></collapsible-content>
   </collapsible-block>
   <ul>
