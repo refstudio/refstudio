@@ -2,8 +2,9 @@ import { Node } from '@tiptap/core';
 import { Fragment, Slice } from '@tiptap/pm/model';
 import { TextSelection } from '@tiptap/pm/state';
 import { ReplaceStep } from '@tiptap/pm/transform';
-import { InputRule, ReactNodeViewRenderer } from '@tiptap/react';
+import { findParentNodeClosestToPos, InputRule, ReactNodeViewRenderer } from '@tiptap/react';
 
+import { isNonNullish } from '../../../lib/isNonNullish';
 import { CollapsibleBlock } from '../CollapsibleBlock';
 
 export interface CollapsibleBlockNodeAttributes {
@@ -14,6 +15,7 @@ declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     collapsibleBlock: {
       setCollapsibleBlock: () => ReturnType;
+      splitCollapsibleBlock: () => ReturnType;
       toggleCollapsedCollapsibleBlock: (pos: number) => ReturnType;
       unsetCollapsibleBlock: () => ReturnType;
     };
@@ -95,14 +97,70 @@ export const CollapsibleBlockNode = Node.create({
           }
           return true;
         },
-      toggleCollapsedCollapsibleBlock:
-        (pos) =>
+      splitCollapsibleBlock:
+        () =>
         ({ editor, dispatch, tr }) => {
-          if (!('collapsibleContent' in editor.schema.nodes)) {
-            console.warn();
+          if (!tr.selection.empty) {
             return false;
           }
 
+          const { $from } = tr.selection;
+
+          if (
+            $from.depth < 2 ||
+            $from.parent.type.name !== editor.schema.nodes.collapsibleSummary.name ||
+            $from.node(-2).type.name !== editor.schema.nodes.draggableBlock.name
+          ) {
+            return false;
+          }
+
+          if (dispatch) {
+            const preSummary = $from.parent.type.create(
+              $from.parent.attrs,
+              $from.parent.slice(0, $from.parentOffset).content,
+              $from.parent.marks,
+            );
+            const preContent = $from.node(-1).childCount === 2 ? $from.node(-1).child(1) : null;
+
+            const preCollapsibleBlock = this.type.create(
+              $from.node(-1).attrs,
+              Fragment.from([preSummary, preContent].filter(isNonNullish)),
+              $from.node(-1).marks,
+            );
+
+            const preDraggableBlock = editor.schema.nodes.draggableBlock.create(
+              $from.node(-2).attrs,
+              preCollapsibleBlock,
+              $from.node(-2).marks,
+            );
+
+            const postSummary = $from.parent.type.create(
+              $from.parent.attrs,
+              $from.parent.slice($from.parentOffset).content,
+              $from.parent.marks,
+            );
+            const postCollapsibleBlock = this.type.create($from.node(-1).attrs, postSummary, $from.node(-1).marks);
+            const postDraggableBlock = editor.schema.nodes.draggableBlock.create(
+              $from.node(-2).attrs,
+              postCollapsibleBlock,
+              $from.node(-2).marks,
+            );
+
+            const fragment = Fragment.from([preDraggableBlock, postDraggableBlock]);
+            const slice = new Slice(fragment, 0, 0);
+
+            const start = $from.before(-2);
+            const end = $from.after(-2);
+
+            const step = new ReplaceStep(start, end, slice);
+            tr.step(step);
+
+            tr.setSelection(TextSelection.near(tr.doc.resolve(start + preDraggableBlock.nodeSize)));
+
+            dispatch(tr);
+          }
+          return true;
+        },
       toggleCollapsedCollapsibleBlock:
         (pos) =>
         ({ editor, dispatch, tr }) => {
@@ -221,6 +279,57 @@ export const CollapsibleBlockNode = Node.create({
 
   addKeyboardShortcuts() {
     return {
+      Backspace: ({ editor }) => {
+        const { selection } = editor.state;
+        // Unset collapsible block when pressing backspace at the beginning of the block
+        if (
+          selection.empty &&
+          selection.$from.parent.type.name === editor.schema.nodes.collapsibleSummary.name &&
+          selection.$from.parentOffset === 0
+        ) {
+          return editor.commands.unsetCollapsibleBlock();
+        }
+        return false;
+      },
+      Enter: ({ editor }) => {
+        const { selection } = editor.state;
+        if (!selection.empty) {
+          return false;
+        }
+
+        const { $from } = selection;
+        if (
+          $from.depth < 2 ||
+          $from.parent.type.name !== editor.schema.nodes.collapsibleSummary.name ||
+          $from.node(-2).type.name !== editor.schema.nodes.draggableBlock.name
+        ) {
+          return false;
+        }
+
+        // If the collapsible block is collapsed, pressing enter splits it
+        if ($from.node(-1).attrs.folded) {
+          return editor.commands.splitCollapsibleBlock();
+          // Otherwise, it adds an empty content block to the collapsible block
+        } else {
+          return editor.commands.command(({ dispatch, tr }) => {
+            if (dispatch) {
+              const postText = $from.parent.slice($from.parentOffset).content;
+              const start = $from.before($from.depth) + $from.parentOffset + 1;
+              const end = $from.after($from.depth);
+              tr.replace(start, end);
+
+              const emptyParagraph = editor.schema.nodes.paragraph.createChecked(null, postText);
+              const draggableBlock = editor.schema.nodes.draggableBlock.createChecked(null, emptyParagraph);
+
+              const updatedPos = tr.mapping.map(end) + 1;
+              tr.insert(updatedPos, draggableBlock);
+              tr.setSelection(TextSelection.near(tr.doc.resolve(updatedPos)));
+              dispatch(tr);
+            }
+            return true;
+          });
+        }
+      },
       'Mod-Enter': ({ editor }) => {
         if (!editor.state.selection.empty) {
           return false;
