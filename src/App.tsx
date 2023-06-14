@@ -21,6 +21,8 @@ function App() {
     pdfViewerRef.current?.updateWidth();
   }, [pdfViewerRef]);
 
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
   return (
     <>
       <PanelGroup
@@ -29,18 +31,27 @@ function App() {
         direction="horizontal"
         onLayout={updatePDFViewerWidth}
       >
-        <LeftSidePanelWrapper onRefClicked={(reference) => editorRef.current?.insertReference(reference)} />
+        <LeftSidePanelWrapper
+          onRefClicked={(reference) => editorRef.current?.insertReference(reference)}
+          onSettingsClick={() => setSettingsOpen(true)}
+        />
         <Panel defaultSize={60}>
           <MainPanel editorRef={editorRef} pdfViewerRef={pdfViewerRef} />
         </Panel>
         <RightPanelWrapper />
       </PanelGroup>
-      <Settings />
+      <Settings open={settingsOpen} onToggle={(open) => setSettingsOpen(open)} />
     </>
   );
 }
 
-function LeftSidePanelWrapper({ onRefClicked }: { onRefClicked(item: ReferenceItem): void }) {
+function LeftSidePanelWrapper({
+  onRefClicked,
+  onSettingsClick,
+}: {
+  onRefClicked(item: ReferenceItem): void;
+  onSettingsClick(): void;
+}) {
   const leftPanelRef = React.useRef<ImperativePanelHandle>(null);
   const [primaryPaneCollapsed, setPrimaryPaneCollapsed] = useState(false);
   const [primaryPane, setPrimaryPane] = useState<PrimarySideBarPane>('Explorer');
@@ -66,7 +77,11 @@ function LeftSidePanelWrapper({ onRefClicked }: { onRefClicked(item: ReferenceIt
 
   return (
     <>
-      <PrimarySideBar activePane={primaryPaneCollapsed ? null : primaryPane} onClick={handleSideBarClick} />
+      <PrimarySideBar
+        activePane={primaryPaneCollapsed ? null : primaryPane}
+        onClick={handleSideBarClick}
+        onSettingsClick={onSettingsClick}
+      />
       <Panel
         collapsible
         defaultSize={20}

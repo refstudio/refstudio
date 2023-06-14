@@ -1,32 +1,31 @@
 import { register, unregister } from '@tauri-apps/api/globalShortcut';
 import { useEffect, useState } from 'react';
+import { VscClose } from 'react-icons/vsc';
 
 import { cx } from './cx';
 
-const SETTINGS_SHORTCUT = 'CmdOrControl+,';
+// Tauri HOTKEYS
+// https://github.com/tauri-apps/global-hotkey/blob/0b91f4beb998526103447d890ed8eeddc0397b7d/src/hotkey.rs#L164
+const SETTINGS_SHORTCUT_TOGGLE = 'Cmd+,';
+const SETTINGS_SHORTCUT_CLOSE = 'Esc';
 
-export function Settings({ onToggle }: { onToggle?(open: boolean): void }) {
+export function Settings({ open = false, onToggle }: { open?: boolean; onToggle(open: boolean): void }) {
   const [pane, selectPane] = useState('user-account');
-  const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
     (async function runAsync() {
       try {
-        await unregister(SETTINGS_SHORTCUT);
-        await register(SETTINGS_SHORTCUT, () => {
-          setShowSettings(!showSettings);
-        });
+        await unregister(SETTINGS_SHORTCUT_TOGGLE);
+        await unregister(SETTINGS_SHORTCUT_CLOSE);
+        await register(SETTINGS_SHORTCUT_TOGGLE, () => onToggle(!open));
+        await register(SETTINGS_SHORTCUT_CLOSE, () => onToggle(false));
       } catch (err) {
         console.error('Cannot register settings shortcut:', err);
       }
     })();
-  }, [showSettings]);
+  }, [onToggle, open]);
 
-  useEffect(() => {
-    onToggle?.(showSettings);
-  }, [showSettings, onToggle]);
-
-  if (!showSettings) {
+  if (!open) {
     return null;
   }
 
@@ -52,10 +51,17 @@ export function Settings({ onToggle }: { onToggle?(open: boolean): void }) {
               <SettingsMenuItem activePane={pane} pane="project-openai" text="Open AI" onClick={selectPane} />
             </div>
           </div>
-          <div className="h-full w-full overflow-auto p-6">
-            {pane === 'user-account' && <ToDoSettings message="The user account settings will be configured here." />}
+          <div className="relative h-full w-full overflow-auto p-6">
+            <VscClose
+              className="absolute right-2 top-2 cursor-pointer rounded-lg p-1 hover:bg-slate-200"
+              size={30}
+              onClick={() => onToggle(false)}
+            />
+            {pane === 'user-account' && (
+              <ToDoSettings header="Account" message="The user account settings will be configured here." />
+            )}
             {pane === 'project-general' && (
-              <ToDoSettings message="The project general settings will be configured here." />
+              <ToDoSettings header="General" message="The project general settings will be configured here." />
             )}
             {pane === 'project-openai' && <OpenAiSettings />}
           </div>
@@ -89,19 +95,26 @@ function SettingsMenuItem({
   );
 }
 
-function ToDoSettings({ message }: { message: string }) {
+function SettingsPane({ header, children }: { header: string; children: React.ReactNode }) {
   return (
     <div className="">
-      <em>{message}</em>
+      <strong className="mb-6 block border-b-2 border-b-slate-200 pb-1 text-2xl">{header}</strong>
+      {children}
     </div>
+  );
+}
+
+function ToDoSettings({ header, message }: { header: string; message: string }) {
+  return (
+    <SettingsPane header={header}>
+      <em>{message}</em>
+    </SettingsPane>
   );
 }
 
 function OpenAiSettings() {
   return (
-    <div className="">
-      <strong className="mb-6 block border-b-2 border-b-slate-200 pb-1 text-2xl">Open AI</strong>
-
+    <SettingsPane header="Open AI">
       <form>
         <fieldset className="space-y-2">
           <label>API Key</label>
@@ -111,6 +124,6 @@ function OpenAiSettings() {
           </p>
         </fieldset>
       </form>
-    </div>
+    </SettingsPane>
   );
 }
