@@ -1,8 +1,9 @@
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
-import { VscSplitHorizontal } from 'react-icons/vsc';
+import { VscCloseAll, VscSplitHorizontal } from 'react-icons/vsc';
 
 import {
+  closeAllFilesAtom,
   leftPaneAtom,
   openFileAtom,
   rightPaneAtom,
@@ -22,6 +23,7 @@ export function ExplorerPanel() {
   const selectFileInPane = useSetAtom(selectFileInPaneAtom);
   const openFile = useSetAtom(openFileAtom);
   const splitFileToPane = useSetAtom(splitFileToPaneAtom);
+  const closeAllFiles = useSetAtom(closeAllFilesAtom);
 
   const [allFiles, setFiles] = useState<FileEntry[]>([]);
   useEffect(() => {
@@ -35,7 +37,10 @@ export function ExplorerPanel() {
 
   return (
     <PanelWrapper title="Explorer">
-      <PanelSection title="Open Files">
+      <PanelSection
+        rightIcons={[{ key: 'closeAll', Icon: VscCloseAll, title: 'Close All Open Files', onClick: closeAllFiles }]}
+        title="Open Files"
+      >
         {hasRightPanelFiles && <div className="ml-4 text-xs font-bold">LEFT</div>}
         {left.files.length > 0 && (
           <FileTree
