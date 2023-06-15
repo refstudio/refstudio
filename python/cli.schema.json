@@ -1,10 +1,6 @@
 {
+  "title": "CliCommands",
   "type": "object",
-  "required": [
-    "ingest",
-    "rewrite",
-    "chat"
-  ],
   "properties": {
     "ingest": {
       "$ref": "#/definitions/IngestResponse"
@@ -22,34 +18,63 @@
       }
     }
   },
-  "description": "CliCommands(ingest: sidecar.typing.IngestResponse, rewrite: list[sidecar.typing.RewriteChoice], chat: list[sidecar.typing.ChatResponseChoice])",
-  "$schema": "http://json-schema.org/draft-06/schema#",
+  "required": [
+    "ingest",
+    "rewrite",
+    "chat"
+  ],
   "definitions": {
-    "IngestResponse": {
+    "Author": {
+      "title": "Author",
       "type": "object",
-      "required": [
-        "project_name",
-        "references"
-      ],
       "properties": {
-        "project_name": {
+        "full_name": {
           "type": "string"
         },
-        "references": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Reference"
-          }
+        "given_name": {
+          "type": "string"
+        },
+        "surname": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
         }
       },
-      "description": "IngestResponse(project_name: str, references: list[sidecar.typing.Reference])"
+      "required": [
+        "full_name",
+        "given_name",
+        "surname",
+        "email"
+      ]
+    },
+    "Chunk": {
+      "title": "Chunk",
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "vector": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "metadata": {
+          "default": {},
+          "type": "object"
+        }
+      },
+      "required": [
+        "text"
+      ]
     },
     "Reference": {
+      "title": "Reference",
+      "description": "A reference for an academic paper / PDF",
       "type": "object",
-      "required": [
-        "source_filename",
-        "filename_md5"
-      ],
       "properties": {
         "source_filename": {
           "type": "string"
@@ -67,79 +92,51 @@
           "type": "string"
         },
         "authors": {
+          "default": [],
           "type": "array",
           "items": {
             "$ref": "#/definitions/Author"
-          },
-          "default": []
+          }
         },
         "chunks": {
+          "default": [],
           "type": "array",
           "items": {
             "$ref": "#/definitions/Chunk"
-          },
-          "default": []
+          }
         },
         "metadata": {
-          "type": "object",
-          "default": {}
+          "default": {},
+          "type": "object"
         }
       },
-      "description": "A reference for an academic paper / PDF"
-    },
-    "Author": {
-      "type": "object",
       "required": [
-        "full_name",
-        "given_name",
-        "surname",
-        "email"
-      ],
-      "properties": {
-        "full_name": {
-          "type": "string"
-        },
-        "given_name": {
-          "type": "string"
-        },
-        "surname": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string"
-        }
-      },
-      "description": "Author(full_name: str, given_name: str, surname: str, email: str)"
+        "source_filename",
+        "filename_md5"
+      ]
     },
-    "Chunk": {
+    "IngestResponse": {
+      "title": "IngestResponse",
       "type": "object",
-      "required": [
-        "text"
-      ],
       "properties": {
-        "text": {
+        "project_name": {
           "type": "string"
         },
-        "vector": {
+        "references": {
           "type": "array",
           "items": {
-            "type": "number"
-          },
-          "default": []
-        },
-        "metadata": {
-          "type": "object",
-          "default": {}
+            "$ref": "#/definitions/Reference"
+          }
         }
       },
-      "description": "Chunk(text: str, vector: List[float] = <factory>, metadata: Dict[str, Any] = <factory>)"
+      "required": [
+        "project_name",
+        "references"
+      ]
     },
     "RewriteChoice": {
+      "title": "RewriteChoice",
       "type": "object",
-      "required": [
-        "index",
-        "text"
-      ],
       "properties": {
         "index": {
           "type": "integer"
@@ -148,14 +145,14 @@
           "type": "string"
         }
       },
-      "description": "RewriteChoice(index: int, text: str)"
+      "required": [
+        "index",
+        "text"
+      ]
     },
     "ChatResponseChoice": {
+      "title": "ChatResponseChoice",
       "type": "object",
-      "required": [
-        "index",
-        "text"
-      ],
       "properties": {
         "index": {
           "type": "integer"
@@ -164,7 +161,10 @@
           "type": "string"
         }
       },
-      "description": "ChatResponseChoice(index: int, text: str)"
+      "required": [
+        "index",
+        "text"
+      ]
     }
   }
 }

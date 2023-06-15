@@ -1,60 +1,65 @@
-from dataclasses import dataclass, field
-from datetime import datetime
-from typing import Any, Dict, List, Optional
+from datetime import date
+from typing import Any
 
-from dataclasses_jsonschema import JsonSchemaMixin
+from pydantic import BaseModel
 
 
-@dataclass
-class Reference(JsonSchemaMixin):
+class RefStudioModel(BaseModel):
+    # This produces cleaner JSON Schema (and hence TypeScript types).
+    # See https://github.com/refstudio/refstudio/pull/161 for more context.
+    class Config:
+        @staticmethod
+        def schema_extra(schema: dict[str, Any], _model) -> None:
+            for prop in schema.get('properties', {}).values():
+                prop.pop('title', None)
+
+
+class Reference(RefStudioModel):
     """A reference for an academic paper / PDF"""
     source_filename: str
     filename_md5: str
-    citation_key: Optional[str] = None
-    title: Optional[str] = None
-    abstract: Optional[str] = None
-    contents: Optional[str] = None
-    published_date: Optional[datetime] = None
-    authors: List["Author"] = field(default_factory=list)
-    chunks: List["Chunk"] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    citation_key: str | None = None
+    title: str | None = None
+    abstract: str | None = None
+    contents: str | None = None
+    published_date: date | None = None
+    authors: list["Author"] = []
+    chunks: list["Chunk"] = []
+    metadata: dict[str, Any] = {}
 
 
-@dataclass
-class Author(JsonSchemaMixin):
-    full_name: str
-    given_name: Optional[str] = None
-    surname: Optional[str] = None
-    email: Optional[str] = None
+class Author(RefStudioModel):
+    full_name: str | None = None
+    given_name: str | None = None
+    surname: str | None = None
+    email: str | None = None
 
 
-@dataclass
-class Chunk(JsonSchemaMixin):
+class Chunk(RefStudioModel):
     text: str
-    vector: List[float] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    vector: list[float] = []
+    metadata: dict[str, Any] = {}
 
 
-@dataclass
-class IngestResponse(JsonSchemaMixin):
+class IngestResponse(RefStudioModel):
     project_name: str
     references: list[Reference]
 
 
-@dataclass
-class RewriteChoice(JsonSchemaMixin):
+class RewriteChoice(RefStudioModel):
     index: int
     text: str
 
 
-@dataclass
-class ChatResponseChoice(JsonSchemaMixin):
+class ChatResponseChoice(RefStudioModel):
     index: int
     text: str
 
 
-@dataclass
-class CliCommands(JsonSchemaMixin):
+class CliCommands(RefStudioModel):
     ingest: IngestResponse
     rewrite: list[RewriteChoice]
     chat: list[ChatResponseChoice]
+
+
+Reference.update_forward_refs()

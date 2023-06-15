@@ -8,15 +8,15 @@
     "authors": [
       {
         "full_name": "John Doe",
-        "given_name": null,
-        "surname": null,
-        "email": null
+        "given_name": "John",
+        "surname": "Doe",
+        "email": "john.doe@example.com"
       },
       {
         "full_name": "Jane Doe",
-        "given_name": null,
-        "surname": null,
-        "email": null
+        "given_name": "Jane",
+        "surname": "Doe",
+        "email": "jane.doe@example.com"
       }
     ],
     "chunks": [
@@ -72,15 +72,15 @@
     "authors": [
       {
         "full_name": "John Doe",
-        "given_name": null,
-        "surname": null,
-        "email": null
+        "given_name": "John",
+        "surname": "Doe",
+        "email": "john.doe@example.com"
       },
       {
         "full_name": "Jane Doe",
-        "given_name": null,
-        "surname": null,
-        "email": null
+        "given_name": "Jane",
+        "surname": "Doe",
+        "email": "jane.doe@example.com"
       }
     ],
     "chunks": [
