@@ -1,22 +1,13 @@
 import React from 'react';
 
+import { PromiseState } from './usePromise';
+
 export interface PendingState {
   state: 'pending';
 }
 
-export interface LoadingState {
-  state: 'loading';
-}
-export interface ErrorState {
-  state: 'error';
-  error: unknown;
-}
-export interface SuccessState<T> {
-  state: 'ok';
-  data: T;
-}
-/** A deferred/promised value can be in one of three states: loading, error or success. */
-export type PromiseState<T> = PendingState | LoadingState | ErrorState | SuccessState<T>;
+/** A deferred/promised value can be in one of four states: pending, loading, error or success. */
+export type CallablePromiseState<T> = PendingState | PromiseState<T>;
 
 /**
  * This presents a synchronous view of an async resource.
@@ -24,7 +15,7 @@ export type PromiseState<T> = PendingState | LoadingState | ErrorState | Success
  * The async function should be wrapped in React.useCallback to avoid unnecessary renders.
  */
 export function useCallablePromise<R, P extends unknown[]>(fn: (...args: P) => Promise<R>) {
-  const [val, setVal] = React.useState<PromiseState<R>>({ state: 'pending' });
+  const [val, setVal] = React.useState<CallablePromiseState<R>>({ state: 'pending' });
   const handleSuccess = React.useCallback((data: R) => setVal({ state: 'ok', data }), []);
   const handleError = React.useCallback((error: unknown) => setVal({ state: 'error', error }), []);
 
