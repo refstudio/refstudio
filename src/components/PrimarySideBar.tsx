@@ -38,6 +38,7 @@ export function PrimarySideBar({
         />
       ))}
       <VscSettingsGear
+        aria-label="Settings"
         className={cx('mt-auto cursor-pointer p-4 hover:opacity-100', {
           'border-l-2 border-l-transparent opacity-50': true,
           'border-l-2 border-l-primary opacity-100': false,
