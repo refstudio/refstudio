@@ -146,6 +146,22 @@ def test_ingest_add_citation_keys(tmp_path):
     ## should be untitled2020, untitled2021, untitled2022, etc.
     for i, ref in enumerate(tested):
         assert ref.citation_key == f"untitled{ref.published_date.year}"
+
+
+    # test 3 - references with no author and duplicate published years
+    refs = []
+    for i in range(3):
+        reference = base_reference.copy()
+        reference.published_date = date(2020, 1, 1)
+        reference.authors = []
+        refs.append(reference)
+    
+    tested = ingestion._add_citation_keys(refs)
+
+    ## should be untitled2020a, untitled2020b, untitled2021c, etc.
+    for i, ref in enumerate(tested):
+        expected = f"untitled{ref.published_date.year}{chr(97 + i)}"
+        assert ref.citation_key == expected
     
     # test 3 - references with same author and no published year
     refs = []
