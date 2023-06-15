@@ -2,6 +2,7 @@ import { register, unregister } from '@tauri-apps/api/globalShortcut';
 import { useEffect, useState } from 'react';
 import { VscClose } from 'react-icons/vsc';
 
+import { JSONDebug, JSONDebugContainer } from '../components/JSONDebug';
 import { cx } from '../cx';
 import { useCallablePromise } from '../hooks/useCallablePromise';
 import { getSettings, initSettings, setSettings } from './settings';
@@ -12,12 +13,66 @@ const SETTINGS_SHORTCUT_TOGGLE = 'Cmd+,';
 const SETTINGS_SHORTCUT_CLOSE = 'Shift+Esc';
 
 type SettingsPaneId = 'user-account' | 'project-general' | 'project-openai' | 'debug';
+interface PaneConfig {
+  id: SettingsPaneId;
+  title: string;
+  Pane: React.FC<{ config: PaneConfig }>;
+}
+
+interface SettingsPanesConfig {
+  section: string;
+  bottom?: boolean;
+  hidden?: boolean;
+  panes: PaneConfig[];
+}
+
+const SETTINGS_PANES: SettingsPanesConfig[] = [
+  {
+    section: 'User',
+    panes: [
+      {
+        id: 'user-account',
+        title: 'User Account',
+        Pane: ToDoSettingsPane,
+      },
+    ],
+  },
+  {
+    section: 'Project',
+    panes: [
+      {
+        id: 'project-general',
+        title: 'General',
+        Pane: ToDoSettingsPane,
+      },
+      {
+        id: 'project-openai',
+        title: 'Open AI',
+        Pane: OpenAiSettingsPane,
+      },
+    ],
+  },
+  {
+    section: 'Debug',
+    bottom: true,
+    hidden: !import.meta.env.DEV,
+    panes: [
+      {
+        id: 'debug',
+        title: 'Config',
+        Pane: DebugSettingsPane,
+      },
+    ],
+  },
+];
 
 // Ensure settings are configured and loaded
 await initSettings();
 
 export function SettingsModal({ open = false, onToggle }: { open?: boolean; onToggle(open: boolean): void }) {
-  const [pane, selectPane] = useState<SettingsPaneId>('project-openai');
+  const [pane, selectPane] = useState<PaneConfig>(
+    SETTINGS_PANES.flatMap((e) => e.panes).find((p) => p.id === 'project-openai')!,
+  );
 
   useEffect(() => {
     (async function runAsync() {
@@ -47,19 +102,21 @@ export function SettingsModal({ open = false, onToggle }: { open?: boolean; onTo
         )}
       >
         <div className="flex h-full flex-row">
-          <div className="flex w-52 flex-col bg-slate-100 p-6">
-            <div className="mb-10 space-y-1">
-              <strong>USER</strong>
-              <SettingsMenuItem activePane={pane} pane="user-account" text="My account" onClick={selectPane} />
-            </div>
-            <div className="space-y-1">
-              <strong>PROJECT</strong>
-              <SettingsMenuItem activePane={pane} pane="project-general" text="General" onClick={selectPane} />
-              <SettingsMenuItem activePane={pane} pane="project-openai" text="Open AI" onClick={selectPane} />
-            </div>
-            <div className="mt-auto">
-              <SettingsMenuItem activePane={pane} pane="debug" text="Debug" onClick={selectPane} />
-            </div>
+          <div className="flex w-52 flex-col space-y-10 bg-slate-100 p-6">
+            {SETTINGS_PANES.filter((s) => !s.hidden).map((paneSection) => (
+              <div className={cx('space-y-1', { '!mt-auto': paneSection.bottom })} key={paneSection.section}>
+                <strong className="uppercase">{paneSection.section}</strong>
+                {paneSection.panes.map((paneConfig) => (
+                  <SettingsMenuItem
+                    activePane={pane}
+                    key={paneConfig.id}
+                    pane={paneConfig}
+                    text={paneConfig.title}
+                    onClick={selectPane}
+                  />
+                ))}
+              </div>
+            ))}
           </div>
           <div className="relative h-full w-full overflow-auto p-6">
             <VscClose
@@ -67,14 +124,7 @@ export function SettingsModal({ open = false, onToggle }: { open?: boolean; onTo
               size={30}
               onClick={() => onToggle(false)}
             />
-            {pane === 'user-account' && (
-              <ToDoSettings header="Account" message="The user account settings will be configured here." />
-            )}
-            {pane === 'project-general' && (
-              <ToDoSettings header="General" message="The project general settings will be configured here." />
-            )}
-            {pane === 'project-openai' && <OpenAiSettings />}
-            {pane === 'debug' && <DebugSettings />}
+            <pane.Pane config={pane} />
           </div>
         </div>
       </div>
@@ -88,9 +138,9 @@ function SettingsMenuItem({
   pane,
   text,
 }: {
-  pane: SettingsPaneId;
-  activePane: SettingsPaneId;
-  onClick(pane: SettingsPaneId): void;
+  pane: PaneConfig;
+  activePane: PaneConfig;
+  onClick(pane: PaneConfig): void;
   text: string;
 }) {
   const active = pane === activePane;
@@ -127,23 +177,27 @@ function SettingsPane({
   );
 }
 
-function ToDoSettings({ header, message }: { header: string; message: string }) {
+interface SettingsPaneProps {
+  config: PaneConfig;
+}
+
+function ToDoSettingsPane({ config }: SettingsPaneProps) {
   return (
-    <SettingsPane header={header}>
-      <em>{message}</em>
+    <SettingsPane header={String(config.title).toUpperCase()}>
+      <em>TODO</em>
     </SettingsPane>
   );
 }
 
-function DebugSettings() {
+function DebugSettingsPane({ config }: SettingsPaneProps) {
   return (
-    <SettingsPane header="DEBUG">
+    <SettingsPane header={config.title}>
       <pre className="text-xs">{JSON.stringify(getSettings().default, null, 2)}</pre>
     </SettingsPane>
   );
 }
 
-function OpenAiSettings() {
+function OpenAiSettingsPane({ config }: SettingsPaneProps) {
   const [paneSettings, setPaneSettings] = useState(getSettings().getCache('openAI'));
   const [result, callSetSettings] = useCallablePromise(setSettings);
 
@@ -151,8 +205,14 @@ function OpenAiSettings() {
     evt.preventDefault();
     callSetSettings('openAI', paneSettings);
   }
+
+  const isDirty = JSON.stringify(paneSettings) !== JSON.stringify(getSettings().getCache('openAI'));
+
   return (
-    <SettingsPane description="You need to configure the API to use the rewrite and chat operations." header="Open AI">
+    <SettingsPane
+      description="You need to configure the API to use the rewrite and chat operations."
+      header={config.title}
+    >
       <form className="mt-10" onSubmit={handleSaveSettings}>
         <fieldset className="space-y-4">
           <div>
@@ -181,11 +241,14 @@ function OpenAiSettings() {
           </div>
         </fieldset>
         <fieldset className="mt-10 flex justify-end">
-          <input className="btn-primary" disabled={result.state === 'loading'} type="submit" value="SAVE" />
+          <input className="btn-primary" disabled={!isDirty || result.state === 'loading'} type="submit" value="SAVE" />
         </fieldset>
       </form>
-      {/* <pre className="text-xs">{JSON.stringify(paneSettings, null, 2)}</pre>
-      <pre className="text-xs">{JSON.stringify(result, null, 2)}</pre> */}
+
+      <JSONDebugContainer className="mt-28">
+        <JSONDebug header="paneSettings" value={paneSettings} />
+        <JSONDebug header="API call result" value={result} />
+      </JSONDebugContainer>
     </SettingsPane>
   );
 }
