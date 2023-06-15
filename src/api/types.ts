@@ -30,7 +30,7 @@ export interface Reference {
   metadata?: {};
 }
 export interface Author {
-  full_name?: string;
+  full_name: string;
   given_name?: string;
   surname?: string;
   email?: string;

@@ -40,7 +40,10 @@
         "email": {
           "type": "string"
         }
-      }
+      },
+      "required": [
+        "full_name"
+      ]
     },
     "Chunk": {
       "title": "Chunk",

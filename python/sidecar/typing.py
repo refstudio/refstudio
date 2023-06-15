@@ -29,7 +29,7 @@ class Reference(RefStudioModel):
 
 
 class Author(RefStudioModel):
-    full_name: str | None = None
+    full_name: str
     given_name: str | None = None
     surname: str | None = None
     email: str | None = None

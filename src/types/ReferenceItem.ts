@@ -6,5 +6,5 @@ export interface ReferenceItem {
 
 interface Author {
   fullName: string;
-  surname: string;
+  surname?: string;
 }
