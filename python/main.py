@@ -1,4 +1,4 @@
-from sidecar import cli, ingest, rewrite
+from sidecar import chat, cli, ingest, rewrite
 
 if __name__ == '__main__':
     parser = cli.get_arg_parser()
@@ -9,4 +9,6 @@ if __name__ == '__main__':
         ingest.main(args.pdf_directory)
     if args.command == "rewrite":
         rewrite.summarize(args.text)
+    if args.command == "chat":
+        chat.ask_question(args.text)
 

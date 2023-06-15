@@ -27,4 +27,13 @@ def get_arg_parser():
         "--text",
         type=str,
     )
+
+    chat_parser = subparsers.add_parser(
+        "chat",
+        description="Chat with the AI",
+    )
+    chat_parser.add_argument(
+        "--text",
+        type=str,
+    )
     return parser

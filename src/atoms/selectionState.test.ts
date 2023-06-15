@@ -1,5 +1,5 @@
-import { renderHook } from '@testing-library/react';
-import { useAtom, useAtomValue } from 'jotai';
+import { act, renderHook } from '@testing-library/react';
+import { useAtom } from 'jotai';
 import { describe, expect, test } from 'vitest';
 
 import { selectionAtom } from './selectionState';
@@ -14,20 +14,13 @@ describe('selectionState', () => {
   });
 
   test('should change to string value', () => {
-    const {
-      result: {
-        current: [selection, setSelection],
-      },
-    } = renderHook(() => useAtom(selectionAtom));
-    setSelection('Some text that is selected');
-
-    // Note that the atom value here is the default ("")
+    const { result } = renderHook(() => useAtom(selectionAtom));
+    const [selection, setSelection] = result.current;
     expect(selection).toBe('');
 
-    // The updated setSelection value needs to be read again with useAtomValue
-    const {
-      result: { current: newSelection },
-    } = renderHook(() => useAtomValue(selectionAtom));
+    act(() => setSelection('Some text that is selected'));
+
+    const [newSelection] = result.current;
     expect(newSelection).toBe('Some text that is selected');
   });
 });

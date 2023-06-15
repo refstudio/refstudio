@@ -23,10 +23,14 @@ export type References = Reference[];
 export type Index = number;
 export type Text1 = string;
 export type Rewrite = RewriteChoice[];
+export type Index1 = number;
+export type Text2 = string;
+export type Chat = ChatResponseChoice[];
 
 export interface CliCommands {
   ingest: IngestResponse;
   rewrite: Rewrite;
+  chat: Chat;
 }
 export interface IngestResponse {
   project_name: ProjectName;
@@ -61,4 +65,8 @@ export interface Metadata1 {}
 export interface RewriteChoice {
   index: Index;
   text: Text1;
+}
+export interface ChatResponseChoice {
+  index: Index1;
+  text: Text2;
 }

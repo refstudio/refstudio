@@ -38,9 +38,15 @@ class RewriteChoice(BaseModel):
     text: str
 
 
+class ChatResponseChoice(BaseModel):
+    index: int
+    text: str
+
+
 class CliCommands(BaseModel):
     ingest: IngestResponse
     rewrite: list[RewriteChoice]
+    chat: list[ChatResponseChoice]
 
 
 Reference.update_forward_refs()

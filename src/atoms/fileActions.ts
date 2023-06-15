@@ -1,15 +1,16 @@
 import { atom } from 'jotai';
 
-import { activePaneAtom, activePaneIdAtom } from './core/activePane';
+import { activePaneIdAtom } from './core/activePane';
 import { fileContentAtom, loadFile, unloadFile } from './core/fileContent';
 import { addFileEntry, removeFileEntry } from './core/fileEntry';
 import { addFileToPane, getPane, paneGroupAtom, removeFileFromPane, selectFileInPaneAtom } from './core/paneGroup';
-import { FileEntry, FileId } from './types/FileEntry';
+import { FileEntry, FileFileEntry, FileId } from './types/FileEntry';
 import { PaneFileId, PaneId } from './types/PaneGroup';
 
+export { activePaneAtom } from './core/activePane';
 export { selectFileInPaneAtom } from './core/paneGroup';
 
-/** Open a file in the active pane */
+/** Open a file in a pane (depending on the file extension) */
 export const openFileAtom = atom(null, (get, set, file: FileEntry) => {
   if (file.isFolder) {
     console.warn('Cannot open directory ', file.path);
@@ -25,14 +26,12 @@ export const openFileAtom = atom(null, (get, set, file: FileEntry) => {
   set(addFileEntry, file);
 
   // Add file to panes state
-  const activePane = get(activePaneAtom);
+  const targetPaneId = targetPaneIdFor(file);
   const fileId = file.path;
-  if (!activePane.openFiles.includes(fileId)) {
-    set(addFileToPane, { fileId, paneId: activePane.id });
-  }
+  set(addFileToPane, { fileId, paneId: targetPaneId });
 
   // Select file in pane
-  set(selectFileInPaneAtom, { fileId, paneId: activePane.id });
+  set(selectFileInPaneAtom, { fileId, paneId: targetPaneId });
 });
 
 /** Removes file from the given pane and unload content from memory if the file is not open in another pane */
@@ -77,3 +76,20 @@ export const splitFileToPaneAtom = atom(null, (_get, set, { fileId, fromPaneId, 
 export const focusPaneAtom = atom(null, (_get, set, paneId: PaneId) => {
   set(activePaneIdAtom, paneId);
 });
+
+export const closeAllFilesAtom = atom(null, (get, set) => {
+  const panes = get(paneGroupAtom);
+  panes.LEFT.openFiles.forEach((file) => set(closeFileFromPaneAtom, { fileId: file, paneId: 'LEFT' }));
+  panes.RIGHT.openFiles.forEach((file) => set(closeFileFromPaneAtom, { fileId: file, paneId: 'RIGHT' }));
+});
+
+function targetPaneIdFor(file: FileFileEntry): PaneId {
+  switch (file.fileExtension) {
+    case 'pdf':
+    case 'xml':
+    case 'json':
+      return 'RIGHT';
+    default:
+      return 'LEFT';
+  }
+}
