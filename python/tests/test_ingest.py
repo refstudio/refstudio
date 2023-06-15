@@ -1,7 +1,9 @@
 import json
+from datetime import date
 from pathlib import Path
 
 from sidecar import ingest
+from sidecar.typing import Author, Reference
 
 FIXTURES_DIR = Path(__file__).parent.joinpath("fixtures")
 
@@ -76,3 +78,98 @@ def test_main(monkeypatch, tmp_path, capsys):
     # json creation and storage - successfully parsed references are stored as json
     assert json_storage_dir.exists()
     assert json_storage_dir.joinpath("test.json").exists()
+
+
+def test_ingest_add_citation_keys(tmp_path):
+    ingestion = ingest.PDFIngestion(input_dir=tmp_path)
+
+    # set up base reference with required fields
+    # we'll be copying this reference and modifying it for each test
+    base_reference = Reference(source_filename="test.pdf", filename_md5="asdf")
+    fake_data = [
+        {
+            "full_name": "John Smith",
+            "published_date": None,
+            "expected_citation_key": "smith"
+        },
+        {
+            "full_name": "Kathy Jones",
+            "published_date": date(2021, 1, 1),
+            "expected_citation_key": "jones2021"
+        },
+        {
+            "full_name": "Jane Doe",
+            "published_date": date(2022, 1, 1),
+            "expected_citation_key": "doe2022"
+        },
+    ]
+
+
+    # test 1 - references with unique citation keys should not be modified
+    refs = []
+    for d in fake_data:
+        reference = base_reference.copy()
+        reference.authors = [Author(full_name=d["full_name"])]
+        reference.published_date = d["published_date"]
+        refs.append(reference)
+
+    tested = ingestion._add_citation_keys(refs)
+
+    for ref, d in zip(tested, fake_data):
+        assert ref.citation_key == d["expected_citation_key"]
+
+
+    # test 2 - references with no author and no published year
+    refs = []
+    for i in range(5):
+        reference = base_reference.copy()
+        reference.authors = []
+        refs.append(reference)
+    
+    tested = ingestion._add_citation_keys(refs)
+
+    ## should be untitled1, untitled2, untitled3, etc.
+    for i, ref in enumerate(tested):
+        assert ref.citation_key == f"untitled{i + 1}"
+    
+
+    # test 2 - references with no author but with published years
+    refs = []
+    for i in range(3):
+        reference = base_reference.copy()
+        reference.published_date = date(2020 + i, 1, 1)
+        reference.authors = []
+        refs.append(reference)
+    
+    tested = ingestion._add_citation_keys(refs)
+
+    ## should be untitled2020, untitled2021, untitled2022, etc.
+    for i, ref in enumerate(tested):
+        assert ref.citation_key == f"untitled{ref.published_date.year}"
+    
+    # test 3 - references with same author and no published year
+    refs = []
+    for i in range(3):
+        reference = base_reference.copy()
+        reference.authors = [Author(full_name="John Smith")]
+        refs.append(reference)
+
+    tested = ingestion._add_citation_keys(refs)
+
+    ## should be smitha, smithb, smithc
+    for i, ref in enumerate(tested):
+        assert ref.citation_key == f"smith{chr(97 + i)}"
+
+    # test 4 - references with same author and same published year
+    refs = []
+    for i in range(3):
+        reference = base_reference.copy()
+        reference.published_date = date(2021, 1, 1)
+        reference.authors = [Author(full_name="John Smith")]
+        refs.append(reference)
+
+    tested = ingestion._add_citation_keys(refs)
+
+    ## should be smith2021a, smith2021b, smith2021c
+    for i, ref in enumerate(tested):
+        assert ref.citation_key == f"smith2021{chr(97 + i)}"

@@ -62,13 +62,16 @@ def create_citation_key(ref: Reference) -> str:
     :param ref: Reference
     :return: str
     """
-    if not ref.authors:
+    if not ref.authors and not ref.published_date:
         return "untitled"
+    
+    if not ref.authors and ref.published_date:
+        return f"untitled{ref.published_date.year}"
 
     surname = get_first_author_surname(ref.authors).strip()
     if ref.authors and ref.published_date:
         key = f"{surname}{ref.published_date.year}"
-    elif ref.authors:
+    elif ref.authors and not ref.published_date:
         key = f"{surname}"
     else:
         key = "untitled"

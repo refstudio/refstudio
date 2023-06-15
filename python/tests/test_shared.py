@@ -62,11 +62,18 @@ def test_create_citation_key():
             "authors": [],
             "published_date": None,
         },
+        {
+            "source_filename": "abc.pdf",
+            "filename_md5": "some_md5",
+            "authors": [],
+            "published_date": date(2020, 1, 1),
+        },
     ]
     references = [Reference(**data) for data in test_data]
     assert shared.create_citation_key(references[0]) == "vanderkam2016"
     assert shared.create_citation_key(references[1]) == "hammerbacher"
     assert shared.create_citation_key(references[2]) == "untitled"
+    assert shared.create_citation_key(references[3]) == "untitled2020"
 
 
 def test_chunk_text():

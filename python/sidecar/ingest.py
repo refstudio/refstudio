@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import sys
+from collections import defaultdict
 from pathlib import Path
 
 import grobid_tei_xml
@@ -208,9 +209,9 @@ class PDFIngestion:
             )
         return references
     
-    def _create_citation_keys(self, references: list[Reference]) -> str:
+    def _add_citation_keys(self, references: list[Reference]) -> list[Reference]:
         """
-        Creates unique citation keys for a list of Reference objects based on Pandoc
+        Adds unique citation keys for a list of Reference objects based on Pandoc
         citation key formatting rules.
 
         Because citation keys are unique, we need to create them after all References
@@ -242,9 +243,21 @@ class PDFIngestion:
 
         https://quarto.org/docs/authoring/footnotes-and-citations.html#sec-citations
         """
+        ref_key_groups = defaultdict(list)
         for ref in references:
-            ref.citation_key = shared.create_citation_key(ref)
-            # TODO finish this function
+            key = shared.create_citation_key(ref)
+            ref_key_groups[key].append(ref)
+        
+        for key, refs in ref_key_groups.items():
+            if len(refs) == 1:
+                refs[0].citation_key = key
+            elif key == "untitled":
+                for i, ref in enumerate(refs):
+                    ref.citation_key = f"{key}{i + 1}"
+            else:
+                for i, ref in enumerate(refs):
+                    ref.citation_key = f"{key}{chr(97 + i)}"
+        return references
 
     def create_references(self) -> list[Reference]:
         """
@@ -276,9 +289,6 @@ class PDFIngestion:
             ref = Reference(
                 source_filename=source_pdf,
                 filename_md5=get_filename_md5(source_pdf),
-                # `shared.citation_key` takes a Reference as input,
-                # so we need to create the Reference object first
-                citation_key=None,
                 title=header.get("title"),
                 authors=header.get("authors"),
                 published_date=pub_date,
@@ -296,7 +306,11 @@ class PDFIngestion:
             f"{len(references)} successful Grobid parses, {len(failures)} Grobid failures"
         )
         logger.info(msg)
-        return references + failures
+
+        references = references + failures
+        self._add_citation_keys(references)
+
+        return references
 
     def save_references(self, references: list[Reference]) -> None:
         """
