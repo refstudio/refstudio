@@ -5,68 +5,44 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
-export type ProjectName = string;
-export type SourceFilename = string;
-export type FilenameMd5 = string;
-export type Title = string;
-export type Abstract = string;
-export type Contents = string;
-export type FullName = string;
-export type GivenName = string;
-export type Surname = string;
-export type Email = string;
-export type Authors = Author[];
-export type Text = string;
-export type Vector = number[];
-export type Chunks = Chunk[];
-export type References = Reference[];
-export type Index = number;
-export type Text1 = string;
-export type Rewrite = RewriteChoice[];
-export type Index1 = number;
-export type Text2 = string;
-export type Chat = ChatResponseChoice[];
-
 export interface CliCommands {
   ingest: IngestResponse;
-  rewrite: Rewrite;
-  chat: Chat;
+  rewrite: RewriteChoice[];
+  chat: ChatResponseChoice[];
 }
 export interface IngestResponse {
-  project_name: ProjectName;
-  references: References;
+  project_name: string;
+  references: Reference[];
 }
 /**
  * A reference for an academic paper / PDF
  */
 export interface Reference {
-  source_filename: SourceFilename;
-  filename_md5: FilenameMd5;
-  title?: Title;
-  abstract?: Abstract;
-  contents?: Contents;
-  authors?: Authors;
-  chunks?: Chunks;
-  metadata?: Metadata1;
+  source_filename: string;
+  filename_md5: string;
+  title?: string;
+  abstract?: string;
+  contents?: string;
+  authors?: Author[];
+  chunks?: Chunk[];
+  metadata?: {};
 }
 export interface Author {
-  full_name: FullName;
-  given_name: GivenName;
-  surname: Surname;
-  email: Email;
+  full_name: string;
+  given_name: string;
+  surname: string;
+  email: string;
 }
 export interface Chunk {
-  text: Text;
-  vector?: Vector;
-  metadata?: Metadata;
+  text: string;
+  vector?: number[];
+  metadata?: {};
 }
-export interface Metadata {}
-export interface Metadata1 {}
 export interface RewriteChoice {
-  index: Index;
-  text: Text1;
+  index: number;
+  text: string;
 }
 export interface ChatResponseChoice {
-  index: Index1;
-  text: Text2;
+  index: number;
+  text: string;
 }
