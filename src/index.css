@@ -14,7 +14,9 @@
 
 @layer components {
   .btn-primary {
-    @apply cursor-pointer rounded-xl bg-primary hover:bg-primary-hover;
+    @apply cursor-pointer rounded-xl bg-primary;
+    @apply px-4 py-0.5;
+    @apply hover:bg-primary-hover hover:text-white;
   }
   .btn-primary[disabled] {
     @apply pointer-events-none opacity-50;

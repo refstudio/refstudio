@@ -2,15 +2,16 @@ import { register, unregister } from '@tauri-apps/api/globalShortcut';
 import { useEffect, useState } from 'react';
 import { VscClose } from 'react-icons/vsc';
 
-import { cx } from './cx';
-import { getSettings, initSettings } from './settings/settings';
+import { cx } from '../cx';
+import { useCallablePromise } from '../hooks/useCallablePromise';
+import { getSettings, initSettings, setSettings } from './settings';
 
 // Tauri HOTKEYS
 // https://github.com/tauri-apps/global-hotkey/blob/0b91f4beb998526103447d890ed8eeddc0397b7d/src/hotkey.rs#L164
 const SETTINGS_SHORTCUT_TOGGLE = 'Cmd+,';
 const SETTINGS_SHORTCUT_CLOSE = 'Shift+Esc';
 
-type SettingsPaneId = 'user-account' | 'project-general' | 'project-openai';
+type SettingsPaneId = 'user-account' | 'project-general' | 'project-openai' | 'debug';
 
 // Ensure settings are configured and loaded
 await initSettings();
@@ -46,7 +47,7 @@ export function SettingsModal({ open = false, onToggle }: { open?: boolean; onTo
         )}
       >
         <div className="flex h-full flex-row">
-          <div className="w-52 bg-slate-100 p-6">
+          <div className="flex w-52 flex-col bg-slate-100 p-6">
             <div className="mb-10 space-y-1">
               <strong>USER</strong>
               <SettingsMenuItem activePane={pane} pane="user-account" text="My account" onClick={selectPane} />
@@ -55,6 +56,9 @@ export function SettingsModal({ open = false, onToggle }: { open?: boolean; onTo
               <strong>PROJECT</strong>
               <SettingsMenuItem activePane={pane} pane="project-general" text="General" onClick={selectPane} />
               <SettingsMenuItem activePane={pane} pane="project-openai" text="Open AI" onClick={selectPane} />
+            </div>
+            <div className="mt-auto">
+              <SettingsMenuItem activePane={pane} pane="debug" text="Debug" onClick={selectPane} />
             </div>
           </div>
           <div className="relative h-full w-full overflow-auto p-6">
@@ -70,6 +74,7 @@ export function SettingsModal({ open = false, onToggle }: { open?: boolean; onTo
               <ToDoSettings header="General" message="The project general settings will be configured here." />
             )}
             {pane === 'project-openai' && <OpenAiSettings />}
+            {pane === 'debug' && <DebugSettings />}
           </div>
         </div>
       </div>
@@ -101,10 +106,22 @@ function SettingsMenuItem({
   );
 }
 
-function SettingsPane({ header, children }: { header: string; children: React.ReactNode }) {
+function SettingsPane({
+  header,
+  description = '',
+  children,
+}: {
+  header: string;
+  description?: string;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="">
-      <strong className="mb-6 block border-b-2 border-b-slate-200 pb-1 text-2xl">{header}</strong>
+    <div>
+      <div className="mb-6">
+        <strong className="block border-b-2 border-b-slate-200 pb-1 text-2xl">{header}</strong>
+        <p className="text-sm text-slate-500">{description}</p>
+      </div>
+
       {children}
     </div>
   );
@@ -118,24 +135,57 @@ function ToDoSettings({ header, message }: { header: string; message: string }) 
   );
 }
 
-function OpenAiSettings() {
-  const settings = getSettings();
-
+function DebugSettings() {
   return (
-    <SettingsPane header="Open AI">
-      <form>
-        <fieldset className="space-y-2">
-          <label>API Key</label>
-          <input
-            className="w-full border px-2 py-0.5"
-            value={settings.getCache('openAI.apiKey')}
-            onChange={(e) => settings.setCache('openAI.apiKey', e.currentTarget.value)}
-          />
-          <p className="text-sm text-slate-500">
-            You need to configure the API to use the <em>rewrite</em> and <em>chat</em> operations.
-          </p>
+    <SettingsPane header="DEBUG">
+      <pre className="text-xs">{JSON.stringify(getSettings().default, null, 2)}</pre>
+    </SettingsPane>
+  );
+}
+
+function OpenAiSettings() {
+  const [paneSettings, setPaneSettings] = useState(getSettings().getCache('openAI'));
+  const [result, callSetSettings] = useCallablePromise(setSettings);
+
+  function handleSaveSettings(evt: React.FormEvent<HTMLFormElement>) {
+    evt.preventDefault();
+    callSetSettings('openAI', paneSettings);
+  }
+  return (
+    <SettingsPane description="You need to configure the API to use the rewrite and chat operations." header="Open AI">
+      <form className="mt-10" onSubmit={handleSaveSettings}>
+        <fieldset className="space-y-4">
+          <div>
+            <label>API Key</label>
+            <input
+              className="w-full border px-2 py-0.5"
+              value={paneSettings.apiKey}
+              onChange={(e) => setPaneSettings({ ...paneSettings, apiKey: e.currentTarget.value })}
+            />
+          </div>
+          <div>
+            <label>Chat Model</label>
+            <input
+              className="w-full border px-2 py-0.5"
+              value={paneSettings.chatModel}
+              onChange={(e) => setPaneSettings({ ...paneSettings, chatModel: e.currentTarget.value })}
+            />
+          </div>
+          <div>
+            <label>Complete Model</label>
+            <input
+              className="w-full border px-2 py-0.5"
+              value={paneSettings.completeModel}
+              onChange={(e) => setPaneSettings({ ...paneSettings, completeModel: e.currentTarget.value })}
+            />
+          </div>
+        </fieldset>
+        <fieldset className="mt-10 flex justify-end">
+          <input className="btn-primary" disabled={result.state === 'loading'} type="submit" value="SAVE" />
         </fieldset>
       </form>
+      {/* <pre className="text-xs">{JSON.stringify(paneSettings, null, 2)}</pre>
+      <pre className="text-xs">{JSON.stringify(result, null, 2)}</pre> */}
     </SettingsPane>
   );
 }

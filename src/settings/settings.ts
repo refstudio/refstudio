@@ -39,6 +39,8 @@ export function getSettings() {
   return settingsManager;
 }
 
+export const setSettings = settingsManager.set.bind(settingsManager);
+
 async function readEnv(key: string) {
   try {
     const value = await invoke('get_environment_variable', { name: key });

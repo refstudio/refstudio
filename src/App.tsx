@@ -8,7 +8,7 @@ import { AIPanel } from './panels/AIPanel';
 import { ExplorerPanel } from './panels/ExplorerPanel';
 import { MainPanel } from './panels/MainPanel';
 import { ReferencesPanel } from './panels/ReferencesPanel';
-import { SettingsModal } from './SettingsModal';
+import { SettingsModal } from './settings/SettingsModal';
 import { EditorAPI } from './types/EditorAPI';
 import { PdfViewerAPI } from './types/PdfViewerAPI';
 import { ReferenceItem } from './types/ReferenceItem';
