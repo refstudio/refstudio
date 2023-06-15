@@ -209,7 +209,7 @@ class PDFIngestion:
             )
         return references
     
-    def _create_citation_keys(self, references: List[Reference]) -> str:
+    def _create_citation_keys(self, references: list[Reference]) -> str:
         """
         Creates unique citation keys for a list of Reference objects based on Pandoc
         citation key formatting rules.
@@ -277,7 +277,9 @@ class PDFIngestion:
             ref = Reference(
                 source_filename=source_pdf,
                 filename_md5=get_filename_md5(source_pdf),
-                citation_key=None,  # shared.create_citation_key takes a Reference as input
+                # `shared.citation_key` takes a Reference as input,
+                # so we need to create the Reference object first
+                citation_key=None,
                 title=header.get("title"),
                 authors=header.get("authors"),
                 published_date=pub_date,
@@ -306,7 +308,7 @@ class PDFIngestion:
 
         contents = [asdict(ref) for ref in references]
         with open(filepath, "w") as fout:
-            json.dump(contents, fout)
+            json.dump(contents, fout, indent=2)
 
     def create_response_from_references(self, references: list[Reference]) -> IngestResponse:
         """
