@@ -18,8 +18,22 @@ export default {
       }
     },
   },
-  plugins: [debugPlugin()],
+  plugins: [debugPlugin(), autocompleteCustomComponentsPlugin()], 
 };
+
+/**
+ * Custom plugin that provide auto-complete support for the listed classes.
+ *
+ * The style definitions can be found in `index.css` under the `@layer components {` section
+ * 
+ */
+function autocompleteCustomComponentsPlugin() {
+  return plugin(function ({ addComponents }) {
+    addComponents({
+      '.btn-primary': {},
+    })
+  })
+}
 
 /**
  * The debugPlugin adds utility `debug*` classes to outline HTML nodes and childs.

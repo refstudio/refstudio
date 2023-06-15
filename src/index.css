@@ -12,6 +12,15 @@
   }
 }
 
+@layer components {
+  .btn-primary {
+    @apply cursor-pointer rounded-xl bg-primary hover:bg-primary-hover;
+  }
+  .btn-primary[disabled] {
+    @apply pointer-events-none opacity-50;
+  }
+}
+
 h1,
 h2,
 h3,
