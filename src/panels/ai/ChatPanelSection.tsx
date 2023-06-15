@@ -73,7 +73,12 @@ export function ChatPanelSection() {
             onKeyDown={handleKeyDown}
           />
           <div className="flex grow-0 items-end">
-            <VscRunAll className="cursor-pointer hover:text-primary-hover" size={20} onClick={() => handleChat(text)} />
+            <VscRunAll
+              className="cursor-pointer hover:text-primary-hover"
+              size={20}
+              title="Send"
+              onClick={() => handleChat(text)}
+            />
           </div>
         </div>
       </div>
