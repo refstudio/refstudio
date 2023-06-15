@@ -21,6 +21,12 @@ class Author(BaseModel):
     surname: str
     email: str
 
+    class Config:
+        @staticmethod
+        def schema_extra(schema: dict[str, Any], model: type['Author']) -> None:
+            for prop in schema.get('properties', {}).values():
+                prop.pop('title', None)
+
 
 class Chunk(BaseModel):
     text: str

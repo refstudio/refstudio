@@ -31,19 +31,15 @@
       "type": "object",
       "properties": {
         "full_name": {
-          "title": "Full Name",
           "type": "string"
         },
         "given_name": {
-          "title": "Given Name",
           "type": "string"
         },
         "surname": {
-          "title": "Surname",
           "type": "string"
         },
         "email": {
-          "title": "Email",
           "type": "string"
         }
       },

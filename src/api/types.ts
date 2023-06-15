@@ -11,10 +11,6 @@ export type FilenameMd5 = string;
 export type Title = string;
 export type Abstract = string;
 export type Contents = string;
-export type FullName = string;
-export type GivenName = string;
-export type Surname = string;
-export type Email = string;
 export type Authors = Author[];
 export type Text = string;
 export type Vector = number[];
@@ -50,10 +46,10 @@ export interface Reference {
   metadata?: Metadata1;
 }
 export interface Author {
-  full_name: FullName;
-  given_name: GivenName;
-  surname: Surname;
-  email: Email;
+  full_name: string;
+  given_name: string;
+  surname: string;
+  email: string;
 }
 export interface Chunk {
   text: Text;
