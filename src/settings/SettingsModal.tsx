@@ -10,7 +10,7 @@ import { getSettings, initSettings, setSettings } from './settings';
 // Tauri HOTKEYS
 // https://github.com/tauri-apps/global-hotkey/blob/0b91f4beb998526103447d890ed8eeddc0397b7d/src/hotkey.rs#L164
 const SETTINGS_SHORTCUT_TOGGLE = 'Cmd+,';
-const SETTINGS_SHORTCUT_CLOSE = 'Shift+Esc';
+const SETTINGS_SHORTCUT_CLOSE = 'Esc'; // 'Shift+Esc';
 
 type SettingsPaneId = 'user-account' | 'project-general' | 'project-openai' | 'debug';
 interface PaneConfig {
