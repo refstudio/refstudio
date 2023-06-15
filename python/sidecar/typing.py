@@ -4,10 +4,8 @@ from pydantic import BaseModel
 
 
 class RefStudioModel(BaseModel):
-    """Base model that produces cleaner JSON Schema (and hence TypeScript types).
-
-    See https://github.com/refstudio/refstudio/pull/161 for more context.
-    """
+    # This produces cleaner JSON Schema (and hence TypeScript types).
+    # See https://github.com/refstudio/refstudio/pull/161 for more context.
     class Config:
         @staticmethod
         def schema_extra(schema: dict[str, Any], _model) -> None:
