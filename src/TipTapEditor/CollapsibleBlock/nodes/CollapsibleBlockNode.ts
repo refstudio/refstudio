@@ -6,6 +6,7 @@ import { findParentNodeClosestToPos, InputRule, ReactNodeViewRenderer } from '@t
 
 import { isNonNullish } from '../../../lib/isNonNullish';
 import { CollapsibleBlock } from '../CollapsibleBlock';
+import { unsetCollapsibleBlock } from '../helpers/unsetCollapsibleBlock';
 
 export interface CollapsibleBlockNodeAttributes {
   folded: boolean;
@@ -249,23 +250,9 @@ export const CollapsibleBlockNode = Node.create({
           }
 
           if (dispatch) {
-            const summary = collapsibleNode.child(0).content;
-            const paragraph = [editor.schema.nodes.paragraph.createChecked(null, summary)];
-            const content = [editor.schema.nodes.draggableBlock.createChecked(null, paragraph)];
-
-            if (collapsibleNode.childCount === 2) {
-              collapsibleNode.child(1).forEach((node) => {
-                content.push(node);
-              });
-            }
-            const fragment = Fragment.from(content);
-            const slice = new Slice(fragment, 0, 0);
-
             const start = $from.before(-2);
-            const end = $from.after(-2);
 
-            const step = new ReplaceStep(start, end, slice);
-            tr.step(step);
+            unsetCollapsibleBlock($from.pos, editor.schema, tr);
 
             // + 2 to account for <collapsibleBlock> and <collapsibleSummary> opening tags, that have been removed
             tr.setSelection(TextSelection.near(tr.doc.resolve(start + $from.parentOffset + 2)));
@@ -297,32 +284,6 @@ export const CollapsibleBlockNode = Node.create({
           // Collapses the block when pressing backspace in a collapsible block that has only one empty block
           if (selection.$from.node(-2).nodeSize === 6) {
             return editor.commands.toggleCollapsedCollapsibleBlock(selection.$from.before(-2) - 1);
-          } else if (selection.$from.parentOffset === 0) {
-            // Removes the content item and moves the selection to the previous content item or the header
-            return editor.commands.command(({ tr, dispatch }) => {
-              const { $from } = selection;
-              if (dispatch) {
-                const start = $from.before(-1);
-                const end = $from.after(-1);
-                const deletedSlice = tr.doc.slice(start, end);
-                tr.delete(start, end);
-
-                const resolvedInsertPos = TextSelection.near(tr.doc.resolve(start), -1);
-                const initialInsertPos = resolvedInsertPos.from;
-
-                let insertPos = initialInsertPos;
-                deletedSlice.content.descendants((node) => {
-                  if (node.type.name === 'text') {
-                    tr.insert(insertPos, node);
-                    insertPos += node.nodeSize;
-                  }
-                });
-                tr.setSelection(TextSelection.near(tr.doc.resolve(initialInsertPos)));
-
-                dispatch(tr);
-              }
-              return true;
-            });
           }
         }
         return false;

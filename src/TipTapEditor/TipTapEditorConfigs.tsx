@@ -24,7 +24,6 @@ export const EDITOR_EXTENSIONS: Extensions = [
   }),
   Color.configure({ types: [TextStyle.name, ListItem.name] }),
   TextStyle,
-  DraggableBlockNode,
   StarterKit.configure({
     bulletList: {
       keepMarks: true,
@@ -39,11 +38,12 @@ export const EDITOR_EXTENSIONS: Extensions = [
     },
   }),
   // Custom extensions
+  RefStudioDocument,
+  DraggableBlockNode,
   CollapsibleBlockNode,
   CollapsibleBlockContentNode,
   CollapsibleBlockSummaryNode,
   ReferenceNode,
-  RefStudioDocument,
 ];
 export const INITIAL_CONTENT = `
   <h2>Hi there,</h2>
