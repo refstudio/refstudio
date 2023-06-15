@@ -32,37 +32,41 @@ def test_json_storage_load():
         for chunk in ref.chunks:
             assert isinstance(chunk, Chunk)
 
+
 def test_json_storage_update(monkeypatch, tmp_path):
     fp = Path(__file__).parent.joinpath("fixtures/data/references.json")
     jstore = storage.JsonStorage(filepath=fp)
     jstore.load()
 
-    # update the first reference
+    # update the citation key of the first reference
     ref = jstore.references[0]
-    ref.title = "Updated title"
+    ref.citation_key = "reda2023"
 
     # mock the filepath before save
     # we do not want modify our test reference data for other tests
     savepath = tmp_path.joinpath("references.json")
     monkeypatch.setattr(jstore, "filepath", savepath)
+
+    # update and save the modified references
     jstore.update(ref)
 
-    # reload the storage
+    # reload from `savepath` to check that the update was successful
     jstore = storage.JsonStorage(filepath=savepath)
     jstore.load()
 
-    # check that the title has been updated
-    assert jstore.references[0].title == "Updated title"
+    # check that the citation key has been updated
+    assert jstore.references[0].citation_key == "reda2023"
     
-    # check that the other reference has not been updated
+    # check that the other reference data has not been updated
     assert len(jstore.references) == 2
-    assert len(jstore.references[0].source_filename) == "some_file.pdf"
-    assert len(jstore.references[0].filename_md5) == "abc123"
+    assert jstore.references[0].source_filename == "some_file.pdf"
+    assert jstore.references[0].filename_md5 == "abc123"
     assert len(jstore.references[0].authors) == 2
     assert len(jstore.references[0].chunks) == 8
 
     assert jstore.references[1].title == "Another title"
-    assert len(jstore.references[0].source_filename) == "another_file.pdf"
-    assert len(jstore.references[0].filename_md5) == "abcdefg123"
-    assert len(jstore.references[0].authors) == 2
-    assert len(jstore.references[0].chunks) == 6
+    assert jstore.references[1].source_filename == "another_file.pdf"
+    assert jstore.references[1].filename_md5 == "abcdefg123"
+    assert jstore.references[1].citation_key == None
+    assert len(jstore.references[1].authors) == 2
+    assert len(jstore.references[1].chunks) == 6

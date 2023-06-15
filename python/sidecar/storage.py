@@ -1,7 +1,6 @@
 import json
 import logging
 import os
-from dataclasses import asdict
 
 from sidecar import typing
 
@@ -49,7 +48,7 @@ class JsonStorage:
         """
         Save the references to the storage file as JSON.
         """
-        contents = [asdict(ref) for ref in self.references]
+        contents = [ref.dict() for ref in self.references]
         with open(self.filepath, 'w') as f:
             json.dump(contents, f, indent=2)
     
