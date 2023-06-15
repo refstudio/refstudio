@@ -15,7 +15,7 @@ def summarize(text: str, n_options: int = 1) -> str:
     prompt = prompts.create_prompt_for_summarize(text)
     chat = Rewriter(prompt, n_options)
     response = chat.get_response()
-    sys.stdout.write(json.dumps([r.to_dict() for r in response]))
+    sys.stdout.write(json.dumps([r.dict() for r in response]))
 
 
 class Rewriter:

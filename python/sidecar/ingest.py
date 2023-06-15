@@ -48,7 +48,7 @@ class PDFIngestion:
         self.convert_grobid_xml_to_json()
         references = self.create_references()
         response = self.create_response_from_references(references)
-        sys.stdout.write(response.to_json())
+        sys.stdout.write(response.json())
         logger.info(f"Finished ingestion for project: {self.project_name}")
         logger.info(f"Response: {response}")
 
