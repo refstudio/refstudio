@@ -2,7 +2,6 @@ import json
 import logging
 import os
 import sys
-from dataclasses import asdict
 from pathlib import Path
 
 import grobid_tei_xml
@@ -49,7 +48,7 @@ class PDFIngestion:
         references = self.create_references()
         self.save_references(references)
         response = self.create_response_from_references(references)
-        sys.stdout.write(response.to_json())
+        sys.stdout.write(response.json())
         logger.info(f"Finished ingestion for project: {self.project_name}")
         logger.info(f"Response: {response}")
 
@@ -110,7 +109,7 @@ class PDFIngestion:
             )
         logger.info("Finished calling Grobid server")
         _ = self._get_grobid_output_statuses()
-    
+
     def _get_grobid_output_statuses(self) -> dict[Path, str]:
         """
         Determines the status of Grobid output files.
@@ -180,7 +179,7 @@ class PDFIngestion:
             surname=author_dict.get("surname"),
             email=author_dict.get("email"),
         )
-    
+
     def _create_references_for_grobid_failures(self) -> list[Reference]:
         """
         Creates Reference objects for PDFs that Grobid was unable to parse.
@@ -245,7 +244,7 @@ class PDFIngestion:
 
         failures = self._create_references_for_grobid_failures()
         return references + failures
-    
+
     def save_references(self, references: list[Reference]) -> None:
         """
         Saves a list of Reference objects to the filesystem
@@ -253,7 +252,7 @@ class PDFIngestion:
         filepath = os.path.join(self.storage_dir, "references.json")
         logger.info(f"Saving references to file: {filepath}")
 
-        contents = [asdict(ref) for ref in references]
+        contents = [ref.dict() for ref in references]
         with open(filepath, "w") as fout:
             json.dump(contents, fout)
 

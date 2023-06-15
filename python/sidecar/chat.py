@@ -31,7 +31,7 @@ def ask_question(
     ranker = BM25Ranker(storage=storage)
     chat = Chat(input_text=input_text, storage=storage, ranker=ranker)
     choices = chat.ask_question(n_options=n_options)
-    sys.stdout.write(json.dumps([c.to_dict() for c in choices]))
+    sys.stdout.write(json.dumps([c.dict() for c in choices]))
 
 
 class Chat:
@@ -43,12 +43,12 @@ class Chat:
     ):
         self.input_text = input_text
         self.ranker = ranker
-        self.storage = storage 
-    
+        self.storage = storage
+
     def get_relevant_documents(self):
         docs = self.ranker.get_top_n(query=self.input_text, limit=5)
         return docs
-    
+
     def call_model(self, messages: list, n_options: int = 1):
         response = openai.ChatCompletion.create(
             model=os.environ["OPENAI_CHAT_MODEL"],
@@ -64,13 +64,13 @@ class Chat:
             {"role": "user", "content": text},
         ]
         return messages
-    
+
     def prepare_choices_for_client(self, response: dict) -> list[ChatResponseChoice]:
         return [
             ChatResponseChoice(index=choice['index'], text=choice["message"]["content"])
             for choice in response['choices']
         ]
-    
+
     def ask_question(self, n_options: int = 1) -> dict:
         docs = self.get_relevant_documents()
         prompt = prompts.create_prompt_for_chat(query=self.input_text, context=docs)

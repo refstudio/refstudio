@@ -8,7 +8,7 @@ from sidecar.typing import CliCommands
 if __name__ == '__main__':
     parser = cli.get_arg_parser()
     commands = [*parser._get_positional_actions()[0].choices.keys()]
-    cli_schema = CliCommands.json_schema()
+    cli_schema = json.loads(CliCommands.schema_json())
 
     # There needs to be a 1-1 match between subcommands and CliCommands properties.
     subcommands = set(commands)
