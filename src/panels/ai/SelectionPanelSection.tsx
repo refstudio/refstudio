@@ -16,24 +16,22 @@ export function SelectionPanelSection() {
     refetch,
     isFetching,
   } = useQuery({
-    queryKey: [], // keep the old summary if the user selects new text
+    queryKey: [debouncedSelection], // clear rewrite when the selection changes
     enabled: false,
     queryFn: () => askForRewrite(debouncedSelection),
   });
   const fetchRewrite = () => {
-    console.log('fetching rewrite');
     void refetch(); // promise rejection is handled via "error" variable
   };
-  console.log(isFetching, rewrite);
 
   return (
     <PanelSection title="Selection">
       <p className="my-4 italic">Select some text in the editor to see it here.</p>
 
-      {(selection || rewrite) && (
+      {selection && (
         <div className="mb-6 flex flex-col gap-4">
           <div className="border border-slate-100 bg-slate-50 p-4">{debouncedSelection}</div>
-          <button className="btn-primary" disabled={isFetching || !selection} onClick={fetchRewrite}>
+          <button className="btn-primary" disabled={isFetching} onClick={fetchRewrite}>
             REWRITE
           </button>
           {error ? <span className="bg-red-50">{String(error)}</span> : null}
