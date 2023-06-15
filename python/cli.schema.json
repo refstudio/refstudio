@@ -40,13 +40,7 @@
         "email": {
           "type": "string"
         }
-      },
-      "required": [
-        "full_name",
-        "given_name",
-        "surname",
-        "email"
-      ]
+      }
     },
     "Chunk": {
       "title": "Chunk",
@@ -82,6 +76,9 @@
         "filename_md5": {
           "type": "string"
         },
+        "citation_key": {
+          "type": "string"
+        },
         "title": {
           "type": "string"
         },
@@ -90,6 +87,10 @@
         },
         "contents": {
           "type": "string"
+        },
+        "published_date": {
+          "type": "string",
+          "format": "date"
         },
         "authors": {
           "default": [],
