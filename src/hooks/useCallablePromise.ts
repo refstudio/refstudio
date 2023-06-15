@@ -2,6 +2,7 @@ import React from 'react';
 
 import { PromiseState } from './usePromise';
 
+/** This means that the request hasn't been issue yet. */
 export interface PendingState {
   state: 'pending';
 }
