@@ -52,6 +52,11 @@ export function ChatPanelSection() {
       })
       .catch((err) => {
         console.error('Error calling chat', err);
+        setChatThread([
+          ...chatThread,
+          { id: String(chatThread.length + 1), question: text, answer: `ERROR: ${String(err)}` },
+        ]);
+        setCurrentChatThreadItem(null);
       });
   }
 

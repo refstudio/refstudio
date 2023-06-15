@@ -44,6 +44,17 @@ describe('ChatPanelSection component', () => {
     expect(chatWithAiMock.mock.calls.length).toBe(1);
   });
 
+  // https://testing-library.com/docs/user-event/keyboard/
+  test('should display ERROR if chatWithAI throw exception', async () => {
+    const chatWithAiMock = vi.mocked(chatWithAI).mockRejectedValue('Error message.');
+    const user = userEvent.setup();
+    render(<ChatPanelSection />);
+    await user.type(screen.getByRole('textbox'), 'This is a question.');
+    await user.type(screen.getByRole('textbox'), '{enter}');
+    expect(chatWithAiMock.mock.calls.length).toBe(1);
+    expect(screen.getByText('ERROR: Error message.')).toBeInTheDocument();
+  });
+
   test('should NOT call api on SHIFT+ENTER in the textbox', async () => {
     const chatWithAiMock = vi.mocked(chatWithAI).mockResolvedValue([]);
     const user = userEvent.setup();
