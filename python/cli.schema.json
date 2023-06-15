@@ -6,14 +6,12 @@
       "$ref": "#/definitions/IngestResponse"
     },
     "rewrite": {
-      "title": "Rewrite",
       "type": "array",
       "items": {
         "$ref": "#/definitions/RewriteChoice"
       }
     },
     "chat": {
-      "title": "Chat",
       "type": "array",
       "items": {
         "$ref": "#/definitions/ChatResponseChoice"
@@ -55,11 +53,9 @@
       "type": "object",
       "properties": {
         "text": {
-          "title": "Text",
           "type": "string"
         },
         "vector": {
-          "title": "Vector",
           "default": [],
           "type": "array",
           "items": {
@@ -67,7 +63,6 @@
           }
         },
         "metadata": {
-          "title": "Metadata",
           "default": {},
           "type": "object"
         }
@@ -82,27 +77,21 @@
       "type": "object",
       "properties": {
         "source_filename": {
-          "title": "Source Filename",
           "type": "string"
         },
         "filename_md5": {
-          "title": "Filename Md5",
           "type": "string"
         },
         "title": {
-          "title": "Title",
           "type": "string"
         },
         "abstract": {
-          "title": "Abstract",
           "type": "string"
         },
         "contents": {
-          "title": "Contents",
           "type": "string"
         },
         "authors": {
-          "title": "Authors",
           "default": [],
           "type": "array",
           "items": {
@@ -110,7 +99,6 @@
           }
         },
         "chunks": {
-          "title": "Chunks",
           "default": [],
           "type": "array",
           "items": {
@@ -118,7 +106,6 @@
           }
         },
         "metadata": {
-          "title": "Metadata",
           "default": {},
           "type": "object"
         }
@@ -133,11 +120,9 @@
       "type": "object",
       "properties": {
         "project_name": {
-          "title": "Project Name",
           "type": "string"
         },
         "references": {
-          "title": "References",
           "type": "array",
           "items": {
             "$ref": "#/definitions/Reference"
@@ -154,11 +139,9 @@
       "type": "object",
       "properties": {
         "index": {
-          "title": "Index",
           "type": "integer"
         },
         "text": {
-          "title": "Text",
           "type": "string"
         }
       },
@@ -172,11 +155,9 @@
       "type": "object",
       "properties": {
         "index": {
-          "title": "Index",
           "type": "integer"
         },
         "text": {
-          "title": "Text",
           "type": "string"
         }
       },

@@ -3,7 +3,15 @@ from typing import Any
 from pydantic import BaseModel
 
 
-class Reference(BaseModel):
+class RefStudioModel(BaseModel):
+    class Config:
+        @staticmethod
+        def schema_extra(schema: dict[str, Any], _model) -> None:
+            for prop in schema.get('properties', {}).values():
+                prop.pop('title', None)
+
+
+class Reference(RefStudioModel):
     """A reference for an academic paper / PDF"""
     source_filename: str
     filename_md5: str
@@ -15,41 +23,35 @@ class Reference(BaseModel):
     metadata: dict[str, Any] = {}
 
 
-class Author(BaseModel):
+class Author(RefStudioModel):
     full_name: str
     given_name: str
     surname: str
     email: str
 
-    class Config:
-        @staticmethod
-        def schema_extra(schema: dict[str, Any], model: type['Author']) -> None:
-            for prop in schema.get('properties', {}).values():
-                prop.pop('title', None)
 
-
-class Chunk(BaseModel):
+class Chunk(RefStudioModel):
     text: str
     vector: list[float] = []
     metadata: dict[str, Any] = {}
 
 
-class IngestResponse(BaseModel):
+class IngestResponse(RefStudioModel):
     project_name: str
     references: list[Reference]
 
 
-class RewriteChoice(BaseModel):
+class RewriteChoice(RefStudioModel):
     index: int
     text: str
 
 
-class ChatResponseChoice(BaseModel):
+class ChatResponseChoice(RefStudioModel):
     index: int
     text: str
 
 
-class CliCommands(BaseModel):
+class CliCommands(RefStudioModel):
     ingest: IngestResponse
     rewrite: list[RewriteChoice]
     chat: list[ChatResponseChoice]
