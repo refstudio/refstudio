@@ -25,5 +25,13 @@
     "**/node_modules": true,
     "**/bower_components": true,
     "**/*.code-search": true
+  },
+  "workbench.colorCustomizations": {
+    // vs code defaults are a bit loud / noisy
+    // These are based on Reviewable with the opacity dialed down
+    "diffEditor.insertedLineBackground": "#5bdc7211",
+    "diffEditor.removedLineBackground": "#f05c5c11",
+    "diffEditor.insertedTextBackground": "#5bdc7222",
+    "diffEditor.removedTextBackground": "#f05c5c22",
   }
 }

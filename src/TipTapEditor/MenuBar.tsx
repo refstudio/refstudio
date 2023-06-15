@@ -39,6 +39,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
       <button
         className="toolbar-item"
         disabled={!editor.can().chain().focus().undo().run()}
+        title="Undo"
         onClick={() => editor.chain().focus().undo().run()}
       >
         <i className="format undo" />
@@ -47,6 +48,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
       <button
         className={cx('toolbar-item')}
         disabled={!editor.can().chain().focus().redo().run()}
+        title="Redo"
         onClick={() => editor.chain().focus().redo().run()}
       >
         <i className="format redo" />
@@ -57,6 +59,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
           active: editor.isActive('bold'),
         })}
         disabled={!editor.can().chain().focus().toggleBold().run()}
+        title="Bold"
         onClick={() => editor.chain().focus().toggleBold().run()}
       >
         <i className="format bold" />
@@ -66,6 +69,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
           active: editor.isActive('italic'),
         })}
         disabled={!editor.can().chain().focus().toggleItalic().run()}
+        title="Italic"
         onClick={() => editor.chain().focus().toggleItalic().run()}
       >
         <i className="format italic" />
@@ -75,6 +79,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
           active: editor.isActive('strike'),
         })}
         disabled={!editor.can().chain().focus().toggleStrike().run()}
+        title="Strikethrough"
         onClick={() => editor.chain().focus().toggleStrike().run()}
       >
         <i className="format strikethrough" />
@@ -84,6 +89,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
           active: editor.isActive('code'),
         })}
         disabled={!editor.can().chain().focus().toggleCode().run()}
+        title="Code Formatting"
         onClick={() => editor.chain().focus().toggleCode().run()}
       >
         <i className="format code" />
@@ -95,6 +101,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
         className={cx('toolbar-item', {
           active: editor.isActive('heading', { level: 1 }),
         })}
+        title="Heading Level 1"
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
       >
         <i className="format h1" />
@@ -103,6 +110,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
         className={cx('toolbar-item', {
           active: editor.isActive('heading', { level: 2 }),
         })}
+        title="Heading Level 2"
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
       >
         <i className="format h2" />
@@ -111,6 +119,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
         className={cx('toolbar-item', {
           active: editor.isActive('heading', { level: 3 }),
         })}
+        title="Heading Level 3"
         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
       >
         <i className="format h3" />
@@ -119,6 +128,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
         className={cx('toolbar-item', {
           active: editor.isActive('paragraph'),
         })}
+        title="Paragraph Text"
         onClick={() => editor.chain().focus().setParagraph().run()}
       >
         <i className="format paragraph" />
@@ -129,6 +139,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
         className={cx('toolbar-item', {
           active: editor.isActive('bulletList'),
         })}
+        title="Bulleted List"
         onClick={() => editor.chain().focus().toggleBulletList().run()}
       >
         <i className="format ul" />
@@ -137,6 +148,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
         className={cx('toolbar-item', {
           active: editor.isActive('orderedList'),
         })}
+        title="Ordered List"
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
       >
         <i className="format ol" />
@@ -161,7 +173,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
       <button onClick={() => editor.chain().focus().setHardBreak().run()}>hard break</button> */}
 
       <Divider />
-      <button className="toolbar-item" onClick={handleToggleMarkdown}>
+      <button className="toolbar-item" title="Markdown View" onClick={handleToggleMarkdown}>
         <i
           className={cx('format', {
             'journal-text': markdownMode,
