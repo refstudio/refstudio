@@ -18,6 +18,7 @@ export const CollapsibleBlock = ({ editor, getPos, node }: CollapsibleBlockProps
   const { folded } = node.attrs;
 
   const handleButtonClick = () => {
+    // getPos() points to <collapsibleBlock>, + 2 is to point to the summary
     editor.commands.toggleCollapsedCollapsibleBlock(getPos() + 2);
   };
 

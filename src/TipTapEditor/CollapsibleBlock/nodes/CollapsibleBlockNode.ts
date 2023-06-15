@@ -289,14 +289,28 @@ export const CollapsibleBlockNode = Node.create({
         ) {
           return editor.commands.unsetCollapsibleBlock();
         }
-        // Collapses the block when pressing backspace in a collapsible block that has only one empty block
         if (
           selection.empty &&
           selection.$from.depth > 3 &&
-          selection.$from.node(-2).type.name === editor.schema.nodes.collapsibleContent.name &&
-          selection.$from.node(-2).nodeSize === 6
+          selection.$from.node(-2).type.name === editor.schema.nodes.collapsibleContent.name
         ) {
-          return editor.commands.toggleCollapsedCollapsibleBlock(selection.$from.before(-2) - 1);
+          // Collapses the block when pressing backspace in a collapsible block that has only one empty block
+          if (selection.$from.node(-2).nodeSize === 6) {
+            return editor.commands.toggleCollapsedCollapsibleBlock(selection.$from.before(-2) - 1);
+          } else if (selection.$from.parentOffset === 0) {
+            // Removes the content item and moves the selection to the previous content item or the header
+            return editor.commands.command(({ tr, dispatch }) => {
+              if (dispatch) {
+                const start = selection.$from.before(-1);
+                const end = selection.$from.after(-1);
+                tr.delete(start, end);
+                tr.setSelection(TextSelection.near(tr.doc.resolve(start), -1));
+
+                dispatch(tr);
+              }
+              return true;
+            });
+          }
         }
         return false;
       },
