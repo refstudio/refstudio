@@ -8,7 +8,7 @@ import { AIPanel } from './panels/AIPanel';
 import { ExplorerPanel } from './panels/ExplorerPanel';
 import { MainPanel } from './panels/MainPanel';
 import { ReferencesPanel } from './panels/ReferencesPanel';
-import { Settings } from './Settings';
+import { SettingsModal } from './SettingsModal';
 import { EditorAPI } from './types/EditorAPI';
 import { PdfViewerAPI } from './types/PdfViewerAPI';
 import { ReferenceItem } from './types/ReferenceItem';
@@ -40,7 +40,7 @@ function App() {
         </Panel>
         <RightPanelWrapper />
       </PanelGroup>
-      <Settings open={settingsOpen} onToggle={(open) => setSettingsOpen(open)} />
+      <SettingsModal open={settingsOpen} onToggle={(open) => setSettingsOpen(open)} />
     </>
   );
 }

@@ -10,11 +10,13 @@ import { getSettings, initSettings } from './settings/settings';
 const SETTINGS_SHORTCUT_TOGGLE = 'Cmd+,';
 const SETTINGS_SHORTCUT_CLOSE = 'Shift+Esc';
 
+type SettingsPaneId = 'user-account' | 'project-general' | 'project-openai';
+
 // Ensure settings are configured and loaded
 await initSettings();
 
-export function Settings({ open = false, onToggle }: { open?: boolean; onToggle(open: boolean): void }) {
-  const [pane, selectPane] = useState('user-account');
+export function SettingsModal({ open = false, onToggle }: { open?: boolean; onToggle(open: boolean): void }) {
+  const [pane, selectPane] = useState<SettingsPaneId>('project-openai');
 
   useEffect(() => {
     (async function runAsync() {
@@ -81,9 +83,9 @@ function SettingsMenuItem({
   pane,
   text,
 }: {
-  pane: string;
-  activePane: string;
-  onClick(pane: string): void;
+  pane: SettingsPaneId;
+  activePane: SettingsPaneId;
+  onClick(pane: SettingsPaneId): void;
   text: string;
 }) {
   const active = pane === activePane;
