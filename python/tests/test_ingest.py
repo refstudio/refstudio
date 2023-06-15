@@ -105,7 +105,7 @@ def test_ingest_add_citation_keys(tmp_path):
     ]
 
 
-    # test 1 - references with unique citation keys should not be modified
+    # test - references with unique citation keys should not be modified
     refs = []
     for d in fake_data:
         reference = base_reference.copy()
@@ -119,7 +119,7 @@ def test_ingest_add_citation_keys(tmp_path):
         assert ref.citation_key == d["expected_citation_key"]
 
 
-    # test 2 - references with no author and no published year
+    # test - references with no author and no published year
     refs = []
     for i in range(5):
         reference = base_reference.copy()
@@ -133,7 +133,7 @@ def test_ingest_add_citation_keys(tmp_path):
         assert ref.citation_key == f"untitled{i + 1}"
     
 
-    # test 2 - references with no author but with published years
+    # test - references with no author but with published years
     refs = []
     for i in range(3):
         reference = base_reference.copy()
@@ -148,7 +148,7 @@ def test_ingest_add_citation_keys(tmp_path):
         assert ref.citation_key == f"untitled{ref.published_date.year}"
 
 
-    # test 3 - references with no author and duplicate published years
+    # test - references with no author and duplicate published years
     refs = []
     for i in range(3):
         reference = base_reference.copy()
@@ -163,7 +163,7 @@ def test_ingest_add_citation_keys(tmp_path):
         expected = f"untitled{ref.published_date.year}{chr(97 + i)}"
         assert ref.citation_key == expected
     
-    # test 3 - references with same author and no published year
+    # test - references with same author and no published year
     refs = []
     for i in range(3):
         reference = base_reference.copy()
@@ -176,7 +176,7 @@ def test_ingest_add_citation_keys(tmp_path):
     for i, ref in enumerate(tested):
         assert ref.citation_key == f"smith{chr(97 + i)}"
 
-    # test 4 - references with same author and same published year
+    # test - references with same author and same published year
     refs = []
     for i in range(3):
         reference = base_reference.copy()
