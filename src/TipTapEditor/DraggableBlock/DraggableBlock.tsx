@@ -21,6 +21,9 @@ export function DraggableBlock({ editor, getPos, selected }: DraggableBlockProps
           onClick={() => {
             editor.commands.setNodeSelection(getPos());
           }}
+          onMouseDown={() => {
+            editor.commands.setNodeSelection(getPos());
+          }}
         />
 
         <NodeViewContent className="content" />

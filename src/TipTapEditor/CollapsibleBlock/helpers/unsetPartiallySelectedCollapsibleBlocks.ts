@@ -20,7 +20,7 @@ export function unsetPartiallySelectedCollapsibleBlocks({ tr, editor }: Paramete
       if (!originalNode) {
         return;
       }
-      if (originalNode.node.nodeSize !== node.nodeSize) {
+      if (originalNode.node.nodeSize !== node.nodeSize && originalNode.pos > from) {
         unsetNodes += 1;
         unsetCollapsibleBlock(from + pos, editor.schema, tr);
       }

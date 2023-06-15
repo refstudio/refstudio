@@ -4,6 +4,7 @@ import { TextSelection } from '@tiptap/pm/state';
 import { ReplaceStep } from '@tiptap/pm/transform';
 import { isNodeSelection, ReactNodeViewRenderer } from '@tiptap/react';
 
+import { unsetPartiallySelectedCollapsibleBlocks } from '../CollapsibleBlock/helpers/unsetPartiallySelectedCollapsibleBlocks';
 import { DraggableBlock } from './DraggableBlock';
 
 declare module '@tiptap/core' {
@@ -106,7 +107,8 @@ export const DraggableBlockNode = Node.create({
 
   addKeyboardShortcuts() {
     return {
-      Enter: ({ editor }) => editor.commands.splitDraggableBlock(),
+      Enter: ({ editor }) =>
+        editor.chain().command(unsetPartiallySelectedCollapsibleBlocks).splitDraggableBlock().run(),
     };
   },
 });
