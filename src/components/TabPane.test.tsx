@@ -2,7 +2,7 @@ import { render, screen, userEvent, within } from './../utils/test-utils';
 import { TabPane } from './TabPane';
 
 describe('TabPane component', () => {
-  it('should render the one tab', () => {
+  test('should render the one tab', () => {
     render(
       <TabPane
         items={[{ key: 'k1', value: '1', text: 'File 1.txt' }]}
@@ -14,7 +14,7 @@ describe('TabPane component', () => {
     expect(screen.getByText('File 1.txt')).toBeInTheDocument();
   });
 
-  it('should render the two tabs', () => {
+  test('should render the two tabs', () => {
     render(
       <TabPane
         items={[
@@ -30,7 +30,7 @@ describe('TabPane component', () => {
     expect(screen.getByText('File 2.txt')).toBeInTheDocument();
   });
 
-  it('should render aria tablist with two aria tabs, one selected', () => {
+  test('should render aria tablist with two aria tabs, one selected', () => {
     render(
       <TabPane
         items={[
@@ -47,7 +47,7 @@ describe('TabPane component', () => {
     expect(screen.getByRole('tab', { selected: true, name: 'File 1.txt' })).toBeInTheDocument();
   });
 
-  it('should call onClick when clicked', async () => {
+  test('should call onClick when clicked', async () => {
     const user = userEvent.setup();
     const onClick = vi.fn();
 
@@ -71,7 +71,7 @@ describe('TabPane component', () => {
     expect(onClick).toBeCalled();
   });
 
-  it('should call onCloseClick when X is clicked (and no call to onClick)', async () => {
+  test('should call onCloseClick when X is clicked (and no call to onClick)', async () => {
     const user = userEvent.setup();
     const onClick = vi.fn();
     const onCloseClick = vi.fn();
