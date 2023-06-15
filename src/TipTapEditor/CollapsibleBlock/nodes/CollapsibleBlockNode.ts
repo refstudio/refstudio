@@ -300,11 +300,24 @@ export const CollapsibleBlockNode = Node.create({
           } else if (selection.$from.parentOffset === 0) {
             // Removes the content item and moves the selection to the previous content item or the header
             return editor.commands.command(({ tr, dispatch }) => {
+              const { $from } = selection;
               if (dispatch) {
-                const start = selection.$from.before(-1);
-                const end = selection.$from.after(-1);
+                const start = $from.before(-1);
+                const end = $from.after(-1);
+                const deletedSlice = tr.doc.slice(start, end);
                 tr.delete(start, end);
-                tr.setSelection(TextSelection.near(tr.doc.resolve(start), -1));
+
+                const resolvedInsertPos = TextSelection.near(tr.doc.resolve(start), -1);
+                const initialInsertPos = resolvedInsertPos.from;
+
+                let insertPos = initialInsertPos;
+                deletedSlice.content.descendants((node) => {
+                  if (node.type.name === 'text') {
+                    tr.insert(insertPos, node);
+                    insertPos += node.nodeSize;
+                  }
+                });
+                tr.setSelection(TextSelection.near(tr.doc.resolve(initialInsertPos)));
 
                 dispatch(tr);
               }
