@@ -41,10 +41,13 @@ export async function initSettings() {
 }
 
 export function getSettings() {
+  if (!settingsManager) {
+    throw new Error('FATAL: Cannot read settings');
+  }
   return settingsManager;
 }
 
-export const setSettings = settingsManager?.set.bind(settingsManager);
+export const setSettings = getSettings().set.bind(settingsManager);
 
 async function readEnv(key: string) {
   try {
