@@ -24,23 +24,23 @@ interface SettingsPanesConfig {
 }
 
 const SETTINGS_PANES: SettingsPanesConfig[] = [
-  {
-    section: 'User',
-    panes: [
-      {
-        id: 'user-account',
-        title: 'User Account',
-        Pane: ToDoSettingsPane,
-      },
-    ],
-  },
+  // {
+  //   section: 'User',
+  //   panes: [
+  //     {
+  //       id: 'user-account',
+  //       title: 'User Account',
+  //       Pane: ToDoSettingsPane,
+  //     },
+  //   ],
+  // },
   {
     section: 'Project',
     panes: [
       {
         id: 'project-general',
         title: 'General',
-        Pane: ToDoSettingsPane,
+        Pane: GeneralSettingsPane,
       },
       {
         id: 'project-openai',
@@ -70,7 +70,7 @@ export function SettingsModal() {
   const [open, setOpen] = useState(false);
 
   const [pane, selectPane] = useState<PaneConfig>(
-    SETTINGS_PANES.flatMap((e) => e.panes).find((p) => p.id === 'project-openai')!,
+    SETTINGS_PANES.flatMap((e) => e.panes).find((p) => p.id === 'project-general')!,
   );
 
   const toggleVisibility = useCallback(
@@ -185,7 +185,83 @@ function ToDoSettingsPane({ config }: SettingsPaneProps) {
 function DebugSettingsPane({ config }: SettingsPaneProps) {
   return (
     <SettingsPane header={config.title}>
-      <pre className="text-xs">{JSON.stringify(getSettings().default, null, 2)}</pre>
+      <JSONDebugContainer>
+        <JSONDebug header="DEFAULT SETTINGS" value={getSettings().default} />
+        <JSONDebug header="CURRENT SETTINGS" value={getSettings()} />
+      </JSONDebugContainer>
+    </SettingsPane>
+  );
+}
+
+function GeneralSettingsPane({ config }: SettingsPaneProps) {
+  const [projectSettings, setProjectSettings] = useState(getSettings().getCache('project'));
+  const [sidecarLoggingSettings, setSidecarLoggingSettings] = useState(getSettings().getCache('sidecar.logging'));
+
+  const saveSettings = useCallback(
+    async (project: typeof projectSettings, sidecarLogging: typeof sidecarLoggingSettings) => {
+      getSettings().setCache('project', project);
+      getSettings().setCache('sidecar.logging', sidecarLogging);
+      return getSettings().syncCache();
+    },
+    [],
+  );
+
+  const [result, callSetSettings] = useCallablePromise(saveSettings);
+
+  function handleSaveSettings(evt: React.FormEvent<HTMLFormElement>) {
+    evt.preventDefault();
+    callSetSettings(projectSettings, sidecarLoggingSettings);
+  }
+
+  const isDirty = JSON.stringify(projectSettings) !== JSON.stringify(getSettings().getCache('openAI'));
+
+  return (
+    <SettingsPane
+      description="You need to configure the API to use the rewrite and chat operations."
+      header={config.title}
+    >
+      <form className="mt-10" onSubmit={handleSaveSettings}>
+        <fieldset className="space-y-4">
+          <div className="space-y-2">
+            <label className="font-semibold">Project Name</label>
+            <input
+              className="w-full border px-2 py-0.5"
+              readOnly
+              value={projectSettings.name}
+              onChange={(e) => setProjectSettings({ ...projectSettings, name: e.currentTarget.value })}
+            />
+            <p className="text-xs text-gray-500">NOTE: This setting is readonly (for now!)</p>
+          </div>
+          <div className="space-y-2">
+            <label className="font-semibold">Sidecar Logging Active</label>
+            <input
+              checked={sidecarLoggingSettings.active}
+              className="w-full border px-2 py-0.5"
+              type="checkbox"
+              onChange={(e) =>
+                setSidecarLoggingSettings({ ...sidecarLoggingSettings, active: e.currentTarget.checked })
+              }
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="font-semibold">Complete Model</label>
+            <input
+              className="w-full border px-2 py-0.5"
+              value={sidecarLoggingSettings.path}
+              onChange={(e) => setSidecarLoggingSettings({ ...sidecarLoggingSettings, path: e.currentTarget.value })}
+            />
+          </div>
+        </fieldset>
+        <fieldset className="mt-10 flex justify-end">
+          <input className="btn-primary" disabled={!isDirty || result.state === 'loading'} type="submit" value="SAVE" />
+        </fieldset>
+      </form>
+
+      <JSONDebugContainer className="mt-28">
+        <JSONDebug header="paneSettings" value={projectSettings} />
+        <JSONDebug header="sidecarLogging" value={sidecarLoggingSettings} />
+        <JSONDebug header="API call result" value={result} />
+      </JSONDebugContainer>
     </SettingsPane>
   );
 }
@@ -195,7 +271,7 @@ function OpenAiSettingsPane({ config }: SettingsPaneProps) {
 
   const saveSettings = useCallback(async (value: typeof paneSettings) => {
     getSettings().setCache('openAI', value);
-    await getSettings().syncCache();
+    return getSettings().syncCache();
   }, []);
 
   const [result, callSetSettings] = useCallablePromise(saveSettings);

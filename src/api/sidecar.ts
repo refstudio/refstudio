@@ -7,10 +7,15 @@ import { CliCommands } from './types';
 
 export async function callSidecar<T extends keyof CliCommands>(subcommand: T, args: string[]): Promise<CliCommands[T]> {
   const openAISettings = getSettings().getCache('openAI');
+  const sidecarSettings = getSettings().getCache('sidecar');
   const env: Record<string, string> = {
+    // Open AI
     OPENAI_API_KEY: openAISettings.apiKey,
     OPENAI_COMPLETE_MODEL: openAISettings.completeModel,
     OPENAI_CHAT_MODEL: openAISettings.chatModel,
+    // Sidecar
+    SIDECAR_ENABLE_LOGGING: String(sidecarSettings.logging.active),
+    SIDECAR_LOG_DIR: sidecarSettings.logging.path,
   };
 
   const command = new Command('call-sidecar', [subcommand, ...args], { env });

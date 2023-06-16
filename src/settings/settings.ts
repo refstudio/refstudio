@@ -1,4 +1,3 @@
-import { invoke } from '@tauri-apps/api';
 import { SettingsManager } from 'tauri-settings';
 
 import { getConfigDir } from '../filesystem';
@@ -12,6 +11,12 @@ interface Schema {
     completeModel: string;
     chatModel: string;
   };
+  sidecar: {
+    logging: {
+      active: boolean;
+      path: string;
+    };
+  };
 }
 
 let settingsManager: SettingsManager<Schema> | undefined;
@@ -23,9 +28,15 @@ export async function initSettings() {
         name: 'project-x',
       },
       openAI: {
-        apiKey: await readEnv('OPENAI_API_KEY'),
-        completeModel: await readEnv('OPENAI_COMPLETE_MODEL'),
-        chatModel: await readEnv('OPENAI_CHAT_MODEL'),
+        apiKey: '',
+        completeModel: 'davinci',
+        chatModel: 'gpt-3.5-turbo',
+      },
+      sidecar: {
+        logging: {
+          active: true,
+          path: '/tmp',
+        },
       },
     },
     {
@@ -45,14 +56,4 @@ export function getSettings() {
     throw new Error('FATAL: Cannot read settings');
   }
   return settingsManager;
-}
-
-async function readEnv(key: string) {
-  try {
-    const value = await invoke('get_environment_variable', { name: key });
-    return String(value);
-  } catch (err) {
-    console.error('Error reading env key %s. ', key, err);
-    return '';
-  }
 }
