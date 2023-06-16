@@ -3,7 +3,7 @@ import { VscFiles, VscLibrary, VscSettingsGear } from 'react-icons/vsc';
 
 import { cx } from '../cx';
 
-export type PrimarySideBarPane = 'Explorer' | 'References' | '';
+export type PrimarySideBarPane = 'Explorer' | 'References';
 
 export function PrimarySideBar({
   activePane,
