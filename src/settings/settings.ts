@@ -14,25 +14,27 @@ interface Schema {
   };
 }
 
-const settingsManager = new SettingsManager<Schema>(
-  {
-    project: {
-      name: 'project-x',
-    },
-    openAI: {
-      apiKey: await readEnv('OPENAI_API_KEY'),
-      completeModel: await readEnv('OPENAI_COMPLETE_MODEL'),
-      chatModel: await readEnv('OPENAI_CHAT_MODEL'),
-    },
-  },
-  {
-    dir: await getConfigDir(),
-    fileName: 'main-settings.json',
-    prettify: true,
-  },
-);
+let settingsManager: SettingsManager<Schema> | undefined;
 
 export async function initSettings() {
+  settingsManager = new SettingsManager<Schema>(
+    {
+      project: {
+        name: 'project-x',
+      },
+      openAI: {
+        apiKey: await readEnv('OPENAI_API_KEY'),
+        completeModel: await readEnv('OPENAI_COMPLETE_MODEL'),
+        chatModel: await readEnv('OPENAI_CHAT_MODEL'),
+      },
+    },
+    {
+      dir: await getConfigDir(),
+      fileName: 'main-settings.json',
+      prettify: true,
+    },
+  );
+
   const configs = await settingsManager.initialize();
   console.log('Settings initialized with success with', configs);
   console.log('openAI', configs.openAI);
@@ -42,7 +44,7 @@ export function getSettings() {
   return settingsManager;
 }
 
-export const setSettings = settingsManager.set.bind(settingsManager);
+export const setSettings = settingsManager?.set.bind(settingsManager);
 
 async function readEnv(key: string) {
   try {
