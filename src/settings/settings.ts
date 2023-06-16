@@ -1,6 +1,8 @@
 import { invoke } from '@tauri-apps/api';
 import { SettingsManager } from 'tauri-settings';
 
+import { getConfigDir } from '../filesystem';
+
 interface Schema {
   project: {
     name: string;
@@ -24,7 +26,8 @@ const settingsManager = new SettingsManager<Schema>(
     },
   },
   {
-    fileName: 'settings',
+    dir: await getConfigDir(),
+    fileName: 'main-settings.json',
     prettify: true,
   },
 );
