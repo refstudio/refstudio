@@ -7,7 +7,7 @@ import { cx } from '../cx';
 import { RefStudioEvents } from '../events';
 import { useAsyncEffect } from '../hooks/useAsyncEffect';
 import { useCallablePromise } from '../hooks/useCallablePromise';
-import { getSettings, initSettings, setSettings } from './settings';
+import { getSettings, initSettings } from './settings';
 
 type SettingsPaneId = 'user-account' | 'project-general' | 'project-openai' | 'debug';
 interface PaneConfig {
@@ -192,11 +192,17 @@ function DebugSettingsPane({ config }: SettingsPaneProps) {
 
 function OpenAiSettingsPane({ config }: SettingsPaneProps) {
   const [paneSettings, setPaneSettings] = useState(getSettings().getCache('openAI'));
-  const [result, callSetSettings] = useCallablePromise(setSettings);
+
+  const saveSettings = useCallback(async (value: typeof paneSettings) => {
+    getSettings().setCache('openAI', value);
+    await getSettings().syncCache();
+  }, []);
+
+  const [result, callSetSettings] = useCallablePromise(saveSettings);
 
   function handleSaveSettings(evt: React.FormEvent<HTMLFormElement>) {
     evt.preventDefault();
-    callSetSettings('openAI', paneSettings);
+    callSetSettings(paneSettings);
   }
 
   const isDirty = JSON.stringify(paneSettings) !== JSON.stringify(getSettings().getCache('openAI'));
