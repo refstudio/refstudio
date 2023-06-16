@@ -1,9 +1,10 @@
-import { appWindow } from '@tauri-apps/api/window';
+import { listen } from '@tauri-apps/api/event';
 import { useCallback, useState } from 'react';
 import { VscClose } from 'react-icons/vsc';
 
 import { JSONDebug, JSONDebugContainer } from '../components/JSONDebug';
 import { cx } from '../cx';
+import { RefStudioEvents } from '../events';
 import { useAsyncEffect } from '../hooks/useAsyncEffect';
 import { useCallablePromise } from '../hooks/useCallablePromise';
 import { getSettings, initSettings, setSettings } from './settings';
@@ -65,14 +66,16 @@ const SETTINGS_PANES: SettingsPanesConfig[] = [
 // Ensure settings are configured and loaded
 await initSettings();
 
-export function SettingsModal({ open = false, onToggle }: { open?: boolean; onToggle(open: boolean): void }) {
+export function SettingsModal() {
+  const [open, setOpen] = useState(false);
+
   const [pane, selectPane] = useState<PaneConfig>(
     SETTINGS_PANES.flatMap((e) => e.panes).find((p) => p.id === 'project-openai')!,
   );
 
   const toggleVisibility = useCallback(
-    (isMounted: () => boolean) => appWindow.listen('settings', () => isMounted() && onToggle(!open)),
-    [open, onToggle],
+    (isMounted: () => boolean) => listen(RefStudioEvents.Menu.settings, () => isMounted() && setOpen(!open)),
+    [open, setOpen],
   );
 
   useAsyncEffect(toggleVisibility, (unregister) => unregister?.());
@@ -112,7 +115,7 @@ export function SettingsModal({ open = false, onToggle }: { open?: boolean; onTo
             <VscClose
               className="absolute right-2 top-2 cursor-pointer rounded-lg p-1 hover:bg-slate-200"
               size={30}
-              onClick={() => onToggle(false)}
+              onClick={() => setOpen(false)}
             />
             <pane.Pane config={pane} />
           </div>

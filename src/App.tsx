@@ -4,6 +4,7 @@ import { ImperativePanelHandle, Panel, PanelGroup } from 'react-resizable-panels
 
 import { PrimarySideBar, PrimarySideBarPane } from './components/PrimarySideBar';
 import { VerticalResizeHandle } from './components/VerticalResizeHandle';
+import { emitEvent, RefStudioEvents } from './events';
 import { AIPanel } from './panels/AIPanel';
 import { ExplorerPanel } from './panels/ExplorerPanel';
 import { MainPanel } from './panels/MainPanel';
@@ -21,8 +22,6 @@ function App() {
     pdfViewerRef.current?.updateWidth();
   }, [pdfViewerRef]);
 
-  const [settingsOpen, setSettingsOpen] = useState(false);
-
   return (
     <>
       <PanelGroup
@@ -33,14 +32,14 @@ function App() {
       >
         <LeftSidePanelWrapper
           onRefClicked={(reference) => editorRef.current?.insertReference(reference)}
-          onSettingsClick={() => setSettingsOpen(true)}
+          onSettingsClick={() => emitEvent(RefStudioEvents.Menu.settings)}
         />
         <Panel defaultSize={60}>
           <MainPanel editorRef={editorRef} pdfViewerRef={pdfViewerRef} />
         </Panel>
         <RightPanelWrapper />
       </PanelGroup>
-      <SettingsModal open={settingsOpen} onToggle={(open) => setSettingsOpen(open)} />
+      <SettingsModal />
     </>
   );
 }

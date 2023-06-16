@@ -12,21 +12,22 @@ impl AppMenu {
                 .add_native_item(MenuItem::About(name.into(), AboutMetadata::new()))
                 .add_native_item(MenuItem::Separator)
                 .add_item(
-                    CustomMenuItem::new("settings".to_string(), "Settings").accelerator("Cmd+,"),
+                    CustomMenuItem::new("tauri://menu/settings".to_string(), "Settings")
+                        .accelerator("Cmd+,"),
                 )
                 .add_native_item(MenuItem::Separator)
                 .add_native_item(MenuItem::Services)
                 .add_native_item(MenuItem::Hide)
                 .add_native_item(MenuItem::HideOthers)
                 .add_native_item(MenuItem::Separator)
-                .add_item(CustomMenuItem::new("quit".to_string(), "Quit")),
+                .add_native_item(MenuItem::Quit),
         );
 
         // let file_menu = Submenu::new(
         //     "File",
         //     Menu::new()
-        //         .add_item(CustomMenuItem::new("new_feed".to_string(), "New Feed"))
-        //         .add_item(CustomMenuItem::new("new_folder".to_string(), "New Folder")),
+        //         .add_item(CustomMenuItem::new("tauri://menu/file/new".to_string(), "New File..."))
+        //         .add_item(CustomMenuItem::new("tauri://menu/file/close".to_string(), "Close File"))
         // );
 
         // let edit_menu = Submenu::new(
@@ -56,16 +57,14 @@ impl AppMenu {
     }
 
     pub fn on_menu_event(event: WindowMenuEvent) {
-        match event.menu_item_id() {
-            "quit" => {
-                println!("quit");
-                std::process::exit(0);
-            }
-            "settings" => {
-                println!("Settings");
-                event.window().emit("settings", {}).unwrap();
-            }
-            _ => {}
-        }
+        // Send all events to the app
+        event.window().emit(event.menu_item_id(), {}).unwrap();
+        // match event.menu_item_id() {
+        //     "tauri://menu/settings" => {
+        //         println!("Settings");
+        //         event.window().emit("settings", {}).unwrap();
+        //     }
+        //     _ => {}
+        // }
     }
 }
