@@ -6,7 +6,7 @@ import { ChatPanelSection } from './ChatPanelSection';
 
 vi.mock('../../api/chat');
 
-describe.skip('ChatPanelSection component', () => {
+describe('ChatPanelSection component', () => {
   afterEach(() => {
     vi.clearAllMocks();
   });

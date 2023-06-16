@@ -1,4 +1,4 @@
-import { emit } from '@tauri-apps/api/event';
+import { emit, listen } from '@tauri-apps/api/event';
 
 export const RefStudioEvents = {
   Menu: {
@@ -10,4 +10,8 @@ export function emitEvent(event: string) {
   (async function run() {
     await emit(event);
   })();
+}
+
+export async function listenEvent(event: string, fn: () => void) {
+  return listen(event, fn);
 }

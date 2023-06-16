@@ -1,8 +1,9 @@
 import { SettingsManager } from 'tauri-settings';
+import { Path, PathValue } from 'tauri-settings/dist/types/dot-notation';
 
 import { getConfigDir } from '../filesystem';
 
-interface Schema {
+export interface SettingsSchema {
   project: {
     name: string;
   };
@@ -19,10 +20,10 @@ interface Schema {
   };
 }
 
-let settingsManager: SettingsManager<Schema> | undefined;
+let settingsManager: SettingsManager<SettingsSchema> | undefined;
 
 export async function initSettings() {
-  settingsManager = new SettingsManager<Schema>(
+  settingsManager = new SettingsManager<SettingsSchema>(
     {
       project: {
         name: 'project-x',
@@ -41,7 +42,7 @@ export async function initSettings() {
     },
     {
       dir: await getConfigDir(),
-      fileName: 'main-settings.json',
+      fileName: 'refstudio-settings.json',
       prettify: true,
     },
   );
@@ -56,4 +57,16 @@ export function getSettings() {
     throw new Error('FATAL: Cannot read settings');
   }
   return settingsManager;
+}
+
+export function getCachedSetting<K extends Path<SettingsSchema>>(key: K): PathValue<SettingsSchema, K> {
+  return getSettings().getCache(key);
+}
+
+export function setCachedSetting<K extends Path<SettingsSchema>>(key: K, value: PathValue<SettingsSchema, K>) {
+  getSettings().setCache(key, value);
+}
+
+export async function flushCachedSettings() {
+  await getSettings().syncCache();
 }

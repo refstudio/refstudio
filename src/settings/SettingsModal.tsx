@@ -1,13 +1,12 @@
-import { listen } from '@tauri-apps/api/event';
 import { useCallback, useState } from 'react';
 import { VscClose } from 'react-icons/vsc';
 
 import { JSONDebug, JSONDebugContainer } from '../components/JSONDebug';
 import { cx } from '../cx';
-import { RefStudioEvents } from '../events';
+import { listenEvent, RefStudioEvents } from '../events';
 import { useAsyncEffect } from '../hooks/useAsyncEffect';
 import { useCallablePromise } from '../hooks/useCallablePromise';
-import { getSettings, initSettings } from './settings';
+import { flushCachedSettings, getCachedSetting, getSettings, initSettings, setCachedSetting } from './settings';
 
 type SettingsPaneId = 'user-account' | 'project-general' | 'project-openai' | 'debug';
 interface PaneConfig {
@@ -24,16 +23,17 @@ interface SettingsPanesConfig {
 }
 
 const SETTINGS_PANES: SettingsPanesConfig[] = [
-  // {
-  //   section: 'User',
-  //   panes: [
-  //     {
-  //       id: 'user-account',
-  //       title: 'User Account',
-  //       Pane: ToDoSettingsPane,
-  //     },
-  //   ],
-  // },
+  {
+    section: 'User',
+    hidden: true,
+    panes: [
+      {
+        id: 'user-account',
+        title: 'User Account',
+        Pane: ToDoSettingsPane,
+      },
+    ],
+  },
   {
     section: 'Project',
     panes: [
@@ -66,19 +66,24 @@ const SETTINGS_PANES: SettingsPanesConfig[] = [
 // Ensure settings are configured and loaded
 await initSettings();
 
-export function SettingsModal() {
-  const [open, setOpen] = useState(false);
+export function SettingsModal({ defaultOpen }: { defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen === true);
 
   const [pane, selectPane] = useState<PaneConfig>(
     SETTINGS_PANES.flatMap((e) => e.panes).find((p) => p.id === 'project-general')!,
   );
 
-  const toggleVisibility = useCallback(
-    (isMounted: () => boolean) => listen(RefStudioEvents.Menu.settings, () => isMounted() && setOpen(!open)),
+  const listenSettingsMenuEvent = useCallback(
+    (isMounted: () => boolean) =>
+      listenEvent(RefStudioEvents.Menu.settings, () => {
+        if (isMounted()) {
+          setOpen(!open);
+        }
+      }),
     [open, setOpen],
   );
 
-  useAsyncEffect(toggleVisibility, (unregister) => unregister?.());
+  useAsyncEffect(listenSettingsMenuEvent, (unregister) => unregister?.());
 
   if (!open) {
     return null;
@@ -194,14 +199,15 @@ function DebugSettingsPane({ config }: SettingsPaneProps) {
 }
 
 function GeneralSettingsPane({ config }: SettingsPaneProps) {
-  const [projectSettings, setProjectSettings] = useState(getSettings().getCache('project'));
-  const [sidecarLoggingSettings, setSidecarLoggingSettings] = useState(getSettings().getCache('sidecar.logging'));
+  const [projectSettings, setProjectSettings] = useState(getCachedSetting('project'));
+  const [sidecarLoggingSettings, setSidecarLoggingSettings] = useState(getCachedSetting('sidecar.logging'));
 
   const saveSettings = useCallback(
     async (project: typeof projectSettings, sidecarLogging: typeof sidecarLoggingSettings) => {
-      getSettings().setCache('project', project);
-      getSettings().setCache('sidecar.logging', sidecarLogging);
-      return getSettings().syncCache();
+      setCachedSetting('project', project);
+      setCachedSetting('sidecar.logging', sidecarLogging);
+      await flushCachedSettings();
+      return getSettings();
     },
     [],
   );
@@ -213,7 +219,9 @@ function GeneralSettingsPane({ config }: SettingsPaneProps) {
     callSetSettings(projectSettings, sidecarLoggingSettings);
   }
 
-  const isDirty = JSON.stringify(projectSettings) !== JSON.stringify(getSettings().getCache('openAI'));
+  const isDirty =
+    JSON.stringify(projectSettings) !== JSON.stringify(getCachedSetting('project')) ||
+    JSON.stringify(sidecarLoggingSettings) !== JSON.stringify(getCachedSetting('sidecar.logging'));
 
   return (
     <SettingsPane
@@ -267,11 +275,12 @@ function GeneralSettingsPane({ config }: SettingsPaneProps) {
 }
 
 function OpenAiSettingsPane({ config }: SettingsPaneProps) {
-  const [paneSettings, setPaneSettings] = useState(getSettings().getCache('openAI'));
+  const [paneSettings, setPaneSettings] = useState(getCachedSetting('openAI'));
 
   const saveSettings = useCallback(async (value: typeof paneSettings) => {
-    getSettings().setCache('openAI', value);
-    return getSettings().syncCache();
+    setCachedSetting('openAI', value);
+    await flushCachedSettings();
+    return getSettings();
   }, []);
 
   const [result, callSetSettings] = useCallablePromise(saveSettings);
@@ -281,7 +290,7 @@ function OpenAiSettingsPane({ config }: SettingsPaneProps) {
     callSetSettings(paneSettings);
   }
 
-  const isDirty = JSON.stringify(paneSettings) !== JSON.stringify(getSettings().getCache('openAI'));
+  const isDirty = JSON.stringify(paneSettings) !== JSON.stringify(getCachedSetting('openAI'));
 
   return (
     <SettingsPane
