@@ -3,9 +3,9 @@
 import { Command } from '@tauri-apps/api/shell';
 
 import { getSettings } from '../settings/settings';
-import { CliSchema } from './types';
+import { CliCommands } from './types';
 
-export async function callSidecar<T extends keyof CliSchema>(subcommand: T, args: string[]): Promise<CliSchema[T]> {
+export async function callSidecar<T extends keyof CliCommands>(subcommand: T, args: string[]): Promise<CliCommands[T]> {
   const openAISettings = getSettings().getCache('openAI');
   const env: Record<string, string> = {
     OPENAI_API_KEY: openAISettings.apiKey,
@@ -20,7 +20,8 @@ export async function callSidecar<T extends keyof CliSchema>(subcommand: T, args
     throw new Error(output.stderr);
   }
   console.log('output: ', output.stdout);
-  const response = JSON.parse(output.stdout) as CliSchema[T];
+
+  const response = JSON.parse(output.stdout) as CliCommands[T];
   console.log('response', response);
   return response;
 }

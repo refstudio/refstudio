@@ -5,17 +5,11 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
-/**
- * CliCommands(ingest: sidecar.typing.IngestResponse, rewrite: list[sidecar.typing.RewriteChoice], chat: list[sidecar.typing.ChatResponseChoice])
- */
-export interface CliSchema {
+export interface CliCommands {
   ingest: IngestResponse;
   rewrite: RewriteChoice[];
   chat: ChatResponseChoice[];
 }
-/**
- * IngestResponse(project_name: str, references: list[sidecar.typing.Reference])
- */
 export interface IngestResponse {
   project_name: string;
   references: Reference[];
@@ -33,33 +27,21 @@ export interface Reference {
   chunks?: Chunk[];
   metadata?: {};
 }
-/**
- * Author(full_name: str, given_name: str, surname: str, email: str)
- */
 export interface Author {
   full_name: string;
   given_name: string;
   surname: string;
   email: string;
 }
-/**
- * Chunk(text: str, vector: List[float] = <factory>, metadata: Dict[str, Any] = <factory>)
- */
 export interface Chunk {
   text: string;
   vector?: number[];
   metadata?: {};
 }
-/**
- * RewriteChoice(index: int, text: str)
- */
 export interface RewriteChoice {
   index: number;
   text: string;
 }
-/**
- * ChatResponseChoice(index: int, text: str)
- */
 export interface ChatResponseChoice {
   index: number;
   text: string;
