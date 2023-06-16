@@ -1,0 +1,170 @@
+{
+  "title": "CliCommands",
+  "type": "object",
+  "properties": {
+    "ingest": {
+      "$ref": "#/definitions/IngestResponse"
+    },
+    "rewrite": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/RewriteChoice"
+      }
+    },
+    "chat": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ChatResponseChoice"
+      }
+    }
+  },
+  "required": [
+    "ingest",
+    "rewrite",
+    "chat"
+  ],
+  "definitions": {
+    "Author": {
+      "title": "Author",
+      "type": "object",
+      "properties": {
+        "full_name": {
+          "type": "string"
+        },
+        "given_name": {
+          "type": "string"
+        },
+        "surname": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "full_name",
+        "given_name",
+        "surname",
+        "email"
+      ]
+    },
+    "Chunk": {
+      "title": "Chunk",
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "vector": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "metadata": {
+          "default": {},
+          "type": "object"
+        }
+      },
+      "required": [
+        "text"
+      ]
+    },
+    "Reference": {
+      "title": "Reference",
+      "description": "A reference for an academic paper / PDF",
+      "type": "object",
+      "properties": {
+        "source_filename": {
+          "type": "string"
+        },
+        "filename_md5": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "abstract": {
+          "type": "string"
+        },
+        "contents": {
+          "type": "string"
+        },
+        "authors": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Author"
+          }
+        },
+        "chunks": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Chunk"
+          }
+        },
+        "metadata": {
+          "default": {},
+          "type": "object"
+        }
+      },
+      "required": [
+        "source_filename",
+        "filename_md5"
+      ]
+    },
+    "IngestResponse": {
+      "title": "IngestResponse",
+      "type": "object",
+      "properties": {
+        "project_name": {
+          "type": "string"
+        },
+        "references": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Reference"
+          }
+        }
+      },
+      "required": [
+        "project_name",
+        "references"
+      ]
+    },
+    "RewriteChoice": {
+      "title": "RewriteChoice",
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "index",
+        "text"
+      ]
+    },
+    "ChatResponseChoice": {
+      "title": "ChatResponseChoice",
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "index",
+        "text"
+      ]
+    }
+  }
+}
