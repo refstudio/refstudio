@@ -1,16 +1,12 @@
-import { register, unregister } from '@tauri-apps/api/globalShortcut';
-import { useEffect, useState } from 'react';
+import { appWindow } from '@tauri-apps/api/window';
+import { useCallback, useState } from 'react';
 import { VscClose } from 'react-icons/vsc';
 
 import { JSONDebug, JSONDebugContainer } from '../components/JSONDebug';
 import { cx } from '../cx';
+import { useAsyncEffect } from '../hooks/useAsyncEffect';
 import { useCallablePromise } from '../hooks/useCallablePromise';
 import { getSettings, initSettings, setSettings } from './settings';
-
-// Tauri HOTKEYS
-// https://github.com/tauri-apps/global-hotkey/blob/0b91f4beb998526103447d890ed8eeddc0397b7d/src/hotkey.rs#L164
-const SETTINGS_SHORTCUT_TOGGLE = 'Cmd+,';
-const SETTINGS_SHORTCUT_CLOSE = 'Esc'; // 'Shift+Esc';
 
 type SettingsPaneId = 'user-account' | 'project-general' | 'project-openai' | 'debug';
 interface PaneConfig {
@@ -74,18 +70,12 @@ export function SettingsModal({ open = false, onToggle }: { open?: boolean; onTo
     SETTINGS_PANES.flatMap((e) => e.panes).find((p) => p.id === 'project-openai')!,
   );
 
-  useEffect(() => {
-    (async function runAsync() {
-      try {
-        await unregister(SETTINGS_SHORTCUT_TOGGLE);
-        await unregister(SETTINGS_SHORTCUT_CLOSE);
-        await register(SETTINGS_SHORTCUT_TOGGLE, () => onToggle(!open));
-        await register(SETTINGS_SHORTCUT_CLOSE, () => onToggle(false));
-      } catch (err) {
-        console.error('Cannot register settings shortcut:', err);
-      }
-    })();
-  }, [onToggle, open]);
+  const toggleVisibility = useCallback(
+    (isMounted: () => boolean) => appWindow.listen('settings', () => isMounted() && onToggle(!open)),
+    [open, onToggle],
+  );
+
+  useAsyncEffect(toggleVisibility, (unregister) => unregister?.());
 
   if (!open) {
     return null;
