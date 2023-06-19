@@ -6,7 +6,7 @@ import { findParentNodeClosestToPos, InputRule, ReactNodeViewRenderer } from '@t
 
 import { isNonNullish } from '../../../lib/isNonNullish';
 import { CollapsibleBlock } from '../CollapsibleBlock';
-import { unsetCollapsibleBlock } from '../helpers/unsetCollapsibleBlock';
+import { changeCollapsibleBlockToParagraph } from '../helpers/changeCollapsibleBlockToParagraph';
 
 export interface CollapsibleBlockNodeAttributes {
   folded: boolean;
@@ -16,6 +16,7 @@ declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     collapsibleBlock: {
       setCollapsibleBlock: () => ReturnType;
+      /** Test */
       splitCollapsibleBlock: () => ReturnType;
       toggleCollapsedCollapsibleBlock: (pos: number) => ReturnType;
       unsetCollapsibleBlock: () => ReturnType;
@@ -98,6 +99,11 @@ export const CollapsibleBlockNode = Node.create({
           }
           return true;
         },
+      /* 
+        Splits a collapsible block from the summary:
+         - removes text after the caret from the first collapsible block
+         - creates a new collapsible block with text after the caret as summary and empty content
+        */
       splitCollapsibleBlock:
         () =>
         ({ editor, dispatch, tr }) => {
@@ -252,7 +258,7 @@ export const CollapsibleBlockNode = Node.create({
           if (dispatch) {
             const start = $from.before(-2);
 
-            unsetCollapsibleBlock($from.pos, editor.schema, tr);
+            changeCollapsibleBlockToParagraph($from.pos, editor.schema, tr);
 
             // + 2 to account for <collapsibleBlock> and <collapsibleSummary> opening tags, that have been removed
             tr.setSelection(TextSelection.near(tr.doc.resolve(start + $from.parentOffset + 2)));

@@ -2,7 +2,12 @@ import { Fragment, Schema, Slice } from '@tiptap/pm/model';
 import { Transaction } from '@tiptap/pm/state';
 import { ReplaceStep } from '@tiptap/pm/transform';
 
-export function unsetCollapsibleBlock(pos: number, schema: Schema, tr: Transaction): void {
+/**
+ * Transforms a collapsible block into blocks:
+ *  - the summary is transformed into a paragraph
+ *  - each block of the content is added after the summary block
+ */
+export function changeCollapsibleBlockToParagraph(pos: number, schema: Schema, tr: Transaction): void {
   const resolvedPos = tr.doc.resolve(pos);
   if (resolvedPos.depth < 1) {
     return;

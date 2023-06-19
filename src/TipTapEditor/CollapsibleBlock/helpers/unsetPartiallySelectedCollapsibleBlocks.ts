@@ -1,13 +1,13 @@
 import { TextSelection } from '@tiptap/pm/state';
-import { Command, findParentNodeClosestToPos } from '@tiptap/react';
+import { CommandProps, findParentNodeClosestToPos } from '@tiptap/react';
 
-import { unsetCollapsibleBlock } from './unsetCollapsibleBlock';
+import { changeCollapsibleBlockToParagraph } from './changeCollapsibleBlockToParagraph';
 
 /**
  * Command that unsets any collapsible block that is partially selected,
  * ie. part of the node is selected but not the whole node
  */
-export function unsetPartiallySelectedCollapsibleBlocks({ tr, editor }: Parameters<Command>[0]) {
+export function unsetPartiallySelectedCollapsibleBlocks({ tr, editor }: CommandProps) {
   const { from, to } = tr.selection;
   let unsetNodes = 0;
 
@@ -22,14 +22,14 @@ export function unsetPartiallySelectedCollapsibleBlocks({ tr, editor }: Paramete
       }
       if (originalNode.node.nodeSize !== node.nodeSize && originalNode.pos > from) {
         unsetNodes += 1;
-        unsetCollapsibleBlock(from + pos, editor.schema, tr);
+        changeCollapsibleBlockToParagraph(from + pos, editor.schema, tr);
       }
     }
   });
 
-  const $updatedFrom = tr.doc.resolve(from);
+  const resolvedUpdatedFrom = tr.doc.resolve(from);
   const $updatedTo = tr.doc.resolve(to - unsetNodes);
 
-  tr.setSelection(new TextSelection($updatedFrom, $updatedTo));
+  tr.setSelection(new TextSelection(resolvedUpdatedFrom, $updatedTo));
   return true;
 }
