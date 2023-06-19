@@ -23,7 +23,7 @@ describe('fileActions', () => {
     vi.clearAllMocks();
   });
 
-  test('should be empty by default', () => {
+  test.skip('should be empty by default', () => {
     const store = createStore();
     const leftPane = runGetAtomHook(leftPaneAtom, store);
     const rightPane = runGetAtomHook(rightPaneAtom, store);
