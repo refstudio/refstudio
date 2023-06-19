@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Any
 
 from pydantic import BaseModel
@@ -17,9 +18,11 @@ class Reference(RefStudioModel):
     """A reference for an academic paper / PDF"""
     source_filename: str
     filename_md5: str
+    citation_key: str | None = None
     title: str | None = None
     abstract: str | None = None
     contents: str | None = None
+    published_date: date | None = None
     authors: list["Author"] = []
     chunks: list["Chunk"] = []
     metadata: dict[str, Any] = {}
@@ -27,9 +30,9 @@ class Reference(RefStudioModel):
 
 class Author(RefStudioModel):
     full_name: str
-    given_name: str
-    surname: str
-    email: str
+    given_name: str | None = None
+    surname: str | None = None
+    email: str | None = None
 
 
 class Chunk(RefStudioModel):

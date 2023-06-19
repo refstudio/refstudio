@@ -50,6 +50,7 @@ export function ReferencesPanel({ onRefClicked }: ReferencesPanelProps) {
               key={reference.id}
               onClick={() => onRefClicked(reference)}
             >
+              <code className="mr-2">[{reference.citationKey}]</code>
               <strong>{reference.title}</strong>
               <br />
               <small>
