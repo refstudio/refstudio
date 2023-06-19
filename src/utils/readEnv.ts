@@ -1,6 +1,6 @@
 import { invoke } from '@tauri-apps/api';
 
-export async function readEnv(key: string, fallback?: string) {
+export async function readEnv(key: string, fallback: string) {
   try {
     const value = await invoke('get_environment_variable', { name: key });
     return String(value) || fallback;

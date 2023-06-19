@@ -7,7 +7,7 @@ vi.mock('@tauri-apps/api');
 describe('readEnv', () => {
   test('should return env value from tauri', async () => {
     vi.mocked(invoke).mockResolvedValue('TAURI ENV VALUE');
-    const value = await readEnv('KEY');
+    const value = await readEnv('KEY', 'unused');
     expect(value).toBe('TAURI ENV VALUE');
   });
 

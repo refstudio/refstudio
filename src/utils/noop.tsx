@@ -1,5 +1,5 @@
-export function noop<T = void>() {
-  return () =>
+export function noop() {
+  return () => {
     // no code!
-    0 as T;
+  };
 }
