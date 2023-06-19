@@ -2,6 +2,7 @@ import { SettingsManager } from 'tauri-settings';
 import { Path, PathValue } from 'tauri-settings/dist/types/dot-notation';
 
 import { getAppDataDir, getConfigDir } from '../filesystem';
+import { readEnv } from '../utils/readEnv';
 
 export interface SettingsSchema {
   general: {
@@ -23,6 +24,9 @@ export interface SettingsSchema {
 
 let settingsManager: SettingsManager<SettingsSchema> | undefined;
 
+export const DEFAULT_OPEN_AI_COMPLETE_MODEL = 'davinci';
+export const DEFAULT_OPEN_AI_CHAT_MODEL = 'gpt-3.5-turbo';
+
 export async function initSettings() {
   settingsManager = new SettingsManager<SettingsSchema>(
     {
@@ -32,13 +36,13 @@ export async function initSettings() {
       },
       openAI: {
         apiKey: '',
-        completeModel: 'davinci',
-        chatModel: 'gpt-3.5-turbo',
+        completeModel: await readEnv('OPENAI_COMPLETE_MODEL', DEFAULT_OPEN_AI_COMPLETE_MODEL),
+        chatModel: await readEnv('OPENAI_CHAT_MODEL', DEFAULT_OPEN_AI_CHAT_MODEL),
       },
       sidecar: {
         logging: {
-          active: true,
-          path: '/tmp',
+          active: (await readEnv('SIDECAR_ENABLE_LOGGING', 'false')).toLowerCase() === 'true',
+          path: await readEnv('SIDECAR_LOG_DIR', '/tmp'),
         },
       },
     },
