@@ -31,7 +31,7 @@ function App() {
         onLayout={updatePDFViewerWidth}
       >
         <LeftSidePanelWrapper onRefClicked={(reference) => editorRef.current?.insertReference(reference)} />
-        <Panel defaultSize={60}>
+        <Panel defaultSize={60} order={2}>
           <MainPanel editorRef={editorRef} pdfViewerRef={pdfViewerRef} />
         </Panel>
         <RightPanelWrapper />
@@ -104,7 +104,7 @@ function RightPanelWrapper() {
   return (
     <>
       <VerticalResizeHandle />
-      <Panel collapsible order={2} ref={panelRef} onCollapse={setClosed}>
+      <Panel collapsible order={3} ref={panelRef} onCollapse={setClosed}>
         <AIPanel onCloseClick={() => setClosed(true)} />
         {closed && (
           <div className="absolute bottom-0 right-0 flex border border-slate-300 bg-slate-100 px-4 py-2">
