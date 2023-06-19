@@ -5,10 +5,11 @@ import { cx } from '../cx';
 import { DebugSettingsPane } from './DebugSettingsPane';
 import { GeneralSettingsPane } from './GeneralSettingsPane';
 import { OpenAiSettingsPane } from './OpenAiSettingsPane';
+import { initSettings } from './settings';
 import { PaneConfig, SettingsPanesConfig } from './types';
 
 // Ensure settings are configured and loaded
-// await initSettings();
+await initSettings();
 
 const SETTINGS_PANES: SettingsPanesConfig[] = [
   // {
