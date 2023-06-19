@@ -359,6 +359,7 @@ export const CollapsibleBlockNode = Node.create({
             })
             .setCollapsibleBlock()
             .setTextSelection(from + 1)
+            .toggleCollapsedCollapsibleBlock(from + 1)
             .run();
         },
       }),

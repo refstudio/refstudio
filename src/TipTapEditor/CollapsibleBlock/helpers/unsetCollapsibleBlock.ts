@@ -18,9 +18,12 @@ export function unsetCollapsibleBlock(pos: number, schema: Schema, tr: Transacti
   const content = [schema.nodes.draggableBlock.createChecked(null, paragraph)];
 
   if (collapsibleNode.childCount === 2) {
-    collapsibleNode.child(1).forEach((node) => {
-      content.push(node);
-    });
+    // If the content has only one empty block, do not add it to the document
+    if (collapsibleNode.child(1).childCount !== 1 || collapsibleNode.child(1).child(0).nodeSize !== 4) {
+      collapsibleNode.child(1).forEach((node) => {
+        content.push(node);
+      });
+    }
   }
   const fragment = Fragment.from(content);
   const slice = new Slice(fragment, 0, 0);
