@@ -321,7 +321,7 @@ class PDFIngestion:
 
         contents = [ref.dict() for ref in references]
         with open(filepath, "w") as fout:
-            json.dump(contents, fout, indent=2)
+            json.dump(contents, fout, indent=2, default=str)
 
     def create_response_from_references(self, references: list[Reference]) -> IngestResponse:
         """

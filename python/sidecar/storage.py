@@ -50,7 +50,7 @@ class JsonStorage:
         """
         contents = [ref.dict() for ref in self.references]
         with open(self.filepath, 'w') as f:
-            json.dump(contents, f, indent=2)
+            json.dump(contents, f, indent=2, default=str)
     
     def update(self, target: typing.Reference):
         """
