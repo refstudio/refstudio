@@ -21,6 +21,10 @@ export async function getConfigDir() {
   return appConfigDir();
 }
 
+export async function getAppDataDir() {
+  return appDataDir();
+}
+
 async function getBaseDir() {
   return join(await appDataDir(), PROJECT_NAME);
 }

@@ -1,11 +1,12 @@
 import { SettingsManager } from 'tauri-settings';
 import { Path, PathValue } from 'tauri-settings/dist/types/dot-notation';
 
-import { getConfigDir } from '../filesystem';
+import { getAppDataDir, getConfigDir } from '../filesystem';
 
 export interface SettingsSchema {
-  project: {
-    name: string;
+  general: {
+    appDataDir: string;
+    projectName: string;
   };
   openAI: {
     apiKey: string;
@@ -25,8 +26,9 @@ let settingsManager: SettingsManager<SettingsSchema> | undefined;
 export async function initSettings() {
   settingsManager = new SettingsManager<SettingsSchema>(
     {
-      project: {
-        name: 'project-x',
+      general: {
+        appDataDir: await getAppDataDir(),
+        projectName: 'project-x',
       },
       openAI: {
         apiKey: '',
@@ -67,6 +69,6 @@ export function setCachedSetting<K extends Path<SettingsSchema>>(key: K, value: 
   getSettings().setCache(key, value);
 }
 
-export async function flushCachedSettings() {
+export async function saveCachedSettings() {
   await getSettings().syncCache();
 }

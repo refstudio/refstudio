@@ -2,9 +2,9 @@ import { Command, SpawnOptions } from '@tauri-apps/api/shell';
 import { describe, test } from 'vitest';
 
 import {
-  flushCachedSettings,
   getCachedSetting,
   initSettings,
+  saveCachedSettings,
   setCachedSetting,
   SettingsSchema,
 } from '../settings/settings';
@@ -15,8 +15,9 @@ vi.mock('../settings/settings');
 vi.mock('@tauri-apps/api/shell');
 
 const mockSettings: SettingsSchema = {
-  project: {
-    name: 'PROJECT-NAME',
+  general: {
+    appDataDir: 'APP_DATA_DIR',
+    projectName: 'PROJECT-NAME',
   },
   openAI: {
     apiKey: 'API KEY',
@@ -35,11 +36,11 @@ describe('sidecar', () => {
   beforeEach(() => {
     // Fake settings methods
     vi.mocked(initSettings).mockResolvedValue();
-    vi.mocked(flushCachedSettings).mockResolvedValue();
+    vi.mocked(saveCachedSettings).mockResolvedValue();
     vi.mocked(getCachedSetting).mockImplementation((key) => {
       switch (key) {
         case 'openAI':
-        case 'project':
+        case 'general':
         case 'sidecar':
           return mockSettings[key];
         default:
@@ -53,7 +54,7 @@ describe('sidecar', () => {
     vi.clearAllMocks();
   });
 
-  test('should flow 5 settings values to ENV vars', async () => {
+  test('should send settings values via ENV', async () => {
     let env: undefined | Record<string, string>;
     vi.mocked(Command).mockImplementation((program: string, args?: string | string[], options?: SpawnOptions) => {
       env = options?.env;
@@ -67,8 +68,12 @@ describe('sidecar', () => {
     await callSidecar('chat', []);
 
     expect(vi.mocked(getCachedSetting).mock.calls.length).toBeGreaterThan(0);
-    expect(Object.keys(env ?? {}).length).toBe(5);
+    expect(Object.keys(env ?? {}).length).toBe(7);
 
+    // General
+    expect(env?.APP_DATA_DIR).toBe(mockSettings.general.appDataDir);
+    expect(env?.PROJECT_NAME).toBe(mockSettings.general.projectName);
+    // OpenAI
     expect(env?.OPENAI_API_KEY).toBe(mockSettings.openAI.apiKey);
     expect(env?.OPENAI_CHAT_MODEL).toBe(mockSettings.openAI.chatModel);
     expect(env?.OPENAI_COMPLETE_MODEL).toBe(mockSettings.openAI.completeModel);

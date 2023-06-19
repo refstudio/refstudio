@@ -1,7 +1,7 @@
 import { noop } from '../utils/noop';
 import { render, screen, userEvent } from '../utils/test-utils';
 import { OpenAiSettingsPane } from './OpenAiSettingsPane';
-import { flushCachedSettings, getCachedSetting, initSettings, setCachedSetting, SettingsSchema } from './settings';
+import { getCachedSetting, initSettings, saveCachedSettings, setCachedSetting, SettingsSchema } from './settings';
 import { PaneConfig } from './types';
 
 vi.mock('./settings');
@@ -13,20 +13,11 @@ const panelConfig: PaneConfig = {
   title: 'OPEN AI',
 };
 
-const mockSettings: SettingsSchema = {
-  project: {
-    name: 'PROJECT-NAME',
-  },
+const mockSettings: Pick<SettingsSchema, 'openAI'> = {
   openAI: {
     apiKey: 'API KEY',
     chatModel: 'CHAT MODEL',
     completeModel: 'COMPLETE MODEL',
-  },
-  sidecar: {
-    logging: {
-      active: true,
-      path: 'PATH',
-    },
   },
 };
 
@@ -34,67 +25,9 @@ describe('OpenAiSettingsPane component', () => {
   beforeEach(() => {
     // Fake settings methods
     vi.mocked(initSettings).mockResolvedValue();
-    vi.mocked(flushCachedSettings).mockResolvedValue();
-    vi.mocked(getCachedSetting).mockImplementation((key) => {
-      switch (key) {
-        case 'openAI':
-        case 'project':
-        case 'sidecar':
-          return mockSettings[key];
-        default:
-          throw new Error('UNEXPECTED CALL FOR KEY ' + key);
-      }
-    });
+    vi.mocked(saveCachedSettings).mockResolvedValue();
+    vi.mocked(getCachedSetting).mockReturnValue(mockSettings.openAI);
     vi.mocked(setCachedSetting).mockImplementation(noop);
-    //   default: {
-    //     project: {
-    //       name: 'name',
-    //     },
-    //     openAI: {
-    //       apiKey: 'apiKey',
-    //       completeModel: 'completeModel',
-    //       chatModel: 'chatModel',
-    //     },
-    //     sidecar: {
-    //       logging: {
-    //         active: true,
-    //         path: 'path',
-    //       },
-    //     },
-    //   },
-    //   settings: {
-    //     project: {
-    //       name: 'name',
-    //     },
-    //     openAI: {
-    //       apiKey: 'apiKey',
-    //       completeModel: 'completeModel',
-    //       chatModel: 'chatModel',
-    //     },
-    //     sidecar: {
-    //       logging: {
-    //         active: true,
-    //         path: 'path',
-    //       },
-    //     },
-    //   },
-    //   path: '',
-    //   options: {
-    //     dir: '',
-    //     fileName: '',
-    //     numSpaces: 2,
-    //     prettify: true,
-    //   },
-    //   initialize: noopPromise<SettingsSchema>(),
-    //   saveSettings: noopPromise(),
-    //   hasCache: noop(),
-    //   getCache: noop(),
-    //   setCache: noop(),
-
-    //   get: noopPromise<unknown>(),
-    //   set: noopPromise<unknown>(),
-    //   syncCache: noopPromise<unknown>(),
-    // });
   });
 
   afterEach(() => {
@@ -134,6 +67,14 @@ describe('OpenAiSettingsPane component', () => {
     // Submit
     await user.click(screen.getByRole('button', { name: /save/i }));
     expect(vi.mocked(setCachedSetting).mock.calls.length).toBe(1);
-    expect(vi.mocked(flushCachedSettings).mock.calls.length).toBe(1);
+    expect(vi.mocked(setCachedSetting).mock.calls[0]).toStrictEqual([
+      'openAI',
+      {
+        apiKey: `${mockSettings.openAI.apiKey}-Updated-1`,
+        chatModel: `${mockSettings.openAI.chatModel}-Updated-2`,
+        completeModel: `${mockSettings.openAI.completeModel}-Updated-3`,
+      },
+    ]);
+    expect(vi.mocked(saveCachedSettings).mock.calls.length).toBe(1);
   });
 });

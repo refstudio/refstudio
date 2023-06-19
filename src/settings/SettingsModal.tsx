@@ -1,14 +1,14 @@
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { VscClose } from 'react-icons/vsc';
 
 import { cx } from '../cx';
-import { listenEvent, RefStudioEvents } from '../events';
-import { useAsyncEffect } from '../hooks/useAsyncEffect';
 import { DebugSettingsPane } from './DebugSettingsPane';
 import { GeneralSettingsPane } from './GeneralSettingsPane';
 import { OpenAiSettingsPane } from './OpenAiSettingsPane';
-import { initSettings } from './settings';
 import { PaneConfig, SettingsPanesConfig } from './types';
+
+// Ensure settings are configured and loaded
+// await initSettings();
 
 const SETTINGS_PANES: SettingsPanesConfig[] = [
   // {
@@ -50,27 +50,10 @@ const SETTINGS_PANES: SettingsPanesConfig[] = [
   },
 ];
 
-// Ensure settings are configured and loaded
-await initSettings();
-
-export function SettingsModal({ defaultOpen }: { defaultOpen?: boolean }) {
-  const [open, setOpen] = useState(defaultOpen === true);
-
+export function SettingsModal({ open, onCloseClick }: { open: boolean; onCloseClick: () => void }) {
   const [pane, selectPane] = useState<PaneConfig>(
     SETTINGS_PANES.flatMap((e) => e.panes).find((p) => p.id === 'project-general')!,
   );
-
-  const listenSettingsMenuEvent = useCallback(
-    (isMounted: () => boolean) =>
-      listenEvent(RefStudioEvents.Menu.settings, () => {
-        if (isMounted()) {
-          setOpen(!open);
-        }
-      }),
-    [open, setOpen],
-  );
-
-  useAsyncEffect(listenSettingsMenuEvent, (unregister) => unregister?.());
 
   if (!open) {
     return null;
@@ -112,7 +95,7 @@ export function SettingsModal({ defaultOpen }: { defaultOpen?: boolean }) {
               className="absolute right-2 top-2 cursor-pointer rounded-lg p-1 hover:bg-slate-200"
               size={30}
               title="close"
-              onClick={() => setOpen(false)}
+              onClick={onCloseClick}
             />
             <pane.Pane config={pane} />
           </div>

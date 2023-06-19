@@ -1,18 +1,18 @@
 import { useCallback, useState } from 'react';
 
 import { useCallablePromise } from '../hooks/useCallablePromise';
-import { flushCachedSettings, getCachedSetting, getSettings, setCachedSetting } from './settings';
+import { getCachedSetting, getSettings, saveCachedSettings, setCachedSetting } from './settings';
 import { SettingsPane, SettingsPaneProps } from './SettingsPane';
 
 export function GeneralSettingsPane({ config }: SettingsPaneProps) {
-  const [projectSettings, setProjectSettings] = useState(getCachedSetting('project'));
+  const [generalSettings] = useState(getCachedSetting('general'));
   const [sidecarLoggingSettings, setSidecarLoggingSettings] = useState(getCachedSetting('sidecar.logging'));
 
   const saveSettings = useCallback(
-    async (project: typeof projectSettings, sidecarLogging: typeof sidecarLoggingSettings) => {
-      setCachedSetting('project', project);
+    async (project: typeof generalSettings, sidecarLogging: typeof sidecarLoggingSettings) => {
+      setCachedSetting('general', project);
       setCachedSetting('sidecar.logging', sidecarLogging);
-      await flushCachedSettings();
+      await saveCachedSettings();
       return getSettings();
     },
     [],
@@ -22,11 +22,11 @@ export function GeneralSettingsPane({ config }: SettingsPaneProps) {
 
   function handleSaveSettings(evt: React.FormEvent<HTMLFormElement>) {
     evt.preventDefault();
-    callSetSettings(projectSettings, sidecarLoggingSettings);
+    callSetSettings(generalSettings, sidecarLoggingSettings);
   }
 
   const isDirty =
-    JSON.stringify(projectSettings) !== JSON.stringify(getCachedSetting('project')) ||
+    JSON.stringify(generalSettings) !== JSON.stringify(getCachedSetting('general')) ||
     JSON.stringify(sidecarLoggingSettings) !== JSON.stringify(getCachedSetting('sidecar.logging'));
 
   return (
@@ -34,15 +34,26 @@ export function GeneralSettingsPane({ config }: SettingsPaneProps) {
       <form className="mt-10" onSubmit={handleSaveSettings}>
         <fieldset className="space-y-4">
           <div className="space-y-2">
+            <label className="font-semibold" htmlFor="app-data-dir">
+              Project App Data Dir
+            </label>
+            <input
+              className="w-full border bg-slate-50 px-2 py-0.5 text-gray-500"
+              id="app-data-dir"
+              readOnly
+              value={generalSettings.appDataDir}
+            />
+            <p className="text-xs text-gray-500">NOTE: This setting is readonly (for now!)</p>
+          </div>
+          <div className="space-y-2">
             <label className="font-semibold" htmlFor="project-name">
               Project Name
             </label>
             <input
-              className="w-full border bg-slate-50 px-2 py-0.5"
+              className="w-full border bg-slate-50 px-2 py-0.5 text-gray-500"
               id="project-name"
               readOnly
-              value={projectSettings.name}
-              onChange={(e) => setProjectSettings({ ...projectSettings, name: e.currentTarget.value })}
+              value={generalSettings.projectName}
             />
             <p className="text-xs text-gray-500">NOTE: This setting is readonly (for now!)</p>
           </div>

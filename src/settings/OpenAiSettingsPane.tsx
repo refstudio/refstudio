@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 
 import { JSONDebug, JSONDebugContainer } from '../components/JSONDebug';
 import { useCallablePromise } from '../hooks/useCallablePromise';
-import { flushCachedSettings, getCachedSetting, getSettings, setCachedSetting } from './settings';
+import { getCachedSetting, getSettings, saveCachedSettings, setCachedSetting } from './settings';
 import { SettingsPane, SettingsPaneProps } from './SettingsPane';
 
 export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
@@ -10,7 +10,7 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
 
   const saveSettings = useCallback(async (value: typeof paneSettings) => {
     setCachedSetting('openAI', value);
-    await flushCachedSettings();
+    await saveCachedSettings();
     return getSettings();
   }, []);
 

@@ -1,7 +1,7 @@
 import { noop } from '../utils/noop';
 import { render, screen, userEvent } from '../utils/test-utils';
 import { GeneralSettingsPane } from './GeneralSettingsPane';
-import { flushCachedSettings, getCachedSetting, initSettings, setCachedSetting, SettingsSchema } from './settings';
+import { getCachedSetting, initSettings, saveCachedSettings, setCachedSetting, SettingsSchema } from './settings';
 import { PaneConfig } from './types';
 
 vi.mock('./settings');
@@ -13,14 +13,10 @@ const panelConfig: PaneConfig = {
   title: 'OPEN AI',
 };
 
-const mockSettings: SettingsSchema = {
-  project: {
-    name: 'PROJECT-NAME',
-  },
-  openAI: {
-    apiKey: 'API KEY',
-    chatModel: 'CHAT MODEL',
-    completeModel: 'COMPLETE MODEL',
+const mockSettings: Pick<SettingsSchema, 'general' | 'sidecar'> = {
+  general: {
+    appDataDir: 'APP-DATA-DIR',
+    projectName: 'PROJECT-NAME',
   },
   sidecar: {
     logging: {
@@ -34,13 +30,11 @@ describe('GeneralSettingsPane component', () => {
   beforeEach(() => {
     // Fake settings methods
     vi.mocked(initSettings).mockResolvedValue();
-    vi.mocked(flushCachedSettings).mockResolvedValue();
+    vi.mocked(saveCachedSettings).mockResolvedValue();
     vi.mocked(getCachedSetting).mockImplementation((key) => {
       switch (key) {
-        case 'openAI':
-        case 'project':
-        case 'sidecar':
-          return mockSettings[key];
+        case 'general':
+          return mockSettings.general;
         case 'sidecar.logging':
           return mockSettings.sidecar.logging;
         default:
@@ -48,55 +42,6 @@ describe('GeneralSettingsPane component', () => {
       }
     });
     vi.mocked(setCachedSetting).mockImplementation(noop);
-    //   default: {
-    //     project: {
-    //       name: 'name',
-    //     },
-    //     openAI: {
-    //       apiKey: 'apiKey',
-    //       completeModel: 'completeModel',
-    //       chatModel: 'chatModel',
-    //     },
-    //     sidecar: {
-    //       logging: {
-    //         active: true,
-    //         path: 'path',
-    //       },
-    //     },
-    //   },
-    //   settings: {
-    //     project: {
-    //       name: 'name',
-    //     },
-    //     openAI: {
-    //       apiKey: 'apiKey',
-    //       completeModel: 'completeModel',
-    //       chatModel: 'chatModel',
-    //     },
-    //     sidecar: {
-    //       logging: {
-    //         active: true,
-    //         path: 'path',
-    //       },
-    //     },
-    //   },
-    //   path: '',
-    //   options: {
-    //     dir: '',
-    //     fileName: '',
-    //     numSpaces: 2,
-    //     prettify: true,
-    //   },
-    //   initialize: noopPromise<SettingsSchema>(),
-    //   saveSettings: noopPromise(),
-    //   hasCache: noop(),
-    //   getCache: noop(),
-    //   setCache: noop(),
-
-    //   get: noopPromise<unknown>(),
-    //   set: noopPromise<unknown>(),
-    //   syncCache: noopPromise<unknown>(),
-    // });
   });
 
   afterEach(() => {
@@ -113,7 +58,7 @@ describe('GeneralSettingsPane component', () => {
     render(<GeneralSettingsPane config={panelConfig} />);
 
     expect(getCachedSettingMock.mock.calls.length).toBeGreaterThan(0);
-    expect(screen.getByLabelText('Project Name')).toHaveValue(mockSettings.project.name);
+    expect(screen.getByLabelText('Project Name')).toHaveValue(mockSettings.general.projectName);
     expect(screen.getByLabelText('Active')).toBeChecked();
     expect(screen.getByLabelText('Path')).toHaveValue(mockSettings.sidecar.logging.path);
   });
@@ -122,14 +67,14 @@ describe('GeneralSettingsPane component', () => {
     const user = userEvent.setup();
     render(<GeneralSettingsPane config={panelConfig} />);
 
-    expect(screen.getByLabelText('Project Name')).toHaveValue(mockSettings.project.name);
+    expect(screen.getByLabelText('Project Name')).toHaveValue(mockSettings.general.projectName);
     expect(screen.getByRole('button', { name: /save/i })).toBeDisabled();
 
     // Type
     await user.type(screen.getByLabelText('Project Name'), 'dont-care-bc-input-is-disabled');
     await user.click(screen.getByLabelText('Active'));
     await user.type(screen.getByLabelText('Path'), '-Updated-2');
-    expect(screen.getByLabelText('Project Name')).toHaveValue(mockSettings.project.name);
+    expect(screen.getByLabelText('Project Name')).toHaveValue(mockSettings.general.projectName);
     expect(screen.getByLabelText('Active')).not.toBeChecked();
     expect(screen.getByLabelText('Path')).toHaveValue(`${mockSettings.sidecar.logging.path}-Updated-2`);
     expect(screen.getByRole('button', { name: /save/i })).toBeEnabled();
@@ -137,6 +82,6 @@ describe('GeneralSettingsPane component', () => {
     // Submit
     await user.click(screen.getByRole('button', { name: /save/i }));
     expect(vi.mocked(setCachedSetting).mock.calls.length).toBe(2);
-    expect(vi.mocked(flushCachedSettings).mock.calls.length).toBe(1);
+    expect(vi.mocked(saveCachedSettings).mock.calls.length).toBe(1);
   });
 });
