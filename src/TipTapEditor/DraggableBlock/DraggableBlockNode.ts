@@ -44,7 +44,7 @@ export const DraggableBlockNode = Node.create({
       ...this.parent?.(),
       splitDraggableBlock:
         () =>
-        ({ tr, dispatch }) => {
+        ({ editor, tr, dispatch }) => {
           const { selection } = tr;
           const { $from, $to } = selection;
 
@@ -75,7 +75,7 @@ export const DraggableBlockNode = Node.create({
           // Create a new draggable block, containing text after the selection
           const postNode = this.type.create(
             null,
-            $to.parent.type.create($to.parent.attrs, $to.parent.slice($to.parentOffset).content, $to.parent.marks),
+            editor.schema.nodes.paragraph.createChecked(null, $to.parent.slice($to.parentOffset).content),
           );
 
           if (dispatch) {

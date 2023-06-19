@@ -5,6 +5,7 @@ export const CollapsibleBlockContentNode = Node.create({
   group: 'block',
   content: 'draggableBlock+',
   defining: true,
+  selectable: false,
 
   parseHTML() {
     return [
