@@ -2,7 +2,7 @@ import { Node } from '@tiptap/core';
 import { Fragment, Slice } from '@tiptap/pm/model';
 import { TextSelection } from '@tiptap/pm/state';
 import { ReplaceStep } from '@tiptap/pm/transform';
-import { InputRule, ReactNodeViewRenderer, findParentNodeClosestToPos } from '@tiptap/react';
+import { findParentNodeClosestToPos, InputRule, ReactNodeViewRenderer } from '@tiptap/react';
 
 import { isNonNullish } from '../../../lib/isNonNullish';
 import { CollapsibleBlock } from '../CollapsibleBlock';
