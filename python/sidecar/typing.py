@@ -19,6 +19,7 @@ class Reference(RefStudioModel):
     source_filename: str
     filename_md5: str
     citation_key: str | None = None
+    status: str | None = None
     title: str | None = None
     abstract: str | None = None
     contents: str | None = None
