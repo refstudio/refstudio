@@ -20,9 +20,6 @@ export function SelectionPanelSection() {
     enabled: false,
     queryFn: () => askForRewrite(debouncedSelection),
   });
-  const fetchRewrite = () => {
-    void refetch(); // promise rejection is handled via "error" variable
-  };
 
   return (
     <PanelSection title="Selection">
@@ -31,10 +28,10 @@ export function SelectionPanelSection() {
       {selection && (
         <div className="mb-6 flex flex-col gap-4">
           <div className="border border-slate-100 bg-slate-50 p-4">{debouncedSelection}</div>
-          <button className="btn-primary" disabled={isFetching} onClick={fetchRewrite}>
+          <button className="btn-primary" disabled={isFetching} onClick={() => void refetch()}>
             REWRITE
           </button>
-          {error ? <span className="bg-red-50">{String(error)}</span> : null}
+          {!!error && <span className="bg-red-50">{String(error)}</span>}
           {isFetching && <span>Processing...</span>}
           {rewrite && (
             <>
