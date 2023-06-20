@@ -31,5 +31,5 @@ export const unsetPartiallySelectedCollapsibleBlocks: Command = function ({ tr, 
   const resolvedUpdatedTo = tr.doc.resolve(to - unsetNodes);
 
   tr.setSelection(new TextSelection(resolvedUpdatedFrom, resolvedUpdatedTo));
-  return true;
+  return unsetNodes > 0;
 };

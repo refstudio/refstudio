@@ -70,7 +70,6 @@ describe('unsetPartiallySelectedCollapsibleBlocks', () => {
       .command(unsetPartiallySelectedCollapsibleBlocks)
       .run();
     expect(commandResult).toBe(false);
-
     expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
   });
 });
