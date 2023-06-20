@@ -1,9 +1,6 @@
+import { noop } from '../utils/noop';
 import { render, screen, userEvent } from '../utils/test-utils';
 import { PrimarySideBar } from './PrimarySideBar';
-
-const noop = () => {
-  // Empty
-};
 
 describe('PrimarySideBar', () => {
   test('should display Explorer and References icons', () => {
