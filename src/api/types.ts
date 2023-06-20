@@ -21,6 +21,7 @@ export interface Reference {
   source_filename: string;
   filename_md5: string;
   citation_key?: string;
+  status?: string;
   title?: string;
   abstract?: string;
   contents?: string;

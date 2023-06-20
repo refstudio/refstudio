@@ -82,6 +82,9 @@
         "citation_key": {
           "type": "string"
         },
+        "status": {
+          "type": "string"
+        },
         "title": {
           "type": "string"
         },
