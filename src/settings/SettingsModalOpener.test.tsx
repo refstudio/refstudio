@@ -1,4 +1,4 @@
-import { act } from '@testing-library/react-hooks';
+import { act } from '@testing-library/react';
 
 import { listenEvent, RefStudioEvents } from '../events';
 import { noop } from '../utils/noop';
