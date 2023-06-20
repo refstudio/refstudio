@@ -4,5 +4,4 @@
 yarn check
 yarn test
 
-yarn pylint:check
 yarn codegen

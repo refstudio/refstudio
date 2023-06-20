@@ -109,5 +109,5 @@ export const ReferencesList = forwardRef((props: ReferenceListProps, ref) => {
 ReferencesList.displayName = 'ReferencesList';
 
 export function getReferenceLabel(referenceItem: ReferenceItem): string {
-  return `[${referenceItem.authors.map(({ surname }) => surname).join(';')}]`;
+  return `[${referenceItem.citationKey}]`;
 }

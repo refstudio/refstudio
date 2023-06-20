@@ -1,13 +1,32 @@
 import hashlib
 import os
 import sys
+from datetime import datetime
 from typing import List
 
-from .typing import Chunk
+from .typing import Author, Chunk, Reference
 
 
 def get_word_count(text: str) -> int:
     return len(text.strip().split(" "))
+
+
+def parse_date(date_str: str) -> datetime:
+    """
+    Parse a YYYY-mm-dd date string into a datetime object.
+    Grobid used ISO 8601 format: https://grobid.readthedocs.io/en/latest/training/date/
+    :param date_str: str
+    :return: datetime
+    """
+    # Since Grobid returns dates in ISO 8601 YYYY-mm-dd format,
+    # this function only needs to support that format for now, but ...
+    # TODO: support more date formats
+    if not date_str:
+        return None
+    try:
+        return datetime.strptime(date_str, "%Y-%m-%d").date()
+    except ValueError:
+        return None
 
 
 def get_filename_md5(filename: str) -> str:
@@ -17,6 +36,46 @@ def get_filename_md5(filename: str) -> str:
     :return: str
     """
     return hashlib.md5(filename.encode()).hexdigest()
+
+
+def get_first_author_surname(authors: List[Author]) -> str:
+    """
+    Get the surname of the first author in a list of authors
+    :param authors: List[Author]
+    :return: str
+    """
+    if not authors:
+        return None
+    
+    author = authors[0]
+    if author.surname:
+        return author.surname
+    elif author.full_name and " " in author.full_name:
+        return author.full_name.split(" ")[-1]
+    return None
+
+
+def create_citation_key(ref: Reference) -> str:
+    """
+    Creates a citation key for a given Reference.
+    Refstudio citation keys use Pandoc markdown syntax, e.g. [smith2019]
+    :param ref: Reference
+    :return: str
+    """
+    if not ref.authors and not ref.published_date:
+        return "untitled"
+    
+    if not ref.authors and ref.published_date:
+        return f"untitled{ref.published_date.year}"
+
+    surname = get_first_author_surname(ref.authors).strip()
+    if ref.authors and ref.published_date:
+        key = f"{surname}{ref.published_date.year}"
+    elif ref.authors and not ref.published_date:
+        key = f"{surname}"
+    else:
+        key = "untitled"
+    return key.lower()
 
 
 def chunk_text(text: str, chunk_size: int = 1000, chunk_overlap: int = 200) -> List[Chunk]:

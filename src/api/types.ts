@@ -20,18 +20,20 @@ export interface IngestResponse {
 export interface Reference {
   source_filename: string;
   filename_md5: string;
+  citation_key?: string;
   title?: string;
   abstract?: string;
   contents?: string;
+  published_date?: string;
   authors?: Author[];
   chunks?: Chunk[];
   metadata?: {};
 }
 export interface Author {
   full_name: string;
-  given_name: string;
-  surname: string;
-  email: string;
+  given_name?: string;
+  surname?: string;
+  email?: string;
 }
 export interface Chunk {
   text: string;
