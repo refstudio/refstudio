@@ -28,7 +28,12 @@ describe('unsetPartiallySelectedCollapsibleBlocks', () => {
     expect(contentBlock.childCount).toBe(2);
     const initialContent = [contentBlock.child(0), contentBlock.child(1)];
 
-    editor.chain().setTextSelection(selection).command(unsetPartiallySelectedCollapsibleBlocks).run();
+    const commandResult = editor
+      .chain()
+      .setTextSelection(selection)
+      .command(unsetPartiallySelectedCollapsibleBlocks)
+      .run();
+    expect(commandResult).toBe(true);
 
     const { doc } = editor.state;
     expect(doc.childCount).toBe(5);
@@ -44,7 +49,8 @@ describe('unsetPartiallySelectedCollapsibleBlocks', () => {
   test('should not do anything if the collapsible block is completely selected', () => {
     const initialDoc = editor.state.doc;
 
-    editor.chain().selectAll().command(unsetPartiallySelectedCollapsibleBlocks).run();
+    const commandResult = editor.chain().selectAll().command(unsetPartiallySelectedCollapsibleBlocks).run();
+    expect(commandResult).toBe(true);
 
     expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
   });
@@ -58,7 +64,12 @@ describe('unsetPartiallySelectedCollapsibleBlocks', () => {
     );
     const initialDoc = editor.state.doc;
 
-    editor.chain().setTextSelection(selection).command(unsetPartiallySelectedCollapsibleBlocks).run();
+    const commandResult = editor
+      .chain()
+      .setTextSelection(selection)
+      .command(unsetPartiallySelectedCollapsibleBlocks)
+      .run();
+    expect(commandResult).toBe(false);
 
     expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
   });

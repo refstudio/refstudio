@@ -4,6 +4,7 @@ import { Editor } from '@tiptap/react';
 import {
   collapsedEmptyCollapsibleBlock,
   defaultCollapsibleBlock,
+  defaultUncollapsedCollapsibleBlock,
   oneLineCollapsibleBlock,
   uncollapsedCollapsibleBlockWithEmptyContent,
 } from '../../test-fixtures';
@@ -28,20 +29,21 @@ describe('CollapsibleBlockNode commands', () => {
       expect(collapsibleBlocks).toHaveLength(1);
 
       let [collapsibleBlock] = collapsibleBlocks;
-      expect(collapsibleBlock.attrs.folded).toBeTruthy();
+      expect(collapsibleBlock.attrs.folded).toBe(true);
 
       // Uncollapse node
-      editor.commands.toggleCollapsedCollapsibleBlock(from);
+      const commandResult = editor.commands.toggleCollapsedCollapsibleBlock(from);
+      expect(commandResult).toBe(true);
 
       collapsibleBlocks = findNodesByNodeType(editor.state.doc, 'collapsibleBlock');
       expect(collapsibleBlocks).toHaveLength(1);
 
       [collapsibleBlock] = collapsibleBlocks;
-      expect(collapsibleBlock.attrs.folded).toBeFalsy();
+      expect(collapsibleBlock.attrs.folded).toBe(false);
     });
 
     test('should collapse with command', () => {
-      editor.commands.setContent(uncollapsedCollapsibleBlockWithEmptyContent);
+      editor.commands.setContent(defaultUncollapsedCollapsibleBlock);
       const { from } = TextSelection.near(editor.state.doc.resolve(0));
 
       // The node is uncollapsed
@@ -49,17 +51,17 @@ describe('CollapsibleBlockNode commands', () => {
       expect(collapsibleBlocks).toHaveLength(1);
 
       let [collapsibleBlock] = collapsibleBlocks;
-      expect(collapsibleBlock.attrs.folded).toBeFalsy();
+      expect(collapsibleBlock.attrs.folded).toBe(false);
 
       // Collapse the node
-      editor.commands.toggleCollapsedCollapsibleBlock(from);
+      const commandResult = editor.commands.toggleCollapsedCollapsibleBlock(from);
+      expect(commandResult).toBe(true);
 
       collapsibleBlocks = findNodesByNodeType(editor.state.doc, 'collapsibleBlock');
       expect(collapsibleBlocks).toHaveLength(1);
 
       [collapsibleBlock] = collapsibleBlocks;
-
-      expect(collapsibleBlock.attrs.folded).toBeTruthy();
+      expect(collapsibleBlock.attrs.folded).toBe(true);
     });
 
     test('should add empty content when uncollapsing', () => {
@@ -69,7 +71,8 @@ describe('CollapsibleBlockNode commands', () => {
       let collapsibleContents = findNodesByNodeType(editor.state.doc, 'collapsibleContent');
       expect(collapsibleContents).toHaveLength(0);
 
-      editor.commands.toggleCollapsedCollapsibleBlock(from);
+      const commandResult = editor.commands.toggleCollapsedCollapsibleBlock(from);
+      expect(commandResult).toBe(true);
 
       collapsibleContents = findNodesByNodeType(editor.state.doc, 'collapsibleContent');
       expect(collapsibleContents).toHaveLength(1);
@@ -82,7 +85,8 @@ describe('CollapsibleBlockNode commands', () => {
       let collapsibleContents = findNodesByNodeType(editor.state.doc, 'collapsibleContent');
       expect(collapsibleContents).toHaveLength(1);
 
-      editor.commands.toggleCollapsedCollapsibleBlock(from);
+      const commandResult = editor.commands.toggleCollapsedCollapsibleBlock(from);
+      expect(commandResult).toBe(true);
 
       collapsibleContents = findNodesByNodeType(editor.state.doc, 'collapsibleContent');
       expect(collapsibleContents).toHaveLength(0);
@@ -94,7 +98,8 @@ describe('CollapsibleBlockNode commands', () => {
 
       const { from } = TextSelection.near(editor.state.doc.resolve(0));
 
-      editor.commands.toggleCollapsedCollapsibleBlock(from);
+      const commandResult = editor.commands.toggleCollapsedCollapsibleBlock(from);
+      expect(commandResult).toBe(false);
       expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
     });
   });
@@ -103,12 +108,11 @@ describe('CollapsibleBlockNode commands', () => {
     test('should wrap paragraph in a collapsible block', () => {
       editor.commands.setContent('<p></p>');
 
-      const selection = TextSelection.near(editor.state.doc.resolve(0));
-
       let collapsibleBlocks = findNodesByNodeType(editor.state.doc, 'collapsibleBlock');
       expect(collapsibleBlocks).toHaveLength(0);
 
-      editor.chain().setTextSelection(selection).setCollapsibleBlock().run();
+      const commandResult = editor.chain().setTextSelection(0).setCollapsibleBlock().run();
+      expect(commandResult).toBe(true);
 
       collapsibleBlocks = findNodesByNodeType(editor.state.doc, 'collapsibleBlock');
       expect(collapsibleBlocks).toHaveLength(1);
@@ -118,9 +122,8 @@ describe('CollapsibleBlockNode commands', () => {
       editor.commands.setContent(defaultCollapsibleBlock);
       const initialDoc = editor.state.doc;
 
-      const selection = TextSelection.near(editor.state.doc.resolve(0));
-
-      editor.chain().setTextSelection(selection).setCollapsibleBlock().run();
+      const commandResult = editor.chain().setTextSelection(0).setCollapsibleBlock().run();
+      expect(commandResult).toBe(false);
       expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
     });
 
@@ -130,7 +133,8 @@ describe('CollapsibleBlockNode commands', () => {
 
       const selection = TextSelection.between(editor.state.doc.resolve(0), editor.state.doc.resolve(5));
 
-      editor.chain().setTextSelection(selection).setCollapsibleBlock().run();
+      const commandResult = editor.chain().setTextSelection(selection).setCollapsibleBlock().run();
+      expect(commandResult).toBe(false);
       expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
     });
   });
@@ -141,9 +145,8 @@ describe('CollapsibleBlockNode commands', () => {
 
       expect(editor.state.doc.childCount).toEqual(1);
 
-      const selection = TextSelection.near(editor.state.doc.resolve(0));
-
-      editor.chain().setTextSelection(selection).unsetCollapsibleBlock().run();
+      const commandResult = editor.chain().setTextSelection(0).unsetCollapsibleBlock().run();
+      expect(commandResult).toBe(true);
 
       expect(editor.state.doc.childCount).toEqual(3);
       expect(getText(editor.state.doc.child(0))).toEqual('Header');
@@ -156,9 +159,8 @@ describe('CollapsibleBlockNode commands', () => {
 
       expect(editor.state.doc.childCount).toEqual(1);
 
-      const selection = TextSelection.near(editor.state.doc.resolve(0));
-
-      editor.chain().setTextSelection(selection).unsetCollapsibleBlock().run();
+      const commandResult = editor.chain().setTextSelection(0).unsetCollapsibleBlock().run();
+      expect(commandResult).toBe(true);
 
       expect(editor.state.doc.childCount).toEqual(2);
       expect(getText(editor.state.doc.child(0))).toEqual('Header');
@@ -169,9 +171,8 @@ describe('CollapsibleBlockNode commands', () => {
       editor.commands.setContent('<p></p>');
       const initialDoc = editor.state.doc;
 
-      const selection = TextSelection.near(editor.state.doc.resolve(0));
-
-      editor.chain().setTextSelection(selection).unsetCollapsibleBlock().run();
+      const commandResult = editor.chain().setTextSelection(0).unsetCollapsibleBlock().run();
+      expect(commandResult).toBe(false);
       expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
     });
 
@@ -181,7 +182,8 @@ describe('CollapsibleBlockNode commands', () => {
 
       const selection = TextSelection.between(editor.state.doc.resolve(0), editor.state.doc.resolve(10));
 
-      editor.chain().setTextSelection(selection).unsetCollapsibleBlock().run();
+      const commandResult = editor.chain().setTextSelection(selection).unsetCollapsibleBlock().run();
+      expect(commandResult).toBe(false);
       expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
     });
   });
@@ -192,14 +194,13 @@ describe('CollapsibleBlockNode commands', () => {
     });
 
     test('should split collapsible block into 2 collapsible blocks', () => {
-      // 6 corresponds to the carret being in the middle of the word 'Header'
-      const selection = TextSelection.near(editor.state.doc.resolve(6));
-
       expect(findNodesByNodeType(editor.state.doc, 'collapsibleBlock')).toHaveLength(1);
       const [initialContent] = findNodesByNodeType(editor.state.doc, 'collapsibleContent');
       expect(initialContent).toBeDefined();
 
-      editor.chain().setTextSelection(selection).splitCollapsibleBlock().run();
+      // 6 corresponds to the carret being in the middle of the word 'Header'
+      const commandResult = editor.chain().setTextSelection(6).splitCollapsibleBlock().run();
+      expect(commandResult).toBe(true);
 
       const collapsibleBlocks = findNodesByNodeType(editor.state.doc, 'collapsibleBlock');
       expect(collapsibleBlocks).toHaveLength(2);
@@ -225,12 +226,12 @@ describe('CollapsibleBlockNode commands', () => {
 
     test('should split collapsed collapsible block with no content into 2 collapsible blocks', () => {
       editor.commands.setContent(collapsedEmptyCollapsibleBlock);
-      const selection = TextSelection.near(editor.state.doc.resolve(0));
 
       expect(findNodesByNodeType(editor.state.doc, 'collapsibleBlock')).toHaveLength(1);
       expect(findNodesByNodeType(editor.state.doc, 'collapsibleContent')).toHaveLength(0);
 
-      editor.chain().setTextSelection(selection).splitCollapsibleBlock().run();
+      const commandResult = editor.chain().setTextSelection(0).splitCollapsibleBlock().run();
+      expect(commandResult).toBe(true);
 
       expect(findNodesByNodeType(editor.state.doc, 'collapsibleBlock')).toHaveLength(2);
       // No content should have been created
@@ -242,7 +243,8 @@ describe('CollapsibleBlockNode commands', () => {
       const selection = TextSelection.between(editor.state.doc.resolve(6), editor.state.doc.resolve(7));
       const initialDoc = editor.state.doc;
 
-      editor.chain().setTextSelection(selection).splitCollapsibleBlock().run();
+      const commandResult = editor.chain().setTextSelection(selection).splitCollapsibleBlock().run();
+      expect(commandResult).toBe(false);
       expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
     });
 
@@ -250,9 +252,8 @@ describe('CollapsibleBlockNode commands', () => {
       editor.commands.setContent('<p></p>');
       const initialDoc = editor.state.doc;
 
-      const selection = TextSelection.near(editor.state.doc.resolve(0));
-
-      editor.chain().setTextSelection(selection).splitCollapsibleBlock().run();
+      const commandResult = editor.chain().setTextSelection(0).splitCollapsibleBlock().run();
+      expect(commandResult).toBe(false);
       expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
     });
   });

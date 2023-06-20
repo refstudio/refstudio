@@ -1,7 +1,7 @@
 import { Editor, EditorContent } from '@tiptap/react';
 
 import { act, screen, setup } from '../../utils/test-utils';
-import { defaultCollapsibleBlock, uncollapsedCollapsibleBlockWithEmptyContent } from '../test-fixtures';
+import { defaultCollapsibleBlock, defaultUncollapsedCollapsibleBlock } from '../test-fixtures';
 import { findNodesByNodeType } from '../test-utils';
 import { EDITOR_EXTENSIONS } from '../TipTapEditorConfigs';
 
@@ -12,12 +12,12 @@ describe('CollapsibleBlock', () => {
   });
 
   test('should collapse block when clicking on the arrow', async () => {
-    editor.commands.setContent(uncollapsedCollapsibleBlockWithEmptyContent);
+    editor.commands.setContent(defaultUncollapsedCollapsibleBlock);
     const { user } = setup(<EditorContent editor={editor} />);
 
     let [collapsibleBlock] = findNodesByNodeType(editor.state.doc, 'collapsibleBlock');
     expect(collapsibleBlock).toBeDefined();
-    expect(collapsibleBlock.attrs.folded).toBeFalsy();
+    expect(collapsibleBlock.attrs.folded).toBe(false);
 
     await act(async () => {
       await user.click(screen.getByRole('button'));
@@ -25,7 +25,7 @@ describe('CollapsibleBlock', () => {
 
     [collapsibleBlock] = findNodesByNodeType(editor.state.doc, 'collapsibleBlock');
     expect(collapsibleBlock).toBeDefined();
-    expect(collapsibleBlock.attrs.folded).toBeTruthy();
+    expect(collapsibleBlock.attrs.folded).toBe(true);
   });
 
   test('should uncollapse block when clicking on the arrow', async () => {
@@ -34,7 +34,7 @@ describe('CollapsibleBlock', () => {
 
     let [collapsibleBlock] = findNodesByNodeType(editor.state.doc, 'collapsibleBlock');
     expect(collapsibleBlock).toBeDefined();
-    expect(collapsibleBlock.attrs.folded).toBeTruthy();
+    expect(collapsibleBlock.attrs.folded).toBe(true);
 
     await act(async () => {
       await user.click(screen.getByRole('button'));
@@ -42,6 +42,6 @@ describe('CollapsibleBlock', () => {
 
     [collapsibleBlock] = findNodesByNodeType(editor.state.doc, 'collapsibleBlock');
     expect(collapsibleBlock).toBeDefined();
-    expect(collapsibleBlock.attrs.folded).toBeFalsy();
+    expect(collapsibleBlock.attrs.folded).toBe(false);
   });
 });
