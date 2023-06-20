@@ -7,6 +7,7 @@ from collections import defaultdict
 from pathlib import Path
 
 import grobid_tei_xml
+from dotenv import load_dotenv
 from grobid_client.grobid_client import (GrobidClient,
                                          ServerUnavailableException)
 from sidecar import shared
@@ -14,6 +15,8 @@ from sidecar import shared
 from .shared import HiddenPrints, chunk_text, get_filename_md5
 from .storage import JsonStorage
 from .typing import Author, IngestResponse, Reference
+
+load_dotenv()
 
 logging.root.setLevel(logging.NOTSET)
 
@@ -23,13 +26,13 @@ handler = logging.FileHandler(
         os.environ.get("SIDECAR_LOG_DIR", "/tmp"), "refstudio-sidecar.log"
     )
 )
-handler.setLevel(logging.DEBUG)
+handler.setLevel(logging.INFO)
 
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 handler.setFormatter(formatter)
 
 logger.addHandler(handler)
-logger.disabled = os.environ.get("SIDECAR_ENABLE_LOGGING", "false").lower() == "true"
+logger.disabled = os.environ.get("SIDECAR_DISABLE_LOGGING", "true").lower() == "true"
 
 GROBID_SERVER_URL = "https://kermitt2-grobid.hf.space"
 
@@ -69,10 +72,9 @@ class PDFIngestion:
         sys.stdout.write(response.json())
 
         for ref in references:
-            self._remove_from_staging(ref)
+            self._remove_temporary_files_for_reference(ref)
 
         logger.info(f"Finished ingestion for project: {self.project_name}")
-        logger.info(f"Response: {response}")
 
     def _create_directories(self) -> None:
         if not self.staging_dir.exists():
@@ -134,6 +136,10 @@ class PDFIngestion:
         Determines which files need to be ingested by comparing the list of 
         already processed References against files found in `uploads`.
         """
+        if not self._check_for_uploaded_files():
+            logger.info("No files have been uploaded")
+            sys.exit()
+
         # fp.stem = fp.name without filetype extension
         uploaded_filestems = {fp.stem: fp for fp in self.input_dir.glob("*.pdf")}
         processed_filestems = {
@@ -143,7 +149,7 @@ class PDFIngestion:
 
         if not needs_ingestion_filestems:
             logger.info("All uploaded PDFs have already been processed")
-            return []
+            sys.exit()
 
         filepaths_to_ingest = []
         for stem in needs_ingestion_filestems:
@@ -160,19 +166,34 @@ class PDFIngestion:
         logger.info(f"Found {len(files_to_ingest)} PDF files to ingest")
         
         for filepath in files_to_ingest:
-            logger.info(f"Copying {filepath} to {self.staging_dir}")
+            logger.info(f"Copying {filepath.name} to {self.staging_dir}")
             shutil.copy(filepath, self.staging_dir)
     
-    def _remove_from_staging(self, ref: Reference) -> None:
+    def _remove_temporary_files_for_reference(self, ref: Reference) -> None:
         """
-        Removes a Reference's `source_filename` from `.staging`.
+        Removes a Reference's temporary files that were created during 
+        various stages of ingestion.
         """
-        filepath = self.staging_dir.joinpath(ref.source_filename)
-        
-        try:
-            os.remove(filepath)
-        except OSError:
-            pass
+        staging_path = self.staging_dir.joinpath(ref.source_filename)
+        shared.remove_file(staging_path)
+
+        # grobid success
+        xml_filename = f"{Path(ref.source_filename).stem}.tei.xml"
+        xml_path = self.grobid_output_dir.joinpath(xml_filename)
+        shared.remove_file(xml_path)
+
+        # grobid failures - there might not be any
+        txt_filename = f"{Path(ref.source_filename).stem}*.txt"
+        matches = list(self.grobid_output_dir.glob(txt_filename))
+
+        if matches:
+            txt_path = matches[0]
+            shared.remove_file(txt_path)
+
+        # json converted from grobid XML
+        json_filename = f"{Path(ref.source_filename).stem}.json"
+        json_path = self.storage_dir.joinpath(json_filename)
+        shared.remove_file(json_path)
 
     def _call_grobid_for_staging(self) -> None:
         """
@@ -184,12 +205,13 @@ class PDFIngestion:
         as `{filename}_{errorcode}.txt` (e.g. some-pdf_500.txt)
         """
         if not self._check_for_staging_files():
-            return
+            logger.info("No staging files found for Grobid processing")
+            sys.exit()
         
         num_files = len(list(self.staging_dir.glob("*.pdf")))
         timeout = 30 * num_files
 
-        logger.info(f"Calling Grobid servier for {num_files} files")
+        logger.info(f"Calling Grobid server for {num_files} files")
 
         # The Grobid client library we use prints info and error messages to stdout.
         # This is a problem because the Tauri client <-> sidecar communicate over stdout.
@@ -206,7 +228,7 @@ class PDFIngestion:
 
             client.process(
                 "processFulltextDocument",
-                input_path=self.input_dir,
+                input_path=self.staging_dir,
                 output=self.grobid_output_dir,
                 force=True
             )
@@ -230,7 +252,7 @@ class PDFIngestion:
         ]
 
         statuses = {}
-        for file in self.input_dir.glob("*.pdf"):
+        for file in self.staging_dir.glob("*.pdf"):
             if file.stem in xml_filestems:
                 logger.info(f"Grobid successfully parsed file: {file.name}")
                 statuses[file.name] = "success"
@@ -438,9 +460,10 @@ class PDFIngestion:
             references.append(ref)
 
         failures = self._create_references_for_grobid_failures()
+        num_created = len(references) + len(failures)
 
         msg = (
-            f"Created {len(references)} Reference objects: "
+            f"Created {num_created} Reference objects: "
             f"{len(references)} successful Grobid parses, {len(failures)} Grobid failures"
         )
         logger.info(msg)

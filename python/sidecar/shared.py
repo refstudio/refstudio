@@ -11,6 +11,16 @@ def get_word_count(text: str) -> int:
     return len(text.strip().split(" "))
 
 
+def remove_file(filepath: str) -> None:
+    """
+    Removes a file located at `filepath`.
+    """
+    try:
+        os.remove(filepath)
+    except OSError:
+        pass
+
+
 def parse_date(date_str: str) -> datetime:
     """
     Parse a YYYY-mm-dd date string into a datetime object.
