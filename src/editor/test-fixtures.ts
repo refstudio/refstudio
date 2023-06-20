@@ -16,6 +16,8 @@ export const defaultUncollapsedCollapsibleBlock = `
     </collapsible-content>
 </collapsible-block>`;
 
+export const defaultParagraph = `<p>Some content</p>`;
+
 export const oneLineCollapsibleBlock = `
 <collapsible-block>
     <collapsible-summary>Header</collapsible-summary>
