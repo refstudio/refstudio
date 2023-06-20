@@ -2,10 +2,12 @@ import json
 import logging
 import os
 import sys
+from collections import defaultdict
 from pathlib import Path
 
 import grobid_tei_xml
 from grobid_client.grobid_client import GrobidClient
+from sidecar import shared
 
 from .shared import HiddenPrints, chunk_text, get_filename_md5
 from .typing import Author, IngestResponse, Reference
@@ -170,6 +172,7 @@ class PDFIngestion:
         return {
             "title": header.get("title"),
             "authors": authors,
+            "published_date": header.get("date"),
         }
 
     def _create_author(self, author_dict: dict) -> Author:
@@ -201,8 +204,59 @@ class PDFIngestion:
                 Reference(
                     source_filename=source_pdf,
                     filename_md5=get_filename_md5(source_pdf),
+                    citation_key="untitled",
                 )
             )
+        return references
+    
+    def _add_citation_keys(self, references: list[Reference]) -> list[Reference]:
+        """
+        Adds unique citation keys for a list of Reference objects based on Pandoc
+        citation key formatting rules.
+
+        Because citation keys are unique, we need to create them after all References
+        have been created. This is because the citation key is based on the Reference's
+        author surname and published date. If two References have the same author surname
+        and published date, then the citation key is appended with a, b, c, etc.
+
+        If a Reference does not have an author surname or published date, then the citation
+        key becomes "untitled" and is appended with 1, 2, 3, etc.
+
+        Examples:
+        1. Two References with different author surnames and different published year:
+            - (Smith, 2018) and (Jones, 2020) => citation keys: smith2018 and jones2020
+        2. Two References with different author surnames and no published year:
+            - (Smith, None) and (Jones, None) => citation keys: smith and jones
+        3. Two References with the same author surname but different published years:
+            - (Smith, 2020) and (Smith, 2021) => citation keys: smith2020 and smith2021
+        4. Two References with the same author surname and published year:
+            - (Smith, 2020) and (Smith, 2020) => citation keys: smith2020a and smith2020b
+        5. Two References with the same author surname and no published year:
+            - (Smith, None) and (Smith, None) => citation keys: smitha and smithb 
+        6. Two References with no author surname and different published years:
+            - (None, 2020) and (None, 2021) => citation keys: untitled2020 and untitled2021
+        7. Two References with no author surname and no published year:
+            - (None, None) and (None, None) => citation keys: untitled1 and untitled2
+
+        :param ref: List[Reference]
+        :return: str
+
+        https://quarto.org/docs/authoring/footnotes-and-citations.html#sec-citations
+        """
+        ref_key_groups = defaultdict(list)
+        for ref in references:
+            key = shared.create_citation_key(ref)
+            ref_key_groups[key].append(ref)
+        
+        for key, refs in ref_key_groups.items():
+            if len(refs) == 1:
+                refs[0].citation_key = key
+            elif key == "untitled":
+                for i, ref in enumerate(refs):
+                    ref.citation_key = f"{key}{i + 1}"
+            else:
+                for i, ref in enumerate(refs):
+                    ref.citation_key = f"{key}{chr(97 + i)}"
         return references
 
     def create_references(self) -> list[Reference]:
@@ -230,20 +284,33 @@ class PDFIngestion:
 
             source_pdf = f"{file.stem}.pdf"
             header = self._parse_header(doc)
+            pub_date = shared.parse_date(header.get("published_date", ""))
 
             ref = Reference(
                 source_filename=source_pdf,
                 filename_md5=get_filename_md5(source_pdf),
                 title=header.get("title"),
                 authors=header.get("authors"),
+                published_date=pub_date,
                 abstract=doc.get("abstract"),
                 contents=doc.get("body"),
                 chunks=chunk_text(doc.get("body"))
             )
+            ref.citation_key = shared.create_citation_key(ref)
             references.append(ref)
 
         failures = self._create_references_for_grobid_failures()
-        return references + failures
+
+        msg = (
+            f"Created {len(references)} Reference objects: "
+            f"{len(references)} successful Grobid parses, {len(failures)} Grobid failures"
+        )
+        logger.info(msg)
+
+        references = references + failures
+        self._add_citation_keys(references)
+
+        return references
 
     def save_references(self, references: list[Reference]) -> None:
         """
@@ -254,7 +321,7 @@ class PDFIngestion:
 
         contents = [ref.dict() for ref in references]
         with open(filepath, "w") as fout:
-            json.dump(contents, fout)
+            json.dump(contents, fout, indent=2, default=str)
 
     def create_response_from_references(self, references: list[Reference]) -> IngestResponse:
         """
