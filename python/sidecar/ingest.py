@@ -23,7 +23,7 @@ handler = logging.FileHandler(
         os.environ.get("SIDECAR_LOG_DIR", "/tmp"), "refstudio-sidecar.log"
     )
 )
-handler.setLevel(logging.INFO)
+handler.setLevel(logging.DEBUG)
 
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 handler.setFormatter(formatter)
@@ -107,7 +107,7 @@ class PDFIngestion:
         bool
             True if PDF files are in the `.staging` directory.
         """
-        if not len(self.staging_dir.glob("*.pdf")):
+        if not list(self.staging_dir.glob("*.pdf")):
             logger.warning(f"No PDF files found in directory: {self.staging_dir}")
             return False
         return True
@@ -137,7 +137,7 @@ class PDFIngestion:
         # fp.stem = fp.name without filetype extension
         uploaded_filestems = {fp.stem: fp for fp in self.input_dir.glob("*.pdf")}
         processed_filestems = {
-            ref.source_filename.stem: ref.source_filename for ref in self.references
+            Path(ref.source_filename).stem: ref.source_filename for ref in self.references
         }
         needs_ingestion_filestems = set(uploaded_filestems.keys()) - set(processed_filestems.keys())
 
@@ -186,7 +186,7 @@ class PDFIngestion:
         if not self._check_for_staging_files():
             return
         
-        num_files = len(self.staging_dir.glob("*.pdf"))
+        num_files = len(list(self.staging_dir.glob("*.pdf")))
         timeout = 30 * num_files
 
         logger.info(f"Calling Grobid servier for {num_files} files")
