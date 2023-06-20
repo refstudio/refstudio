@@ -21,8 +21,6 @@ export function ReferencesPanel({ onRefClicked }: ReferencesPanelProps) {
   const references = useAtomValue(getReferencesAtom);
   const setReferences = useSetAtom(setReferencesAtom);
 
-  const inputRef = createRef<HTMLInputElement>();
-
   const [isPdfIngestionRunning, setIsPdfIngestionRunning] = useState(false);
 
   async function handleChange(uploadedFiles: FileList) {
@@ -72,41 +70,13 @@ export function ReferencesPanel({ onRefClicked }: ReferencesPanelProps) {
                 <div className="p-2">Welcome to your RefStudio references library. Start by uploading some PDFs.</div>
               )}
 
-              <ul className="space-y-2">
-                {references.map((reference) => (
-                  <li
-                    className="mb-0 cursor-pointer overflow-x-hidden text-ellipsis p-1 hover:bg-slate-200"
-                    key={reference.id}
-                    onClick={() => onRefClicked(reference)}
-                  >
-                    <code className="mr-2">[{reference.citationKey}]</code>
-                    <strong>{reference.title}</strong>
-                    <br />
-                    <small>
-                      <em className="whitespace-nowrap">
-                        {reference.authors.map(({ fullName }) => fullName).join(', ')}
-                      </em>
-                    </small>
-                  </li>
-                ))}
-              </ul>
+              <ReferencesList references={references} onRefClicked={onRefClicked} />
               {isPdfIngestionRunning && <ProgressSpinner badge="PDF Ingestion" />}
               {!isPdfIngestionRunning && (
-                <div className="my-2 bg-yellow-50 p-1 text-sm italic">
-                  <input
-                    accept="application/pdf"
-                    className="hidden"
-                    multiple
-                    ref={inputRef}
-                    type="file"
-                    onChange={(e) => e.currentTarget.files && void handleChange(e.currentTarget.files)}
-                  />
-                  <strong>TIP:</strong> Click{' '}
-                  <span className="cursor-pointer underline" onClick={() => inputRef.current?.click()}>
-                    here
-                  </span>{' '}
-                  or drag/drop PDF files here for upload.
-                </div>
+                <PdfInputFileUpload
+                  className="my-2 bg-yellow-50 p-1 text-sm italic"
+                  onUpload={(files) => void handleChange(files)}
+                />
               )}
               {references.length > 0 && !isPdfIngestionRunning && (
                 <div className="mt-10 text-right text-xs ">
@@ -120,5 +90,54 @@ export function ReferencesPanel({ onRefClicked }: ReferencesPanelProps) {
         </DndProvider>
       </PanelSection>
     </PanelWrapper>
+  );
+}
+
+function ReferencesList({
+  references,
+  onRefClicked,
+}: {
+  references: ReferenceItem[];
+  onRefClicked: (item: ReferenceItem) => void;
+}) {
+  return (
+    <ul className="space-y-2">
+      {references.map((reference) => (
+        <li
+          className="mb-0 cursor-pointer overflow-x-hidden text-ellipsis p-1 hover:bg-slate-200"
+          key={reference.id}
+          onClick={() => onRefClicked(reference)}
+        >
+          <code className="mr-2">[{reference.citationKey}]</code>
+          <strong>{reference.title}</strong>
+          <br />
+          <small>
+            <em className="whitespace-nowrap">{reference.authors.map(({ fullName }) => fullName).join(', ')}</em>
+          </small>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function PdfInputFileUpload({ className, onUpload }: { className?: string; onUpload: (files: FileList) => void }) {
+  const inputRef = createRef<HTMLInputElement>();
+
+  return (
+    <div className={className}>
+      <input
+        accept="application/pdf"
+        className="hidden"
+        multiple
+        ref={inputRef}
+        type="file"
+        onChange={(e) => e.currentTarget.files && onUpload(e.currentTarget.files)}
+      />
+      <strong>TIP:</strong> Click{' '}
+      <span className="cursor-pointer underline" onClick={() => inputRef.current?.click()}>
+        here
+      </span>{' '}
+      or drag/drop PDF files here for upload.
+    </div>
   );
 }

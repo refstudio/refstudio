@@ -16,7 +16,6 @@ export function FileDropTarget(props: FileDropTargetProps) {
     () => ({
       accept: [NativeTypes.FILE],
       drop(item: { files: FileList }) {
-        console.log('DROP', item.files);
         onDrop(item.files);
       },
       collect: (monitor: DropTargetMonitor) => ({
