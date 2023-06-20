@@ -50,8 +50,7 @@ describe('unsetPartiallySelectedCollapsibleBlocks', () => {
     const initialDoc = editor.state.doc;
 
     const commandResult = editor.chain().selectAll().command(unsetPartiallySelectedCollapsibleBlocks).run();
-    expect(commandResult).toBe(true);
-
+    expect(commandResult).toBe(false);
     expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
   });
 
