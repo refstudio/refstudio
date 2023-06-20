@@ -7,7 +7,7 @@ import { ReplaceStep } from '@tiptap/pm/transform';
  *  - the summary is transformed into a paragraph
  *  - each block of the content is added after the summary block
  */
-export function changeCollapsibleBlockToParagraph(pos: number, schema: Schema, tr: Transaction): void {
+export function changeCollapsibleBlockToParagraphs(pos: number, schema: Schema, tr: Transaction): void {
   const resolvedPos = tr.doc.resolve(pos);
   if (resolvedPos.depth < 1) {
     return;

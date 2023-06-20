@@ -2,11 +2,11 @@ import { Node } from '@tiptap/core';
 import { Fragment, Slice } from '@tiptap/pm/model';
 import { TextSelection } from '@tiptap/pm/state';
 import { ReplaceStep } from '@tiptap/pm/transform';
-import { findParentNodeClosestToPos, InputRule, ReactNodeViewRenderer } from '@tiptap/react';
+import { InputRule, ReactNodeViewRenderer, findParentNodeClosestToPos } from '@tiptap/react';
 
 import { isNonNullish } from '../../../lib/isNonNullish';
 import { CollapsibleBlock } from '../CollapsibleBlock';
-import { changeCollapsibleBlockToParagraph } from '../helpers/changeCollapsibleBlockToParagraph';
+import { changeCollapsibleBlockToParagraphs } from '../helpers/changeCollapsibleBlockToParagraphs';
 
 export interface CollapsibleBlockNodeAttributes {
   folded: boolean;
@@ -16,7 +16,6 @@ declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     collapsibleBlock: {
       setCollapsibleBlock: () => ReturnType;
-      /** Test */
       splitCollapsibleBlock: () => ReturnType;
       toggleCollapsedCollapsibleBlock: (pos: number) => ReturnType;
       unsetCollapsibleBlock: () => ReturnType;
@@ -246,19 +245,14 @@ export const CollapsibleBlockNode = Node.create({
           }
 
           const { $from } = tr.selection;
-          if ($from.depth < 1) {
-            return false;
-          }
-
-          const collapsibleNode = $from.node(-1);
-          if (collapsibleNode.type.name !== this.type.name) {
+          if ($from.depth < 3) {
             return false;
           }
 
           if (dispatch) {
             const start = $from.before(-2);
 
-            changeCollapsibleBlockToParagraph($from.pos, editor.schema, tr);
+            changeCollapsibleBlockToParagraphs($from.pos, editor.schema, tr);
 
             // + 2 to account for <collapsibleBlock> and <collapsibleSummary> opening tags, that have been removed
             tr.setSelection(TextSelection.near(tr.doc.resolve(start + $from.parentOffset + 2)));
