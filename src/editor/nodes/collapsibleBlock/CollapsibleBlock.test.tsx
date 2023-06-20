@@ -5,7 +5,6 @@ import { defaultCollapsibleBlock, defaultUncollapsedCollapsibleBlock } from '../
 import { findNodesByNodeType } from '../../test-utils';
 import { EDITOR_EXTENSIONS } from '../../TipTapEditorConfigs';
 
-
 describe('CollapsibleBlock', () => {
   const editor = new Editor({
     extensions: EDITOR_EXTENSIONS,
