@@ -30,29 +30,37 @@ impl AppMenu {
         //         .add_item(CustomMenuItem::new("tauri://menu/file/close".to_string(), "Close File"))
         // );
 
-        // let edit_menu = Submenu::new(
-        //     "Edit",
-        //     Menu::new()
-        //         .add_native_item(MenuItem::Copy)
-        //         .add_native_item(MenuItem::Paste)
-        //         .add_native_item(MenuItem::Cut)
-        //         .add_item(CustomMenuItem::new("undo".to_string(), "Undo"))
-        //         .add_item(CustomMenuItem::new("redo".to_string(), "Redo")),
-        // );
+        let edit_menu = Submenu::new(
+            "Edit",
+            Menu::new()
+                .add_native_item(MenuItem::Undo)
+                .add_native_item(MenuItem::Redo)
+                .add_native_item(MenuItem::Separator)
+                .add_native_item(MenuItem::Cut)
+                .add_native_item(MenuItem::Copy)
+                .add_native_item(MenuItem::Paste)
+                .add_native_item(MenuItem::SelectAll),
+        );
+
+        let view_menu = Submenu::new(
+            "View",
+            Menu::new().add_native_item(MenuItem::EnterFullScreen),
+        );
 
         let window_menu = Submenu::new(
             "Window",
             Menu::new()
                 .add_native_item(MenuItem::Minimize)
                 .add_native_item(MenuItem::Zoom)
-                .add_native_item(MenuItem::CloseWindow)
-                .add_native_item(MenuItem::EnterFullScreen),
+                .add_native_item(MenuItem::Separator)
+                .add_native_item(MenuItem::CloseWindow),
         );
 
         Menu::new()
             .add_submenu(app_menu)
             // .add_submenu(file_menu)
-            // .add_submenu(edit_menu)
+            .add_submenu(edit_menu)
+            .add_submenu(view_menu)
             .add_submenu(window_menu)
     }
 
