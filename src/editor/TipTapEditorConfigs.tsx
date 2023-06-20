@@ -9,12 +9,12 @@ import markdown from 'highlight.js/lib/languages/markdown';
 import { lowlight } from 'lowlight';
 import { Markdown } from 'tiptap-markdown';
 
-import { CollapsibleBlockContentNode } from './CollapsibleBlock/nodes/CollapsibleBlockContent';
-import { CollapsibleBlockNode } from './CollapsibleBlock/nodes/CollapsibleBlockNode';
-import { CollapsibleBlockSummaryNode } from './CollapsibleBlock/nodes/CollapsibleBlockSummary';
-import { DraggableBlockNode } from './DraggableBlock/DraggableBlockNode';
-import { ReferenceNode } from './ReferenceNode/ReferenceNode';
-import { RefStudioDocument } from './RefStudioDocument';
+import { CollapsibleBlockContentNode } from './nodes/collapsibleBlock/nodes/CollapsibleBlockContent';
+import { CollapsibleBlockNode } from './nodes/collapsibleBlock/nodes/CollapsibleBlockNode';
+import { CollapsibleBlockSummaryNode } from './nodes/collapsibleBlock/nodes/CollapsibleBlockSummary';
+import { DraggableBlockNode } from './nodes/draggableBlock/DraggableBlockNode';
+import { ReferenceNode } from './nodes/referenceNode/ReferenceNode';
+import { RefStudioDocument } from './nodes/refStudioDocument/RefStudioDocument';
 lowlight.registerLanguage('markdown', markdown);
 
 export const EDITOR_EXTENSIONS: Extensions = [

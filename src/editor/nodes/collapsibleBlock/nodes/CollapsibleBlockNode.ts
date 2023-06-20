@@ -4,7 +4,7 @@ import { TextSelection } from '@tiptap/pm/state';
 import { ReplaceStep } from '@tiptap/pm/transform';
 import { findParentNodeClosestToPos, InputRule, ReactNodeViewRenderer } from '@tiptap/react';
 
-import { isNonNullish } from '../../../lib/isNonNullish';
+import { isNonNullish } from '../../../../lib/isNonNullish';
 import { CollapsibleBlock } from '../CollapsibleBlock';
 import { changeCollapsibleBlockToParagraphs } from '../helpers/changeCollapsibleBlockToParagraphs';
 import { chevronHandler } from '../inputRuleHandlers/chevronHandler';

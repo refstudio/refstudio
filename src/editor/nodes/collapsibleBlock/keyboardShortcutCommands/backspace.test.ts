@@ -1,8 +1,8 @@
 import { Editor } from '@tiptap/react';
 
-import { defaultCollapsibleBlock, uncollapsedCollapsibleBlockWithEmptyContent } from '../../test-fixtures';
-import { findNodesByNodeType, getText } from '../../test-utils';
-import { EDITOR_EXTENSIONS } from '../../TipTapEditorConfigs';
+import { defaultCollapsibleBlock, uncollapsedCollapsibleBlockWithEmptyContent } from '../../../test-fixtures';
+import { findNodesByNodeType, getText } from '../../../test-utils';
+import { EDITOR_EXTENSIONS } from '../../../TipTapEditorConfigs';
 import { backspace } from './backspace';
 
 describe('Backspace keyboard shortcut command', () => {

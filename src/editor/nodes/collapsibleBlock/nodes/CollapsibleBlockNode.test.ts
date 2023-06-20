@@ -7,9 +7,9 @@ import {
   defaultUncollapsedCollapsibleBlock,
   oneLineCollapsibleBlock,
   uncollapsedCollapsibleBlockWithEmptyContent,
-} from '../../test-fixtures';
-import { findNodesByNodeType, getText } from '../../test-utils';
-import { EDITOR_EXTENSIONS } from '../../TipTapEditorConfigs';
+} from '../../../test-fixtures';
+import { findNodesByNodeType, getText } from '../../../test-utils';
+import { EDITOR_EXTENSIONS } from '../../../TipTapEditorConfigs';
 
 describe('CollapsibleBlockNode commands', () => {
   const editor = new Editor({

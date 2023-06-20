@@ -1,7 +1,7 @@
 import { Editor } from '@tiptap/react';
 
-import { findNodesByNodeType, getText } from '../../test-utils';
-import { EDITOR_EXTENSIONS } from '../../TipTapEditorConfigs';
+import { findNodesByNodeType, getText } from '../../../test-utils';
+import { EDITOR_EXTENSIONS } from '../../../TipTapEditorConfigs';
 import { chevronHandler } from './chevronHandler';
 
 describe('Chevron input rule handler', () => {

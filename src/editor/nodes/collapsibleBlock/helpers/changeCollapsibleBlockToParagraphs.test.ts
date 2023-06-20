@@ -1,9 +1,9 @@
 import { TextSelection } from '@tiptap/pm/state';
 import { Editor } from '@tiptap/react';
 
-import { defaultCollapsibleBlock } from '../../test-fixtures';
-import { findNodesByNodeType, getText } from '../../test-utils';
-import { EDITOR_EXTENSIONS } from '../../TipTapEditorConfigs';
+import { defaultCollapsibleBlock } from '../../../test-fixtures';
+import { findNodesByNodeType, getText } from '../../../test-utils';
+import { EDITOR_EXTENSIONS } from '../../../TipTapEditorConfigs';
 import { changeCollapsibleBlockToParagraphs } from './changeCollapsibleBlockToParagraphs';
 
 describe('changeCollapsibleBlockToParagraph', () => {

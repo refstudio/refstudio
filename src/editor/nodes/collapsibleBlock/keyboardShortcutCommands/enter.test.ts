@@ -1,8 +1,8 @@
 import { Editor } from '@tiptap/react';
 
-import { defaultCollapsibleBlock, defaultUncollapsedCollapsibleBlock } from '../../test-fixtures';
-import { findNodesByNodeType, getText } from '../../test-utils';
-import { EDITOR_EXTENSIONS } from '../../TipTapEditorConfigs';
+import { defaultCollapsibleBlock, defaultUncollapsedCollapsibleBlock } from '../../../test-fixtures';
+import { findNodesByNodeType, getText } from '../../../test-utils';
+import { EDITOR_EXTENSIONS } from '../../../TipTapEditorConfigs';
 import { enter } from './enter';
 
 describe('Enter keyboard shortcut command', () => {
