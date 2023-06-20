@@ -4,21 +4,20 @@ collapsible-block {
 }
 
 collapsible-block > button {
-  @apply flex cursor-pointer border-0 bg-transparent p-0;
+  @apply block cursor-pointer border-0 bg-transparent;
   @apply self-start;
+  @apply h-6 w-6 items-center justify-center p-1.5;
+  @apply rotate-180;
+  @apply opacity-100;
+  transition: transform 200ms ease-out 0s;
 }
 
-collapsible-block > button:before {
-  content: '\25bc';
-  @apply flex h-6 w-6 items-center justify-center;
+collapsible-block > button.folded {
+  @apply rotate-90;
 }
 
-collapsible-block > button.folded:before {
-  content: '\25b6';
-}
-
-collapsible-block:not(:has(collapsible-content)) > button:before {
-  color: #93928e;
+collapsible-block:not(:has(collapsible-content)) > button {
+  @apply opacity-50;
 }
 
 collapsible-block .content {
