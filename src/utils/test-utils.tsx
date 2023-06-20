@@ -1,11 +1,17 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render } from '@testing-library/react';
 
 function customRender(ui: React.ReactElement, options = {}) {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+    },
+  });
   return render(ui, {
     // wrap provider(s) here if needed
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    wrapper: ({ children }) => children,
+    wrapper: ({ children }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>,
     ...options,
   });
 }

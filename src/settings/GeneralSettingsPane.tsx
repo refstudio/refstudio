@@ -1,6 +1,6 @@
-import { useCallback, useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { useState } from 'react';
 
-import { useCallablePromise } from '../hooks/useCallablePromise';
 import { getCachedSetting, getSettings, saveCachedSettings, setCachedSetting } from './settings';
 import { SettingsPane, SettingsPaneProps } from './SettingsPane';
 
@@ -8,21 +8,18 @@ export function GeneralSettingsPane({ config }: SettingsPaneProps) {
   const [generalSettings] = useState(getCachedSetting('general'));
   const [sidecarLoggingSettings, setSidecarLoggingSettings] = useState(getCachedSetting('sidecar.logging'));
 
-  const saveSettings = useCallback(
-    async (project: typeof generalSettings, sidecarLogging: typeof sidecarLoggingSettings) => {
-      setCachedSetting('general', project);
-      setCachedSetting('sidecar.logging', sidecarLogging);
+  const saveMutation = useMutation({
+    mutationFn: async (data: { general: typeof generalSettings; sidecarLogging: typeof sidecarLoggingSettings }) => {
+      setCachedSetting('general', data.general);
+      setCachedSetting('sidecar.logging', data.sidecarLogging);
       await saveCachedSettings();
       return getSettings();
     },
-    [],
-  );
-
-  const [result, callSetSettings] = useCallablePromise(saveSettings);
+  });
 
   function handleSaveSettings(evt: React.FormEvent<HTMLFormElement>) {
     evt.preventDefault();
-    callSetSettings(generalSettings, sidecarLoggingSettings);
+    saveMutation.mutate({ general: generalSettings, sidecarLogging: sidecarLoggingSettings });
   }
 
   const isDirty =
@@ -88,7 +85,9 @@ export function GeneralSettingsPane({ config }: SettingsPaneProps) {
           </div>
         </fieldset>
         <fieldset className="mt-10 flex justify-end">
-          <input className="btn-primary" disabled={!isDirty || result.state === 'loading'} type="submit" value="SAVE" />
+          {saveMutation.isSuccess && <span className="px-2 text-primary">Saved!</span>}
+          {saveMutation.isError && <span className="px-2 text-red-300">{String(saveMutation.error)}</span>}
+          <input className="btn-primary" disabled={!isDirty || saveMutation.isLoading} type="submit" value="SAVE" />
         </fieldset>
       </form>
 

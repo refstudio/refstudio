@@ -1,24 +1,24 @@
-import { useCallback, useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { useState } from 'react';
 
 import { JSONDebug, JSONDebugContainer } from '../components/JSONDebug';
-import { useCallablePromise } from '../hooks/useCallablePromise';
 import { getCachedSetting, getSettings, saveCachedSettings, setCachedSetting } from './settings';
 import { SettingsPane, SettingsPaneProps } from './SettingsPane';
 
 export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
   const [paneSettings, setPaneSettings] = useState(getCachedSetting('openAI'));
 
-  const saveSettings = useCallback(async (value: typeof paneSettings) => {
-    setCachedSetting('openAI', value);
-    await saveCachedSettings();
-    return getSettings();
-  }, []);
-
-  const [result, callSetSettings] = useCallablePromise(saveSettings);
+  const saveMutation = useMutation({
+    mutationFn: async (value: typeof paneSettings) => {
+      setCachedSetting('openAI', value);
+      await saveCachedSettings();
+      return getSettings();
+    },
+  });
 
   function handleSaveSettings(evt: React.FormEvent<HTMLFormElement>) {
     evt.preventDefault();
-    callSetSettings(paneSettings);
+    saveMutation.mutate(paneSettings);
   }
 
   const isDirty = JSON.stringify(paneSettings) !== JSON.stringify(getCachedSetting('openAI'));
@@ -60,14 +60,15 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
             />
           </div>
         </fieldset>
-        <fieldset className="mt-10 flex justify-end">
-          <input className="btn-primary" disabled={!isDirty || result.state === 'loading'} type="submit" value="SAVE" />
+        <fieldset className="mt-10 flex items-center justify-end">
+          {saveMutation.isSuccess && <span className="px-2 text-primary">Saved!</span>}
+          {saveMutation.isError && <span className="px-2 text-red-300">{String(saveMutation.error)}</span>}
+          <input className="btn-primary" disabled={!isDirty || saveMutation.isLoading} type="submit" value="SAVE" />
         </fieldset>
       </form>
-
       <JSONDebugContainer className="mt-28">
         <JSONDebug header="paneSettings" value={paneSettings} />
-        <JSONDebug header="API call result" value={result} />
+        <JSONDebug header="API call result" value={saveMutation.data} />
       </JSONDebugContainer>
     </SettingsPane>
   );
