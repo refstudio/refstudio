@@ -16,11 +16,6 @@ export const RefStudioDocument = Document.extend({
   addKeyboardShortcuts() {
     return {
       Backspace: backspace,
-      'Mod-l': ({ editor }) => {
-        console.log(editor.getJSON());
-        console.log(editor.state.selection);
-        return true;
-      },
     };
   },
   addCommands() {
