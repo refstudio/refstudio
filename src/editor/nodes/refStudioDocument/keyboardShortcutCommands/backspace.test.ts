@@ -28,7 +28,7 @@ describe('Backspace keyboard shortcut command', () => {
     expect(getText(editor.state.doc)).toEqual('Some contentSome content');
   });
 
-  test.skip('should unset partially selected collapsible blocks before deleting content', () => {
+  test('should unset partially selected collapsible blocks before deleting content', () => {
     editor
       .chain()
       .setContent(defaultParagraph + defaultCollapsibleBlock + defaultCollapsibleBlock)

@@ -1,8 +1,6 @@
 import { TextSelection } from '@tiptap/pm/state';
 import { isNodeSelection, KeyboardShortcutCommand } from '@tiptap/react';
 
-import { unsetPartiallySelectedCollapsibleBlocks } from '../../collapsibleBlock/helpers/unsetPartiallySelectedCollapsibleBlocks';
-
 export const backspace: KeyboardShortcutCommand = function ({ editor }) {
   if (editor.state.selection.empty && editor.state.selection.$from.parentOffset === 0) {
     // Removes the content item and moves the selection to the previous content item or the header
@@ -34,5 +32,5 @@ export const backspace: KeyboardShortcutCommand = function ({ editor }) {
   if (editor.state.selection.empty || isNodeSelection(editor.state.selection)) {
     return false;
   }
-  return editor.chain().command(unsetPartiallySelectedCollapsibleBlocks).deleteSelection().run();
+  return editor.commands.deleteSelection();
 };

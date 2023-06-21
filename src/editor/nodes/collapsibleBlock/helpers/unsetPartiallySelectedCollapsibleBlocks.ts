@@ -7,7 +7,7 @@ import { changeCollapsibleBlockToParagraphs } from './changeCollapsibleBlockToPa
  * Command that unsets any collapsible block that is partially selected,
  * ie. part of the node is selected but not the whole node
  */
-export const unsetPartiallySelectedCollapsibleBlocks: Command = function ({ tr, editor }) {
+export const unsetPartiallySelectedCollapsibleBlocks: Command = function ({ dispatch, editor, tr }) {
   const { from, to } = tr.selection;
   let unsetNodes = 0;
 
@@ -22,7 +22,9 @@ export const unsetPartiallySelectedCollapsibleBlocks: Command = function ({ tr, 
       }
       if (originalNode.node.nodeSize !== node.nodeSize && originalNode.pos > from) {
         unsetNodes += 1;
-        changeCollapsibleBlockToParagraphs(from + pos, editor.schema, tr);
+        if (dispatch) {
+          changeCollapsibleBlockToParagraphs(from + pos, editor.schema, tr);
+        }
       }
     }
   });
@@ -30,6 +32,8 @@ export const unsetPartiallySelectedCollapsibleBlocks: Command = function ({ tr, 
   const resolvedUpdatedFrom = tr.doc.resolve(from);
   const resolvedUpdatedTo = tr.doc.resolve(to - unsetNodes);
 
-  tr.setSelection(new TextSelection(resolvedUpdatedFrom, resolvedUpdatedTo));
+  if (dispatch) {
+    tr.setSelection(new TextSelection(resolvedUpdatedFrom, resolvedUpdatedTo));
+  }
   return unsetNodes > 0;
 };
