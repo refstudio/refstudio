@@ -60,7 +60,7 @@
         "width": 1280,
         "height": 800,
         "maximized": true,
-        "fileDropEnabled": false
+        "fileDropEnabled": true
       }
     ]
   }

@@ -10,7 +10,6 @@ type ReferencesState = Record<string, ReferenceItem>;
 const referencesAtom = atomWithStorage<ReferencesState>('references', {});
 
 /** EXTERNAL ATOMS */
-
 export const getReferencesAtom = atom((get) => Object.values(get(referencesAtom)));
 
 export const getDerivedReferenceAtom = (referenceId: string) => atom((get) => get(referencesAtom)[referenceId]);
@@ -22,3 +21,5 @@ export const setReferencesAtom = atom(null, (_get, set, references: ReferenceIte
   });
   set(referencesAtom, updatedReferences);
 });
+
+export const referencesSyncInProgressAtom = atom<boolean>(false);

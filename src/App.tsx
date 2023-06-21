@@ -7,7 +7,8 @@ import { VerticalResizeHandle } from './components/VerticalResizeHandle';
 import { AIPanel } from './panels/AIPanel';
 import { ExplorerPanel } from './panels/ExplorerPanel';
 import { MainPanel } from './panels/MainPanel';
-import { ReferencesPanel } from './panels/ReferencesPanel';
+import { ReferencesDropZone } from './panels/references/ReferencesDropZone';
+import { ReferencesPanel } from './panels/references/ReferencesPanel';
 import { EditorAPI } from './types/EditorAPI';
 import { PdfViewerAPI } from './types/PdfViewerAPI';
 import { ReferenceItem } from './types/ReferenceItem';
@@ -32,6 +33,7 @@ function App() {
         <MainPanel editorRef={editorRef} pdfViewerRef={pdfViewerRef} />
       </Panel>
       <RightPanelWrapper />
+      <ReferencesDropZone />
     </PanelGroup>
   );
 }
