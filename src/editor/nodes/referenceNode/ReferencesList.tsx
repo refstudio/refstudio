@@ -7,9 +7,9 @@ import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useSt
 import { createPortal } from 'react-dom';
 import { usePopper } from 'react-popper';
 
-import { getReferencesAtom } from '../../atoms/referencesState';
-import { cx } from '../../cx';
-import { ReferenceItem } from '../../types/ReferenceItem';
+import { getReferencesAtom } from '../../../atoms/referencesState';
+import { cx } from '../../../cx';
+import { ReferenceItem } from '../../../types/ReferenceItem';
 import { fuseOptions } from './config';
 
 export type ReferenceListProps = SuggestionProps<{ id: string; label: string }>;

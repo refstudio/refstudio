@@ -7,8 +7,8 @@ import { useEffect, useState } from 'react';
 import { selectionAtom } from '../atoms/selectionState';
 import { EditorAPI } from '../types/EditorAPI';
 import { MenuBar } from './MenuBar';
-import { ReferenceNode } from './ReferenceNode/ReferenceNode';
-import { getReferenceLabel } from './ReferenceNode/ReferencesList';
+import { ReferenceNode } from './nodes/referenceNode/ReferenceNode';
+import { getReferenceLabel } from './nodes/referenceNode/ReferencesList';
 import { EDITOR_EXTENSIONS, INITIAL_CONTENT, transformPasted } from './TipTapEditorConfigs';
 
 interface EditorProps {
