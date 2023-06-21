@@ -18,6 +18,10 @@ def get_arg_parser():
         "--pdf_directory",
         type=str,
     )
+    ingest_parser.add_argument(
+        "--status",
+        action="store_true"
+    )
 
     ai_parser = subparsers.add_parser(
         "rewrite",

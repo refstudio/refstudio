@@ -7,9 +7,10 @@ from pathlib import Path
 
 import grobid_tei_xml
 from grobid_client.grobid_client import GrobidClient
-from sidecar import shared
+from sidecar import shared, typing
 
 from .shared import HiddenPrints, chunk_text, get_filename_md5
+from .storage import JsonStorage
 from .typing import Author, IngestResponse, Reference
 
 logging.root.setLevel(logging.NOTSET)
@@ -30,6 +31,13 @@ logger.disabled = os.environ.get("SIDECAR_ENABLE_LOGGING", "false").lower() == "
 
 GROBID_SERVER_URL = "https://kermitt2-grobid.hf.space"
 GROBID_TIMEOUT = 60 * 5
+
+APPDATA_DIR = os.environ.get('APP_DATA_DIR')
+PROJECT_NAME = os.environ.get('PROJECT_NAME')
+UPLOADS_DIR = os.path.join(APPDATA_DIR, PROJECT_NAME, 'uploads')
+REFERENCES_JSON_PATH = os.path.join(
+    APPDATA_DIR, PROJECT_NAME, '.storage', 'references.json'
+)
 
 
 class PDFIngestion:
@@ -339,3 +347,20 @@ def main(pdf_directory: str):
     pdf_directory = Path(pdf_directory)
     ingest = PDFIngestion(input_dir=pdf_directory)
     ingest.run()
+
+
+def get_statuses():
+    storage = JsonStorage(filepath=REFERENCES_JSON_PATH)
+    storage.load()
+
+    statuses = []
+    for ref in storage.references:
+        statuses.append(
+            typing.ReferenceStatus(
+                source_filename=ref.source_filename,
+                filename_md5=ref.filename_md5,
+                status=ref.status
+            )
+        )
+    response = typing.IngestStatusResponse(statuses=statuses)
+    sys.stdout.write(response.json())

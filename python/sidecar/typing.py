@@ -1,4 +1,5 @@
 from datetime import date
+from enum import Enum
 from typing import Any
 
 from pydantic import BaseModel
@@ -8,16 +9,25 @@ class RefStudioModel(BaseModel):
     # This produces cleaner JSON Schema (and hence TypeScript types).
     # See https://github.com/refstudio/refstudio/pull/161 for more context.
     class Config:
+        use_enum_values = True
+
         @staticmethod
         def schema_extra(schema: dict[str, Any], _model) -> None:
             for prop in schema.get('properties', {}).values():
                 prop.pop('title', None)
 
 
+class IngestStatus(str, Enum):
+    PENDING = "pending"
+    FAILURE = "failure"
+    COMPLETE = "complete"
+
+
 class Reference(RefStudioModel):
     """A reference for an academic paper / PDF"""
     source_filename: str
     filename_md5: str
+    status: IngestStatus = IngestStatus.PENDING
     citation_key: str | None = None
     title: str | None = None
     abstract: str | None = None
@@ -44,6 +54,16 @@ class Chunk(RefStudioModel):
 class IngestResponse(RefStudioModel):
     project_name: str
     references: list[Reference]
+
+
+class ReferenceStatus(RefStudioModel):
+    source_filename: str
+    filename_md5: str
+    status: IngestStatus
+
+
+class IngestStatusResponse(RefStudioModel):
+    statuses: list[ReferenceStatus]
 
 
 class RewriteChoice(RefStudioModel):
