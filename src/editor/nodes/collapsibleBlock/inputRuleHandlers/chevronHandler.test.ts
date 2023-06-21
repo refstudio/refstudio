@@ -5,14 +5,13 @@ import { EDITOR_EXTENSIONS } from '../../../TipTapEditorConfigs';
 import { chevronHandler } from './chevronHandler';
 
 describe('Chevron input rule handler', () => {
+  const editor = new Editor({
+    extensions: EDITOR_EXTENSIONS,
+  });
   test('should remove "> " and turn paragraph into an uncollapsed and focused collapsible block', () => {
-    const editor = new Editor({
-      extensions: EDITOR_EXTENSIONS,
-    });
+    editor.chain().setContent('<p>> Some content</p>').setTextSelection(4).run();
 
-    editor.commands.setContent('<p>> Some content</p>');
-
-    chevronHandler({ chain: () => editor.chain(), range: { from: 2, to: 4 } });
+    chevronHandler({ can: () => editor.can(), chain: () => editor.chain(), range: { from: 2, to: 4 } });
 
     expect(getText(editor.state.doc)).not.toContain('> ');
 
@@ -30,5 +29,14 @@ describe('Chevron input rule handler', () => {
     // The selection should point to the start of the text
     expect(editor.state.doc.nodeAt($from.pos)?.type.name).toEqual('text');
     expect($from.sameParent(editor.state.doc.resolve($from.pos - 1))).toBe(false);
+  });
+
+  test('should do nothing when the block cannot be turned into a collapsible block', () => {
+    editor.chain().setContent('<h1>> Some content</h1>').setTextSelection(4).run();
+    const initialDoc = editor.state.doc;
+
+    chevronHandler({ can: () => editor.can(), chain: () => editor.chain(), range: { from: 2, to: 4 } });
+
+    expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
   });
 });

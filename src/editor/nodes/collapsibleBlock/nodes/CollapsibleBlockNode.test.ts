@@ -127,6 +127,15 @@ describe('CollapsibleBlockNode commands', () => {
       expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
     });
 
+    test('should not do anything if block cannot be turned into collapsible block', () => {
+      editor.commands.setContent('<h1>Some content</h1>');
+      const initialDoc = editor.state.doc;
+
+      const commandResult = editor.chain().setTextSelection(0).setCollapsibleBlock().run();
+      expect(commandResult).toBe(false);
+      expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
+    });
+
     test('should not do anything if selection is not empty', () => {
       editor.commands.setContent('<p>Some text</p>');
       const initialDoc = editor.state.doc;
