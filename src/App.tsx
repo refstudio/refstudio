@@ -4,11 +4,13 @@ import { ImperativePanelHandle, Panel, PanelGroup } from 'react-resizable-panels
 
 import { PrimarySideBar, PrimarySideBarPane } from './components/PrimarySideBar';
 import { VerticalResizeHandle } from './components/VerticalResizeHandle';
+import { emitEvent, RefStudioEvents } from './events';
 import { AIPanel } from './panels/AIPanel';
 import { ExplorerPanel } from './panels/ExplorerPanel';
 import { MainPanel } from './panels/MainPanel';
 import { ReferencesDropZone } from './panels/references/ReferencesDropZone';
 import { ReferencesPanel } from './panels/references/ReferencesPanel';
+import { SettingsModalOpener } from './settings/SettingsModalOpener';
 import { EditorAPI } from './types/EditorAPI';
 import { PdfViewerAPI } from './types/PdfViewerAPI';
 import { ReferenceItem } from './types/ReferenceItem';
@@ -22,19 +24,22 @@ function App() {
   }, [pdfViewerRef]);
 
   return (
-    <PanelGroup
-      autoSaveId="refstudio"
-      className="relative h-full"
-      direction="horizontal"
-      onLayout={updatePDFViewerWidth}
-    >
-      <LeftSidePanelWrapper onRefClicked={(reference) => editorRef.current?.insertReference(reference)} />
-      <Panel defaultSize={60}>
-        <MainPanel editorRef={editorRef} pdfViewerRef={pdfViewerRef} />
-      </Panel>
-      <RightPanelWrapper />
+    <>
+      <PanelGroup
+        autoSaveId="refstudio"
+        className="relative h-full"
+        direction="horizontal"
+        onLayout={updatePDFViewerWidth}
+      >
+        <LeftSidePanelWrapper onRefClicked={(reference) => editorRef.current?.insertReference(reference)} />
+        <Panel defaultSize={60} order={2}>
+          <MainPanel editorRef={editorRef} pdfViewerRef={pdfViewerRef} />
+        </Panel>
+        <RightPanelWrapper />
+      </PanelGroup>
       <ReferencesDropZone />
-    </PanelGroup>
+      <SettingsModalOpener />
+    </>
   );
 }
 
@@ -62,12 +67,19 @@ function LeftSidePanelWrapper({ onRefClicked }: { onRefClicked(item: ReferenceIt
     }
   }, [leftPanelRef, primaryPaneCollapsed]);
 
+  const openSettings = React.useCallback(() => emitEvent(RefStudioEvents.Menu.settings), []);
+
   return (
     <>
-      <PrimarySideBar activePane={primaryPaneCollapsed ? null : primaryPane} onClick={handleSideBarClick} />
+      <PrimarySideBar
+        activePane={primaryPaneCollapsed ? null : primaryPane}
+        onClick={handleSideBarClick}
+        onSettingsClick={openSettings}
+      />
       <Panel
         collapsible
         defaultSize={20}
+        order={1}
         ref={leftPanelRef}
         onCollapse={(collapsed) => setPrimaryPaneCollapsed(collapsed)}
       >
@@ -94,7 +106,7 @@ function RightPanelWrapper() {
   return (
     <>
       <VerticalResizeHandle />
-      <Panel collapsible ref={panelRef} onCollapse={setClosed}>
+      <Panel collapsible order={3} ref={panelRef} onCollapse={setClosed}>
         <AIPanel onCloseClick={() => setClosed(true)} />
         {closed && (
           <div className="absolute bottom-0 right-0 flex border border-slate-300 bg-slate-100 px-4 py-2">

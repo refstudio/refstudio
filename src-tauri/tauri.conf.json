@@ -19,6 +19,8 @@
       "fs": {
         "all": true,
         "scope": [
+          "$APPCONFIG",
+          "$APPCONFIG/*",
           "$APPDATA/**",
           "$RESOURCE/**"
         ]

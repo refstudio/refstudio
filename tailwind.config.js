@@ -31,6 +31,7 @@ function autocompleteCustomComponentsPlugin() {
   return plugin(function ({ addComponents }) {
     addComponents({
       '.btn-primary': {},
+      '.debug-widget': {}
     })
   })
 }

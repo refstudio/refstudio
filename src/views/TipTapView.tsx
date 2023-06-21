@@ -1,5 +1,5 @@
 import { TipTapFileContent } from '../atoms/types/FileContent';
-import { TipTapEditor } from '../TipTapEditor/TipTapEditor';
+import { TipTapEditor } from '../editor/TipTapEditor';
 import { EditorAPI } from '../types/EditorAPI';
 
 export function TipTapView({
