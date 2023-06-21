@@ -1,9 +1,10 @@
 import { Node } from '@tiptap/core';
 import { Fragment, Slice } from '@tiptap/pm/model';
-import { NodeSelection, TextSelection } from '@tiptap/pm/state';
+import { TextSelection } from '@tiptap/pm/state';
 import { ReplaceStep } from '@tiptap/pm/transform';
-import { ReactNodeViewRenderer } from '@tiptap/react';
+import { isNodeSelection, ReactNodeViewRenderer } from '@tiptap/react';
 
+import { unsetPartiallySelectedCollapsibleBlocks } from '../collapsibleBlock/helpers/unsetPartiallySelectedCollapsibleBlocks';
 import { DraggableBlock } from './DraggableBlock';
 
 declare module '@tiptap/core' {
@@ -43,11 +44,11 @@ export const DraggableBlockNode = Node.create({
       ...this.parent?.(),
       splitDraggableBlock:
         () =>
-        ({ tr, state, dispatch }) => {
-          const { selection } = state;
+        ({ editor, tr, dispatch }) => {
+          const { selection } = tr;
           const { $from, $to } = selection;
 
-          if (('node' in selection && (selection as NodeSelection).node.isBlock) || $from.depth < 2) {
+          if ((isNodeSelection(selection) && selection.node.isBlock) || $from.depth < 2) {
             return false;
           }
 
@@ -74,7 +75,7 @@ export const DraggableBlockNode = Node.create({
           // Create a new draggable block, containing text after the selection
           const postNode = this.type.create(
             null,
-            $to.parent.type.create($to.parent.attrs, $to.parent.slice($to.parentOffset).content, $to.parent.marks),
+            editor.schema.nodes.paragraph.createChecked(null, $to.parent.slice($to.parentOffset).content),
           );
 
           if (dispatch) {
@@ -106,7 +107,8 @@ export const DraggableBlockNode = Node.create({
 
   addKeyboardShortcuts() {
     return {
-      Enter: ({ editor }) => editor.commands.splitDraggableBlock(),
+      Enter: ({ editor }) =>
+        editor.chain().command(unsetPartiallySelectedCollapsibleBlocks).splitDraggableBlock().run(),
     };
   },
 });

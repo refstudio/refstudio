@@ -2,7 +2,7 @@ import './DraggableBlock.css';
 
 import { Editor, NodeViewContent, NodeViewWrapper } from '@tiptap/react';
 
-import { cx } from '../../cx';
+import { cx } from '../../../cx';
 
 interface DraggableBlockProps {
   editor: Editor;
@@ -19,6 +19,9 @@ export function DraggableBlock({ editor, getPos, selected }: DraggableBlockProps
           contentEditable="false"
           data-drag-handle
           onClick={() => {
+            editor.commands.setNodeSelection(getPos());
+          }}
+          onMouseDown={() => {
             editor.commands.setNodeSelection(getPos());
           }}
         />
