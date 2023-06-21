@@ -13,7 +13,7 @@ export function ReferenceView({ referenceId }: { referenceId: ReferenceFileConte
   }
 
   return (
-    <table className='reference-details'>
+    <table className="reference-details">
       <thead>
         <tr>
           <th>Key</th>

@@ -91,11 +91,7 @@ export function MainPanelPane({ pane, pdfViewerRef }: MainPanelPaneProps & MainP
       />
       <div className="flex h-full w-full overflow-hidden">
         {activeFile && activeFileContent ? (
-          <MainPaneViewContent
-            activeFileAtom={activeFileContent}
-            fileId={activeFile}
-            pdfViewerRef={pdfViewerRef}
-          />
+          <MainPaneViewContent activeFileAtom={activeFileContent} fileId={activeFile} pdfViewerRef={pdfViewerRef} />
         ) : (
           <EmptyView />
         )}
