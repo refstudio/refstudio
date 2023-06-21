@@ -4,10 +4,12 @@ import { ImperativePanelHandle, Panel, PanelGroup } from 'react-resizable-panels
 
 import { PrimarySideBar, PrimarySideBarPane } from './components/PrimarySideBar';
 import { VerticalResizeHandle } from './components/VerticalResizeHandle';
+import { emitEvent, RefStudioEvents } from './events';
 import { AIPanel } from './panels/AIPanel';
 import { ExplorerPanel } from './panels/ExplorerPanel';
 import { MainPanel } from './panels/MainPanel';
 import { ReferencesPanel } from './panels/ReferencesPanel';
+import { SettingsModalOpener } from './settings/SettingsModalOpener';
 import { PdfViewerAPI } from './types/PdfViewerAPI';
 
 function App() {
@@ -17,18 +19,21 @@ function App() {
   }, [pdfViewerRef]);
 
   return (
-    <PanelGroup
-      autoSaveId="refstudio"
-      className="relative h-full"
-      direction="horizontal"
-      onLayout={updatePDFViewerWidth}
-    >
-      <LeftSidePanelWrapper />
-      <Panel defaultSize={60}>
-        <MainPanel pdfViewerRef={pdfViewerRef} />
-      </Panel>
-      <RightPanelWrapper />
-    </PanelGroup>
+    <>
+      <PanelGroup
+        autoSaveId="refstudio"
+        className="relative h-full"
+        direction="horizontal"
+        onLayout={updatePDFViewerWidth}
+      >
+        <LeftSidePanelWrapper />
+        <Panel defaultSize={60} order={2}>
+          <MainPanel pdfViewerRef={pdfViewerRef} />
+        </Panel>
+        <RightPanelWrapper />
+      </PanelGroup>
+      <SettingsModalOpener />
+    </>
   );
 }
 
@@ -56,12 +61,19 @@ function LeftSidePanelWrapper() {
     }
   }, [leftPanelRef, primaryPaneCollapsed]);
 
+  const openSettings = React.useCallback(() => emitEvent(RefStudioEvents.Menu.settings), []);
+
   return (
     <>
-      <PrimarySideBar activePane={primaryPaneCollapsed ? null : primaryPane} onClick={handleSideBarClick} />
+      <PrimarySideBar
+        activePane={primaryPaneCollapsed ? null : primaryPane}
+        onClick={handleSideBarClick}
+        onSettingsClick={openSettings}
+      />
       <Panel
         collapsible
         defaultSize={20}
+        order={1}
         ref={leftPanelRef}
         onCollapse={(collapsed) => setPrimaryPaneCollapsed(collapsed)}
       >
@@ -88,7 +100,7 @@ function RightPanelWrapper() {
   return (
     <>
       <VerticalResizeHandle />
-      <Panel collapsible ref={panelRef} onCollapse={setClosed}>
+      <Panel collapsible order={3} ref={panelRef} onCollapse={setClosed}>
         <AIPanel onCloseClick={() => setClosed(true)} />
         {closed && (
           <div className="absolute bottom-0 right-0 flex border border-slate-300 bg-slate-100 px-4 py-2">
