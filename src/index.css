@@ -14,10 +14,17 @@
 
 @layer components {
   .btn-primary {
-    @apply cursor-pointer rounded-xl bg-primary hover:bg-primary-hover;
+    @apply cursor-pointer rounded-xl bg-primary;
+    @apply px-4 py-0.5;
+    @apply hover:bg-primary-hover hover:text-white;
   }
   .btn-primary[disabled] {
     @apply pointer-events-none opacity-50;
+  }
+
+  /* Displays a box (top right) with a debug note */
+  .debug-widget {
+    @apply relative before:absolute before:right-4 before:top-4 before:hidden before:bg-yellow-100 before:p-2 hover:before:block hover:before:content-['Just_for_Debug!'];
   }
 }
 

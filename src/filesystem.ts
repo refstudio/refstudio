@@ -8,14 +8,22 @@ import {
   writeBinaryFile,
   writeTextFile,
 } from '@tauri-apps/api/fs';
-import { appDataDir, join } from '@tauri-apps/api/path';
+import { appConfigDir, appDataDir, join } from '@tauri-apps/api/path';
 
 import { FileContent } from './atoms/types/FileContent';
 import { FileEntry, FileFileEntry } from './atoms/types/FileEntry';
-import { INITIAL_CONTENT } from './TipTapEditor/TipTapEditorConfigs';
+import { INITIAL_CONTENT } from './editor/TipTapEditorConfigs';
 
 const PROJECT_NAME = 'project-x';
 const UPLOADS_DIR = 'uploads';
+
+export async function getConfigDir() {
+  return appConfigDir();
+}
+
+export async function getAppDataDir() {
+  return appDataDir();
+}
 
 async function getBaseDir() {
   return join(await appDataDir(), PROJECT_NAME);

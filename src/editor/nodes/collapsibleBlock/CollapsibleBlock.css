@@ -1,0 +1,29 @@
+collapsible-block {
+  @apply flex rounded-lg;
+  @apply relative;
+}
+
+collapsible-block > button {
+  @apply block cursor-pointer border-0 bg-transparent;
+  @apply self-start;
+  @apply h-6 w-6 items-center justify-center p-1.5;
+  @apply rotate-180;
+  @apply opacity-100;
+  transition: transform 200ms ease-out 0s;
+}
+
+collapsible-block > button.folded {
+  @apply rotate-90;
+}
+
+collapsible-block:not(:has(collapsible-content)) > button {
+  @apply opacity-50;
+}
+
+collapsible-block .content {
+  @apply flex-1;
+}
+
+collapsible-block .content.folded collapsible-content {
+  @apply hidden;
+}
