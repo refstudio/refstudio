@@ -78,7 +78,7 @@ export function ReferencesPanel({ onRefClicked }: ReferencesPanelProps) {
                   onUpload={(files) => void handleChange(files)}
                 />
               )}
-              {references.length > 0 && !isPdfIngestionRunning && (
+              {import.meta.env.DEV && references.length > 0 && !isPdfIngestionRunning && (
                 <div className="mt-10 text-right text-xs ">
                   <button className="text-gray-400 hover:underline" onClick={() => setReferences([])}>
                     DEBUG: reset references store
