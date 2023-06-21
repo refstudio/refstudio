@@ -1,4 +1,4 @@
-import { act, renderHook } from '@testing-library/react-hooks';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { createStore, useAtomValue } from 'jotai';
 import { describe, expect, test } from 'vitest';
 
@@ -338,15 +338,13 @@ describe('fileActions', () => {
     });
 
     expect(leftPane.current.activeFileContent).toBeDefined();
-    const { result: activeFile, waitForNextUpdate } = renderHook(() =>
-      useAtomValue(leftPane.current.activeFileContent!, { store }),
-    );
+    const { result: activeFile } = renderHook(() => useAtomValue(leftPane.current.activeFileContent!, { store }));
 
     expect(activeFile.current.state).toBe('loading');
 
-    await waitForNextUpdate();
-
-    expect(mockedReadFileContent.mock.calls).toHaveLength(1);
+    await waitFor(() => {
+      expect(mockedReadFileContent.mock.calls).toHaveLength(1);
+    });
 
     if (activeFile.current.state !== 'hasData') {
       fail('Data should be available');

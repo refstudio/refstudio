@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook } from '@testing-library/react';
 import { Atom, createStore, useAtomValue, useSetAtom, WritableAtom } from 'jotai';
 
 export function runGetAtomHook<T>(atom: Atom<T>, store: ReturnType<typeof createStore>) {

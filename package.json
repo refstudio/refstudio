@@ -52,6 +52,7 @@
     "react-popper": "^2.3.0",
     "react-resizable-panels": "^0.0.51",
     "tailwindcss": "^3.3.2",
+    "tauri-settings": "^0.3.2",
     "tiptap-markdown": "^0.7.2",
     "usehooks-ts": "^2.9.1"
   },
@@ -59,7 +60,6 @@
     "@tauri-apps/cli": "^1.2.3",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
-    "@testing-library/react-hooks": "^8.0.1",
     "@testing-library/user-event": "^14.4.3",
     "@types/node": "^18.7.10",
     "@types/react": "^18.0.15",
