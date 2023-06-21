@@ -353,14 +353,28 @@ def get_statuses():
     storage = JsonStorage(filepath=REFERENCES_JSON_PATH)
     storage.load()
 
+    uploads = Path(UPLOADS_DIR).glob("*.pdf")
+    references = {
+        ref.source_filename: ref for ref in storage.references
+    }
+
     statuses = []
-    for ref in storage.references:
-        statuses.append(
-            typing.ReferenceStatus(
+    for filepath in uploads:
+        if filepath.name in references:
+            ref = references[filepath.name]
+
+            status = typing.ReferenceStatus(
                 source_filename=ref.source_filename,
                 filename_md5=ref.filename_md5,
                 status=ref.status
             )
-        )
+        else:
+            status = typing.ReferenceStatus(
+                source_filename=filepath.name,
+                filename_md5=get_filename_md5(filepath.name),
+                status=typing.IngestStatus.PENDING
+            )
+        statuses.append(status)
+
     response = typing.IngestStatusResponse(statuses=statuses)
     sys.stdout.write(response.json())
