@@ -5,6 +5,11 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
+/**
+ * An enumeration.
+ */
+export type IngestStatus = "pending" | "failure" | "complete";
+
 export interface CliCommands {
   ingest: IngestResponse;
   rewrite: RewriteChoice[];
@@ -20,6 +25,7 @@ export interface IngestResponse {
 export interface Reference {
   source_filename: string;
   filename_md5: string;
+  status?: IngestStatus & string;
   citation_key?: string;
   title?: string;
   abstract?: string;

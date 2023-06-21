@@ -24,6 +24,16 @@
     "chat"
   ],
   "definitions": {
+    "IngestStatus": {
+      "title": "IngestStatus",
+      "description": "An enumeration.",
+      "enum": [
+        "pending",
+        "failure",
+        "complete"
+      ],
+      "type": "string"
+    },
     "Author": {
       "title": "Author",
       "type": "object",
@@ -78,6 +88,14 @@
         },
         "filename_md5": {
           "type": "string"
+        },
+        "status": {
+          "default": "pending",
+          "allOf": [
+            {
+              "$ref": "#/definitions/IngestStatus"
+            }
+          ]
         },
         "citation_key": {
           "type": "string"
