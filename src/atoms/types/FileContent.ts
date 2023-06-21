@@ -18,4 +18,9 @@ export interface JsonFileContent {
   textContent: string;
 }
 
-export type FileContent = TipTapFileContent | PdfFileContent | XmlFileContent | JsonFileContent;
+export interface ReferenceFileContent {
+  type: 'reference';
+  referenceId: string;
+}
+
+export type FileContent = TipTapFileContent | PdfFileContent | XmlFileContent | JsonFileContent | ReferenceFileContent;

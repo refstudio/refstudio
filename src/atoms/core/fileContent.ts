@@ -5,7 +5,8 @@ import { Loadable } from 'jotai/vanilla/utils/loadable';
 
 import { readFileContent } from '../../filesystem';
 import { FileContent } from '../types/FileContent';
-import { FileFileEntry, FileId } from '../types/FileEntry';
+import { FileId } from '../types/FileData';
+import { FileFileEntry } from '../types/FileEntry';
 
 type FileContentState = ReadonlyMap<FileId, Atom<Loadable<FileContent>>>;
 
@@ -23,6 +24,18 @@ export const loadFile = atom(null, (get, set, file: FileFileEntry) => {
   updatedMap.set(file.path, fileAtom);
   set(fileContentAtom, updatedMap);
 });
+
+/** Synchronously loads file content in memory */
+export const loadFileSync = atom(
+  null,
+  (get, set, { fileId, fileContent }: { fileId: FileId; fileContent: FileContent }) => {
+    const currentOpenFiles = get(fileContentAtom);
+    const updatedMap = new Map(currentOpenFiles);
+    const fileAtom = loadable(atom(() => fileContent));
+    updatedMap.set(fileId, fileAtom);
+    set(fileContentAtom, updatedMap);
+  },
+);
 
 /** Removes the content from memory when closing the file */
 export const unloadFile = atom(null, (get, set, fileId: FileId) => {

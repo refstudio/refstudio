@@ -5,7 +5,7 @@ import { isNonNullish } from '../../lib/isNonNullish';
 import { PaneContent, PaneFileId, PaneId, PaneState } from '../types/PaneGroup';
 import { activePaneIdAtom } from './activePane';
 import { fileContentAtom } from './fileContent';
-import { fileEntryAtom } from './fileEntry';
+import { fileDataAtom } from './fileData';
 
 type PaneGroupState = Record<PaneId, PaneState>;
 
@@ -21,13 +21,13 @@ export const paneGroupAtom = atom<PaneGroupState>({
 
 export function getPane(get: Getter, paneId: PaneId): PaneContent {
   const panes = get(paneGroupAtom);
-  const fileEntries = get(fileEntryAtom);
+  const filesData = get(fileDataAtom);
   const openFiles = get(fileContentAtom);
   const pane = panes[paneId];
   return {
     id: paneId,
-    files: pane.openFiles.map((id) => fileEntries.get(id)).filter(isNonNullish),
-    activeFile: pane.activeFile ? fileEntries.get(pane.activeFile) : undefined,
+    files: pane.openFiles.map((id) => filesData.get(id)).filter(isNonNullish),
+    activeFile: pane.activeFile,
     activeFileContent: pane.activeFile ? openFiles.get(pane.activeFile) : undefined,
   };
 }

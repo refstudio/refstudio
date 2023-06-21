@@ -5,18 +5,14 @@ import { useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 
 import { selectionAtom } from '../atoms/selectionState';
-import { EditorAPI } from '../types/EditorAPI';
 import { MenuBar } from './MenuBar';
-import { ReferenceNode } from './ReferenceNode/ReferenceNode';
-import { getReferenceLabel } from './ReferenceNode/ReferencesList';
 import { EDITOR_EXTENSIONS, INITIAL_CONTENT, transformPasted } from './TipTapEditorConfigs';
 
 interface EditorProps {
-  editorRef: React.MutableRefObject<EditorAPI | null>;
   editorContent: string | null;
 }
 
-export function TipTapEditor({ editorRef, editorContent }: EditorProps) {
+export function TipTapEditor({ editorContent }: EditorProps) {
   const [editor, setEditor] = useState<Editor | null>(null);
   const setSelection = useSetAtom(selectionAtom);
 
@@ -39,20 +35,6 @@ export function TipTapEditor({ editorRef, editorContent }: EditorProps) {
       newEditor.destroy();
     };
   }, [editorContent, setSelection]);
-
-  useEffect(() => {
-    if (!editor) {
-      return;
-    }
-    editorRef.current = {
-      insertReference(reference) {
-        editor.commands.insertContentAt(editor.state.selection.head, {
-          type: ReferenceNode.name,
-          attrs: { id: reference.id, label: getReferenceLabel(reference) },
-        });
-      },
-    };
-  }, [editor, editorRef]);
 
   if (!editor) {
     return <div>...</div>;

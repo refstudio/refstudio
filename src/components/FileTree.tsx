@@ -1,65 +1,75 @@
 import { VscFile, VscFolder } from 'react-icons/vsc';
 
+import { FileId } from '../atoms/types/FileData';
 import { FileEntry } from '../atoms/types/FileEntry';
 import { cx } from '../cx';
 
-interface FileTreeBaseProps {
-  root?: boolean;
-  files: FileEntry[];
-  file?: FileEntry;
-  selectedFiles: FileEntry[];
-  onClick: (file: FileEntry) => void;
-  rightAction?: (file: FileEntry) => React.ReactNode;
+interface FileTreeNodeProps {
+  fileName: string;
+  isFolder?: boolean;
+  onClick?: () => void;
+  rightAction?: React.ReactNode;
+  selected?: boolean;
 }
-export function FileTree({ files, root, ...props }: FileTreeBaseProps) {
+
+interface FileEntryTreeProps {
+  files: FileEntry[];
+  onClick: (fileId: FileId) => void;
+  rightAction?: (file: FileId) => React.ReactNode;
+  root?: boolean;
+  selectedFiles: FileId[];
+}
+
+export function FileEntryTree(props: FileEntryTreeProps) {
+  const { files, root, onClick, rightAction, selectedFiles } = props;
+
   return (
     <div>
       <ul className={root ? 'ml-4' : 'ml-6'}>
-        {files.map((file) => (
-          <FileTreeNode file={file} files={files} key={file.path} {...props} />
-        ))}
+        <li>
+          {files
+            // Hide DOTFILES
+            .filter((file) => !file.isDotfile)
+            .map((file) =>
+              file.isFolder ? (
+                <>
+                  <FileTreeNode fileName={file.name} isFolder key={file.path} />
+                  <FileEntryTree key={file.path} {...props} files={file.children} />
+                </>
+              ) : (
+                <FileTreeNode
+                  fileName={file.name}
+                  key={file.path}
+                  rightAction={rightAction ? rightAction(file.path) : undefined}
+                  selected={selectedFiles.includes(file.path)}
+                  onClick={() => onClick(file.path)}
+                />
+              ),
+            )}
+        </li>
       </ul>
     </div>
   );
 }
-function FileTreeNode({ file, onClick, rightAction, selectedFiles }: FileTreeBaseProps) {
-  if (!file) {
-    return null;
-  }
-
-  const { isFolder } = file;
-
-  // Hide DOT_FILES
-  if (file.isDotfile) {
-    return null;
-  }
-
+export function FileTreeNode({ fileName, isFolder, onClick, rightAction, selected }: FileTreeNodeProps) {
   return (
-    <li>
-      <div
-        className={cx('mb-1 py-1', 'flex flex-row items-center gap-1', 'group', {
-          'bg-slate-100': selectedFiles.some((f) => f.path === file.path),
-          'cursor-pointer hover:bg-slate-100': !isFolder,
+    <div
+      className={cx('mb-1 py-1', 'flex flex-row items-center gap-1', 'group', {
+        'bg-slate-100': selected,
+        'cursor-pointer hover:bg-slate-100': !isFolder,
+      })}
+      title={fileName}
+      onClick={onClick}
+    >
+      {isFolder ? <VscFolder className="shrink-0" /> : <VscFile className="shrink-0" />}
+      <span
+        className={cx('flex-1 truncate', {
+          'font-bold': isFolder,
         })}
-        title={file.name}
-        onClick={() => !isFolder && onClick(file)}
       >
-        {isFolder ? <VscFolder className="shrink-0" /> : <VscFile className="shrink-0" />}
-        <span
-          className={cx('flex-1 truncate', {
-            'font-bold': isFolder,
-          })}
-        >
-          {file.name}
-        </span>
-        {rightAction && (
-          <div className="mr-2 hidden p-0.5 hover:bg-gray-200 group-hover:block">{rightAction(file)}</div>
-        )}
-      </div>
-
-      {isFolder && (
-        <FileTree files={file.children} rightAction={rightAction} selectedFiles={selectedFiles} onClick={onClick} />
-      )}
-    </li>
+        {fileName}
+      </span>
+      {rightAction && <div className="mr-2 hidden p-0.5 hover:bg-gray-200 group-hover:block">{rightAction}</div>}
+    </div>
   );
 }

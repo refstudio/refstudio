@@ -3,22 +3,19 @@ import { useState } from 'react';
 import { FileUploader } from 'react-drag-drop-files';
 
 import { runPDFIngestion } from '../api/ingestion';
+import { openReferenceAtom } from '../atoms/fileActions';
 import { getReferencesAtom, setReferencesAtom } from '../atoms/referencesState';
 import { PanelSection } from '../components/PanelSection';
 import { PanelWrapper } from '../components/PanelWrapper';
 import { Spinner } from '../components/Spinner';
 import { ensureProjectFileStructure, uploadFiles } from '../filesystem';
-import { ReferenceItem } from '../types/ReferenceItem';
 
 const BASE_DIR = await ensureProjectFileStructure();
 
-interface ReferencesPanelProps {
-  onRefClicked: (item: ReferenceItem) => void;
-}
-
-export function ReferencesPanel({ onRefClicked }: ReferencesPanelProps) {
+export function ReferencesPanel() {
   const references = useAtomValue(getReferencesAtom);
   const setReferences = useSetAtom(setReferencesAtom);
+  const openReference = useSetAtom(openReferenceAtom);
 
   const [isPdfIngestionRunning, setIsPdfIngestionRunning] = useState(false);
 
@@ -48,7 +45,7 @@ export function ReferencesPanel({ onRefClicked }: ReferencesPanelProps) {
             <li
               className="mb-0 cursor-pointer overflow-x-hidden text-ellipsis p-1 hover:bg-slate-200"
               key={reference.id}
-              onClick={() => onRefClicked(reference)}
+              onClick={() => openReference(reference.id)}
             >
               <code className="mr-2">[{reference.citationKey}]</code>
               <strong>{reference.title}</strong>

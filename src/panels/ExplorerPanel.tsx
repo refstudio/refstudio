@@ -1,5 +1,6 @@
+import { useQuery } from '@tanstack/react-query';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { useEffect, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { VscCloseAll, VscSplitHorizontal } from 'react-icons/vsc';
 
 import {
@@ -10,28 +11,60 @@ import {
   selectFileInPaneAtom,
   splitFileToPaneAtom,
 } from '../atoms/fileActions';
-import { FileEntry } from '../atoms/types/FileEntry';
-import { FileTree } from '../components/FileTree';
+import { FileId } from '../atoms/types/FileData';
+import { FileEntry, FileFileEntry } from '../atoms/types/FileEntry';
+import { PaneId } from '../atoms/types/PaneGroup';
+import { FileEntryTree, FileTreeNode } from '../components/FileTree';
 import { PanelSection } from '../components/PanelSection';
 import { PanelWrapper } from '../components/PanelWrapper';
 import { readAllProjectFiles } from '../filesystem';
 import { isNonNullish } from '../lib/isNonNullish';
+
+function SplitPaneButton({ fromPaneId, toPaneId, fileId }: { fromPaneId: PaneId; toPaneId: PaneId; fileId: FileId }) {
+  const splitFileToPane = useSetAtom(splitFileToPaneAtom);
+
+  return (
+    <VscSplitHorizontal
+      title={`Move to ${fromPaneId} split pane`}
+      onClick={(evt) => {
+        evt.stopPropagation();
+        splitFileToPane({ fileId, fromPaneId, toPaneId });
+      }}
+    />
+  );
+}
 
 export function ExplorerPanel() {
   const left = useAtomValue(leftPaneAtom);
   const right = useAtomValue(rightPaneAtom);
   const selectFileInPane = useSetAtom(selectFileInPaneAtom);
   const openFile = useSetAtom(openFileAtom);
-  const splitFileToPane = useSetAtom(splitFileToPaneAtom);
   const closeAllFiles = useSetAtom(closeAllFilesAtom);
 
-  const [allFiles, setFiles] = useState<FileEntry[]>([]);
-  useEffect(() => {
-    (async function refreshProjectTree() {
-      const newFiles = await readAllProjectFiles();
-      setFiles(newFiles);
-    })();
-  }, []);
+  const { data: allFiles } = useQuery({
+    queryKey: ['allFiles'],
+    queryFn: readAllProjectFiles,
+    initialData: [],
+  });
+
+  const flattenFiles: (files: FileEntry[]) => FileFileEntry[] = useCallback(
+    (files: FileEntry[]) => files.flatMap((file) => (file.isFolder ? flattenFiles(file.children) : file)),
+    [],
+  );
+
+  const flattenedFiles = useMemo(() => flattenFiles(allFiles), [allFiles, flattenFiles]);
+
+  const handleOpenFile = useCallback(
+    (fileId: FileId) => {
+      const file = flattenedFiles.find((f) => f.path === fileId);
+      if (!file) {
+        console.warn('This file does not exist');
+        return;
+      }
+      openFile(file);
+    },
+    [flattenedFiles, openFile],
+  );
 
   const hasRightPanelFiles = right.files.length > 0;
 
@@ -43,48 +76,39 @@ export function ExplorerPanel() {
       >
         {hasRightPanelFiles && <div className="ml-4 text-xs font-bold">LEFT</div>}
         {left.files.length > 0 && (
-          <FileTree
-            files={left.files}
-            rightAction={(file) => (
-              <VscSplitHorizontal
-                title="Move to RIGHT split pane"
-                onClick={(evt) => {
-                  evt.stopPropagation();
-                  splitFileToPane({ fileId: file.path, fromPaneId: left.id, toPaneId: right.id });
-                }}
+          <div className="ml-4">
+            {left.files.map(({ fileId, fileName }) => (
+              <FileTreeNode
+                fileName={fileName}
+                key={fileId}
+                rightAction={<SplitPaneButton fileId={fileId} fromPaneId={left.id} toPaneId={right.id} />}
+                selected={fileId === left.activeFile}
+                onClick={() => selectFileInPane({ paneId: left.id, fileId })}
               />
-            )}
-            root
-            selectedFiles={left.activeFile ? [left.activeFile] : []}
-            onClick={(file) => selectFileInPane({ paneId: left.id, fileId: file.path })}
-          />
+            ))}
+          </div>
         )}
         {hasRightPanelFiles && <div className="ml-4 text-xs font-bold">RIGHT</div>}
         {hasRightPanelFiles && (
-          <FileTree
-            files={right.files}
-            rightAction={(file) => (
-              <VscSplitHorizontal
-                title="Move to LEFT split pane"
-                onClick={(evt) => {
-                  evt.preventDefault();
-                  evt.stopPropagation();
-                  splitFileToPane({ fileId: file.path, fromPaneId: right.id, toPaneId: left.id });
-                }}
+          <div className="ml-4">
+            {right.files.map(({ fileId, fileName }) => (
+              <FileTreeNode
+                fileName={fileName}
+                key={fileId}
+                rightAction={<SplitPaneButton fileId={fileId} fromPaneId={right.id} toPaneId={left.id} />}
+                selected={fileId === left.activeFile}
+                onClick={() => selectFileInPane({ paneId: right.id, fileId })}
               />
-            )}
-            root
-            selectedFiles={right.activeFile ? [right.activeFile] : []}
-            onClick={(file) => selectFileInPane({ paneId: right.id, fileId: file.path })}
-          />
+            ))}
+          </div>
         )}
       </PanelSection>
       <PanelSection grow title="Project X">
-        <FileTree
+        <FileEntryTree
           files={allFiles}
           root
           selectedFiles={[left.activeFile, right.activeFile].filter(isNonNullish)}
-          onClick={(file) => openFile(file)}
+          onClick={handleOpenFile}
         />
       </PanelSection>
     </PanelWrapper>
