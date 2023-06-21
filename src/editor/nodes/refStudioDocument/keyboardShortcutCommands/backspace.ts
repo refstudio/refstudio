@@ -32,5 +32,5 @@ export const backspace: KeyboardShortcutCommand = function ({ editor }) {
   if (editor.state.selection.empty || isNodeSelection(editor.state.selection)) {
     return false;
   }
-  return editor.commands.deleteSelection();
+  return editor.commands.deleteNonEmptySelection();
 };
