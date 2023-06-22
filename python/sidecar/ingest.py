@@ -36,10 +36,10 @@ GROBID_SERVER_URL = "https://kermitt2-grobid.hf.space"
 GROBID_TIMEOUT = 60 * 5
 
 APPDATA_DIR = Path(
-    os.environ.get('APP_DATA_DIR')
+    os.environ.get('APP_DATA_DIR', '/tmp')
 )
 PROJECT_NAME = Path(
-    os.environ.get('PROJECT_NAME')
+    os.environ.get('PROJECT_NAME', 'project-x')
 )
 UPLOADS_DIR = Path(
     os.path.join(APPDATA_DIR, PROJECT_NAME, 'uploads')
