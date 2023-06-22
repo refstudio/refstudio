@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import { Atom, atom } from 'jotai';
 import { loadable } from 'jotai/utils';
 import { Loadable } from 'jotai/vanilla/utils/loadable';

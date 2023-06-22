@@ -1,11 +1,10 @@
-/* eslint-disable no-underscore-dangle */
 import { atom, Getter } from 'jotai';
 
 import { isNonNullish } from '../../lib/isNonNullish';
 import { PaneContent, PaneFileId, PaneId, PaneState } from '../types/PaneGroup';
 import { activePaneIdAtom } from './activePane';
 import { fileContentAtom } from './fileContent';
-import { fileDataAtom } from './fileData';
+import { filesDataAtom } from './fileData';
 
 type PaneGroupState = Record<PaneId, PaneState>;
 
@@ -21,7 +20,7 @@ export const paneGroupAtom = atom<PaneGroupState>({
 
 export function getPane(get: Getter, paneId: PaneId): PaneContent {
   const panes = get(paneGroupAtom);
-  const filesData = get(fileDataAtom);
+  const filesData = get(filesDataAtom);
   const openFiles = get(fileContentAtom);
   const pane = panes[paneId];
   return {
