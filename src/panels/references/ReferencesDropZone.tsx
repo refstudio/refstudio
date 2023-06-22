@@ -11,7 +11,6 @@ import { listenEvent, RefStudioEvents } from '../../events';
 import { copyFiles } from '../../filesystem';
 import { useAsyncEffect } from '../../hooks/useAsyncEffect';
 import { isNonNullish } from '../../lib/isNonNullish';
-import { ReferenceItem } from '../../types/ReferenceItem';
 
 export function ReferencesDropZone() {
   const [visible, setVisible] = useState(false);
@@ -42,7 +41,7 @@ export function ReferencesDropZone() {
             title: filename,
             filename,
             authors: [{ fullName: 'Unknown' }],
-          } as ReferenceItem;
+          };
         })
         .filter(isNonNullish);
 

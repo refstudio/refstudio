@@ -1,7 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
 import { getUploadsDir } from '../filesystem';
-import { ReferenceItem } from '../types/ReferenceItem';
 import { runPDFIngestion } from './ingestion';
 import { callSidecar } from './sidecar';
 
@@ -54,12 +53,10 @@ describe('runPDFIngestion', () => {
         filename: 'file.pdf',
         id: 'md5',
         title: 'file',
-        abstract: '',
         authors: [],
         citationKey: 'unknown',
-        publishedDate: '',
       },
-    ] as ReferenceItem[]);
+    ]);
   });
 
   test('Should map fullName of authors ReferenceItem', async () => {
@@ -93,6 +90,6 @@ describe('runPDFIngestion', () => {
       {
         fullName: 'Ana Maria',
       },
-    ] as ReferenceItem['authors']);
+    ]);
   });
 });
