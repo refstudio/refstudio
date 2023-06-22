@@ -5,7 +5,7 @@ import { useAtomValue } from 'jotai';
 import { getDerivedReferenceAtom } from '../atoms/referencesState';
 import { ReferenceFileContent } from '../atoms/types/FileContent';
 
-export function ReferenceView({ referenceId }: { referenceId: ReferenceFileContent['referenceId'] }) {
+export function ReferenceView({ referenceId }: Pick<ReferenceFileContent, 'referenceId'>) {
   const reference = useAtomValue(getDerivedReferenceAtom(referenceId));
 
   if (!reference) {

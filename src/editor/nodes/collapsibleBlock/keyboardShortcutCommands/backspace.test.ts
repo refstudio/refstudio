@@ -5,26 +5,89 @@ import { findNodesByNodeType, getText } from '../../../test-utils';
 import { EDITOR_EXTENSIONS } from '../../../TipTapEditorConfigs';
 import { backspace } from './backspace';
 
+const collapsibleBlockWithSelection = `
+<collapsible-block>
+    <collapsible-summary>He|ader|</collapsible-summary>
+    <collapsible-content>
+        <p>Content Line 1</p>
+        <p>Content Line 2</p>
+    </collapsible-content>
+</collapsible-block>`;
+
+function setUpEditorWithSelection(editor: Editor, content: string) {
+  editor.chain().setContent(content).run();
+  const docLength = editor.getText().length;
+  const positions = [];
+  for (let i = 0; i < docLength; i++) {
+    const text = editor.view.state.doc.textBetween(i, i + 1);
+    if (text === '|') {
+      positions.push(i - positions.length);
+      console.log('Found | at', i);
+    }
+  }
+  editor.chain().setContent(content.replaceAll('|', '')).run();
+  return positions;
+}
+
 describe('Backspace keyboard shortcut command', () => {
   const editor = new Editor({
     extensions: EDITOR_EXTENSIONS,
   });
 
+  it.only('should select text based on markers', () => {
+    const [from, to] = setUpEditorWithSelection(editor, collapsibleBlockWithSelection);
+    console.log(from, to);
+    editor.chain().setTextSelection({ from, to }).run();
+
+    const sel = editor.view.state.selection;
+    const text = editor.view.state.doc.textBetween(sel.from, sel.to);
+    expect(sel.from).toEqual(from);
+    expect(sel.to).toEqual(to);
+    expect(text).toEqual('ader');
+  });
+
   test('should turn collapsible block back into paragraphs when selection is at the beginning of the summary', () => {
     // 3 is to position the caret at the beginning of the summary
-    editor.chain().setContent(defaultCollapsibleBlock).setTextSelection(3).run();
+    // editor.chain().setContent(collapsibleBlockWithSelection).run();
+    // editor.chain().setContent(collapsibleBlockWithSelection).setTextSelection({ from: 3, to: 5 }).run();
+    editor.chain().setContent(collapsibleBlockWithSelection).setTextSelection(2).run();
     expect(editor.state.doc.childCount).toBe(1);
+
+    const docLength = editor.getText().length;
+    for (let i = 0; i < docLength; i++) {
+      const text = editor.view.state.doc.textBetween(i, i + 1);
+      if (text === '|') {
+        console.log('Found | at', i);
+      }
+    }
+
+    console.log(editor.state.selection.content().content.toString());
+
+    editor.state.doc.forEach(function search(node, offset, index) {
+      // console.log(node.nodeSize, node.textContent);
+      if (node.type.name === 'text' && node.textContent.includes('|')) {
+        const pos = node.resolve(0);
+        console.log(pos.start(0), pos.index(0), node.textContent);
+      }
+      if ('forEach' in node) {
+        node.forEach(search);
+      }
+    });
+
+    console.log('html', editor.getHTML());
 
     const commandResult = backspace({ editor });
     expect(commandResult).toBe(true);
 
     const { doc } = editor.state;
+    console.log(editor.getHTML());
     // A new collapsible should have been added
     expect(doc.childCount).toBe(3);
 
     expect(getText(doc.child(0))).toEqual('Header');
     expect(getText(doc.child(1))).toEqual('Content Line 1');
     expect(getText(doc.child(2))).toEqual('Content Line 2');
+    expect(false).toBeTruthy();
   });
 
   test('should remove content and collapse block when removing the only remaining content block of collapsible block', () => {

@@ -102,7 +102,7 @@ export const CollapsibleBlockNode = Node.create({
           }
           return true;
         },
-      /* 
+      /*
         Splits a collapsible block from the summary:
          - removes text after the caret from the first collapsible block
          - creates a new collapsible block with text after the caret as summary and empty content
