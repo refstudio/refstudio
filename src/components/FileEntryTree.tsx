@@ -1,3 +1,4 @@
+import React from 'react';
 import { VscFile, VscFolder } from 'react-icons/vsc';
 
 import { FileId } from '../atoms/types/FileData';
@@ -32,10 +33,10 @@ export function FileEntryTree(props: FileEntryTreeProps) {
             .filter((file) => !file.isDotfile)
             .map((file) =>
               file.isFolder ? (
-                <>
-                  <FileTreeNode fileName={file.name} isFolder key={file.path} />
-                  <FileEntryTree key={file.path} {...props} files={file.children} root={false} />
-                </>
+                <React.Fragment key={file.path}>
+                  <FileTreeNode fileName={file.name} isFolder />
+                  <FileEntryTree {...props} files={file.children} root={false} />
+                </React.Fragment>
               ) : (
                 <FileTreeNode
                   fileName={file.name}
