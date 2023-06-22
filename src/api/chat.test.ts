@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect } from 'vitest';
 
 import { chatWithAI } from './chat';
 import { callSidecar } from './sidecar';
@@ -22,7 +22,7 @@ describe('chatWithAI', () => {
     expect(response).toStrictEqual(['some reply']);
   });
 
-  it('should return list of strings with content returned by sidecar', async () => {
+  it('should return list of strings with content returned by sidecar 2', async () => {
     vi.mocked(callSidecar).mockResolvedValue([
       {
         index: 0,

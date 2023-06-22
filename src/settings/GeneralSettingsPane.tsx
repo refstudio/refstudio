@@ -17,10 +17,10 @@ export function GeneralSettingsPane({ config }: SettingsPaneProps) {
     },
   });
 
-  function handleSaveSettings(evt: React.FormEvent<HTMLFormElement>) {
+  const handleSaveSettings = (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
     saveMutation.mutate({ general: generalSettings, sidecarLogging: sidecarLoggingSettings });
-  }
+  };
 
   const isDirty =
     JSON.stringify(generalSettings) !== JSON.stringify(getCachedSetting('general')) ||

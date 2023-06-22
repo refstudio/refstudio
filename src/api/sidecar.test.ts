@@ -1,5 +1,5 @@
 import { Command, SpawnOptions } from '@tauri-apps/api/shell';
-import { describe, test } from 'vitest';
+import { describe, it } from 'vitest';
 
 import {
   getCachedSetting,
