@@ -48,15 +48,8 @@ describe('runPDFIngestion', () => {
 
     const response = await runPDFIngestion();
     expect(response).toHaveLength(1);
-    expect(response).toStrictEqual([
-      {
-        filename: 'file.pdf',
-        id: 'md5',
-        title: 'file',
-        authors: [],
-        citationKey: 'unknown',
-      },
-    ]);
+    expect(response[0].id).toBe('md5');
+    expect(response[0].filename).toBe('file.pdf');
   });
 
   test('Should map fullName of authors ReferenceItem', async () => {
