@@ -95,6 +95,7 @@ describe('fileActions', () => {
 
     const reference: ReferenceItem = {
       id: 'reference',
+      filename: 'reference.pdf',
       citationKey: 'citationKey',
       title: 'Reference',
       authors: [],
@@ -182,6 +183,7 @@ describe('fileActions', () => {
 
     const reference: ReferenceItem = {
       id: 'reference',
+      filename: 'reference.pdf',
       citationKey: 'citationKey',
       title: 'Reference',
       authors: [],
