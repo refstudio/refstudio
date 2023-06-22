@@ -116,6 +116,7 @@ describe('Backspace keyboard shortcut command', () => {
       </collapsible-content>
     </collapsible-block>`;
     editor.chain().setContent(content).setTextSelection(7).run();
+    console.log(editor.state.doc.textBetween(0, 150));
     const initialDoc = editor.state.doc;
 
     const commandResult = backspace({ editor });
