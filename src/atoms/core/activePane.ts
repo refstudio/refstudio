@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import { atom } from 'jotai';
 
 import { PaneId, PaneState } from '../types/PaneGroup';

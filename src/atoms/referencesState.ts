@@ -13,7 +13,8 @@ const referencesAtom = atomWithStorage<ReferencesState>('references', {});
 
 export const getReferencesAtom = atom((get) => Object.values(get(referencesAtom)));
 
-export const getDerivedReferenceAtom = (referenceId: string) => atom((get) => get(referencesAtom)[referenceId]);
+export const getDerivedReferenceAtom = (referenceId: string) =>
+  atom<ReferenceItem | undefined>((get) => get(referencesAtom)[referenceId]);
 
 export const setReferencesAtom = atom(null, (_get, set, references: ReferenceItem[]) => {
   const updatedReferences = {} as ReferencesState;
