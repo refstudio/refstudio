@@ -109,12 +109,12 @@ describe('Backspace keyboard shortcut command', () => {
     setUpEditorWithSelection(
       editor,
       `<collapsible-block>
-      <collapsible-summary></collapsible-summary>
-      <collapsible-content>
-        <p>|</p>
-        <p>A sibling with content</p>
-      </collapsible-content>
-    </collapsible-block>`,
+        <collapsible-summary></collapsible-summary>
+        <collapsible-content>
+          <p>|</p>
+          <p>A sibling with content</p>
+        </collapsible-content>
+      </collapsible-block>`,
     );
     const initialDoc = editor.state.doc;
 
