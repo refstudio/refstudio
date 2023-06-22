@@ -5,7 +5,7 @@ import { describe, expect, test } from 'vitest';
 import { selectionAtom } from './selectionState';
 
 describe('selectionState', () => {
-  test('should be empty by default', () => {
+  it('should be empty by default', () => {
     // Note: We need to use `renderHook` to test atoms outside of react/provider
     // https://github.com/pmndrs/jotai/blob/main/docs/guides/testing.mdx#custom-hooks
     const { result } = renderHook(() => useAtom(selectionAtom));
@@ -13,7 +13,7 @@ describe('selectionState', () => {
     expect(selection).toBe('');
   });
 
-  test('should change to string value', () => {
+  it('should change to string value', () => {
     const { result } = renderHook(() => useAtom(selectionAtom));
     const [selection, setSelection] = result.current;
     expect(selection).toBe('');

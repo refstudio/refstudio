@@ -48,12 +48,12 @@ describe('GeneralSettingsPane component', () => {
     vi.clearAllMocks();
   });
 
-  test('should render the component', () => {
+  it('should render the component', () => {
     render(<GeneralSettingsPane config={panelConfig} />);
     expect(screen.getByTestId(panelConfig.id)).toBeInTheDocument();
   });
 
-  test('should render existing settings value', () => {
+  it('should render existing settings value', () => {
     const getCachedSettingMock = vi.mocked(getCachedSetting);
     render(<GeneralSettingsPane config={panelConfig} />);
 
@@ -63,7 +63,7 @@ describe('GeneralSettingsPane component', () => {
     expect(screen.getByLabelText('Path')).toHaveValue(mockSettings.sidecar.logging.path);
   });
 
-  test('should save (setCached, flush) with edited values on save', async () => {
+  it('should save (setCached, flush) with edited values on save', async () => {
     const user = userEvent.setup();
     render(<GeneralSettingsPane config={panelConfig} />);
 

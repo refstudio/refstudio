@@ -10,7 +10,7 @@ describe('chatWithAI', () => {
     vi.clearAllMocks();
   });
 
-  test('should return list of strings with content returned by sidecar', async () => {
+  it('should return list of strings with content returned by sidecar', async () => {
     vi.mocked(callSidecar).mockResolvedValue([
       {
         index: 0,
@@ -22,7 +22,7 @@ describe('chatWithAI', () => {
     expect(response).toStrictEqual(['some reply']);
   });
 
-  test('should return list of strings with content returned by sidecar', async () => {
+  it('should return list of strings with content returned by sidecar', async () => {
     vi.mocked(callSidecar).mockResolvedValue([
       {
         index: 0,
@@ -38,7 +38,7 @@ describe('chatWithAI', () => {
     expect(response).toStrictEqual(['some reply', 'Another reply']);
   });
 
-  test('should return empty list, and not call sidecar, if provided text is empty', async () => {
+  it('should return empty list, and not call sidecar, if provided text is empty', async () => {
     const callSidecarMock = vi.mocked(callSidecar).mockResolvedValue([]);
 
     const response = await chatWithAI('');
@@ -46,7 +46,7 @@ describe('chatWithAI', () => {
     expect(callSidecarMock.mock.calls.length).toBe(0);
   });
 
-  test('should return error message reply if exception thrown calling sidecar', async () => {
+  it('should return error message reply if exception thrown calling sidecar', async () => {
     vi.mocked(callSidecar).mockRejectedValue(new Error('Invalid API Key'));
 
     const response = await chatWithAI('input text');

@@ -22,12 +22,12 @@ describe('SettingsModalOpener component', () => {
     vi.clearAllMocks();
   });
 
-  test('should render the modal CLOSED (empty) by default', () => {
+  it('should render the modal CLOSED (empty) by default', () => {
     const { container } = render(<SettingsModalOpener />);
     expect(container).toBeEmptyDOMElement();
   });
 
-  test('should open the Settings model on SETTING menu event', () => {
+  it('should open the Settings model on SETTING menu event', () => {
     let settingEvtHandler: undefined | RefStudioEventCallback;
     let eventName = '';
     vi.mocked(listenEvent).mockImplementation(async (event: string, handler: RefStudioEventCallback) => {
@@ -53,7 +53,7 @@ describe('SettingsModalOpener component', () => {
     expect(screen.getByRole('menuitem', { name: 'Config' })).toBeInTheDocument();
   });
 
-  test('should toggle the Settings model on SETTING menu event', () => {
+  it('should toggle the Settings model on SETTING menu event', () => {
     let settingEvtHandler: undefined | RefStudioEventCallback;
     let eventName = '';
     vi.mocked(listenEvent).mockImplementation(async (event: string, handler: RefStudioEventCallback) => {

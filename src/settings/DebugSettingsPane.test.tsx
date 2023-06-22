@@ -48,17 +48,17 @@ describe('DebugSettingsPane component', () => {
     vi.clearAllMocks();
   });
 
-  test('should render the component', () => {
+  it('should render the component', () => {
     render(<DebugSettingsPane config={panelConfig} />);
     expect(screen.getByTestId(panelConfig.id)).toBeInTheDocument();
   });
 
-  test('should render default settings component', () => {
+  it('should render default settings component', () => {
     render(<DebugSettingsPane config={panelConfig} />);
     expect(screen.getByText(/default settings/i)).toBeInTheDocument();
   });
 
-  test('should render current settings component', () => {
+  it('should render current settings component', () => {
     render(<DebugSettingsPane config={panelConfig} />);
     expect(screen.getByText(/current settings/i)).toBeInTheDocument();
   });

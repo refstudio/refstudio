@@ -20,19 +20,19 @@ describe('SettingsModal component', () => {
     vi.clearAllMocks();
   });
 
-  test('should render the modal CLOSED (empty)', () => {
+  it('should render the modal CLOSED (empty)', () => {
     const { container } = render(<SettingsModal open={false} onCloseClick={noop} />);
     expect(container).toBeEmptyDOMElement();
   });
 
-  test('should render 3 settings panels with open={true}', () => {
+  it('should render 3 settings panels with open={true}', () => {
     render(<SettingsModal open onCloseClick={noop} />);
     expect(screen.getByRole('menuitem', { name: 'General' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Open AI' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Config' })).toBeInTheDocument();
   });
 
-  test.skip('should close Modal on X click', async () => {
+  it.skip('should close Modal on X click', async () => {
     const user = userEvent.setup();
     const spyClose = vi.fn();
     render(<SettingsModal open onCloseClick={spyClose} />);
@@ -41,12 +41,12 @@ describe('SettingsModal component', () => {
     expect(spyClose).toBeCalled();
   });
 
-  test('should render General panel by default', () => {
+  it('should render General panel by default', () => {
     render(<SettingsModal open onCloseClick={noop} />);
     expect(screen.getByTestId('project-general' as SettingsPaneId)).toBeInTheDocument();
   });
 
-  test('should toggle to "Open AI" panel from sidebar', async () => {
+  it('should toggle to "Open AI" panel from sidebar', async () => {
     const user = userEvent.setup();
     render(<SettingsModal open onCloseClick={noop} />);
     await user.click(screen.getByText('Open AI'));

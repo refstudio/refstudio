@@ -54,7 +54,7 @@ describe('sidecar', () => {
     vi.clearAllMocks();
   });
 
-  test('should send settings values via ENV', async () => {
+  it('should send settings values via ENV', async () => {
     let env: undefined | Record<string, string>;
     vi.mocked(Command).mockImplementation((program: string, args?: string | string[], options?: SpawnOptions) => {
       env = options?.env;
@@ -82,7 +82,7 @@ describe('sidecar', () => {
     expect(env?.SIDECAR_LOG_DIR).toBe(mockSettings.sidecar.logging.path);
   });
 
-  test('should throw exception if stderr has content', async () => {
+  it('should throw exception if stderr has content', async () => {
     vi.mocked(Command).mockImplementation(
       () =>
         ({

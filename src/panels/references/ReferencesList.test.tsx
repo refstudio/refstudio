@@ -3,12 +3,12 @@ import { render, screen, setup } from '../../utils/test-utils';
 import { ReferencesList } from './ReferencesList';
 
 describe('ReferencesList', () => {
-  test('should display empty list if for empty array', () => {
+  it('should display empty list if for empty array', () => {
     render(<ReferencesList references={[]} onRefClicked={noop} />);
     expect(screen.queryByRole('listitem')).not.toBeInTheDocument();
   });
 
-  test('should display one reference item with title', () => {
+  it('should display one reference item with title', () => {
     render(
       <ReferencesList
         references={[
@@ -29,7 +29,7 @@ describe('ReferencesList', () => {
     expect(screen.getByText('title')).toBeInTheDocument();
   });
 
-  test('should display multiple reference items with title', () => {
+  it('should display multiple reference items with title', () => {
     render(
       <ReferencesList
         references={[
@@ -61,7 +61,7 @@ describe('ReferencesList', () => {
     expect(screen.getByText('title-2')).toBeInTheDocument();
   });
 
-  test('should display one reference item with authors', () => {
+  it('should display one reference item with authors', () => {
     render(
       <ReferencesList
         references={[
@@ -83,7 +83,7 @@ describe('ReferencesList', () => {
     expect(screen.getByText(/Maria Ana/i)).toBeInTheDocument();
   });
 
-  test('should trigger onRefClicked on ref item click', async () => {
+  it('should trigger onRefClicked on ref item click', async () => {
     const handler = vi.fn();
     const { user } = setup(
       <ReferencesList

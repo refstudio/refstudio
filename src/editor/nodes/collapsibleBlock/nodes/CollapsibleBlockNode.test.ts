@@ -21,7 +21,7 @@ describe('CollapsibleBlockNode commands', () => {
       editor.commands.setContent(defaultCollapsibleBlock);
     });
 
-    test('should uncollapse with command', () => {
+    it('should uncollapse with command', () => {
       const { from } = TextSelection.near(editor.state.doc.resolve(0));
 
       // The node is collapsed by default
@@ -42,7 +42,7 @@ describe('CollapsibleBlockNode commands', () => {
       expect(collapsibleBlock.attrs.folded).toBe(false);
     });
 
-    test('should collapse with command', () => {
+    it('should collapse with command', () => {
       editor.commands.setContent(defaultUncollapsedCollapsibleBlock);
       const { from } = TextSelection.near(editor.state.doc.resolve(0));
 
@@ -64,7 +64,7 @@ describe('CollapsibleBlockNode commands', () => {
       expect(collapsibleBlock.attrs.folded).toBe(true);
     });
 
-    test('should add empty content when uncollapsing', () => {
+    it('should add empty content when uncollapsing', () => {
       editor.commands.setContent(collapsedEmptyCollapsibleBlock);
       const { from } = TextSelection.near(editor.state.doc.resolve(0));
 
@@ -78,7 +78,7 @@ describe('CollapsibleBlockNode commands', () => {
       expect(collapsibleContents).toHaveLength(1);
     });
 
-    test('should remove empty content when collapsing', () => {
+    it('should remove empty content when collapsing', () => {
       editor.commands.setContent(uncollapsedCollapsibleBlockWithEmptyContent);
       const { from } = TextSelection.near(editor.state.doc.resolve(0));
 
@@ -92,7 +92,7 @@ describe('CollapsibleBlockNode commands', () => {
       expect(collapsibleContents).toHaveLength(0);
     });
 
-    test('should not do anything if run from a paragraph', () => {
+    it('should not do anything if run from a paragraph', () => {
       editor.commands.setContent('<p></p>');
       const initialDoc = editor.state.doc;
 
@@ -105,7 +105,7 @@ describe('CollapsibleBlockNode commands', () => {
   });
 
   describe('setCollapsibleBlock command', () => {
-    test('should wrap paragraph in a collapsible block', () => {
+    it('should wrap paragraph in a collapsible block', () => {
       editor.commands.setContent('<p></p>');
 
       let collapsibleBlocks = findNodesByNodeType(editor.state.doc, 'collapsibleBlock');
@@ -118,7 +118,7 @@ describe('CollapsibleBlockNode commands', () => {
       expect(collapsibleBlocks).toHaveLength(1);
     });
 
-    test('should not do anything if content is already in a collapsible block', () => {
+    it('should not do anything if content is already in a collapsible block', () => {
       editor.commands.setContent(defaultCollapsibleBlock);
       const initialDoc = editor.state.doc;
 
@@ -127,7 +127,7 @@ describe('CollapsibleBlockNode commands', () => {
       expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
     });
 
-    test('should not do anything if block cannot be turned into collapsible block', () => {
+    it('should not do anything if block cannot be turned into collapsible block', () => {
       editor.commands.setContent('<h1>Some content</h1>');
       const initialDoc = editor.state.doc;
 
@@ -136,7 +136,7 @@ describe('CollapsibleBlockNode commands', () => {
       expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
     });
 
-    test('should not do anything if selection is not empty', () => {
+    it('should not do anything if selection is not empty', () => {
       editor.commands.setContent('<p>Some text</p>');
       const initialDoc = editor.state.doc;
 
@@ -149,34 +149,34 @@ describe('CollapsibleBlockNode commands', () => {
   });
 
   describe('unsetCollapsibleBlock command', () => {
-    test('should unwrap block and add all its content blocks to the document', () => {
+    it('should unwrap block and add all its content blocks to the document', () => {
       editor.commands.setContent(defaultCollapsibleBlock);
 
-      expect(editor.state.doc.childCount).toEqual(1);
+      expect(editor.state.doc.childCount).toBe(1);
 
       const commandResult = editor.chain().setTextSelection(0).unsetCollapsibleBlock().run();
       expect(commandResult).toBe(true);
 
-      expect(editor.state.doc.childCount).toEqual(3);
-      expect(getText(editor.state.doc.child(0))).toEqual('Header');
-      expect(getText(editor.state.doc.child(1))).toEqual('Content Line 1');
-      expect(getText(editor.state.doc.child(2))).toEqual('Content Line 2');
+      expect(editor.state.doc.childCount).toBe(3);
+      expect(getText(editor.state.doc.child(0))).toBe('Header');
+      expect(getText(editor.state.doc.child(1))).toBe('Content Line 1');
+      expect(getText(editor.state.doc.child(2))).toBe('Content Line 2');
     });
 
-    test('should unwrap block and add its content block to the document', () => {
+    it('should unwrap block and add its content block to the document', () => {
       editor.commands.setContent(oneLineCollapsibleBlock);
 
-      expect(editor.state.doc.childCount).toEqual(1);
+      expect(editor.state.doc.childCount).toBe(1);
 
       const commandResult = editor.chain().setTextSelection(0).unsetCollapsibleBlock().run();
       expect(commandResult).toBe(true);
 
-      expect(editor.state.doc.childCount).toEqual(2);
-      expect(getText(editor.state.doc.child(0))).toEqual('Header');
-      expect(getText(editor.state.doc.child(1))).toEqual('Content Line');
+      expect(editor.state.doc.childCount).toBe(2);
+      expect(getText(editor.state.doc.child(0))).toBe('Header');
+      expect(getText(editor.state.doc.child(1))).toBe('Content Line');
     });
 
-    test('should not do anything if content is not in a collapsible block', () => {
+    it('should not do anything if content is not in a collapsible block', () => {
       editor.commands.setContent('<p></p>');
       const initialDoc = editor.state.doc;
 
@@ -185,7 +185,7 @@ describe('CollapsibleBlockNode commands', () => {
       expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
     });
 
-    test('should not do anything if the selection is not empty', () => {
+    it('should not do anything if the selection is not empty', () => {
       editor.commands.setContent(defaultCollapsibleBlock);
       const initialDoc = editor.state.doc;
 
@@ -202,7 +202,7 @@ describe('CollapsibleBlockNode commands', () => {
       editor.commands.setContent(defaultCollapsibleBlock);
     });
 
-    test('should split collapsible block into 2 collapsible blocks', () => {
+    it('should split collapsible block into 2 collapsible blocks', () => {
       expect(findNodesByNodeType(editor.state.doc, 'collapsibleBlock')).toHaveLength(1);
       const [initialContent] = findNodesByNodeType(editor.state.doc, 'collapsibleContent');
       expect(initialContent).toBeDefined();
@@ -219,9 +219,9 @@ describe('CollapsibleBlockNode commands', () => {
         findNodesByNodeType(collapsibleBlock, 'collapsibleSummary'),
       );
       expect(firstSummaries).toHaveLength(1);
-      expect(getText(firstSummaries[0])).toEqual('Hea');
+      expect(getText(firstSummaries[0])).toBe('Hea');
       expect(secondSummaries).toHaveLength(1);
-      expect(getText(secondSummaries[0])).toEqual('der');
+      expect(getText(secondSummaries[0])).toBe('der');
 
       // The content should still be in the first collapsible block
       const [firstCollapsibleBlock, secondCollapsibleBlock] = collapsibleBlocks;
@@ -233,7 +233,7 @@ describe('CollapsibleBlockNode commands', () => {
       expect(findNodesByNodeType(secondCollapsibleBlock, 'collapsibleContent')).toHaveLength(0);
     });
 
-    test('should split collapsed collapsible block with no content into 2 collapsible blocks', () => {
+    it('should split collapsed collapsible block with no content into 2 collapsible blocks', () => {
       editor.commands.setContent(collapsedEmptyCollapsibleBlock);
 
       expect(findNodesByNodeType(editor.state.doc, 'collapsibleBlock')).toHaveLength(1);
@@ -247,7 +247,7 @@ describe('CollapsibleBlockNode commands', () => {
       expect(findNodesByNodeType(editor.state.doc, 'collapsibleContent')).toHaveLength(0);
     });
 
-    test('should not do anything if the selection is not empty', () => {
+    it('should not do anything if the selection is not empty', () => {
       // 6 corresponds to the carret being in the middle of the word 'Header'
       const selection = TextSelection.between(editor.state.doc.resolve(6), editor.state.doc.resolve(7));
       const initialDoc = editor.state.doc;
@@ -257,7 +257,7 @@ describe('CollapsibleBlockNode commands', () => {
       expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
     });
 
-    test('should not do anything if the block is not a collapsibleBlock', () => {
+    it('should not do anything if the block is not a collapsibleBlock', () => {
       editor.commands.setContent('<p></p>');
       const initialDoc = editor.state.doc;
 
