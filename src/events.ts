@@ -15,7 +15,7 @@ export function emitEvent(event: EventName) {
   void emit(event);
 }
 
-export type RefStudioEventCallback<Payload = void> = EventCallback<Payload>;
+export type RefStudioEventCallback<Payload = undefined> = EventCallback<Payload>;
 
 export async function listenEvent<EventPayload = void>(event: string, fn: RefStudioEventCallback<EventPayload>) {
   return listen<EventPayload>(event, fn);

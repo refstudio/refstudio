@@ -28,11 +28,11 @@ describe('SettingsModalOpener component', () => {
   });
 
   test('should open the Settings model on SETTING menu event', () => {
-    let settingEventHandler: undefined | RefStudioEventCallback<string>;
+    let settingEvtHandler: undefined | RefStudioEventCallback;
     let eventName = '';
-    vi.mocked(listenEvent).mockImplementation(async (event: string, handler: RefStudioEventCallback<string>) => {
+    vi.mocked(listenEvent).mockImplementation(async (event: string, handler: RefStudioEventCallback) => {
       eventName = event;
-      settingEventHandler = handler;
+      settingEvtHandler = handler;
       await Promise.resolve();
       return noop();
     });
@@ -43,10 +43,10 @@ describe('SettingsModalOpener component', () => {
     expect(screen.queryByRole('menuitem', { name: 'Config' })).not.toBeInTheDocument();
 
     expect(eventName).toBe(RefStudioEvents.menu.settings);
-    expect(settingEventHandler).toBeDefined();
+    expect(settingEvtHandler).toBeDefined();
 
     // Trigger the settings event to open the modal
-    act(() => settingEventHandler!({ event: RefStudioEvents.menu.settings, windowLabel: '', id: 1, payload: '' }));
+    act(() => settingEvtHandler!({ event: RefStudioEvents.menu.settings, windowLabel: '', id: 1, payload: undefined }));
 
     expect(screen.getByRole('menuitem', { name: 'General' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Open AI' })).toBeInTheDocument();
@@ -54,11 +54,11 @@ describe('SettingsModalOpener component', () => {
   });
 
   test('should toggle the Settings model on SETTING menu event', () => {
-    let settingEventHandler: undefined | RefStudioEventCallback<string>;
+    let settingEvtHandler: undefined | RefStudioEventCallback;
     let eventName = '';
-    vi.mocked(listenEvent).mockImplementation(async (event: string, handler: RefStudioEventCallback<string>) => {
+    vi.mocked(listenEvent).mockImplementation(async (event: string, handler: RefStudioEventCallback) => {
       eventName = event;
-      settingEventHandler = handler;
+      settingEvtHandler = handler;
       await Promise.resolve();
       return noop();
     });
@@ -66,14 +66,14 @@ describe('SettingsModalOpener component', () => {
     render(<SettingsModalOpener />);
     expect(screen.queryByRole('menuitem', { name: 'General' })).not.toBeInTheDocument();
     expect(eventName).toBe(RefStudioEvents.menu.settings);
-    expect(settingEventHandler).toBeDefined();
+    expect(settingEvtHandler).toBeDefined();
 
     // Open
-    act(() => settingEventHandler!({ event: RefStudioEvents.menu.settings, windowLabel: '', id: 1, payload: '' }));
+    act(() => settingEvtHandler!({ event: RefStudioEvents.menu.settings, windowLabel: '', id: 1, payload: undefined }));
     expect(screen.getByRole('menuitem', { name: 'General' })).toBeInTheDocument();
 
     // Close
-    act(() => settingEventHandler!({ event: RefStudioEvents.menu.settings, windowLabel: '', id: 1, payload: '' }));
+    act(() => settingEvtHandler!({ event: RefStudioEvents.menu.settings, windowLabel: '', id: 1, payload: undefined }));
     expect(screen.queryByRole('menuitem', { name: 'General' })).not.toBeInTheDocument();
   });
 });
