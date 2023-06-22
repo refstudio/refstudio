@@ -1,12 +1,14 @@
 import './ReferenceView.css';
 
 import { useAtomValue } from 'jotai';
+import { useMemo } from 'react';
 
 import { getDerivedReferenceAtom } from '../atoms/referencesState';
 import { ReferenceFileContent } from '../atoms/types/FileContent';
 
 export function ReferenceView({ referenceId }: { referenceId: ReferenceFileContent['referenceId'] }) {
-  const reference = useAtomValue(getDerivedReferenceAtom(referenceId));
+  const referenceAtom = useMemo(() => getDerivedReferenceAtom(referenceId), [referenceId]);
+  const reference = useAtomValue(referenceAtom);
 
   if (!reference) {
     return null;
