@@ -22,6 +22,7 @@ describe('settings', () => {
     vi.resetAllMocks();
   });
 
+  // eslint-disable-next-line vitest/expect-expect
   it('should throw when using getSettings before initialization', () => {
     try {
       getSettings();
