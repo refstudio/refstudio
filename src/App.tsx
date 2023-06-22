@@ -4,7 +4,7 @@ import { ImperativePanelHandle, Panel, PanelGroup } from 'react-resizable-panels
 
 import { PrimarySideBar, PrimarySideBarPane } from './components/PrimarySideBar';
 import { VerticalResizeHandle } from './components/VerticalResizeHandle';
-import { RefStudioEvents, emitEvent } from './events';
+import { emitEvent, RefStudioEvents } from './events';
 import { AIPanel } from './panels/AIPanel';
 import { ExplorerPanel } from './panels/ExplorerPanel';
 import { MainPanel } from './panels/MainPanel';

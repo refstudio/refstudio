@@ -8,11 +8,12 @@ export function ReferencesList({
   onRefClicked: (item: ReferenceItem) => void;
 }) {
   return (
-    <ul className="space-y-2">
+    <ul className="space-y-2" role="list">
       {references.map((reference) => (
         <li
           className="mb-0 cursor-pointer overflow-x-hidden text-ellipsis p-1 hover:bg-slate-200"
           key={reference.id}
+          role="listitem"
           onClick={() => onRefClicked(reference)}
         >
           <code className="mr-2">[{reference.citationKey}]</code>

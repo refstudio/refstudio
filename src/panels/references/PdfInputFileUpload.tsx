@@ -16,6 +16,7 @@ export function PdfInputFileUpload({
         className="hidden"
         multiple
         ref={inputRef}
+        role="form"
         type="file"
         onChange={(e) => e.currentTarget.files && onUpload(e.currentTarget.files)}
       />
