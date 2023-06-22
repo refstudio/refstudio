@@ -9,7 +9,7 @@ export function SettingsModalOpener() {
 
   const listenSettingsMenuEvent = useCallback(
     (isMounted: () => boolean) =>
-      listenEvent(RefStudioEvents.Menu.settings, () => {
+      listenEvent(RefStudioEvents.menu.settings, () => {
         if (isMounted()) {
           setOpen((curr) => !curr);
         }

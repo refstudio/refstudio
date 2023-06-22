@@ -10,7 +10,8 @@ import { emitEvent, RefStudioEvents } from './events';
 import { AIPanel } from './panels/AIPanel';
 import { ExplorerPanel } from './panels/ExplorerPanel';
 import { MainPanel } from './panels/MainPanel';
-import { ReferencesPanel } from './panels/ReferencesPanel';
+import { ReferencesDropZone } from './panels/references/ReferencesDropZone';
+import { ReferencesPanel } from './panels/references/ReferencesPanel';
 import { SettingsModalOpener } from './settings/SettingsModalOpener';
 import { PdfViewerAPI } from './types/PdfViewerAPI';
 
@@ -34,6 +35,7 @@ function App() {
         </Panel>
         <RightPanelWrapper />
       </PanelGroup>
+      <ReferencesDropZone />
       <SettingsModalOpener />
     </>
   );
@@ -64,7 +66,7 @@ function LeftSidePanelWrapper() {
     }
   }, [leftPanelRef, primaryPaneCollapsed]);
 
-  const openSettings = React.useCallback(() => emitEvent(RefStudioEvents.Menu.settings), []);
+  const openSettings = React.useCallback(() => emitEvent(RefStudioEvents.menu.settings), []);
 
   return (
     <>
