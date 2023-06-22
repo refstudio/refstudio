@@ -61,7 +61,6 @@ export function ReferencesPanel() {
             <Spinner />
           </div>
         )}
-        <p className="my-4 text-sm italic">Click on a reference to add it to the document.</p>
       </PanelSection>
       <PanelSection title="Upload">
         <FileUploader
