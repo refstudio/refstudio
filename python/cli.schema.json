@@ -28,7 +28,7 @@
       "title": "IngestStatus",
       "description": "An enumeration.",
       "enum": [
-        "pending",
+        "processing",
         "failure",
         "complete"
       ],
@@ -90,7 +90,7 @@
           "type": "string"
         },
         "status": {
-          "default": "pending",
+          "default": "processing",
           "allOf": [
             {
               "$ref": "#/definitions/IngestStatus"
