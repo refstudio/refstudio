@@ -1,7 +1,7 @@
 import { Editor } from '@tiptap/react';
 
-import { defaultCollapsibleBlock, defaultUncollapsedCollapsibleBlock } from '../../../test-fixtures';
-import { findNodesByNodeType } from '../../../test-utils';
+import { defaultCollapsibleBlock } from '../../../test-fixtures';
+import { findNodesByNodeType, getPrettyHTML, setUpEditorWithSelection } from '../../../test-utils';
 import { EDITOR_EXTENSIONS } from '../../../TipTapEditorConfigs';
 import { modEnter } from './modEnter';
 
@@ -10,19 +10,30 @@ describe('Mod-Enter keyboard shortcut command', () => {
     extensions: EDITOR_EXTENSIONS,
   });
 
-  test('should collapse collapsible block', () => {
-    editor.chain().setContent(defaultUncollapsedCollapsibleBlock).setTextSelection(0).run();
-
-    let [collapsibleBlock] = findNodesByNodeType(editor.state.doc, 'collapsibleBlock');
-    expect(collapsibleBlock).toBeDefined();
-    expect(collapsibleBlock.attrs.folded).toBe(false);
+  test.only('should collapse collapsible block', () => {
+    setUpEditorWithSelection(
+      editor,
+      `<collapsible-block folded='false'>
+        <collapsible-summary>|Header</collapsible-summary>
+        <collapsible-content>
+            <p>Content Line 1</p>
+            <p>Content Line 2</p>
+        </collapsible-content>
+      </collapsible-block>`,
+    );
 
     const commandResult = modEnter({ editor });
     expect(commandResult).toBe(true);
 
-    [collapsibleBlock] = findNodesByNodeType(editor.state.doc, 'collapsibleBlock');
-    expect(collapsibleBlock).toBeDefined();
-    expect(collapsibleBlock.attrs.folded).toBe(true);
+    expect(getPrettyHTML(editor)).toMatchInlineSnapshot(`
+      "<collapsible-block folded=\\"true\\">
+        <collapsible-summary>Header</collapsible-summary>
+        <collapsible-content>
+          <p>Content Line 1</p>
+          <p>Content Line 2</p>
+        </collapsible-content>
+      </collapsible-block>"
+    `);
   });
 
   test('should uncollapse collapsible block', () => {
