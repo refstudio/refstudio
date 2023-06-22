@@ -44,9 +44,9 @@ describe('Backspace keyboard shortcut command', () => {
     expect(commandResult).toBe(true);
 
     expect(getPrettyHTML(editor)).toMatchInlineSnapshot(`
-      "<draggable-block><p>Header</p></draggable-block>
-      <draggable-block><p>Content Line 1</p></draggable-block>
-      <draggable-block><p>Content Line 2</p></draggable-block>"
+      "<p>Header</p>
+      <p>Content Line 1</p>
+      <p>Content Line 2</p>"
     `);
   });
 
@@ -79,11 +79,9 @@ describe('Backspace keyboard shortcut command', () => {
     expect(collapsibleBlock.childCount).toBe(1);
     expect(getText(collapsibleBlock)).toEqual(initialSummary);
     expect(getPrettyHTML(editor)).toMatchInlineSnapshot(`
-      "<draggable-block>
-        <collapsible-block folded=\\"true\\">
-          <collapsible-summary></collapsible-summary>
-        </collapsible-block>
-      </draggable-block>"
+      "<collapsible-block folded=\\"true\\">
+        <collapsible-summary></collapsible-summary>
+      </collapsible-block>"
     `);
   });
 

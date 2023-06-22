@@ -75,9 +75,16 @@ export function setUpEditorWithSelection(editor: Editor, contentHTML: string) {
   return positions;
 }
 
-/** Get the editor content as HTML and format it with prettier. */
+/**
+ * Get the editor content as HTML and format it with prettier.
+ *
+ * Note that this removes <draggable-block> nodes since these tend to add noise to the HTML.
+ */
 export function getPrettyHTML(editor: Editor) {
-  const html = editor.getHTML();
+  let html = editor.getHTML();
+  html = html.replaceAll('<draggable-block>', '');
+  html = html.replaceAll('</draggable-block>', '');
+
   // Format with prettier. TipTap HTML has multiple root nodes, so we need to wrap with <html>...</html>
   const prettyHtml = format('<html>' + html + '</html>', {
     parser: 'html',
