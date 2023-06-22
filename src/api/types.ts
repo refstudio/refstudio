@@ -8,7 +8,7 @@
 /**
  * An enumeration.
  */
-export type IngestStatus = 'processing' | 'failure' | 'complete';
+export type IngestStatus = "processing" | "failure" | "complete";
 
 export interface CliCommands {
   ingest: IngestResponse;
