@@ -1,6 +1,6 @@
 import { act } from '@testing-library/react';
 
-import { listenEvent, RefStudioEvents } from '../events';
+import { listenEvent, RefStudioEventCallback, RefStudioEvents } from '../events';
 import { noop } from '../utils/noop';
 import { render, screen } from '../utils/test-utils';
 import { getCachedSetting, initSettings, saveCachedSettings, setCachedSetting } from './settings';
@@ -28,9 +28,9 @@ describe('SettingsModalOpener component', () => {
   });
 
   test('should open the Settings model on SETTING menu event', () => {
-    let settingEventHandler: undefined | (() => void);
+    let settingEventHandler: undefined | RefStudioEventCallback<string>;
     let eventName = '';
-    vi.mocked(listenEvent).mockImplementation(async (event: string, handler: () => void) => {
+    vi.mocked(listenEvent).mockImplementation(async (event: string, handler: RefStudioEventCallback<string>) => {
       eventName = event;
       settingEventHandler = handler;
       await Promise.resolve();
@@ -45,10 +45,8 @@ describe('SettingsModalOpener component', () => {
     expect(eventName).toBe(RefStudioEvents.menu.settings);
     expect(settingEventHandler).toBeDefined();
 
-    act(() => {
-      // Trigger the settings event to open the modal
-      settingEventHandler!();
-    });
+    // Trigger the settings event to open the modal
+    act(() => settingEventHandler!({ event: RefStudioEvents.menu.settings, windowLabel: '', id: 1, payload: '' }));
 
     expect(screen.getByRole('menuitem', { name: 'General' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Open AI' })).toBeInTheDocument();
@@ -56,9 +54,9 @@ describe('SettingsModalOpener component', () => {
   });
 
   test('should toggle the Settings model on SETTING menu event', () => {
-    let settingEventHandler: undefined | (() => void);
+    let settingEventHandler: undefined | RefStudioEventCallback<string>;
     let eventName = '';
-    vi.mocked(listenEvent).mockImplementation(async (event: string, handler: () => void) => {
+    vi.mocked(listenEvent).mockImplementation(async (event: string, handler: RefStudioEventCallback<string>) => {
       eventName = event;
       settingEventHandler = handler;
       await Promise.resolve();
@@ -71,11 +69,11 @@ describe('SettingsModalOpener component', () => {
     expect(settingEventHandler).toBeDefined();
 
     // Open
-    act(() => settingEventHandler!());
+    act(() => settingEventHandler!({ event: RefStudioEvents.menu.settings, windowLabel: '', id: 1, payload: '' }));
     expect(screen.getByRole('menuitem', { name: 'General' })).toBeInTheDocument();
 
     // Close
-    act(() => settingEventHandler!());
+    act(() => settingEventHandler!({ event: RefStudioEvents.menu.settings, windowLabel: '', id: 1, payload: '' }));
     expect(screen.queryByRole('menuitem', { name: 'General' })).not.toBeInTheDocument();
   });
 });
