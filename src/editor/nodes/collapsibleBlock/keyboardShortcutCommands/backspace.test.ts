@@ -88,7 +88,17 @@ describe('Backspace keyboard shortcut command', () => {
   });
 
   test('should not do anything when the selection is not at the beginning of the summary', () => {
-    editor.chain().setContent(defaultCollapsibleBlock).setTextSelection(4).run();
+    // editor.chain().setContent(defaultCollapsibleBlock).setTextSelection(4).run();
+    setUpEditorWithSelection(
+      editor,
+      `<collapsible-block>
+        <collapsible-summary>H|eader</collapsible-summary>
+        <collapsible-content>
+            <p>Content Line 1</p>
+            <p>Content Line 2</p>
+        </collapsible-content>
+      </collapsible-block>`,
+    );
     const initialDoc = editor.state.doc;
 
     const commandResult = backspace({ editor });
