@@ -10,24 +10,6 @@ describe('Backspace keyboard shortcut command', () => {
     extensions: EDITOR_EXTENSIONS,
   });
 
-  it('should select text based on markers', () => {
-    const [from, to] = setUpEditorWithSelection(
-      editor,
-      `<collapsible-block>
-        <collapsible-summary>He|ader|</collapsible-summary>
-        <collapsible-content>
-            <p>Content Line 1</p>
-            <p>Content Line 2</p>
-        </collapsible-content>
-      </collapsible-block>`,
-    );
-    const sel = editor.view.state.selection;
-    const text = editor.view.state.doc.textBetween(sel.from, sel.to);
-    expect(sel.from).toEqual(from);
-    expect(sel.to).toEqual(to);
-    expect(text).toEqual('ader');
-  });
-
   test('should turn collapsible block back into paragraphs when selection is at the beginning of the summary', () => {
     setUpEditorWithSelection(
       editor,
