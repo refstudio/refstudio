@@ -1,4 +1,5 @@
 import { Node } from '@tiptap/pm/model';
+import { TextSelection } from '@tiptap/pm/state';
 import { Editor, Predicate } from '@tiptap/react';
 import { format } from 'prettier';
 
@@ -54,9 +55,11 @@ export function getText(node: Node) {
  */
 export function setUpEditorWithSelection(editor: Editor, contentHTML: string) {
   editor.chain().setContent(contentHTML).run();
-  const docLength = editor.getText().length;
+  const minPos = TextSelection.atStart(editor.state.doc).from;
+  const maxPos = TextSelection.atEnd(editor.state.doc).to;
+
   const positions = [];
-  for (let i = 0; i < docLength; i++) {
+  for (let i = minPos; i <= maxPos; i++) {
     const text = editor.view.state.doc.textBetween(i, i + 1);
     if (text === '|') {
       positions.push(i - positions.length); // subtract the number of chars that will have been deleted
