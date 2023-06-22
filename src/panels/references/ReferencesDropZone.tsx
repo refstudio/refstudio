@@ -1,13 +1,15 @@
 import { useMutation } from '@tanstack/react-query';
-import { listen, TauriEvent, UnlistenFn } from '@tauri-apps/api/event';
+import { TauriEvent } from '@tauri-apps/api/event';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { VscFilePdf } from 'react-icons/vsc';
 
 import { runPDFIngestion } from '../../api/ingestion';
 import { getReferencesAtom, referencesSyncInProgressAtom, setReferencesAtom } from '../../atoms/referencesState';
 import { cx } from '../../cx';
+import { listenEvent, RefStudioEvents } from '../../events';
 import { copyFiles } from '../../filesystem';
+import { useAsyncEffect } from '../../hooks/useAsyncEffect';
 import { isNonNullish } from '../../lib/isNonNullish';
 import { ReferenceItem } from '../../types/ReferenceItem';
 
@@ -24,6 +26,7 @@ export function ReferencesDropZone() {
       // Merge new files
       // FIXME: Improve this once we have references state/status
       const newReferences = Array.from(filePaths)
+        .filter((f) => f.endsWith('.pdf'))
         .map((filePath) => {
           const filename = filePath.split('/').pop();
           if (!filename) {
@@ -66,44 +69,36 @@ export function ReferencesDropZone() {
     },
   });
 
-  // FIXME: Replace with use async effect (after settings PR merge)
-  useEffect(() => {
-    let unlisten: UnlistenFn[] = [];
-    let isMounted = true;
-    (async function run() {
-      unlisten = [
-        await listen<string[]>(TauriEvent.WINDOW_FILE_DROP, (e) => {
-          if (isMounted) {
+  useAsyncEffect(
+    async (isMounted) =>
+      Promise.all([
+        await listenEvent<string[]>(TauriEvent.WINDOW_FILE_DROP, (e) => {
+          if (isMounted()) {
             setSyncInProgress(true);
             copyAndIngestMutation.mutate(e.payload);
           }
         }),
-        await listen('refstudio://references/ingestion/run', () => {
-          if (isMounted) {
+        await listenEvent(RefStudioEvents.references.ingestion.run, () => {
+          if (isMounted()) {
             setSyncInProgress(true);
             ingestMutation.mutate();
           }
         }),
-        await listen<string[]>(TauriEvent.WINDOW_FILE_DROP_HOVER, (event) => {
-          if (isMounted) {
+        await listenEvent<string[]>(TauriEvent.WINDOW_FILE_DROP_HOVER, (event) => {
+          if (isMounted()) {
             setVisible(true);
             setFiles(event.payload);
           }
         }),
-        await listen(TauriEvent.WINDOW_FILE_DROP_CANCELLED, () => {
-          if (isMounted) {
+        await listenEvent(TauriEvent.WINDOW_FILE_DROP_CANCELLED, () => {
+          if (isMounted()) {
             setVisible(false);
             setFiles([]);
           }
         }),
-      ];
-    })();
-
-    return () => {
-      isMounted = false;
-      unlisten.forEach((fn) => fn());
-    };
-  }, [copyAndIngestMutation, visible, files, setSyncInProgress]);
+      ]),
+    (releaseHandles) => releaseHandles?.map((h) => h()),
+  );
 
   return (
     <div

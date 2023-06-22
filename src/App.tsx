@@ -4,7 +4,7 @@ import { ImperativePanelHandle, Panel, PanelGroup } from 'react-resizable-panels
 
 import { PrimarySideBar, PrimarySideBarPane } from './components/PrimarySideBar';
 import { VerticalResizeHandle } from './components/VerticalResizeHandle';
-import { emitEvent, RefStudioEvents } from './events';
+import { RefStudioEvents, emitEvent } from './events';
 import { AIPanel } from './panels/AIPanel';
 import { ExplorerPanel } from './panels/ExplorerPanel';
 import { MainPanel } from './panels/MainPanel';
@@ -67,7 +67,7 @@ function LeftSidePanelWrapper({ onRefClicked }: { onRefClicked(item: ReferenceIt
     }
   }, [leftPanelRef, primaryPaneCollapsed]);
 
-  const openSettings = React.useCallback(() => emitEvent(RefStudioEvents.Menu.settings), []);
+  const openSettings = React.useCallback(() => emitEvent(RefStudioEvents.menu.settings), []);
 
   return (
     <>

@@ -1,17 +1,20 @@
-import { emit, listen } from '@tauri-apps/api/event';
+import { emit, EventCallback, listen } from '@tauri-apps/api/event';
 
 export const RefStudioEvents = {
-  Menu: {
-    settings: 'tauri://menu/settings',
+  menu: {
+    settings: 'refstudio://menu/settings',
+  },
+  references: {
+    ingestion: {
+      run: 'refstudio://references/ingestion/run',
+    },
   },
 };
 
 export function emitEvent(event: string) {
-  (async function run() {
-    await emit(event);
-  })();
+  void emit(event);
 }
 
-export async function listenEvent(event: string, fn: () => void) {
-  return listen(event, fn);
+export async function listenEvent<EventPayload>(event: string, fn: EventCallback<EventPayload>) {
+  return listen<EventPayload>(event, fn);
 }

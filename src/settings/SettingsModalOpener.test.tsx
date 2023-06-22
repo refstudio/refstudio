@@ -42,7 +42,7 @@ describe('SettingsModalOpener component', () => {
     expect(screen.queryByRole('menuitem', { name: 'Open AI' })).not.toBeInTheDocument();
     expect(screen.queryByRole('menuitem', { name: 'Config' })).not.toBeInTheDocument();
 
-    expect(eventName).toBe(RefStudioEvents.Menu.settings);
+    expect(eventName).toBe(RefStudioEvents.menu.settings);
     expect(settingEventHandler).toBeDefined();
 
     act(() => {
@@ -67,7 +67,7 @@ describe('SettingsModalOpener component', () => {
 
     render(<SettingsModalOpener />);
     expect(screen.queryByRole('menuitem', { name: 'General' })).not.toBeInTheDocument();
-    expect(eventName).toBe(RefStudioEvents.Menu.settings);
+    expect(eventName).toBe(RefStudioEvents.menu.settings);
     expect(settingEventHandler).toBeDefined();
 
     // Open

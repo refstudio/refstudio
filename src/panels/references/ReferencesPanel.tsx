@@ -1,10 +1,10 @@
-import { emit } from '@tauri-apps/api/event';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 
 import { getReferencesAtom, referencesSyncInProgressAtom, setReferencesAtom } from '../../atoms/referencesState';
 import { PanelSection } from '../../components/PanelSection';
 import { PanelWrapper } from '../../components/PanelWrapper';
 import { ProgressSpinner } from '../../components/Spinner';
+import { emitEvent, RefStudioEvents } from '../../events';
 import { uploadFiles } from '../../filesystem';
 import { ReferenceItem } from '../../types/ReferenceItem';
 import { PdfInputFileUpload } from './PdfInputFileUpload';
@@ -23,7 +23,7 @@ export function ReferencesPanel({ onRefClicked }: ReferencesPanelProps) {
   async function handleChange(uploadedFiles: FileList) {
     try {
       await uploadFiles(uploadedFiles);
-      void emit('refstudio://references/ingestion/run');
+      emitEvent(RefStudioEvents.references.ingestion.run);
     } catch (err) {
       console.error('Error uploading references', err);
     } finally {
