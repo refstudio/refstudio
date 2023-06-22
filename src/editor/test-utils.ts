@@ -91,3 +91,10 @@ export function getPrettyHTML(editor: Editor) {
     .replace(/^ {2}/gm, '')
     .trim();
 }
+
+export function getFullText(editor: Editor): string {
+  return editor.view.state.doc.textBetween(
+    TextSelection.atStart(editor.state.doc).from,
+    TextSelection.atEnd(editor.state.doc).to,
+  );
+}

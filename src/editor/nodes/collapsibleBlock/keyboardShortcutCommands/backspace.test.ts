@@ -1,7 +1,13 @@
 import { Editor } from '@tiptap/react';
 
 import { defaultCollapsibleBlock } from '../../../test-fixtures';
-import { findNodesByNodeType, getPrettyHTML, getText, setUpEditorWithSelection } from '../../../test-utils';
+import {
+  findNodesByNodeType,
+  getFullText,
+  getPrettyHTML,
+  getText,
+  setUpEditorWithSelection,
+} from '../../../test-utils';
 import { EDITOR_EXTENSIONS } from '../../../TipTapEditorConfigs';
 import { backspace } from './backspace';
 
@@ -100,6 +106,7 @@ describe('Backspace keyboard shortcut command', () => {
       </collapsible-block>`,
     );
     const initialDoc = editor.state.doc;
+    console.log(getFullText(editor));
 
     const commandResult = backspace({ editor });
     expect(commandResult).toBe(false);
@@ -107,16 +114,16 @@ describe('Backspace keyboard shortcut command', () => {
   });
 
   test('should not do anything when removing a content block that has siblings', () => {
-    const content = `
-    <collapsible-block folded='false'>
+    setUpEditorWithSelection(
+      editor,
+      `<collapsible-block>
       <collapsible-summary></collapsible-summary>
       <collapsible-content>
-        <p></p>
+        <p>|</p>
         <p>A sibling with content</p>
       </collapsible-content>
-    </collapsible-block>`;
-    editor.chain().setContent(content).setTextSelection(7).run();
-    console.log(editor.state.doc.textBetween(0, 150));
+    </collapsible-block>`,
+    );
     const initialDoc = editor.state.doc;
 
     const commandResult = backspace({ editor });
