@@ -183,7 +183,6 @@ module.exports = {
       'error',
       {
         allowStandaloneDeclarations: true,
-        singleReturnOnly: true,
       },
     ],
     'vitest/consistent-test-it': 'error',

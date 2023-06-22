@@ -1,7 +1,7 @@
 import { TextSelection } from '@tiptap/pm/state';
 import { KeyboardShortcutCommand } from '@tiptap/react';
 
-export const enter: KeyboardShortcutCommand = function ({ editor }) {
+export const enter: KeyboardShortcutCommand = ({ editor }) => {
   const { selection } = editor.state;
   if (!selection.empty) {
     return false;
