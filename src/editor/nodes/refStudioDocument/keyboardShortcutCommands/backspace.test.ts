@@ -1,7 +1,7 @@
 import { Editor } from '@tiptap/react';
 
 import { defaultParagraph } from '../../../test-fixtures';
-import { getPrettyHTML, getText, setUpEditorWithSelection } from '../../../test-utils';
+import { getPrettyHTML, getSelectedText, getText, setUpEditorWithSelection } from '../../../test-utils';
 import { EDITOR_EXTENSIONS } from '../../../TipTapEditorConfigs';
 import { backspace } from './backspace';
 
@@ -23,7 +23,7 @@ describe('Backspace keyboard shortcut command', () => {
     expect(getText(editor.state.doc)).toEqual('Some contentSome content');
   });
 
-  test.only('should unset partially selected collapsible blocks before deleting content', () => {
+  test('should unset partially selected collapsible blocks before deleting content', () => {
     setUpEditorWithSelection(
       editor,
       `<p>Some |content</p>
@@ -43,13 +43,6 @@ describe('Backspace keyboard shortcut command', () => {
       </collapsible-block>
       `,
     );
-    // editor
-    //   .chain()
-    //   .setContent(defaultParagraph + defaultCollapsibleBlock + defaultCollapsibleBlock)
-    //   // 30 is after the C in "Content Line 1", in the first collapsible block
-    //   .setTextSelection({ from: 7, to: 30 })
-    //   .run();
-
     expect(editor.state.doc.childCount).toBe(3);
 
     const commandResult = backspace({ editor });
@@ -59,27 +52,20 @@ describe('Backspace keyboard shortcut command', () => {
     expect(editor.state.doc.childCount).toBe(3);
 
     expect(getPrettyHTML(editor)).toMatchInlineSnapshot(`
-      "<draggable-block><p>Some ontent Line 1</p></draggable-block>
-      <draggable-block><p>Content Line 2</p></draggable-block>
-      <draggable-block>
-        <collapsible-block folded=\\"true\\">
-          <collapsible-summary>Header</collapsible-summary>
-          <collapsible-content>
-            <draggable-block><p>Content Line 1</p></draggable-block>
-            <draggable-block><p>Content Line 2</p></draggable-block>
-          </collapsible-content>
-        </collapsible-block>
-      </draggable-block>"
+      "<p>Some ontent Line 1</p>
+      <p>Content Line 2</p>
+      <collapsible-block folded=\\"true\\">
+        <collapsible-summary>Header</collapsible-summary>
+        <collapsible-content>
+          <p>Content Line 1</p>
+          <p>Content Line 2</p>
+        </collapsible-content>
+      </collapsible-block>"
     `);
   });
 
   test('should not do anything when the selection is empty and not a the beginning of a block', () => {
-    editor
-      .chain()
-      .setContent(defaultParagraph + defaultParagraph)
-      // 18 is the beginning of the second paragraph
-      .setTextSelection(19)
-      .run();
+    setUpEditorWithSelection(editor, `<p>Some content</p><p>S|ome content</p>`);
     const initialDoc = editor.state.doc;
 
     const commandResult = backspace({ editor });
@@ -95,6 +81,7 @@ describe('Backspace keyboard shortcut command', () => {
       .setNodeSelection(18)
       .run();
     const initialDoc = editor.state.doc;
+    expect(getSelectedText(editor)).toEqual('Some content');
 
     const commandResult = backspace({ editor });
     expect(commandResult).toBe(false);
