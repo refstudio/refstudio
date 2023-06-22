@@ -2,7 +2,7 @@ import json
 from datetime import date
 from pathlib import Path
 
-from sidecar import ingest
+from sidecar import ingest, storage, typing
 from sidecar.typing import Author, Reference
 
 FIXTURES_DIR = Path(__file__).parent.joinpath("fixtures")
@@ -189,3 +189,87 @@ def test_ingest_add_citation_keys(tmp_path):
     ## should be smith2021a, smith2021b, smith2021c
     for i, ref in enumerate(tested):
         assert ref.citation_key == f"smith2021{chr(97 + i)}"
+
+
+def test_ingest_get_statuses(monkeypatch, capsys):
+    ingest.UPLOADS_DIR = FIXTURES_DIR.joinpath("pdf")
+
+    # test: JsonStorage path does not exist
+    # expect: all `uploads` are in process
+    jstore = storage.JsonStorage("does_not_exist.json")
+    fetcher = ingest.IngestStatusFetcher(storage=jstore)
+    _ = fetcher.emit_statuses()
+
+    captured = capsys.readouterr()
+    output = json.loads(captured.out)
+    statuses = output['reference_statuses']
+
+    assert output['status'] == "ok"
+    assert len(statuses) == 2
+    for ref in statuses:
+        ref['status'] == "processing"
+
+    
+    # test: stored references should be checked against uploads
+    # expect: stored references return stored status,
+    #   uploads (not yet stored) return processeding
+    mock_references = [
+        Reference(
+            source_filename="completed.pdf",
+            filename_md5="abcdef123",
+            status=typing.IngestStatus.COMPLETE
+        ),
+        Reference(
+            source_filename="failed.pdf",
+            filename_md5="abcdef123",
+            status=typing.IngestStatus.FAILURE
+        ),
+    ]
+    mock_uploads = [
+        Path("completed.pdf"),  # retain mock_reference.status
+        Path("failed.pdf"),  # retain mock_reference.status
+        Path("not_yet_processed.pdf")  # not in mock_reference -> `processing`
+    ]
+
+    def mock_storage_load(*args, **kwargs):
+        # do nothing since we also mock references propery
+        pass
+
+    jstore = storage.JsonStorage("to_be_mocked.json")
+    monkeypatch.setattr(jstore, 'load', mock_storage_load)
+    monkeypatch.setattr(jstore, 'references', mock_references)
+
+    fetcher = ingest.IngestStatusFetcher(storage=jstore)
+    monkeypatch.setattr(fetcher, 'uploads', mock_uploads)
+
+    _ = fetcher.emit_statuses()
+
+    captured = capsys.readouterr()
+    output = json.loads(captured.out)
+    statuses = output['reference_statuses']
+
+    assert output['status'] == "ok"
+    assert len(statuses) == 3
+    for ref in statuses:
+        if ref['source_filename'] == "completed.pdf":
+            ref['status'] == "completed"
+        elif ref['source_filename'] == 'failed.pdf':
+            ref['status'] == "failure"
+        else:
+            ref['status'] == "processing"
+    
+
+    # test: Exception on storage load should return error status
+    # expect: response status = error, ref statuses = []
+    def mock_storage_load_raises_exception(*args, **kwargs):
+        raise Exception
+
+    monkeypatch.setattr(jstore, 'load', mock_storage_load_raises_exception)
+    _ = fetcher.emit_statuses()
+
+    captured = capsys.readouterr()
+    output = json.loads(captured.out)
+    statuses = output['reference_statuses']
+
+    assert output['status'] == "error"
+    assert len(statuses) == 0

@@ -17,8 +17,13 @@ class RefStudioModel(BaseModel):
                 prop.pop('title', None)
 
 
+class ResponseStatus(str, Enum):
+    OK = "ok"
+    ERROR = "error"
+
+
 class IngestStatus(str, Enum):
-    PENDING = "pending"
+    PROCESSING = "processing"
     FAILURE = "failure"
     COMPLETE = "complete"
 
@@ -27,7 +32,7 @@ class Reference(RefStudioModel):
     """A reference for an academic paper / PDF"""
     source_filename: str
     filename_md5: str
-    status: IngestStatus = IngestStatus.PENDING
+    status: IngestStatus
     citation_key: str | None = None
     title: str | None = None
     abstract: str | None = None
@@ -58,12 +63,12 @@ class IngestResponse(RefStudioModel):
 
 class ReferenceStatus(RefStudioModel):
     source_filename: str
-    filename_md5: str
     status: IngestStatus
 
 
 class IngestStatusResponse(RefStudioModel):
-    statuses: list[ReferenceStatus]
+    status: ResponseStatus
+    reference_statuses: list[ReferenceStatus]
 
 
 class RewriteChoice(RefStudioModel):
