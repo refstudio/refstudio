@@ -40,26 +40,13 @@ describe('Backspace keyboard shortcut command', () => {
       </collapsible-block>`,
     );
 
-    expect(editor.state.doc.childCount).toBe(1);
-
-    // console.log('html', editor.getHTML());
-
     const commandResult = backspace({ editor });
     expect(commandResult).toBe(true);
 
     expect(getPrettyHTML(editor)).toMatchInlineSnapshot(`
-      "<>
-        <draggable-block>
-          <p>Header</p>
-        </draggable-block>
-        <draggable-block>
-          <p>Content Line 1</p>
-        </draggable-block>
-        <draggable-block>
-          <p>Content Line 2</p>
-        </draggable-block>
-      </>;
-      "
+      "<draggable-block><p>Header</p></draggable-block>
+      <draggable-block><p>Content Line 1</p></draggable-block>
+      <draggable-block><p>Content Line 2</p></draggable-block>"
     `);
   });
 

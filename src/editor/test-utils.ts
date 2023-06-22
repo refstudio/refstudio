@@ -59,7 +59,7 @@ export function setUpEditorWithSelection(editor: Editor, contentHTML: string) {
   for (let i = 0; i < docLength; i++) {
     const text = editor.view.state.doc.textBetween(i, i + 1);
     if (text === '|') {
-      positions.push(i - positions.length);
+      positions.push(i - positions.length); // subtract the number of chars that will have been deleted
     }
   }
   expect(positions.length).toBeGreaterThanOrEqual(1);
@@ -67,7 +67,7 @@ export function setUpEditorWithSelection(editor: Editor, contentHTML: string) {
   editor
     .chain()
     .setContent(contentHTML.replaceAll('|', ''))
-    .setTextSelection(positions.length > 1 ? { from: positions[0], to: positions[1] } : positions[0])
+    .setTextSelection({ from: positions[0], to: positions[1] ?? positions[0] })
     .run();
   return positions;
 }
@@ -75,6 +75,16 @@ export function setUpEditorWithSelection(editor: Editor, contentHTML: string) {
 /** Get the editor content as HTML and format it with prettier. */
 export function getPrettyHTML(editor: Editor) {
   const html = editor.getHTML();
-  const prettyHtml = format('<>' + html + '</>');
-  return prettyHtml;
+  // Format with prettier. TipTap HTML has multiple root nodes, so we need to wrap with <html>...</html>
+  const prettyHtml = format('<html>' + html + '</html>', {
+    parser: 'html',
+    bracketSameLine: true,
+    htmlWhitespaceSensitivity: 'ignore',
+  });
+  // Unwrap and shift everything left by two spaces (one indent level)
+  return prettyHtml
+    .replace(/^<html>/, '')
+    .replace(/<\/html>\s*$/, '')
+    .replace(/^ {2}/gm, '')
+    .trim();
 }
