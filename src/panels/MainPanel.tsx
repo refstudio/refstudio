@@ -11,21 +11,20 @@ import {
   selectFileInPaneAtom,
 } from '../atoms/fileActions';
 import { FileContent } from '../atoms/types/FileContent';
-import { FileId } from '../atoms/types/FileEntry';
+import { FileId } from '../atoms/types/FileData';
 import { PaneContent } from '../atoms/types/PaneGroup';
 import { Spinner } from '../components/Spinner';
 import { TabPane } from '../components/TabPane';
 import { VerticalResizeHandle } from '../components/VerticalResizeHandle';
-import { EditorAPI } from '../types/EditorAPI';
 import { PdfViewerAPI } from '../types/PdfViewerAPI';
 import { assertNever } from '../utils/assertNever';
 import { EmptyView } from '../views/EmptyView';
 import { PdfViewer } from '../views/PdfViewer';
+import { ReferenceView } from '../views/ReferenceView';
 import { TextView } from '../views/TextView';
 import { TipTapView } from '../views/TipTapView';
 
 interface MainPanelProps {
-  editorRef: React.MutableRefObject<EditorAPI | null>;
   pdfViewerRef: React.MutableRefObject<PdfViewerAPI | null>;
 }
 
@@ -66,12 +65,12 @@ interface MainPanelPaneProps {
   pane: PaneContent;
 }
 
-export function MainPanelPane({ pane, editorRef, pdfViewerRef }: MainPanelPaneProps & MainPanelProps) {
+export function MainPanelPane({ pane, pdfViewerRef }: MainPanelPaneProps & MainPanelProps) {
   const { files, activeFile, activeFileContent } = pane;
-  const items = files.map((file) => ({
-    key: file.path,
-    text: file.name,
-    value: file.path,
+  const items = files.map(({ fileId, fileName }) => ({
+    key: fileId,
+    text: fileName,
+    value: fileId,
   }));
 
   const selectFileInPane = useSetAtom(selectFileInPaneAtom);
@@ -86,18 +85,13 @@ export function MainPanelPane({ pane, editorRef, pdfViewerRef }: MainPanelPanePr
     >
       <TabPane
         items={items}
-        value={activeFile?.path}
+        value={activeFile}
         onClick={(file) => selectFileInPane({ paneId: pane.id, fileId: file })}
         onCloseClick={(path) => closeFileInPane({ paneId: pane.id, fileId: path })}
       />
       <div className="flex h-full w-full overflow-hidden">
         {activeFile && activeFileContent ? (
-          <MainPaneViewContent
-            activeFileAtom={activeFileContent}
-            editorRef={editorRef}
-            fileId={activeFile.path}
-            pdfViewerRef={pdfViewerRef}
-          />
+          <MainPaneViewContent activeFileAtom={activeFileContent} fileId={activeFile} pdfViewerRef={pdfViewerRef} />
         ) : (
           <EmptyView />
         )}
@@ -108,12 +102,11 @@ export function MainPanelPane({ pane, editorRef, pdfViewerRef }: MainPanelPanePr
 
 interface MainPaneViewContentProps {
   activeFileAtom: Atom<Loadable<FileContent>>;
-  editorRef: React.MutableRefObject<EditorAPI | null>;
   fileId: FileId;
   pdfViewerRef: React.MutableRefObject<PdfViewerAPI | null>;
 }
 
-export function MainPaneViewContent({ activeFileAtom, editorRef, pdfViewerRef }: MainPaneViewContentProps) {
+export function MainPaneViewContent({ activeFileAtom, pdfViewerRef }: MainPaneViewContentProps) {
   const loadableFileContent = useAtomValue(activeFileAtom);
 
   if (loadableFileContent.state === 'loading') {
@@ -134,7 +127,9 @@ export function MainPaneViewContent({ activeFileAtom, editorRef, pdfViewerRef }:
     case 'pdf':
       return <PdfViewer file={data} pdfViewerRef={pdfViewerRef} />;
     case 'tiptap':
-      return <TipTapView editorRef={editorRef} file={data} />;
+      return <TipTapView file={data} />;
+    case 'reference':
+      return <ReferenceView referenceId={data.referenceId} />;
     default: {
       assertNever(data);
       return null;

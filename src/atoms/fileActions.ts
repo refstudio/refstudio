@@ -1,10 +1,12 @@
 import { atom } from 'jotai';
 
 import { activePaneIdAtom } from './core/activePane';
-import { fileContentAtom, loadFile, unloadFile } from './core/fileContent';
-import { addFileEntry, removeFileEntry } from './core/fileEntry';
+import { fileContentAtom, loadFile, loadFileSync, unloadFile } from './core/fileContent';
+import { addFileData, removeFileData } from './core/fileData';
 import { addFileToPane, getPane, paneGroupAtom, removeFileFromPane, selectFileInPaneAtom } from './core/paneGroup';
-import { FileEntry, FileFileEntry, FileId } from './types/FileEntry';
+import { getDerivedReferenceAtom } from './referencesState';
+import { FileId } from './types/FileData';
+import { FileEntry, FileFileEntry } from './types/FileEntry';
 import { PaneFileId, PaneId } from './types/PaneGroup';
 
 export { activePaneAtom } from './core/activePane';
@@ -23,7 +25,7 @@ export const openFileAtom = atom(null, (get, set, file: FileEntry) => {
   }
 
   // Add to file entries atom
-  set(addFileEntry, file);
+  set(addFileData, { fileId: file.path, fileName: file.name });
 
   // Add file to panes state
   const targetPaneId = targetPaneIdFor(file);
@@ -32,6 +34,33 @@ export const openFileAtom = atom(null, (get, set, file: FileEntry) => {
 
   // Select file in pane
   set(selectFileInPaneAtom, { fileId, paneId: targetPaneId });
+});
+
+/** Open a reference in the right pane */
+export const openReferenceAtom = atom(null, (get, set, referenceId: string) => {
+  const fileId = `refstudio://references/${referenceId}`;
+
+  const reference = get(getDerivedReferenceAtom(referenceId));
+  if (!reference) {
+    console.warn('This reference does not exist');
+    return;
+  }
+
+  // Load file in memory
+  const currentOpenFiles = get(fileContentAtom);
+  if (!currentOpenFiles.has(fileId)) {
+    set(loadFileSync, { fileId, fileContent: { type: 'reference', referenceId } });
+  }
+
+  // Add to file entries atom
+  set(addFileData, { fileId, fileName: reference.title });
+
+  const paneId: PaneId = 'RIGHT';
+  // Add file to panes state
+  set(addFileToPane, { fileId, paneId });
+
+  // Select file in pane
+  set(selectFileInPaneAtom, { fileId, paneId });
 });
 
 /** Removes file from the given pane and unload content from memory if the file is not open in another pane */
@@ -46,7 +75,7 @@ export const closeFileFromPaneAtom = atom(null, (get, set, { fileId, paneId }: P
       .filter(([_paneId]) => _paneId !== paneId) // Keep only other panes
       .every(([, pane]) => !pane.openFiles.includes(fileId)) // Check that the file was not open in any other pane
   ) {
-    set(removeFileEntry, fileId);
+    set(removeFileData, fileId);
     set(unloadFile, fileId);
   }
 
