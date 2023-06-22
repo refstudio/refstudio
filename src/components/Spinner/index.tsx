@@ -11,9 +11,12 @@ export function ProgressSpinner({ badge }: { badge: string }) {
   const STEP = 1;
   const [percent, setValue] = useState(0);
 
-  useInterval(() => {
-    setValue(Math.min(percent + STEP, 100));
-  }, 200);
+  useInterval(
+    () => {
+      setValue(Math.min(percent + STEP, 100));
+    },
+    percent < 100 ? 200 : null,
+  );
 
   return (
     <div className="relative pt-1">
