@@ -16,6 +16,7 @@ module.exports = {
     'testing-library',
     'eslint-plugin-import',
     'jsdoc',
+    'vitest',
   ],
   extends: [
     'eslint:recommended',
@@ -27,6 +28,7 @@ module.exports = {
     'plugin:react-hooks/recommended',
     'plugin:jest-dom/recommended',
     'plugin:testing-library/react',
+    'plugin:vitest/recommended',
   ],
   settings: {
     react: {
@@ -183,5 +185,6 @@ module.exports = {
         allowStandaloneDeclarations: true,
       },
     ],
+    'vitest/consistent-test-it': 'error',
   },
 };
