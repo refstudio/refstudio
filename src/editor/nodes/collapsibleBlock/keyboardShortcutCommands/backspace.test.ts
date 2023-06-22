@@ -1,13 +1,7 @@
 import { Editor } from '@tiptap/react';
 
 import { defaultCollapsibleBlock } from '../../../test-fixtures';
-import {
-  findNodesByNodeType,
-  getFullText,
-  getPrettyHTML,
-  getText,
-  setUpEditorWithSelection,
-} from '../../../test-utils';
+import { findNodesByNodeType, getPrettyHTML, getText, setUpEditorWithSelection } from '../../../test-utils';
 import { EDITOR_EXTENSIONS } from '../../../TipTapEditorConfigs';
 import { backspace } from './backspace';
 
@@ -94,7 +88,6 @@ describe('Backspace keyboard shortcut command', () => {
   });
 
   test('should not do anything when the selection is not at the beginning of the summary', () => {
-    // editor.chain().setContent(defaultCollapsibleBlock).setTextSelection(4).run();
     setUpEditorWithSelection(
       editor,
       `<collapsible-block>
@@ -106,7 +99,6 @@ describe('Backspace keyboard shortcut command', () => {
       </collapsible-block>`,
     );
     const initialDoc = editor.state.doc;
-    console.log(getFullText(editor));
 
     const commandResult = backspace({ editor });
     expect(commandResult).toBe(false);
@@ -132,11 +124,7 @@ describe('Backspace keyboard shortcut command', () => {
   });
 
   test('should not do anything when the selection is not in a collapsible block', () => {
-    editor
-      .chain()
-      .setContent('<p>Some content</p>' + defaultCollapsibleBlock)
-      .setTextSelection(2)
-      .run();
+    setUpEditorWithSelection(editor, `<p>So|me content</p>` + defaultCollapsibleBlock);
     const initialDoc = editor.state.doc;
 
     const commandResult = backspace({ editor });
