@@ -24,7 +24,6 @@ export function TipTapEditor({ editorContent }: EditorProps) {
         const updatedEditor = update.editor;
         const { from, to } = updatedEditor.view.state.selection;
         const text = updatedEditor.view.state.doc.textBetween(from, to);
-        console.log('selection range', from, to, text);
         setSelection(text);
       },
       editorProps: {
