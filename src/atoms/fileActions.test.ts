@@ -17,9 +17,8 @@ import {
   splitFileToPaneAtom,
 } from './fileActions';
 import { setReferencesAtom } from './referencesState';
+import { makeFile, makeFolder } from './test-fixtures';
 import { runGetAtomHook, runSetAtomHook } from './test-utils';
-import { FileData } from './types/FileData';
-import { FileFileEntry, FolderFileEntry } from './types/FileEntry';
 import { PaneId } from './types/PaneGroup';
 
 describe('fileActions', () => {
@@ -408,31 +407,3 @@ describe('fileActions', () => {
     expect(activeFile.current.data).toEqual({ type: 'tiptap', textContent: 'some content' });
   });
 });
-
-function makeFile(name: string): { fileEntry: FileFileEntry; fileData: FileData } {
-  const filePath = './' + name;
-  return {
-    fileEntry: {
-      name,
-      path: filePath,
-      fileExtension: name.split('.').pop() ?? '',
-      isFolder: false,
-      isDotfile: false,
-      isFile: true,
-    },
-    fileData: {
-      fileId: filePath,
-      fileName: name,
-    },
-  };
-}
-function makeFolder(name: string): FolderFileEntry {
-  return {
-    name,
-    path: './' + name,
-    isFolder: true,
-    isDotfile: false,
-    isFile: false,
-    children: [],
-  };
-}

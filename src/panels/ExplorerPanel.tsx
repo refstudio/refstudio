@@ -14,7 +14,7 @@ import {
 import { FileId } from '../atoms/types/FileData';
 import { FileEntry, FileFileEntry } from '../atoms/types/FileEntry';
 import { PaneId } from '../atoms/types/PaneGroup';
-import { FileEntryTree, FileTreeNode } from '../components/FileTree';
+import { FileEntryTree, FileTreeNode } from '../components/FileEntryTree';
 import { PanelSection } from '../components/PanelSection';
 import { PanelWrapper } from '../components/PanelWrapper';
 import { readAllProjectFiles } from '../filesystem';

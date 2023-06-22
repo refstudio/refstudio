@@ -34,7 +34,7 @@ export function FileEntryTree(props: FileEntryTreeProps) {
               file.isFolder ? (
                 <>
                   <FileTreeNode fileName={file.name} isFolder key={file.path} />
-                  <FileEntryTree key={file.path} {...props} files={file.children} />
+                  <FileEntryTree key={file.path} {...props} files={file.children} root={false} />
                 </>
               ) : (
                 <FileTreeNode
@@ -56,7 +56,7 @@ export function FileTreeNode({ fileName, isFolder, onClick, rightAction, selecte
     <div
       className={cx('mb-1 py-1', 'flex flex-row items-center gap-1', 'group', {
         'bg-slate-100': selected,
-        'cursor-pointer hover:bg-slate-100': !isFolder,
+        'cursor-pointer hover:bg-slate-100': !!onClick,
       })}
       title={fileName}
       onClick={onClick}
