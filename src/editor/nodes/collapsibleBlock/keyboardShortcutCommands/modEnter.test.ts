@@ -10,7 +10,7 @@ describe('Mod-Enter keyboard shortcut command', () => {
     extensions: EDITOR_EXTENSIONS,
   });
 
-  test.only('should collapse collapsible block', () => {
+  test('should collapse collapsible block', () => {
     setUpEditorWithSelection(
       editor,
       `<collapsible-block folded='false'>
