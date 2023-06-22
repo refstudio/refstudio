@@ -222,6 +222,7 @@ class PDFIngestion:
             references.append(
                 Reference(
                     source_filename=source_pdf,
+                    status=typing.IngestStatus.FAILURE,
                     filename_md5=get_filename_md5(source_pdf),
                     citation_key="untitled",
                 )
