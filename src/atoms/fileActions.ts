@@ -38,7 +38,7 @@ export const openFileAtom = atom(null, (get, set, file: FileEntry) => {
 
 /** Open a reference in the right pane */
 export const openReferenceAtom = atom(null, (get, set, referenceId: string) => {
-  const fileId = `refstudio://reference/${referenceId}`;
+  const fileId = `refstudio://references/${referenceId}`;
 
   const reference = get(getDerivedReferenceAtom(referenceId));
   if (!reference) {

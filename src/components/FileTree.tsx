@@ -4,20 +4,20 @@ import { FileId } from '../atoms/types/FileData';
 import { FileEntry } from '../atoms/types/FileEntry';
 import { cx } from '../cx';
 
-interface FileTreeNodeProps {
-  fileName: string;
-  isFolder?: boolean;
-  onClick?: () => void;
-  rightAction?: React.ReactNode;
-  selected?: boolean;
-}
-
 interface FileEntryTreeProps {
   files: FileEntry[];
   onClick: (fileId: FileId) => void;
   rightAction?: (file: FileId) => React.ReactNode;
   root?: boolean;
   selectedFiles: FileId[];
+}
+
+interface FileTreeNodeProps {
+  fileName: string;
+  isFolder?: boolean;
+  onClick?: () => void;
+  rightAction?: React.ReactNode;
+  selected?: boolean;
 }
 
 export function FileEntryTree(props: FileEntryTreeProps) {

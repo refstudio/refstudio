@@ -3,6 +3,7 @@ import { createStore, useAtomValue } from 'jotai';
 import { describe, expect, test } from 'vitest';
 
 import { readFileContent } from '../filesystem';
+import { ReferenceItem } from '../types/ReferenceItem';
 import {
   activePaneAtom,
   closeAllFilesAtom,
@@ -10,10 +11,12 @@ import {
   focusPaneAtom,
   leftPaneAtom,
   openFileAtom,
+  openReferenceAtom,
   rightPaneAtom,
   selectFileInPaneAtom,
   splitFileToPaneAtom,
 } from './fileActions';
+import { setReferencesAtom } from './referencesState';
 import { runGetAtomHook, runSetAtomHook } from './test-utils';
 import { FileData } from './types/FileData';
 import { FileFileEntry, FolderFileEntry } from './types/FileEntry';
@@ -85,6 +88,34 @@ describe('fileActions', () => {
     expect(leftPane.current.files.length).toBe(1);
   });
 
+  test('should open Reference in the right pane, and make it active', () => {
+    const store = createStore();
+    const setReferences = runSetAtomHook(setReferencesAtom, store);
+    const openReference = runSetAtomHook(openReferenceAtom, store);
+    const rightPane = runGetAtomHook(rightPaneAtom, store);
+
+    const reference: ReferenceItem = {
+      id: 'reference',
+      citationKey: 'citationKey',
+      title: 'Reference',
+      authors: [],
+    };
+    const referenceFileId = `refstudio://references/${reference.id}`;
+
+    expect(rightPane.current.files.map(({ fileId }) => fileId)).not.toContainEqual(referenceFileId);
+    expect(rightPane.current.activeFile).toBeUndefined();
+
+    act(() => {
+      setReferences.current([reference]);
+      openReference.current(reference.id);
+    });
+
+    expect(rightPane.current.id).toBe<PaneId>('RIGHT');
+    expect(rightPane.current.files.length).toBe(1);
+    expect(rightPane.current.files.map(({ fileId }) => fileId)).toContainEqual(referenceFileId);
+    expect(rightPane.current.activeFile).toEqual(referenceFileId);
+  });
+
   test('should close opened file in same pane', () => {
     const store = createStore();
     const openFile = runSetAtomHook(openFileAtom, store);
@@ -143,6 +174,30 @@ describe('fileActions', () => {
     });
 
     expect(leftPane.current.files).not.toContainEqual(fileData);
+  });
+
+  test('should not fail when trying to open a reference that does not exist', () => {
+    const store = createStore();
+    const openReference = runSetAtomHook(openReferenceAtom, store);
+    const rightPane = runGetAtomHook(rightPaneAtom, store);
+
+    const reference: ReferenceItem = {
+      id: 'reference',
+      citationKey: 'citationKey',
+      title: 'Reference',
+      authors: [],
+    };
+    const referenceFileId = `refstudio://references/${reference.id}`;
+
+    expect(rightPane.current.files.map(({ fileId }) => fileId)).not.toContainEqual(referenceFileId);
+    expect(rightPane.current.activeFile).toBeUndefined();
+
+    act(() => {
+      openReference.current(reference.id);
+    });
+
+    expect(rightPane.current.files.map(({ fileId }) => fileId)).not.toContainEqual(referenceFileId);
+    expect(rightPane.current.activeFile).toBeUndefined();
   });
 
   test('should close all opened files with closeAllFilesAtom', () => {
