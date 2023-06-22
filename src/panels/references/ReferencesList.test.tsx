@@ -29,7 +29,7 @@ describe('ReferencesList', () => {
     expect(screen.getByText('title')).toBeInTheDocument();
   });
 
-  test('should display multiple reference items with title', async () => {
+  test('should display multiple reference items with title', () => {
     render(
       <ReferencesList
         references={[

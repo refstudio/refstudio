@@ -15,12 +15,18 @@ describe('PdfInputFileUpload', () => {
     const input = screen.getByRole<HTMLInputElement>('form');
 
     const file = new File(['hello'], 'file.pdf', { type: 'application/pdf' });
+    await user.click(screen.getByText('here'));
     await user.upload(input, file);
 
     expect(input.files).toBeDefined();
     expect(input.files!).toHaveLength(1);
     expect(input.files![0]).toBe(file);
     expect(input.files!.item(0)).toBe(file);
+
+    expect(handler).toBeCalledTimes(1);
+    const handlerParameters = handler.mock.calls[0] as [FileList];
+    expect(handlerParameters).toHaveLength(1);
+    expect(handlerParameters[0].item(0)).toBe(file);
   });
 
   test('should upload multiple files on click', async () => {
@@ -37,11 +43,5 @@ describe('PdfInputFileUpload', () => {
     expect(input.files).toHaveLength(2);
     expect(input.files![0]).toBe(files[0]);
     expect(input.files![1]).toBe(files[1]);
-  });
-
-  test('should open file upload on click in HERE', async () => {
-    const handler = vi.fn();
-    const { user } = setup(<PdfInputFileUpload onUpload={handler} />);
-    await user.click(screen.getByText('here'));
   });
 });
