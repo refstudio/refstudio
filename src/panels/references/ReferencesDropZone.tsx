@@ -12,6 +12,10 @@ import { copyFiles } from '../../filesystem';
 import { useAsyncEffect } from '../../hooks/useAsyncEffect';
 import { isNonNullish } from '../../lib/isNonNullish';
 
+function validReferencesFiles(filePath: string) {
+  return filePath.toLowerCase().endsWith('.pdf');
+}
+
 export function ReferencesDropZone() {
   const [visible, setVisible] = useState(false);
   const [files, setFiles] = useState<string[]>([]);
@@ -25,7 +29,6 @@ export function ReferencesDropZone() {
       // Merge new files
       // FIXME: Improve this once we have references state/status
       const newReferences = Array.from(filePaths)
-        .filter((f) => f.endsWith('.pdf'))
         .map((filePath) => {
           const filename = filePath.split('/').pop();
           if (!filename) {
@@ -74,7 +77,7 @@ export function ReferencesDropZone() {
         await listenEvent<string[]>(TauriEvent.WINDOW_FILE_DROP, (e) => {
           if (isMounted()) {
             setSyncInProgress(true);
-            copyAndIngestMutation.mutate(e.payload);
+            copyAndIngestMutation.mutate(e.payload.filter(validReferencesFiles));
           }
         }),
         await listenEvent(RefStudioEvents.references.ingestion.run, () => {
@@ -86,7 +89,7 @@ export function ReferencesDropZone() {
         await listenEvent<string[]>(TauriEvent.WINDOW_FILE_DROP_HOVER, (event) => {
           if (isMounted()) {
             setVisible(true);
-            setFiles(event.payload);
+            setFiles(event.payload.filter(validReferencesFiles));
           }
         }),
         await listenEvent(TauriEvent.WINDOW_FILE_DROP_CANCELLED, () => {
