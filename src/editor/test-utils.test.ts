@@ -1,6 +1,6 @@
 import { Editor } from '@tiptap/react';
 
-import { getSelectedText, setUpEditorWithSelection } from './test-utils';
+import { getPrettyHTML, getSelectedText, setUpEditorWithSelection } from './test-utils';
 import { EDITOR_EXTENSIONS } from './TipTapEditorConfigs';
 
 describe('TipTap test utils', () => {
@@ -34,6 +34,28 @@ describe('TipTap test utils', () => {
       expect(text).toEqual('ader');
 
       expect(getSelectedText(editor)).toEqual('ader');
+    });
+  });
+
+  describe('getPrettyHTML', () => {
+    it('should nicely format document HTML, removing draggable blocks', () => {
+      editor
+        .chain()
+        .setContent(
+          `<p
+      >some <b
+      >text</b
+      ></p
+      >`,
+        )
+        .run();
+      expect(editor.getHTML()).toMatch(/<draggable-block/);
+      expect(getPrettyHTML(editor)).toMatchInlineSnapshot(`
+        "<p>
+          some
+          <strong>text</strong>
+        </p>"
+      `);
     });
   });
 });

@@ -99,13 +99,6 @@ export function getPrettyHTML(editor: Editor) {
     .trim();
 }
 
-export function getFullText(editor: Editor): string {
-  return editor.view.state.doc.textBetween(
-    TextSelection.atStart(editor.state.doc).from,
-    TextSelection.atEnd(editor.state.doc).to,
-  );
-}
-
 export function getSelectedText(editor: Editor) {
   const sel = editor.view.state.selection;
   const text = editor.view.state.doc.textBetween(sel.from, sel.to);
