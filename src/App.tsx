@@ -7,6 +7,7 @@ import { openReferenceAtom } from './atoms/fileActions';
 import { PrimarySideBar, PrimarySideBarPane } from './components/PrimarySideBar';
 import { VerticalResizeHandle } from './components/VerticalResizeHandle';
 import { emitEvent, RefStudioEvents } from './events';
+import { Footer } from './Footer';
 import { AIPanel } from './panels/AIPanel';
 import { ExplorerPanel } from './panels/ExplorerPanel';
 import { MainPanel } from './panels/MainPanel';
@@ -23,20 +24,31 @@ function App() {
 
   return (
     <ReferencesDropZone>
-      <PanelGroup
-        autoSaveId="refstudio"
-        className="relative h-full"
-        direction="horizontal"
-        onLayout={updatePDFViewerWidth}
-      >
-        <LeftSidePanelWrapper />
-        <Panel defaultSize={60} order={2}>
-          <MainPanel pdfViewerRef={pdfViewerRef} />
-        </Panel>
-        <RightPanelWrapper />
-      </PanelGroup>
+      <ApplicationFrame>
+        <PanelGroup
+          autoSaveId="refstudio"
+          className="relative h-full"
+          direction="horizontal"
+          onLayout={updatePDFViewerWidth}
+        >
+          <LeftSidePanelWrapper />
+          <Panel defaultSize={60} order={2}>
+            <MainPanel pdfViewerRef={pdfViewerRef} />
+          </Panel>
+          <RightPanelWrapper />
+        </PanelGroup>
+      </ApplicationFrame>
       <SettingsModalOpener />
     </ReferencesDropZone>
+  );
+}
+
+function ApplicationFrame({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex h-screen flex-col">
+      {children}
+      <Footer />
+    </div>
   );
 }
 
