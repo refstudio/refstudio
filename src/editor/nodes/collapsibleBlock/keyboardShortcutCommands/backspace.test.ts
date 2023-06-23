@@ -1,12 +1,7 @@
 import { Editor } from '@tiptap/react';
 
 import { defaultCollapsibleBlock } from '../../../test-fixtures';
-import {
-  findNodesByNodeType,
-  getPrettyHTMLWithSelection,
-  getText,
-  setUpEditorWithSelection,
-} from '../../../test-utils';
+import { getPrettyHTMLWithSelection, setUpEditorWithSelection } from '../../../test-utils';
 import { EDITOR_EXTENSIONS } from '../../../TipTapEditorConfigs';
 import { backspace } from './backspace';
 
@@ -41,33 +36,19 @@ describe('Backspace keyboard shortcut command', () => {
     setUpEditorWithSelection(
       editor,
       `<collapsible-block folded='false'>
-          <collapsible-summary></collapsible-summary>
+          <collapsible-summary>Summary</collapsible-summary>
           <collapsible-content>
               <p>|</p>
           </collapsible-content>
       </collapsible-block>`,
     );
 
-    let [collapsibleBlock] = findNodesByNodeType(editor.state.doc, 'collapsibleBlock');
-    expect(collapsibleBlock).toBeDefined();
-
-    expect(collapsibleBlock.attrs.folded).toBe(false);
-    expect(collapsibleBlock.childCount).toBe(2);
-
-    const initialSummary = getText(collapsibleBlock.child(0));
-
     const commandResult = backspace({ editor });
     expect(commandResult).toBe(true);
 
-    [collapsibleBlock] = findNodesByNodeType(editor.state.doc, 'collapsibleBlock');
-    expect(collapsibleBlock).toBeDefined();
-
-    expect(collapsibleBlock.attrs.folded).toBe(true);
-    expect(collapsibleBlock.childCount).toBe(1);
-    expect(getText(collapsibleBlock)).toEqual(initialSummary);
     expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
       "<collapsible-block folded=\\"true\\">
-        <collapsible-summary>|</collapsible-summary>
+        <collapsible-summary>Summary|</collapsible-summary>
       </collapsible-block>"
     `);
   });
