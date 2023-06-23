@@ -64,7 +64,7 @@ class JsonStorage:
         Delete a Reference from storage.
         """
         # preprocess references into a dict of source_filename: Reference
-        # so that we can simply do `list.remove`
+        # so that we can simply do `del refs[filename]`
         refs = {
             ref.source_filename: ref for ref in self.references
         }
