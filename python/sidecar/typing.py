@@ -44,7 +44,7 @@ class Reference(RefStudioModel):
 
 
 class ReferenceDelete(RefStudioModel):
-    source_filenames = list[str]
+    source_filenames: list[str]
 
 
 class Author(RefStudioModel):
