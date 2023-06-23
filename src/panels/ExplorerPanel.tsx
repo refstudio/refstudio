@@ -61,7 +61,8 @@ export function ExplorerPanel() {
       (evt: React.MouseEvent) => {
         evt.stopPropagation();
         splitFileToPane({ fileId, fromPaneId, toPaneId });
-      }, [splitFileToPane],
+      },
+    [splitFileToPane],
   );
 
   const hasLeftAndRightPanelsFiles = left.files.length > 0 && right.files.length > 0;

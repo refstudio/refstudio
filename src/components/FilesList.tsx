@@ -12,15 +12,19 @@ interface FilesListProps {
 }
 
 export function FilesList({ files, onClick, paddingLeft, rightAction, selectedFiles }: FilesListProps) {
-  return files.map((file) => (
-    <FileNode
-      VscIcon={VscFile}
-      fileName={file.fileName}
-      key={file.fileId}
-      paddingLeft={paddingLeft}
-      rightAction={rightAction?.(file.fileId)}
-      selected={selectedFiles.includes(file.fileId)}
-      onClick={() => onClick(file.fileId)}
-    />
-  ));
+  return (
+    <>
+      {files.map((file) => (
+        <FileNode
+          VscIcon={VscFile}
+          fileName={file.fileName}
+          key={file.fileId}
+          paddingLeft={paddingLeft}
+          rightAction={rightAction?.(file.fileId)}
+          selected={selectedFiles.includes(file.fileId)}
+          onClick={() => onClick(file.fileId)}
+        />
+      ))}
+    </>
+  );
 }
