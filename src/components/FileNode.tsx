@@ -43,6 +43,7 @@ export function FileNode({ bold, fileName, onClick, paddingLeft, rightAction, se
             h={6}
             marginRight={theme.space[2]}
             padding={theme.space['0.5']}
+            role="button"
             rounded={theme.radii.md}
             title={rightAction.title}
             w={6}

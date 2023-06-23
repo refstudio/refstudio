@@ -1,6 +1,9 @@
+import { VscFile } from 'react-icons/vsc';
+
 import { makeFile } from '../atoms/test-fixtures';
 import { noop } from '../utils/noop';
 import { render, screen, setup } from '../utils/test-utils';
+import { RightAction } from './FileNode';
 import { FilesList } from './FilesList';
 
 describe('FilesList component', () => {
@@ -35,12 +38,13 @@ describe('FilesList component', () => {
 
   it('should call rightAction with file id', () => {
     const { fileData } = makeFile('File 1.pdf');
-    const rightActionMock = vi.fn().mockReturnValue(<div>Right action</div>);
+    const rightActionMock = vi.fn<[], RightAction>().mockReturnValue({ onClick: vi.fn(), VscIcon: VscFile });
 
     render(<FilesList files={[fileData]} rightAction={rightActionMock} selectedFiles={[]} onClick={noop} />);
 
     expect(rightActionMock).toHaveBeenCalledTimes(1);
     expect(rightActionMock).toHaveBeenCalledWith(fileData.fileId);
-    expect(screen.getByText('Right action')).toBeInTheDocument();
+
+    expect(screen.getByRole('button', { hidden: true })).toBeInTheDocument();
   });
 });
