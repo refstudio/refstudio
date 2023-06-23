@@ -22,7 +22,8 @@ describe('settings', () => {
     vi.resetAllMocks();
   });
 
-  test('should throw when using getSettings before initialization', () => {
+  // eslint-disable-next-line vitest/expect-expect
+  it('should throw when using getSettings before initialization', () => {
     try {
       getSettings();
       fail();
@@ -31,7 +32,7 @@ describe('settings', () => {
     }
   });
 
-  test('should getSettings manager after call to initSettings', async () => {
+  it('should getSettings manager after call to initSettings', async () => {
     const fn = vi.fn();
     vi.mocked(SettingsManager<SettingsSchema>).mockImplementation(
       (defaultSettings) =>
@@ -44,7 +45,7 @@ describe('settings', () => {
     expect(fn).toBeCalled();
   });
 
-  test('should read settings from env', async () => {
+  it('should read settings from env', async () => {
     vi.mocked(readEnv).mockResolvedValue('some value');
     const fn = vi.fn();
     vi.mocked(SettingsManager<SettingsSchema>).mockImplementation(
@@ -59,7 +60,7 @@ describe('settings', () => {
     expect(getSettings()).toBeDefined();
   });
 
-  test('should read default value from env', async () => {
+  it('should read default value from env', async () => {
     vi.mocked(readEnv).mockResolvedValue('OPENAI_COMPLETE_MODEL-value');
     const fn = vi.fn();
     vi.mocked(SettingsManager<SettingsSchema>).mockImplementation(
@@ -73,7 +74,7 @@ describe('settings', () => {
     expect(getSettings().default.openAI.chatModel).toBe('OPENAI_COMPLETE_MODEL-value');
   });
 
-  test('should call settingsManager via getCachedSetting and setCachedSetting', async () => {
+  it('should call settingsManager via getCachedSetting and setCachedSetting', async () => {
     const getCachedFn = vi.fn();
     const setCachedFn = vi.fn();
     vi.mocked(SettingsManager<SettingsSchema>).mockImplementation(
@@ -96,7 +97,7 @@ describe('settings', () => {
     expect(setCachedFn).toBeCalledWith('openAI.chatModel', 'value');
   });
 
-  test('should call settingsManager.syncCache via saveCachedSettings', async () => {
+  it('should call settingsManager.syncCache via saveCachedSettings', async () => {
     const syncCacheFn = vi.fn();
     vi.mocked(SettingsManager<SettingsSchema>).mockImplementation(
       (defaultSettings, options) =>

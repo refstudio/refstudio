@@ -1,7 +1,7 @@
 import { TextSelection } from '@tiptap/pm/state';
 import { isNodeSelection, KeyboardShortcutCommand } from '@tiptap/react';
 
-export const backspace: KeyboardShortcutCommand = function ({ editor }) {
+export const backspace: KeyboardShortcutCommand = ({ editor }) => {
   if (editor.state.selection.empty && editor.state.selection.$from.parentOffset === 0) {
     // Removes the content item and moves the selection to the previous content item or the header
     return editor.commands.command(({ tr, dispatch }) => {

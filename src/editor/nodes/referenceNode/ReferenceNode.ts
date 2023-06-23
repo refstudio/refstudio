@@ -5,9 +5,7 @@ import { SuggestionKeyDownProps } from '@tiptap/suggestion';
 import { ReferenceListProps, ReferencesList } from './ReferencesList';
 
 export const ReferenceNode = Mention.configure({
-  renderLabel({ node }) {
-    return (node.attrs.label as string | undefined) ?? '[INVALID_REF]';
-  },
+  renderLabel: ({ node }) => (node.attrs.label as string | undefined) ?? '[INVALID_REF]',
   suggestion: {
     allowSpaces: true,
     char: '[',
@@ -26,11 +24,11 @@ export const ReferenceNode = Mention.configure({
           );
         },
 
-        onUpdate(props) {
+        onUpdate: (props) => {
           reactRenderer.updateProps(props);
         },
 
-        onKeyDown(props) {
+        onKeyDown: (props) => {
           if (props.event.key === 'Escape') {
             reactRenderer.destroy();
             return true;
@@ -39,7 +37,7 @@ export const ReferenceNode = Mention.configure({
           return reactRenderer.ref?.onKeyDown(props) ?? false;
         },
 
-        onExit() {
+        onExit: () => {
           reactRenderer.destroy();
         },
       };

@@ -1,6 +1,6 @@
 import { act } from '@testing-library/react';
 
-import { listenEvent, RefStudioEvents } from '../events';
+import { listenEvent, RefStudioEventCallback, RefStudioEvents } from '../events';
 import { noop } from '../utils/noop';
 import { render, screen } from '../utils/test-utils';
 import { getCachedSetting, initSettings, saveCachedSettings, setCachedSetting } from './settings';
@@ -22,17 +22,17 @@ describe('SettingsModalOpener component', () => {
     vi.clearAllMocks();
   });
 
-  test('should render the modal CLOSED (empty) by default', () => {
+  it('should render the modal CLOSED (empty) by default', () => {
     const { container } = render(<SettingsModalOpener />);
     expect(container).toBeEmptyDOMElement();
   });
 
-  test('should open the Settings model on SETTING menu event', () => {
-    let settingEventHandler: undefined | (() => void);
+  it('should open the Settings model on SETTING menu event', () => {
+    let settingEvtHandler: undefined | RefStudioEventCallback;
     let eventName = '';
-    vi.mocked(listenEvent).mockImplementation(async (event: string, handler: () => void) => {
+    vi.mocked(listenEvent).mockImplementation(async (event: string, handler: RefStudioEventCallback) => {
       eventName = event;
-      settingEventHandler = handler;
+      settingEvtHandler = handler;
       await Promise.resolve();
       return noop();
     });
@@ -42,40 +42,38 @@ describe('SettingsModalOpener component', () => {
     expect(screen.queryByRole('menuitem', { name: 'Open AI' })).not.toBeInTheDocument();
     expect(screen.queryByRole('menuitem', { name: 'Config' })).not.toBeInTheDocument();
 
-    expect(eventName).toBe(RefStudioEvents.Menu.settings);
-    expect(settingEventHandler).toBeDefined();
+    expect(eventName).toBe(RefStudioEvents.menu.settings);
+    expect(settingEvtHandler).toBeDefined();
 
-    act(() => {
-      // Trigger the settings event to open the modal
-      settingEventHandler!();
-    });
+    // Trigger the settings event to open the modal
+    act(() => settingEvtHandler!({ event: RefStudioEvents.menu.settings, windowLabel: '', id: 1, payload: undefined }));
 
     expect(screen.getByRole('menuitem', { name: 'General' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Open AI' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Config' })).toBeInTheDocument();
   });
 
-  test('should toggle the Settings model on SETTING menu event', () => {
-    let settingEventHandler: undefined | (() => void);
+  it('should toggle the Settings model on SETTING menu event', () => {
+    let settingEvtHandler: undefined | RefStudioEventCallback;
     let eventName = '';
-    vi.mocked(listenEvent).mockImplementation(async (event: string, handler: () => void) => {
+    vi.mocked(listenEvent).mockImplementation(async (event: string, handler: RefStudioEventCallback) => {
       eventName = event;
-      settingEventHandler = handler;
+      settingEvtHandler = handler;
       await Promise.resolve();
       return noop();
     });
 
     render(<SettingsModalOpener />);
     expect(screen.queryByRole('menuitem', { name: 'General' })).not.toBeInTheDocument();
-    expect(eventName).toBe(RefStudioEvents.Menu.settings);
-    expect(settingEventHandler).toBeDefined();
+    expect(eventName).toBe(RefStudioEvents.menu.settings);
+    expect(settingEvtHandler).toBeDefined();
 
     // Open
-    act(() => settingEventHandler!());
+    act(() => settingEvtHandler!({ event: RefStudioEvents.menu.settings, windowLabel: '', id: 1, payload: undefined }));
     expect(screen.getByRole('menuitem', { name: 'General' })).toBeInTheDocument();
 
     // Close
-    act(() => settingEventHandler!());
+    act(() => settingEvtHandler!({ event: RefStudioEvents.menu.settings, windowLabel: '', id: 1, payload: undefined }));
     expect(screen.queryByRole('menuitem', { name: 'General' })).not.toBeInTheDocument();
   });
 });

@@ -1,7 +1,7 @@
 import { Editor } from '@tiptap/react';
 
-import { defaultCollapsibleBlock, uncollapsedCollapsibleBlockWithEmptyContent } from '../../../test-fixtures';
-import { findNodesByNodeType, getText } from '../../../test-utils';
+import { defaultCollapsibleBlock } from '../../../test-fixtures';
+import { getPrettyHTMLWithSelection, setUpEditorWithSelection } from '../../../test-utils';
 import { EDITOR_EXTENSIONS } from '../../../TipTapEditorConfigs';
 import { backspace } from './backspace';
 
@@ -10,48 +10,60 @@ describe('Backspace keyboard shortcut command', () => {
     extensions: EDITOR_EXTENSIONS,
   });
 
-  test('should turn collapsible block back into paragraphs when selection is at the beginning of the summary', () => {
-    // 3 is to position the caret at the beginning of the summary
-    editor.chain().setContent(defaultCollapsibleBlock).setTextSelection(3).run();
-    expect(editor.state.doc.childCount).toBe(1);
+  it('should turn collapsible block back into paragraphs when selection is at the beginning of the summary', () => {
+    setUpEditorWithSelection(
+      editor,
+      `<collapsible-block>
+        <collapsible-summary>|Header</collapsible-summary>
+        <collapsible-content>
+            <p>Content Line 1</p>
+            <p>Content Line 2</p>
+        </collapsible-content>
+      </collapsible-block>`,
+    );
 
     const commandResult = backspace({ editor });
     expect(commandResult).toBe(true);
 
-    const { doc } = editor.state;
-    // A new collapsible should have been added
-    expect(doc.childCount).toBe(3);
-
-    expect(getText(doc.child(0))).toEqual('Header');
-    expect(getText(doc.child(1))).toEqual('Content Line 1');
-    expect(getText(doc.child(2))).toEqual('Content Line 2');
+    expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
+      "<p>|Header</p>
+      <p>Content Line 1</p>
+      <p>Content Line 2</p>"
+    `);
   });
 
-  test('should remove content and collapse block when removing the only remaining content block of collapsible block', () => {
-    // 7 is to position the caret in the content
-    editor.chain().setContent(uncollapsedCollapsibleBlockWithEmptyContent).setTextSelection(7).run();
-
-    let [collapsibleBlock] = findNodesByNodeType(editor.state.doc, 'collapsibleBlock');
-    expect(collapsibleBlock).toBeDefined();
-
-    expect(collapsibleBlock.attrs.folded).toBe(false);
-    expect(collapsibleBlock.childCount).toBe(2);
-
-    const initialSummary = getText(collapsibleBlock.child(0));
+  it('should remove content and collapse block when removing the only remaining content block of collapsible block', () => {
+    setUpEditorWithSelection(
+      editor,
+      `<collapsible-block folded='false'>
+          <collapsible-summary>Summary</collapsible-summary>
+          <collapsible-content>
+              <p>|</p>
+          </collapsible-content>
+      </collapsible-block>`,
+    );
 
     const commandResult = backspace({ editor });
     expect(commandResult).toBe(true);
 
-    [collapsibleBlock] = findNodesByNodeType(editor.state.doc, 'collapsibleBlock');
-    expect(collapsibleBlock).toBeDefined();
-
-    expect(collapsibleBlock.attrs.folded).toBe(true);
-    expect(collapsibleBlock.childCount).toBe(1);
-    expect(getText(collapsibleBlock)).toEqual(initialSummary);
+    expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
+      "<collapsible-block folded='true'>
+        <collapsible-summary>Summary|</collapsible-summary>
+      </collapsible-block>"
+    `);
   });
 
-  test('should not do anything when the selection is not at the beginning of the summary', () => {
-    editor.chain().setContent(defaultCollapsibleBlock).setTextSelection(4).run();
+  it('should not do anything when the selection is not at the beginning of the summary', () => {
+    setUpEditorWithSelection(
+      editor,
+      `<collapsible-block>
+        <collapsible-summary>H|eader</collapsible-summary>
+        <collapsible-content>
+            <p>Content Line 1</p>
+            <p>Content Line 2</p>
+        </collapsible-content>
+      </collapsible-block>`,
+    );
     const initialDoc = editor.state.doc;
 
     const commandResult = backspace({ editor });
@@ -59,16 +71,17 @@ describe('Backspace keyboard shortcut command', () => {
     expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
   });
 
-  test('should not do anything when removing a content block that has siblings', () => {
-    const content = `
-    <collapsible-block folded='false'>
-      <collapsible-summary></collapsible-summary>
-      <collapsible-content>
-        <p></p>
-        <p>A sibling with content</p>
-      </collapsible-content>
-    </collapsible-block>`;
-    editor.chain().setContent(content).setTextSelection(7).run();
+  it('should not do anything when removing a content block that has siblings', () => {
+    setUpEditorWithSelection(
+      editor,
+      `<collapsible-block>
+        <collapsible-summary></collapsible-summary>
+        <collapsible-content>
+          <p>|</p>
+          <p>A sibling with content</p>
+        </collapsible-content>
+      </collapsible-block>`,
+    );
     const initialDoc = editor.state.doc;
 
     const commandResult = backspace({ editor });
@@ -76,12 +89,8 @@ describe('Backspace keyboard shortcut command', () => {
     expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
   });
 
-  test('should not do anything when the selection is not in a collapsible block', () => {
-    editor
-      .chain()
-      .setContent('<p>Some content</p>' + defaultCollapsibleBlock)
-      .setTextSelection(2)
-      .run();
+  it('should not do anything when the selection is not in a collapsible block', () => {
+    setUpEditorWithSelection(editor, `<p>So|me content</p>` + defaultCollapsibleBlock);
     const initialDoc = editor.state.doc;
 
     const commandResult = backspace({ editor });
@@ -89,7 +98,7 @@ describe('Backspace keyboard shortcut command', () => {
     expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
   });
 
-  test('should not do anything when the selection is not empty', () => {
+  it('should not do anything when the selection is not empty', () => {
     editor.chain().setContent(defaultCollapsibleBlock).selectAll().run();
     const initialDoc = editor.state.doc;
 

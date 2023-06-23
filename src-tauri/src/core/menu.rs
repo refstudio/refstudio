@@ -12,7 +12,7 @@ impl AppMenu {
                 .add_native_item(MenuItem::About(name.into(), AboutMetadata::new()))
                 .add_native_item(MenuItem::Separator)
                 .add_item(
-                    CustomMenuItem::new("tauri://menu/settings".to_string(), "Settings")
+                    CustomMenuItem::new("refstudio://menu/settings".to_string(), "Settings")
                         .accelerator("Cmd+,"),
                 )
                 .add_native_item(MenuItem::Separator)
@@ -68,7 +68,7 @@ impl AppMenu {
         // Send all events to the app
         event.window().emit(event.menu_item_id(), {}).unwrap();
         // match event.menu_item_id() {
-        //     "tauri://menu/settings" => {
+        //     "refstudio://menu/settings" => {
         //         println!("Settings");
         //         event.window().emit("settings", {}).unwrap();
         //     }

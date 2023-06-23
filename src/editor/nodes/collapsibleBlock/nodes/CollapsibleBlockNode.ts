@@ -38,33 +38,25 @@ export const CollapsibleBlockNode = Node.create({
   defining: true,
   selectable: false,
 
-  parseHTML() {
-    return [
-      {
-        tag: 'collapsible-block',
-      },
-    ];
-  },
+  parseHTML: () => [
+    {
+      tag: 'collapsible-block',
+    },
+  ],
 
-  renderHTML({ HTMLAttributes }) {
-    return ['collapsible-block', HTMLAttributes, 0];
-  },
+  renderHTML: ({ HTMLAttributes }) => ['collapsible-block', HTMLAttributes, 0],
 
-  addAttributes(): {
+  addAttributes: (): {
     [K in keyof CollapsibleBlockNodeAttributes]: {
       default: CollapsibleBlockNodeAttributes[K];
     };
-  } {
-    return {
-      folded: {
-        default: true,
-      },
-    };
-  },
+  } => ({
+    folded: {
+      default: true,
+    },
+  }),
 
-  addNodeView() {
-    return ReactNodeViewRenderer(CollapsibleBlock);
-  },
+  addNodeView: () => ReactNodeViewRenderer(CollapsibleBlock),
 
   addCommands() {
     return {
@@ -102,7 +94,7 @@ export const CollapsibleBlockNode = Node.create({
           }
           return true;
         },
-      /* 
+      /*
         Splits a collapsible block from the summary:
          - removes text after the caret from the first collapsible block
          - creates a new collapsible block with text after the caret as summary and empty content
@@ -268,20 +260,16 @@ export const CollapsibleBlockNode = Node.create({
     };
   },
 
-  addKeyboardShortcuts() {
-    return {
-      Backspace: backspace,
-      Enter: enter,
-      'Mod-Enter': modEnter,
-    };
-  },
+  addKeyboardShortcuts: () => ({
+    Backspace: backspace,
+    Enter: enter,
+    'Mod-Enter': modEnter,
+  }),
 
-  addInputRules() {
-    return [
-      new InputRule({
-        find: inputRegex,
-        handler: chevronHandler,
-      }),
-    ];
-  },
+  addInputRules: () => [
+    new InputRule({
+      find: inputRegex,
+      handler: chevronHandler,
+    }),
+  ],
 });

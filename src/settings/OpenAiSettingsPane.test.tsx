@@ -34,12 +34,12 @@ describe('OpenAiSettingsPane component', () => {
     vi.clearAllMocks();
   });
 
-  test('should render the component', () => {
+  it('should render the component', () => {
     render(<OpenAiSettingsPane config={panelConfig} />);
     expect(screen.getByTestId(panelConfig.id)).toBeInTheDocument();
   });
 
-  test('should render existing settings value', () => {
+  it('should render existing settings value', () => {
     render(<OpenAiSettingsPane config={panelConfig} />);
 
     expect(vi.mocked(getCachedSetting).mock.calls.length).toBeGreaterThan(0);
@@ -48,7 +48,7 @@ describe('OpenAiSettingsPane component', () => {
     expect(screen.getByLabelText('Complete Model')).toHaveValue(mockSettings.openAI.completeModel);
   });
 
-  test('should save (setCached, flush) with edited values on save', async () => {
+  it('should save (setCached, flush) with edited values on save', async () => {
     const user = userEvent.setup();
     render(<OpenAiSettingsPane config={panelConfig} />);
 

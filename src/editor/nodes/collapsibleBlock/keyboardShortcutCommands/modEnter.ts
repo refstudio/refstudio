@@ -1,6 +1,6 @@
 import { KeyboardShortcutCommand } from '@tiptap/react';
 
-export const modEnter: KeyboardShortcutCommand = function ({ editor }) {
+export const modEnter: KeyboardShortcutCommand = ({ editor }) => {
   if (!editor.state.selection.empty) {
     return false;
   }

@@ -2,7 +2,7 @@ import { Atom } from 'jotai';
 import { Loadable } from 'jotai/vanilla/utils/loadable';
 
 import { FileContent } from './FileContent';
-import { FileFileEntry, FileId } from './FileEntry';
+import { FileData, FileId } from './FileData';
 
 export type PaneId = 'LEFT' | 'RIGHT';
 
@@ -17,7 +17,7 @@ export interface PaneState {
 
 export interface PaneContent {
   id: PaneId;
-  files: FileFileEntry[];
-  activeFile?: FileFileEntry;
+  files: FileData[];
+  activeFile?: FileId;
   activeFileContent?: Atom<Loadable<FileContent>>;
 }

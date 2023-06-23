@@ -23,21 +23,15 @@ export const DraggableBlockNode = Node.create({
   draggable: true,
   selectable: true,
 
-  parseHTML() {
-    return [
-      {
-        tag: 'draggable-block',
-      },
-    ];
-  },
+  parseHTML: () => [
+    {
+      tag: 'draggable-block',
+    },
+  ],
 
-  renderHTML({ HTMLAttributes }) {
-    return ['draggable-block', HTMLAttributes, 0];
-  },
+  renderHTML: ({ HTMLAttributes }) => ['draggable-block', HTMLAttributes, 0],
 
-  addNodeView() {
-    return ReactNodeViewRenderer(DraggableBlock);
-  },
+  addNodeView: () => ReactNodeViewRenderer(DraggableBlock),
 
   addCommands() {
     return {
@@ -105,10 +99,7 @@ export const DraggableBlockNode = Node.create({
     };
   },
 
-  addKeyboardShortcuts() {
-    return {
-      Enter: ({ editor }) =>
-        editor.chain().command(unsetPartiallySelectedCollapsibleBlocks).splitDraggableBlock().run(),
-    };
-  },
+  addKeyboardShortcuts: () => ({
+    Enter: ({ editor }) => editor.chain().command(unsetPartiallySelectedCollapsibleBlocks).splitDraggableBlock().run(),
+  }),
 });

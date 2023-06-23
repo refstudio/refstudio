@@ -1,5 +1,3 @@
-export type FileId = string;
-
 interface FileEntryBase {
   name: string;
   path: string;

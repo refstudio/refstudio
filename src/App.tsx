@@ -1,22 +1,21 @@
+import { useSetAtom } from 'jotai';
 import React, { useCallback, useEffect, useState } from 'react';
 import { VscChevronUp } from 'react-icons/vsc';
 import { ImperativePanelHandle, Panel, PanelGroup } from 'react-resizable-panels';
 
+import { openReferenceAtom } from './atoms/fileActions';
 import { PrimarySideBar, PrimarySideBarPane } from './components/PrimarySideBar';
 import { VerticalResizeHandle } from './components/VerticalResizeHandle';
 import { emitEvent, RefStudioEvents } from './events';
 import { AIPanel } from './panels/AIPanel';
 import { ExplorerPanel } from './panels/ExplorerPanel';
 import { MainPanel } from './panels/MainPanel';
-import { ReferencesPanel } from './panels/ReferencesPanel';
+import { ReferencesDropZone } from './panels/references/ReferencesDropZone';
+import { ReferencesPanel } from './panels/references/ReferencesPanel';
 import { SettingsModalOpener } from './settings/SettingsModalOpener';
-import { EditorAPI } from './types/EditorAPI';
 import { PdfViewerAPI } from './types/PdfViewerAPI';
-import { ReferenceItem } from './types/ReferenceItem';
 
 function App() {
-  const editorRef = React.useRef<EditorAPI>(null);
-
   const pdfViewerRef = React.useRef<PdfViewerAPI>(null);
   const updatePDFViewerWidth = useCallback(() => {
     pdfViewerRef.current?.updateWidth();
@@ -30,23 +29,25 @@ function App() {
         direction="horizontal"
         onLayout={updatePDFViewerWidth}
       >
-        <LeftSidePanelWrapper onRefClicked={(reference) => editorRef.current?.insertReference(reference)} />
+        <LeftSidePanelWrapper />
         <Panel defaultSize={60} order={2}>
-          <MainPanel editorRef={editorRef} pdfViewerRef={pdfViewerRef} />
+          <MainPanel pdfViewerRef={pdfViewerRef} />
         </Panel>
         <RightPanelWrapper />
       </PanelGroup>
+      <ReferencesDropZone />
       <SettingsModalOpener />
     </>
   );
 }
 
-function LeftSidePanelWrapper({ onRefClicked }: { onRefClicked(item: ReferenceItem): void }) {
+function LeftSidePanelWrapper() {
   const leftPanelRef = React.useRef<ImperativePanelHandle>(null);
   const [primaryPaneCollapsed, setPrimaryPaneCollapsed] = useState(false);
   const [primaryPane, setPrimaryPane] = useState<PrimarySideBarPane>('Explorer');
+  const openReference = useSetAtom(openReferenceAtom);
 
-  function handleSideBarClick(selectedPane: PrimarySideBarPane) {
+  const handleSideBarClick = (selectedPane: PrimarySideBarPane) => {
     if (selectedPane === primaryPane) {
       // Toggle collapsing
       setPrimaryPaneCollapsed(!primaryPaneCollapsed);
@@ -55,7 +56,7 @@ function LeftSidePanelWrapper({ onRefClicked }: { onRefClicked(item: ReferenceIt
       setPrimaryPaneCollapsed(false);
     }
     setPrimaryPane(selectedPane);
-  }
+  };
 
   React.useEffect(() => {
     if (primaryPaneCollapsed) {
@@ -65,7 +66,7 @@ function LeftSidePanelWrapper({ onRefClicked }: { onRefClicked(item: ReferenceIt
     }
   }, [leftPanelRef, primaryPaneCollapsed]);
 
-  const openSettings = React.useCallback(() => emitEvent(RefStudioEvents.Menu.settings), []);
+  const openSettings = React.useCallback(() => emitEvent(RefStudioEvents.menu.settings), []);
 
   return (
     <>
@@ -82,7 +83,7 @@ function LeftSidePanelWrapper({ onRefClicked }: { onRefClicked(item: ReferenceIt
         onCollapse={(collapsed) => setPrimaryPaneCollapsed(collapsed)}
       >
         {primaryPane === 'Explorer' && <ExplorerPanel />}
-        {primaryPane === 'References' && <ReferencesPanel onRefClicked={onRefClicked} />}
+        {primaryPane === 'References' && <ReferencesPanel onRefClicked={(reference) => openReference(reference.id)} />}
       </Panel>
       <VerticalResizeHandle />
     </>
