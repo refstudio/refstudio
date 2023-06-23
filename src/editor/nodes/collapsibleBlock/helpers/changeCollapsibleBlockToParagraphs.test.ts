@@ -15,7 +15,7 @@ describe('changeCollapsibleBlockToParagraph', () => {
     editor.commands.setContent(defaultCollapsibleBlock);
   });
 
-  test('should transform collapsible block into paragraphs', () => {
+  it('should transform collapsible block into paragraphs', () => {
     const { from } = TextSelection.near(editor.state.doc.resolve(0));
 
     expect(editor.state.doc.childCount).toBe(1);
@@ -39,7 +39,7 @@ describe('changeCollapsibleBlockToParagraph', () => {
     expect(getText(doc.child(2))).toEqual(getText(initialContent[1]));
   });
 
-  test('should not do anything if pos does not belong to a collapsibleBlock', () => {
+  it('should not do anything if pos does not belong to a collapsibleBlock', () => {
     const initialDoc = editor.state.doc;
 
     editor.commands.command(({ tr }) => {
@@ -50,7 +50,7 @@ describe('changeCollapsibleBlockToParagraph', () => {
     expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
   });
 
-  test('should not do anything if there is no collapsibleBlock in the document', () => {
+  it('should not do anything if there is no collapsibleBlock in the document', () => {
     editor.commands.setContent('<p></p>');
     expect(findNodesByNodeType(editor.state.doc, 'collapsibleBlock')).toHaveLength(0);
 

@@ -10,7 +10,7 @@ describe('Backspace keyboard shortcut command', () => {
     extensions: EDITOR_EXTENSIONS,
   });
 
-  test('should turn collapsible block back into paragraphs when selection is at the beginning of the summary', () => {
+  it('should turn collapsible block back into paragraphs when selection is at the beginning of the summary', () => {
     editor
       .chain()
       .setContent(defaultParagraph + defaultParagraph)
@@ -25,10 +25,10 @@ describe('Backspace keyboard shortcut command', () => {
     // Paragraphs should have been merged together
     expect(editor.state.doc.childCount).toBe(1);
 
-    expect(getText(editor.state.doc)).toEqual('Some contentSome content');
+    expect(getText(editor.state.doc)).toBe('Some contentSome content');
   });
 
-  test('should unset partially selected collapsible blocks before deleting content', () => {
+  it('should unset partially selected collapsible blocks before deleting content', () => {
     editor
       .chain()
       .setContent(defaultParagraph + defaultCollapsibleBlock + defaultCollapsibleBlock)
@@ -45,7 +45,7 @@ describe('Backspace keyboard shortcut command', () => {
     expect(editor.state.doc.childCount).toBe(3);
   });
 
-  test('should not do anything when the selection is empty and not a the beginning of a block', () => {
+  it('should not do anything when the selection is empty and not a the beginning of a block', () => {
     editor
       .chain()
       .setContent(defaultParagraph + defaultParagraph)
@@ -59,7 +59,7 @@ describe('Backspace keyboard shortcut command', () => {
     expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
   });
 
-  test('should not do anything when the selection is a node selection', () => {
+  it('should not do anything when the selection is a node selection', () => {
     editor
       .chain()
       .setContent(defaultParagraph + defaultParagraph)

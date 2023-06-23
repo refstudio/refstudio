@@ -13,21 +13,17 @@ declare module '@tiptap/core' {
 
 export const RefStudioDocument = Document.extend({
   content: 'draggableBlock* | codeBlock',
-  addKeyboardShortcuts() {
-    return {
-      Backspace: backspace,
-    };
-  },
-  addCommands() {
-    return {
-      deleteNonEmptySelection: () => (props) => {
-        const { dispatch, tr } = props;
-        if (dispatch) {
-          unsetPartiallySelectedCollapsibleBlocks(props);
-          tr.deleteSelection();
-        }
-        return true;
-      },
-    };
-  },
+  addKeyboardShortcuts: () => ({
+    Backspace: backspace,
+  }),
+  addCommands: () => ({
+    deleteNonEmptySelection: () => (props) => {
+      const { dispatch, tr } = props;
+      if (dispatch) {
+        unsetPartiallySelectedCollapsibleBlocks(props);
+        tr.deleteSelection();
+      }
+      return true;
+    },
+  }),
 });

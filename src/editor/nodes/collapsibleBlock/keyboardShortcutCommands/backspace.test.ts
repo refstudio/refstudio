@@ -10,7 +10,7 @@ describe('Backspace keyboard shortcut command', () => {
     extensions: EDITOR_EXTENSIONS,
   });
 
-  test('should turn collapsible block back into paragraphs when selection is at the beginning of the summary', () => {
+  it('should turn collapsible block back into paragraphs when selection is at the beginning of the summary', () => {
     // 3 is to position the caret at the beginning of the summary
     editor.chain().setContent(defaultCollapsibleBlock).setTextSelection(3).run();
     expect(editor.state.doc.childCount).toBe(1);
@@ -22,12 +22,12 @@ describe('Backspace keyboard shortcut command', () => {
     // A new collapsible should have been added
     expect(doc.childCount).toBe(3);
 
-    expect(getText(doc.child(0))).toEqual('Header');
-    expect(getText(doc.child(1))).toEqual('Content Line 1');
-    expect(getText(doc.child(2))).toEqual('Content Line 2');
+    expect(getText(doc.child(0))).toBe('Header');
+    expect(getText(doc.child(1))).toBe('Content Line 1');
+    expect(getText(doc.child(2))).toBe('Content Line 2');
   });
 
-  test('should remove content and collapse block when removing the only remaining content block of collapsible block', () => {
+  it('should remove content and collapse block when removing the only remaining content block of collapsible block', () => {
     // 7 is to position the caret in the content
     editor.chain().setContent(uncollapsedCollapsibleBlockWithEmptyContent).setTextSelection(7).run();
 
@@ -50,7 +50,7 @@ describe('Backspace keyboard shortcut command', () => {
     expect(getText(collapsibleBlock)).toEqual(initialSummary);
   });
 
-  test('should not do anything when the selection is not at the beginning of the summary', () => {
+  it('should not do anything when the selection is not at the beginning of the summary', () => {
     editor.chain().setContent(defaultCollapsibleBlock).setTextSelection(4).run();
     const initialDoc = editor.state.doc;
 
@@ -59,7 +59,7 @@ describe('Backspace keyboard shortcut command', () => {
     expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
   });
 
-  test('should not do anything when removing a content block that has siblings', () => {
+  it('should not do anything when removing a content block that has siblings', () => {
     const content = `
     <collapsible-block folded='false'>
       <collapsible-summary></collapsible-summary>
@@ -76,7 +76,7 @@ describe('Backspace keyboard shortcut command', () => {
     expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
   });
 
-  test('should not do anything when the selection is not in a collapsible block', () => {
+  it('should not do anything when the selection is not in a collapsible block', () => {
     editor
       .chain()
       .setContent('<p>Some content</p>' + defaultCollapsibleBlock)
@@ -89,7 +89,7 @@ describe('Backspace keyboard shortcut command', () => {
     expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
   });
 
-  test('should not do anything when the selection is not empty', () => {
+  it('should not do anything when the selection is not empty', () => {
     editor.chain().setContent(defaultCollapsibleBlock).selectAll().run();
     const initialDoc = editor.state.doc;
 

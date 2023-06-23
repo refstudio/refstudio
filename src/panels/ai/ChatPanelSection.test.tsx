@@ -11,13 +11,13 @@ describe('ChatPanelSection component', () => {
     vi.clearAllMocks();
   });
 
-  test('should render the panel without history content and a textbox', () => {
+  it('should render the panel without history content and a textbox', () => {
     render(<ChatPanelSection />);
     expect(screen.getByText(/your chat history will be shown here\./i)).toBeInTheDocument();
     expect(screen.getByRole('textbox')).toBeInTheDocument();
   });
 
-  test('should call api if textbox has text', async () => {
+  it('should call api if textbox has text', async () => {
     const chatWithAiMock = vi.mocked(chatWithAI).mockResolvedValue([]);
     const user = userEvent.setup();
     render(<ChatPanelSection />);
@@ -26,7 +26,7 @@ describe('ChatPanelSection component', () => {
     expect(chatWithAiMock.mock.calls.length).toBe(1);
   });
 
-  test('should NOT call api if textbox has empty text', async () => {
+  it('should NOT call api if textbox has empty text', async () => {
     const chatWithAiMock = vi.mocked(chatWithAI).mockResolvedValue([]);
     const user = userEvent.setup();
     render(<ChatPanelSection />);
@@ -35,7 +35,7 @@ describe('ChatPanelSection component', () => {
   });
 
   // https://testing-library.com/docs/user-event/keyboard/
-  test('should call api on ENTER in the textbox', async () => {
+  it('should call api on ENTER in the textbox', async () => {
     const chatWithAiMock = vi.mocked(chatWithAI).mockResolvedValue([]);
     const user = userEvent.setup();
     render(<ChatPanelSection />);
@@ -45,7 +45,7 @@ describe('ChatPanelSection component', () => {
   });
 
   // https://testing-library.com/docs/user-event/keyboard/
-  test('should display ERROR if chatWithAI throw exception', async () => {
+  it('should display ERROR if chatWithAI throw exception', async () => {
     const chatWithAiMock = vi.mocked(chatWithAI).mockRejectedValue('Error message.');
     const user = userEvent.setup();
     render(<ChatPanelSection />);
@@ -55,7 +55,7 @@ describe('ChatPanelSection component', () => {
     expect(screen.getByText('ERROR: Error message.')).toBeInTheDocument();
   });
 
-  test('should NOT call api on SHIFT+ENTER in the textbox', async () => {
+  it('should NOT call api on SHIFT+ENTER in the textbox', async () => {
     const chatWithAiMock = vi.mocked(chatWithAI).mockResolvedValue([]);
     const user = userEvent.setup();
     render(<ChatPanelSection />);
@@ -64,7 +64,7 @@ describe('ChatPanelSection component', () => {
     expect(chatWithAiMock.mock.calls.length).toBe(0);
   });
 
-  test('should render question and reply in the screen', async () => {
+  it('should render question and reply in the screen', async () => {
     const chatWithAiMock = vi.mocked(chatWithAI).mockResolvedValue(['Sure!']);
     const user = userEvent.setup();
     render(<ChatPanelSection />);
@@ -75,7 +75,7 @@ describe('ChatPanelSection component', () => {
     expect(screen.getByText('Sure!')).toBeInTheDocument();
   });
 
-  test('should render ... while waiting for reply', async () => {
+  it('should render ... while waiting for reply', async () => {
     // Note: this is a promise that _don't resolve_ so that we can test the "..." below.
     vi.mocked(chatWithAI).mockImplementation(async () => new Promise<string[]>(() => ['---']));
     const user = userEvent.setup();
@@ -88,7 +88,7 @@ describe('ChatPanelSection component', () => {
     expect(screen.getByText('...')).toBeInTheDocument();
   });
 
-  test('should render ... and then the ### reply text', async () => {
+  it('should render ... and then the ### reply text', async () => {
     let resolveFn: () => void = vi.fn();
     vi.mocked(chatWithAI).mockImplementation(async () => {
       await new Promise<void>((resolve) => {

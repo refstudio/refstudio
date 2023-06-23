@@ -15,7 +15,7 @@ describe('unsetPartiallySelectedCollapsibleBlocks', () => {
     editor.commands.setContent('<p>First paragraph</p>' + defaultCollapsibleBlock + '<p>Last paragraph</p>');
   });
 
-  test('should unset the collapsible block when it is partially selected', () => {
+  it('should unset the collapsible block when it is partially selected', () => {
     const selection = TextSelection.between(editor.state.doc.resolve(0), editor.state.doc.resolve(30));
     expect(editor.state.doc.childCount).toBe(3);
     const [collapsibleBlock] = findNodesByNodeType(editor.state.doc, 'collapsibleBlock');
@@ -46,7 +46,7 @@ describe('unsetPartiallySelectedCollapsibleBlocks', () => {
     expect(doc.child(4).toJSON()).toEqual(lastParagraph.toJSON());
   });
 
-  test('should not do anything if the collapsible block is completely selected', () => {
+  it('should not do anything if the collapsible block is completely selected', () => {
     const initialDoc = editor.state.doc;
 
     const commandResult = editor.chain().selectAll().command(unsetPartiallySelectedCollapsibleBlocks).run();
@@ -54,7 +54,7 @@ describe('unsetPartiallySelectedCollapsibleBlocks', () => {
     expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
   });
 
-  test('should not do anything if the selection head is inside the collapsible block', () => {
+  it('should not do anything if the selection head is inside the collapsible block', () => {
     const firstParagraph = editor.state.doc.child(0);
     const selection = TextSelection.between(
       // + 6 is to position the caret in the middle of the collapsible summary

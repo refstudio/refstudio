@@ -47,7 +47,7 @@ function LeftSidePanelWrapper() {
   const [primaryPane, setPrimaryPane] = useState<PrimarySideBarPane>('Explorer');
   const openReference = useSetAtom(openReferenceAtom);
 
-  function handleSideBarClick(selectedPane: PrimarySideBarPane) {
+  const handleSideBarClick = (selectedPane: PrimarySideBarPane) => {
     if (selectedPane === primaryPane) {
       // Toggle collapsing
       setPrimaryPaneCollapsed(!primaryPaneCollapsed);
@@ -56,7 +56,7 @@ function LeftSidePanelWrapper() {
       setPrimaryPaneCollapsed(false);
     }
     setPrimaryPane(selectedPane);
-  }
+  };
 
   React.useEffect(() => {
     if (primaryPaneCollapsed) {
