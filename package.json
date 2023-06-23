@@ -27,6 +27,9 @@
     "tauri:dev:debug": "DEV_TOOLS=1 tauri dev"
   },
   "dependencies": {
+    "@chakra-ui/react": "^2.7.1",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
     "@tanstack/react-query": "^4.29.13",
     "@tauri-apps/api": "^1.2.0",
     "@tiptap/extension-code-block-lowlight": "^2.0.3",
@@ -40,6 +43,7 @@
     "@tiptap/suggestion": "^2.0.3",
     "autoprefixer": "^10.4.14",
     "classnames": "^2.3.2",
+    "framer-motion": "^10.12.16",
     "fuse.js": "^6.6.2",
     "jotai": "^2.1.0",
     "lowlight": "^2.9.0",
