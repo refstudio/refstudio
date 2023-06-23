@@ -6,13 +6,14 @@ export const RefStudioEvents = {
   },
   references: {
     ingestion: {
+      upload: 'refstudio://references/ingestion/upload',
       run: 'refstudio://references/ingestion/run',
     },
   },
 };
 
-export function emitEvent(event: EventName) {
-  void emit(event);
+export function emitEvent<Payload>(event: EventName, payload?: Payload) {
+  void emit(event, payload);
 }
 
 export type RefStudioEventCallback<Payload = undefined> = EventCallback<Payload>;

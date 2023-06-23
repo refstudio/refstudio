@@ -42,6 +42,14 @@ impl AppMenu {
                 .add_native_item(MenuItem::SelectAll),
         );
 
+        let references_menu = Submenu::new(
+            "References",
+            Menu::new().add_item(CustomMenuItem::new(
+                "refstudio://references/ingestion/upload".to_string(),
+                "Upload...",
+            )),
+        );
+
         let view_menu = Submenu::new(
             "View",
             Menu::new().add_native_item(MenuItem::EnterFullScreen),
@@ -60,6 +68,7 @@ impl AppMenu {
             .add_submenu(app_menu)
             // .add_submenu(file_menu)
             .add_submenu(edit_menu)
+            .add_submenu(references_menu)
             .add_submenu(view_menu)
             .add_submenu(window_menu)
     }

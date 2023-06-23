@@ -1,55 +1,36 @@
 import { useMutation } from '@tanstack/react-query';
-import { TauriEvent } from '@tauri-apps/api/event';
-import { useAtomValue, useSetAtom } from 'jotai';
-import { useState } from 'react';
+import { useSetAtom } from 'jotai';
+import { createRef, useState } from 'react';
 import { VscFilePdf } from 'react-icons/vsc';
 
 import { runPDFIngestion } from '../../api/ingestion';
-import { getReferencesAtom, referencesSyncInProgressAtom, setReferencesAtom } from '../../atoms/referencesState';
+import {
+  referencesSyncInProgressAtom,
+  setReferencesAtom,
+  setTemporaryReferencesAtom,
+} from '../../atoms/referencesState';
 import { cx } from '../../cx';
-import { listenEvent, RefStudioEvents } from '../../events';
-import { copyFiles } from '../../filesystem';
+import { RefStudioEvents, listenEvent } from '../../events';
+import { uploadFiles } from '../../filesystem';
 import { useAsyncEffect } from '../../hooks/useAsyncEffect';
-import { isNonNullish } from '../../lib/isNonNullish';
+import { FilesDragDropZone } from './FilesDragDropZone';
 
-function validReferencesFiles(filePath: string) {
-  return filePath.toLowerCase().endsWith('.pdf');
+function validReferencesFiles(file: File) {
+  return file.name.toLowerCase().endsWith('.pdf');
 }
 
-export function ReferencesDropZone() {
+export function ReferencesDropZone({ children }: { children: React.ReactNode }) {
   const [visible, setVisible] = useState(false);
   const [files, setFiles] = useState<string[]>([]);
-  const references = useAtomValue(getReferencesAtom);
   const setReferences = useSetAtom(setReferencesAtom);
+  const setTemporaryReferences = useSetAtom(setTemporaryReferencesAtom);
   const setSyncInProgress = useSetAtom(referencesSyncInProgressAtom);
 
-  const copyFilesMutation = useMutation({
-    mutationFn: copyFiles,
-    onSuccess: (filePaths) => {
-      // Merge new files
-      // FIXME: Improve this once we have references state/status
-      const newReferences = Array.from(filePaths)
-        .map((filePath) => {
-          const filename = filePath.split('/').pop();
-          if (!filename) {
-            return null;
-          }
-          const existingRef = references.find((ref) => ref.filename === filename);
-          if (existingRef) {
-            return null;
-          }
-          return {
-            id: filename,
-            citationKey: '...',
-            title: filename,
-            filename,
-            authors: [{ fullName: 'Unknown' }],
-          };
-        })
-        .filter(isNonNullish);
+  const inputRef = createRef<HTMLInputElement>();
 
-      setReferences([...references, ...newReferences]);
-    },
+  const uploadFilesMutation = useMutation({
+    mutationFn: uploadFiles,
+    onSuccess: (filePaths) => setTemporaryReferences(filePaths),
     onSettled: () => {
       setVisible(false);
       setFiles([]);
@@ -64,9 +45,9 @@ export function ReferencesDropZone() {
     },
   });
 
-  const copyAndIngestMutation = useMutation({
-    mutationFn: async (filePaths: string[]) => {
-      await copyFilesMutation.mutateAsync(filePaths);
+  const uploadAndIngestMutation = useMutation({
+    mutationFn: async (files: FileList) => {
+      await uploadFilesMutation.mutateAsync(Array.from(files).filter(validReferencesFiles));
       await ingestMutation.mutateAsync();
     },
   });
@@ -74,54 +55,58 @@ export function ReferencesDropZone() {
   useAsyncEffect(
     async (isMounted) =>
       Promise.all([
-        await listenEvent<string[]>(TauriEvent.WINDOW_FILE_DROP, (e) => {
+        await listenEvent<FileList>(RefStudioEvents.references.ingestion.run, (event) => {
           if (isMounted()) {
             setSyncInProgress(true);
-            copyAndIngestMutation.mutate(e.payload.filter(validReferencesFiles));
+            uploadAndIngestMutation.mutate(event.payload);
           }
         }),
-        await listenEvent(RefStudioEvents.references.ingestion.run, () => {
+        await listenEvent(RefStudioEvents.references.ingestion.upload, () => {
           if (isMounted()) {
-            setSyncInProgress(true);
-            ingestMutation.mutate();
-          }
-        }),
-        await listenEvent<string[]>(TauriEvent.WINDOW_FILE_DROP_HOVER, (event) => {
-          if (isMounted()) {
-            setVisible(true);
-            setFiles(event.payload.filter(validReferencesFiles));
-          }
-        }),
-        await listenEvent(TauriEvent.WINDOW_FILE_DROP_CANCELLED, () => {
-          if (isMounted()) {
-            setVisible(false);
-            setFiles([]);
+            inputRef.current?.click();
           }
         }),
       ]),
     (releaseHandles) => releaseHandles?.map((h) => h()),
   );
 
+  const handleFilesUpload = (files: FileList) => {
+    setSyncInProgress(true);
+    uploadAndIngestMutation.mutate(files);
+  };
+
   return (
-    <div
-      className={cx(
-        'absolute left-0 top-0 z-50 h-screen w-screen opacity-90',
-        'flex flex-col items-center justify-center gap-4',
-        'bg-slate-100 p-10 text-center text-xl',
-        { hidden: !visible },
-      )}
-    >
-      <VscFilePdf className="" size={60} />
-      Release to upload files to your library
-      {import.meta.env.DEV && (
-        <pre className="text-left text-xs">
-          <ul className="list-disc">
-            {files.map((f) => (
-              <li key={f}>{f}</li>
-            ))}
-          </ul>
-        </pre>
-      )}
-    </div>
+    <FilesDragDropZone onFileDropStarted={() => {}} onFileDropCompleted={() => {}} onFileDrop={handleFilesUpload}>
+      {children}
+      <input
+        accept="application/pdf"
+        className="hidden"
+        multiple
+        ref={inputRef}
+        role="form"
+        type="file"
+        onChange={(e) => e.currentTarget.files && handleFilesUpload(e.currentTarget.files)}
+      />
+      <div
+        className={cx(
+          'absolute left-0 top-0 z-50 h-screen w-screen opacity-90',
+          'flex flex-col items-center justify-center gap-4',
+          'bg-slate-100 p-10 text-center text-xl',
+          { hidden: !visible || files.length === 0 },
+        )}
+      >
+        <VscFilePdf className="" size={60} />
+        Release to upload files to your library
+        {import.meta.env.DEV && (
+          <pre className="text-left text-xs">
+            <ul className="list-disc">
+              {files.map((f) => (
+                <li key={f}>{f}</li>
+              ))}
+            </ul>
+          </pre>
+        )}
+      </div>
+    </FilesDragDropZone>
   );
 }
