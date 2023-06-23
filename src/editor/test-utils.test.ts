@@ -1,6 +1,6 @@
 import { Editor } from '@tiptap/react';
 
-import { getPrettyHTML, getSelectedText, setUpEditorWithSelection } from './test-utils';
+import { getPrettyHTML, getPrettyHTMLWithSelection, getSelectedText, setUpEditorWithSelection } from './test-utils';
 import { EDITOR_EXTENSIONS } from './TipTapEditorConfigs';
 
 describe('TipTap test utils', () => {
@@ -39,22 +39,65 @@ describe('TipTap test utils', () => {
 
   describe('getPrettyHTML', () => {
     it('should nicely format document HTML, removing draggable blocks', () => {
-      editor
-        .chain()
-        .setContent(
-          `<p
+      editor.commands.setContent(
+        `<p
       >some <b
       >text</b
       ></p
       >`,
-        )
-        .run();
+      );
       expect(editor.getHTML()).toMatch(/<draggable-block/);
       expect(getPrettyHTML(editor)).toMatchInlineSnapshot(`
         "<p>
           some
           <strong>text</strong>
         </p>"
+      `);
+    });
+  });
+
+  describe('getPrettyHTMLWithSelection', () => {
+    it('should correctly place cursor corresponding to selection', () => {
+      setUpEditorWithSelection(
+        editor,
+        `<collapsible-block>
+          <collapsible-summary>He|ader</collapsible-summary>
+          <collapsible-content>
+              <p>Content Line 1</p>
+              <p>Content Line 2</p>
+          </collapsible-content>
+        </collapsible-block>`,
+      );
+      expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
+        "<collapsible-block folded=\\"true\\">
+          <collapsible-summary>He|ader</collapsible-summary>
+          <collapsible-content>
+            <p>Content Line 1</p>
+            <p>Content Line 2</p>
+          </collapsible-content>
+        </collapsible-block>"
+      `);
+    });
+
+    it('should correctly place markers corresponding to selected text', () => {
+      setUpEditorWithSelection(
+        editor,
+        `<collapsible-block>
+        <collapsible-summary>He|ader</collapsible-summary>
+        <collapsible-content>
+            <p>Content| Line 1</p>
+            <p>Content Line 2</p>
+        </collapsible-content>
+      </collapsible-block>`,
+      );
+      expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
+        "<collapsible-block folded=\\"true\\">
+          <collapsible-summary>He|ader</collapsible-summary>
+          <collapsible-content>
+            <p>Content| Line 1</p>
+            <p>Content Line 2</p>
+          </collapsible-content>
+        </collapsible-block>"
       `);
     });
   });
