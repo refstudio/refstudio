@@ -36,4 +36,9 @@ def get_arg_parser():
         "--text",
         type=str,
     )
+
+    update_parser = subparsers.add_parser(  # noqa: F481
+        "update",
+        description="Update metadata for a Reference"
+    )
     return parser

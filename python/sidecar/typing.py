@@ -56,10 +56,16 @@ class ChatResponseChoice(RefStudioModel):
     text: str
 
 
+class ReferenceUpdate(RefStudioModel):
+    source_filename: str
+    updates: dict[str, Any]
+
+
 class CliCommands(RefStudioModel):
     ingest: IngestResponse
     rewrite: list[RewriteChoice]
     chat: list[ChatResponseChoice]
+    update: list[ReferenceUpdate]
 
 
 Reference.update_forward_refs()

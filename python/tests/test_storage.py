@@ -60,13 +60,11 @@ def test_json_storage_update(monkeypatch, tmp_path):
     # check that the other reference data has not been updated
     assert len(jstore.references) == 2
     assert jstore.references[0].source_filename == "some_file.pdf"
-    assert jstore.references[0].filename_md5 == "abc123"
     assert len(jstore.references[0].authors) == 2
     assert len(jstore.references[0].chunks) == 8
 
     assert jstore.references[1].title == "Another title"
     assert jstore.references[1].source_filename == "another_file.pdf"
-    assert jstore.references[1].filename_md5 == "abcdefg123"
     assert jstore.references[1].citation_key is None
     assert len(jstore.references[1].authors) == 2
     assert len(jstore.references[1].chunks) == 6

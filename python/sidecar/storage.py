@@ -21,6 +21,10 @@ logger.addHandler(handler)
 logger.disabled = os.environ.get("SIDECAR_ENABLE_LOGGING", "false").lower() == "true"
 
 
+def update_reference(data):
+    pass
+
+
 class JsonStorage:
     def __init__(self, filepath: str):
         self.filepath = filepath
@@ -52,19 +56,25 @@ class JsonStorage:
         with open(self.filepath, 'w') as f:
             json.dump(contents, f, indent=2, default=str)
     
-    def update(self, target: typing.Reference):
+    def update(self, updates: list[typing.ReferenceUpdate]):
         """
         Update a Reference in storage with the target reference.
         This is used when the client has updated the reference in the UI.
         """
-        for i, source in enumerate(self.references):
-            if source.filename_md5 == target.filename_md5:
-                logger.info(f"Updating reference {source.source_filename} ({source.filename_md5})")
-                self.references[i] = target
-                break
-        else:
-            logger.info(f"Unable to find reference {target.source_filename} ({target.filename_md5})")
-            return
+        refs = {
+            ref.source_filename: ref.json() for ref in self.references
+        }
+
+        for update in updates:
+            try:
+                target = refs[update.source_filename]
+            except KeyError as e:
+                logger.error(f"Reference {update.source_filename} not found in json storage: {e}")
+                continue
+
+            for field, val in update.updates.items():
+                logger.info(f"Updating {field} to {val} for Reference {update.source_filename}")
+                target[field] = val
         self.save()
     
     def create_corpus(self):
