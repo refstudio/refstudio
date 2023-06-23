@@ -1,6 +1,6 @@
 import { KeyboardShortcutCommand } from '@tiptap/react';
 
-export const backspace: KeyboardShortcutCommand = function ({ editor }) {
+export const backspace: KeyboardShortcutCommand = ({ editor }) => {
   const { selection } = editor.state;
   if (!selection.empty) {
     return false;

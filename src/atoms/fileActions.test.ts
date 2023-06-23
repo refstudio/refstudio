@@ -1,6 +1,6 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { createStore, useAtomValue } from 'jotai';
-import { describe, expect, test } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { readFileContent } from '../filesystem';
 import { ReferenceItem } from '../types/ReferenceItem';
@@ -26,7 +26,7 @@ describe('fileActions', () => {
     vi.clearAllMocks();
   });
 
-  test('should be empty by default', () => {
+  it('should be empty by default', () => {
     const store = createStore();
     const leftPane = runGetAtomHook(leftPaneAtom, store);
     const rightPane = runGetAtomHook(rightPaneAtom, store);
@@ -37,7 +37,7 @@ describe('fileActions', () => {
     expect(rightPane.current.activeFile).toBeUndefined();
   });
 
-  test('should open TXT file in the left pane, and be active', () => {
+  it('should open TXT file in the left pane, and be active', () => {
     const store = createStore();
     const openFile = runSetAtomHook(openFileAtom, store);
     const leftPane = runGetAtomHook(leftPaneAtom, store);
@@ -54,7 +54,7 @@ describe('fileActions', () => {
     expect(leftPane.current.activeFile).toEqual(fileData.fileId);
   });
 
-  test('should open PDF file in the right pane, and be active', () => {
+  it('should open PDF file in the right pane, and be active', () => {
     const store = createStore();
     const openFile = runSetAtomHook(openFileAtom, store);
     const rightPane = runGetAtomHook(rightPaneAtom, store);
@@ -71,7 +71,7 @@ describe('fileActions', () => {
     expect(rightPane.current.activeFile).toEqual(fileData.fileId);
   });
 
-  test('should open file once in same panel', () => {
+  it('should open file once in same panel', () => {
     const store = createStore();
     const openFile = runSetAtomHook(openFileAtom, store);
     const leftPane = runGetAtomHook(leftPaneAtom, store);
@@ -87,7 +87,7 @@ describe('fileActions', () => {
     expect(leftPane.current.files.length).toBe(1);
   });
 
-  test('should open Reference in the right pane, and make it active', () => {
+  it('should open Reference in the right pane, and make it active', () => {
     const store = createStore();
     const setReferences = runSetAtomHook(setReferencesAtom, store);
     const openReference = runSetAtomHook(openReferenceAtom, store);
@@ -116,7 +116,7 @@ describe('fileActions', () => {
     expect(rightPane.current.activeFile).toEqual(referenceFileId);
   });
 
-  test('should close opened file in same pane', () => {
+  it('should close opened file in same pane', () => {
     const store = createStore();
     const openFile = runSetAtomHook(openFileAtom, store);
     const closeFileFromPane = runSetAtomHook(closeFileFromPaneAtom, store);
@@ -138,7 +138,7 @@ describe('fileActions', () => {
     expect(leftPane.current.files.length).toBe(1);
   });
 
-  test('should not fail trying to close file that is not opened in pane', () => {
+  it('should not fail trying to close file that is not opened in pane', () => {
     const store = createStore();
     const openFile = runSetAtomHook(openFileAtom, store);
     const closeFileFromPane = runSetAtomHook(closeFileFromPaneAtom, store);
@@ -162,7 +162,7 @@ describe('fileActions', () => {
     expect(leftPane.current.files).not.toContainEqual(notOpenedFileData);
   });
 
-  test('should not fail trying to select file that is not opened in pane', () => {
+  it('should not fail trying to select file that is not opened in pane', () => {
     const store = createStore();
     const selectFileInPane = runSetAtomHook(selectFileInPaneAtom, store);
     const leftPane = runGetAtomHook(leftPaneAtom, store);
@@ -176,7 +176,7 @@ describe('fileActions', () => {
     expect(leftPane.current.files).not.toContainEqual(fileData);
   });
 
-  test('should not fail when trying to open a reference that does not exist', () => {
+  it('should not fail when trying to open a reference that does not exist', () => {
     const store = createStore();
     const openReference = runSetAtomHook(openReferenceAtom, store);
     const rightPane = runGetAtomHook(rightPaneAtom, store);
@@ -201,7 +201,7 @@ describe('fileActions', () => {
     expect(rightPane.current.activeFile).toBeUndefined();
   });
 
-  test('should close all opened files with closeAllFilesAtom', () => {
+  it('should close all opened files with closeAllFilesAtom', () => {
     const store = createStore();
     const openFile = runSetAtomHook(openFileAtom, store);
     const closeAllFiles = runSetAtomHook(closeAllFilesAtom, store);
@@ -226,7 +226,7 @@ describe('fileActions', () => {
     expect(totalOpenedFiles).toBe(0);
   });
 
-  test('should split (move) file from one tab to the other', () => {
+  it('should split (move) file from one tab to the other', () => {
     const store = createStore();
     const openFile = runSetAtomHook(openFileAtom, store);
     const leftPane = runGetAtomHook(leftPaneAtom, store);
@@ -250,7 +250,7 @@ describe('fileActions', () => {
     expect(rightPane.current.files).toContainEqual(fileData);
   });
 
-  test('should split (move) file from one tab to same tab', () => {
+  it('should split (move) file from one tab to same tab', () => {
     const store = createStore();
     const openFile = runSetAtomHook(openFileAtom, store);
     const leftPane = runGetAtomHook(leftPaneAtom, store);
@@ -274,7 +274,7 @@ describe('fileActions', () => {
     expect(rightPane.current.files).not.toContainEqual(fileData);
   });
 
-  test('should NOT split (move) file if file is NOT opened', () => {
+  it('should NOT split (move) file if file is NOT opened', () => {
     const store = createStore();
     const openFile = runSetAtomHook(openFileAtom, store);
     const leftPane = runGetAtomHook(leftPaneAtom, store);
@@ -298,7 +298,7 @@ describe('fileActions', () => {
     expect(rightPane.current.files).not.toContainEqual(fileData);
   });
 
-  test('should make another file active, in same pane, after closing the active', () => {
+  it('should make another file active, in same pane, after closing the active', () => {
     const store = createStore();
     const openFile = runSetAtomHook(openFileAtom, store);
     const closeFileFromPane = runSetAtomHook(closeFileFromPaneAtom, store);
@@ -323,7 +323,7 @@ describe('fileActions', () => {
     expect(leftPane.current.activeFile).toEqual(fileBData.fileId);
   });
 
-  test('should not make another file active, in same pane, after closing other than the active', () => {
+  it('should not make another file active, in same pane, after closing other than the active', () => {
     const store = createStore();
     const openFile = runSetAtomHook(openFileAtom, store);
     const closeFileFromPane = runSetAtomHook(closeFileFromPaneAtom, store);
@@ -348,7 +348,7 @@ describe('fileActions', () => {
     expect(leftPane.current.activeFile).toEqual(fileCData.fileId);
   });
 
-  test('should not open folder entries', () => {
+  it('should not open folder entries', () => {
     const store = createStore();
     const openFileResult = runSetAtomHook(openFileAtom, store);
     const leftPane = runGetAtomHook(leftPaneAtom, store);
@@ -363,7 +363,7 @@ describe('fileActions', () => {
     expect(rightPane.current.files.length).toBe(0);
   });
 
-  test('should focus panel to make active', () => {
+  it('should focus panel to make active', () => {
     const store = createStore();
     const activePane = runGetAtomHook(activePaneAtom, store);
     const focusPanel = runSetAtomHook(focusPaneAtom, store);
@@ -377,7 +377,7 @@ describe('fileActions', () => {
     expect(activePane.current.id).toBe(paneToFocus);
   });
 
-  test('should read file content on openFile', async () => {
+  it('should read file content on openFile', async () => {
     const store = createStore();
     const openFile = runSetAtomHook(openFileAtom, store);
     const leftPane = runGetAtomHook(leftPaneAtom, store);

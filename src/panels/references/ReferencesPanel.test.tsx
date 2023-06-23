@@ -7,7 +7,7 @@ import { act, render, screen } from '../../utils/test-utils';
 import { ReferencesPanel } from './ReferencesPanel';
 
 describe('ReferencesPanel', () => {
-  test('should display welcome message with empty references', () => {
+  it('should display welcome message with empty references', () => {
     render(
       <Provider>
         <ReferencesPanel onRefClicked={noop} />
@@ -17,7 +17,7 @@ describe('ReferencesPanel', () => {
     expect(screen.getByText(/welcome to your refstudio references library/i)).toBeInTheDocument();
   });
 
-  test('should display references list with non-empty references', () => {
+  it('should display references list with non-empty references', () => {
     const store = createStore();
     render(
       <Provider store={store}>

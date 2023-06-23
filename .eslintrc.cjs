@@ -1,4 +1,5 @@
 /* eslint-disable no-undef */
+// eslint-disable-next-line jsdoc/no-restricted-syntax
 /** @type {import("@types/eslint").Linter.Config} */
 module.exports = {
   parser: '@typescript-eslint/parser',
@@ -9,11 +10,13 @@ module.exports = {
   },
   plugins: [
     '@typescript-eslint',
+    'prefer-arrow',
     'simple-import-sort',
     'jest-dom',
     'testing-library',
     'eslint-plugin-import',
     'jsdoc',
+    'vitest',
   ],
   extends: [
     'eslint:recommended',
@@ -25,6 +28,7 @@ module.exports = {
     'plugin:react-hooks/recommended',
     'plugin:jest-dom/recommended',
     'plugin:testing-library/react',
+    'plugin:vitest/recommended',
   ],
   settings: {
     react: {
@@ -175,5 +179,12 @@ module.exports = {
         ],
       },
     ],
+    'prefer-arrow/prefer-arrow-functions': [
+      'error',
+      {
+        allowStandaloneDeclarations: true,
+      },
+    ],
+    'vitest/consistent-test-it': 'error',
   },
 };

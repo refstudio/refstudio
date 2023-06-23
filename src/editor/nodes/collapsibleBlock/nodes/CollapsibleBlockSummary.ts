@@ -8,15 +8,11 @@ export const CollapsibleBlockSummaryNode = Node.create({
   content: 'text*',
   selectable: false,
 
-  parseHTML() {
-    return [
-      {
-        tag: 'collapsible-summary',
-      },
-    ];
-  },
+  parseHTML: () => [
+    {
+      tag: 'collapsible-summary',
+    },
+  ],
 
-  renderHTML({ HTMLAttributes }) {
-    return ['collapsible-summary', mergeAttributes(HTMLAttributes), 0];
-  },
+  renderHTML: ({ HTMLAttributes }) => ['collapsible-summary', mergeAttributes(HTMLAttributes), 0],
 });

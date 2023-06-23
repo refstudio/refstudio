@@ -12,8 +12,8 @@ describe('TipTap test utils', () => {
     it('should position the cursor based on a marker', () => {
       const pos = setUpEditorWithSelection(editor, `<p>This |is some text content.</p>`);
       expect(pos).toEqual([7]);
-      expect(editor.view.state.doc.textBetween(pos[0], pos[0] + 2)).toEqual('is');
-      expect(getSelectedText(editor)).toEqual('');
+      expect(editor.view.state.doc.textBetween(pos[0], pos[0] + 2)).toBe('is');
+      expect(getSelectedText(editor)).toBe('');
     });
 
     it('should select text based on markers', () => {
@@ -31,9 +31,9 @@ describe('TipTap test utils', () => {
       const text = editor.view.state.doc.textBetween(sel.from, sel.to);
       expect(sel.from).toEqual(from);
       expect(sel.to).toEqual(to);
-      expect(text).toEqual('ader');
+      expect(text).toBe('ader');
 
-      expect(getSelectedText(editor)).toEqual('ader');
+      expect(getSelectedText(editor)).toBe('ader');
     });
   });
 

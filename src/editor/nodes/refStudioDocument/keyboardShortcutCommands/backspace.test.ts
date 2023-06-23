@@ -10,7 +10,7 @@ describe('Backspace keyboard shortcut command', () => {
     extensions: EDITOR_EXTENSIONS,
   });
 
-  test('should turn collapsible block back into paragraphs when selection is at the beginning of the summary', () => {
+  it('should turn collapsible block back into paragraphs when selection is at the beginning of the summary', () => {
     setUpEditorWithSelection(editor, `<p>Some content</p><p>|Some content</p>`);
     expect(editor.state.doc.childCount).toBe(2);
 
@@ -20,10 +20,10 @@ describe('Backspace keyboard shortcut command', () => {
     // Paragraphs should have been merged together
     expect(editor.state.doc.childCount).toBe(1);
 
-    expect(getText(editor.state.doc)).toEqual('Some contentSome content');
+    expect(getText(editor.state.doc)).toBe('Some contentSome content');
   });
 
-  test('should unset partially selected collapsible blocks before deleting content', () => {
+  it('should unset partially selected collapsible blocks before deleting content', () => {
     setUpEditorWithSelection(
       editor,
       `<p>Some |content</p>
@@ -64,7 +64,7 @@ describe('Backspace keyboard shortcut command', () => {
     `);
   });
 
-  test('should not do anything when the selection is empty and not a the beginning of a block', () => {
+  it('should not do anything when the selection is empty and not a the beginning of a block', () => {
     setUpEditorWithSelection(editor, `<p>Some content</p><p>S|ome content</p>`);
     const initialDoc = editor.state.doc;
 
@@ -73,7 +73,7 @@ describe('Backspace keyboard shortcut command', () => {
     expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
   });
 
-  test('should not do anything when the selection is a node selection', () => {
+  it('should not do anything when the selection is a node selection', () => {
     editor
       .chain()
       .setContent(defaultParagraph + defaultParagraph)
@@ -81,7 +81,7 @@ describe('Backspace keyboard shortcut command', () => {
       .setNodeSelection(18)
       .run();
     const initialDoc = editor.state.doc;
-    expect(getSelectedText(editor)).toEqual('Some content');
+    expect(getSelectedText(editor)).toBe('Some content');
 
     const commandResult = backspace({ editor });
     expect(commandResult).toBe(false);

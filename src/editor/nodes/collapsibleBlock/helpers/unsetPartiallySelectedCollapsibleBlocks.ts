@@ -7,7 +7,7 @@ import { changeCollapsibleBlockToParagraphs } from './changeCollapsibleBlockToPa
  * Command that unsets any collapsible block that is partially selected,
  * ie. part of the node is selected but not the whole node
  */
-export const unsetPartiallySelectedCollapsibleBlocks: Command = function ({ dispatch, editor, tr }) {
+export const unsetPartiallySelectedCollapsibleBlocks: Command = ({ dispatch, editor, tr }) => {
   const { from, to } = tr.selection;
   let unsetNodes = 0;
 

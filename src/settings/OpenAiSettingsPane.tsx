@@ -16,10 +16,10 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
     },
   });
 
-  function handleSaveSettings(evt: React.FormEvent<HTMLFormElement>) {
+  const handleSaveSettings = (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
     saveMutation.mutate(paneSettings);
-  }
+  };
 
   const isDirty = JSON.stringify(paneSettings) !== JSON.stringify(getCachedSetting('openAI'));
 

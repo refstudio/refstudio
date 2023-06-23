@@ -1736,7 +1736,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/utils@npm:5.60.0, @typescript-eslint/utils@npm:^5.58.0":
+"@typescript-eslint/utils@npm:5.60.0, @typescript-eslint/utils@npm:^5.58.0, @typescript-eslint/utils@npm:^5.59.9":
   version: 5.60.0
   resolution: "@typescript-eslint/utils@npm:5.60.0"
   dependencies:
@@ -3243,6 +3243,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"eslint-plugin-prefer-arrow@npm:^1.2.3":
+  version: 1.2.3
+  resolution: "eslint-plugin-prefer-arrow@npm:1.2.3"
+  peerDependencies:
+    eslint: ">=2.0.0"
+  checksum: 3cdae574121c4a683d77e329ee193103b2bf418d7a8c85831b274000ae4aba64cb4d302fe69a44ae4d729b90f5130c968e4a9e43852a5de940d00283e61f92fc
+  languageName: node
+  linkType: hard
+
 "eslint-plugin-react-hooks@npm:^4.6.0":
   version: 4.6.0
   resolution: "eslint-plugin-react-hooks@npm:4.6.0"
@@ -3294,6 +3303,17 @@ __metadata:
   peerDependencies:
     eslint: ^7.5.0 || ^8.0.0
   checksum: 7f19d3dedd7788b411ca3d9045de682feb26025b9c26d97d4e2f0bf62f5eaa276147d946bd5d0cd967b822e546a954330fdb7ef80485301264f646143f011a02
+  languageName: node
+  linkType: hard
+
+"eslint-plugin-vitest@npm:^0.2.6":
+  version: 0.2.6
+  resolution: "eslint-plugin-vitest@npm:0.2.6"
+  dependencies:
+    "@typescript-eslint/utils": ^5.59.9
+  peerDependencies:
+    eslint: ">=8.0.0"
+  checksum: 09bb95262dc39b05546eb704b60440bce03bc68f4d563b3bcb4b25774624b3758db76bfa3702b8b0d45313246b6a6d57729ecc027f64ad840b234b94ca6aa233
   languageName: node
   linkType: hard
 
@@ -6187,10 +6207,12 @@ __metadata:
     eslint-plugin-import: ^2.27.5
     eslint-plugin-jest-dom: ^5.0.1
     eslint-plugin-jsdoc: ^46.2.6
+    eslint-plugin-prefer-arrow: ^1.2.3
     eslint-plugin-react: ^7.32.2
     eslint-plugin-react-hooks: ^4.6.0
     eslint-plugin-simple-import-sort: ^10.0.0
     eslint-plugin-testing-library: ^5.11.0
+    eslint-plugin-vitest: ^0.2.6
     fuse.js: ^6.6.2
     husky: ^8.0.0
     jotai: ^2.1.0

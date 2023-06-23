@@ -7,15 +7,11 @@ export const CollapsibleBlockContentNode = Node.create({
   defining: true,
   selectable: false,
 
-  parseHTML() {
-    return [
-      {
-        tag: 'collapsible-content',
-      },
-    ];
-  },
+  parseHTML: () => [
+    {
+      tag: 'collapsible-content',
+    },
+  ],
 
-  renderHTML({ HTMLAttributes }) {
-    return ['collapsible-content', mergeAttributes(HTMLAttributes), 0];
-  },
+  renderHTML: ({ HTMLAttributes }) => ['collapsible-content', mergeAttributes(HTMLAttributes), 0],
 });

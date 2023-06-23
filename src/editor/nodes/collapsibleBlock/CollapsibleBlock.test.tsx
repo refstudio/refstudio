@@ -10,7 +10,7 @@ describe('CollapsibleBlock', () => {
     extensions: EDITOR_EXTENSIONS,
   });
 
-  test('should collapse block when clicking on the arrow', async () => {
+  it('should collapse block when clicking on the arrow', async () => {
     editor.commands.setContent(defaultUncollapsedCollapsibleBlock);
     const { user } = setup(<EditorContent editor={editor} />);
 
@@ -27,7 +27,7 @@ describe('CollapsibleBlock', () => {
     expect(collapsibleBlock.attrs.folded).toBe(true);
   });
 
-  test('should uncollapse block when clicking on the arrow', async () => {
+  it('should uncollapse block when clicking on the arrow', async () => {
     editor.commands.setContent(defaultCollapsibleBlock);
     const { user } = setup(<EditorContent editor={editor} />);
 

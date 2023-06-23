@@ -31,15 +31,15 @@ export function ChatPanelSection() {
   ]);
   const [currentChatThreadItem, setCurrentChatThreadItem] = useState<ChatThreadItem | null>(null);
 
-  function handleKeyDown(evt: React.KeyboardEvent<HTMLTextAreaElement>): void {
+  const handleKeyDown = (evt: React.KeyboardEvent<HTMLTextAreaElement>): void => {
     if (!evt.shiftKey && evt.code === 'Enter') {
       evt.preventDefault();
       handleChat(text);
       return;
     }
-  }
+  };
 
-  function handleChat(question: string) {
+  const handleChat = (question: string) => {
     if (!question || currentChatThreadItem) {
       return;
     }
@@ -58,7 +58,7 @@ export function ChatPanelSection() {
         ]);
         setCurrentChatThreadItem(null);
       });
-  }
+  };
 
   return (
     <PanelSection grow title="Chat">

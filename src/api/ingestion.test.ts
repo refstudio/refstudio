@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { getUploadsDir } from '../filesystem';
 import { runPDFIngestion } from './ingestion';
@@ -12,7 +12,7 @@ describe('runPDFIngestion', () => {
     vi.clearAllMocks();
   });
 
-  test('should call sidecar ingest with upload dir arg', async () => {
+  it('should call sidecar ingest with upload dir arg', async () => {
     const UPLOAD_DIR = '/some/upload/directory';
     vi.mocked(getUploadsDir).mockResolvedValue(UPLOAD_DIR);
     vi.mocked(callSidecar).mockResolvedValue({
@@ -25,7 +25,7 @@ describe('runPDFIngestion', () => {
     expect(vi.mocked(callSidecar).mock.calls[0]).toStrictEqual(['ingest', ['--pdf_directory', UPLOAD_DIR]]);
   });
 
-  test('Should map empty IngestResponse[] to empty ReferenceItem[]', async () => {
+  it('Should map empty IngestResponse[] to empty ReferenceItem[]', async () => {
     vi.mocked(callSidecar).mockResolvedValue({
       project_name: 'project-name',
       references: [],
@@ -35,7 +35,7 @@ describe('runPDFIngestion', () => {
     expect(response).toStrictEqual([]);
   });
 
-  test('Should map undefined IngestResponse to ReferenceItem', async () => {
+  it('Should map undefined IngestResponse to ReferenceItem', async () => {
     vi.mocked(callSidecar).mockResolvedValue({
       project_name: 'project-name',
       references: [
@@ -52,7 +52,7 @@ describe('runPDFIngestion', () => {
     expect(response[0].filename).toBe('file.pdf');
   });
 
-  test('Should map fullName of authors ReferenceItem', async () => {
+  it('Should map fullName of authors ReferenceItem', async () => {
     vi.mocked(callSidecar).mockResolvedValue({
       project_name: 'project-name',
       references: [

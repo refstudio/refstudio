@@ -20,7 +20,7 @@ export function ReferencesPanel({ onRefClicked }: ReferencesPanelProps) {
 
   const [syncInProgress, setSyncInProgress] = useAtom(referencesSyncInProgressAtom);
 
-  async function handleChange(uploadedFiles: FileList) {
+  const handleChange = async (uploadedFiles: FileList) => {
     try {
       await uploadFiles(uploadedFiles);
       emitEvent(RefStudioEvents.references.ingestion.run);
@@ -29,7 +29,7 @@ export function ReferencesPanel({ onRefClicked }: ReferencesPanelProps) {
     } finally {
       setSyncInProgress(false);
     }
-  }
+  };
 
   return (
     <PanelWrapper title="References">
