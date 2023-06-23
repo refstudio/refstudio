@@ -69,7 +69,7 @@ describe('TipTap test utils', () => {
         </collapsible-block>`,
       );
       expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
-        "<collapsible-block folded=\\"true\\">
+        "<collapsible-block folded='true'>
           <collapsible-summary>He|ader</collapsible-summary>
           <collapsible-content>
             <p>Content Line 1</p>
@@ -91,7 +91,7 @@ describe('TipTap test utils', () => {
       </collapsible-block>`,
       );
       expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
-        "<collapsible-block folded=\\"true\\">
+        "<collapsible-block folded='true'>
           <collapsible-summary>He|ader</collapsible-summary>
           <collapsible-content>
             <p>Content| Line 1</p>

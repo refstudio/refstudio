@@ -30,14 +30,14 @@ describe('Enter keyboard shortcut command', () => {
     // and the second collapsible block should not have content.
 
     expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
-      "<collapsible-block folded=\\"true\\">
+      "<collapsible-block folded='true'>
         <collapsible-summary>Hea</collapsible-summary>
         <collapsible-content>
           <p>Content Line 1</p>
           <p>Content Line 2</p>
         </collapsible-content>
       </collapsible-block>
-      <collapsible-block folded=\\"true\\">
+      <collapsible-block folded='true'>
         <collapsible-summary>|der</collapsible-summary>
       </collapsible-block>"
     `);
@@ -59,7 +59,7 @@ describe('Enter keyboard shortcut command', () => {
     expect(commandResult).toBe(true);
 
     expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
-      "<collapsible-block folded=\\"false\\">
+      "<collapsible-block folded='false'>
         <collapsible-summary>Hea</collapsible-summary>
         <collapsible-content>
           <p>|der</p>

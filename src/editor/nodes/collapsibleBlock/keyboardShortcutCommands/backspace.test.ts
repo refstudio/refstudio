@@ -47,7 +47,7 @@ describe('Backspace keyboard shortcut command', () => {
     expect(commandResult).toBe(true);
 
     expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
-      "<collapsible-block folded=\\"true\\">
+      "<collapsible-block folded='true'>
         <collapsible-summary>Summary|</collapsible-summary>
       </collapsible-block>"
     `);

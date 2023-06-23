@@ -26,7 +26,7 @@ describe('Mod-Enter keyboard shortcut command', () => {
     expect(commandResult).toBe(true);
 
     expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
-      "<collapsible-block folded=\\"true\\">
+      "<collapsible-block folded='true'>
         <collapsible-summary>|Header</collapsible-summary>
         <collapsible-content>
           <p>Content Line 1</p>

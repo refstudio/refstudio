@@ -54,7 +54,7 @@ describe('Backspace keyboard shortcut command', () => {
     expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
       "<p>Some |ontent Line 1</p>
       <p>Content Line 2</p>
-      <collapsible-block folded=\\"true\\">
+      <collapsible-block folded='true'>
         <collapsible-summary>Header</collapsible-summary>
         <collapsible-content>
           <p>Content Line 1</p>

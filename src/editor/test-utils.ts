@@ -110,11 +110,15 @@ export function getPrettyHTML(editor: Editor) {
     htmlWhitespaceSensitivity: 'ignore',
   });
   // Unwrap and shift everything left by two spaces (one indent level)
-  return prettyHtml
-    .replace(/^<html>/, '')
-    .replace(/<\/html>\s*$/, '')
-    .replace(/^ {2}/gm, '')
-    .trim();
+  return (
+    prettyHtml
+      .replace(/^<html>/, '')
+      .replace(/<\/html>\s*$/, '')
+      .replace(/^ {2}/gm, '')
+      // Use single quotes
+      .replace(/"/g, "'")
+      .trim()
+  );
 }
 /** Add cursors to represent selection, then return prettified HTML. */
 export function getPrettyHTMLWithSelection(editor: Editor) {
