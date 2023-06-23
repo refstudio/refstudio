@@ -3,8 +3,8 @@ import { useCallback, useEffect, useRef } from 'react';
 let draggingCount = 0;
 
 interface FileDragDropZoneProps {
-  onFileDropStarted: (files: FileList) => void;
-  onFileDropCompleted: () => void;
+  onFileDropStarted?: (files: FileList) => void;
+  onFileDropCompleted?: () => void;
   onFileDrop: (files: FileList) => void;
   children: React.ReactNode;
 }
@@ -22,8 +22,8 @@ export function FilesDragDropZone({
       e.preventDefault();
       e.stopPropagation();
       draggingCount++;
-      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-        onFileDropStarted(e.dataTransfer.files);
+      if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
+        onFileDropStarted?.(e.dataTransfer.files);
       }
     },
     [onFileDropStarted],
@@ -33,8 +33,8 @@ export function FilesDragDropZone({
     (e: DragEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-        onFileDropStarted(e.dataTransfer.files);
+      if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
+        onFileDropStarted?.(e.dataTransfer.files);
       }
     },
     [onFileDropStarted],
@@ -45,8 +45,10 @@ export function FilesDragDropZone({
       e.preventDefault();
       e.stopPropagation();
       draggingCount--;
-      if (draggingCount > 0) return;
-      onFileDropCompleted();
+      if (draggingCount > 0) {
+        return;
+      }
+      onFileDropCompleted?.();
     },
     [onFileDropCompleted],
   );
@@ -55,13 +57,14 @@ export function FilesDragDropZone({
     (e: DragEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      const file = e.dataTransfer?.files[0];
       draggingCount = 0;
 
-      if (!e.dataTransfer) return;
+      if (!e.dataTransfer) {
+        return;
+      }
 
       const eventFiles = e.dataTransfer.files;
-      if (eventFiles && eventFiles.length > 0) {
+      if (eventFiles.length > 0) {
         onFileDrop(eventFiles);
       }
     },
@@ -70,7 +73,9 @@ export function FilesDragDropZone({
 
   useEffect(() => {
     const ele = divRef.current;
-    if (!ele) return;
+    if (!ele) {
+      return;
+    }
     // Note: We need all of these (with the stoppropagation) in order to have the drop event
     ele.addEventListener('dragenter', handleDragIn);
     ele.addEventListener('dragleave', handleDragOut);

@@ -10,7 +10,7 @@ import {
   setTemporaryReferencesAtom,
 } from '../../atoms/referencesState';
 import { cx } from '../../cx';
-import { RefStudioEvents, listenEvent } from '../../events';
+import { listenEvent, RefStudioEvents } from '../../events';
 import { uploadFiles } from '../../filesystem';
 import { useAsyncEffect } from '../../hooks/useAsyncEffect';
 import { FilesDragDropZone } from './FilesDragDropZone';
@@ -46,8 +46,8 @@ export function ReferencesDropZone({ children }: { children: React.ReactNode }) 
   });
 
   const uploadAndIngestMutation = useMutation({
-    mutationFn: async (files: FileList) => {
-      await uploadFilesMutation.mutateAsync(Array.from(files).filter(validReferencesFiles));
+    mutationFn: async (uploadedFiles: FileList) => {
+      await uploadFilesMutation.mutateAsync(Array.from(uploadedFiles).filter(validReferencesFiles));
       await ingestMutation.mutateAsync();
     },
   });
@@ -70,13 +70,13 @@ export function ReferencesDropZone({ children }: { children: React.ReactNode }) 
     (releaseHandles) => releaseHandles?.map((h) => h()),
   );
 
-  const handleFilesUpload = (files: FileList) => {
+  const handleFilesUpload = (uploadedFiles: FileList) => {
     setSyncInProgress(true);
-    uploadAndIngestMutation.mutate(files);
+    uploadAndIngestMutation.mutate(uploadedFiles);
   };
 
   return (
-    <FilesDragDropZone onFileDropStarted={() => {}} onFileDropCompleted={() => {}} onFileDrop={handleFilesUpload}>
+    <FilesDragDropZone onFileDrop={handleFilesUpload}>
       {children}
       <input
         accept="application/pdf"

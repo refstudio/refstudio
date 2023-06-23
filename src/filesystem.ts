@@ -1,7 +1,7 @@
 import {
   BaseDirectory,
-  FileEntry as TauriFileEntry,
   createDir,
+  FileEntry as TauriFileEntry,
   readBinaryFile,
   readDir,
   readTextFile,

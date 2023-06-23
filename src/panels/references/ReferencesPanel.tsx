@@ -4,7 +4,7 @@ import { getReferencesAtom, referencesSyncInProgressAtom, setReferencesAtom } fr
 import { PanelSection } from '../../components/PanelSection';
 import { PanelWrapper } from '../../components/PanelWrapper';
 import { ProgressSpinner } from '../../components/Spinner';
-import { RefStudioEvents, emitEvent } from '../../events';
+import { emitEvent, RefStudioEvents } from '../../events';
 import { ReferenceItem } from '../../types/ReferenceItem';
 import { ReferencesList } from './ReferencesList';
 
@@ -56,9 +56,15 @@ function ResetReferencesInstructions() {
   const references = useAtomValue(getReferencesAtom);
   const setReferences = useSetAtom(setReferencesAtom);
   const syncInProgress = useAtomValue(referencesSyncInProgressAtom);
-  if (!import.meta.env.DEV) return;
-  if (references.length === 0) return;
-  if (syncInProgress) return;
+  if (!import.meta.env.DEV) {
+    return null;
+  }
+  if (references.length === 0) {
+    return null;
+  }
+  if (syncInProgress) {
+    return null;
+  }
 
   return (
     <div className="mt-10 text-right text-xs ">
