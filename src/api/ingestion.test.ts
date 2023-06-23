@@ -42,6 +42,7 @@ describe('runPDFIngestion', () => {
         {
           source_filename: 'file.pdf',
           filename_md5: 'md5',
+          status: 'complete',
         },
       ],
     });
@@ -59,6 +60,7 @@ describe('runPDFIngestion', () => {
         {
           source_filename: 'file.pdf',
           filename_md5: 'md5',
+          status: 'complete',
           authors: [
             {
               full_name: 'Joe Doe',
