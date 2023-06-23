@@ -1,8 +1,9 @@
 import json
 import logging
 import os
+import sys
 
-from sidecar import typing
+from sidecar import settings, typing
 
 logging.root.setLevel(logging.NOTSET)
 
@@ -19,6 +20,12 @@ handler.setFormatter(formatter)
 
 logger.addHandler(handler)
 logger.disabled = os.environ.get("SIDECAR_ENABLE_LOGGING", "false").lower() == "true"
+
+
+def delete_references(source_filenames: list[str]):
+    storage = JsonStorage(settings.REFERENCES_JSON_PATH)
+    storage.load()
+    storage.delete(source_filenames)
 
 
 class JsonStorage:
@@ -51,6 +58,38 @@ class JsonStorage:
         contents = [ref.dict() for ref in self.references]
         with open(self.filepath, 'w') as f:
             json.dump(contents, f, indent=2, default=str)
+    
+    def delete(self, source_filenames: list[str]):
+        """
+        Delete a Reference from storage.
+        """
+        # preprocess references into a dict of source_filename: Reference
+        # so that we can simply do `list.remove`
+        refs = {
+            ref.source_filename: ref for ref in self.references
+        }
+
+        for filename in source_filenames:
+            try:
+                del refs[filename]
+            except KeyError:
+                msg = f"Unable to delete {filename}: not found in storage"
+                logger.warning(msg)
+                response = typing.DeleteStatusResponse(
+                    status=typing.ResponseStatus.ERROR,
+                    message=msg
+                )
+                sys.stdout.write(response.json())
+                return
+        
+        self.references = list(refs.values())
+        self.save()
+        
+        response = typing.DeleteStatusResponse(
+            status=typing.ResponseStatus.OK,
+            message=""
+        )
+        sys.stdout.write(response.json())
     
     def update(self, target: typing.Reference):
         """

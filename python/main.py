@@ -1,4 +1,4 @@
-from sidecar import chat, cli, ingest, rewrite
+from sidecar import chat, cli, ingest, rewrite, storage
 
 if __name__ == '__main__':
     parser = cli.get_arg_parser()
@@ -19,3 +19,5 @@ if __name__ == '__main__':
     if args.command == "chat":
         chat.ask_question(args.text)
 
+    if args.command == "delete":
+        storage.delete_references(args.source_filenames)
