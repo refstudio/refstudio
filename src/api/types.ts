@@ -19,6 +19,7 @@ export interface CliCommands {
   ingest_status: IngestStatusResponse;
   rewrite: RewriteChoice[];
   chat: ChatResponseChoice[];
+  delete: ResponseStatus;
 }
 export interface IngestResponse {
   project_name: string;

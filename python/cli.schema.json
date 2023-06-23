@@ -19,13 +19,17 @@
       "items": {
         "$ref": "#/definitions/ChatResponseChoice"
       }
+    },
+    "delete": {
+      "$ref": "#/definitions/ResponseStatus"
     }
   },
   "required": [
     "ingest",
     "ingest_status",
     "rewrite",
-    "chat"
+    "chat",
+    "delete"
   ],
   "definitions": {
     "IngestStatus": {
