@@ -10,6 +10,7 @@ def get_arg_parser():
     subparsers = parser.add_subparsers(
         dest="command",
     )
+
     ingest_parser = subparsers.add_parser(
         "ingest",
         description="Ingest PDFs",
@@ -18,9 +19,11 @@ def get_arg_parser():
         "--pdf_directory",
         type=str,
     )
-    ingest_parser.add_argument(
-        "--status",
-        action="store_true"
+
+    ingest_status_parser = subparsers.add_parser(  # noqa: F841
+        "ingest_status",
+        description="Retrieve ingestion status of uploads"
+
     )
 
     ai_parser = subparsers.add_parser(

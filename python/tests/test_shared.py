@@ -41,6 +41,7 @@ def test_create_citation_key():
         {
             "source_filename": "abc.pdf",
             "filename_md5": "some_md5",
+            "status": "complete",
             "authors": [
                 Author(full_name="Dan Vanderkam", given_name="Dan", surname="Vanderkam"),
                 Author(full_name="Jeff Hammerbacher", given_name="Jeff", surname="Hammerbacher"),
@@ -51,6 +52,7 @@ def test_create_citation_key():
         {
             "source_filename": "abc.pdf",
             "filename_md5": "some_md5",
+            "status": "complete",
             "authors": [
                 Author(full_name="Jeff Hammerbacher", given_name="Jeff", surname="Hammerbacher")
             ],
@@ -59,12 +61,14 @@ def test_create_citation_key():
         {
             "source_filename": "abc.pdf",
             "filename_md5": "some_md5",
+            "status": "complete",
             "authors": [],
             "published_date": None,
         },
         {
             "source_filename": "abc.pdf",
             "filename_md5": "some_md5",
+            "status": "complete",
             "authors": [],
             "published_date": date(2020, 1, 1),
         },

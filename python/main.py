@@ -1,5 +1,3 @@
-import sys
-
 from sidecar import chat, cli, ingest, rewrite
 
 if __name__ == '__main__':
@@ -10,10 +8,10 @@ if __name__ == '__main__':
         print(args)
     
     if args.command == "ingest":
-        if args.status:
-            ingest.get_statuses()
-            sys.exit()
         ingest.main(args.pdf_directory)
+    
+    if args.command == "ingest_status":
+        ingest.get_statuses()
 
     if args.command == "rewrite":
         rewrite.summarize(args.text)

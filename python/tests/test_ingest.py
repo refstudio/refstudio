@@ -85,7 +85,11 @@ def test_ingest_add_citation_keys(tmp_path):
 
     # set up base reference with required fields
     # we'll be copying this reference and modifying it for each test
-    base_reference = Reference(source_filename="test.pdf", filename_md5="asdf")
+    base_reference = Reference(
+        source_filename="test.pdf",
+        filename_md5="asdf",
+        status="complete"
+    )
     fake_data = [
         {
             "full_name": "John Smith",

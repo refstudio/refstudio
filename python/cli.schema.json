@@ -5,6 +5,9 @@
     "ingest": {
       "$ref": "#/definitions/IngestResponse"
     },
+    "ingest_status": {
+      "$ref": "#/definitions/IngestStatusResponse"
+    },
     "rewrite": {
       "type": "array",
       "items": {
@@ -20,6 +23,7 @@
   },
   "required": [
     "ingest",
+    "ingest_status",
     "rewrite",
     "chat"
   ],
@@ -90,12 +94,7 @@
           "type": "string"
         },
         "status": {
-          "default": "processing",
-          "allOf": [
-            {
-              "$ref": "#/definitions/IngestStatus"
-            }
-          ]
+          "$ref": "#/definitions/IngestStatus"
         },
         "citation_key": {
           "type": "string"
@@ -134,7 +133,8 @@
       },
       "required": [
         "source_filename",
-        "filename_md5"
+        "filename_md5",
+        "status"
       ]
     },
     "IngestResponse": {
@@ -154,6 +154,50 @@
       "required": [
         "project_name",
         "references"
+      ]
+    },
+    "ResponseStatus": {
+      "title": "ResponseStatus",
+      "description": "An enumeration.",
+      "enum": [
+        "ok",
+        "error"
+      ],
+      "type": "string"
+    },
+    "ReferenceStatus": {
+      "title": "ReferenceStatus",
+      "type": "object",
+      "properties": {
+        "source_filename": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/IngestStatus"
+        }
+      },
+      "required": [
+        "source_filename",
+        "status"
+      ]
+    },
+    "IngestStatusResponse": {
+      "title": "IngestStatusResponse",
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "reference_statuses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ReferenceStatus"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "reference_statuses"
       ]
     },
     "RewriteChoice": {

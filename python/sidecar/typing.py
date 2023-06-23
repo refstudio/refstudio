@@ -32,7 +32,7 @@ class Reference(RefStudioModel):
     """A reference for an academic paper / PDF"""
     source_filename: str
     filename_md5: str
-    status: IngestStatus = IngestStatus.PROCESSING
+    status: IngestStatus
     citation_key: str | None = None
     title: str | None = None
     abstract: str | None = None
@@ -83,6 +83,7 @@ class ChatResponseChoice(RefStudioModel):
 
 class CliCommands(RefStudioModel):
     ingest: IngestResponse
+    ingest_status: IngestStatusResponse
     rewrite: list[RewriteChoice]
     chat: list[ChatResponseChoice]
 

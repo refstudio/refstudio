@@ -36,8 +36,9 @@ $ poetry run pytest --cov=. tests
 
 The application current has three main functions:
 1. Ingest
-2. Rewrite
-3. Chat
+2. Ingest Status
+3. Rewrite
+4. Chat
 
 ### Ingest
 `Ingest` is called when a Refstudio user uploads Reference documents.
@@ -95,6 +96,39 @@ $ poetry run python main.py ingest --pdf_directory=tests/fixtures/pdf/ | jq
       "authors": [],
       "chunks": [],
       "metadata": {}
+    }
+  ]
+}
+```
+
+### Ingest Status
+`ingest_status` is called while `ingest` is running in the background, to check the status of each uploaded file.
+
+It does not take any input and returns a dictionary of various statuses.
+
+To run `ingest_status`:
+
+```bash
+$ poetry run python main.py ingest_status | jq
+
+# Example:
+$ poetry run python main.py ingest_status | jq
+
+# Response:
+{
+  "status": "ok",
+  "reference_statuses": [
+    {
+      "source_filename": "A Few Useful Things to Know about Machine Learning.pdf",
+      "status": "complete"
+    },
+    {
+      "source_filename": "2301.10140.pdf",
+      "status": "pending"
+    },
+    {
+      "source_filename": "grobid-fails.pdf",
+      "status": "failure"
     }
   ]
 }
