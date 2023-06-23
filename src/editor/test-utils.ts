@@ -1,5 +1,7 @@
 import { Node } from '@tiptap/pm/model';
-import { Predicate } from '@tiptap/react';
+import { TextSelection } from '@tiptap/pm/state';
+import { Editor, Predicate } from '@tiptap/react';
+import { format } from 'prettier';
 
 /**
  * Filters descendants of a given node with a given predicate
@@ -38,5 +40,94 @@ export function findNodesByNodeType(node: Node, nodeType: string) {
 export function getText(node: Node) {
   return filterDescendants(node, (n) => n.isText)
     .map((textNode) => textNode.text!)
-    .reduce((acc, current) => acc + current, '');
+    .join('');
+}
+
+/**
+ * Set both content and selection for an editor.
+ *
+ * The selection is determined by the position of the "|" character.
+ * There must be either one or two of these.
+ * With one, this sets the cursor position.
+ * With two, it sets the start and end of the selection.
+ *
+ * @returns The text positions of the one or two "|" characters in the editor.
+ */
+export function setUpEditorWithSelection(editor: Editor, contentHTML: string) {
+  editor.commands.setContent(contentHTML);
+  const minPos = TextSelection.atStart(editor.state.doc).from;
+  const maxPos = TextSelection.atEnd(editor.state.doc).to;
+
+  const positions = [];
+  for (let i = minPos; i <= maxPos; i++) {
+    const text = editor.view.state.doc.textBetween(i, i + 1);
+    if (text === '|') {
+      positions.push(i - positions.length); // subtract the number of chars that will have been deleted
+    }
+  }
+  expect(positions.length).toBeGreaterThanOrEqual(1);
+  expect(positions.length).toBeLessThanOrEqual(2);
+  editor
+    .chain()
+    .setContent(contentHTML.replaceAll('|', ''))
+    .setTextSelection({ from: positions[0], to: positions[1] ?? positions[0] })
+    .run();
+  return positions;
+}
+
+/**
+ * Add "|" character(s) to editor content to represent the current selection
+ *
+ * When the selection is empty, add one "|" character
+ * Otherwise, add "|" to the start and to the end positions of the selection
+ */
+function addSelectionCursors(editor: Editor) {
+  const { empty, from, to } = editor.state.selection;
+  let chain = editor.chain().insertContentAt(from, '|');
+
+  if (!empty) {
+    // Add 1 to account for the previously inserted
+    chain = chain.insertContentAt(to + 1, '|');
+  }
+
+  chain.run();
+}
+
+/**
+ * Get the editor content as HTML and format it with prettier.
+ *
+ * Note that this removes <draggable-block> nodes since these tend to add noise to the HTML.
+ */
+export function getPrettyHTML(editor: Editor) {
+  let html = editor.getHTML();
+  html = html.replaceAll('<draggable-block>', '');
+  html = html.replaceAll('</draggable-block>', '');
+
+  // Format with prettier. TipTap HTML has multiple root nodes, so we need to wrap with <html>...</html>
+  const prettyHtml = format('<html>' + html + '</html>', {
+    parser: 'html',
+    bracketSameLine: true,
+    htmlWhitespaceSensitivity: 'ignore',
+  });
+  // Unwrap and shift everything left by two spaces (one indent level)
+  return (
+    prettyHtml
+      .replace(/^<html>/, '')
+      .replace(/<\/html>\s*$/, '')
+      .replace(/^ {2}/gm, '')
+      // Use single quotes
+      .replace(/"/g, "'")
+      .trim()
+  );
+}
+/** Add cursors to represent selection, then return prettified HTML. */
+export function getPrettyHTMLWithSelection(editor: Editor) {
+  addSelectionCursors(editor);
+  return getPrettyHTML(editor);
+}
+
+export function getSelectedText(editor: Editor) {
+  const sel = editor.view.state.selection;
+  const text = editor.view.state.doc.textBetween(sel.from, sel.to);
+  return text;
 }

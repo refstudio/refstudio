@@ -6,7 +6,7 @@ import { useMemo } from 'react';
 import { getDerivedReferenceAtom } from '../atoms/referencesState';
 import { ReferenceFileContent } from '../atoms/types/FileContent';
 
-export function ReferenceView({ referenceId }: { referenceId: ReferenceFileContent['referenceId'] }) {
+export function ReferenceView({ referenceId }: Pick<ReferenceFileContent, 'referenceId'>) {
   const referenceAtom = useMemo(() => getDerivedReferenceAtom(referenceId), [referenceId]);
   const reference = useAtomValue(referenceAtom);
 

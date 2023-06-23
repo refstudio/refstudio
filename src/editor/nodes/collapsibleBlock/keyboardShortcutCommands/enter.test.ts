@@ -1,7 +1,7 @@
 import { Editor } from '@tiptap/react';
 
-import { defaultCollapsibleBlock, defaultUncollapsedCollapsibleBlock } from '../../../test-fixtures';
-import { findNodesByNodeType, getText } from '../../../test-utils';
+import { defaultCollapsibleBlock } from '../../../test-fixtures';
+import { getPrettyHTMLWithSelection, setUpEditorWithSelection } from '../../../test-utils';
 import { EDITOR_EXTENSIONS } from '../../../TipTapEditorConfigs';
 import { enter } from './enter';
 
@@ -11,52 +11,63 @@ describe('Enter keyboard shortcut command', () => {
   });
 
   it('should split a collapsed collapsible block', () => {
-    // 6 is to position the caret in the middle of 'Header'
-    editor.chain().setContent(defaultCollapsibleBlock).setTextSelection(6).run();
-    expect(editor.state.doc.childCount).toBe(1);
+    setUpEditorWithSelection(
+      editor,
+      `<collapsible-block>
+        <collapsible-summary>Hea|der</collapsible-summary>
+        <collapsible-content>
+            <p>Content Line 1</p>
+            <p>Content Line 2</p>
+        </collapsible-content>
+      </collapsible-block>`,
+    );
 
     const commandResult = enter({ editor });
     expect(commandResult).toBe(true);
 
-    // A new collapsible should have been added
-    expect(editor.state.doc.childCount).toBe(2);
+    // A new collapsible should have been added,
+    // the first collapsible block should contain the content of the initial block
+    // and the second collapsible block should not have content.
 
-    const [firstNode, secondNode] = findNodesByNodeType(editor.state.doc, 'collapsibleBlock');
-    // The first collapsible block should contain the content of the initial block
-    expect(firstNode.childCount).toBe(2);
-    expect(getText(firstNode.child(0))).toBe('Hea');
-    expect(firstNode.attrs.folded).toBe(true);
-    const content = firstNode.child(1);
-    expect(content.childCount).toBe(2);
-    expect(getText(content.child(0))).toBe('Content Line 1');
-    expect(getText(content.child(1))).toBe('Content Line 2');
-
-    // The second collapsible block should not have content
-    expect(secondNode.childCount).toBe(1);
-    expect(getText(secondNode.child(0))).toBe('der');
-    expect(secondNode.attrs.folded).toBe(true);
+    expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
+      "<collapsible-block folded='true'>
+        <collapsible-summary>Hea</collapsible-summary>
+        <collapsible-content>
+          <p>Content Line 1</p>
+          <p>Content Line 2</p>
+        </collapsible-content>
+      </collapsible-block>
+      <collapsible-block folded='true'>
+        <collapsible-summary>|der</collapsible-summary>
+      </collapsible-block>"
+    `);
   });
 
   it('should add a new content line to an uncollapsed collapsible block', () => {
-    // 6 is to position the caret in the middle of 'Header'
-    editor.chain().setContent(defaultUncollapsedCollapsibleBlock).setTextSelection(6).run();
-    expect(editor.state.doc.childCount).toBe(1);
+    setUpEditorWithSelection(
+      editor,
+      `<collapsible-block folded='false'>
+        <collapsible-summary>Hea|der</collapsible-summary>
+        <collapsible-content>
+            <p>Content Line 1</p>
+            <p>Content Line 2</p>
+        </collapsible-content>
+      </collapsible-block>`,
+    );
 
     const commandResult = enter({ editor });
     expect(commandResult).toBe(true);
 
-    expect(editor.state.doc.childCount).toBe(1);
-
-    const [collapsibleBlock] = findNodesByNodeType(editor.state.doc, 'collapsibleBlock');
-    expect(collapsibleBlock).toBeDefined();
-    expect(collapsibleBlock.childCount).toBe(2);
-    expect(getText(collapsibleBlock.child(0))).toBe('Hea');
-
-    const content = collapsibleBlock.child(1);
-    expect(content.childCount).toBe(3);
-    expect(getText(content.child(0))).toBe('der');
-    expect(getText(content.child(1))).toBe('Content Line 1');
-    expect(getText(content.child(2))).toBe('Content Line 2');
+    expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
+      "<collapsible-block folded='false'>
+        <collapsible-summary>Hea</collapsible-summary>
+        <collapsible-content>
+          <p>|der</p>
+          <p>Content Line 1</p>
+          <p>Content Line 2</p>
+        </collapsible-content>
+      </collapsible-block>"
+    `);
   });
 
   it('should not do anything when the selection is not in a collapsible block', () => {
