@@ -1,7 +1,12 @@
 import { Editor } from '@tiptap/react';
 
 import { defaultCollapsibleBlock, defaultUncollapsedCollapsibleBlock } from '../../../test-fixtures';
-import { findNodesByNodeType, getPrettyHTML, getText, setUpEditorWithSelection } from '../../../test-utils';
+import {
+  findNodesByNodeType,
+  getPrettyHTMLWithSelection,
+  getText,
+  setUpEditorWithSelection,
+} from '../../../test-utils';
 import { EDITOR_EXTENSIONS } from '../../../TipTapEditorConfigs';
 import { enter } from './enter';
 
@@ -29,7 +34,7 @@ describe('Enter keyboard shortcut command', () => {
     // the first collapsible block should contain the content of the initial block
     // and the second collapsible block should not have content.
 
-    expect(getPrettyHTML(editor)).toMatchInlineSnapshot(`
+    expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
       "<collapsible-block folded=\\"true\\">
         <collapsible-summary>Hea</collapsible-summary>
         <collapsible-content>
@@ -38,7 +43,7 @@ describe('Enter keyboard shortcut command', () => {
         </collapsible-content>
       </collapsible-block>
       <collapsible-block folded=\\"true\\">
-        <collapsible-summary>der</collapsible-summary>
+        <collapsible-summary>|der</collapsible-summary>
       </collapsible-block>"
     `);
   });
@@ -58,11 +63,11 @@ describe('Enter keyboard shortcut command', () => {
     const commandResult = enter({ editor });
     expect(commandResult).toBe(true);
 
-    expect(getPrettyHTML(editor)).toMatchInlineSnapshot(`
+    expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
       "<collapsible-block folded=\\"false\\">
         <collapsible-summary>Hea</collapsible-summary>
         <collapsible-content>
-          <p>der</p>
+          <p>|der</p>
           <p>Content Line 1</p>
           <p>Content Line 2</p>
         </collapsible-content>

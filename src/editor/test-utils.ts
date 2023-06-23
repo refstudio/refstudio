@@ -54,7 +54,7 @@ export function getText(node: Node) {
  * @returns The text positions of the one or two "|" characters in the editor.
  */
 export function setUpEditorWithSelection(editor: Editor, contentHTML: string) {
-  editor.chain().setContent(contentHTML).run();
+  editor.commands.setContent(contentHTML);
   const minPos = TextSelection.atStart(editor.state.doc).from;
   const maxPos = TextSelection.atEnd(editor.state.doc).to;
 
@@ -73,6 +73,24 @@ export function setUpEditorWithSelection(editor: Editor, contentHTML: string) {
     .setTextSelection({ from: positions[0], to: positions[1] ?? positions[0] })
     .run();
   return positions;
+}
+
+/**
+ * Add "|" character(s) to editor content to represent the current selection
+ *
+ * When the selection is empty, add one "|" character
+ * Otherwise, add "|" to the start and to the end positions of the selection
+ */
+function addSelectionCursors(editor: Editor) {
+  const { empty, from, to } = editor.state.selection;
+  let chain = editor.chain().insertContentAt(from, '|');
+
+  if (!empty) {
+    // Add 1 to account for the previously inserted
+    chain = chain.insertContentAt(to + 1, '|');
+  }
+
+  chain.run();
 }
 
 /**
@@ -97,6 +115,11 @@ export function getPrettyHTML(editor: Editor) {
     .replace(/<\/html>\s*$/, '')
     .replace(/^ {2}/gm, '')
     .trim();
+}
+/** Add cursors to represent selection, then return prettified HTML. */
+export function getPrettyHTMLWithSelection(editor: Editor) {
+  addSelectionCursors(editor);
+  return getPrettyHTML(editor);
 }
 
 export function getSelectedText(editor: Editor) {

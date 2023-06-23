@@ -1,7 +1,7 @@
 import { Editor } from '@tiptap/react';
 
 import { defaultCollapsibleBlock } from '../../../test-fixtures';
-import { findNodesByNodeType, getPrettyHTML, setUpEditorWithSelection } from '../../../test-utils';
+import { findNodesByNodeType, getPrettyHTMLWithSelection, setUpEditorWithSelection } from '../../../test-utils';
 import { EDITOR_EXTENSIONS } from '../../../TipTapEditorConfigs';
 import { modEnter } from './modEnter';
 
@@ -25,9 +25,9 @@ describe('Mod-Enter keyboard shortcut command', () => {
     const commandResult = modEnter({ editor });
     expect(commandResult).toBe(true);
 
-    expect(getPrettyHTML(editor)).toMatchInlineSnapshot(`
+    expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
       "<collapsible-block folded=\\"true\\">
-        <collapsible-summary>Header</collapsible-summary>
+        <collapsible-summary>|Header</collapsible-summary>
         <collapsible-content>
           <p>Content Line 1</p>
           <p>Content Line 2</p>

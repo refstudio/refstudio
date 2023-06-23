@@ -1,7 +1,7 @@
 import { Editor } from '@tiptap/react';
 
 import { defaultParagraph } from '../../../test-fixtures';
-import { getPrettyHTML, getSelectedText, getText, setUpEditorWithSelection } from '../../../test-utils';
+import { getPrettyHTMLWithSelection, getSelectedText, getText, setUpEditorWithSelection } from '../../../test-utils';
 import { EDITOR_EXTENSIONS } from '../../../TipTapEditorConfigs';
 import { backspace } from './backspace';
 
@@ -51,8 +51,8 @@ describe('Backspace keyboard shortcut command', () => {
     // A new collapsible should have been added
     expect(editor.state.doc.childCount).toBe(3);
 
-    expect(getPrettyHTML(editor)).toMatchInlineSnapshot(`
-      "<p>Some ontent Line 1</p>
+    expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
+      "<p>Some |ontent Line 1</p>
       <p>Content Line 2</p>
       <collapsible-block folded=\\"true\\">
         <collapsible-summary>Header</collapsible-summary>
