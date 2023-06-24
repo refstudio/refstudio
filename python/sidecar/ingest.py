@@ -6,11 +6,15 @@ from collections import defaultdict
 from pathlib import Path
 
 import grobid_tei_xml
+from dotenv import load_dotenv
 from grobid_client.grobid_client import GrobidClient
-from sidecar import shared
+from sidecar import shared, typing
 
 from .shared import HiddenPrints, chunk_text, get_filename_md5
+from .storage import JsonStorage
 from .typing import Author, IngestResponse, Reference
+
+load_dotenv()
 
 logging.root.setLevel(logging.NOTSET)
 
@@ -30,6 +34,21 @@ logger.disabled = os.environ.get("SIDECAR_ENABLE_LOGGING", "false").lower() == "
 
 GROBID_SERVER_URL = "https://kermitt2-grobid.hf.space"
 GROBID_TIMEOUT = 60 * 5
+
+APPDATA_DIR = Path(
+    os.environ.get('APP_DATA_DIR', '/tmp')
+)
+PROJECT_NAME = Path(
+    os.environ.get('PROJECT_NAME', 'project-x')
+)
+UPLOADS_DIR = Path(
+    os.path.join(APPDATA_DIR, PROJECT_NAME, 'uploads')
+)
+REFERENCES_JSON_PATH = Path(
+    os.path.join(
+        APPDATA_DIR, PROJECT_NAME, '.storage', 'references.json'
+    )
+)
 
 
 class PDFIngestion:
@@ -203,6 +222,7 @@ class PDFIngestion:
             references.append(
                 Reference(
                     source_filename=source_pdf,
+                    status=typing.IngestStatus.FAILURE,
                     filename_md5=get_filename_md5(source_pdf),
                     citation_key="untitled",
                 )
@@ -289,6 +309,7 @@ class PDFIngestion:
             ref = Reference(
                 source_filename=source_pdf,
                 filename_md5=get_filename_md5(source_pdf),
+                status=typing.IngestStatus.COMPLETE,
                 title=header.get("title"),
                 authors=header.get("authors"),
                 published_date=pub_date,
@@ -333,9 +354,107 @@ class PDFIngestion:
             project_name=self.project_name,
             references=references,
         )
+    
+
+class IngestStatusFetcher:
+    def __init__(self, storage: JsonStorage):
+        self.storage = storage
+        self.uploads = list(UPLOADS_DIR.glob("*.pdf"))
+    
+    def _emit_ingest_status_response(
+            self,
+            response_status: typing.ResponseStatus,
+            reference_statuses: list[typing.ReferenceStatus]
+        ):
+        """
+        Emits IngestStatusResponse as json to stdout and exits.
+        """
+        response = typing.IngestStatusResponse(
+            status=response_status,
+            reference_statuses=reference_statuses
+        )
+        sys.stdout.write(response.json())
+        return
+
+    def _handle_missing_references_json(self) -> list[typing.ReferenceStatus]:
+        """
+        Handles scenario where `references.json` does not exist.
+
+        In this case, all files in `upload` will be in process since 
+        ingest has not created the `references.json` file for storage.
+        """
+        statuses = []
+        for filepath in self.uploads:
+            statuses.append(
+                typing.ReferenceStatus(
+                    source_filename=filepath.name,
+                    status=typing.IngestStatus.PROCESSING
+                )
+            )
+        return statuses
+    
+    def _compare_uploads_against_references_json(self) -> list[typing.ReferenceStatus]:
+        """
+        Compares files in `uploads` directory against References stored 
+        in `references.json` to determine ingestion status.
+
+        Files that are not yet in `references.json` are in process.
+        """
+        references = {
+            ref.source_filename: ref for ref in self.storage.references
+        }
+
+        statuses = []
+        for filepath in self.uploads:
+            if filepath.name in references:
+                ref = references[filepath.name]
+
+                status = typing.ReferenceStatus(
+                    source_filename=ref.source_filename,
+                    status=ref.status
+                )
+            else:
+                status = typing.ReferenceStatus(
+                    source_filename=filepath.name,
+                    status=typing.IngestStatus.PROCESSING
+                )
+            statuses.append(status)
+        return statuses
+
+    def emit_statuses(self):
+        try:
+            self.storage.load()
+        except FileNotFoundError as e:
+            logger.warning(e)
+            statuses = self._handle_missing_references_json()
+            self._emit_ingest_status_response(
+                response_status=typing.ResponseStatus.OK,
+                reference_statuses=statuses
+            )
+            return
+        except Exception as e:
+            logger.error(f"Error loading references.json: {e}")
+            self._emit_ingest_status_response(
+                response_status=typing.ResponseStatus.ERROR,
+                reference_statuses=[]
+            )
+            return
+
+        statuses = self._compare_uploads_against_references_json()
+        self._emit_ingest_status_response(
+            response_status=typing.ResponseStatus.OK,
+            reference_statuses=statuses
+        )
+        return
 
 
 def main(pdf_directory: str):
     pdf_directory = Path(pdf_directory)
     ingest = PDFIngestion(input_dir=pdf_directory)
     ingest.run()
+
+
+def get_statuses():
+    storage = JsonStorage(REFERENCES_JSON_PATH)
+    status_fetcher = IngestStatusFetcher(storage=storage)
+    status_fetcher.emit_statuses()
