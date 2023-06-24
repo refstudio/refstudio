@@ -2,59 +2,85 @@ import { useCallback, useEffect, useRef } from 'react';
 
 let draggingCount = 0;
 
+const isFileDrop = (e: DragEvent) => {
+  if (!e.dataTransfer) {
+    return false;
+  }
+  if (!e.dataTransfer.types.includes('Files')) {
+    return false;
+  }
+  return true;
+};
+
 interface FileDragDropZoneProps {
-  onFileDropStarted?: (files: FileList) => void;
-  onFileDropCompleted?: () => void;
+  onFileDropStarted?: (files: string[]) => void;
+  onFileDropCanceled?: () => void;
   onFileDrop: (files: FileList) => void;
   children: React.ReactNode;
 }
 
+/**
+ * FilesDragDropZone
+ *
+ *  In HTML drag and drop events, it is not possible to directly access the names of files before the drop event occurs.
+ *  The dragstart and dragover events provide limited information about the dragged data,
+ *  but they do not expose details about the content of the files being dragged.
+ *
+ *  We need to register in the dragStart and DragOver to e.preventDefault() in order to get the drop event.
+ */
 export function FilesDragDropZone({
   onFileDropStarted,
-  onFileDropCompleted,
+  onFileDropCanceled,
   onFileDrop,
   children,
 }: FileDragDropZoneProps) {
   const divRef = useRef<HTMLDivElement>(null);
 
-  const handleDragIn = useCallback(
+  const handleDragEnter = useCallback(
     (e: DragEvent) => {
+      if (!isFileDrop(e)) {
+        return;
+      }
       e.preventDefault();
       e.stopPropagation();
+
       draggingCount++;
-      if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
-        onFileDropStarted?.(e.dataTransfer.files);
+      if (draggingCount === 1) {
+        onFileDropStarted?.([]);
       }
     },
     [onFileDropStarted],
   );
 
-  const handleDragOver = useCallback(
-    (e: DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
-        onFileDropStarted?.(e.dataTransfer.files);
-      }
-    },
-    [onFileDropStarted],
-  );
+  const handleDragOver = useCallback((e: DragEvent) => {
+    if (!isFileDrop(e)) {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+  }, []);
 
-  const handleDragOut = useCallback(
+  const handleDragLeave = useCallback(
     (e: DragEvent) => {
+      if (!isFileDrop(e)) {
+        return;
+      }
       e.preventDefault();
       e.stopPropagation();
       draggingCount--;
-      if (draggingCount > 0) {
-        return;
+      if (draggingCount === 0) {
+        onFileDropCanceled?.();
       }
-      onFileDropCompleted?.();
     },
-    [onFileDropCompleted],
+    [onFileDropCanceled],
   );
 
   const handleDrop = useCallback(
     (e: DragEvent) => {
+      if (!isFileDrop(e)) {
+        return;
+      }
+
       e.preventDefault();
       e.stopPropagation();
       draggingCount = 0;
@@ -76,18 +102,17 @@ export function FilesDragDropZone({
     if (!ele) {
       return;
     }
-    // Note: We need all of these (with the stoppropagation) in order to have the drop event
-    ele.addEventListener('dragenter', handleDragIn);
-    ele.addEventListener('dragleave', handleDragOut);
+    ele.addEventListener('dragenter', handleDragEnter);
+    ele.addEventListener('dragleave', handleDragLeave);
     ele.addEventListener('dragover', handleDragOver);
     ele.addEventListener('drop', handleDrop);
     return () => {
-      ele.removeEventListener('dragenter', handleDragIn);
-      ele.removeEventListener('dragleave', handleDragOut);
+      ele.removeEventListener('dragenter', handleDragEnter);
+      ele.removeEventListener('dragleave', handleDragLeave);
       ele.removeEventListener('dragover', handleDragOver);
       ele.removeEventListener('drop', handleDrop);
     };
-  }, [handleDragIn, handleDragOut, handleDragOver, handleDrop, divRef]);
+  }, [handleDragEnter, handleDragLeave, handleDragOver, handleDrop, divRef]);
 
   return (
     <div className="relative h-screen" ref={divRef}>

@@ -21,7 +21,6 @@ function validReferencesFiles(file: File) {
 
 export function ReferencesDropZone({ children }: { children: React.ReactNode }) {
   const [visible, setVisible] = useState(false);
-  const [files, setFiles] = useState<string[]>([]);
   const setReferences = useSetAtom(setReferencesAtom);
   const setTemporaryReferences = useSetAtom(setTemporaryReferencesAtom);
   const setSyncInProgress = useSetAtom(referencesSyncInProgressAtom);
@@ -33,7 +32,6 @@ export function ReferencesDropZone({ children }: { children: React.ReactNode }) 
     onSuccess: (filePaths) => setTemporaryReferences(filePaths),
     onSettled: () => {
       setVisible(false);
-      setFiles([]);
     },
   });
 
@@ -76,7 +74,11 @@ export function ReferencesDropZone({ children }: { children: React.ReactNode }) 
   };
 
   return (
-    <FilesDragDropZone onFileDrop={handleFilesUpload}>
+    <FilesDragDropZone
+      onFileDrop={handleFilesUpload}
+      onFileDropCanceled={() => setVisible(false)}
+      onFileDropStarted={() => setVisible(true)}
+    >
       {children}
       <input
         accept="application/pdf"
@@ -92,20 +94,11 @@ export function ReferencesDropZone({ children }: { children: React.ReactNode }) 
           'absolute left-0 top-0 z-50 h-screen w-screen opacity-90',
           'flex flex-col items-center justify-center gap-4',
           'bg-slate-100 p-10 text-center text-xl',
-          { hidden: !visible || files.length === 0 },
+          { hidden: !visible },
         )}
       >
         <VscFilePdf className="" size={60} />
         Release to upload files to your library
-        {import.meta.env.DEV && (
-          <pre className="text-left text-xs">
-            <ul className="list-disc">
-              {files.map((f) => (
-                <li key={f}>{f}</li>
-              ))}
-            </ul>
-          </pre>
-        )}
       </div>
     </FilesDragDropZone>
   );
