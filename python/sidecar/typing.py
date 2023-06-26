@@ -95,7 +95,7 @@ class CliCommands(RefStudioModel):
     ingest_status: IngestStatusResponse
     rewrite: list[RewriteChoice]
     chat: list[ChatResponseChoice]
-    delete: ResponseStatus
+    delete: DeleteStatusResponse
 
 
 Reference.update_forward_refs()

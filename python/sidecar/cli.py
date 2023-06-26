@@ -53,4 +53,8 @@ def get_arg_parser():
         nargs="*",
         type=str
     )
+    delete_parser.add_argument(
+        "--all",
+        action="store_true"
+    )
     return parser

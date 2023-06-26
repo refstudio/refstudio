@@ -20,4 +20,8 @@ if __name__ == '__main__':
         chat.ask_question(args.text)
 
     if args.command == "delete":
-        storage.delete_references(args.source_filenames)
+        if args.all:
+            storage.delete_references(all_=args.all)
+        else:
+            storage.delete_references(source_filenames=args.source_filenames)
+        

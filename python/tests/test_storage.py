@@ -85,12 +85,35 @@ def test_storage_delete_references(monkeypatch, tmp_path, capsys):
 
     # -------------
 
+    # test: delete with `all_=True`
+    # expect: all References should be deleted, json response in stdout = OK
+    jstore.delete(all_=True)
+
+    captured = capsys.readouterr()
+    output = json.loads(captured.out)
+
+    assert output['status'] == 'ok'
+    assert output['message'] == ""
+
+    # reload from `savepath` to check that the delete was successful
+    jstore = storage.JsonStorage(filepath=savepath)
+    jstore.load()
+
+    source_filenames_from_storage = [ref.source_filename for ref in jstore.references]
+    assert len(source_filenames_from_storage) == 0
+
+    # -------------
+
+    jstore = storage.JsonStorage(filepath=fp)
+    jstore.load()
+    monkeypatch.setattr(jstore, "filepath", savepath)
+
     # test: delete source_filename that is present in references.json
     # expect: corresponding Reference is deleted
     #   json response in stdout should be of status: ok
     to_be_deleted = ["some_file.pdf"]
 
-    jstore.delete(to_be_deleted)
+    jstore.delete(source_filenames=to_be_deleted)
     
     captured = capsys.readouterr()
     output = json.loads(captured.out)
