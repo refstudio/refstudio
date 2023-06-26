@@ -19,7 +19,7 @@ export function PanelSection({
 
   return (
     <div
-      className={cx('flex flex-col px-2', {
+      className={cx('flex flex-col', {
         'flex-shrink-0': !grow, // Take the component's height without shrinking
         'flex-grow overflow-hidden': grow, // Can grow
       })}
@@ -28,7 +28,7 @@ export function PanelSection({
         className={cx(
           'group/header',
           'flex flex-row items-center gap-1', //
-          'mb-2 cursor-pointer text-sm',
+          'mb-1 cursor-pointer pl-1 text-sm',
         )}
         onClick={() => setExpanded(!expanded)}
       >
