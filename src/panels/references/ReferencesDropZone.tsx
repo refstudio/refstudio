@@ -4,11 +4,7 @@ import { createRef, useState } from 'react';
 import { VscFilePdf } from 'react-icons/vsc';
 
 import { runPDFIngestion } from '../../api/ingestion';
-import {
-  referencesSyncInProgressAtom,
-  setReferencesAtom,
-  setTemporaryReferencesAtom,
-} from '../../atoms/referencesState';
+import { referencesSyncInProgressAtom, setReferencesAtom } from '../../atoms/referencesState';
 import { cx } from '../../cx';
 import { listenEvent, RefStudioEvents } from '../../events';
 import { uploadFiles } from '../../filesystem';
@@ -22,18 +18,9 @@ function validReferencesFiles(file: File) {
 export function ReferencesDropZone({ children }: { children: React.ReactNode }) {
   const [visible, setVisible] = useState(false);
   const setReferences = useSetAtom(setReferencesAtom);
-  const setTemporaryReferences = useSetAtom(setTemporaryReferencesAtom);
   const setSyncInProgress = useSetAtom(referencesSyncInProgressAtom);
 
   const inputRef = createRef<HTMLInputElement>();
-
-  const uploadFilesMutation = useMutation({
-    mutationFn: uploadFiles,
-    onSuccess: (filePaths) => setTemporaryReferences(filePaths),
-    onSettled: () => {
-      setVisible(false);
-    },
-  });
 
   const ingestMutation = useMutation({
     mutationFn: runPDFIngestion,
@@ -45,9 +32,10 @@ export function ReferencesDropZone({ children }: { children: React.ReactNode }) 
 
   const uploadAndIngestMutation = useMutation({
     mutationFn: async (uploadedFiles: FileList) => {
-      await uploadFilesMutation.mutateAsync(Array.from(uploadedFiles).filter(validReferencesFiles));
-      await ingestMutation.mutateAsync();
+      await uploadFiles(Array.from(uploadedFiles).filter(validReferencesFiles));
+      ingestMutation.mutate();
     },
+    onSuccess: () => setVisible(false),
   });
 
   useAsyncEffect(
@@ -96,6 +84,7 @@ export function ReferencesDropZone({ children }: { children: React.ReactNode }) 
           'bg-slate-100 p-10 text-center text-xl',
           { hidden: !visible },
         )}
+        data-testid="release-files-message"
       >
         <VscFilePdf className="" size={60} />
         Release to upload files to your library

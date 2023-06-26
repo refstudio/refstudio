@@ -23,17 +23,4 @@ export const setReferencesAtom = atom(null, (_get, set, references: ReferenceIte
   set(referencesAtom, updatedReferences);
 });
 
-export const setTemporaryReferencesAtom = atom(null, (_get, set, newFiles: string[]) => {
-  const references = _get(getReferencesAtom);
-  const newReferences: ReferenceItem[] = newFiles.map((filename) => ({
-    id: filename,
-    citationKey: '...',
-    title: filename,
-    filename,
-    authors: [{ fullName: 'Unknown' }],
-  }));
-
-  set(setReferencesAtom, [...references, ...newReferences]);
-});
-
 export const referencesSyncInProgressAtom = atom<boolean>(false);

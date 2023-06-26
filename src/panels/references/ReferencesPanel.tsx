@@ -3,7 +3,6 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { getReferencesAtom, referencesSyncInProgressAtom, setReferencesAtom } from '../../atoms/referencesState';
 import { PanelSection } from '../../components/PanelSection';
 import { PanelWrapper } from '../../components/PanelWrapper';
-import { ProgressSpinner } from '../../components/Spinner';
 import { emitEvent, RefStudioEvents } from '../../events';
 import { ReferenceItem } from '../../types/ReferenceItem';
 import { ReferencesList } from './ReferencesList';
@@ -13,7 +12,6 @@ interface ReferencesPanelProps {
 }
 
 export function ReferencesPanel({ onRefClicked }: ReferencesPanelProps) {
-  const syncInProgress = useAtomValue(referencesSyncInProgressAtom);
   const references = useAtomValue(getReferencesAtom);
 
   return (
@@ -25,7 +23,6 @@ export function ReferencesPanel({ onRefClicked }: ReferencesPanelProps) {
           )}
 
           <ReferencesList references={references} onRefClicked={onRefClicked} />
-          {syncInProgress && <ProgressSpinner badge="PDF Ingestion" />}
           <UploadTipInstructions />
           <ResetReferencesInstructions />
         </div>

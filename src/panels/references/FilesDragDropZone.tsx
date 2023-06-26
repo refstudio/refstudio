@@ -13,7 +13,7 @@ const isFileDrop = (e: DragEvent) => {
 };
 
 interface FileDragDropZoneProps {
-  onFileDropStarted?: (files: string[]) => void;
+  onFileDropStarted?: () => void;
   onFileDropCanceled?: () => void;
   onFileDrop: (files: FileList) => void;
   children: React.ReactNode;
@@ -45,8 +45,9 @@ export function FilesDragDropZone({
       e.stopPropagation();
 
       draggingCount++;
+      console.log('handleDragEnter', draggingCount);
       if (draggingCount === 1) {
-        onFileDropStarted?.([]);
+        onFileDropStarted?.();
       }
     },
     [onFileDropStarted],
@@ -68,6 +69,7 @@ export function FilesDragDropZone({
       e.preventDefault();
       e.stopPropagation();
       draggingCount--;
+      console.log('handleDragLeave', draggingCount);
       if (draggingCount === 0) {
         onFileDropCanceled?.();
       }
@@ -80,16 +82,11 @@ export function FilesDragDropZone({
       if (!isFileDrop(e)) {
         return;
       }
-
       e.preventDefault();
       e.stopPropagation();
       draggingCount = 0;
 
-      if (!e.dataTransfer) {
-        return;
-      }
-
-      const eventFiles = e.dataTransfer.files;
+      const eventFiles = e.dataTransfer!.files;
       if (eventFiles.length > 0) {
         onFileDrop(eventFiles);
       }
