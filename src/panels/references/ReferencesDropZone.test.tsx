@@ -19,6 +19,7 @@ describe('ReferencesDropZone', () => {
   });
 
   it('should render children with', () => {
+    vi.mocked(listenEvent).mockResolvedValue(noop);
     render(
       <Provider>
         <ReferencesDropZone>This is the child content</ReferencesDropZone>
@@ -28,6 +29,7 @@ describe('ReferencesDropZone', () => {
   });
 
   it('should render upload overlay hidden', () => {
+    vi.mocked(listenEvent).mockResolvedValue(noop);
     render(
       <Provider>
         <ReferencesDropZone>APP</ReferencesDropZone>
@@ -38,6 +40,7 @@ describe('ReferencesDropZone', () => {
   });
 
   it('should display overlay visible on drag start', () => {
+    vi.mocked(listenEvent).mockResolvedValue(noop);
     const store = createStore();
     render(
       <Provider store={store}>
@@ -61,7 +64,7 @@ describe('ReferencesDropZone', () => {
     });
   });
 
-  it('should open file explorer on RefStudioEvents.references.ingestion.upload', () => {
+  it('should open file explorer on RefStudioEvents.menu.references.upload', () => {
     let evtHandler: undefined | RefStudioEventCallback;
     let eventName = '';
     vi.mocked(listenEvent).mockImplementation(async (event: string, handler: RefStudioEventCallback) => {
@@ -80,14 +83,23 @@ describe('ReferencesDropZone', () => {
 
     // Expect to be registered
     expect(eventName).toBe(RefStudioEvents.menu.references.upload);
+    expect(evtHandler).toBeDefined();
+
+    const input = screen.getByRole<HTMLInputElement>('form');
+    const clickFn = vi.fn();
+    input.click = clickFn;
 
     // Trigger menu action
     act(() =>
       evtHandler!({ event: RefStudioEvents.menu.references.upload, windowLabel: '', id: 1, payload: undefined }),
     );
+
+    // Note: I don't know how to check that the file modal is opened
+    expect(clickFn).toHaveBeenCalled();
   });
 
   it('should start ingestion on PDF upload', async () => {
+    vi.mocked(listenEvent).mockResolvedValue(noop);
     const REFERENCE = {
       id: 'ref.id',
       citationKey: 'citationKey',

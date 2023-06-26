@@ -31,12 +31,6 @@ describe('FilesDragDropZone', () => {
     });
 
     expect(onFileDropStarted).toHaveBeenCalled();
-
-    fireEvent.dragLeave(target, {
-      dataTransfer: {
-        types: ['Files'],
-      },
-    });
   });
 
   it('should NOT call onFileDropStarted on drag enter for invalid file types', () => {
@@ -54,12 +48,6 @@ describe('FilesDragDropZone', () => {
     });
 
     expect(onFileDropStarted).not.toHaveBeenCalled();
-
-    fireEvent.dragLeave(target, {
-      dataTransfer: {
-        types: ['Html'],
-      },
-    });
   });
 
   it('should call onFileDropCanceled on drag leave', () => {

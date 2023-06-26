@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
 
-let draggingCount = 0;
-
 const isFileDrop = (e: DragEvent) => {
   if (!e.dataTransfer) {
     return false;
@@ -35,6 +33,7 @@ export function FilesDragDropZone({
   children,
 }: FileDragDropZoneProps) {
   const divRef = useRef<HTMLDivElement>(null);
+  const draggingCountRef = useRef(0);
 
   const handleDragEnter = useCallback(
     (e: DragEvent) => {
@@ -44,12 +43,13 @@ export function FilesDragDropZone({
       e.preventDefault();
       e.stopPropagation();
 
-      draggingCount++;
-      if (draggingCount === 1) {
+      draggingCountRef.current++;
+      console.log('draggingCountRef.current', draggingCountRef.current);
+      if (draggingCountRef.current === 1) {
         onFileDropStarted?.();
       }
     },
-    [onFileDropStarted],
+    [onFileDropStarted, draggingCountRef],
   );
 
   const handleDragOver = useCallback((e: DragEvent) => {
@@ -67,12 +67,14 @@ export function FilesDragDropZone({
       }
       e.preventDefault();
       e.stopPropagation();
-      draggingCount--;
-      if (draggingCount === 0) {
+
+      draggingCountRef.current--;
+      console.log('draggingCountRef.current', draggingCountRef.current);
+      if (draggingCountRef.current === 0) {
         onFileDropCanceled?.();
       }
     },
-    [onFileDropCanceled],
+    [onFileDropCanceled, draggingCountRef],
   );
 
   const handleDrop = useCallback(
@@ -82,14 +84,15 @@ export function FilesDragDropZone({
       }
       e.preventDefault();
       e.stopPropagation();
-      draggingCount = 0;
+      draggingCountRef.current = 0;
+      console.log('draggingCountRef.current', draggingCountRef.current);
 
       const eventFiles = e.dataTransfer!.files;
       if (eventFiles.length > 0) {
         onFileDrop(eventFiles);
       }
     },
-    [onFileDrop],
+    [onFileDrop, draggingCountRef],
   );
 
   useEffect(() => {

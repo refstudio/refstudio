@@ -6,9 +6,9 @@ import { VscFilePdf } from 'react-icons/vsc';
 import { runPDFIngestion } from '../../api/ingestion';
 import { referencesSyncInProgressAtom, setReferencesAtom } from '../../atoms/referencesState';
 import { cx } from '../../cx';
-import { listenEvent, RefStudioEvents } from '../../events';
+import { RefStudioEvents } from '../../events';
 import { uploadFiles } from '../../filesystem';
-import { useAsyncEffect } from '../../hooks/useAsyncEffect';
+import { useListenEvent } from '../../hooks/useListenEvent';
 import { FilesDragDropZone } from './FilesDragDropZone';
 
 function validReferencesFiles(file: File) {
@@ -38,19 +38,7 @@ export function ReferencesDropZone({ children }: { children: React.ReactNode }) 
     onSuccess: () => setVisible(false),
   });
 
-  useAsyncEffect(
-    async (isMounted) =>
-      Promise.all([
-        await listenEvent(RefStudioEvents.menu.references.upload, () => {
-          if (isMounted()) {
-            inputRef.current?.click();
-          }
-        }),
-      ]),
-    (releaseHandles) => {
-      releaseHandles?.filter((h) => h).map((h) => h());
-    },
-  );
+  useListenEvent(RefStudioEvents.menu.references.upload, () => inputRef.current?.click());
 
   const handleFilesUpload = (uploadedFiles: FileList) => {
     setSyncInProgress(true);

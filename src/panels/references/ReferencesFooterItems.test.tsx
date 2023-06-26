@@ -8,7 +8,6 @@ import { ReferencesFooterItems } from './ReferencesFooterItems';
 describe('ReferencesFooterItems component', () => {
   it('should render empty without loading', () => {
     const store = createStore();
-    // const setReferences = runSetAtomHook(setReferencesAtom, store);
     render(
       <Provider store={store}>
         <ReferencesFooterItems />
