@@ -188,7 +188,7 @@ $ poetry run python main.py --text "What can you tell me about hidden feedback l
 ### Delete (References)
 `delete` removes a Reference from project storage. It is called when a Reference is deleted from the UI.
 
-It takes a list of `source_filenames` as input and returns a response status.
+It takes a list of `source_filenames` as input and returns a response status. Alternatively, you can use the `--all` parameter to delete all References in storage.
 
 To run `delete`:
 
