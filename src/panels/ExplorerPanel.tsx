@@ -71,7 +71,7 @@ export function ExplorerPanel() {
         rightIcons={[{ key: 'closeAll', Icon: VscCloseAll, title: 'Close All Open Files', onClick: closeAllFiles }]}
         title="Open Files"
       >
-        {hasLeftAndRightPanelsFiles && <div className="font-bold ml-4 text-xs">LEFT</div>}
+        {hasLeftAndRightPanelsFiles && <div className="ml-4 text-xs font-bold">LEFT</div>}
         {left.files.length > 0 && (
           <FilesList
             files={left.files}
@@ -85,7 +85,7 @@ export function ExplorerPanel() {
             onClick={(fileId) => selectFileInPane({ paneId: left.id, fileId })}
           />
         )}
-        {hasLeftAndRightPanelsFiles && <div className="font-bold ml-4 text-xs">RIGHT</div>}
+        {hasLeftAndRightPanelsFiles && <div className="ml-4 text-xs font-bold">RIGHT</div>}
         {right.files.length > 0 && (
           <FilesList
             files={right.files}
