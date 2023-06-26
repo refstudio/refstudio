@@ -21,8 +21,8 @@ interface FileNodeProps {
 export function FileNode({ bold, fileName, onClick, paddingLeft, rightAction, selected, VscIcon }: FileNodeProps) {
   return (
     <div
-      className={cx('cursor-pointer select-none', 'flex flex-row items-center gap-1', 'group', {
-        'bg-slate-200': selected,
+      className={cx('cursor-pointer select-none', 'flex flex-row items-center gap-1 py-1', 'group', {
+        'bg-slate-100': selected,
         'hover:bg-slate-100': !selected,
       })}
       style={{ paddingLeft }}
