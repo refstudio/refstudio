@@ -40,6 +40,7 @@ export function FileNode({ bold, fileName, onClick, paddingLeft, rightAction, se
         {rightAction && (
           <div
             className="mr-2 hidden rounded-md p-0.5 hover:bg-gray-300 group-hover:block"
+            role="button"
             title={rightAction.title}
             onClick={rightAction.onClick}
           >

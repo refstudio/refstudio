@@ -6,12 +6,12 @@ import { FileNode, RightAction } from './FileNode';
 interface FilesListProps {
   files: FileData[];
   onClick: (fileId: FileId) => void;
-  paddingLeft: string;
+  paddingLeft?: string;
   rightAction?: (file: FileId) => RightAction;
   selectedFiles: FileId[];
 }
 
-export function FilesList({ files, onClick, paddingLeft, rightAction, selectedFiles }: FilesListProps) {
+export function FilesList({ files, onClick, paddingLeft = '0', rightAction, selectedFiles }: FilesListProps) {
   return (
     <>
       {files.map((file) => (
