@@ -94,7 +94,6 @@ describe('ReferencesDropZone', () => {
       evtHandler!({ event: RefStudioEvents.menu.references.upload, windowLabel: '', id: 1, payload: undefined }),
     );
 
-    // Note: I don't know how to check that the file modal is opened
     expect(clickFn).toHaveBeenCalled();
   });
 
