@@ -14,25 +14,12 @@ import {
 import { FileId } from '../atoms/types/FileData';
 import { FileEntry, FileFileEntry } from '../atoms/types/FileEntry';
 import { PaneId } from '../atoms/types/PaneGroup';
-import { FileEntryTree, FileTreeNode } from '../components/FileEntryTree';
+import { FileEntryTree } from '../components/FileEntryTree';
+import { FilesList } from '../components/FilesList';
 import { PanelSection } from '../components/PanelSection';
 import { PanelWrapper } from '../components/PanelWrapper';
 import { readAllProjectFiles } from '../filesystem';
 import { isNonNullish } from '../lib/isNonNullish';
-
-function SplitPaneButton({ fromPaneId, toPaneId, fileId }: { fromPaneId: PaneId; toPaneId: PaneId; fileId: FileId }) {
-  const splitFileToPane = useSetAtom(splitFileToPaneAtom);
-
-  return (
-    <VscSplitHorizontal
-      title={`Move to ${fromPaneId} split pane`}
-      onClick={(evt) => {
-        evt.stopPropagation();
-        splitFileToPane({ fileId, fromPaneId, toPaneId });
-      }}
-    />
-  );
-}
 
 export function ExplorerPanel() {
   const left = useAtomValue(leftPaneAtom);
@@ -40,6 +27,7 @@ export function ExplorerPanel() {
   const selectFileInPane = useSetAtom(selectFileInPaneAtom);
   const openFile = useSetAtom(openFileAtom);
   const closeAllFiles = useSetAtom(closeAllFilesAtom);
+  const splitFileToPane = useSetAtom(splitFileToPaneAtom);
 
   const { data: allFiles } = useQuery({
     queryKey: ['allFiles'],
@@ -66,7 +54,16 @@ export function ExplorerPanel() {
     [flattenedFiles, openFile],
   );
 
-  const hasRightPanelFiles = right.files.length > 0;
+  const handleSplitFile = useCallback(
+    ({ fileId, fromPaneId, toPaneId }: { fileId: FileId; fromPaneId: PaneId; toPaneId: PaneId }) =>
+      (evt: React.MouseEvent) => {
+        evt.stopPropagation();
+        splitFileToPane({ fileId, fromPaneId, toPaneId });
+      },
+    [splitFileToPane],
+  );
+
+  const hasLeftAndRightPanelsFiles = left.files.length > 0 && right.files.length > 0;
 
   return (
     <PanelWrapper title="Explorer">
@@ -74,41 +71,42 @@ export function ExplorerPanel() {
         rightIcons={[{ key: 'closeAll', Icon: VscCloseAll, title: 'Close All Open Files', onClick: closeAllFiles }]}
         title="Open Files"
       >
-        {hasRightPanelFiles && <div className="ml-4 text-xs font-bold">LEFT</div>}
+        {hasLeftAndRightPanelsFiles && <div className="ml-4 text-xs font-bold">LEFT</div>}
         {left.files.length > 0 && (
-          <div className="ml-4">
-            {left.files.map(({ fileId, fileName }) => (
-              <FileTreeNode
-                fileName={fileName}
-                key={fileId}
-                rightAction={<SplitPaneButton fileId={fileId} fromPaneId={left.id} toPaneId={right.id} />}
-                selected={fileId === left.activeFile}
-                onClick={() => selectFileInPane({ paneId: left.id, fileId })}
-              />
-            ))}
-          </div>
+          <FilesList
+            files={left.files}
+            paddingLeft="1.5rem"
+            rightAction={(fileId) => ({
+              onClick: handleSplitFile({ fileId, fromPaneId: left.id, toPaneId: right.id }),
+              VscIcon: VscSplitHorizontal,
+              title: `Move to ${right.id} split pane`,
+            })}
+            selectedFiles={left.activeFile ? [left.activeFile] : []}
+            onClick={(fileId) => selectFileInPane({ paneId: left.id, fileId })}
+          />
         )}
-        {hasRightPanelFiles && <div className="ml-4 text-xs font-bold">RIGHT</div>}
-        {hasRightPanelFiles && (
-          <div className="ml-4">
-            {right.files.map(({ fileId, fileName }) => (
-              <FileTreeNode
-                fileName={fileName}
-                key={fileId}
-                rightAction={<SplitPaneButton fileId={fileId} fromPaneId={right.id} toPaneId={left.id} />}
-                selected={fileId === left.activeFile}
-                onClick={() => selectFileInPane({ paneId: right.id, fileId })}
-              />
-            ))}
-          </div>
+        {hasLeftAndRightPanelsFiles && <div className="ml-4 text-xs font-bold">RIGHT</div>}
+        {right.files.length > 0 && (
+          <FilesList
+            files={right.files}
+            paddingLeft="1.5rem"
+            rightAction={(fileId) => ({
+              onClick: handleSplitFile({ fileId, fromPaneId: right.id, toPaneId: left.id }),
+              VscIcon: VscSplitHorizontal,
+              title: `Move to ${right.id} split pane`,
+            })}
+            selectedFiles={right.activeFile ? [right.activeFile] : []}
+            onClick={(fileId) => selectFileInPane({ paneId: right.id, fileId })}
+          />
         )}
       </PanelSection>
       <PanelSection grow title="Project X">
         <FileEntryTree
           files={allFiles}
+          paddingLeft="1.25rem"
           root
           selectedFiles={[left.activeFile, right.activeFile].filter(isNonNullish)}
-          onClick={handleOpenFile}
+          onFileClick={handleOpenFile}
         />
       </PanelSection>
     </PanelWrapper>

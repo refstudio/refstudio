@@ -48,13 +48,11 @@ export function MainPanel(props: MainPanelProps) {
             <MainPanelPane pane={left} {...props} />
           </Panel>
         )}
+        {showLeft && showRight && <VerticalResizeHandle />}
         {showRight && (
-          <>
-            <VerticalResizeHandle />
-            <Panel order={2}>
-              <MainPanelPane pane={right} {...props} />
-            </Panel>
-          </>
+          <Panel order={2}>
+            <MainPanelPane pane={right} {...props} />
+          </Panel>
         )}
       </PanelGroup>
     </>
