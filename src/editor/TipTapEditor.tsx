@@ -1,20 +1,27 @@
 import './TipTapEditor.css';
 
-import { Editor, EditorContent } from '@tiptap/react';
+import { Editor, EditorContent, JSONContent } from '@tiptap/react';
 import { useSetAtom } from 'jotai';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { selectionAtom } from '../atoms/selectionState';
+import { FileContentAtoms } from '../atoms/types/FileContentAtoms';
 import { MenuBar } from './MenuBar';
 import { EDITOR_EXTENSIONS, INITIAL_CONTENT, transformPasted } from './TipTapEditorConfigs';
 
 interface EditorProps {
-  editorContent: string | null;
+  editorContent: string | JSONContent | null;
+  activeFileAtoms: FileContentAtoms;
 }
 
-export function TipTapEditor({ editorContent }: EditorProps) {
+export function TipTapEditor({ editorContent, activeFileAtoms }: EditorProps) {
   const [editor, setEditor] = useState<Editor | null>(null);
   const setSelection = useSetAtom(selectionAtom);
+
+  const { updateFileBufferAtom, saveFileInMemoryAtom } = activeFileAtoms;
+
+  const updateFileBuffer = useSetAtom(updateFileBufferAtom);
+  const saveFileInMemory = useSetAtom(saveFileInMemoryAtom);
 
   useEffect(() => {
     const newEditor = new Editor({
@@ -29,12 +36,16 @@ export function TipTapEditor({ editorContent }: EditorProps) {
       editorProps: {
         transformPasted,
       },
+      onUpdate: ({ editor: updatedEditor }) => {
+        updateFileBuffer({ type: 'tiptap', content: updatedEditor.getJSON() });
+      },
     });
     setEditor(newEditor);
     return () => {
+      saveFileInMemory();
       newEditor.destroy();
     };
-  }, [editorContent, setSelection]);
+  }, [editorContent, setSelection, saveFileInMemory, updateFileBuffer]);
 
   if (!editor) {
     return <div>...</div>;

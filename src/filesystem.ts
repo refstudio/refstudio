@@ -99,8 +99,8 @@ export async function readFileContent(file: FileFileEntry): Promise<FileContent>
       return { type: 'pdf', binaryContent };
     }
     default: {
-      const textContent = await readTextFile(file.path);
-      return { type: 'tiptap', textContent };
+      const content = await readTextFile(file.path);
+      return { type: 'tiptap', content };
     }
   }
 }

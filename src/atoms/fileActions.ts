@@ -1,7 +1,7 @@
 import { atom } from 'jotai';
 
 import { activePaneIdAtom } from './core/activePane';
-import { fileContentAtom, loadFile, loadFileSync, unloadFile } from './core/fileContent';
+import { fileContentStateAtom, loadFile, loadFileSync, unloadFile } from './core/fileContent';
 import { addFileData, removeFileData } from './core/fileData';
 import { addFileToPane, getPane, paneGroupAtom, removeFileFromPane, selectFileInPaneAtom } from './core/paneGroup';
 import { getDerivedReferenceAtom } from './referencesState';
@@ -19,7 +19,7 @@ export const openFileAtom = atom(null, (get, set, file: FileEntry) => {
     return;
   }
   // Load file in memory
-  const currentOpenFiles = get(fileContentAtom);
+  const currentOpenFiles = get(fileContentStateAtom);
   if (!currentOpenFiles.has(file.path)) {
     set(loadFile, file);
   }
@@ -47,7 +47,7 @@ export const openReferenceAtom = atom(null, (get, set, referenceId: string) => {
   }
 
   // Load file in memory
-  const currentOpenFiles = get(fileContentAtom);
+  const currentOpenFiles = get(fileContentStateAtom);
   if (!currentOpenFiles.has(fileId)) {
     set(loadFileSync, { fileId, fileContent: { type: 'reference', referenceId } });
   }

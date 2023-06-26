@@ -1,6 +1,8 @@
+import { JSONContent } from '@tiptap/react';
+
 export interface TipTapFileContent {
   type: 'tiptap';
-  textContent: string;
+  content: string | JSONContent;
 }
 
 export interface PdfFileContent {
