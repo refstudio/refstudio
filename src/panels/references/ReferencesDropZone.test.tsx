@@ -1,27 +1,23 @@
 import { createStore, Provider } from 'jotai';
 
-import { act, render, screen } from '../../utils/test-utils';
-import { FilesDragDropZone } from './FilesDragDropZone';
+import { runPDFIngestion } from '../../api/ingestion';
+import { getReferencesAtom, referencesSyncInProgressAtom } from '../../atoms/referencesState';
+import { runGetAtomHook } from '../../atoms/test-utils';
+import { listenEvent, RefStudioEventCallback, RefStudioEvents } from '../../events';
+import { uploadFiles } from '../../filesystem';
+import { noop } from '../../utils/noop';
+import { act, fireEvent, render, screen, waitFor } from '../../utils/test-utils';
 import { ReferencesDropZone } from './ReferencesDropZone';
 
-let onFileDropFn: undefined | ((uploadedFiles: FileList) => void);
-let onFileDropStarted: undefined | (() => void);
-vi.mock('./FilesDragDropZone', () => {
-  const FakeFilesDragDropZone = vi.fn(
-    (params: {
-      onFileDropStarted: () => void;
-      onFileDrop: (uploadedFiles: FileList) => void;
-      children: React.ReactNode;
-    }) => {
-      onFileDropFn = params.onFileDrop;
-      onFileDropStarted = params.onFileDropStarted;
-      return params.children;
-    },
-  );
-  return { FilesDragDropZone: FakeFilesDragDropZone };
-});
+vi.mock('../../events');
+vi.mock('../../filesystem');
+vi.mock('../../api/ingestion');
 
 describe('ReferencesDropZone', () => {
+  afterEach(() => {
+    vi.resetAllMocks();
+  });
+
   it('should render children with', () => {
     render(
       <Provider>
@@ -37,10 +33,11 @@ describe('ReferencesDropZone', () => {
         <ReferencesDropZone>APP</ReferencesDropZone>
       </Provider>,
     );
+    expect(screen.getByText('Release to upload files to your library')).toBeInTheDocument();
     expect(screen.getByTestId('release-files-message')).toHaveClass('hidden');
   });
 
-  it.skip('should display overlay visible', () => {
+  it('should display overlay visible on drag start', () => {
     const store = createStore();
     render(
       <Provider store={store}>
@@ -48,13 +45,100 @@ describe('ReferencesDropZone', () => {
       </Provider>,
     );
 
-    expect(screen.getByTestId('release-files-message')).toHaveClass('hidden');
-    expect(FilesDragDropZone).toHaveBeenCalled();
-
-    act(() => {
-      onFileDropStarted?.();
+    const target = screen.getByText('APP');
+    fireEvent.dragEnter(target, {
+      dataTransfer: {
+        types: ['Files'],
+      },
     });
 
-    expect(screen.getByTestId('release-files-message')).toHaveClass('visible');
+    expect(screen.getByTestId('release-files-message')).not.toHaveClass('hidden');
+
+    fireEvent.dragLeave(target, {
+      dataTransfer: {
+        types: ['Files'],
+      },
+    });
+  });
+
+  it('should open file explorer on RefStudioEvents.references.ingestion.upload', () => {
+    let evtHandler: undefined | RefStudioEventCallback;
+    let eventName = '';
+    vi.mocked(listenEvent).mockImplementation(async (event: string, handler: RefStudioEventCallback) => {
+      eventName = event;
+      evtHandler = handler;
+      await Promise.resolve();
+      return noop();
+    });
+
+    const store = createStore();
+    render(
+      <Provider store={store}>
+        <ReferencesDropZone>APP</ReferencesDropZone>
+      </Provider>,
+    );
+
+    // Expect to be registered
+    expect(eventName).toBe(RefStudioEvents.menu.references.upload);
+
+    // Trigger menu action
+    act(() =>
+      evtHandler!({ event: RefStudioEvents.menu.references.upload, windowLabel: '', id: 1, payload: undefined }),
+    );
+  });
+
+  it('should start ingestion on PDF upload', async () => {
+    const REFERENCE = {
+      id: 'ref.id',
+      citationKey: 'citationKey',
+      title: 'title',
+      abstract: '',
+      authors: [],
+      filename: 'title.pdf',
+      publishedDate: '2023-06-22',
+    };
+    vi.mocked(runPDFIngestion).mockResolvedValue([REFERENCE]);
+
+    const store = createStore();
+    const syncInProgress = runGetAtomHook(referencesSyncInProgressAtom, store);
+    const references = runGetAtomHook(getReferencesAtom, store);
+
+    render(
+      <Provider store={store}>
+        <ReferencesDropZone>APP</ReferencesDropZone>
+      </Provider>,
+    );
+
+    expect(syncInProgress.current).toBe(false);
+    expect(references.current).toHaveLength(0);
+
+    const target = screen.getByText('APP');
+    fireEvent.dragEnter(target, {
+      dataTransfer: {
+        types: ['Files'],
+      },
+    });
+
+    const file = new File(['(⌐□_□)'], 'chucknorris.pdf', { type: 'application/pdf' });
+
+    fireEvent.drop(target, {
+      dataTransfer: {
+        types: ['Files'],
+        files: [file],
+      },
+    });
+
+    expect(syncInProgress.current).toBe(true);
+
+    await waitFor(() => {
+      expect(uploadFiles).toBeCalledWith([file]);
+    });
+
+    await waitFor(() => {
+      expect(runPDFIngestion).toBeCalled();
+    });
+
+    expect(references.current).toHaveLength(1);
+    expect(references.current).toStrictEqual([REFERENCE]);
   });
 });

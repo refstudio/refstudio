@@ -41,19 +41,15 @@ export function ReferencesDropZone({ children }: { children: React.ReactNode }) 
   useAsyncEffect(
     async (isMounted) =>
       Promise.all([
-        await listenEvent<FileList>(RefStudioEvents.references.ingestion.run, (event) => {
-          if (isMounted()) {
-            setSyncInProgress(true);
-            uploadAndIngestMutation.mutate(event.payload);
-          }
-        }),
-        await listenEvent(RefStudioEvents.references.ingestion.upload, () => {
+        await listenEvent(RefStudioEvents.menu.references.upload, () => {
           if (isMounted()) {
             inputRef.current?.click();
           }
         }),
       ]),
-    (releaseHandles) => releaseHandles?.map((h) => h()),
+    (releaseHandles) => {
+      releaseHandles?.filter((h) => h).map((h) => h());
+    },
   );
 
   const handleFilesUpload = (uploadedFiles: FileList) => {

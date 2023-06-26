@@ -3,10 +3,12 @@ import { emit, EventCallback, EventName, listen } from '@tauri-apps/api/event';
 export const RefStudioEvents = {
   menu: {
     settings: 'refstudio://menu/settings',
+    references: {
+      upload: 'refstudio://menu/references/upload',
+    },
   },
   references: {
     ingestion: {
-      upload: 'refstudio://references/ingestion/upload',
       run: 'refstudio://references/ingestion/run',
     },
   },

@@ -45,7 +45,7 @@ impl AppMenu {
         let references_menu = Submenu::new(
             "References",
             Menu::new().add_item(CustomMenuItem::new(
-                "refstudio://references/ingestion/upload".to_string(),
+                "refstudio://menu/references/upload".to_string(),
                 "Upload...",
             )),
         );

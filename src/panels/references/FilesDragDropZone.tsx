@@ -45,7 +45,6 @@ export function FilesDragDropZone({
       e.stopPropagation();
 
       draggingCount++;
-      console.log('handleDragEnter', draggingCount);
       if (draggingCount === 1) {
         onFileDropStarted?.();
       }
@@ -69,7 +68,6 @@ export function FilesDragDropZone({
       e.preventDefault();
       e.stopPropagation();
       draggingCount--;
-      console.log('handleDragLeave', draggingCount);
       if (draggingCount === 0) {
         onFileDropCanceled?.();
       }

@@ -41,7 +41,7 @@ function UploadTipInstructions() {
   return (
     <div className="my-2 bg-yellow-50 p-1 text-sm italic">
       <strong>TIP:</strong> Click{' '}
-      <span className="cursor-pointer underline" onClick={() => emitEvent(RefStudioEvents.references.ingestion.upload)}>
+      <span className="cursor-pointer underline" onClick={() => emitEvent(RefStudioEvents.menu.references.upload)}>
         here
       </span>{' '}
       or drag/drop PDF files for upload.

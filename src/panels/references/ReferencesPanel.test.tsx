@@ -82,7 +82,7 @@ describe('ReferencesPanel', () => {
 
     await user.click(screen.getByText(/here/));
 
-    expect(vi.mocked(emitEvent)).toHaveBeenCalledWith(RefStudioEvents.references.ingestion.upload);
+    expect(vi.mocked(emitEvent)).toHaveBeenCalledWith(RefStudioEvents.menu.references.upload);
   });
 
   it('should reset references when click in reset', async () => {

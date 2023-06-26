@@ -89,13 +89,6 @@ describe('FilesDragDropZone', () => {
     });
 
     expect(onFileDropCanceled).toHaveBeenCalled();
-
-    // fireEvent.drop(app, {
-    //   dataTransfer: {
-    //     types: ['FILES'],
-    //     files: [new File(['(⌐□_□)'], 'chucknorris.pdf', { type: 'application/pdf' })],
-    //   },
-    // });
   });
 
   it('should call onDrop on drop with files', () => {
