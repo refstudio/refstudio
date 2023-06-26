@@ -48,4 +48,18 @@ def get_arg_parser():
         "update",
         description="Update metadata for a Reference"
     )
+
+    delete_parser = subparsers.add_parser(
+        "delete",
+        description="Deletes a Reference"
+    )
+    delete_parser.add_argument(
+        "--source_filenames",
+        nargs="*",
+        type=str
+    )
+    delete_parser.add_argument(
+        "--all",
+        action="store_true"
+    )
     return parser

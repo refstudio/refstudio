@@ -18,6 +18,13 @@ if __name__ == '__main__':
     
     if args.command == "chat":
         chat.ask_question(args.text)
+    
     if args.command == "update":
         storage.update_reference(args.data)
 
+    if args.command == "delete":
+        if args.all:
+            storage.delete_references(all_=args.all)
+        else:
+            storage.delete_references(source_filenames=args.source_filenames)
+        

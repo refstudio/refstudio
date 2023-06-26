@@ -1,8 +1,9 @@
 import json
 import logging
 import os
+import sys
 
-from sidecar import typing
+from sidecar import settings, typing
 
 logging.root.setLevel(logging.NOTSET)
 
@@ -21,8 +22,14 @@ logger.addHandler(handler)
 logger.disabled = os.environ.get("SIDECAR_ENABLE_LOGGING", "false").lower() == "true"
 
 
-def update_reference(data):
+def update_references():
     pass
+
+
+def delete_references(source_filenames: list[str] = [], all_: bool = False):
+    storage = JsonStorage(settings.REFERENCES_JSON_PATH)
+    storage.load()
+    storage.delete(source_filenames=source_filenames, all_=all_)
 
 
 class JsonStorage:
@@ -56,7 +63,54 @@ class JsonStorage:
         with open(self.filepath, 'w') as f:
             json.dump(contents, f, indent=2, default=str)
     
-    def update(self, updates: list[typing.ReferenceUpdate]):
+    def delete(self, source_filenames: list[str] = [], all_: bool = False):
+        """
+        Delete one or more References from storage.
+        
+        Parameters
+        ----------
+        source_filenames : list[str]
+            List of source filenames to be deleted
+        all_ : bool, default False
+            Delete all References from storage
+        """
+        if not source_filenames and not all_:
+            msg = ("`delete` operation requires one of "
+                   "`source_filenames` or `all_` input parameters")
+            raise ValueError(msg)
+    
+        # preprocess references into a dict of source_filename: Reference
+        # so that we can simply do `del refs[filename]`
+        refs = {
+            ref.source_filename: ref for ref in self.references
+        }
+
+        if all_:
+            source_filenames = list(refs.keys())
+
+        for filename in source_filenames:
+            try:
+                del refs[filename]
+            except KeyError:
+                msg = f"Unable to delete {filename}: not found in storage"
+                logger.warning(msg)
+                response = typing.DeleteStatusResponse(
+                    status=typing.ResponseStatus.ERROR,
+                    message=msg
+                )
+                sys.stdout.write(response.json())
+                return
+        
+        self.references = list(refs.values())
+        self.save()
+        
+        response = typing.DeleteStatusResponse(
+            status=typing.ResponseStatus.OK,
+            message=""
+        )
+        sys.stdout.write(response.json())
+    
+    def update(self, target: typing.Reference):
         """
         Update a Reference in storage with the target reference.
         This is used when the client has updated the reference in the UI.

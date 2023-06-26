@@ -43,6 +43,10 @@ class Reference(RefStudioModel):
     metadata: dict[str, Any] = {}
 
 
+class ReferenceDelete(RefStudioModel):
+    source_filenames: list[str]
+
+
 class Author(RefStudioModel):
     full_name: str
     given_name: str | None = None
@@ -71,6 +75,16 @@ class IngestStatusResponse(RefStudioModel):
     reference_statuses: list[ReferenceStatus]
 
 
+class UpdateStatusResponse(RefStudioModel):
+    status: ResponseStatus
+    message: str
+
+
+class DeleteStatusResponse(RefStudioModel):
+    status: ResponseStatus
+    message: str
+
+
 class RewriteChoice(RefStudioModel):
     index: int
     text: str
@@ -91,7 +105,8 @@ class CliCommands(RefStudioModel):
     ingest_status: IngestStatusResponse
     rewrite: list[RewriteChoice]
     chat: list[ChatResponseChoice]
-    update: list[ReferenceUpdate]
+    update: UpdateStatusResponse
+    delete: DeleteStatusResponse
 
 
 Reference.update_forward_refs()

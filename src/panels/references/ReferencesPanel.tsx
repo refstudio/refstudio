@@ -1,13 +1,10 @@
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 
 import { getReferencesAtom, referencesSyncInProgressAtom, setReferencesAtom } from '../../atoms/referencesState';
 import { PanelSection } from '../../components/PanelSection';
 import { PanelWrapper } from '../../components/PanelWrapper';
-import { ProgressSpinner } from '../../components/Spinner';
 import { emitEvent, RefStudioEvents } from '../../events';
-import { uploadFiles } from '../../filesystem';
 import { ReferenceItem } from '../../types/ReferenceItem';
-import { PdfInputFileUpload } from './PdfInputFileUpload';
 import { ReferencesList } from './ReferencesList';
 
 interface ReferencesPanelProps {
@@ -16,20 +13,6 @@ interface ReferencesPanelProps {
 
 export function ReferencesPanel({ onRefClicked }: ReferencesPanelProps) {
   const references = useAtomValue(getReferencesAtom);
-  const setReferences = useSetAtom(setReferencesAtom);
-
-  const [syncInProgress, setSyncInProgress] = useAtom(referencesSyncInProgressAtom);
-
-  const handleChange = async (uploadedFiles: FileList) => {
-    try {
-      await uploadFiles(uploadedFiles);
-      emitEvent(RefStudioEvents.references.ingestion.run);
-    } catch (err) {
-      console.error('Error uploading references', err);
-    } finally {
-      setSyncInProgress(false);
-    }
-  };
 
   return (
     <PanelWrapper title="References">
@@ -40,22 +23,51 @@ export function ReferencesPanel({ onRefClicked }: ReferencesPanelProps) {
           )}
 
           <ReferencesList references={references} onRefClicked={onRefClicked} />
-          {syncInProgress && <ProgressSpinner badge="PDF Ingestion" />}
-          {!syncInProgress && (
-            <PdfInputFileUpload
-              className="my-2 bg-yellow-50 p-1 text-sm italic"
-              onUpload={(files) => void handleChange(files)}
-            />
-          )}
-          {import.meta.env.DEV && references.length > 0 && !syncInProgress && (
-            <div className="mt-10 text-right text-xs ">
-              <button className="text-gray-400 hover:underline" onClick={() => setReferences([])}>
-                DEBUG: reset references store
-              </button>
-            </div>
-          )}
+          <UploadTipInstructions />
+          <ResetReferencesInstructions />
         </div>
       </PanelSection>
     </PanelWrapper>
+  );
+}
+
+function UploadTipInstructions() {
+  const syncInProgress = useAtomValue(referencesSyncInProgressAtom);
+
+  if (syncInProgress) {
+    return null;
+  }
+
+  return (
+    <div className="my-2 bg-yellow-50 p-1 text-sm italic">
+      <strong>TIP:</strong> Click{' '}
+      <span className="cursor-pointer underline" onClick={() => emitEvent(RefStudioEvents.menu.references.upload)}>
+        here
+      </span>{' '}
+      or drag/drop PDF files for upload.
+    </div>
+  );
+}
+
+function ResetReferencesInstructions() {
+  const references = useAtomValue(getReferencesAtom);
+  const setReferences = useSetAtom(setReferencesAtom);
+  const syncInProgress = useAtomValue(referencesSyncInProgressAtom);
+  if (!import.meta.env.DEV) {
+    return null;
+  }
+  if (references.length === 0) {
+    return null;
+  }
+  if (syncInProgress) {
+    return null;
+  }
+
+  return (
+    <div className="mt-10 text-right text-xs ">
+      <button className="text-gray-400 hover:underline" onClick={() => setReferences([])}>
+        DEBUG: reset references store
+      </button>
+    </div>
   );
 }
