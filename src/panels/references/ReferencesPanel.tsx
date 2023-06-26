@@ -1,5 +1,7 @@
 import { useAtomValue, useSetAtom } from 'jotai';
+import { VscNewFile, VscOpenPreview } from 'react-icons/vsc';
 
+import { openReferencesAtom } from '../../atoms/fileActions';
 import { getReferencesAtom, referencesSyncInProgressAtom, setReferencesAtom } from '../../atoms/referencesState';
 import { PanelSection } from '../../components/PanelSection';
 import { PanelWrapper } from '../../components/PanelWrapper';
@@ -13,10 +15,22 @@ interface ReferencesPanelProps {
 
 export function ReferencesPanel({ onRefClicked }: ReferencesPanelProps) {
   const references = useAtomValue(getReferencesAtom);
+  const openReferences = useSetAtom(openReferencesAtom);
+
+  const handleAddReferences = () => {
+    emitEvent(RefStudioEvents.menu.references.upload);
+  };
 
   return (
     <PanelWrapper title="References">
-      <PanelSection grow title="Library">
+      <PanelSection
+        grow
+        rightIcons={[
+          { key: 'new', Icon: VscNewFile, title: 'Add References', onClick: handleAddReferences },
+          { key: 'open', Icon: VscOpenPreview, title: 'Open References', onClick: openReferences },
+        ]}
+        title="Library"
+      >
         <div className="min-h-[200px] ">
           {references.length === 0 && (
             <div className="p-2">Welcome to your RefStudio references library. Start by uploading some PDFs.</div>

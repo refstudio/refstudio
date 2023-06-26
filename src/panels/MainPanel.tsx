@@ -20,6 +20,7 @@ import { PdfViewerAPI } from '../types/PdfViewerAPI';
 import { assertNever } from '../utils/assertNever';
 import { EmptyView } from '../views/EmptyView';
 import { PdfViewer } from '../views/PdfViewer';
+import { ReferencesTableView } from '../views/ReferencesTableView';
 import { ReferenceView } from '../views/ReferenceView';
 import { TextView } from '../views/TextView';
 import { TipTapView } from '../views/TipTapView';
@@ -128,6 +129,8 @@ export function MainPaneViewContent({ activeFileAtom, pdfViewerRef }: MainPaneVi
       return <TipTapView file={data} />;
     case 'reference':
       return <ReferenceView referenceId={data.referenceId} />;
+    case 'references':
+      return <ReferencesTableView />;
     default: {
       assertNever(data);
       return null;
