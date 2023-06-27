@@ -1,11 +1,14 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { createStore, useAtomValue } from 'jotai';
+import { Loadable } from 'jotai/vanilla/utils/loadable';
 import { describe, expect, it } from 'vitest';
 
-import { readFileContent } from '../filesystem';
+import { readFileContent, writeFileContent } from '../filesystem';
 import { ReferenceItem } from '../types/ReferenceItem';
+import { asyncNoop } from '../utils/noop';
 import {
   activePaneAtom,
+  activePaneContentAtom,
   closeAllFilesAtom,
   closeFileFromPaneAtom,
   focusPaneAtom,
@@ -19,6 +22,9 @@ import {
 import { setReferencesAtom } from './referencesState';
 import { makeFile, makeFolder } from './test-fixtures';
 import { runGetAtomHook, runSetAtomHook } from './test-utils';
+import { FileContent } from './types/FileContent';
+import { FileContentAtoms } from './types/FileContentAtoms';
+import { FileEntry } from './types/FileEntry';
 import { PaneId } from './types/PaneGroup';
 
 describe('fileActions', () => {
@@ -418,8 +424,10 @@ describe('fileActions', () => {
       openFile.current(fileA);
     });
 
-    expect(leftPane.current.activeFileContent).toBeDefined();
-    const { result: activeFile } = renderHook(() => useAtomValue(leftPane.current.activeFileContent!, { store }));
+    expect(leftPane.current.activeFileAtoms).toBeDefined();
+    const { result: activeFile } = renderHook(() =>
+      useAtomValue(leftPane.current.activeFileAtoms!.loadableFileAtom, { store }),
+    );
 
     expect(activeFile.current.state).toBe('loading');
 
@@ -431,5 +439,149 @@ describe('fileActions', () => {
       fail('Data should be available');
     }
     expect(activeFile.current.data).toEqual({ type: 'tiptap', textContent: 'some content' });
+  });
+
+  it('should return the content of the active pane', () => {
+    const store = createStore();
+    const activePane = runGetAtomHook(activePaneContentAtom, store);
+    const focusPanel = runSetAtomHook(focusPaneAtom, store);
+
+    const paneToFocus: PaneId = activePane.current.id === 'LEFT' ? 'RIGHT' : 'LEFT';
+
+    act(() => {
+      focusPanel.current(paneToFocus);
+    });
+
+    expect(activePane.current.id).toBe(paneToFocus);
+  });
+
+  describe('File content atoms', () => {
+    let store: ReturnType<typeof createStore>;
+    let fileEntry: FileEntry;
+    let fileContentAtoms: FileContentAtoms;
+
+    beforeEach(() => {
+      fileEntry = makeFile('file.txt').fileEntry;
+
+      vi.mocked(readFileContent).mockResolvedValue({ type: 'tiptap', textContent: 'File content' });
+
+      store = createStore();
+      store.set(openFileAtom, fileEntry);
+
+      const pane = store.get(activePaneContentAtom);
+      expect(pane.activeFileAtoms).toBeDefined();
+
+      fileContentAtoms = pane.activeFileAtoms!;
+    });
+
+    afterEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it('should not update the file atom when using updateFileBufferAtom', async () => {
+      const { loadableFileAtom, updateFileBufferAtom } = fileContentAtoms;
+
+      const loadableFile = runGetAtomHook(loadableFileAtom, store);
+      const updateFileBuffer = runSetAtomHook(updateFileBufferAtom, store);
+
+      await waitFor(() => {
+        expect(loadableFile.current.state).toBe('hasData');
+      });
+
+      const initialFileContent = { ...loadableFile.current };
+
+      act(() => {
+        updateFileBuffer.current({ type: 'tiptap', textContent: 'Updated content' });
+      });
+
+      expect(loadableFile.current).toStrictEqual(initialFileContent);
+    });
+
+    it('should update the file atom when using saveFileInMemoryAtom', async () => {
+      const { loadableFileAtom, updateFileBufferAtom, saveFileInMemoryAtom } = fileContentAtoms;
+
+      const loadableFile = runGetAtomHook(loadableFileAtom, store);
+      const updateFileBuffer = runSetAtomHook(updateFileBufferAtom, store);
+      const saveFileInMemory = runSetAtomHook(saveFileInMemoryAtom, store);
+
+      await waitFor(() => {
+        expect(loadableFile.current.state).toBe('hasData');
+      });
+
+      const updatedContent = 'Updated content';
+
+      act(() => {
+        updateFileBuffer.current({ type: 'tiptap', textContent: updatedContent });
+        saveFileInMemory.current();
+      });
+
+      const expectedData: Loadable<FileContent> = {
+        state: 'hasData',
+        data: { type: 'tiptap', textContent: updatedContent },
+      };
+
+      expect(loadableFile.current).toStrictEqual(expectedData);
+    });
+
+    it('should call writeFileContent when using saveFileAtom', async () => {
+      vi.mocked(writeFileContent).mockImplementation(asyncNoop);
+
+      const { loadableFileAtom, updateFileBufferAtom, saveFileAtom } = fileContentAtoms;
+
+      const loadableFile = runGetAtomHook(loadableFileAtom, store);
+      const updateFileBuffer = runSetAtomHook(updateFileBufferAtom, store);
+      const saveFile = runSetAtomHook(saveFileAtom, store);
+
+      await waitFor(() => {
+        expect(loadableFile.current.state).toBe('hasData');
+      });
+
+      await act(async () => {
+        updateFileBuffer.current({ type: 'tiptap', textContent: 'Updated content' });
+        await saveFile.current();
+      });
+
+      expect(writeFileContent).toHaveBeenCalledOnce();
+    });
+
+    it('should not call writeFileContent if the file buffer is empty', async () => {
+      vi.mocked(writeFileContent).mockImplementation(asyncNoop);
+
+      const { loadableFileAtom, saveFileAtom } = fileContentAtoms;
+
+      const loadableFile = runGetAtomHook(loadableFileAtom, store);
+      const saveFile = runSetAtomHook(saveFileAtom, store);
+
+      await waitFor(() => {
+        expect(loadableFile.current.state).toBe('hasData');
+      });
+
+      await act(async () => {
+        await saveFile.current();
+      });
+
+      expect(writeFileContent).not.toHaveBeenCalledOnce();
+    });
+
+    it('should not call writeFileContent if the type is not supported', async () => {
+      vi.mocked(writeFileContent).mockImplementation(asyncNoop);
+
+      const { loadableFileAtom, updateFileBufferAtom, saveFileAtom } = fileContentAtoms;
+
+      const loadableFile = runGetAtomHook(loadableFileAtom, store);
+      const updateFileBuffer = runSetAtomHook(updateFileBufferAtom, store);
+      const saveFile = runSetAtomHook(saveFileAtom, store);
+
+      await waitFor(() => {
+        expect(loadableFile.current.state).toBe('hasData');
+      });
+
+      await act(async () => {
+        updateFileBuffer.current({ type: 'json', textContent: 'Updated content' });
+        await saveFile.current();
+      });
+
+      expect(writeFileContent).not.toHaveBeenCalledOnce();
+    });
   });
 });

@@ -1,7 +1,7 @@
 import { atom } from 'jotai';
 import { loadable } from 'jotai/utils';
 
-import { saveFile } from '../filesystem';
+import { writeFileContent } from '../filesystem';
 import { FileContent } from './types/FileContent';
 import { FileContentAtoms } from './types/FileContentAtoms';
 
@@ -30,7 +30,7 @@ export function createFileContentAtoms(
     if (fileContent) {
       switch (fileContent.type) {
         case 'tiptap': {
-          await saveFile(filePath, fileContent.textContent);
+          await writeFileContent(filePath, fileContent.textContent);
           return;
         }
         default: {

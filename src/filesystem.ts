@@ -55,7 +55,7 @@ export async function readAllProjectFiles() {
   return sortedFileEntries(fileEntries);
 }
 
-export async function saveFile(path: string, textContent: string) {
+export async function writeFileContent(path: string, textContent: string) {
   try {
     await writeTextFile(path, textContent);
   } catch (err) {
