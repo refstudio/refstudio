@@ -2,6 +2,7 @@ import { atom } from 'jotai';
 import { loadable } from 'jotai/utils';
 
 import { writeFileContent } from '../filesystem';
+import { markFileDirtyAtom, markFileNonDirtyAtom } from './fileActions';
 import { FileContent } from './types/FileContent';
 import { FileContentAtoms } from './types/FileContentAtoms';
 
@@ -16,6 +17,7 @@ export function createFileContentAtoms(
 
   const updateFileBufferAtom = atom(null, (_, set, payload: FileContent) => {
     set(fileBufferAtom, payload);
+    set(markFileDirtyAtom, filePath);
   });
 
   const saveFileInMemoryAtom = atom(null, (get, set) => {
@@ -25,12 +27,13 @@ export function createFileContentAtoms(
     }
   });
 
-  const saveFileAtom = atom(null, async (get) => {
+  const saveFileAtom = atom(null, async (get, set) => {
     const fileContent = get(fileBufferAtom);
     if (fileContent) {
       switch (fileContent.type) {
         case 'tiptap': {
           await writeFileContent(filePath, fileContent.textContent);
+          set(markFileNonDirtyAtom, filePath);
           return;
         }
         default: {

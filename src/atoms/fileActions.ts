@@ -2,7 +2,7 @@ import { atom } from 'jotai';
 
 import { activePaneIdAtom } from './core/activePane';
 import { fileContentStateAtom, loadFile, loadFileSync, unloadFile } from './core/fileContent';
-import { addFileData, removeFileData } from './core/fileData';
+import { addFileData, removeFileData, setFileDataIsDirtyAtom } from './core/fileData';
 import { addFileToPane, getPane, paneGroupAtom, removeFileFromPane, selectFileInPaneAtom } from './core/paneGroup';
 import { getDerivedReferenceAtom } from './referencesState';
 import { FileId } from './types/FileData';
@@ -116,6 +116,14 @@ export const closeAllFilesAtom = atom(null, (get, set) => {
   const panes = get(paneGroupAtom);
   panes.LEFT.openFiles.forEach((file) => set(closeFileFromPaneAtom, { fileId: file, paneId: 'LEFT' }));
   panes.RIGHT.openFiles.forEach((file) => set(closeFileFromPaneAtom, { fileId: file, paneId: 'RIGHT' }));
+});
+
+export const markFileDirtyAtom = atom(null, (_, set, fileId: FileId) => {
+  set(setFileDataIsDirtyAtom, { fileId, isDirty: true });
+});
+
+export const markFileNonDirtyAtom = atom(null, (_, set, fileId: FileId) => {
+  set(setFileDataIsDirtyAtom, { fileId, isDirty: false });
 });
 
 function targetPaneIdFor(file: FileFileEntry): PaneId {
