@@ -8,22 +8,20 @@ export function ReferencesList({
   onRefClicked: (item: ReferenceItem) => void;
 }) {
   return (
-    <ul className="space-y-2" role="list">
-      {references.map((reference) => (
-        <li
-          className="mb-0 cursor-pointer overflow-x-hidden text-ellipsis p-1 hover:bg-slate-200"
-          key={reference.id}
-          role="listitem"
-          onClick={() => onRefClicked(reference)}
-        >
-          <code className="mr-2">[{reference.citationKey}]</code>
-          <strong>{reference.title}</strong>
-          <br />
-          <small>
-            <em className="whitespace-nowrap">{reference.authors.map(({ fullName }) => fullName).join(', ')}</em>
-          </small>
-        </li>
-      ))}
-    </ul>
+    <div className="">
+      <ul className="space-y-4">
+        {references.map((reference) => (
+          <li
+            className="cursor-pointer bg-white p-1 px-4 even:bg-slate-50 hover:bg-slate-200"
+            key={reference.id}
+            onClick={() => onRefClicked(reference)}
+          >
+            <div className="truncate whitespace-nowrap">{reference.title}</div>
+            <div className="text-xs">{reference.authors.map(({ fullName }) => fullName).join(', ')}</div>
+            <div className="text-xs">{reference.citationKey}</div>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

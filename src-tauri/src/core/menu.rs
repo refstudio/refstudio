@@ -2,6 +2,11 @@ use tauri::utils::assets::EmbeddedAssets;
 use tauri::{AboutMetadata, Context, CustomMenuItem, Menu, MenuItem, Submenu, WindowMenuEvent};
 pub struct AppMenu {}
 
+const MENU_SETTINGS: &str = "refstudio://menu/settings";
+const MENU_REFERENCES_OPEN: &str = "refstudio://menu/references/open";
+const MENU_REFERENCES_UPLOAD: &str = "refstudio://menu/references/upload";
+const MENU_FILE_SAVE: &str = "refstudio://menu/file/save";
+
 impl AppMenu {
     pub fn get_menu(context: &Context<EmbeddedAssets>) -> Menu {
         let name = &context.package_info().name;
@@ -11,10 +16,7 @@ impl AppMenu {
             Menu::new()
                 .add_native_item(MenuItem::About(name.into(), AboutMetadata::new()))
                 .add_native_item(MenuItem::Separator)
-                .add_item(
-                    CustomMenuItem::new("refstudio://menu/settings".to_string(), "Settings")
-                        .accelerator("Cmd+,"),
-                )
+                .add_item(CustomMenuItem::new(MENU_SETTINGS, "Settings").accelerator("Cmd+,"))
                 .add_native_item(MenuItem::Separator)
                 .add_native_item(MenuItem::Services)
                 .add_native_item(MenuItem::Hide)
@@ -26,8 +28,7 @@ impl AppMenu {
         let file_menu = Submenu::new(
             "File",
             Menu::new().add_item(
-                CustomMenuItem::new("refstudio://menu/file/save".to_string(), "Save")
-                    .accelerator("cmdOrControl+S"),
+                CustomMenuItem::new(MENU_FILE_SAVE, "Save").accelerator("cmdOrControl+S"),
             ), // .add_item(CustomMenuItem::new("tauri://menu/file/new".to_string(), "New File..."))
                // .add_item(CustomMenuItem::new("tauri://menu/file/close".to_string(), "Close File"))
         );
@@ -46,10 +47,9 @@ impl AppMenu {
 
         let references_menu = Submenu::new(
             "References",
-            Menu::new().add_item(CustomMenuItem::new(
-                "refstudio://menu/references/upload".to_string(),
-                "Upload...",
-            )),
+            Menu::new()
+                .add_item(CustomMenuItem::new(MENU_REFERENCES_OPEN, "Open").accelerator("Cmd+R"))
+                .add_item(CustomMenuItem::new(MENU_REFERENCES_UPLOAD, "Upload...")),
         );
 
         let view_menu = Submenu::new(

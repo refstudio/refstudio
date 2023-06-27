@@ -7,6 +7,7 @@ export const RefStudioEvents = {
     },
     settings: 'refstudio://menu/settings',
     references: {
+      open: 'refstudio://menu/references/open',
       upload: 'refstudio://menu/references/upload',
     },
   },
@@ -21,7 +22,7 @@ export function emitEvent<Payload>(event: EventName, payload?: Payload) {
   void emit(event, payload);
 }
 
-export type RefStudioEventCallback<Payload = undefined> = EventCallback<Payload>;
+export type RefStudioEventCallback<Payload> = EventCallback<Payload>;
 
 export async function listenEvent<EventPayload = void>(event: string, fn: RefStudioEventCallback<EventPayload>) {
   return listen<EventPayload>(event, fn);

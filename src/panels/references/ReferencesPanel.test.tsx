@@ -1,6 +1,6 @@
 import { createStore, Provider } from 'jotai';
 
-import { getReferencesAtom, referencesSyncInProgressAtom, setReferencesAtom } from '../../atoms/referencesState';
+import { getReferencesAtom, setReferencesAtom } from '../../atoms/referencesState';
 import { runGetAtomHook, runSetAtomHook } from '../../atoms/test-utils';
 import { emitEvent, RefStudioEvents } from '../../events';
 import { noop } from '../../utils/noop';
@@ -48,41 +48,13 @@ describe('ReferencesPanel', () => {
     expect(screen.getByText(/Reference document title/i)).toBeInTheDocument();
   });
 
-  it('should display tip instructions', () => {
-    const store = createStore();
-    render(
-      <Provider store={store}>
-        <ReferencesPanel onRefClicked={noop} />
-      </Provider>,
-    );
-    expect(screen.getByText(/or drag.drop PDF files for upload/i)).toBeInTheDocument();
-  });
-
-  it('should hide tip instructions during sync', () => {
-    const store = createStore();
-    render(
-      <Provider store={store}>
-        <ReferencesPanel onRefClicked={noop} />
-      </Provider>,
-    );
-
-    const setSync = runSetAtomHook(referencesSyncInProgressAtom, store);
-    act(() => setSync.current(true));
-
-    expect(screen.queryByText(/or drag.drop PDF files for upload/i)).not.toBeInTheDocument();
-  });
-
-  it('should trigger upload event when click in CLICK HERE link', async () => {
-    const store = createStore();
-    const { user } = setup(
-      <Provider store={store}>
-        <ReferencesPanel onRefClicked={noop} />
-      </Provider>,
-    );
-
-    await user.click(screen.getByText(/here/));
-
-    expect(vi.mocked(emitEvent)).toHaveBeenCalledWith(RefStudioEvents.menu.references.upload);
+  it.each([
+    { title: 'Add References', event: RefStudioEvents.menu.references.upload },
+    { title: 'Open References', event: RefStudioEvents.menu.references.open },
+  ])('should trigger $title on click', async ({ title, event }) => {
+    const { user } = setup(<ReferencesPanel onRefClicked={noop} />);
+    await user.click(screen.getByTitle(title));
+    expect(vi.mocked(emitEvent)).toBeCalledWith(event);
   });
 
   it('should reset references when click in reset', async () => {

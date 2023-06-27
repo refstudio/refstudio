@@ -1,11 +1,19 @@
 import { createStore, Provider } from 'jotai';
 
+import { activePaneAtom } from '../../atoms/fileActions';
 import { referencesSyncInProgressAtom, setReferencesAtom } from '../../atoms/referencesState';
-import { runSetAtomHook } from '../../atoms/test-utils';
-import { act, render, screen } from '../../utils/test-utils';
+import { runGetAtomHook, runSetAtomHook } from '../../atoms/test-utils';
+import { emitEvent, RefStudioEvents } from '../../events';
+import { act, mockListenEvent, render, screen, setup } from '../../utils/test-utils';
 import { ReferencesFooterItems } from './ReferencesFooterItems';
 
+vi.mock('../../events');
+
 describe('ReferencesFooterItems component', () => {
+  afterEach(() => {
+    vi.resetAllMocks();
+  });
+
   it('should render empty without loading', () => {
     const store = createStore();
     render(
@@ -64,5 +72,35 @@ describe('ReferencesFooterItems component', () => {
     expect(screen.queryByText('References ingestion...')).not.toBeInTheDocument();
     act(() => setSync.current(true));
     expect(screen.getByText('References ingestion...')).toBeInTheDocument();
+  });
+
+  it('should emit RefStudioEvents.menu.references.open on click', async () => {
+    const store = createStore();
+    const { user } = setup(
+      <Provider store={store}>
+        <ReferencesFooterItems />
+      </Provider>,
+    );
+    await user.click(screen.getByRole('listitem'));
+    expect(vi.mocked(emitEvent)).toHaveBeenCalledWith(RefStudioEvents.menu.references.open);
+  });
+
+  it('should listen RefStudioEvents.menu.references.open to open references', () => {
+    const mockData = mockListenEvent();
+    const store = createStore();
+    render(
+      <Provider store={store}>
+        <ReferencesFooterItems />
+      </Provider>,
+    );
+
+    expect(mockData.registeredEventName).toBeDefined();
+    expect(mockData.registeredEventName).toBe(RefStudioEvents.menu.references.open);
+    act(() => mockData.trigger());
+
+    const opened = runGetAtomHook(activePaneAtom, store);
+    expect(opened.current.openFiles).toHaveLength(1);
+    expect(opened.current.activeFile).toBeDefined();
+    expect(opened.current.activeFile).toBe('refstudio://references');
   });
 });

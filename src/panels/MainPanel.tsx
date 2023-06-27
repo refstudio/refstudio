@@ -22,6 +22,7 @@ import { PdfViewerAPI } from '../types/PdfViewerAPI';
 import { assertNever } from '../utils/assertNever';
 import { EmptyView } from '../views/EmptyView';
 import { PdfViewer } from '../views/PdfViewer';
+import { ReferencesTableView } from '../views/ReferencesTableView';
 import { ReferenceView } from '../views/ReferenceView';
 import { TextView } from '../views/TextView';
 import { TipTapView } from '../views/TipTapView';
@@ -83,18 +84,16 @@ export function MainPanelPane({ pane, pdfViewerRef }: MainPanelPaneProps & MainP
   const focusPane = useSetAtom(focusPaneAtom);
 
   return (
-    <div
-      className="h-full grid-cols-1 grid-rows-[auto_1fr]"
-      onClick={() => focusPane(pane.id)}
-      onFocus={() => focusPane(pane.id)}
-    >
-      <TabPane
-        items={items}
-        value={activeFile}
-        onClick={(file) => selectFileInPane({ paneId: pane.id, fileId: file })}
-        onCloseClick={(path) => closeFileInPane({ paneId: pane.id, fileId: path })}
-      />
-      <div className="flex h-full w-full overflow-hidden">
+    <div className="flex h-full flex-col" onClick={() => focusPane(pane.id)} onFocus={() => focusPane(pane.id)}>
+      <div className="grow-0">
+        <TabPane
+          items={items}
+          value={activeFile}
+          onClick={(file) => selectFileInPane({ paneId: pane.id, fileId: file })}
+          onCloseClick={(path) => closeFileInPane({ paneId: pane.id, fileId: path })}
+        />
+      </div>
+      <div className="flex w-full grow overflow-hidden">
         {activeFile && activeFileAtoms ? (
           <MainPaneViewContent activeFileAtoms={activeFileAtoms} fileId={activeFile} pdfViewerRef={pdfViewerRef} />
         ) : (
@@ -136,6 +135,8 @@ export function MainPaneViewContent({ activeFileAtoms, pdfViewerRef }: MainPaneV
       return <TipTapView activeFileAtoms={activeFileAtoms} file={data} />;
     case 'reference':
       return <ReferenceView referenceId={data.referenceId} />;
+    case 'references':
+      return <ReferencesTableView />;
     default: {
       assertNever(data);
       return null;

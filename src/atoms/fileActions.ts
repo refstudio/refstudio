@@ -63,6 +63,24 @@ export const openReferenceAtom = atom(null, (get, set, referenceId: string) => {
   set(selectFileInPaneAtom, { fileId, paneId });
 });
 
+/** Open the references pane in the right pane */
+export const openReferencesAtom = atom(null, (_get, set) => {
+  const fileId = `refstudio://references`;
+
+  // Load in memory
+  set(loadFileSync, { fileId, fileContent: { type: 'references' } });
+
+  // Add to file entries atom
+  set(addFileData, { fileId, fileName: 'RefStudio References' });
+
+  const paneId: PaneId = 'RIGHT';
+  // Add file to panes state
+  set(addFileToPane, { fileId, paneId });
+
+  // Select file in pane
+  set(selectFileInPaneAtom, { fileId, paneId });
+});
+
 /** Removes file from the given pane and unload content from memory if the file is not open in another pane */
 export const closeFileFromPaneAtom = atom(null, (get, set, { fileId, paneId }: PaneFileId) => {
   const panes = get(paneGroupAtom);

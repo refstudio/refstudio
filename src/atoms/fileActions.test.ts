@@ -280,6 +280,37 @@ describe('fileActions', () => {
     expect(rightPane.current.files).not.toContainEqual(fileData);
   });
 
+  it('should make remaining file active when splitting (moving) file from one pane to another', () => {
+    const store = createStore();
+    const openFile = runSetAtomHook(openFileAtom, store);
+    const leftPane = runGetAtomHook(leftPaneAtom, store);
+    const rightPane = runGetAtomHook(rightPaneAtom, store);
+    const activePane = runGetAtomHook(activePaneAtom, store);
+    const splitFileToPane = runSetAtomHook(splitFileToPaneAtom, store);
+
+    const { fileEntry: fileA, fileData: fileAData } = makeFile('file1.txt');
+    const { fileEntry: fileB, fileData: fileBData } = makeFile('file2.txt');
+
+    act(() => {
+      openFile.current(fileA);
+      openFile.current(fileB);
+    });
+
+    expect(activePane.current.id).toBe('LEFT');
+    expect(leftPane.current.activeFile).toBe(fileBData.fileId);
+
+    act(() => {
+      splitFileToPane.current({ fileId: fileBData.fileId, fromPaneId: 'LEFT', toPaneId: 'RIGHT' });
+    });
+
+    expect(activePane.current.id).toBe('RIGHT');
+
+    expect(leftPane.current.files).toContainEqual(fileAData);
+    expect(leftPane.current.activeFile).toBe(fileAData.fileId);
+    expect(rightPane.current.files).toContainEqual(fileBData);
+    expect(rightPane.current.activeFile).toBe(fileBData.fileId);
+  });
+
   it('should NOT split (move) file if file is NOT opened', () => {
     const store = createStore();
     const openFile = runSetAtomHook(openFileAtom, store);
@@ -354,7 +385,7 @@ describe('fileActions', () => {
     expect(leftPane.current.activeFile).toEqual(fileCData.fileId);
   });
 
-  it('should make active file undefined if is the last one closed in same pane', () => {
+  it('should make active file undefined if it is the last one closed in the pane', () => {
     const store = createStore();
     const openFile = runSetAtomHook(openFileAtom, store);
     const closeFileFromPane = runSetAtomHook(closeFileFromPaneAtom, store);
