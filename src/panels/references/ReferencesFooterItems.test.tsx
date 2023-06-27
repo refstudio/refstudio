@@ -1,11 +1,11 @@
+import { waitFor } from '@testing-library/react';
 import { createStore, Provider } from 'jotai';
 
 import { activePaneAtom } from '../../atoms/fileActions';
 import { referencesSyncInProgressAtom, setReferencesAtom } from '../../atoms/referencesState';
 import { runGetAtomHook, runSetAtomHook } from '../../atoms/test-utils';
-import { emitEvent, listenEvent, RefStudioEventCallback, RefStudioEvents } from '../../events';
-import { noop } from '../../utils/noop';
-import { act, render, screen, setup } from '../../utils/test-utils';
+import { emitEvent, RefStudioEvents } from '../../events';
+import { act, mockListenEvent, render, screen, setup } from '../../utils/test-utils';
 import { ReferencesFooterItems } from './ReferencesFooterItems';
 
 vi.mock('../../events');
@@ -86,16 +86,8 @@ describe('ReferencesFooterItems component', () => {
     expect(vi.mocked(emitEvent)).toHaveBeenCalledWith(RefStudioEvents.menu.references.open);
   });
 
-  it('should listen RefStudioEvents.menu.references.open to open references', () => {
-    let fireEvent: undefined | RefStudioEventCallback;
-    let eventName = '';
-    vi.mocked(listenEvent).mockImplementation(async (event: string, handler: RefStudioEventCallback) => {
-      eventName = event;
-      fireEvent = handler;
-      await Promise.resolve();
-      return noop();
-    });
-
+  it('should listen RefStudioEvents.menu.references.open to open references', async () => {
+    const mockData = mockListenEvent();
     const store = createStore();
     render(
       <Provider store={store}>
@@ -103,9 +95,9 @@ describe('ReferencesFooterItems component', () => {
       </Provider>,
     );
 
-    expect(eventName).toBe(RefStudioEvents.menu.references.open);
-    expect(fireEvent).toBeDefined();
-    act(() => fireEvent!({ event: eventName, windowLabel: '', id: 1, payload: undefined }));
+    await waitFor(() => expect(mockData.registeredEventName).toBeDefined());
+    expect(mockData.registeredEventName).toBe(RefStudioEvents.menu.references.open);
+    act(() => mockData.trigger());
 
     const opened = runGetAtomHook(activePaneAtom, store);
     expect(opened.current.openFiles).toHaveLength(1);
