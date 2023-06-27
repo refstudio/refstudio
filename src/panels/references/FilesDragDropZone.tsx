@@ -44,7 +44,6 @@ export function FilesDragDropZone({
       e.stopPropagation();
 
       draggingCountRef.current++;
-      console.log('draggingCountRef.current', draggingCountRef.current);
       if (draggingCountRef.current === 1) {
         onFileDropStarted?.();
       }
@@ -69,7 +68,6 @@ export function FilesDragDropZone({
       e.stopPropagation();
 
       draggingCountRef.current--;
-      console.log('draggingCountRef.current', draggingCountRef.current);
       if (draggingCountRef.current === 0) {
         onFileDropCanceled?.();
       }
@@ -85,7 +83,6 @@ export function FilesDragDropZone({
       e.preventDefault();
       e.stopPropagation();
       draggingCountRef.current = 0;
-      console.log('draggingCountRef.current', draggingCountRef.current);
 
       const eventFiles = e.dataTransfer!.files;
       if (eventFiles.length > 0) {

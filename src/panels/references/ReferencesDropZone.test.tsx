@@ -3,10 +3,10 @@ import { createStore, Provider } from 'jotai';
 import { runPDFIngestion } from '../../api/ingestion';
 import { getReferencesAtom, referencesSyncInProgressAtom } from '../../atoms/referencesState';
 import { runGetAtomHook } from '../../atoms/test-utils';
-import { listenEvent, RefStudioEventCallback, RefStudioEvents } from '../../events';
+import { listenEvent, RefStudioEvents } from '../../events';
 import { uploadFiles } from '../../filesystem';
 import { noop } from '../../utils/noop';
-import { act, fireEvent, render, screen, waitFor } from '../../utils/test-utils';
+import { act, fireEvent, mockListenEvent, render, screen, waitFor } from '../../utils/test-utils';
 import { ReferencesDropZone } from './ReferencesDropZone';
 
 vi.mock('../../events');
@@ -65,14 +65,7 @@ describe('ReferencesDropZone', () => {
   });
 
   it('should open file explorer on RefStudioEvents.menu.references.upload', () => {
-    let evtHandler: undefined | RefStudioEventCallback;
-    let eventName = '';
-    vi.mocked(listenEvent).mockImplementation(async (event: string, handler: RefStudioEventCallback) => {
-      eventName = event;
-      evtHandler = handler;
-      await Promise.resolve();
-      return noop();
-    });
+    const mockData = mockListenEvent();
 
     const store = createStore();
     render(
@@ -82,17 +75,14 @@ describe('ReferencesDropZone', () => {
     );
 
     // Expect to be registered
-    expect(eventName).toBe(RefStudioEvents.menu.references.upload);
-    expect(evtHandler).toBeDefined();
+    expect(mockData.registeredEventName).toBe(RefStudioEvents.menu.references.upload);
 
     const input = screen.getByRole<HTMLInputElement>('form');
     const clickFn = vi.fn();
     input.click = clickFn;
 
     // Trigger menu action
-    act(() =>
-      evtHandler!({ event: RefStudioEvents.menu.references.upload, windowLabel: '', id: 1, payload: undefined }),
-    );
+    act(() => mockData.trigger());
 
     expect(clickFn).toHaveBeenCalled();
   });
