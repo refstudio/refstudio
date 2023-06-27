@@ -70,10 +70,17 @@ export const removeFileFromPane = atom(null, (get, set, { fileId, paneId }: Pane
   }
 
   const updatedOpenFiles = panes[paneId].openFiles.filter((_fileId) => _fileId !== fileId);
+
+  // If the active file was the file being removed, make the last file of the pane the active one
+  let updatedActiveFile = panes[paneId].activeFile;
+  if (updatedActiveFile === fileId) {
+    updatedActiveFile = updatedOpenFiles.length > 0 ? updatedOpenFiles[updatedOpenFiles.length - 1] : undefined;
+  }
+
   set(updatePaneGroup, {
     paneId,
     openFiles: updatedOpenFiles,
-    activeFile: updatedOpenFiles.includes(fileId) ? fileId : undefined,
+    activeFile: updatedActiveFile,
   });
 });
 
