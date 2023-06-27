@@ -15,6 +15,9 @@ import { PaneContent } from '../atoms/types/PaneGroup';
 import { Spinner } from '../components/Spinner';
 import { TabPane } from '../components/TabPane';
 import { VerticalResizeHandle } from '../components/VerticalResizeHandle';
+import { RefStudioEvents } from '../events';
+import { useListenEvent } from '../hooks/useListenEvent';
+import { useSaveActiveFile } from '../hooks/useSaveActiveFile';
 import { PdfViewerAPI } from '../types/PdfViewerAPI';
 import { assertNever } from '../utils/assertNever';
 import { EmptyView } from '../views/EmptyView';
@@ -31,6 +34,10 @@ export function MainPanel(props: MainPanelProps) {
   const { pdfViewerRef } = props;
   const left = useAtomValue(leftPaneAtom);
   const right = useAtomValue(rightPaneAtom);
+
+  const saveActiveFile = useSaveActiveFile();
+
+  useListenEvent(RefStudioEvents.menu.file.save, saveActiveFile);
 
   const updatePDFViewerWidth = useCallback(() => {
     pdfViewerRef.current?.updateWidth();

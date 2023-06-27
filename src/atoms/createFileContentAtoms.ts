@@ -1,10 +1,14 @@
 import { atom } from 'jotai';
 import { loadable } from 'jotai/utils';
 
+import { saveFile } from '../filesystem';
 import { FileContent } from './types/FileContent';
 import { FileContentAtoms } from './types/FileContentAtoms';
 
-export function createFileContentAtoms(initialContent: FileContent | Promise<FileContent>): FileContentAtoms {
+export function createFileContentAtoms(
+  filePath: string,
+  initialContent: FileContent | Promise<FileContent>,
+): FileContentAtoms {
   const fileAtom = atom(initialContent);
   const fileBufferAtom = atom<FileContent | null>(null);
 
@@ -21,5 +25,21 @@ export function createFileContentAtoms(initialContent: FileContent | Promise<Fil
     }
   });
 
-  return { loadableFileAtom, updateFileBufferAtom, saveFileInMemoryAtom };
+  const saveFileAtom = atom(null, async (get) => {
+    const fileContent = get(fileBufferAtom);
+    if (fileContent) {
+      switch (fileContent.type) {
+        case 'tiptap': {
+          await saveFile(filePath, fileContent.textContent);
+          return;
+        }
+        default: {
+          console.error('Save file - Unsupported file type: ', fileContent.type);
+          return;
+        }
+      }
+    }
+  });
+
+  return { loadableFileAtom, updateFileBufferAtom, saveFileInMemoryAtom, saveFileAtom };
 }

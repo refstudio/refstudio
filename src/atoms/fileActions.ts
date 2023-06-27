@@ -90,6 +90,12 @@ export const closeFileFromPaneAtom = atom(null, (get, set, { fileId, paneId }: P
 export const leftPaneAtom = atom((get) => getPane(get, 'LEFT'));
 export const rightPaneAtom = atom((get) => getPane(get, 'RIGHT'));
 
+/** Returns the content of the active pane */
+export const activePaneContentAtom = atom((get) => {
+  const activePaneId = get(activePaneIdAtom);
+  return getPane(get, activePaneId);
+});
+
 interface SplitFilePayload {
   fileId: FileId;
   fromPaneId: PaneId;

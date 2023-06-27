@@ -23,12 +23,14 @@ impl AppMenu {
                 .add_native_item(MenuItem::Quit),
         );
 
-        // let file_menu = Submenu::new(
-        //     "File",
-        //     Menu::new()
-        //         .add_item(CustomMenuItem::new("tauri://menu/file/new".to_string(), "New File..."))
-        //         .add_item(CustomMenuItem::new("tauri://menu/file/close".to_string(), "Close File"))
-        // );
+        let file_menu = Submenu::new(
+            "File",
+            Menu::new().add_item(
+                CustomMenuItem::new("refstudio://menu/file/save".to_string(), "Save")
+                    .accelerator("cmdOrControl+S"),
+            ), // .add_item(CustomMenuItem::new("tauri://menu/file/new".to_string(), "New File..."))
+               // .add_item(CustomMenuItem::new("tauri://menu/file/close".to_string(), "Close File"))
+        );
 
         let edit_menu = Submenu::new(
             "Edit",
@@ -66,7 +68,7 @@ impl AppMenu {
 
         Menu::new()
             .add_submenu(app_menu)
-            // .add_submenu(file_menu)
+            .add_submenu(file_menu)
             .add_submenu(edit_menu)
             .add_submenu(references_menu)
             .add_submenu(view_menu)

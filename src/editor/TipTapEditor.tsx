@@ -2,7 +2,7 @@ import './TipTapEditor.css';
 
 import { Editor, EditorContent, JSONContent } from '@tiptap/react';
 import { useSetAtom } from 'jotai';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { selectionAtom } from '../atoms/selectionState';
 import { FileContentAtoms } from '../atoms/types/FileContentAtoms';
@@ -37,7 +37,7 @@ export function TipTapEditor({ editorContent, activeFileAtoms }: EditorProps) {
         transformPasted,
       },
       onUpdate: ({ editor: updatedEditor }) => {
-        updateFileBuffer({ type: 'tiptap', content: updatedEditor.getJSON() });
+        updateFileBuffer({ type: 'tiptap', textContent: updatedEditor.storage.markdown.getMarkdown() as string });
       },
     });
     setEditor(newEditor);

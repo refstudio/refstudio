@@ -55,6 +55,14 @@ export async function readAllProjectFiles() {
   return sortedFileEntries(fileEntries);
 }
 
+export async function saveFile(path: string, textContent: string) {
+  try {
+    await writeTextFile(path, textContent);
+  } catch (err) {
+    console.error('Error', err);
+  }
+}
+
 export async function uploadFiles(files: File[]) {
   console.log('upload', files);
   const uploadsDir = await join(await getBaseDir(), UPLOADS_DIR);
@@ -81,8 +89,8 @@ export async function readFileContent(file: FileFileEntry): Promise<FileContent>
       return { type: 'pdf', binaryContent };
     }
     default: {
-      const content = await readTextFile(file.path);
-      return { type: 'tiptap', content };
+      const textContent = await readTextFile(file.path);
+      return { type: 'tiptap', textContent };
     }
   }
 }

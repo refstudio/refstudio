@@ -8,5 +8,5 @@ interface TipTapViewProps {
 }
 
 export function TipTapView({ file, activeFileAtoms }: TipTapViewProps) {
-  return <TipTapEditor activeFileAtoms={activeFileAtoms} editorContent={file.content} />;
+  return <TipTapEditor activeFileAtoms={activeFileAtoms} editorContent={file.textContent} />;
 }

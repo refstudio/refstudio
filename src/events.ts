@@ -2,6 +2,9 @@ import { emit, EventCallback, EventName, listen } from '@tauri-apps/api/event';
 
 export const RefStudioEvents = {
   menu: {
+    file: {
+      save: 'refstudio://menu/file/save',
+    },
     settings: 'refstudio://menu/settings',
     references: {
       upload: 'refstudio://menu/references/upload',

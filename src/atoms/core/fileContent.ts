@@ -20,7 +20,7 @@ export const loadFile = atom(null, (get, set, file: FileFileEntry) => {
   const currentOpenFiles = get(fileContentStateAtom);
   const updatedMap = new Map(currentOpenFiles);
 
-  updatedMap.set(file.path, createFileContentAtoms(readFileContent(file)));
+  updatedMap.set(file.path, createFileContentAtoms(file.path, readFileContent(file)));
   set(fileContentStateAtom, updatedMap);
 });
 
@@ -31,7 +31,7 @@ export const loadFileSync = atom(
     const currentOpenFiles = get(fileContentStateAtom);
     const updatedMap = new Map(currentOpenFiles);
 
-    updatedMap.set(fileId, createFileContentAtoms(fileContent));
+    updatedMap.set(fileId, createFileContentAtoms(fileId, fileContent));
     set(fileContentStateAtom, updatedMap);
   },
 );
