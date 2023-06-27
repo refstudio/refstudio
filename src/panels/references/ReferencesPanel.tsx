@@ -1,7 +1,6 @@
 import { useAtomValue, useSetAtom } from 'jotai';
 import { VscNewFile, VscOpenPreview } from 'react-icons/vsc';
 
-import { openReferencesAtom } from '../../atoms/fileActions';
 import { getReferencesAtom, referencesSyncInProgressAtom, setReferencesAtom } from '../../atoms/referencesState';
 import { PanelSection } from '../../components/PanelSection';
 import { PanelWrapper } from '../../components/PanelWrapper';
@@ -15,10 +14,13 @@ interface ReferencesPanelProps {
 
 export function ReferencesPanel({ onRefClicked }: ReferencesPanelProps) {
   const references = useAtomValue(getReferencesAtom);
-  const openReferences = useSetAtom(openReferencesAtom);
 
   const handleAddReferences = () => {
     emitEvent(RefStudioEvents.menu.references.upload);
+  };
+
+  const handleOpenReferences = () => {
+    emitEvent(RefStudioEvents.menu.references.open);
   };
 
   return (
@@ -27,7 +29,7 @@ export function ReferencesPanel({ onRefClicked }: ReferencesPanelProps) {
         grow
         rightIcons={[
           { key: 'new', Icon: VscNewFile, title: 'Add References', onClick: handleAddReferences },
-          { key: 'open', Icon: VscOpenPreview, title: 'Open References', onClick: openReferences },
+          { key: 'open', Icon: VscOpenPreview, title: 'Open References', onClick: handleOpenReferences },
         ]}
         title="Library"
       >

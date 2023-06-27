@@ -4,6 +4,7 @@ export const RefStudioEvents = {
   menu: {
     settings: 'refstudio://menu/settings',
     references: {
+      open: 'refstudio://menu/references/open',
       upload: 'refstudio://menu/references/upload',
     },
   },
