@@ -2,6 +2,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render } from '@testing-library/react';
 import { default as userEvent } from '@testing-library/user-event';
 
+import { listenEvent, RefStudioEventCallback } from '../events';
+import { noop } from './noop';
+
 function customRender(ui: React.ReactElement, options = {}) {
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -28,4 +31,33 @@ export function setup(jsx: React.ReactElement) {
     user: userEvent.setup(),
     ...customRender(jsx),
   };
+}
+
+/**
+ * Utility method to mock the listenEvent method.
+ *
+ * This method will register the mock with a custom implementation of the listen
+ * that captures (and returns) the registered eventName and returns a fireEvent
+ * function that simulates the event being fired.
+ *
+ * Usage:
+ *
+ *   const mock = mockListenEvent();                              // create the mock
+ *   render(...)                                                  // render a component that listen to events
+ *   expect(mock.registerEventName).toBe("expected-event-name")   // expect the registry of the correct name
+ *   act(() => mock.trigger())                                    // To simulate the registered event to be triggered
+ *
+ */
+export function mockListenEvent<Payload = void>() {
+  const current: { registeredEventName?: string; trigger: (payload: Payload) => void } = {
+    trigger: () => fail(),
+    registeredEventName: undefined,
+  };
+  vi.mocked(listenEvent).mockImplementation(async (event: string, handler: RefStudioEventCallback<Payload>) => {
+    current.registeredEventName = event;
+    current.trigger = (payload: Payload) => handler({ event, windowLabel: '', id: 0, payload });
+    await Promise.resolve();
+    return noop();
+  });
+  return current;
 }
