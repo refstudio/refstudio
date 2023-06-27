@@ -1,12 +1,14 @@
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { VscNewFile, VscOpenPreview } from 'react-icons/vsc';
 
-import { getReferencesAtom, referencesSyncInProgressAtom, setReferencesAtom } from '../../atoms/referencesState';
+import { getReferencesAtom } from '../../atoms/referencesState';
 import { PanelSection } from '../../components/PanelSection';
 import { PanelWrapper } from '../../components/PanelWrapper';
 import { emitEvent, RefStudioEvents } from '../../events';
 import { ReferenceItem } from '../../types/ReferenceItem';
 import { ReferencesList } from './ReferencesList';
+import { ResetReferencesInstructions } from './ResetReferencesInstructions';
+import { UploadTipInstructions } from './UploadTipInstructions';
 
 interface ReferencesPanelProps {
   onRefClicked: (item: ReferenceItem) => void;
@@ -44,46 +46,5 @@ export function ReferencesPanel({ onRefClicked }: ReferencesPanelProps) {
         </div>
       </PanelSection>
     </PanelWrapper>
-  );
-}
-
-function UploadTipInstructions() {
-  const syncInProgress = useAtomValue(referencesSyncInProgressAtom);
-
-  if (syncInProgress) {
-    return null;
-  }
-
-  return (
-    <div className="my-2 bg-yellow-50 p-1 text-sm italic">
-      <strong>TIP:</strong> Click{' '}
-      <span className="cursor-pointer underline" onClick={() => emitEvent(RefStudioEvents.menu.references.upload)}>
-        here
-      </span>{' '}
-      or drag/drop PDF files for upload.
-    </div>
-  );
-}
-
-function ResetReferencesInstructions() {
-  const references = useAtomValue(getReferencesAtom);
-  const setReferences = useSetAtom(setReferencesAtom);
-  const syncInProgress = useAtomValue(referencesSyncInProgressAtom);
-  if (!import.meta.env.DEV) {
-    return null;
-  }
-  if (references.length === 0) {
-    return null;
-  }
-  if (syncInProgress) {
-    return null;
-  }
-
-  return (
-    <div className="mt-10 text-right text-xs ">
-      <button className="text-gray-400 hover:underline" onClick={() => setReferences([])}>
-        DEBUG: reset references store
-      </button>
-    </div>
   );
 }

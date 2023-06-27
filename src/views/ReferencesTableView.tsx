@@ -3,12 +3,14 @@ import './ReferenceView.css';
 import { useAtomValue } from 'jotai';
 
 import { getReferencesAtom } from '../atoms/referencesState';
+import { UploadTipInstructions } from '../panels/references/UploadTipInstructions';
 
 export function ReferencesTableView() {
   const references = useAtomValue(getReferencesAtom);
 
   return (
-    <div className="debug w-full p-6">
+    <div className="w-full p-6">
+      {references.length === 0 && <UploadTipInstructions />}
       <table className="w-full border border-slate-300 text-left text-gray-500 ">
         <thead>
           <tr className="h-10 bg-slate-300 text-black">
@@ -20,11 +22,7 @@ export function ReferencesTableView() {
         </thead>
         <tbody>
           {references.map((reference) => (
-            <tr
-              className="cursor-pointer bg-white even:bg-slate-50 hover:bg-slate-200"
-              key={reference.id}
-              // onClick={() => onRefClicked(reference)}
-            >
+            <tr className="cursor-pointer bg-white even:bg-slate-50 hover:bg-slate-200" key={reference.id}>
               <td className="px-2">{reference.citationKey}</td>
               <td className="py-2">
                 <div className="whitespace-nowrap ">{reference.title}</div>
