@@ -1,4 +1,3 @@
-import { waitFor } from '@testing-library/react';
 import { createStore, Provider } from 'jotai';
 
 import { activePaneAtom } from '../../atoms/fileActions';
@@ -86,7 +85,7 @@ describe('ReferencesFooterItems component', () => {
     expect(vi.mocked(emitEvent)).toHaveBeenCalledWith(RefStudioEvents.menu.references.open);
   });
 
-  it('should listen RefStudioEvents.menu.references.open to open references', async () => {
+  it('should listen RefStudioEvents.menu.references.open to open references', () => {
     const mockData = mockListenEvent();
     const store = createStore();
     render(
@@ -95,7 +94,7 @@ describe('ReferencesFooterItems component', () => {
       </Provider>,
     );
 
-    await waitFor(() => expect(mockData.registeredEventName).toBeDefined());
+    expect(mockData.registeredEventName).toBeDefined();
     expect(mockData.registeredEventName).toBe(RefStudioEvents.menu.references.open);
     act(() => mockData.trigger());
 

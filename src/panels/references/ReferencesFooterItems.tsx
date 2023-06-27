@@ -12,9 +12,7 @@ export function ReferencesFooterItems() {
   const references = useAtomValue(getReferencesAtom);
   const openReferences = useSetAtom(openReferencesAtom);
 
-  useListenEvent(RefStudioEvents.menu.references.open, () => {
-    openReferences();
-  });
+  useListenEvent(RefStudioEvents.menu.references.open, openReferences);
 
   return (
     <>

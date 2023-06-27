@@ -9,7 +9,7 @@ export function ReferencesTableView() {
   const references = useAtomValue(getReferencesAtom);
 
   return (
-    <div className="w-full p-6">
+    <div className="w-full overflow-y-auto p-6">
       {references.length === 0 && <UploadTipInstructions />}
       <table className="w-full border border-slate-300 text-left text-gray-500 ">
         <thead>
