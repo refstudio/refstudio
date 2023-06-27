@@ -1,11 +1,20 @@
 import { createStore, Provider } from 'jotai';
 
+import { activePaneAtom } from '../../atoms/fileActions';
 import { referencesSyncInProgressAtom, setReferencesAtom } from '../../atoms/referencesState';
-import { runSetAtomHook } from '../../atoms/test-utils';
-import { act, render, screen } from '../../utils/test-utils';
+import { runGetAtomHook, runSetAtomHook } from '../../atoms/test-utils';
+import { emitEvent, listenEvent, RefStudioEventCallback, RefStudioEvents } from '../../events';
+import { noop } from '../../utils/noop';
+import { act, render, screen, setup } from '../../utils/test-utils';
 import { ReferencesFooterItems } from './ReferencesFooterItems';
 
+vi.mock('../../events');
+
 describe('ReferencesFooterItems component', () => {
+  afterEach(() => {
+    vi.resetAllMocks();
+  });
+
   it('should render empty without loading', () => {
     const store = createStore();
     render(
@@ -64,5 +73,43 @@ describe('ReferencesFooterItems component', () => {
     expect(screen.queryByText('References ingestion...')).not.toBeInTheDocument();
     act(() => setSync.current(true));
     expect(screen.getByText('References ingestion...')).toBeInTheDocument();
+  });
+
+  it('should emit RefStudioEvents.menu.references.open on click', async () => {
+    const store = createStore();
+    const { user } = setup(
+      <Provider store={store}>
+        <ReferencesFooterItems />
+      </Provider>,
+    );
+    await user.click(screen.getByRole('listitem'));
+    expect(vi.mocked(emitEvent)).toHaveBeenCalledWith(RefStudioEvents.menu.references.open);
+  });
+
+  it('should listen RefStudioEvents.menu.references.open to open references', () => {
+    let fireEvent: undefined | RefStudioEventCallback;
+    let eventName = '';
+    vi.mocked(listenEvent).mockImplementation(async (event: string, handler: RefStudioEventCallback) => {
+      eventName = event;
+      fireEvent = handler;
+      await Promise.resolve();
+      return noop();
+    });
+
+    const store = createStore();
+    render(
+      <Provider store={store}>
+        <ReferencesFooterItems />
+      </Provider>,
+    );
+
+    expect(eventName).toBe(RefStudioEvents.menu.references.open);
+    expect(fireEvent).toBeDefined();
+    act(() => fireEvent!({ event: eventName, windowLabel: '', id: 1, payload: undefined }));
+
+    const opened = runGetAtomHook(activePaneAtom, store);
+    expect(opened.current.openFiles).toHaveLength(1);
+    expect(opened.current.activeFile).toBeDefined();
+    expect(opened.current.activeFile).toBe('refstudio://references');
   });
 });
