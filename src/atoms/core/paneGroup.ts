@@ -73,6 +73,7 @@ export const removeFileFromPane = atom(null, (get, set, { fileId, paneId }: Pane
   set(updatePaneGroup, {
     paneId,
     openFiles: updatedOpenFiles,
+    activeFile: updatedOpenFiles.includes(fileId) ? fileId : undefined,
   });
 });
 

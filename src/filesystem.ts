@@ -1,6 +1,5 @@
 import {
   BaseDirectory,
-  copyFile as tauriCopyFile,
   createDir,
   FileEntry as TauriFileEntry,
   readBinaryFile,
@@ -14,7 +13,6 @@ import { appConfigDir, appDataDir, join } from '@tauri-apps/api/path';
 import { FileContent } from './atoms/types/FileContent';
 import { FileEntry, FileFileEntry } from './atoms/types/FileEntry';
 import { INITIAL_CONTENT } from './editor/TipTapEditorConfigs';
-import { isNonNullish } from './lib/isNonNullish';
 
 const PROJECT_NAME = 'project-x';
 const UPLOADS_DIR = 'uploads';
@@ -57,31 +55,15 @@ export async function readAllProjectFiles() {
   return sortedFileEntries(fileEntries);
 }
 
-export async function copyFiles(filePaths: string[]) {
-  return (await Promise.all(filePaths.map(copyFile))).filter(isNonNullish);
-}
-
-export async function copyFile(filePath: string) {
-  try {
-    const filename = filePath.split('/').pop();
-    if (!filename) {
-      return null;
-    }
-    const targetFilePath = await join(await getBaseDir(), UPLOADS_DIR, filename);
-    await tauriCopyFile(filePath, targetFilePath);
-    return targetFilePath;
-  } catch (err) {
-    console.error('Error', err);
-  }
-}
-
-export async function uploadFiles(files: FileList) {
+export async function uploadFiles(files: File[]) {
+  console.log('upload', files);
   const uploadsDir = await join(await getBaseDir(), UPLOADS_DIR);
   for (const file of files) {
     const path = await join(uploadsDir, file.name);
     const bytes = await file.arrayBuffer();
     await writeBinaryFile(path, bytes, { dir: BaseDirectory.Home });
   }
+  return Array.from(files).map((file) => file.name);
 }
 
 export async function readFileContent(file: FileFileEntry): Promise<FileContent> {

@@ -39,6 +39,7 @@ The application current has three main functions:
 2. Ingest Status
 3. Rewrite
 4. Chat
+5. Delete (References)
 
 ### Ingest
 `Ingest` is called when a Refstudio user uploads Reference documents.
@@ -182,4 +183,34 @@ $ poetry run python main.py --text "What can you tell me about hidden feedback l
     "text": "Hidden feedback loops in machine learning refer to situations where two systems indirectly influence each other through the world, leading to changes in behavior that may not be immediately visible. These loops may exist between completely disjoint systems and can make analyzing the effect of proposed changes extremely difficult, adding cost to even simple improvements. It is recommended to look carefully for hidden feedback loops and remove them whenever feasible."
   }
 ]
+```
+
+### Delete (References)
+`delete` removes a Reference from project storage. It is called when a Reference is deleted from the UI.
+
+It takes a list of `source_filenames` as input and returns a response status. Alternatively, you can use the `--all` parameter to delete all References in storage.
+
+To run `delete`:
+
+```bash
+$ poetry run python main.py delete --source_filenames grobid-fails.pdf "Machine Learning at Scale.pdf"
+
+
+# Example:
+$ poetry run python main.py delete --source_filenames grobid-fails.pdf "Machine Learning at Scale.pdf" | jq
+
+# Response:
+{
+  "status": "ok",
+  "message": ""
+}
+
+# Another Example (error):
+$ poetry run python main.py delete --source_filenames file-does-not-exist.pdf | jq
+
+# Error Response:
+{
+  "status": "error",
+  "message": "Unable to delete file-does-not-exist.pdf: not found in storage"
+}
 ```

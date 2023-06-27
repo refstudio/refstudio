@@ -19,13 +19,17 @@
       "items": {
         "$ref": "#/definitions/ChatResponseChoice"
       }
+    },
+    "delete": {
+      "$ref": "#/definitions/DeleteStatusResponse"
     }
   },
   "required": [
     "ingest",
     "ingest_status",
     "rewrite",
-    "chat"
+    "chat",
+    "delete"
   ],
   "definitions": {
     "IngestStatus": {
@@ -230,6 +234,22 @@
       "required": [
         "index",
         "text"
+      ]
+    },
+    "DeleteStatusResponse": {
+      "title": "DeleteStatusResponse",
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "message"
       ]
     }
   }

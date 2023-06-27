@@ -348,6 +348,30 @@ describe('fileActions', () => {
     expect(leftPane.current.activeFile).toEqual(fileCData.fileId);
   });
 
+  it('should make active file undefined if is the last one closed in same pane', () => {
+    const store = createStore();
+    const openFile = runSetAtomHook(openFileAtom, store);
+    const closeFileFromPane = runSetAtomHook(closeFileFromPaneAtom, store);
+    const leftPane = runGetAtomHook(leftPaneAtom, store);
+
+    const { fileEntry: fileA } = makeFile('fileA.txt');
+    const { fileEntry: fileB, fileData: fileBData } = makeFile('fileB.txt');
+
+    act(() => {
+      openFile.current(fileA);
+      openFile.current(fileB);
+    });
+
+    expect(leftPane.current.activeFile).toEqual(fileBData.fileId);
+
+    act(() => {
+      closeFileFromPane.current({ paneId: leftPane.current.id, fileId: fileB.path });
+      closeFileFromPane.current({ paneId: leftPane.current.id, fileId: fileA.path });
+    });
+
+    expect(leftPane.current.activeFile).toBeUndefined();
+  });
+
   it('should not open folder entries', () => {
     const store = createStore();
     const openFileResult = runSetAtomHook(openFileAtom, store);
