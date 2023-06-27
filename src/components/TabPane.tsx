@@ -1,4 +1,3 @@
-
 import { cx } from '../cx';
 import { TabCloseButton } from './TabCloseButton';
 

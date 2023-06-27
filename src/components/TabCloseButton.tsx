@@ -7,14 +7,16 @@ interface CloseButtonProps {
 }
 
 function CloseIcon({ onClick }: Pick<CloseButtonProps, 'onClick'>) {
-  return <VscClose
-    className="invisible group-hover:visible"
-    role="button"
-    onClick={(e) => {
-      e.stopPropagation();
-      onClick();
-    }}
-  />;
+  return (
+    <VscClose
+      className="invisible group-hover:visible"
+      role="button"
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
+    />
+  );
 }
 
 /**
@@ -27,11 +29,7 @@ export function TabCloseButton({ isDirty, onClick }: CloseButtonProps) {
 
   return (
     <div onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
-      {isDirty ?
-        (isHovered ?
-          <CloseIcon onClick={onClick} /> :
-          <VscCircleFilled />)
-        : <CloseIcon onClick={onClick} />}
+      {isDirty ? isHovered ? <CloseIcon onClick={onClick} /> : <VscCircleFilled /> : <CloseIcon onClick={onClick} />}
     </div>
   );
 }
