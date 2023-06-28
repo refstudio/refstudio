@@ -48,6 +48,10 @@ def get_arg_parser():
         "update",
         description="Update metadata for a Reference"
     )
+    update_parser.add_argument(
+        "--data",
+        type=str,
+    )
 
     delete_parser = subparsers.add_parser(
         "delete",

@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from sidecar import storage
+from sidecar import storage, typing
 from sidecar.typing import Author, Chunk, Reference
 
 
@@ -34,22 +34,65 @@ def test_json_storage_load():
             assert isinstance(chunk, Chunk)
 
 
-def test_json_storage_update(monkeypatch, tmp_path):
+def test_json_storage_update(monkeypatch, tmp_path, capsys):
     fp = Path(__file__).parent.joinpath("fixtures/data/references.json")
     jstore = storage.JsonStorage(filepath=fp)
     jstore.load()
-
-    # update the citation key of the first reference
-    ref = jstore.references[0]
-    ref.citation_key = "reda2023"
 
     # mock the filepath before save
     # we do not want modify our test reference data for other tests
     savepath = tmp_path.joinpath("references.json")
     monkeypatch.setattr(jstore, "filepath", savepath)
 
-    # update and save the modified references
-    jstore.update(ref)
+    # -------------
+
+    # test: update for `source_filename` that does not exist
+    # expect: no References are changed and json response in stdout = ERROR
+
+    bad_update = typing.ReferenceUpdate(
+        source_filename='does_not_exist.pdf',
+        patch=typing.ReferencePatch(
+            data={'citation_key': 'should-not-change'}
+        )
+    )
+
+    jstore.update(bad_update)
+
+    captured = capsys.readouterr()
+    output = json.loads(captured.out)
+
+    assert output['status'] == 'error'
+    assert output['message'] != ""
+
+    # -------------
+
+    # reload and remock storage for new test
+    jstore = storage.JsonStorage(filepath=fp)
+    jstore.load()
+    monkeypatch.setattr(jstore, "filepath", savepath)
+
+    # test: update `citation_key` for one Reference
+    # expect: Reference that has been updated has new citation key
+    #   and no other Reference metadata has changed
+    #   and json response in stdout = OK
+
+    # create the ReferenceUpdate object for input
+    ref = jstore.references[0]
+
+    reference_update = typing.ReferenceUpdate(
+        source_filename=ref.source_filename,
+        patch=typing.ReferencePatch(
+            data={'citation_key': 'reda2023'}
+        )
+    )
+
+    jstore.update(reference_update)
+
+    captured = capsys.readouterr()
+    output = json.loads(captured.out)
+
+    assert output['status'] == 'ok'
+    assert output['message'] == ""
 
     # reload from `savepath` to check that the update was successful
     jstore = storage.JsonStorage(filepath=savepath)
@@ -69,6 +112,7 @@ def test_json_storage_update(monkeypatch, tmp_path):
     assert jstore.references[1].citation_key is None
     assert len(jstore.references[1].authors) == 2
     assert len(jstore.references[1].chunks) == 6
+
 
 
 def test_storage_delete_references(monkeypatch, tmp_path, capsys):

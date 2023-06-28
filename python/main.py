@@ -1,3 +1,5 @@
+import json
+
 from sidecar import chat, cli, ingest, rewrite, storage
 
 if __name__ == '__main__':
@@ -20,7 +22,8 @@ if __name__ == '__main__':
         chat.ask_question(args.text)
     
     if args.command == "update":
-        storage.update_reference(args.data)
+        data = json.loads(args.data)
+        storage.update_reference(data)
 
     if args.command == "delete":
         if args.all:
