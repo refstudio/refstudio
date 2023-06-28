@@ -3,11 +3,11 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { VscChevronUp } from 'react-icons/vsc';
 import { ImperativePanelHandle, Panel, PanelGroup } from 'react-resizable-panels';
 
+import { AIPanel } from './ai/sidebar/AIPanel';
 import { openReferenceAtom } from './atoms/fileActions';
 import { PrimarySideBar, PrimarySideBarPane } from './components/PrimarySideBar';
 import { VerticalResizeHandle } from './components/VerticalResizeHandle';
 import { emitEvent, RefStudioEvents } from './events';
-import { AIPanel } from './panels/AIPanel';
 import { ExplorerPanel } from './panels/ExplorerPanel';
 import { MainPanel } from './panels/MainPanel';
 import { ReferencesDropZone } from './references/components/ReferencesDropZone';

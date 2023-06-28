@@ -1,6 +1,6 @@
-import { PanelWrapper } from '../components/PanelWrapper';
-import { ChatPanelSection } from './ai/ChatPanelSection';
-import { SelectionPanelSection } from './ai/SelectionPanelSection';
+import { PanelWrapper } from '../../components/PanelWrapper';
+import { ChatPanelSection } from './ChatPanelSection';
+import { SelectionPanelSection } from './SelectionPanelSection';
 
 export function AIPanel({ onCloseClick }: { onCloseClick?: () => void }) {
   return (

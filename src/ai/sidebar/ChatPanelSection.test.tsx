@@ -4,7 +4,7 @@ import { chatWithAI } from '../../api/chat';
 import { render, userEvent } from '../../utils/test-utils';
 import { ChatPanelSection } from './ChatPanelSection';
 
-vi.mock('../../api/chat');
+vi.mock('../api/chat');
 
 describe('ChatPanelSection component', () => {
   afterEach(() => {
