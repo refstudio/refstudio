@@ -1,16 +1,18 @@
 import { createStore } from 'jotai';
 
-import { activePaneContentAtom, openFileAtom } from './atoms/fileActions';
+import { activePaneAtom, activePaneContentAtom, closeFileFromPaneAtom, openFileAtom } from './atoms/fileActions';
 import { makeFile } from './atoms/test-fixtures';
-import { runGetAtomHook, runSetAtomHook } from './atoms/test-utils';
+import { runSetAtomHook } from './atoms/test-utils';
 import { FileEntry } from './atoms/types/FileEntry';
 import { RefStudioEvents } from './events';
 import { EventsListener } from './EventsListener';
 import { readFileContent, writeFileContent } from './filesystem';
+import { asyncNoop } from './utils/noop';
 import { act, mockListenEvent, screen, setupWithJotaiProvider } from './utils/test-utils';
 
 vi.mock('./events');
 vi.mock('./filesystem');
+vi.mock('./utils/noop');
 
 describe('EventsListener', () => {
   let store: ReturnType<typeof createStore>;
@@ -45,8 +47,8 @@ describe('EventsListener', () => {
 
   it(`should call saveFile when ${RefStudioEvents.menu.file.save} event is triggered`, () => {
     const mockData = mockListenEvent();
-    const fileContentAtoms = runGetAtomHook(activePaneContentAtom, store);
-    const { updateFileBufferAtom } = fileContentAtoms.current.activeFileAtoms!;
+    const fileContentAtoms = store.get(activePaneContentAtom);
+    const { updateFileBufferAtom } = fileContentAtoms.activeFileAtoms!;
 
     const updateFileBuffer = runSetAtomHook(updateFileBufferAtom, store);
 
@@ -73,5 +75,19 @@ describe('EventsListener', () => {
     });
 
     expect(writeFileContent).toHaveBeenCalledTimes(0);
+  });
+
+  it(`should call asyncNoop ${RefStudioEvents.menu.file.save} event is triggered without content changes`, () => {
+    const activePaneId = store.get(activePaneAtom).id;
+    store.set(closeFileFromPaneAtom, { fileId: fileEntry.path, paneId: activePaneId });
+    const mockData = mockListenEvent();
+
+    setupWithJotaiProvider(<EventsListener />, store);
+
+    act(() => {
+      mockData.trigger();
+    });
+
+    expect(asyncNoop).toHaveBeenCalledTimes(1);
   });
 });
