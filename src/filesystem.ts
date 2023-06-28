@@ -58,8 +58,10 @@ export async function readAllProjectFiles() {
 export async function writeFileContent(path: string, textContent: string) {
   try {
     await writeTextFile(path, textContent);
+    return true;
   } catch (err) {
     console.error('Error', err);
+    return false;
   }
 }
 

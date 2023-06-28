@@ -32,8 +32,10 @@ export function createFileContentAtoms(
     if (fileContent) {
       switch (fileContent.type) {
         case 'tiptap': {
-          await writeFileContent(filePath, fileContent.textContent);
-          set(markFileNonDirtyAtom, filePath);
+          const success = await writeFileContent(filePath, fileContent.textContent);
+          if (success) {
+            set(markFileNonDirtyAtom, filePath);
+          }
           return;
         }
         default: {
