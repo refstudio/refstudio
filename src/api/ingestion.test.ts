@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { getUploadsDir } from '../filesystem';
+import { getUploadsDir } from '../io/filesystem';
 import { runPDFIngestion } from './ingestion';
 import { callSidecar } from './sidecar';
 
 vi.mock('./sidecar');
-vi.mock('../filesystem');
+vi.mock('../io/filesystem');
 
 describe('runPDFIngestion', () => {
   beforeEach(() => {

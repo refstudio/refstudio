@@ -1,5 +1,5 @@
-import { noop } from '../utils/noop';
-import { render, screen, userEvent } from '../utils/test-utils';
+import { noop } from '../lib/noop';
+import { render, screen, userEvent } from '../test/test-utils';
 import { PrimarySideBar } from './PrimarySideBar';
 
 describe('PrimarySideBar', () => {

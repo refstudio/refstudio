@@ -1,6 +1,6 @@
 import { VscCircleFilled, VscClose } from 'react-icons/vsc';
 
-import { cx } from '../cx';
+import { cx } from '../lib/cx';
 
 interface CloseButtonProps {
   className?: string;

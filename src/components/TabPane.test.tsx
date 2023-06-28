@@ -1,4 +1,4 @@
-import { render, screen, userEvent, within } from './../utils/test-utils';
+import { render, screen, userEvent, within } from '../test/test-utils';
 import { TabPane } from './TabPane';
 
 describe('TabPane component', () => {

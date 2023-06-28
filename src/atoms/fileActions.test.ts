@@ -3,7 +3,7 @@ import { createStore, useAtomValue } from 'jotai';
 import { Loadable } from 'jotai/vanilla/utils/loadable';
 import { describe, expect, it } from 'vitest';
 
-import { readFileContent, writeFileContent } from '../filesystem';
+import { readFileContent, writeFileContent } from '../io/filesystem';
 import { ReferenceItem } from '../types/ReferenceItem';
 import {
   activePaneAtom,
@@ -442,7 +442,7 @@ describe('fileActions', () => {
     const openFile = runSetAtomHook(openFileAtom, store);
     const leftPane = runGetAtomHook(leftPaneAtom, store);
 
-    vi.mock('../filesystem');
+    vi.mock('../io/filesystem');
     const mockedReadFileContent = vi.mocked(readFileContent).mockResolvedValue({
       type: 'tiptap',
       textContent: 'some content',

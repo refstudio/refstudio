@@ -2,7 +2,7 @@ import './DraggableBlock.css';
 
 import { Editor, NodeViewContent, NodeViewWrapper } from '@tiptap/react';
 
-import { cx } from '../../../cx';
+import { cx } from '../../../lib/cx';
 
 interface DraggableBlockProps {
   editor: Editor;

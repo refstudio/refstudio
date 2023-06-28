@@ -1,4 +1,4 @@
-import { PaneConfig } from './../types';
+import { PaneConfig } from '../types';
 
 export interface SettingsPaneProps {
   config: PaneConfig;

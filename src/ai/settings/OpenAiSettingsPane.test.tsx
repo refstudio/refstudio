@@ -1,10 +1,16 @@
-import { noop } from '../../utils/noop';
-import { render, screen, userEvent } from '../../utils/test-utils';
-import { getCachedSetting, initSettings, saveCachedSettings, setCachedSetting, SettingsSchema } from '../settings';
-import { PaneConfig } from '../types';
+import { noop } from '../../lib/noop';
+import {
+  getCachedSetting,
+  initSettings,
+  saveCachedSettings,
+  setCachedSetting,
+  SettingsSchema,
+} from '../../settings/settingsManager';
+import { PaneConfig } from '../../settings/types';
+import { render, screen, userEvent } from '../../test/test-utils';
 import { OpenAiSettingsPane } from './OpenAiSettingsPane';
 
-vi.mock('./settings');
+vi.mock('../../settings/settingsManager');
 vi.mock('../../events');
 
 const panelConfig: PaneConfig = {

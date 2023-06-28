@@ -4,7 +4,7 @@ import { default as userEvent } from '@testing-library/user-event';
 import { createStore, Provider } from 'jotai';
 
 import { listenEvent, RefStudioEventCallback } from '../events';
-import { noop } from './noop';
+import { noop } from '../lib/noop';
 
 function customRender(ui: React.ReactElement, options = {}) {
   const queryClient = new QueryClient({
@@ -39,7 +39,7 @@ export function setupWithJotaiProvider(jsx: React.ReactNode, store?: ReturnType<
   store = store ?? createStore();
   return {
     store,
-    ...customRender(<Provider store={store}>{jsx}</Provider>),
+    ...setup(<Provider store={store}>{jsx}</Provider>),
   };
 }
 
@@ -66,8 +66,7 @@ export function mockListenEvent<Payload = void>() {
   vi.mocked(listenEvent).mockImplementation(async (event: string, handler: RefStudioEventCallback<Payload>) => {
     current.registeredEventName = event;
     current.trigger = (payload: Payload) => handler({ event, windowLabel: '', id: 0, payload });
-    await Promise.resolve();
-    return noop();
+    return Promise.resolve(noop);
   });
   return current;
 }

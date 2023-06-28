@@ -1,10 +1,9 @@
-import { createStore, Provider } from 'jotai';
-
 import { activePaneAtom } from '../../atoms/fileActions';
 import { referencesSyncInProgressAtom, setReferencesAtom } from '../../atoms/referencesState';
 import { runGetAtomHook, runSetAtomHook } from '../../atoms/test-utils';
 import { emitEvent, RefStudioEvents } from '../../events';
-import { act, mockListenEvent, render, screen, setup } from '../../utils/test-utils';
+import { act, mockListenEvent, screen, setupWithJotaiProvider } from '../../test/test-utils';
+import { REFERENCES } from '../test-fixtures';
 import { ReferencesFooterItems } from './ReferencesFooterItems';
 
 vi.mock('../../events');
@@ -15,84 +14,36 @@ describe('ReferencesFooterItems component', () => {
   });
 
   it('should render empty without loading', () => {
-    const store = createStore();
-    render(
-      <Provider store={store}>
-        <ReferencesFooterItems />
-      </Provider>,
-    );
+    setupWithJotaiProvider(<ReferencesFooterItems />);
     expect(screen.getByText('References: 0')).toBeInTheDocument();
   });
 
   it('should render number of references ingested', () => {
-    const store = createStore();
+    const { store } = setupWithJotaiProvider(<ReferencesFooterItems />);
     const setReferences = runSetAtomHook(setReferencesAtom, store);
 
-    act(() => {
-      setReferences.current([
-        {
-          id: 'ref.id',
-          citationKey: 'citationKey',
-          title: 'Reference document title',
-          abstract: '',
-          authors: [],
-          filename: 'title.pdf',
-          publishedDate: '2023-06-22',
-        },
-        {
-          id: 'ref.id 2',
-          citationKey: 'citationKey 2',
-          title: 'Reference document title 2',
-          abstract: '',
-          authors: [],
-          filename: 'title-2.pdf',
-          publishedDate: '2023-06-22',
-        },
-      ]);
-    });
-
-    render(
-      <Provider store={store}>
-        <ReferencesFooterItems />
-      </Provider>,
-    );
-    expect(screen.getByText('References: 2')).toBeInTheDocument();
+    act(() => setReferences.current(REFERENCES));
+    expect(screen.getByText(`References: ${REFERENCES.length}`)).toBeInTheDocument();
   });
 
   it('should render loading spinner', () => {
-    const store = createStore();
+    const { store } = setupWithJotaiProvider(<ReferencesFooterItems />);
     const setSync = runSetAtomHook(referencesSyncInProgressAtom, store);
-
-    render(
-      <Provider store={store}>
-        <ReferencesFooterItems />
-      </Provider>,
-    );
 
     expect(screen.queryByText('References ingestion...')).not.toBeInTheDocument();
     act(() => setSync.current(true));
     expect(screen.getByText('References ingestion...')).toBeInTheDocument();
   });
 
-  it('should emit RefStudioEvents.menu.references.open on click', async () => {
-    const store = createStore();
-    const { user } = setup(
-      <Provider store={store}>
-        <ReferencesFooterItems />
-      </Provider>,
-    );
+  it(`should emit ${RefStudioEvents.menu.references.open} on click`, async () => {
+    const { user } = setupWithJotaiProvider(<ReferencesFooterItems />);
     await user.click(screen.getByRole('listitem'));
     expect(vi.mocked(emitEvent)).toHaveBeenCalledWith(RefStudioEvents.menu.references.open);
   });
 
-  it('should listen RefStudioEvents.menu.references.open to open references', () => {
+  it(`should listen ${RefStudioEvents.menu.references.open} to open references`, () => {
     const mockData = mockListenEvent();
-    const store = createStore();
-    render(
-      <Provider store={store}>
-        <ReferencesFooterItems />
-      </Provider>,
-    );
+    const { store } = setupWithJotaiProvider(<ReferencesFooterItems />);
 
     expect(mockData.registeredEventName).toBeDefined();
     expect(mockData.registeredEventName).toBe(RefStudioEvents.menu.references.open);

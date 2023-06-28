@@ -1,6 +1,6 @@
 import { makeFile, makeFolder } from '../atoms/test-fixtures';
-import { noop } from '../utils/noop';
-import { render, screen, setup } from '../utils/test-utils';
+import { noop } from '../lib/noop';
+import { render, screen, setup } from '../test/test-utils';
 import { FileEntryTree } from './FileEntryTree';
 
 describe('FileEntryTree component', () => {

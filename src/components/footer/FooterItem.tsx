@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { cx } from '../../cx';
+import { cx } from '../../lib/cx';
 
 export function FooterItem({ icon, text, onClick }: { icon: React.ReactNode; text: string; onClick?: () => void }) {
   return (

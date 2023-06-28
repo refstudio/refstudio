@@ -1,4 +1,4 @@
-import { getUploadsDir } from '../filesystem';
+import { getUploadsDir } from '../io/filesystem';
 import { ReferenceItem } from '../types/ReferenceItem';
 import { callSidecar } from './sidecar';
 import { IngestResponse } from './types';

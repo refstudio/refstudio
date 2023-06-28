@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { VscClose } from 'react-icons/vsc';
 
-import { cx } from '../cx';
-import { initSettings } from './settings';
+import { OpenAiSettingsPane } from '../ai/settings/OpenAiSettingsPane';
+import { cx } from '../lib/cx';
+import { DebugSettingsPane } from './panes/DebugSettingsPane';
+import { GeneralSettingsPane } from './panes/GeneralSettingsPane';
+import { initSettings } from './settingsManager';
 import { PaneConfig, SettingsPanesConfig } from './types';
-import { DebugSettingsPane } from './ui/DebugSettingsPane';
-import { GeneralSettingsPane } from './ui/GeneralSettingsPane';
-import { OpenAiSettingsPane } from './ui/OpenAiSettingsPane';
 
 // Ensure settings are configured and loaded
 await initSettings();

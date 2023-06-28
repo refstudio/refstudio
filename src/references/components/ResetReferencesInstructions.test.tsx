@@ -1,20 +1,13 @@
-import { createStore, Provider } from 'jotai';
-
 import { getReferencesAtom, setReferencesAtom } from '../../atoms/referencesState';
 import { runGetAtomHook, runSetAtomHook } from '../../atoms/test-utils';
-import { act, screen, setup } from '../../utils/test-utils';
+import { act, screen, setupWithJotaiProvider } from '../../test/test-utils';
 import { ResetReferencesInstructions } from './ResetReferencesInstructions';
 
 vi.mock('../../events');
 
 describe('ResetReferencesInstructions', () => {
   it('should reset references when click in reset', async () => {
-    const store = createStore();
-    const { user } = setup(
-      <Provider store={store}>
-        <ResetReferencesInstructions />
-      </Provider>,
-    );
+    const { user, store } = setupWithJotaiProvider(<ResetReferencesInstructions />);
 
     const setReferences = runSetAtomHook(setReferencesAtom, store);
     const getReferences = runGetAtomHook(getReferencesAtom, store);

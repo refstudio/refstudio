@@ -1,7 +1,7 @@
 import { atom } from 'jotai';
 import { loadable } from 'jotai/utils';
 
-import { writeFileContent } from '../filesystem';
+import { writeFileContent } from '../io/filesystem';
 import { markFileDirtyAtom, markFileNonDirtyAtom } from './fileActions';
 import { FileContent } from './types/FileContent';
 import { FileContentAtoms } from './types/FileContentAtoms';

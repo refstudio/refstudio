@@ -10,9 +10,9 @@ import {
 } from '@tauri-apps/api/fs';
 import { appConfigDir, appDataDir, join } from '@tauri-apps/api/path';
 
-import { FileContent } from './atoms/types/FileContent';
-import { FileEntry, FileFileEntry } from './atoms/types/FileEntry';
-import { INITIAL_CONTENT } from './editor/TipTapEditorConfigs';
+import { FileContent } from '../atoms/types/FileContent';
+import { FileEntry, FileFileEntry } from '../atoms/types/FileEntry';
+import { INITIAL_CONTENT } from '../editor/TipTapEditorConfigs';
 
 const PROJECT_NAME = 'project-x';
 const UPLOADS_DIR = 'uploads';

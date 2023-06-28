@@ -18,7 +18,7 @@ import { FileEntryTree } from '../components/FileEntryTree';
 import { FilesList } from '../components/FilesList';
 import { PanelSection } from '../components/PanelSection';
 import { PanelWrapper } from '../components/PanelWrapper';
-import { readAllProjectFiles } from '../filesystem';
+import { readAllProjectFiles } from '../io/filesystem';
 import { isNonNullish } from '../lib/isNonNullish';
 
 export function ExplorerPanel() {

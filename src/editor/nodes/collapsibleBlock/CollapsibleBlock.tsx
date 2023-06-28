@@ -4,7 +4,7 @@ import { Node } from '@tiptap/pm/model';
 import { Editor, NodeViewContent, NodeViewWrapper } from '@tiptap/react';
 import { ElementType } from 'react';
 
-import { cx } from '../../../cx';
+import { cx } from '../../../lib/cx';
 import { CollapsibleBlockNodeAttributes } from './nodes/CollapsibleBlockNode';
 
 // The attributes in this interface must correspond to the attributes defined in the `addAttributes` method of CollapsibleBlockNode

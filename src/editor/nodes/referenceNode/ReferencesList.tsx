@@ -8,7 +8,7 @@ import { createPortal } from 'react-dom';
 import { usePopper } from 'react-popper';
 
 import { getReferencesAtom } from '../../../atoms/referencesState';
-import { cx } from '../../../cx';
+import { cx } from '../../../lib/cx';
 import { ReferenceItem } from '../../../types/ReferenceItem';
 import { fuseOptions } from './config';
 

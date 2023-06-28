@@ -1,5 +1,5 @@
 import { ReferencesFooterItems } from '../../references/footer/ReferencesFooterItems';
-import { render } from '../../utils/test-utils';
+import { render } from '../../test/test-utils';
 import { Footer } from './Footer';
 
 describe('Footer component', () => {

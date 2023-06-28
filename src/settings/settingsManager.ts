@@ -1,8 +1,8 @@
 import { SettingsManager } from 'tauri-settings';
 import { Path, PathValue } from 'tauri-settings/dist/types/dot-notation';
 
-import { getAppDataDir, getConfigDir } from '../filesystem';
-import { readEnv } from '../utils/readEnv';
+import { getAppDataDir, getConfigDir } from '../io/filesystem';
+import { readEnv } from '../io/readEnv';
 
 export interface SettingsSchema {
   general: {

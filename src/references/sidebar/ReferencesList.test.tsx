@@ -1,5 +1,5 @@
-import { noop } from '../../utils/noop';
-import { render, screen, setup } from '../../utils/test-utils';
+import { noop } from '../../lib/noop';
+import { render, screen, setup } from '../../test/test-utils';
 import { ReferencesList } from './ReferencesList';
 
 describe('ReferencesList', () => {

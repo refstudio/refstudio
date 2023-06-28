@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 
-import { getCachedSetting, getSettings, saveCachedSettings, setCachedSetting } from '../settings';
+import { getCachedSetting, getSettings, saveCachedSettings, setCachedSetting } from '../settingsManager';
 import { SettingsPane, SettingsPaneProps } from './SettingsPane';
 
 export function GeneralSettingsPane({ config }: SettingsPaneProps) {

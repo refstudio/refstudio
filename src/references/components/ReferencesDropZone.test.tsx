@@ -1,16 +1,14 @@
-import { createStore, Provider } from 'jotai';
-
 import { runPDFIngestion } from '../../api/ingestion';
 import { getReferencesAtom, referencesSyncInProgressAtom } from '../../atoms/referencesState';
 import { runGetAtomHook } from '../../atoms/test-utils';
 import { listenEvent, RefStudioEvents } from '../../events';
-import { uploadFiles } from '../../filesystem';
-import { noop } from '../../utils/noop';
-import { act, fireEvent, mockListenEvent, render, screen, waitFor } from '../../utils/test-utils';
+import { uploadFiles } from '../../io/filesystem';
+import { noop } from '../../lib/noop';
+import { act, fireEvent, mockListenEvent, screen, setupWithJotaiProvider, waitFor } from '../../test/test-utils';
 import { ReferencesDropZone } from './ReferencesDropZone';
 
 vi.mock('../../events');
-vi.mock('../../filesystem');
+vi.mock('../../io/filesystem');
 vi.mock('../../api/ingestion');
 
 describe('ReferencesDropZone', () => {
@@ -20,33 +18,22 @@ describe('ReferencesDropZone', () => {
 
   it('should render children with', () => {
     vi.mocked(listenEvent).mockResolvedValue(noop);
-    render(
-      <Provider>
-        <ReferencesDropZone>This is the child content</ReferencesDropZone>
-      </Provider>,
-    );
+    setupWithJotaiProvider(<ReferencesDropZone>This is the child content</ReferencesDropZone>);
+
     expect(screen.getByText('This is the child content')).toBeInTheDocument();
   });
 
   it('should render upload overlay hidden', () => {
     vi.mocked(listenEvent).mockResolvedValue(noop);
-    render(
-      <Provider>
-        <ReferencesDropZone>APP</ReferencesDropZone>
-      </Provider>,
-    );
+    setupWithJotaiProvider(<ReferencesDropZone>APP</ReferencesDropZone>);
+
     expect(screen.getByText('Release to upload files to your library')).toBeInTheDocument();
     expect(screen.getByTestId('release-files-message')).toHaveClass('hidden');
   });
 
   it('should display overlay visible on drag start', () => {
     vi.mocked(listenEvent).mockResolvedValue(noop);
-    const store = createStore();
-    render(
-      <Provider store={store}>
-        <ReferencesDropZone>APP</ReferencesDropZone>
-      </Provider>,
-    );
+    setupWithJotaiProvider(<ReferencesDropZone>APP</ReferencesDropZone>);
 
     const target = screen.getByText('APP');
     fireEvent.dragEnter(target, {
@@ -66,13 +53,7 @@ describe('ReferencesDropZone', () => {
 
   it('should open file explorer on RefStudioEvents.menu.references.upload', () => {
     const mockData = mockListenEvent();
-
-    const store = createStore();
-    render(
-      <Provider store={store}>
-        <ReferencesDropZone>APP</ReferencesDropZone>
-      </Provider>,
-    );
+    setupWithJotaiProvider(<ReferencesDropZone>APP</ReferencesDropZone>);
 
     // Expect to be registered
     expect(mockData.registeredEventName).toBe(RefStudioEvents.menu.references.upload);
@@ -100,15 +81,9 @@ describe('ReferencesDropZone', () => {
     };
     vi.mocked(runPDFIngestion).mockResolvedValue([REFERENCE]);
 
-    const store = createStore();
+    const { store } = setupWithJotaiProvider(<ReferencesDropZone>APP</ReferencesDropZone>);
     const syncInProgress = runGetAtomHook(referencesSyncInProgressAtom, store);
     const references = runGetAtomHook(getReferencesAtom, store);
-
-    render(
-      <Provider store={store}>
-        <ReferencesDropZone>APP</ReferencesDropZone>
-      </Provider>,
-    );
 
     expect(syncInProgress.current).toBe(false);
     expect(references.current).toHaveLength(0);

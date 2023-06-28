@@ -1,12 +1,12 @@
 import { act } from '@testing-library/react';
 
 import { RefStudioEvents } from '../events';
-import { noop } from '../utils/noop';
-import { mockListenEvent, render, screen } from '../utils/test-utils';
-import { getCachedSetting, initSettings, saveCachedSettings, setCachedSetting } from './settings';
+import { noop } from '../lib/noop';
+import { mockListenEvent, render, screen } from '../test/test-utils';
 import { SettingsModalOpener } from './SettingsModalOpener';
+import { getCachedSetting, initSettings, saveCachedSettings, setCachedSetting } from './settingsManager';
 
-vi.mock('./settings');
+vi.mock('./settingsManager');
 vi.mock('../events');
 
 describe('SettingsModalOpener component', () => {

@@ -1,10 +1,10 @@
-import { noop } from '../utils/noop';
-import { render, screen, userEvent } from '../utils/test-utils';
-import { getCachedSetting, initSettings, saveCachedSettings, setCachedSetting } from './settings';
+import { noop } from '../lib/noop';
+import { render, screen, userEvent } from '../test/test-utils';
 import { SettingsModal } from './SettingsModal';
+import { getCachedSetting, initSettings, saveCachedSettings, setCachedSetting } from './settingsManager';
 import { SettingsPaneId } from './types';
 
-vi.mock('./settings');
+vi.mock('./settingsManager');
 vi.mock('../events');
 
 describe('SettingsModal component', () => {

@@ -2,8 +2,8 @@ import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 
 import { JSONDebug, JSONDebugContainer } from '../../components/JSONDebug';
-import { getCachedSetting, getSettings, saveCachedSettings, setCachedSetting } from './../settings';
-import { SettingsPane, SettingsPaneProps } from './SettingsPane';
+import { SettingsPane, SettingsPaneProps } from '../../settings/panes/SettingsPane';
+import { getCachedSetting, getSettings, saveCachedSettings, setCachedSetting } from '../../settings/settingsManager';
 
 export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
   const [paneSettings, setPaneSettings] = useState(getCachedSetting('openAI'));

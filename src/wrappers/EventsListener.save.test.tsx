@@ -5,14 +5,14 @@ import { makeFile } from '../atoms/test-fixtures';
 import { runSetAtomHook } from '../atoms/test-utils';
 import { FileEntry } from '../atoms/types/FileEntry';
 import { RefStudioEvents } from '../events';
-import { readFileContent, writeFileContent } from '../filesystem';
-import { asyncNoop } from '../utils/noop';
-import { act, mockListenEvent, screen, setupWithJotaiProvider } from '../utils/test-utils';
+import { readFileContent, writeFileContent } from '../io/filesystem';
+import { asyncNoop } from '../lib/noop';
+import { act, mockListenEvent, screen, setupWithJotaiProvider } from '../test/test-utils';
 import { EventsListener } from './EventsListener';
 
 vi.mock('../events');
-vi.mock('../filesystem');
-vi.mock('../utils/noop');
+vi.mock('../io/filesystem');
+vi.mock('../lib/noop');
 
 describe('EventsListener.save', () => {
   let store: ReturnType<typeof createStore>;

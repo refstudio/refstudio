@@ -5,10 +5,10 @@ import { VscFilePdf } from 'react-icons/vsc';
 
 import { runPDFIngestion } from '../../api/ingestion';
 import { referencesSyncInProgressAtom, setReferencesAtom } from '../../atoms/referencesState';
-import { cx } from '../../cx';
 import { RefStudioEvents } from '../../events';
-import { uploadFiles } from '../../filesystem';
 import { useListenEvent } from '../../hooks/useListenEvent';
+import { uploadFiles } from '../../io/filesystem';
+import { cx } from '../../lib/cx';
 import { FilesDragDropZone } from '../../wrappers/FilesDragDropZone';
 
 function validReferencesFiles(file: File) {

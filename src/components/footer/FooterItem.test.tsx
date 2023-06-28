@@ -1,4 +1,4 @@
-import { render, screen, setup } from '../../utils/test-utils';
+import { render, screen, setup } from '../../test/test-utils';
 import { FooterItem } from './FooterItem';
 
 describe('FooterItem component', () => {

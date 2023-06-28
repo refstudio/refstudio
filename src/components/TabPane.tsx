@@ -1,4 +1,4 @@
-import { cx } from '../cx';
+import { cx } from '../lib/cx';
 import { TabCloseButton } from './TabCloseButton';
 
 export function TabPane({

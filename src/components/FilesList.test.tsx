@@ -1,8 +1,8 @@
 import { VscFile } from 'react-icons/vsc';
 
 import { makeFile } from '../atoms/test-fixtures';
-import { noop } from '../utils/noop';
-import { render, screen, setup } from '../utils/test-utils';
+import { noop } from '../lib/noop';
+import { render, screen, setup } from '../test/test-utils';
 import { RightAction } from './FileNode';
 import { FilesList } from './FilesList';
 

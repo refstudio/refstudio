@@ -3,7 +3,7 @@ import './MenuBar.css';
 import { Editor } from '@tiptap/react';
 import * as React from 'react';
 
-import { cx } from '../cx';
+import { cx } from '../lib/cx';
 
 export function MenuBar({ editor }: { editor: Editor }) {
   const [markdownMode, setMarkdownMode] = React.useState(false);

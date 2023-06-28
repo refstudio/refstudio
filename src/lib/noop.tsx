@@ -1,7 +1,5 @@
 export function noop() {
-  return () => {
-    // no code!
-  };
+  // no code!
 }
 
 export async function asyncNoop() {

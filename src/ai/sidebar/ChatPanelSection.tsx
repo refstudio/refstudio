@@ -3,7 +3,7 @@ import { VscMegaphone, VscRunAll, VscWand } from 'react-icons/vsc';
 
 import { chatWithAI } from '../../api/chat';
 import { PanelSection } from '../../components/PanelSection';
-import { cx } from '../../cx';
+import { cx } from '../../lib/cx';
 
 interface ChatThreadItem {
   id: string;
