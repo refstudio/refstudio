@@ -5,20 +5,20 @@ import { useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 
 import { selectionAtom } from '../../../atoms/selectionState';
-import { FileContentAtoms } from '../../../atoms/types/FileContentAtoms';
+import { EditorContentAtoms } from '../../../atoms/types/EditorContentAtoms';
 import { MenuBar } from './MenuBar';
 import { EDITOR_EXTENSIONS, INITIAL_CONTENT, transformPasted } from './tipTapEditorConfigs';
 
 interface EditorProps {
   editorContent: string | JSONContent | null;
-  activeFileAtoms: FileContentAtoms;
+  activeEditorContentAtoms: EditorContentAtoms;
 }
 
-export function TipTapEditor({ editorContent, activeFileAtoms }: EditorProps) {
+export function TipTapEditor({ editorContent, activeEditorContentAtoms }: EditorProps) {
   const [editor, setEditor] = useState<Editor | null>(null);
   const setSelection = useSetAtom(selectionAtom);
 
-  const { updateFileBufferAtom, saveFileInMemoryAtom } = activeFileAtoms;
+  const { updateEditorContentBufferAtom: updateFileBufferAtom, saveEditorContentInMemoryAtom: saveFileInMemoryAtom } = activeEditorContentAtoms;
 
   const updateFileBuffer = useSetAtom(updateFileBufferAtom);
   const saveFileInMemory = useSetAtom(saveFileInMemoryAtom);
@@ -37,7 +37,7 @@ export function TipTapEditor({ editorContent, activeFileAtoms }: EditorProps) {
         transformPasted,
       },
       onUpdate: ({ editor: updatedEditor }) => {
-        updateFileBuffer({ type: 'tiptap', textContent: updatedEditor.storage.markdown.getMarkdown() as string });
+        updateFileBuffer({ type: 'text', textContent: updatedEditor.storage.markdown.getMarkdown() as string });
       },
     });
     setEditor(newEditor);

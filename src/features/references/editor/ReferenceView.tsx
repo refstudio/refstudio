@@ -4,9 +4,9 @@ import { useAtomValue } from 'jotai';
 import { useMemo } from 'react';
 
 import { getDerivedReferenceAtom } from '../../../atoms/referencesState';
-import { ReferenceFileContent } from '../../../atoms/types/FileContent';
+import { ReferenceEditorContent } from '../../../atoms/types/EditorContent';
 
-export function ReferenceView({ referenceId }: Pick<ReferenceFileContent, 'referenceId'>) {
+export function ReferenceView({ referenceId }: Pick<ReferenceEditorContent, 'referenceId'>) {
   const referenceAtom = useMemo(() => getDerivedReferenceAtom(referenceId), [referenceId]);
   const reference = useAtomValue(referenceAtom);
 

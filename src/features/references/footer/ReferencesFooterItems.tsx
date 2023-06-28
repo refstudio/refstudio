@@ -1,7 +1,7 @@
 import { useAtomValue, useSetAtom } from 'jotai';
 import { VscLibrary, VscRefresh } from 'react-icons/vsc';
 
-import { openReferencesAtom } from '../../../atoms/fileActions';
+import { openReferencesAtom } from '../../../atoms/editorActions';
 import { getReferencesAtom, referencesSyncInProgressAtom } from '../../../atoms/referencesState';
 import { FooterItem } from '../../../components/footer/FooterItem';
 import { emitEvent, RefStudioEvents } from '../../../events';

@@ -3,14 +3,15 @@ import { useCallback } from 'react';
 import { Panel, PanelGroup } from 'react-resizable-panels';
 
 import {
-  closeFileFromPaneAtom,
+  closeEditorFromPaneAtom,
+  selectEditorInPaneAtom,
+} from '../../atoms/editorActions';
+import {
   focusPaneAtom,
   leftPaneAtom,
   rightPaneAtom,
-  selectFileInPaneAtom,
-} from '../../atoms/fileActions';
-import { FileContentAtoms } from '../../atoms/types/FileContentAtoms';
-import { FileId } from '../../atoms/types/FileData';
+} from '../../atoms/paneActions';
+import { EditorContentAtoms } from '../../atoms/types/EditorContentAtoms';
 import { PaneContent } from '../../atoms/types/PaneGroup';
 import { Spinner } from '../../components/Spinner';
 import { TabPane } from '../../components/TabPane';
@@ -37,8 +38,8 @@ export function MainPanel(props: MainPanelProps) {
     pdfViewerRef.current?.updateWidth();
   }, [pdfViewerRef]);
 
-  const showRight = right.files.length > 0;
-  const showLeft = left.files.length > 0 || !showRight;
+  const showRight = right.openEditors.length > 0;
+  const showLeft = left.openEditors.length > 0 || !showRight;
 
   return (
     <PanelGroup autoSaveId="mainPanel" direction="horizontal" onLayout={updatePDFViewerWidth}>
@@ -62,16 +63,17 @@ interface MainPanelPaneProps {
 }
 
 export function MainPanelPane({ pane, pdfViewerRef }: MainPanelPaneProps & MainPanelProps) {
-  const { files, activeFile, activeFileAtoms } = pane;
-  const items = files.map(({ fileId, fileName, isDirty }) => ({
-    key: fileId,
-    text: fileName,
-    value: fileId,
+  const { openEditors, activeEditor: activeFile, activeEditor } = pane;
+  const activeEditorAtoms = activeEditor?.contentAtoms;
+
+  const items = openEditors.map(({ id: editorId, title, isDirty }) => ({
+    text: title,
+    value: editorId,
     isDirty,
   }));
 
-  const selectFileInPane = useSetAtom(selectFileInPaneAtom);
-  const closeFileInPane = useSetAtom(closeFileFromPaneAtom);
+  const selectFileInPane = useSetAtom(selectEditorInPaneAtom);
+  const closeFileInPane = useSetAtom(closeEditorFromPaneAtom);
   const focusPane = useSetAtom(focusPaneAtom);
 
   return (
@@ -79,14 +81,14 @@ export function MainPanelPane({ pane, pdfViewerRef }: MainPanelPaneProps & MainP
       <div className="grow-0">
         <TabPane
           items={items}
-          value={activeFile}
-          onClick={(file) => selectFileInPane({ paneId: pane.id, fileId: file })}
-          onCloseClick={(path) => closeFileInPane({ paneId: pane.id, fileId: path })}
+          value={activeFile?.id}
+          onClick={(editorId) => selectFileInPane({ paneId: pane.id, editorId })}
+          onCloseClick={(editorId) => closeFileInPane({ paneId: pane.id, editorId })}
         />
       </div>
       <div className="flex w-full grow overflow-hidden">
-        {activeFile && activeFileAtoms ? (
-          <MainPaneViewContent activeFileAtoms={activeFileAtoms} fileId={activeFile} pdfViewerRef={pdfViewerRef} />
+        {activeEditorAtoms ? (
+          <MainPaneViewContent activeEditorAtoms={activeEditorAtoms} pdfViewerRef={pdfViewerRef} />
         ) : (
           <EmptyView />
         )}
@@ -96,14 +98,13 @@ export function MainPanelPane({ pane, pdfViewerRef }: MainPanelPaneProps & MainP
 }
 
 interface MainPaneViewContentProps {
-  activeFileAtoms: FileContentAtoms;
-  fileId: FileId;
+  activeEditorAtoms: EditorContentAtoms;
   pdfViewerRef: React.MutableRefObject<PdfViewerAPI | null>;
 }
 
-export function MainPaneViewContent({ activeFileAtoms, pdfViewerRef }: MainPaneViewContentProps) {
-  const { loadableFileAtom } = activeFileAtoms;
-  const loadableFileContent = useAtomValue(loadableFileAtom);
+export function MainPaneViewContent({ activeEditorAtoms, pdfViewerRef }: MainPaneViewContentProps) {
+  const { loadableEditorContentAtom } = activeEditorAtoms;
+  const loadableFileContent = useAtomValue(loadableEditorContentAtom);
 
   if (loadableFileContent.state === 'loading') {
     return <Spinner />;
@@ -122,8 +123,8 @@ export function MainPaneViewContent({ activeFileAtoms, pdfViewerRef }: MainPaneV
       return <TextView file={data} textFormatter={(input) => JSON.stringify(JSON.parse(input), null, 2)} />;
     case 'pdf':
       return <PdfViewer file={data} pdfViewerRef={pdfViewerRef} />;
-    case 'tiptap':
-      return <TipTapView activeFileAtoms={activeFileAtoms} file={data} />;
+    case 'text':
+      return <TipTapView activeEditorContentAtoms={activeEditorAtoms} file={data} />;
     case 'reference':
       return <ReferenceView referenceId={data.referenceId} />;
     case 'references':

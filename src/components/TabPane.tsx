@@ -1,16 +1,16 @@
 import { cx } from '../lib/cx';
 import { TabCloseButton } from './TabCloseButton';
 
-export function TabPane({
+export function TabPane<K extends string>({
   items,
   value,
   onClick,
   onCloseClick,
 }: {
-  items: { key: string; text: string; value: string; isDirty?: boolean }[];
-  value?: string;
-  onClick(value: string): void;
-  onCloseClick(value: string): void;
+  items: { text: string; value: K; isDirty?: boolean }[];
+  value?: K;
+  onClick(value: K): void;
+  onCloseClick(value: K): void;
 }) {
   return (
     <div
@@ -26,7 +26,7 @@ export function TabPane({
           active={item.value === value}
           content={item.text}
           isDirty={item.isDirty}
-          key={item.key}
+          key={item.value}
           onClick={() => onClick(item.value)}
           onCloseClick={() => onCloseClick(item.value)}
         />

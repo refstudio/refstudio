@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { VscChevronUp } from 'react-icons/vsc';
 import { ImperativePanelHandle, Panel, PanelGroup } from 'react-resizable-panels';
 
-import { openReferenceAtom } from '../atoms/fileActions';
+import { openReferenceAtom } from '../atoms/editorActions';
 import { PrimarySideBar, PrimarySideBarPane } from '../components/PrimarySideBar';
 import { VerticalResizeHandle } from '../components/VerticalResizeHandle';
 import { emitEvent, RefStudioEvents } from '../events';

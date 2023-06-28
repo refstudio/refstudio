@@ -4,14 +4,14 @@ import 'react-pdf/dist/esm/Page/TextLayer.css';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 
-import { PdfFileContent } from '../../atoms/types/FileContent';
+import { PdfEditorContent } from '../../atoms/types/EditorContent';
 import { useDebouncedCallback } from '../../hooks/useDebouncedCallback';
 import { PdfViewerAPI } from '../../types/PdfViewerAPI';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).toString();
 
 interface PdfViewerProps {
-  file: PdfFileContent;
+  file: PdfEditorContent;
   pdfViewerRef: React.MutableRefObject<PdfViewerAPI | null>;
 }
 

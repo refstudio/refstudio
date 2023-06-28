@@ -1,7 +1,7 @@
-import { FileData } from './types/FileData';
+import { buildEditorId, EditorData } from './types/EditorData';
 import { FileEntry, FileFileEntry, FolderFileEntry } from './types/FileEntry';
 
-export function makeFile(name: string): { fileEntry: FileFileEntry; fileData: FileData } {
+export function makeFile(name: string): { fileEntry: FileFileEntry; editorData: EditorData } {
   const filePath = './' + name;
   return {
     fileEntry: {
@@ -12,9 +12,9 @@ export function makeFile(name: string): { fileEntry: FileFileEntry; fileData: Fi
       isDotfile: name.startsWith('.'),
       isFile: true,
     },
-    fileData: {
-      fileId: filePath,
-      fileName: name,
+    editorData: {
+      id: buildEditorId('text', filePath),
+      title: name,
     },
   };
 }
