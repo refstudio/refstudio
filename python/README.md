@@ -227,7 +227,7 @@ To run `update`:
 $ poetry run python main.py update --data '{"source_filename": "grobid-fails.pdf", "patch": {"title": "a title that was missing"}}'
 
 # Example:
-❯ poetry run python main.py update --data '{"source_filename": "grobid-fails.pdf", "patch": {"title": "a title that was missing"}}'
+$ poetry run python main.py update --data '{"source_filename": "grobid-fails.pdf", "patch": {"title": "a title that was missing"}}'
 | jq
 
 # Response:
@@ -243,5 +243,29 @@ $ poetry run python main.py update --data '{"source_filename": "does-not-exist.p
 {
   "status": "error",
   "message": "Unable to update does-not-exist.pdf: not found in storage"
+}
+
+# Full example showing the update
+$ cat .storage/references.json | jq '.[] | select(.source_filename | contains("fails")) | {"source_filename": .source_filename, "title": .title}'
+
+{
+  "source_filename": "grobid-fails.pdf",
+  "title": null
+}
+
+# run the update
+$ poetry run python main.py update --data '{"source_filename": "grobid-fails.pdf", "patch": {"title": "a title that was missing"}}'
+
+{
+  "status": "ok",
+  "message": ""
+}
+
+# check that it worked
+$ cat .storage/references.json | jq '.[] | select(.source_filename | contains("fails")) | {"source_filename": .source_filename, "title": .title}'
+
+{
+  "source_filename": "grobid-fails.pdf",
+  "title": "a title that was missing"
 }
 ```
