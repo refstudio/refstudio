@@ -1,4 +1,4 @@
-import { ReferencesFooterItems } from '../../references/footer/ReferencesFooterItems';
+import { ReferencesFooterItems } from '../../features/references/footer/ReferencesFooterItems';
 
 export function Footer() {
   return (

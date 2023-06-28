@@ -12,7 +12,7 @@ import { appConfigDir, appDataDir, join } from '@tauri-apps/api/path';
 
 import { FileContent } from '../atoms/types/FileContent';
 import { FileEntry, FileFileEntry } from '../atoms/types/FileEntry';
-import { INITIAL_CONTENT } from '../editor/TipTapEditorConfigs';
+import { INITIAL_CONTENT } from '../features/textEditor/components/tipTapEditorConfigs';
 
 const PROJECT_NAME = 'project-x';
 const UPLOADS_DIR = 'uploads';
