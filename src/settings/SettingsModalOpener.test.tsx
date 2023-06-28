@@ -3,8 +3,8 @@ import { act } from '@testing-library/react';
 import { RefStudioEvents } from '../events';
 import { noop } from '../lib/noop';
 import { mockListenEvent, render, screen } from '../test/test-utils';
-import { SettingsModalOpener } from './SettingsModalOpener';
 import { getCachedSetting, initSettings, saveCachedSettings, setCachedSetting } from './settingsManager';
+import { SettingsModalOpener } from './SettingsModalOpener';
 
 vi.mock('./settingsManager');
 vi.mock('../events');

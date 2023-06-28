@@ -7,7 +7,7 @@ import { AIPanel } from './ai/AIPanel';
 import { openReferenceAtom } from './atoms/fileActions';
 import { PrimarySideBar, PrimarySideBarPane } from './components/PrimarySideBar';
 import { VerticalResizeHandle } from './components/VerticalResizeHandle';
-import { RefStudioEvents, emitEvent } from './events';
+import { emitEvent,RefStudioEvents } from './events';
 import { ExplorerPanel } from './panels/ExplorerPanel';
 import { MainPanel } from './panels/MainPanel';
 import { ReferencesDropZone } from './references/components/ReferencesDropZone';

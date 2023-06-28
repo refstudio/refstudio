@@ -1,6 +1,6 @@
 import { getReferencesAtom, setReferencesAtom } from '../../atoms/referencesState';
 import { runGetAtomHook, runSetAtomHook } from '../../atoms/test-utils';
-import { RefStudioEvents, emitEvent } from '../../events';
+import { emitEvent,RefStudioEvents } from '../../events';
 import { noop } from '../../lib/noop';
 import { act, screen, setupWithJotaiProvider, within } from '../../test/test-utils';
 import { REFERENCES } from '../test-fixtures';
