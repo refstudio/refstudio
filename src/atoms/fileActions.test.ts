@@ -5,7 +5,6 @@ import { describe, expect, it } from 'vitest';
 
 import { readFileContent, writeFileContent } from '../filesystem';
 import { ReferenceItem } from '../types/ReferenceItem';
-import { asyncNoop } from '../utils/noop';
 import {
   activePaneAtom,
   activePaneContentAtom,
@@ -551,7 +550,7 @@ describe('fileActions', () => {
     });
 
     it('should call writeFileContent when using saveFileAtom', async () => {
-      vi.mocked(writeFileContent).mockImplementation(asyncNoop);
+      vi.mocked(writeFileContent).mockResolvedValueOnce(true);
 
       const { loadableFileAtom, updateFileBufferAtom, saveFileAtom } = fileContentAtoms;
 
@@ -572,7 +571,7 @@ describe('fileActions', () => {
     });
 
     it('should not call writeFileContent if the file buffer is empty', async () => {
-      vi.mocked(writeFileContent).mockImplementation(asyncNoop);
+      vi.mocked(writeFileContent).mockResolvedValueOnce(true);
 
       const { loadableFileAtom, saveFileAtom } = fileContentAtoms;
 
@@ -591,7 +590,7 @@ describe('fileActions', () => {
     });
 
     it('should not call writeFileContent if the type is not supported', async () => {
-      vi.mocked(writeFileContent).mockImplementation(asyncNoop);
+      vi.mocked(writeFileContent).mockResolvedValueOnce(true);
 
       const { loadableFileAtom, updateFileBufferAtom, saveFileAtom } = fileContentAtoms;
 

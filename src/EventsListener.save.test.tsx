@@ -14,7 +14,7 @@ vi.mock('./events');
 vi.mock('./filesystem');
 vi.mock('./utils/noop');
 
-describe('EventsListener', () => {
+describe('EventsListener.save', () => {
   let store: ReturnType<typeof createStore>;
   let fileEntry: FileEntry;
 

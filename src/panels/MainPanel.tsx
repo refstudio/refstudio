@@ -63,10 +63,11 @@ interface MainPanelPaneProps {
 
 export function MainPanelPane({ pane, pdfViewerRef }: MainPanelPaneProps & MainPanelProps) {
   const { files, activeFile, activeFileAtoms } = pane;
-  const items = files.map(({ fileId, fileName }) => ({
+  const items = files.map(({ fileId, fileName, isDirty }) => ({
     key: fileId,
     text: fileName,
     value: fileId,
+    isDirty,
   }));
 
   const selectFileInPane = useSetAtom(selectFileInPaneAtom);

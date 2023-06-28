@@ -24,3 +24,21 @@ export const removeFileData = atom(null, (get, set, fileId: FileId) => {
   updatedFilesData.delete(fileId);
   set(filesDataAtom, updatedFilesData);
 });
+
+/** Updated the `isDirty` flag of the given file */
+export const setFileDataIsDirtyAtom = atom(
+  null,
+  (get, set, { fileId, isDirty }: { fileId: FileId; isDirty: boolean }) => {
+    const updatedFilesData = new Map(get(filesDataAtom));
+
+    const fileData = updatedFilesData.get(fileId);
+
+    if (!fileData) {
+      console.warn('File is not open ', fileId);
+      return;
+    }
+
+    updatedFilesData.set(fileId, { ...fileData, isDirty });
+    set(filesDataAtom, updatedFilesData);
+  },
+);
