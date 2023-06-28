@@ -15,34 +15,30 @@ interface CloseButtonProps {
  */
 export function TabCloseButton({ isDirty, onClick }: CloseButtonProps) {
   return (
-    <div className={
-      cx(
+    <div
+      className={cx(
         'invisible group-hover:visible', // invisible unless the tab is hovered
         'group/tab-close-button',
         {
           '!visible': isDirty,
         },
-      )
-    }>
-      <VscClose className={cx(
-        'block',
-        'group-hover/tab-close-button:!block',
-        {
-          '!hidden': isDirty,
-        },
       )}
+    >
+      <VscClose
+        className={cx('block', 'group-hover/tab-close-button:!block', {
+          '!hidden': isDirty,
+        })}
         role="button"
         onClick={(e) => {
           e.stopPropagation();
           onClick();
-        }} />
-      <VscCircleFilled className={cx(
-        'hidden',
-        'group-hover/tab-close-button:!hidden',
-        {
+        }}
+      />
+      <VscCircleFilled
+        className={cx('hidden', 'group-hover/tab-close-button:!hidden', {
           '!block': isDirty,
-        },
-      )} />
+        })}
+      />
     </div>
   );
 }
