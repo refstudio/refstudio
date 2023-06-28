@@ -8,6 +8,7 @@ import { Footer } from './components/footer/Footer';
 import { PrimarySideBar, PrimarySideBarPane } from './components/PrimarySideBar';
 import { VerticalResizeHandle } from './components/VerticalResizeHandle';
 import { emitEvent, RefStudioEvents } from './events';
+import { EventsListener } from './EventsListener';
 import { AIPanel } from './panels/AIPanel';
 import { ExplorerPanel } from './panels/ExplorerPanel';
 import { MainPanel } from './panels/MainPanel';
@@ -23,23 +24,25 @@ function App() {
   }, [pdfViewerRef]);
 
   return (
-    <ReferencesDropZone>
-      <ApplicationFrame>
-        <PanelGroup
-          autoSaveId="refstudio"
-          className="relative h-full"
-          direction="horizontal"
-          onLayout={updatePDFViewerWidth}
-        >
-          <LeftSidePanelWrapper />
-          <Panel defaultSize={60} order={2}>
-            <MainPanel pdfViewerRef={pdfViewerRef} />
-          </Panel>
-          <RightPanelWrapper />
-        </PanelGroup>
-      </ApplicationFrame>
-      <SettingsModalOpener />
-    </ReferencesDropZone>
+    <EventsListener>
+      <ReferencesDropZone>
+        <ApplicationFrame>
+          <PanelGroup
+            autoSaveId="refstudio"
+            className="relative h-full"
+            direction="horizontal"
+            onLayout={updatePDFViewerWidth}
+          >
+            <LeftSidePanelWrapper />
+            <Panel defaultSize={60} order={2}>
+              <MainPanel pdfViewerRef={pdfViewerRef} />
+            </Panel>
+            <RightPanelWrapper />
+          </PanelGroup>
+        </ApplicationFrame>
+        <SettingsModalOpener />
+      </ReferencesDropZone>
+    </EventsListener>
   );
 }
 
