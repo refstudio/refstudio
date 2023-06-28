@@ -72,15 +72,20 @@ class PDFIngestion:
         self._call_grobid_for_staging()
         self._convert_grobid_xml_to_json()
 
-        references = self.create_references()
-        self.save_references(references)
+        self._create_references()
+        self._save_references()
 
         response = self.create_response_from_references(references)
         sys.stdout.write(response.json())
 
+<<<<<<< Updated upstream
         for ref in references:
             self._remove_temporary_files_for_reference(ref)
         
+=======
+        self._remove_temporary_files()
+
+>>>>>>> Stashed changes
         logger.info(f"Finished ingestion for project: {self.project_name}")
 
     def _create_directories(self) -> None:
@@ -172,8 +177,13 @@ class PDFIngestion:
         for filepath in files_to_ingest:
             logger.info(f"Copying {filepath.name} to {self.staging_dir}")
             shutil.copy(filepath, self.staging_dir)
+<<<<<<< Updated upstream
 
     def _remove_temporary_files_for_reference(self, ref: Reference) -> None:
+=======
+    
+    def _remove_temporary_files(self) -> None:
+>>>>>>> Stashed changes
         """
         Removes a Reference's temporary files that were created during 
         various stages of ingestion.
@@ -406,10 +416,10 @@ class PDFIngestion:
                     ref.citation_key = f"{key}{chr(97 + i)}"
         return references
 
-    def create_references(self) -> list[Reference]:
+    def _create_references(self) -> None:
         """
-        Creates a list of Reference objects from the json files in the storage directory
-        :return: List[Reference]
+        Creates new Reference objects, appending them to any we have 
+        previously loaded.
         """
         json_files = list(self.storage_dir.glob("*.json"))
 
@@ -422,7 +432,7 @@ class PDFIngestion:
 
         logger.info(f"Found {len(json_files)} Grobid JSON files to parse")
 
-        references = []
+        successes = []
         for file in json_files:
             logger.info(f"Creating Reference from file: {file.name}")
 
@@ -445,34 +455,45 @@ class PDFIngestion:
                 chunks=chunk_text(doc.get("body"))
             )
             ref.citation_key = shared.create_citation_key(ref)
-            references.append(ref)
+            successes.append(ref)
 
         failures = self._create_references_for_grobid_failures()
-        num_created = len(references) + len(failures)
+        num_created = len(successes) + len(failures)
 
         msg = (
             f"Created {num_created} Reference objects: "
-            f"{len(references)} successful Grobid parses, {len(failures)} Grobid failures"
+            f"{len(successes)} successful Grobid parses, {len(failures)} Grobid failures"
         )
         logger.info(msg)
 
+<<<<<<< Updated upstream
         references = references + failures
         self._add_citation_keys(references)
 
         return references
+=======
+        new_references = successes + failures
 
-    def save_references(self, references: list[Reference]) -> None:
+        self._add_citation_keys(new_references)
+        self._add_reference_statuses(new_references)
+>>>>>>> Stashed changes
+
+        # append new references to any we have previously loaded
+        for ref in new_references:
+            self.references.append(ref)
+
+    def _save_references(self) -> None:
         """
-        Saves a list of Reference objects to the filesystem
+        Saves all Reference objects to the filesystem
         """
-        filepath = os.path.join(self.storage_dir, "references.json")
+        filepath = self.storage_dir.joinpath("references.json")
         logger.info(f"Saving references to file: {filepath}")
 
-        contents = [ref.dict() for ref in references]
+        contents = [ref.dict() for ref in self.references]
         with open(filepath, "w") as fout:
             json.dump(contents, fout, indent=2, default=str)
 
-    def create_response_from_references(self, references: list[Reference]) -> IngestResponse:
+    def create_ingest_response(self) -> IngestResponse:
         """
         Creates a Response object from a list of Reference objects
         :param references: List[Reference]
@@ -480,7 +501,7 @@ class PDFIngestion:
         """
         return IngestResponse(
             project_name=self.project_name,
-            references=references,
+            references=self.references,
         )
     
 
