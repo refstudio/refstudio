@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render } from '@testing-library/react';
 import { default as userEvent } from '@testing-library/user-event';
+import { createStore, Provider } from 'jotai';
 
 import { listenEvent, RefStudioEventCallback } from '../events';
 import { noop } from './noop';
@@ -30,6 +31,15 @@ export function setup(jsx: React.ReactElement) {
   return {
     user: userEvent.setup(),
     ...customRender(jsx),
+  };
+}
+
+/** Renders given fragment with a jotai store wrapped context */
+export function setupWithJotaiProvider(jsx: React.ReactNode, store?: ReturnType<typeof createStore>) {
+  store = store ?? createStore();
+  return {
+    store,
+    ...customRender(<Provider store={store}>{jsx}</Provider>),
   };
 }
 

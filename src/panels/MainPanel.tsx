@@ -15,9 +15,6 @@ import { PaneContent } from '../atoms/types/PaneGroup';
 import { Spinner } from '../components/Spinner';
 import { TabPane } from '../components/TabPane';
 import { VerticalResizeHandle } from '../components/VerticalResizeHandle';
-import { RefStudioEvents } from '../events';
-import { useListenEvent } from '../hooks/useListenEvent';
-import { useSaveActiveFile } from '../hooks/useSaveActiveFile';
 import { PdfViewerAPI } from '../types/PdfViewerAPI';
 import { assertNever } from '../utils/assertNever';
 import { EmptyView } from '../views/EmptyView';
@@ -36,10 +33,6 @@ export function MainPanel(props: MainPanelProps) {
   const left = useAtomValue(leftPaneAtom);
   const right = useAtomValue(rightPaneAtom);
 
-  const saveActiveFile = useSaveActiveFile();
-
-  useListenEvent(RefStudioEvents.menu.file.save, saveActiveFile);
-
   const updatePDFViewerWidth = useCallback(() => {
     pdfViewerRef.current?.updateWidth();
   }, [pdfViewerRef]);
@@ -48,21 +41,19 @@ export function MainPanel(props: MainPanelProps) {
   const showLeft = left.files.length > 0 || !showRight;
 
   return (
-    <>
-      <PanelGroup autoSaveId="mainPanel" direction="horizontal" onLayout={updatePDFViewerWidth}>
-        {showLeft && (
-          <Panel order={1}>
-            <MainPanelPane pane={left} {...props} />
-          </Panel>
-        )}
-        {showLeft && showRight && <VerticalResizeHandle />}
-        {showRight && (
-          <Panel order={2}>
-            <MainPanelPane pane={right} {...props} />
-          </Panel>
-        )}
-      </PanelGroup>
-    </>
+    <PanelGroup autoSaveId="mainPanel" direction="horizontal" onLayout={updatePDFViewerWidth}>
+      {showLeft && (
+        <Panel order={1}>
+          <MainPanelPane pane={left} {...props} />
+        </Panel>
+      )}
+      {showLeft && showRight && <VerticalResizeHandle />}
+      {showRight && (
+        <Panel order={2}>
+          <MainPanelPane pane={right} {...props} />
+        </Panel>
+      )}
+    </PanelGroup>
   );
 }
 

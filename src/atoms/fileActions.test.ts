@@ -505,10 +505,6 @@ describe('fileActions', () => {
       fileContentAtoms = pane.activeFileAtoms!;
     });
 
-    afterEach(() => {
-      vi.clearAllMocks();
-    });
-
     it('should not update the file atom when using updateFileBufferAtom', async () => {
       const { loadableFileAtom, updateFileBufferAtom } = fileContentAtoms;
 
