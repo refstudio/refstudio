@@ -1,11 +1,11 @@
-import { noop } from '../utils/noop';
-import { render, screen, userEvent } from '../utils/test-utils';
+import { noop } from '../../utils/noop';
+import { render, screen, userEvent } from '../../utils/test-utils';
+import { getCachedSetting, initSettings, saveCachedSettings, setCachedSetting, SettingsSchema } from '../settings';
+import { PaneConfig } from '../types';
 import { GeneralSettingsPane } from './GeneralSettingsPane';
-import { getCachedSetting, initSettings, saveCachedSettings, setCachedSetting, SettingsSchema } from './settings';
-import { PaneConfig } from './types';
 
 vi.mock('./settings');
-vi.mock('../events');
+vi.mock('../../events');
 
 const panelConfig: PaneConfig = {
   id: 'project-general',

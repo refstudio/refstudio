@@ -1,5 +1,5 @@
-import { JSONDebug, JSONDebugContainer } from '../components/JSONDebug';
-import { getSettings } from './settings';
+import { JSONDebug, JSONDebugContainer } from '../../components/JSONDebug';
+import { getSettings } from '../settings';
 import { SettingsPane, SettingsPaneProps } from './SettingsPane';
 
 export function DebugSettingsPane({ config }: SettingsPaneProps) {
