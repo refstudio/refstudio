@@ -2,15 +2,8 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback } from 'react';
 import { Panel, PanelGroup } from 'react-resizable-panels';
 
-import {
-  closeEditorFromPaneAtom,
-  selectEditorInPaneAtom,
-} from '../../atoms/editorActions';
-import {
-  focusPaneAtom,
-  leftPaneAtom,
-  rightPaneAtom,
-} from '../../atoms/paneActions';
+import { closeEditorFromPaneAtom, selectEditorInPaneAtom } from '../../atoms/editorActions';
+import { focusPaneAtom, leftPaneAtom, rightPaneAtom } from '../../atoms/paneActions';
 import { EditorContentAtoms } from '../../atoms/types/EditorContentAtoms';
 import { PaneContent } from '../../atoms/types/PaneGroup';
 import { Spinner } from '../../components/Spinner';

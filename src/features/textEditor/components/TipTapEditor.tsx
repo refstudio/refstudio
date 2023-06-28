@@ -18,7 +18,8 @@ export function TipTapEditor({ editorContent, activeEditorContentAtoms }: Editor
   const [editor, setEditor] = useState<Editor | null>(null);
   const setSelection = useSetAtom(selectionAtom);
 
-  const { updateEditorContentBufferAtom: updateFileBufferAtom, saveEditorContentInMemoryAtom: saveFileInMemoryAtom } = activeEditorContentAtoms;
+  const { updateEditorContentBufferAtom: updateFileBufferAtom, saveEditorContentInMemoryAtom: saveFileInMemoryAtom } =
+    activeEditorContentAtoms;
 
   const updateFileBuffer = useSetAtom(updateFileBufferAtom);
   const saveFileInMemory = useSetAtom(saveFileInMemoryAtom);

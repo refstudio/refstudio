@@ -104,10 +104,9 @@ export function ExplorerPanel() {
           files={allFiles}
           paddingLeft="1.25rem"
           root
-          selectedFiles={
-            [left.activeEditor?.id, right.activeEditor?.id]
-              .filter(isNonNullish)
-              .map(editorId => parseEditorId(editorId).id)}
+          selectedFiles={[left.activeEditor?.id, right.activeEditor?.id]
+            .filter(isNonNullish)
+            .map((editorId) => parseEditorId(editorId).id)}
           onFileClick={handleOpenFile}
         />
       </PanelSection>

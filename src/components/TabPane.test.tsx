@@ -3,14 +3,7 @@ import { TabPane } from './TabPane';
 
 describe('TabPane component', () => {
   it('should render the one tab', () => {
-    render(
-      <TabPane
-        items={[{ key: 'k1', value: '1', text: 'File 1.txt' }]}
-        value="1"
-        onClick={() => 0}
-        onCloseClick={() => 1}
-      />,
-    );
+    render(<TabPane items={[{ value: '1', text: 'File 1.txt' }]} value="1" onClick={() => 0} onCloseClick={() => 1} />);
     expect(screen.getByText('File 1.txt')).toBeInTheDocument();
   });
 
@@ -18,8 +11,8 @@ describe('TabPane component', () => {
     render(
       <TabPane
         items={[
-          { key: 'k1', value: '1', text: 'File 1.txt' },
-          { key: 'k2', value: '2', text: 'File 2.txt' },
+          { value: '1', text: 'File 1.txt' },
+          { value: '2', text: 'File 2.txt' },
         ]}
         value="1"
         onClick={() => 0}
@@ -34,8 +27,8 @@ describe('TabPane component', () => {
     render(
       <TabPane
         items={[
-          { key: 'k1', value: '1', text: 'File 1.txt' },
-          { key: 'k2', value: '2', text: 'File 2.txt' },
+          { value: '1', text: 'File 1.txt' },
+          { value: '2', text: 'File 2.txt' },
         ]}
         value="1"
         onClick={() => 0}
@@ -54,8 +47,8 @@ describe('TabPane component', () => {
     render(
       <TabPane
         items={[
-          { key: 'k1', value: '1', text: 'File 1.txt' },
-          { key: 'k2', value: '2', text: 'File 2.txt' },
+          { value: '1', text: 'File 1.txt' },
+          { value: '2', text: 'File 2.txt' },
         ]}
         value="1"
         onClick={onClick}
@@ -78,8 +71,8 @@ describe('TabPane component', () => {
     render(
       <TabPane
         items={[
-          { key: 'k1', value: '1', text: 'File 1.txt' },
-          { key: 'k2', value: '2', text: 'File 2.txt' },
+          { value: '1', text: 'File 1.txt' },
+          { value: '2', text: 'File 2.txt' },
         ]}
         value="1"
         onClick={onClick}

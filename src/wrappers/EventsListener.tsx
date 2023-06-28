@@ -15,7 +15,9 @@ export function EventsListener({ children }: { children?: React.ReactNode }) {
 
 function useSaveActiveFile() {
   const activePaneContent = useAtomValue(activePaneContentAtom);
-  const saveFile = useSetAtom(activePaneContent.activeEditor?.contentAtoms.saveEditorContentAtom ?? atom(null, asyncNoop));
+  const saveFile = useSetAtom(
+    activePaneContent.activeEditor?.contentAtoms.saveEditorContentAtom ?? atom(null, asyncNoop),
+  );
 
   return () => void saveFile();
 }
