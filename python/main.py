@@ -8,7 +8,7 @@ if __name__ == '__main__':
         print(args)
     
     if args.command == "ingest":
-        ingest.main(args.pdf_directory)
+        ingest.run_ingest(args.pdf_directory)
     
     if args.command == "ingest_status":
         ingest.get_statuses()
