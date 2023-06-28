@@ -1,12 +1,12 @@
-import { TipTapFileContent } from '../../../atoms/types/FileContent';
-import { FileContentAtoms } from '../../../atoms/types/FileContentAtoms';
+import { TextEditorContent } from '../../../atoms/types/EditorContent';
+import { EditorContentAtoms } from '../../../atoms/types/EditorContentAtoms';
 import { TipTapEditor } from '../components/TipTapEditor';
 
 interface TipTapViewProps {
-  file: TipTapFileContent;
-  activeFileAtoms: FileContentAtoms;
+  file: TextEditorContent;
+  activeEditorContentAtoms: EditorContentAtoms;
 }
 
-export function TipTapView({ file, activeFileAtoms }: TipTapViewProps) {
-  return <TipTapEditor activeFileAtoms={activeFileAtoms} editorContent={file.textContent} />;
+export function TipTapView({ file, activeEditorContentAtoms }: TipTapViewProps) {
+  return <TipTapEditor activeEditorContentAtoms={activeEditorContentAtoms} editorContent={file.textContent} />;
 }

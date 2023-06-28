@@ -1,6 +1,7 @@
-import { activePaneAtom } from '../../../atoms/fileActions';
+import { activePaneAtom } from '../../../atoms/editorActions';
 import { referencesSyncInProgressAtom, setReferencesAtom } from '../../../atoms/referencesState';
 import { runGetAtomHook, runSetAtomHook } from '../../../atoms/test-utils';
+import { buildEditorId } from '../../../atoms/types/EditorData';
 import { emitEvent, RefStudioEvents } from '../../../events';
 import { act, mockListenEvent, screen, setupWithJotaiProvider } from '../../../test/test-utils';
 import { REFERENCES } from '../test-fixtures';
@@ -50,8 +51,8 @@ describe('ReferencesFooterItems component', () => {
     act(() => mockData.trigger());
 
     const opened = runGetAtomHook(activePaneAtom, store);
-    expect(opened.current.openFiles).toHaveLength(1);
-    expect(opened.current.activeFile).toBeDefined();
-    expect(opened.current.activeFile).toBe('refstudio://references');
+    expect(opened.current.openEditorIds).toHaveLength(1);
+    expect(opened.current.activeEditorId).toBeDefined();
+    expect(opened.current.activeEditorId).toBe(buildEditorId('references'));
   });
 });

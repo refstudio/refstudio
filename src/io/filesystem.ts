@@ -10,7 +10,7 @@ import {
 } from '@tauri-apps/api/fs';
 import { appConfigDir, appDataDir, join } from '@tauri-apps/api/path';
 
-import { FileContent } from '../atoms/types/FileContent';
+import { EditorContent } from '../atoms/types/EditorContent';
 import { FileEntry, FileFileEntry } from '../atoms/types/FileEntry';
 import { INITIAL_CONTENT } from '../features/textEditor/components/tipTapEditorConfigs';
 
@@ -76,7 +76,7 @@ export async function uploadFiles(files: File[]) {
   return Array.from(files).map((file) => file.name);
 }
 
-export async function readFileContent(file: FileFileEntry): Promise<FileContent> {
+export async function readFileContent(file: FileFileEntry): Promise<EditorContent> {
   switch (file.fileExtension) {
     case 'xml': {
       const textContent = await readTextFile(file.path);
@@ -92,7 +92,7 @@ export async function readFileContent(file: FileFileEntry): Promise<FileContent>
     }
     default: {
       const textContent = await readTextFile(file.path);
-      return { type: 'tiptap', textContent };
+      return { type: 'text', textContent };
     }
   }
 }

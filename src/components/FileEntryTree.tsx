@@ -1,14 +1,13 @@
 import { useState } from 'react';
 import { VscChevronDown, VscChevronRight, VscFile } from 'react-icons/vsc';
 
-import { FileId } from '../atoms/types/FileData';
 import { FileEntry, FolderFileEntry } from '../atoms/types/FileEntry';
 import { FileNode } from './FileNode';
 
 interface FileEntryTreePropsBase {
   files: FileEntry[];
-  onFileClick: (fileId: FileId) => void;
-  selectedFiles: FileId[];
+  onFileClick: (filePath: string) => void;
+  selectedFiles: string[];
   paddingLeft?: string;
 }
 

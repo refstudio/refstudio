@@ -1,20 +1,19 @@
-import { FileContentAtoms } from './FileContentAtoms';
-import { FileData, FileId } from './FileData';
+import { EditorContentAtoms } from './EditorContentAtoms';
+import { EditorData, EditorId } from './EditorData';
 
 export type PaneId = 'LEFT' | 'RIGHT';
 
-export interface PaneFileId {
+export interface PaneEditorId {
   paneId: PaneId;
-  fileId: FileId;
+  editorId: EditorId;
 }
 export interface PaneState {
-  openFiles: FileId[];
-  activeFile?: FileId;
+  openEditorIds: EditorId[];
+  activeEditorId?: EditorId;
 }
 
 export interface PaneContent {
   id: PaneId;
-  files: FileData[];
-  activeFile?: FileId;
-  activeFileAtoms?: FileContentAtoms;
+  openEditors: EditorData[];
+  activeEditor?: { id: EditorId; contentAtoms: EditorContentAtoms };
 }

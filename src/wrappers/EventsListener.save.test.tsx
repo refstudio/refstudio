@@ -1,8 +1,10 @@
 import { createStore } from 'jotai';
 
-import { activePaneAtom, activePaneContentAtom, closeFileFromPaneAtom, openFileAtom } from '../atoms/fileActions';
+import { activePaneAtom, closeEditorFromPaneAtom, openFileEntryAtom } from '../atoms/editorActions';
+import { activePaneContentAtom } from '../atoms/paneActions';
 import { makeFile } from '../atoms/test-fixtures';
 import { runSetAtomHook } from '../atoms/test-utils';
+import { EditorData } from '../atoms/types/EditorData';
 import { FileEntry } from '../atoms/types/FileEntry';
 import { RefStudioEvents } from '../events';
 import { readFileContent, writeFileContent } from '../io/filesystem';
@@ -17,14 +19,17 @@ vi.mock('../lib/noop');
 describe('EventsListener.save', () => {
   let store: ReturnType<typeof createStore>;
   let fileEntry: FileEntry;
+  let editorData: EditorData;
 
   beforeEach(() => {
-    vi.mocked(readFileContent).mockResolvedValue({ type: 'tiptap', textContent: 'Lorem Ipsum' });
+    vi.mocked(readFileContent).mockResolvedValue({ type: 'text', textContent: 'Lorem Ipsum' });
     store = createStore();
 
-    fileEntry = makeFile('File.txt').fileEntry;
+    const file = makeFile('File.txt');
+    fileEntry = file.fileEntry;
+    editorData = file.editorData;
 
-    store.set(openFileAtom, fileEntry);
+    store.set(openFileEntryAtom, fileEntry);
   });
 
   afterEach(() => {
@@ -47,17 +52,17 @@ describe('EventsListener.save', () => {
 
   it(`should call saveFile when ${RefStudioEvents.menu.file.save} event is triggered`, () => {
     const mockData = mockListenEvent();
-    const fileContentAtoms = store.get(activePaneContentAtom);
-    const { updateFileBufferAtom } = fileContentAtoms.activeFileAtoms!;
+    const activePaneContent = store.get(activePaneContentAtom);
+    const { updateEditorContentBufferAtom } = activePaneContent.activeEditor!.contentAtoms;
 
-    const updateFileBuffer = runSetAtomHook(updateFileBufferAtom, store);
+    const updateFileBuffer = runSetAtomHook(updateEditorContentBufferAtom, store);
 
     setupWithJotaiProvider(<EventsListener />, store);
 
     const updatedContent = 'Updated content';
 
     act(() => {
-      updateFileBuffer.current({ type: 'tiptap', textContent: updatedContent });
+      updateFileBuffer.current({ type: 'text', textContent: updatedContent });
       mockData.trigger();
     });
 
@@ -79,7 +84,7 @@ describe('EventsListener.save', () => {
 
   it(`should call asyncNoop ${RefStudioEvents.menu.file.save} event is triggered without content changes`, () => {
     const activePaneId = store.get(activePaneAtom).id;
-    store.set(closeFileFromPaneAtom, { fileId: fileEntry.path, paneId: activePaneId });
+    store.set(closeEditorFromPaneAtom, { editorId: editorData.id, paneId: activePaneId });
     const mockData = mockListenEvent();
 
     setupWithJotaiProvider(<EventsListener />, store);
