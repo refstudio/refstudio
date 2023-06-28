@@ -4,18 +4,18 @@ import { VscChevronUp } from 'react-icons/vsc';
 import { ImperativePanelHandle, Panel, PanelGroup } from 'react-resizable-panels';
 
 import { openReferenceAtom } from './atoms/fileActions';
-import { Footer } from './components/footer/Footer';
 import { PrimarySideBar, PrimarySideBarPane } from './components/PrimarySideBar';
 import { VerticalResizeHandle } from './components/VerticalResizeHandle';
 import { emitEvent, RefStudioEvents } from './events';
-import { EventsListener } from './EventsListener';
 import { AIPanel } from './panels/AIPanel';
 import { ExplorerPanel } from './panels/ExplorerPanel';
 import { MainPanel } from './panels/MainPanel';
-import { ReferencesDropZone } from './panels/references/ReferencesDropZone';
-import { ReferencesPanel } from './panels/references/ReferencesPanel';
+import { ReferencesDropZone } from './references/components/ReferencesDropZone';
+import { ReferencesPanel } from './references/sidebar/ReferencesPanel';
 import { SettingsModalOpener } from './settings/SettingsModalOpener';
 import { PdfViewerAPI } from './types/PdfViewerAPI';
+import { ApplicationFrame } from './wrappers/ApplicationFrame';
+import { EventsListener } from './wrappers/EventsListener';
 
 function App() {
   const pdfViewerRef = React.useRef<PdfViewerAPI>(null);
@@ -43,15 +43,6 @@ function App() {
         <SettingsModalOpener />
       </ReferencesDropZone>
     </EventsListener>
-  );
-}
-
-function ApplicationFrame({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex h-screen flex-col">
-      {children}
-      <Footer />
-    </div>
   );
 }
 

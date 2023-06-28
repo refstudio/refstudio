@@ -3,8 +3,8 @@ import './ReferenceView.css';
 import { useAtomValue } from 'jotai';
 import { useMemo } from 'react';
 
-import { getDerivedReferenceAtom } from '../atoms/referencesState';
-import { ReferenceFileContent } from '../atoms/types/FileContent';
+import { getDerivedReferenceAtom } from '../../atoms/referencesState';
+import { ReferenceFileContent } from '../../atoms/types/FileContent';
 
 export function ReferenceView({ referenceId }: Pick<ReferenceFileContent, 'referenceId'>) {
   const referenceAtom = useMemo(() => getDerivedReferenceAtom(referenceId), [referenceId]);

@@ -15,12 +15,12 @@ import { PaneContent } from '../atoms/types/PaneGroup';
 import { Spinner } from '../components/Spinner';
 import { TabPane } from '../components/TabPane';
 import { VerticalResizeHandle } from '../components/VerticalResizeHandle';
+import { ReferencesTableView } from '../references/editor/ReferencesTableView';
+import { ReferenceView } from '../references/editor/ReferenceView';
 import { PdfViewerAPI } from '../types/PdfViewerAPI';
 import { assertNever } from '../utils/assertNever';
 import { EmptyView } from '../views/EmptyView';
 import { PdfViewer } from '../views/PdfViewer';
-import { ReferencesTableView } from '../views/ReferencesTableView';
-import { ReferenceView } from '../views/ReferenceView';
 import { TextView } from '../views/TextView';
 import { TipTapView } from '../views/TipTapView';
 

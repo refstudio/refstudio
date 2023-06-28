@@ -1,9 +1,9 @@
 import { createStore, Provider } from 'jotai';
 
-import { setReferencesAtom } from '../atoms/referencesState';
-import { runSetAtomHook } from '../atoms/test-utils';
-import { UploadTipInstructions } from '../panels/references/UploadTipInstructions';
-import { act, render, screen } from '../utils/test-utils';
+import { setReferencesAtom } from '../../atoms/referencesState';
+import { runSetAtomHook } from '../../atoms/test-utils';
+import { act, render, screen } from '../../utils/test-utils';
+import { UploadTipInstructions } from '../components/UploadTipInstructions';
 import { ReferencesTableView } from './ReferencesTableView';
 
 describe('ReferencesTableView component', () => {

@@ -9,7 +9,7 @@ import { cx } from '../../cx';
 import { RefStudioEvents } from '../../events';
 import { uploadFiles } from '../../filesystem';
 import { useListenEvent } from '../../hooks/useListenEvent';
-import { FilesDragDropZone } from './FilesDragDropZone';
+import { FilesDragDropZone } from '../../wrappers/FilesDragDropZone';
 
 function validReferencesFiles(file: File) {
   return file.name.toLowerCase().endsWith('.pdf');

@@ -2,8 +2,8 @@ import './ReferenceView.css';
 
 import { useAtomValue } from 'jotai';
 
-import { getReferencesAtom } from '../atoms/referencesState';
-import { UploadTipInstructions } from '../panels/references/UploadTipInstructions';
+import { getReferencesAtom } from '../../atoms/referencesState';
+import { UploadTipInstructions } from '../components/UploadTipInstructions';
 
 export function ReferencesTableView() {
   const references = useAtomValue(getReferencesAtom);

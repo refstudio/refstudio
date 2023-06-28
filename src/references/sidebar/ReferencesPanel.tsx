@@ -6,9 +6,9 @@ import { PanelSection } from '../../components/PanelSection';
 import { PanelWrapper } from '../../components/PanelWrapper';
 import { emitEvent, RefStudioEvents } from '../../events';
 import { ReferenceItem } from '../../types/ReferenceItem';
+import { ResetReferencesInstructions } from '../components/ResetReferencesInstructions';
+import { UploadTipInstructions } from '../components/UploadTipInstructions';
 import { ReferencesList } from './ReferencesList';
-import { ResetReferencesInstructions } from './ResetReferencesInstructions';
-import { UploadTipInstructions } from './UploadTipInstructions';
 
 interface ReferencesPanelProps {
   onRefClicked: (item: ReferenceItem) => void;

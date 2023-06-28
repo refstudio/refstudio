@@ -1,5 +1,5 @@
-import { noop } from '../../utils/noop';
-import { fireEvent, render, screen } from '../../utils/test-utils';
+import { noop } from '../utils/noop';
+import { fireEvent, render, screen } from '../utils/test-utils';
 import { FilesDragDropZone } from './FilesDragDropZone';
 
 const onFileDropStarted = vi.fn();

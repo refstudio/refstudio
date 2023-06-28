@@ -1,18 +1,18 @@
 import { createStore } from 'jotai';
 
-import { activePaneAtom, activePaneContentAtom, closeFileFromPaneAtom, openFileAtom } from './atoms/fileActions';
-import { makeFile } from './atoms/test-fixtures';
-import { runSetAtomHook } from './atoms/test-utils';
-import { FileEntry } from './atoms/types/FileEntry';
-import { RefStudioEvents } from './events';
+import { activePaneAtom, activePaneContentAtom, closeFileFromPaneAtom, openFileAtom } from '../atoms/fileActions';
+import { makeFile } from '../atoms/test-fixtures';
+import { runSetAtomHook } from '../atoms/test-utils';
+import { FileEntry } from '../atoms/types/FileEntry';
+import { RefStudioEvents } from '../events';
+import { readFileContent, writeFileContent } from '../filesystem';
+import { asyncNoop } from '../utils/noop';
+import { act, mockListenEvent, screen, setupWithJotaiProvider } from '../utils/test-utils';
 import { EventsListener } from './EventsListener';
-import { readFileContent, writeFileContent } from './filesystem';
-import { asyncNoop } from './utils/noop';
-import { act, mockListenEvent, screen, setupWithJotaiProvider } from './utils/test-utils';
 
-vi.mock('./events');
-vi.mock('./filesystem');
-vi.mock('./utils/noop');
+vi.mock('../events');
+vi.mock('../filesystem');
+vi.mock('../utils/noop');
 
 describe('EventsListener.save', () => {
   let store: ReturnType<typeof createStore>;

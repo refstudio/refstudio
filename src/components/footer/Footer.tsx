@@ -1,4 +1,4 @@
-import { ReferencesFooterItems } from '../../panels/references/ReferencesFooterItems';
+import { ReferencesFooterItems } from '../../references/footer/ReferencesFooterItems';
 
 export function Footer() {
   return (
