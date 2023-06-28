@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { IconType } from 'react-icons';
 import { VscChevronDown, VscChevronRight } from 'react-icons/vsc';
 
-import { cx } from '../cx';
+import { cx } from '../lib/cx';
 
 export function PanelSection({
   title,

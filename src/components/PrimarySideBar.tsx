@@ -1,7 +1,7 @@
 import { IconType } from 'react-icons';
 import { VscFiles, VscLibrary, VscSettingsGear } from 'react-icons/vsc';
 
-import { cx } from '../cx';
+import { cx } from '../lib/cx';
 
 export type PrimarySideBarPane = 'Explorer' | 'References';
 

@@ -1,6 +1,6 @@
 import { IconType } from 'react-icons';
 
-import { cx } from '../cx';
+import { cx } from '../lib/cx';
 
 export interface RightAction {
   title?: string;

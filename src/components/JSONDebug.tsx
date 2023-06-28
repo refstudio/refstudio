@@ -1,4 +1,4 @@
-import { cx } from '../cx';
+import { cx } from '../lib/cx';
 
 export function JSONDebug<T>({ header, value }: { header?: string; value: T }) {
   if (!import.meta.env.DEV) {

@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
 
-import { readFileContent } from '../../filesystem';
+import { readFileContent } from '../../io/filesystem';
 import { createFileContentAtoms } from '../createFileContentAtoms';
 import { FileContent } from '../types/FileContent';
 import { FileContentAtoms } from '../types/FileContentAtoms';

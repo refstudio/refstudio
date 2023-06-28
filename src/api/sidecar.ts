@@ -2,7 +2,7 @@
 
 import { Command } from '@tauri-apps/api/shell';
 
-import { getCachedSetting } from '../settings/settings';
+import { getCachedSetting } from '../settings/settingsManager';
 import { CliCommands } from './types';
 
 export async function callSidecar<T extends keyof CliCommands>(subcommand: T, args: string[]): Promise<CliCommands[T]> {
