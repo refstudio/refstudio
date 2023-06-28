@@ -1,22 +1,11 @@
-import { useState } from 'react';
 import { VscCircleFilled, VscClose } from 'react-icons/vsc';
 
+import { cx } from '../cx';
+
 interface CloseButtonProps {
+  className?: string;
   isDirty?: boolean;
   onClick: () => void;
-}
-
-function CloseIcon({ onClick }: Pick<CloseButtonProps, 'onClick'>) {
-  return (
-    <VscClose
-      className="invisible group-hover:visible"
-      role="button"
-      onClick={(e) => {
-        e.stopPropagation();
-        onClick();
-      }}
-    />
-  );
 }
 
 /**
@@ -25,11 +14,35 @@ function CloseIcon({ onClick }: Pick<CloseButtonProps, 'onClick'>) {
  * When the file is not dirty, there is an invisble close icon, that appears when the tab is hovered
  */
 export function TabCloseButton({ isDirty, onClick }: CloseButtonProps) {
-  const [isHovered, setIsHovered] = useState(false);
-
   return (
-    <div onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
-      {isDirty ? isHovered ? <CloseIcon onClick={onClick} /> : <VscCircleFilled /> : <CloseIcon onClick={onClick} />}
+    <div className={
+      cx(
+        'invisible group-hover:visible', // invisible unless the tab is hovered
+        'group/tab-close-button',
+        {
+          '!visible': isDirty,
+        },
+      )
+    }>
+      <VscClose className={cx(
+        'block',
+        'group-hover/tab-close-button:!block',
+        {
+          '!hidden': isDirty,
+        },
+      )}
+        role="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onClick();
+        }} />
+      <VscCircleFilled className={cx(
+        'hidden',
+        'group-hover/tab-close-button:!hidden',
+        {
+          '!block': isDirty,
+        },
+      )} />
     </div>
   );
 }
