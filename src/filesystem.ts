@@ -55,6 +55,14 @@ export async function readAllProjectFiles() {
   return sortedFileEntries(fileEntries);
 }
 
+export async function writeFileContent(path: string, textContent: string) {
+  try {
+    await writeTextFile(path, textContent);
+  } catch (err) {
+    console.error('Error', err);
+  }
+}
+
 export async function uploadFiles(files: File[]) {
   console.log('upload', files);
   const uploadsDir = await join(await getBaseDir(), UPLOADS_DIR);

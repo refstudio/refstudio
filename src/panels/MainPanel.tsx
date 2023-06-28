@@ -1,5 +1,4 @@
-import { Atom, useAtomValue, useSetAtom } from 'jotai';
-import { Loadable } from 'jotai/vanilla/utils/loadable';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback } from 'react';
 import { Panel, PanelGroup } from 'react-resizable-panels';
 
@@ -10,7 +9,7 @@ import {
   rightPaneAtom,
   selectFileInPaneAtom,
 } from '../atoms/fileActions';
-import { FileContent } from '../atoms/types/FileContent';
+import { FileContentAtoms } from '../atoms/types/FileContentAtoms';
 import { FileId } from '../atoms/types/FileData';
 import { PaneContent } from '../atoms/types/PaneGroup';
 import { Spinner } from '../components/Spinner';
@@ -42,21 +41,19 @@ export function MainPanel(props: MainPanelProps) {
   const showLeft = left.files.length > 0 || !showRight;
 
   return (
-    <>
-      <PanelGroup autoSaveId="mainPanel" direction="horizontal" onLayout={updatePDFViewerWidth}>
-        {showLeft && (
-          <Panel order={1}>
-            <MainPanelPane pane={left} {...props} />
-          </Panel>
-        )}
-        {showLeft && showRight && <VerticalResizeHandle />}
-        {showRight && (
-          <Panel order={2}>
-            <MainPanelPane pane={right} {...props} />
-          </Panel>
-        )}
-      </PanelGroup>
-    </>
+    <PanelGroup autoSaveId="mainPanel" direction="horizontal" onLayout={updatePDFViewerWidth}>
+      {showLeft && (
+        <Panel order={1}>
+          <MainPanelPane pane={left} {...props} />
+        </Panel>
+      )}
+      {showLeft && showRight && <VerticalResizeHandle />}
+      {showRight && (
+        <Panel order={2}>
+          <MainPanelPane pane={right} {...props} />
+        </Panel>
+      )}
+    </PanelGroup>
   );
 }
 
@@ -65,7 +62,7 @@ interface MainPanelPaneProps {
 }
 
 export function MainPanelPane({ pane, pdfViewerRef }: MainPanelPaneProps & MainPanelProps) {
-  const { files, activeFile, activeFileContent } = pane;
+  const { files, activeFile, activeFileAtoms } = pane;
   const items = files.map(({ fileId, fileName }) => ({
     key: fileId,
     text: fileName,
@@ -87,8 +84,8 @@ export function MainPanelPane({ pane, pdfViewerRef }: MainPanelPaneProps & MainP
         />
       </div>
       <div className="flex w-full grow overflow-hidden">
-        {activeFile && activeFileContent ? (
-          <MainPaneViewContent activeFileAtom={activeFileContent} fileId={activeFile} pdfViewerRef={pdfViewerRef} />
+        {activeFile && activeFileAtoms ? (
+          <MainPaneViewContent activeFileAtoms={activeFileAtoms} fileId={activeFile} pdfViewerRef={pdfViewerRef} />
         ) : (
           <EmptyView />
         )}
@@ -98,13 +95,14 @@ export function MainPanelPane({ pane, pdfViewerRef }: MainPanelPaneProps & MainP
 }
 
 interface MainPaneViewContentProps {
-  activeFileAtom: Atom<Loadable<FileContent>>;
+  activeFileAtoms: FileContentAtoms;
   fileId: FileId;
   pdfViewerRef: React.MutableRefObject<PdfViewerAPI | null>;
 }
 
-export function MainPaneViewContent({ activeFileAtom, pdfViewerRef }: MainPaneViewContentProps) {
-  const loadableFileContent = useAtomValue(activeFileAtom);
+export function MainPaneViewContent({ activeFileAtoms, pdfViewerRef }: MainPaneViewContentProps) {
+  const { loadableFileAtom } = activeFileAtoms;
+  const loadableFileContent = useAtomValue(loadableFileAtom);
 
   if (loadableFileContent.state === 'loading') {
     return <Spinner />;
@@ -124,7 +122,7 @@ export function MainPaneViewContent({ activeFileAtom, pdfViewerRef }: MainPaneVi
     case 'pdf':
       return <PdfViewer file={data} pdfViewerRef={pdfViewerRef} />;
     case 'tiptap':
-      return <TipTapView file={data} />;
+      return <TipTapView activeFileAtoms={activeFileAtoms} file={data} />;
     case 'reference':
       return <ReferenceView referenceId={data.referenceId} />;
     case 'references':

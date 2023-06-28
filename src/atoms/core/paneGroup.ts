@@ -3,7 +3,7 @@ import { atom, Getter } from 'jotai';
 import { isNonNullish } from '../../lib/isNonNullish';
 import { PaneContent, PaneFileId, PaneId, PaneState } from '../types/PaneGroup';
 import { activePaneIdAtom } from './activePane';
-import { fileContentAtom } from './fileContent';
+import { fileContentStateAtom } from './fileContent';
 import { filesDataAtom } from './fileData';
 
 type PaneGroupState = Record<PaneId, PaneState>;
@@ -21,13 +21,13 @@ export const paneGroupAtom = atom<PaneGroupState>({
 export function getPane(get: Getter, paneId: PaneId): PaneContent {
   const panes = get(paneGroupAtom);
   const filesData = get(filesDataAtom);
-  const openFiles = get(fileContentAtom);
+  const openFiles = get(fileContentStateAtom);
   const pane = panes[paneId];
   return {
     id: paneId,
     files: pane.openFiles.map((id) => filesData.get(id)).filter(isNonNullish),
     activeFile: pane.activeFile,
-    activeFileContent: pane.activeFile ? openFiles.get(pane.activeFile) : undefined,
+    activeFileAtoms: pane.activeFile ? openFiles.get(pane.activeFile) : undefined,
   };
 }
 
