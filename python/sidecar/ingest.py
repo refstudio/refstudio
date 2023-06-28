@@ -75,17 +75,12 @@ class PDFIngestion:
         self._create_references()
         self._save_references()
 
-        response = self.create_response_from_references(references)
+        response = self.create_ingest_response()
         sys.stdout.write(response.json())
 
-<<<<<<< Updated upstream
-        for ref in references:
+        for ref in self.references:
             self._remove_temporary_files_for_reference(ref)
         
-=======
-        self._remove_temporary_files()
-
->>>>>>> Stashed changes
         logger.info(f"Finished ingestion for project: {self.project_name}")
 
     def _create_directories(self) -> None:
@@ -177,13 +172,8 @@ class PDFIngestion:
         for filepath in files_to_ingest:
             logger.info(f"Copying {filepath.name} to {self.staging_dir}")
             shutil.copy(filepath, self.staging_dir)
-<<<<<<< Updated upstream
 
     def _remove_temporary_files_for_reference(self, ref: Reference) -> None:
-=======
-    
-    def _remove_temporary_files(self) -> None:
->>>>>>> Stashed changes
         """
         Removes a Reference's temporary files that were created during 
         various stages of ingestion.
@@ -348,6 +338,7 @@ class PDFIngestion:
 
         references = []
         for file in txt_files:
+            logger.info(f"Creating Reference from file: {file.name}")
             source_pdf = f"{file.stem.rpartition('_')[0]}.pdf"
             references.append(
                 Reference(
@@ -466,17 +457,8 @@ class PDFIngestion:
         )
         logger.info(msg)
 
-<<<<<<< Updated upstream
-        references = references + failures
-        self._add_citation_keys(references)
-
-        return references
-=======
         new_references = successes + failures
-
         self._add_citation_keys(new_references)
-        self._add_reference_statuses(new_references)
->>>>>>> Stashed changes
 
         # append new references to any we have previously loaded
         for ref in new_references:
@@ -496,8 +478,10 @@ class PDFIngestion:
     def create_ingest_response(self) -> IngestResponse:
         """
         Creates a Response object from a list of Reference objects
-        :param references: List[Reference]
-        :return: Response
+
+        Returns
+        -------
+        response : IngestResponse
         """
         return IngestResponse(
             project_name=self.project_name,
