@@ -1,16 +1,16 @@
 import { createStore } from 'jotai';
 
-import { activePaneAtom, closeEditorFromPaneAtom, openFileEntryAtom } from '../atoms/editorActions';
-import { activePaneContentAtom } from '../atoms/paneActions';
-import { makeFile } from '../atoms/test-fixtures';
-import { runSetAtomHook } from '../atoms/test-utils';
-import { EditorData } from '../atoms/types/EditorData';
-import { FileEntry } from '../atoms/types/FileEntry';
-import { RefStudioEvents } from '../events';
-import { readFileContent, writeFileContent } from '../io/filesystem';
-import { asyncNoop } from '../lib/noop';
-import { act, mockListenEvent, screen, setupWithJotaiProvider } from '../test/test-utils';
-import { EventsListener } from './EventsListener';
+import { activePaneAtom, closeEditorFromPaneAtom, openFileEntryAtom } from '../../atoms/editorActions';
+import { activePaneContentAtom } from '../../atoms/paneActions';
+import { makeFile } from '../../atoms/test-fixtures';
+import { runSetAtomHook } from '../../atoms/test-utils';
+import { EditorData } from '../../atoms/types/EditorData';
+import { FileEntry } from '../../atoms/types/FileEntry';
+import { RefStudioEvents } from '../../events';
+import { readFileContent, writeFileContent } from '../../io/filesystem';
+import { asyncNoop } from '../../lib/noop';
+import { act, mockListenEvent, screen, setupWithJotaiProvider } from '../../test/test-utils';
+import { EventsListener } from '../EventsListener';
 
 vi.mock('../events');
 vi.mock('../io/filesystem');

@@ -1,8 +1,8 @@
-import { noop } from '../lib/noop';
-import { render, screen, userEvent } from '../test/test-utils';
-import { getCachedSetting, initSettings, saveCachedSettings, setCachedSetting } from './settingsManager';
-import { SettingsModal } from './SettingsModal';
-import { SettingsPaneId } from './types';
+import { noop } from '../../lib/noop';
+import { render, screen, userEvent } from '../../test/test-utils';
+import { getCachedSetting, initSettings, saveCachedSettings, setCachedSetting } from '../settingsManager';
+import { SettingsModal } from '../SettingsModal';
+import { SettingsPaneId } from '../types';
 
 vi.mock('./settingsManager');
 vi.mock('../events');

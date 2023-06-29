@@ -1,6 +1,6 @@
 import { SettingsManager } from 'tauri-settings';
 
-import { readEnv } from '../io/readEnv';
+import { readEnv } from '../../io/readEnv';
 import {
   getCachedSetting,
   getSettings,
@@ -8,7 +8,7 @@ import {
   saveCachedSettings,
   setCachedSetting,
   SettingsSchema,
-} from './settingsManager';
+} from '../settingsManager';
 
 vi.mock('tauri-settings');
 vi.mock('../io/filesystem');

@@ -1,10 +1,10 @@
 import { SettingsManager } from 'tauri-settings';
 
-import { render, screen } from '../../test/test-utils';
-import { getSettings, initSettings, saveCachedSettings, SettingsSchema } from '../settingsManager';
-import { PaneConfig } from '../types';
-import { DebugSettingsPane } from './DebugSettingsPane';
-import { GeneralSettingsPane } from './GeneralSettingsPane';
+import { render, screen } from '../../../test/test-utils';
+import { getSettings, initSettings, saveCachedSettings, SettingsSchema } from '../../settingsManager';
+import { PaneConfig } from '../../types';
+import { DebugSettingsPane } from '../DebugSettingsPane';
+import { GeneralSettingsPane } from '../GeneralSettingsPane';
 
 vi.mock('../settingsManager');
 vi.mock('../../events');
