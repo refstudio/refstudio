@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { getUploadsDir } from '../io/filesystem';
-import { runPDFIngestion } from './ingestion';
-import { callSidecar } from './sidecar';
+import { getUploadsDir } from '../../io/filesystem';
+import { runPDFIngestion } from '../ingestion';
+import { callSidecar } from '../sidecar';
 
 vi.mock('./sidecar');
 vi.mock('../io/filesystem');

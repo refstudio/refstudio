@@ -1,15 +1,15 @@
 import { Command, SpawnOptions } from '@tauri-apps/api/shell';
 import { describe, it } from 'vitest';
 
-import { noop } from '../lib/noop';
+import { noop } from '../../lib/noop';
 import {
   getCachedSetting,
   initSettings,
   saveCachedSettings,
   setCachedSetting,
   SettingsSchema,
-} from '../settings/settingsManager';
-import { callSidecar } from './sidecar';
+} from '../../settings/settingsManager';
+import { callSidecar } from '../sidecar';
 
 vi.mock('../settings/settingsManager');
 vi.mock('@tauri-apps/api/shell');

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { askForRewrite } from './rewrite';
-import { callSidecar } from './sidecar';
-import { RewriteChoice } from './types';
+import { askForRewrite } from '../rewrite';
+import { callSidecar } from '../sidecar';
+import { RewriteChoice } from '../types';
 
 vi.mock('./sidecar');
 vi.mock('../io/filesystem');

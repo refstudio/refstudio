@@ -1,7 +1,7 @@
 import { describe, expect } from 'vitest';
 
-import { chatWithAI } from './chat';
-import { callSidecar } from './sidecar';
+import { chatWithAI } from '../chat';
+import { callSidecar } from '../sidecar';
 
 vi.mock('./sidecar');
 
