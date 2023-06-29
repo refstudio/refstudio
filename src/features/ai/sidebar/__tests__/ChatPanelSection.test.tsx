@@ -1,10 +1,10 @@
 import { screen, waitFor } from '@testing-library/react';
 
-import { chatWithAI } from '../../../api/chat';
-import { render, userEvent } from '../../../test/test-utils';
-import { ChatPanelSection } from './ChatPanelSection';
+import { chatWithAI } from '../../../../api/chat';
+import { render, userEvent } from '../../../../test/test-utils';
+import { ChatPanelSection } from '../ChatPanelSection';
 
-vi.mock('../../../api/chat');
+vi.mock('../../../../api/chat');
 
 describe('ChatPanelSection component', () => {
   afterEach(() => {

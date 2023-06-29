@@ -1,9 +1,9 @@
 import { Editor, EditorContent } from '@tiptap/react';
 
-import { act, screen, setup } from '../../../../../test/test-utils';
-import { EDITOR_EXTENSIONS } from '../../tipTapEditorConfigs';
-import { defaultCollapsibleBlock, defaultUncollapsedCollapsibleBlock } from '../test-fixtures';
-import { findNodesByNodeType } from '../test-utils';
+import { act, screen, setup } from '../../../../../../test/test-utils';
+import { EDITOR_EXTENSIONS } from '../../../tipTapEditorConfigs';
+import { defaultCollapsibleBlock, defaultUncollapsedCollapsibleBlock } from '../../test-fixtures';
+import { findNodesByNodeType } from '../../test-utils';
 
 describe('CollapsibleBlock', () => {
   const editor = new Editor({

@@ -1,7 +1,7 @@
 import { Editor } from '@tiptap/react';
 
-import { EDITOR_EXTENSIONS } from '../tipTapEditorConfigs';
-import { getPrettyHTML, getPrettyHTMLWithSelection, getSelectedText, setUpEditorWithSelection } from './test-utils';
+import { EDITOR_EXTENSIONS } from '../../tipTapEditorConfigs';
+import { getPrettyHTML, getPrettyHTMLWithSelection, getSelectedText, setUpEditorWithSelection } from '../test-utils';
 
 describe('TipTap test utils', () => {
   const editor = new Editor({
