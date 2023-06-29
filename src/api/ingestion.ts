@@ -11,7 +11,11 @@ function parsePdfIngestionResponse(response: IngestResponse): ReferenceItem[] {
     title: reference.title ?? reference.source_filename.replace('.pdf', ''),
     publishedDate: reference.published_date ?? '',
     abstract: reference.abstract ?? '',
-    authors: (reference.authors ?? []).map((author) => ({ fullName: author.full_name })),
+    status: reference.status,
+    authors: (reference.authors ?? []).map((author) => ({
+      fullName: author.full_name,
+      lastName: author.surname ?? author.full_name.split(' ').pop() ?? '',
+    })),
   }));
 }
 

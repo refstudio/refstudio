@@ -1,9 +1,7 @@
-import { useSetAtom } from 'jotai';
 import React, { useCallback, useEffect, useState } from 'react';
 import { VscChevronUp } from 'react-icons/vsc';
 import { ImperativePanelHandle, Panel, PanelGroup } from 'react-resizable-panels';
 
-import { openReferenceAtom } from '../atoms/editorActions';
 import { PrimarySideBar, PrimarySideBarPane } from '../components/PrimarySideBar';
 import { VerticalResizeHandle } from '../components/VerticalResizeHandle';
 import { emitEvent, RefStudioEvents } from '../events';
@@ -50,7 +48,6 @@ function LeftSidePanelWrapper() {
   const leftPanelRef = React.useRef<ImperativePanelHandle>(null);
   const [primaryPaneCollapsed, setPrimaryPaneCollapsed] = useState(false);
   const [primaryPane, setPrimaryPane] = useState<PrimarySideBarPane>('Explorer');
-  const openReference = useSetAtom(openReferenceAtom);
 
   const handleSideBarClick = (selectedPane: PrimarySideBarPane) => {
     if (selectedPane === primaryPane) {
@@ -88,7 +85,7 @@ function LeftSidePanelWrapper() {
         onCollapse={(collapsed) => setPrimaryPaneCollapsed(collapsed)}
       >
         {primaryPane === 'Explorer' && <ExplorerPanel />}
-        {primaryPane === 'References' && <ReferencesPanel onRefClicked={(reference) => openReference(reference.id)} />}
+        {primaryPane === 'References' && <ReferencesPanel />}
       </Panel>
       <VerticalResizeHandle />
     </>

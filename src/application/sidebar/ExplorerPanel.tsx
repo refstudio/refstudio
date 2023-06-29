@@ -48,6 +48,7 @@ export function ExplorerPanel() {
         console.warn('This file does not exist');
         return;
       }
+      console.log('file', file);
       openFile(file);
     },
     [flattenedFiles, openFile],
