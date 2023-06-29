@@ -2471,7 +2471,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"clsx@npm:^1.2.1":
+"clsx@npm:^1.1.1, clsx@npm:^1.2.1":
   version: 1.2.1
   resolution: "clsx@npm:1.2.1"
   checksum: 30befca8019b2eb7dbad38cff6266cf543091dae2825c856a62a8ccf2c3ab9c2907c4d12b288b73101196767f66812365400a227581484a05f968b0307cfaf12
@@ -6021,6 +6021,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-data-grid@npm:^7.0.0-beta.34":
+  version: 7.0.0-canary.49
+  resolution: "react-data-grid@npm:7.0.0-canary.49"
+  dependencies:
+    clsx: ^1.1.1
+  peerDependencies:
+    react: ^16.14 || ^17.0
+    react-dom: ^16.14 || ^17.0
+  checksum: fe57d441a5e56dac39a0f7e06979a27d5606515653ead31fc06f9c2fe08ebaf88ff4ab70f1565dd356b343cf4612137dea2d188a40a7e246b85dd5aa2589da04
+  languageName: node
+  linkType: hard
+
 "react-dom@npm:^18.2.0":
   version: 18.2.0
   resolution: "react-dom@npm:18.2.0"
@@ -6223,6 +6235,7 @@ __metadata:
     prettier: ^2.8.8
     prettier-plugin-tailwindcss: ^0.3.0
     react: ^18.2.0
+    react-data-grid: ^7.0.0-beta.34
     react-dom: ^18.2.0
     react-icons: ^4.8.0
     react-pdf: ^6.2.2

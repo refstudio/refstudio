@@ -1,6 +1,7 @@
 import './ReferenceView.css';
 
 import { useAtomValue } from 'jotai';
+import DataGrid from 'react-data-grid';
 
 import { getReferencesAtom } from '../../../atoms/referencesState';
 import { UploadTipInstructions } from '../components/UploadTipInstructions';
@@ -11,7 +12,23 @@ export function ReferencesTableView() {
   return (
     <div className="w-full overflow-y-auto p-6">
       {references.length === 0 && <UploadTipInstructions />}
-      <table className="w-full border border-slate-300 text-left text-gray-500 ">
+
+      <DataGrid
+        columns={[
+          { key: 'citationKey', name: 'Citation Key' },
+          { key: 'title', name: 'Title' },
+          { key: 'date', name: 'Date' },
+          { key: 'authors', name: 'Authors' },
+        ]}
+        rows={references.map((reference) => ({
+          citationKey: reference.citationKey,
+          title: reference.title,
+          date: reference.publishedDate,
+          authors: reference.authors.map((a) => a.fullName),
+        }))}
+      />
+
+      {/* <table className="w-full border border-slate-300 text-left text-gray-500 ">
         <thead>
           <tr className="h-10 bg-slate-300 text-black">
             <th scope="col">Citation Key</th>
@@ -38,7 +55,7 @@ export function ReferencesTableView() {
             </tr>
           ))}
         </tbody>
-      </table>
+      </table> */}
     </div>
   );
 }
