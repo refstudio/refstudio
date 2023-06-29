@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
+import { describe, expect, it } from 'bun:test';
 import { useAtom } from 'jotai';
-import { describe, expect, it } from 'vitest';
 
 import { selectionAtom } from './selectionState';
 

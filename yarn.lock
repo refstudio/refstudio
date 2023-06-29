@@ -567,6 +567,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@happy-dom/global-registrator@npm:^9.20.3":
+  version: 9.20.3
+  resolution: "@happy-dom/global-registrator@npm:9.20.3"
+  dependencies:
+    happy-dom: ^9.20.3
+  checksum: 8d77044850ebb6b39f1108f764f1742fe30787941533bd207b565b32dc1860fb39787d17ab9df5a66320cede809fdb35a77d52f2e8b99f77e3fc8d65ba2ce4ea
+  languageName: node
+  linkType: hard
+
 "@humanwhocodes/config-array@npm:^0.11.10":
   version: 0.11.10
   resolution: "@humanwhocodes/config-array@npm:0.11.10"
@@ -2903,7 +2912,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"entities@npm:^4.4.0":
+"entities@npm:^4.4.0, entities@npm:^4.5.0":
   version: 4.5.0
   resolution: "entities@npm:4.5.0"
   checksum: 853f8ebd5b425d350bffa97dd6958143179a5938352ccae092c62d1267c4e392a039be1bae7d51b6e4ffad25f51f9617531fedf5237f15df302ccfb452cbf2d7
@@ -3938,6 +3947,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"happy-dom@npm:^9.20.3":
+  version: 9.20.3
+  resolution: "happy-dom@npm:9.20.3"
+  dependencies:
+    css.escape: ^1.5.1
+    entities: ^4.5.0
+    iconv-lite: ^0.6.3
+    webidl-conversions: ^7.0.0
+    whatwg-encoding: ^2.0.0
+    whatwg-mimetype: ^3.0.0
+  checksum: 7c737a0005aaf72e1f7138e5fe651759618d45c67597ab9865434da4a980a2854b4179ee678a84a5613c1bf4da88e64437670048cc2466c946265110c8a49f55
+  languageName: node
+  linkType: hard
+
 "has-bigints@npm:^1.0.1, has-bigints@npm:^1.0.2":
   version: 1.0.2
   resolution: "has-bigints@npm:1.0.2"
@@ -4076,7 +4099,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"iconv-lite@npm:0.6.3, iconv-lite@npm:^0.6.2":
+"iconv-lite@npm:0.6.3, iconv-lite@npm:^0.6.2, iconv-lite@npm:^0.6.3":
   version: 0.6.3
   resolution: "iconv-lite@npm:0.6.3"
   dependencies:
@@ -6184,6 +6207,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "refstudio@workspace:."
   dependencies:
+    "@happy-dom/global-registrator": ^9.20.3
     "@tanstack/react-query": ^4.29.13
     "@tauri-apps/api": ^1.2.0
     "@tauri-apps/cli": ^1.2.3

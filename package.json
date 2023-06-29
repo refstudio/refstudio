@@ -56,6 +56,7 @@
     "usehooks-ts": "^2.9.1"
   },
   "devDependencies": {
+    "@happy-dom/global-registrator": "^9.20.3",
     "@tauri-apps/cli": "^1.2.3",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",

@@ -1,6 +1,6 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
+import { afterEach, describe, expect, it, mock } from 'bun:test';
 import { createStore, useAtomValue } from 'jotai';
-import { describe, expect, it } from 'vitest';
 
 import { readFileContent } from '../io/filesystem';
 import { ReferenceItem } from '../types/ReferenceItem';
@@ -20,11 +20,11 @@ import { runGetAtomHook, runSetAtomHook } from './test-utils';
 import { buildEditorId } from './types/EditorData';
 import { PaneId } from './types/PaneGroup';
 
-vi.mock('../io/filesystem');
+mock('../io/filesystem');
 
 describe('fileActions', () => {
   afterEach(() => {
-    vi.clearAllMocks();
+    // jest.clearAllMocks();
   });
 
   it('should be empty by default', () => {
