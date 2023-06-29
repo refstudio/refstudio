@@ -5,6 +5,7 @@ const config: KnipConfig = {
   project: ['src/**/*.ts', 'src/**/*.tsx'],
   ignore: ['src/api/types.ts', 'src/vite-env.d.ts'],
   exclude: ['types'],
+  ignoreBinaries: ['poetry'],
 };
 
 export default config;
