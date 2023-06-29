@@ -27,11 +27,7 @@ export function ReferencesList({
             role="listitem"
             onClick={handleClickFor(reference, false)}
           >
-            <div className="truncate whitespace-nowrap">
-              <a className="text-black" onClick={handleClickFor(reference, true)}>
-                {reference.title}
-              </a>
-            </div>
+            <div className="truncate whitespace-nowrap">{reference.title}</div>
             <div className="whitespace truncate text-xs">
               {reference.authors.map(({ lastName }) => lastName).join(', ')}
             </div>
