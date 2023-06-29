@@ -1,5 +1,5 @@
-import { render, screen, userEvent, within } from '../test/test-utils';
-import { TabPane } from './TabPane';
+import { render, screen, userEvent, within } from '../../test/test-utils';
+import { TabPane } from '../TabPane';
 
 describe('TabPane component', () => {
   it('should render the one tab', () => {

@@ -1,6 +1,6 @@
-import { ReferencesFooterItems } from '../../features/references/footer/ReferencesFooterItems';
-import { render } from '../../test/test-utils';
-import { Footer } from './Footer';
+import { ReferencesFooterItems } from '../../../features/references/footer/ReferencesFooterItems';
+import { render } from '../../../test/test-utils';
+import { Footer } from '../Footer';
 
 describe('Footer component', () => {
   it('should render the footer with ReferencesFooterItems', () => {

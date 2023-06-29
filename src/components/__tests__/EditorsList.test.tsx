@@ -1,10 +1,10 @@
 import { VscFile } from 'react-icons/vsc';
 
-import { makeFile } from '../atoms/test-fixtures';
-import { noop } from '../lib/noop';
-import { render, screen, setup } from '../test/test-utils';
-import { EditorsList } from './EditorsList';
-import { RightAction } from './FileNode';
+import { makeFile } from '../../atoms/test-fixtures';
+import { noop } from '../../lib/noop';
+import { render, screen, setup } from '../../test/test-utils';
+import { EditorsList } from '../EditorsList';
+import { RightAction } from '../FileNode';
 
 describe('EditorsList component', () => {
   beforeEach(() => {

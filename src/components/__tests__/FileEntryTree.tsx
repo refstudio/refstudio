@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { VscChevronDown, VscChevronRight, VscFile } from 'react-icons/vsc';
 
-import { FileEntry, FolderFileEntry } from '../atoms/types/FileEntry';
-import { FileNode } from './FileNode';
+import { FileEntry, FolderFileEntry } from '../../atoms/types/FileEntry';
+import { FileNode } from '../FileNode';
 
 interface FileEntryTreePropsBase {
   files: FileEntry[];

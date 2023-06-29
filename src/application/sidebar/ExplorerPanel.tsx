@@ -14,9 +14,9 @@ import { EditorId, parseEditorId } from '../../atoms/types/EditorData';
 import { FileEntry, FileFileEntry } from '../../atoms/types/FileEntry';
 import { PaneId } from '../../atoms/types/PaneGroup';
 import { EditorsList } from '../../components/EditorsList';
-import { FileEntryTree } from '../../components/FileEntryTree';
 import { PanelSection } from '../../components/PanelSection';
 import { PanelWrapper } from '../../components/PanelWrapper';
+import { FileEntryTree } from '../../components/__tests__/FileEntryTree';
 import { readAllProjectFiles } from '../../io/filesystem';
 import { isNonNullish } from '../../lib/isNonNullish';
 

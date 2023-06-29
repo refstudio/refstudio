@@ -1,6 +1,6 @@
-import { noop } from '../lib/noop';
-import { render, screen, userEvent } from '../test/test-utils';
-import { PrimarySideBar } from './PrimarySideBar';
+import { noop } from '../../lib/noop';
+import { render, screen, userEvent } from '../../test/test-utils';
+import { PrimarySideBar } from '../PrimarySideBar';
 
 describe('PrimarySideBar', () => {
   it('should display Explorer and References icons', () => {

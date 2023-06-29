@@ -1,5 +1,5 @@
-import { render, screen, setup } from '../../test/test-utils';
-import { FooterItem } from './FooterItem';
+import { render, screen, setup } from '../../../test/test-utils';
+import { FooterItem } from '../FooterItem';
 
 describe('FooterItem component', () => {
   it('should render with text and icon', () => {
