@@ -10,7 +10,7 @@ import { format } from 'prettier';
  * @param predicate the predicate function to use to filter
  * @returns the array of the descendants of the given node, for which the predicate is true
  */
-function filterDescendants(node: Node, predicate: Predicate): Node[] {
+export function filterDescendants(node: Node, predicate: Predicate): Node[] {
   const nodes: Node[] = [];
   node.descendants((descendant) => {
     if (predicate(descendant)) {
