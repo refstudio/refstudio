@@ -1,9 +1,9 @@
 import { Editor } from '@tiptap/react';
 
-import { EDITOR_EXTENSIONS } from '../../../tipTapEditorConfigs';
-import { defaultCollapsibleBlock } from '../../test-fixtures';
-import { getPrettyHTMLWithSelection, setUpEditorWithSelection } from '../../test-utils';
-import { unsetPartiallySelectedCollapsibleBlocks } from './unsetPartiallySelectedCollapsibleBlocks';
+import { EDITOR_EXTENSIONS } from '../../../../tipTapEditorConfigs';
+import { defaultCollapsibleBlock } from '../../../test-fixtures';
+import { getPrettyHTMLWithSelection, setUpEditorWithSelection } from '../../../test-utils';
+import { unsetPartiallySelectedCollapsibleBlocks } from '../unsetPartiallySelectedCollapsibleBlocks';
 
 describe('unsetPartiallySelectedCollapsibleBlocks', () => {
   const editor = new Editor({

@@ -1,9 +1,9 @@
 import { Editor } from '@tiptap/react';
 
-import { EDITOR_EXTENSIONS } from '../../../tipTapEditorConfigs';
-import { defaultCollapsibleBlock } from '../../test-fixtures';
-import { getPrettyHTMLWithSelection, setUpEditorWithSelection } from '../../test-utils';
-import { enter } from './enter';
+import { EDITOR_EXTENSIONS } from '../../../../tipTapEditorConfigs';
+import { defaultCollapsibleBlock } from '../../../test-fixtures';
+import { getPrettyHTMLWithSelection, setUpEditorWithSelection } from '../../../test-utils';
+import { enter } from '../enter';
 
 describe('Enter keyboard shortcut command', () => {
   const editor = new Editor({

@@ -1,9 +1,9 @@
 import { Editor } from '@tiptap/react';
 
-import { EDITOR_EXTENSIONS } from '../../../tipTapEditorConfigs';
-import { defaultCollapsibleBlock } from '../../test-fixtures';
-import { getPrettyHTMLWithSelection, setUpEditorWithSelection } from '../../test-utils';
-import { backspace } from './backspace';
+import { EDITOR_EXTENSIONS } from '../../../../tipTapEditorConfigs';
+import { defaultCollapsibleBlock } from '../../../test-fixtures';
+import { getPrettyHTMLWithSelection, setUpEditorWithSelection } from '../../../test-utils';
+import { backspace } from '../backspace';
 
 describe('Backspace keyboard shortcut command', () => {
   const editor = new Editor({
