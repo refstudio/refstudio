@@ -35,10 +35,10 @@ describe('SettingsModalOpener component', () => {
     expect(screen.queryByRole('menuitem', { name: 'Open AI' })).not.toBeInTheDocument();
     expect(screen.queryByRole('menuitem', { name: 'Config' })).not.toBeInTheDocument();
 
-    expect(mockData.registeredEventName).toBe(RefStudioEvents.menu.settings);
+    expect(mockData.registeredEventNames).toContain(RefStudioEvents.menu.settings);
 
     // Trigger the settings event to open the modal
-    act(() => mockData.trigger());
+    act(() => mockData.trigger(RefStudioEvents.menu.settings));
 
     expect(screen.getByRole('menuitem', { name: 'General' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Open AI' })).toBeInTheDocument();
@@ -50,14 +50,14 @@ describe('SettingsModalOpener component', () => {
 
     render(<SettingsModalOpener />);
     expect(screen.queryByRole('menuitem', { name: 'General' })).not.toBeInTheDocument();
-    expect(mockData.registeredEventName).toBe(RefStudioEvents.menu.settings);
+    expect(mockData.registeredEventNames).toContain(RefStudioEvents.menu.settings);
 
     // Open
-    act(() => mockData.trigger());
+    act(() => mockData.trigger(RefStudioEvents.menu.settings));
     expect(screen.getByRole('menuitem', { name: 'General' })).toBeInTheDocument();
 
     // Close
-    act(() => mockData.trigger());
+    act(() => mockData.trigger(RefStudioEvents.menu.settings));
     expect(screen.queryByRole('menuitem', { name: 'General' })).not.toBeInTheDocument();
   });
 });

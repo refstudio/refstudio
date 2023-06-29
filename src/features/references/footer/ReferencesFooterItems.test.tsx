@@ -46,9 +46,8 @@ describe('ReferencesFooterItems component', () => {
     const mockData = mockListenEvent();
     const { store } = setupWithJotaiProvider(<ReferencesFooterItems />);
 
-    expect(mockData.registeredEventName).toBeDefined();
-    expect(mockData.registeredEventName).toBe(RefStudioEvents.menu.references.open);
-    act(() => mockData.trigger());
+    expect(mockData.registeredEventNames).toContain(RefStudioEvents.menu.references.open);
+    act(() => mockData.trigger(RefStudioEvents.menu.references.open));
 
     const opened = runGetAtomHook(activePaneAtom, store);
     expect(opened.current.openEditorIds).toHaveLength(1);

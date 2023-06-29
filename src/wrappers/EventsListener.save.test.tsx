@@ -47,7 +47,7 @@ describe('EventsListener.save', () => {
 
     setupWithJotaiProvider(<EventsListener />, store);
 
-    expect(mockData.registeredEventName).toBe(RefStudioEvents.menu.file.save);
+    expect(mockData.registeredEventNames).toContain(RefStudioEvents.menu.file.save);
   });
 
   it(`should call saveFile when ${RefStudioEvents.menu.file.save} event is triggered`, () => {
@@ -63,7 +63,7 @@ describe('EventsListener.save', () => {
 
     act(() => {
       updateFileBuffer.current({ type: 'text', textContent: updatedContent });
-      mockData.trigger();
+      mockData.trigger(RefStudioEvents.menu.file.save);
     });
 
     expect(writeFileContent).toHaveBeenCalledTimes(1);
@@ -76,7 +76,7 @@ describe('EventsListener.save', () => {
     setupWithJotaiProvider(<EventsListener />, store);
 
     act(() => {
-      mockData.trigger();
+      mockData.trigger(RefStudioEvents.menu.file.save);
     });
 
     expect(writeFileContent).toHaveBeenCalledTimes(0);
@@ -90,7 +90,7 @@ describe('EventsListener.save', () => {
     setupWithJotaiProvider(<EventsListener />, store);
 
     act(() => {
-      mockData.trigger();
+      mockData.trigger(RefStudioEvents.menu.file.save);
     });
 
     expect(asyncNoop).toHaveBeenCalledTimes(1);

@@ -59,14 +59,25 @@ export function setupWithJotaiProvider(jsx: React.ReactNode, store?: ReturnType<
  *
  */
 export function mockListenEvent<Payload = void>() {
-  const current: { registeredEventName?: string; trigger: (payload: Payload) => void } = {
-    trigger: () => fail(),
-    registeredEventName: undefined,
-  };
-  vi.mocked(listenEvent).mockImplementation(async (event: string, handler: RefStudioEventCallback<Payload>) => {
-    current.registeredEventName = event;
-    current.trigger = (payload: Payload) => handler({ event, windowLabel: '', id: 0, payload });
+  const current: Record<string, (payload: Payload) => void> = {};
+
+  vi.mocked(listenEvent).mockImplementation((event: string, handler: RefStudioEventCallback<Payload>) => {
+    current[event] = (payload: Payload) => handler({ event, windowLabel: '', id: 0, payload });
     return Promise.resolve(noop);
   });
-  return current;
+
+  const trigger = (eventName: string, payload: Payload) => {
+    if (eventName in current) {
+      return current[eventName](payload);
+    } else {
+      throw new Error(`Received unexpected event ${eventName}`);
+    }
+  };
+
+  return {
+    trigger,
+    get registeredEventNames() {
+      return Object.keys(current);
+    },
+  };
 }

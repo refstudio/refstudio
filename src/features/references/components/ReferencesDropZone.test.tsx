@@ -56,14 +56,14 @@ describe('ReferencesDropZone', () => {
     setupWithJotaiProvider(<ReferencesDropZone>APP</ReferencesDropZone>);
 
     // Expect to be registered
-    expect(mockData.registeredEventName).toBe(RefStudioEvents.menu.references.upload);
+    expect(mockData.registeredEventNames).toContain(RefStudioEvents.menu.references.upload);
 
     const input = screen.getByRole<HTMLInputElement>('form');
     const clickFn = vi.fn();
     input.click = clickFn;
 
     // Trigger menu action
-    act(() => mockData.trigger());
+    act(() => mockData.trigger(RefStudioEvents.menu.references.upload));
 
     expect(clickFn).toHaveBeenCalled();
   });
