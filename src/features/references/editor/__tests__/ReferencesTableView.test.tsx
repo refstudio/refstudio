@@ -1,9 +1,9 @@
-import { setReferencesAtom } from '../../../atoms/referencesState';
-import { runSetAtomHook } from '../../../atoms/test-utils';
-import { act, screen, setupWithJotaiProvider } from '../../../test/test-utils';
-import { UploadTipInstructions } from '../components/UploadTipInstructions';
-import { REFERENCES } from '../test-fixtures';
-import { ReferencesTableView } from './ReferencesTableView';
+import { setReferencesAtom } from '../../../../atoms/referencesState';
+import { runSetAtomHook } from '../../../../atoms/test-utils';
+import { act, screen, setupWithJotaiProvider } from '../../../../test/test-utils';
+import { UploadTipInstructions } from '../../components/UploadTipInstructions';
+import { REFERENCES } from '../../test-fixtures';
+import { ReferencesTableView } from '../ReferencesTableView';
 
 describe('ReferencesTableView component', () => {
   afterEach(() => {

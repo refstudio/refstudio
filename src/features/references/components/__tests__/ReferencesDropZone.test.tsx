@@ -1,11 +1,11 @@
-import { runPDFIngestion } from '../../../api/ingestion';
-import { getReferencesAtom, referencesSyncInProgressAtom } from '../../../atoms/referencesState';
-import { runGetAtomHook } from '../../../atoms/test-utils';
-import { listenEvent, RefStudioEvents } from '../../../events';
-import { uploadFiles } from '../../../io/filesystem';
-import { noop } from '../../../lib/noop';
-import { act, fireEvent, mockListenEvent, screen, setupWithJotaiProvider, waitFor } from '../../../test/test-utils';
-import { ReferencesDropZone } from './ReferencesDropZone';
+import { runPDFIngestion } from '../../../../api/ingestion';
+import { getReferencesAtom, referencesSyncInProgressAtom } from '../../../../atoms/referencesState';
+import { runGetAtomHook } from '../../../../atoms/test-utils';
+import { listenEvent, RefStudioEvents } from '../../../../events';
+import { uploadFiles } from '../../../../io/filesystem';
+import { noop } from '../../../../lib/noop';
+import { act, fireEvent, mockListenEvent, screen, setupWithJotaiProvider, waitFor } from '../../../../test/test-utils';
+import { ReferencesDropZone } from '../ReferencesDropZone';
 
 vi.mock('../../../events');
 vi.mock('../../../io/filesystem');

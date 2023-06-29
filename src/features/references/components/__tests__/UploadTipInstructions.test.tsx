@@ -1,8 +1,8 @@
-import { referencesSyncInProgressAtom } from '../../../atoms/referencesState';
-import { runSetAtomHook } from '../../../atoms/test-utils';
-import { emitEvent, RefStudioEvents } from '../../../events';
-import { act, screen, setupWithJotaiProvider } from '../../../test/test-utils';
-import { UploadTipInstructions } from './UploadTipInstructions';
+import { referencesSyncInProgressAtom } from '../../../../atoms/referencesState';
+import { runSetAtomHook } from '../../../../atoms/test-utils';
+import { emitEvent, RefStudioEvents } from '../../../../events';
+import { act, screen, setupWithJotaiProvider } from '../../../../test/test-utils';
+import { UploadTipInstructions } from '../UploadTipInstructions';
 
 vi.mock('../../../events');
 

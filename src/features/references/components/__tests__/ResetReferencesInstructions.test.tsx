@@ -1,7 +1,7 @@
-import { getReferencesAtom, setReferencesAtom } from '../../../atoms/referencesState';
-import { runGetAtomHook, runSetAtomHook } from '../../../atoms/test-utils';
-import { act, screen, setupWithJotaiProvider } from '../../../test/test-utils';
-import { ResetReferencesInstructions } from './ResetReferencesInstructions';
+import { getReferencesAtom, setReferencesAtom } from '../../../../atoms/referencesState';
+import { runGetAtomHook, runSetAtomHook } from '../../../../atoms/test-utils';
+import { act, screen, setupWithJotaiProvider } from '../../../../test/test-utils';
+import { ResetReferencesInstructions } from '../ResetReferencesInstructions';
 
 vi.mock('../../../events');
 

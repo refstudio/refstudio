@@ -1,6 +1,6 @@
-import { noop } from '../../../lib/noop';
-import { render, screen, setup } from '../../../test/test-utils';
-import { ReferencesList } from './ReferencesList';
+import { noop } from '../../../../lib/noop';
+import { render, screen, setup } from '../../../../test/test-utils';
+import { ReferencesList } from '../ReferencesList';
 
 describe('ReferencesList', () => {
   it('should display empty list if for empty array', () => {

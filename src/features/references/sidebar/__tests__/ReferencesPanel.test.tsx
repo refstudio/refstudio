@@ -1,11 +1,11 @@
-import { getReferencesAtom, setReferencesAtom } from '../../../atoms/referencesState';
-import { runGetAtomHook, runSetAtomHook } from '../../../atoms/test-utils';
-import { emitEvent, RefStudioEvents } from '../../../events';
-import { noop } from '../../../lib/noop';
-import { act, screen, setupWithJotaiProvider, within } from '../../../test/test-utils';
-import { REFERENCES } from '../test-fixtures';
-import { ReferencesList } from './ReferencesList';
-import { ReferencesPanel } from './ReferencesPanel';
+import { getReferencesAtom, setReferencesAtom } from '../../../../atoms/referencesState';
+import { runGetAtomHook, runSetAtomHook } from '../../../../atoms/test-utils';
+import { emitEvent, RefStudioEvents } from '../../../../events';
+import { noop } from '../../../../lib/noop';
+import { act, screen, setupWithJotaiProvider, within } from '../../../../test/test-utils';
+import { REFERENCES } from '../../test-fixtures';
+import { ReferencesList } from '../ReferencesList';
+import { ReferencesPanel } from '../ReferencesPanel';
 
 vi.mock('../../../events');
 
