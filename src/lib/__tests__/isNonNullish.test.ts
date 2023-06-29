@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { isNonNullish } from './isNonNullish';
+import { isNonNullish } from '../isNonNullish';
 
 describe('isNonNullish', () => {
   it('should filter null values', () => {

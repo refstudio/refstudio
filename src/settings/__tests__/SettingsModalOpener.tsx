@@ -1,8 +1,8 @@
 import { useState } from 'react';
 
-import { RefStudioEvents } from '../events';
-import { useListenEvent } from '../hooks/useListenEvent';
-import { SettingsModal } from './SettingsModal';
+import { RefStudioEvents } from '../../events';
+import { useListenEvent } from '../../hooks/useListenEvent';
+import { SettingsModal } from '../SettingsModal';
 
 export function SettingsModalOpener() {
   const [open, setOpen] = useState(false);

@@ -1,6 +1,6 @@
 import { invoke } from '@tauri-apps/api';
 
-import { readEnv } from './readEnv';
+import { readEnv } from '../readEnv';
 
 vi.mock('@tauri-apps/api');
 

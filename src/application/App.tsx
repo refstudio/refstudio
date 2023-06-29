@@ -10,7 +10,7 @@ import { emitEvent, RefStudioEvents } from '../events';
 import { AIPanel } from '../features/ai/AIPanel';
 import { ReferencesDropZone } from '../features/references/components/ReferencesDropZone';
 import { ReferencesPanel } from '../features/references/sidebar/ReferencesPanel';
-import { SettingsModalOpener } from '../settings/SettingsModalOpener';
+import { SettingsModalOpener } from '../settings/__tests__/SettingsModalOpener';
 import { PdfViewerAPI } from '../types/PdfViewerAPI';
 import { ApplicationFrame } from '../wrappers/ApplicationFrame';
 import { EventsListener } from '../wrappers/EventsListener';
