@@ -12,9 +12,9 @@ import { asyncNoop } from '../../lib/noop';
 import { act, mockListenEvent, screen, setupWithJotaiProvider } from '../../test/test-utils';
 import { EventsListener } from '../EventsListener';
 
-vi.mock('../events');
-vi.mock('../io/filesystem');
-vi.mock('../lib/noop');
+vi.mock('../../events');
+vi.mock('../../io/filesystem');
+vi.mock('../../lib/noop');
 
 describe('EventsListener.save', () => {
   let store: ReturnType<typeof createStore>;

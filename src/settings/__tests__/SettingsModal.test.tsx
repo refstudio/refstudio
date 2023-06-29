@@ -4,8 +4,8 @@ import { getCachedSetting, initSettings, saveCachedSettings, setCachedSetting } 
 import { SettingsModal } from '../SettingsModal';
 import { SettingsPaneId } from '../types';
 
-vi.mock('./settingsManager');
-vi.mock('../events');
+vi.mock('../settingsManager');
+vi.mock('../../events');
 
 describe('SettingsModal component', () => {
   beforeEach(() => {
