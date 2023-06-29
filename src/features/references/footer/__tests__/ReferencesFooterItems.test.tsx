@@ -7,7 +7,7 @@ import { act, mockListenEvent, screen, setupWithJotaiProvider } from '../../../.
 import { REFERENCES } from '../../test-fixtures';
 import { ReferencesFooterItems } from '../ReferencesFooterItems';
 
-vi.mock('../../../events');
+vi.mock('../../../../events');
 
 describe('ReferencesFooterItems component', () => {
   afterEach(() => {
