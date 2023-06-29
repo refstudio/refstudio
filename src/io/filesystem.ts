@@ -25,7 +25,7 @@ export async function getAppDataDir() {
   return appDataDir();
 }
 
-async function getBaseDir() {
+export async function getBaseDir() {
   return join(await appDataDir(), PROJECT_NAME);
 }
 export async function getUploadsDir() {

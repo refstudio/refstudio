@@ -4,7 +4,8 @@ import { Loadable } from 'jotai/vanilla/utils/loadable';
 import { describe, expect, it } from 'vitest';
 
 import { readFileContent, writeFileContent } from '../io/filesystem';
-import { activePaneAtom, openFileEntryAtom } from './editorActions';
+import { activePaneAtom } from './editorActions';
+import { openFileEntryAtom } from './fileEntryActions';
 import { activePaneContentAtom, focusPaneAtom } from './paneActions';
 import { makeFile } from './test-fixtures';
 import { runGetAtomHook, runSetAtomHook } from './test-utils';

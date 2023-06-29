@@ -3,12 +3,8 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback, useMemo } from 'react';
 import { VscCloseAll, VscSplitHorizontal } from 'react-icons/vsc';
 
-import {
-  closeAllEditorsAtom,
-  moveEditorToPaneAtom,
-  openFileEntryAtom,
-  selectEditorInPaneAtom,
-} from '../../atoms/editorActions';
+import { closeAllEditorsAtom, moveEditorToPaneAtom, selectEditorInPaneAtom } from '../../atoms/editorActions';
+import { openFileEntryAtom } from '../../atoms/fileEntryActions';
 import { leftPaneAtom, rightPaneAtom } from '../../atoms/paneActions';
 import { EditorId, parseEditorId } from '../../atoms/types/EditorData';
 import { FileEntry, FileFileEntry } from '../../atoms/types/FileEntry';

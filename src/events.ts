@@ -4,6 +4,7 @@ export const RefStudioEvents = {
   menu: {
     file: {
       save: 'refstudio://menu/file/save',
+      new: 'refstudio://menu/file/new',
     },
     settings: 'refstudio://menu/settings',
     references: {

@@ -6,6 +6,7 @@ const MENU_SETTINGS: &str = "refstudio://menu/settings";
 const MENU_REFERENCES_OPEN: &str = "refstudio://menu/references/open";
 const MENU_REFERENCES_UPLOAD: &str = "refstudio://menu/references/upload";
 const MENU_FILE_SAVE: &str = "refstudio://menu/file/save";
+const MENU_FILE_NEW: &str = "refstudio://menu/file/new";
 
 impl AppMenu {
     pub fn get_menu(context: &Context<EmbeddedAssets>) -> Menu {
@@ -27,10 +28,12 @@ impl AppMenu {
 
         let file_menu = Submenu::new(
             "File",
-            Menu::new().add_item(
-                CustomMenuItem::new(MENU_FILE_SAVE, "Save").accelerator("cmdOrControl+S"),
-            ), // .add_item(CustomMenuItem::new("tauri://menu/file/new".to_string(), "New File..."))
-               // .add_item(CustomMenuItem::new("tauri://menu/file/close".to_string(), "Close File"))
+            Menu::new()
+                .add_item(CustomMenuItem::new(MENU_FILE_SAVE, "Save").accelerator("cmdOrControl+S"))
+                .add_item(
+                    CustomMenuItem::new(MENU_FILE_NEW, "New File").accelerator("cmdOrControl + N"),
+                ),
+            // .add_item(CustomMenuItem::new("tauri://menu/file/close".to_string(), "Close File"))
         );
 
         let edit_menu = Submenu::new(

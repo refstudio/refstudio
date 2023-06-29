@@ -12,7 +12,7 @@ export function createEditorContentAtoms(
   initialContent: EditorContent | Promise<EditorContent>,
 ): EditorContentAtoms {
   const editorAtom = atom(initialContent);
-  const editorBufferAtom = atom<EditorContent | null>(null);
+  const editorBufferAtom = atom<EditorContent | null>(initialContent instanceof Promise ? null : initialContent);
 
   const loadableEditorContentAtom = loadable(editorAtom);
 

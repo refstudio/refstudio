@@ -9,10 +9,10 @@ import {
   closeAllEditorsAtom,
   closeEditorFromPaneAtom,
   moveEditorToPaneAtom,
-  openFileEntryAtom,
   openReferenceAtom,
   selectEditorInPaneAtom,
 } from './editorActions';
+import { openFileEntryAtom } from './fileEntryActions';
 import { leftPaneAtom, rightPaneAtom } from './paneActions';
 import { setReferencesAtom } from './referencesState';
 import { makeFile, makeFolder } from './test-fixtures';
