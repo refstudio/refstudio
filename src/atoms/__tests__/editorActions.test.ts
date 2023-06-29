@@ -2,8 +2,8 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { createStore, useAtomValue } from 'jotai';
 import { describe, expect, it } from 'vitest';
 
-import { readFileContent } from '../io/filesystem';
-import { ReferenceItem } from '../types/ReferenceItem';
+import { readFileContent } from '../../io/filesystem';
+import { ReferenceItem } from '../../types/ReferenceItem';
 import {
   activePaneAtom,
   closeAllEditorsAtom,
@@ -12,13 +12,13 @@ import {
   openFileEntryAtom,
   openReferenceAtom,
   selectEditorInPaneAtom,
-} from './editorActions';
-import { leftPaneAtom, rightPaneAtom } from './paneActions';
-import { setReferencesAtom } from './referencesState';
-import { makeFile, makeFolder } from './test-fixtures';
-import { runGetAtomHook, runSetAtomHook } from './test-utils';
-import { buildEditorId } from './types/EditorData';
-import { PaneId } from './types/PaneGroup';
+} from '../editorActions';
+import { leftPaneAtom, rightPaneAtom } from '../paneActions';
+import { setReferencesAtom } from '../referencesState';
+import { makeFile, makeFolder } from '../test-fixtures';
+import { runGetAtomHook, runSetAtomHook } from '../test-utils';
+import { buildEditorId } from '../types/EditorData';
+import { PaneId } from '../types/PaneGroup';
 
 vi.mock('../io/filesystem');
 

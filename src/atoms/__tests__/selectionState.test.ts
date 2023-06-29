@@ -2,7 +2,7 @@ import { act, renderHook } from '@testing-library/react';
 import { useAtom } from 'jotai';
 import { describe, expect, it } from 'vitest';
 
-import { selectionAtom } from './selectionState';
+import { selectionAtom } from '../selectionState';
 
 describe('selectionState', () => {
   it('should be empty by default', () => {

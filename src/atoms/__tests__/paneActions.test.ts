@@ -3,15 +3,15 @@ import { createStore } from 'jotai';
 import { Loadable } from 'jotai/vanilla/utils/loadable';
 import { describe, expect, it } from 'vitest';
 
-import { readFileContent, writeFileContent } from '../io/filesystem';
-import { activePaneAtom, openFileEntryAtom } from './editorActions';
-import { activePaneContentAtom, focusPaneAtom } from './paneActions';
-import { makeFile } from './test-fixtures';
-import { runGetAtomHook, runSetAtomHook } from './test-utils';
-import { EditorContent } from './types/EditorContent';
-import { EditorContentAtoms } from './types/EditorContentAtoms';
-import { FileEntry } from './types/FileEntry';
-import { PaneId } from './types/PaneGroup';
+import { readFileContent, writeFileContent } from '../../io/filesystem';
+import { activePaneAtom, openFileEntryAtom } from '../editorActions';
+import { activePaneContentAtom, focusPaneAtom } from '../paneActions';
+import { makeFile } from '../test-fixtures';
+import { runGetAtomHook, runSetAtomHook } from '../test-utils';
+import { EditorContent } from '../types/EditorContent';
+import { EditorContentAtoms } from '../types/EditorContentAtoms';
+import { FileEntry } from '../types/FileEntry';
+import { PaneId } from '../types/PaneGroup';
 
 vi.mock('../io/filesystem');
 
