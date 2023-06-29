@@ -76,12 +76,13 @@ export function ReferencesPanel() {
         title="Library"
       >
         <div className="min-h-[200px] ">
+          <FilterInput placeholder="Filter (e.g. title, author)" onChange={handleFilterChanged} />
+          <ReferencesList references={visibleReferences} onRefClicked={handleRefClicked} />
+
           {references.length === 0 && (
             <div className="p-2">Welcome to your RefStudio references library. Start by uploading some PDFs.</div>
           )}
 
-          <FilterInput placeholder="Filter (e.g. title, author)" onChange={handleFilterChanged} />
-          <ReferencesList references={visibleReferences} onRefClicked={handleRefClicked} />
           <UploadTipInstructions />
           <ResetReferencesInstructions />
         </div>
