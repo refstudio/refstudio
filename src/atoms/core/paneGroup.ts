@@ -38,16 +38,19 @@ export function getPane(get: Getter, paneId: PaneId): PaneContent {
 }
 
 /** Updates a given pane with partial attributes */
-const updatePaneGroup = atom(null, (get, set, { paneId, ...update }: { paneId: PaneId } & Partial<PaneState>) => {
-  const panes = get(paneGroupAtom);
-  set(paneGroupAtom, {
-    ...panes,
-    [paneId]: {
-      ...panes[paneId],
-      ...update,
-    },
-  });
-});
+export const updatePaneGroup = atom(
+  null,
+  (get, set, { paneId, ...update }: { paneId: PaneId } & Partial<PaneState>) => {
+    const panes = get(paneGroupAtom);
+    set(paneGroupAtom, {
+      ...panes,
+      [paneId]: {
+        ...panes[paneId],
+        ...update,
+      },
+    });
+  },
+);
 
 /**
  * Adds an editor to the list of open editors of the given pane

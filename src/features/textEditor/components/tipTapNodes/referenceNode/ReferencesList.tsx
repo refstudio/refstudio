@@ -108,6 +108,6 @@ export const ReferencesList = forwardRef((props: ReferenceListProps, ref) => {
 
 ReferencesList.displayName = 'ReferencesList';
 
-function getReferenceLabel(referenceItem: ReferenceItem): string {
+export function getReferenceLabel(referenceItem: ReferenceItem): string {
   return `[${referenceItem.citationKey}]`;
 }

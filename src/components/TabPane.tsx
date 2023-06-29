@@ -35,7 +35,7 @@ export function TabPane<K extends string>({
   );
 }
 
-function TabItem({
+export function TabItem({
   active,
   content,
   isDirty,
