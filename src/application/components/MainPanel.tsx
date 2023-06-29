@@ -55,7 +55,7 @@ interface MainPanelPaneProps {
   pane: PaneContent;
 }
 
-export function MainPanelPane({ pane, pdfViewerRef }: MainPanelPaneProps & MainPanelProps) {
+function MainPanelPane({ pane, pdfViewerRef }: MainPanelPaneProps & MainPanelProps) {
   const { openEditors, activeEditor: activeFile, activeEditor } = pane;
   const activeEditorAtoms = activeEditor?.contentAtoms;
 
@@ -95,7 +95,7 @@ interface MainPaneViewContentProps {
   pdfViewerRef: React.MutableRefObject<PdfViewerAPI | null>;
 }
 
-export function MainPaneViewContent({ activeEditorAtoms, pdfViewerRef }: MainPaneViewContentProps) {
+function MainPaneViewContent({ activeEditorAtoms, pdfViewerRef }: MainPaneViewContentProps) {
   const { loadableEditorContentAtom } = activeEditorAtoms;
   const loadableFileContent = useAtomValue(loadableEditorContentAtom);
 

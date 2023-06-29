@@ -1,6 +1,5 @@
 import {
   BaseDirectory,
-  createDir,
   FileEntry as TauriFileEntry,
   readBinaryFile,
   readDir,
@@ -12,7 +11,6 @@ import { appConfigDir, appDataDir, join } from '@tauri-apps/api/path';
 
 import { EditorContent } from '../atoms/types/EditorContent';
 import { FileEntry, FileFileEntry } from '../atoms/types/FileEntry';
-import { INITIAL_CONTENT } from '../features/textEditor/components/tipTapEditorConfigs';
 
 const PROJECT_NAME = 'project-x';
 const UPLOADS_DIR = 'uploads';
@@ -31,24 +29,7 @@ async function getBaseDir() {
 export async function getUploadsDir() {
   return join(await getBaseDir(), UPLOADS_DIR);
 }
-export async function ensureProjectFileStructure() {
-  try {
-    const baseDir = await getBaseDir();
-    await createDir(baseDir, { recursive: true });
-    await createDir(await join(baseDir, UPLOADS_DIR), { recursive: true });
 
-    // Create sample files
-    await writeTextFile(await join(baseDir, 'file 1.tiptap'), INITIAL_CONTENT);
-    await writeTextFile(await join(baseDir, 'file 2.tiptap'), '# Heading');
-
-    console.log('Project structure created with success. Folder: ', baseDir);
-
-    return baseDir;
-  } catch (err) {
-    console.error('ERROR', err);
-    throw new Error('Error ensuring file struture');
-  }
-}
 export async function readAllProjectFiles() {
   const entries = await readDir(await getBaseDir(), { recursive: true });
   const fileEntries = entries.map(convertTauriFileEntryToFileEntry);
