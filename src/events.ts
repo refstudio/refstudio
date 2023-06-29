@@ -9,6 +9,7 @@ export const RefStudioEvents = {
     references: {
       open: 'refstudio://menu/references/open',
       upload: 'refstudio://menu/references/upload',
+      export: 'refstudio://menu/references/export',
     },
   },
   references: {

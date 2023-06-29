@@ -1,5 +1,6 @@
 export interface ReferenceItem {
   id: string;
+  filepath: string;
   filename: string;
   citationKey: string;
   publishedDate?: string;

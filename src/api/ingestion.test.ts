@@ -81,9 +81,11 @@ describe('runPDFIngestion', () => {
     expect(response[0].authors).toStrictEqual([
       {
         fullName: 'Joe Doe',
+        lastName: 'Doe',
       },
       {
         fullName: 'Ana Maria',
+        lastName: 'Maria',
       },
     ]);
   });

@@ -1,51 +1,43 @@
-import { getReferencesAtom, setReferencesAtom } from '../../../atoms/referencesState';
-import { runGetAtomHook, runSetAtomHook } from '../../../atoms/test-utils';
+import { setReferencesAtom } from '../../../atoms/referencesState';
+import { runSetAtomHook } from '../../../atoms/test-utils';
 import { emitEvent, RefStudioEvents } from '../../../events';
-import { noop } from '../../../lib/noop';
-import { act, screen, setupWithJotaiProvider, within } from '../../../test/test-utils';
+import { act, screen, setupWithJotaiProvider } from '../../../test/test-utils';
 import { REFERENCES } from '../test-fixtures';
-import { ReferencesList } from './ReferencesList';
 import { ReferencesPanel } from './ReferencesPanel';
 
 vi.mock('../../../events');
+vi.mock('./ReferencesList', () => {
+  const FakeReferencesList = vi.fn(() => null);
+  return { ReferencesList: FakeReferencesList };
+});
 
 describe('ReferencesPanel', () => {
-  it('should display welcome message with empty references', () => {
-    setupWithJotaiProvider(<ReferencesPanel onRefClicked={noop} />);
-    expect(screen.getByText('REFERENCES')).toBeInTheDocument();
-    expect(screen.getByText(/welcome to your refstudio references library/i)).toBeInTheDocument();
+  afterEach(() => {
+    vi.resetAllMocks();
   });
 
-  it('should display references list with non-empty references', () => {
-    const { store } = setupWithJotaiProvider(<ReferencesPanel onRefClicked={noop} />);
-    const setReferences = runSetAtomHook(setReferencesAtom, store);
-
-    act(() => setReferences.current(REFERENCES));
-
-    expect(screen.queryByText(/welcome to your refstudio references library/i)).not.toBeInTheDocument();
-    const referencesListElement = screen.getByTestId(ReferencesList.name);
-    expect(referencesListElement).toBeInTheDocument();
-    expect(within(referencesListElement).getAllByRole('listitem')).toHaveLength(REFERENCES.length);
+  it('should display welcome message with empty references', () => {
+    setupWithJotaiProvider(<ReferencesPanel />);
+    expect(screen.getByText('REFERENCES')).toBeInTheDocument();
+    expect(screen.getByText(/welcome to your refstudio references library/i)).toBeInTheDocument();
   });
 
   it.each([
     { title: 'Add References', event: RefStudioEvents.menu.references.upload },
     { title: 'Open References', event: RefStudioEvents.menu.references.open },
+    { title: 'Export References (NOT IMPLEMENTED)', event: RefStudioEvents.menu.references.export },
   ])('should trigger $title on click', async ({ title, event }) => {
-    const { user } = setupWithJotaiProvider(<ReferencesPanel onRefClicked={noop} />);
+    const { user } = setupWithJotaiProvider(<ReferencesPanel />);
     await user.click(screen.getByTitle(title));
     expect(vi.mocked(emitEvent)).toBeCalledWith(event);
   });
 
-  it('should reset references when click in reset', async () => {
-    const { user, store } = setupWithJotaiProvider(<ReferencesPanel onRefClicked={noop} />);
+  it('should display ReferencesList with references', () => {
+    const { store } = setupWithJotaiProvider(<ReferencesPanel />);
     const setReferences = runSetAtomHook(setReferencesAtom, store);
-    const getReferences = runGetAtomHook(getReferencesAtom, store);
 
     act(() => setReferences.current(REFERENCES));
 
-    expect(getReferences.current).toStrictEqual(REFERENCES);
-    await user.click(screen.getByText(/reset references store/));
-    expect(getReferences.current).toStrictEqual([]);
+    expect(screen.queryByText(/welcome to your refstudio references library/i)).not.toBeInTheDocument();
   });
 });

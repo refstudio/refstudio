@@ -3,11 +3,12 @@ import { ReferenceItem } from '../types/ReferenceItem';
 import { callSidecar } from './sidecar';
 import { IngestResponse } from './types';
 
-function parsePdfIngestionResponse(response: IngestResponse): ReferenceItem[] {
+function parsePdfIngestionResponse(response: IngestResponse, uploadsDir: string): ReferenceItem[] {
   return response.references.map((reference) => ({
     id: reference.filename_md5,
-    citationKey: reference.citation_key ?? 'unknown',
+    filepath: `${uploadsDir}/${reference.source_filename}`,
     filename: reference.source_filename,
+    citationKey: reference.citation_key ?? 'unknown',
     title: reference.title ?? reference.source_filename.replace('.pdf', ''),
     publishedDate: reference.published_date ?? '',
     abstract: reference.abstract ?? '',
@@ -22,5 +23,5 @@ function parsePdfIngestionResponse(response: IngestResponse): ReferenceItem[] {
 export async function runPDFIngestion(): Promise<ReferenceItem[]> {
   const uploadsDir = await getUploadsDir();
   const response = await callSidecar('ingest', ['--pdf_directory', String(uploadsDir)]);
-  return parsePdfIngestionResponse(response);
+  return parsePdfIngestionResponse(response, uploadsDir);
 }

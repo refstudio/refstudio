@@ -1,14 +1,13 @@
 import { useAtomValue, useSetAtom } from 'jotai';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { VscDesktopDownload, VscNewFile, VscOpenPreview } from 'react-icons/vsc';
 
-import { openFileEntryAtom, openReferenceAtom } from '../../../atoms/editorActions';
+import { openFilePathAtom, openReferenceAtom } from '../../../atoms/editorActions';
 import { getReferencesAtom } from '../../../atoms/referencesState';
 import { PanelSection } from '../../../components/PanelSection';
 import { PanelWrapper } from '../../../components/PanelWrapper';
 import { emitEvent, RefStudioEvents } from '../../../events';
 import { useDebouncedCallback } from '../../../hooks/useDebouncedCallback';
-import { getUploadsDir } from '../../../io/filesystem';
 import { ReferenceItem } from '../../../types/ReferenceItem';
 import { ResetReferencesInstructions } from '../components/ResetReferencesInstructions';
 import { UploadTipInstructions } from '../components/UploadTipInstructions';
@@ -17,9 +16,12 @@ import { ReferencesList } from './ReferencesList';
 export function ReferencesPanel() {
   const references = useAtomValue(getReferencesAtom);
   const openReference = useSetAtom(openReferenceAtom);
-  const openFileEntry = useSetAtom(openFileEntryAtom);
+  const openFilePath = useSetAtom(openFilePathAtom);
 
   const [visibleReferences, setVisibleReferences] = useState(references);
+  useEffect(() => {
+    setVisibleReferences(references);
+  }, [references]);
 
   const handleAddReferences = () => {
     emitEvent(RefStudioEvents.menu.references.upload);
@@ -30,27 +32,22 @@ export function ReferencesPanel() {
   };
 
   const handleExportReferences = () => {
-    throw new Error('NOT IMPLEMENTED');
+    emitEvent(RefStudioEvents.menu.references.export);
   };
 
-  const handleRefClicked = async (reference: ReferenceItem, openPdf?: boolean) => {
+  const handleRefClicked = (reference: ReferenceItem, openPdf?: boolean) => {
     if (openPdf) {
-      const path = `${await getUploadsDir()}/${reference.filename}`;
-      openFileEntry({
-        path,
-        name: reference.filename,
-        isFile: true,
-        isDotfile: false,
-        fileExtension: 'pdf',
-        isFolder: false,
-      });
+      openFilePath(reference.filepath);
     } else {
       openReference(reference.id);
     }
   };
 
   const handleFilterChanged = (filter: string) => {
-    console.log('Filter by', filter);
+    if (filter.trim() === '') {
+      return setVisibleReferences(references);
+    }
+
     setVisibleReferences(
       references.filter((reference) => {
         const text =
@@ -73,7 +70,7 @@ export function ReferencesPanel() {
             Icon: VscDesktopDownload,
             title: 'Export References (NOT IMPLEMENTED)',
             className: 'text-slate-600/50',
-            onClick: () => void handleExportReferences(),
+            onClick: () => handleExportReferences(),
           },
         ]}
         title="Library"
@@ -84,10 +81,7 @@ export function ReferencesPanel() {
           )}
 
           <FilterInput placeholder="Filter (e.g. title, author)" onChange={handleFilterChanged} />
-          <ReferencesList
-            references={visibleReferences}
-            onRefClicked={(ref, openPdf) => void handleRefClicked(ref, openPdf)}
-          />
+          <ReferencesList references={visibleReferences} onRefClicked={handleRefClicked} />
           <UploadTipInstructions />
           <ResetReferencesInstructions />
         </div>
