@@ -1,5 +1,5 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
-import { afterEach, describe, expect, it, mock } from 'bun:test';
+// import { afterEach, describe, expect, it, mock } from 'bun:test';
 import { createStore, useAtomValue } from 'jotai';
 
 import { readFileContent } from '../io/filesystem';
@@ -20,7 +20,7 @@ import { runGetAtomHook, runSetAtomHook } from './test-utils';
 import { buildEditorId } from './types/EditorData';
 import { PaneId } from './types/PaneGroup';
 
-mock('../io/filesystem');
+vi.mock('../io/filesystem');
 
 describe('fileActions', () => {
   afterEach(() => {
@@ -44,14 +44,14 @@ describe('fileActions', () => {
     const leftPane = runGetAtomHook(leftPaneAtom, store);
 
     const { fileEntry: fileToOpen, editorData } = makeFile('file.txt');
-    expect(leftPane.current.openEditors).not.toContainEqual(editorData);
+    expect(leftPane.current.openEditors).not.toContain(editorData);
     expect(leftPane.current.activeEditor).toBeUndefined();
 
     act(() => openFile.current(fileToOpen));
 
     expect(leftPane.current.id).toBe('LEFT' as PaneId);
     expect(leftPane.current.openEditors.length).toBe(1);
-    expect(leftPane.current.openEditors).toContainEqual(editorData);
+    expect(leftPane.current.openEditors).toContain(editorData);
     expect(leftPane.current.activeEditor!.id).toBe(editorData.id);
   });
 
@@ -61,14 +61,14 @@ describe('fileActions', () => {
     const rightPane = runGetAtomHook(rightPaneAtom, store);
 
     const { fileEntry: fileToOpen, editorData } = makeFile('file.pdf');
-    expect(rightPane.current.openEditors).not.toContainEqual(fileToOpen);
+    expect(rightPane.current.openEditors).not.toContain(fileToOpen);
     expect(rightPane.current.activeEditor).toBeUndefined();
 
     act(() => openFile.current(fileToOpen));
 
     expect(rightPane.current.id).toBe('RIGHT' as PaneId);
     expect(rightPane.current.openEditors.length).toBe(1);
-    expect(rightPane.current.openEditors).toContainEqual(editorData);
+    expect(rightPane.current.openEditors).toContain(editorData);
     expect(rightPane.current.activeEditor!.id).toBe(editorData.id);
   });
 
@@ -111,7 +111,7 @@ describe('fileActions', () => {
       openReference.current(reference.id);
     });
 
-    expect(rightPane.current.id).toBe<PaneId>('RIGHT');
+    expect(rightPane.current.id).toBe('RIGHT');
     expect(rightPane.current.openEditors.length).toBe(1);
     expect(rightPane.current.openEditors.map(({ id }) => id)).toContain(editorId);
     expect(rightPane.current.activeEditor!.id).toBe(editorId);
@@ -152,15 +152,15 @@ describe('fileActions', () => {
       openFile.current(fileOpened);
     });
 
-    expect(leftPane.current.openEditors).toContainEqual(openedEditorData);
-    expect(leftPane.current.openEditors).not.toContainEqual(notOpenedEditorData);
+    expect(leftPane.current.openEditors).toContain(openedEditorData);
+    expect(leftPane.current.openEditors).not.toContain(notOpenedEditorData);
 
     act(() => {
       closeFileFromPane.current({ paneId: leftPane.current.id, editorId: notOpenedEditorData.id });
     });
 
-    expect(leftPane.current.openEditors).toContainEqual(openedEditorData);
-    expect(leftPane.current.openEditors).not.toContainEqual(notOpenedEditorData);
+    expect(leftPane.current.openEditors).toContain(openedEditorData);
+    expect(leftPane.current.openEditors).not.toContain(notOpenedEditorData);
   });
 
   it('should not fail trying to select file that is not opened in pane', () => {
@@ -174,7 +174,7 @@ describe('fileActions', () => {
       selectFileInPane.current({ paneId: leftPane.current.id, editorId: editorData.id });
     });
 
-    expect(leftPane.current.openEditors).not.toContainEqual(editorData);
+    expect(leftPane.current.openEditors).not.toContain(editorData);
   });
 
   it('should not fail when trying to open a reference that does not exist', () => {
@@ -191,14 +191,14 @@ describe('fileActions', () => {
     };
     const editorId = buildEditorId('reference', reference.id);
 
-    expect(rightPane.current.openEditors.map(({ id }) => id)).not.toContainEqual(editorId);
+    expect(rightPane.current.openEditors.map(({ id }) => id)).not.toContain(editorId);
     expect(rightPane.current.activeEditor).toBeUndefined();
 
     act(() => {
       openReference.current(reference.id);
     });
 
-    expect(rightPane.current.openEditors.map(({ id }) => id)).not.toContainEqual(editorId);
+    expect(rightPane.current.openEditors.map(({ id }) => id)).not.toContain(editorId);
     expect(rightPane.current.activeEditor).toBeUndefined();
   });
 
@@ -218,8 +218,8 @@ describe('fileActions', () => {
     });
 
     const paneFiles = [...leftPane.current.openEditors, ...rightPane.current.openEditors];
-    expect(paneFiles).toContainEqual(fileAData);
-    expect(paneFiles).toContainEqual(fileBData);
+    expect(paneFiles).toContain(fileAData);
+    expect(paneFiles).toContain(fileBData);
 
     act(() => closeAllFiles.current());
 
@@ -240,15 +240,15 @@ describe('fileActions', () => {
       openFile.current(fileEntry);
     });
 
-    expect(leftPane.current.openEditors).toContainEqual(editorData);
-    expect(rightPane.current.openEditors).not.toContainEqual(editorData);
+    expect(leftPane.current.openEditors).toContain(editorData);
+    expect(rightPane.current.openEditors).not.toContain(editorData);
 
     act(() => {
       moveEditorToPane.current({ editorId: editorData.id, fromPaneId: 'LEFT', toPaneId: 'RIGHT' });
     });
 
-    expect(leftPane.current.openEditors).not.toContainEqual(editorData);
-    expect(rightPane.current.openEditors).toContainEqual(editorData);
+    expect(leftPane.current.openEditors).not.toContain(editorData);
+    expect(rightPane.current.openEditors).toContain(editorData);
   });
 
   it('should move file from one tab to same tab', () => {
@@ -264,15 +264,15 @@ describe('fileActions', () => {
       openFile.current(fileA);
     });
 
-    expect(leftPane.current.openEditors).toContainEqual(editorData);
-    expect(rightPane.current.openEditors).not.toContainEqual(editorData);
+    expect(leftPane.current.openEditors).toContain(editorData);
+    expect(rightPane.current.openEditors).not.toContain(editorData);
 
     act(() => {
       moveEditorToPane.current({ editorId: editorData.id, fromPaneId: 'LEFT', toPaneId: 'LEFT' });
     });
 
-    expect(leftPane.current.openEditors).toContainEqual(editorData);
-    expect(rightPane.current.openEditors).not.toContainEqual(editorData);
+    expect(leftPane.current.openEditors).toContain(editorData);
+    expect(rightPane.current.openEditors).not.toContain(editorData);
   });
 
   it('should make remaining file active when moving file from one pane to another', () => {
@@ -300,9 +300,9 @@ describe('fileActions', () => {
 
     expect(activePane.current.id).toBe('RIGHT');
 
-    expect(leftPane.current.openEditors).toContainEqual(fileAData);
+    expect(leftPane.current.openEditors).toContain(fileAData);
     expect(leftPane.current.activeEditor!.id).toBe(fileAData.id);
-    expect(rightPane.current.openEditors).toContainEqual(fileBData);
+    expect(rightPane.current.openEditors).toContain(fileBData);
     expect(rightPane.current.activeEditor!.id).toBe(fileBData.id);
   });
 
@@ -319,15 +319,15 @@ describe('fileActions', () => {
       openFile.current(fileA);
     });
 
-    expect(leftPane.current.openEditors).toContainEqual(editorData);
-    expect(rightPane.current.openEditors).not.toContainEqual(editorData);
+    expect(leftPane.current.openEditors).toContain(editorData);
+    expect(rightPane.current.openEditors).not.toContain(editorData);
 
     act(() => {
       moveEditorToPane.current({ editorId: editorData.id, fromPaneId: 'RIGHT', toPaneId: 'LEFT' });
     });
 
-    expect(leftPane.current.openEditors).toContainEqual(editorData);
-    expect(rightPane.current.openEditors).not.toContainEqual(editorData);
+    expect(leftPane.current.openEditors).toContain(editorData);
+    expect(rightPane.current.openEditors).not.toContain(editorData);
   });
 
   it('should make another file active, in same pane, after closing the active', () => {

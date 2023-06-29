@@ -1,7 +1,8 @@
 import { act, waitFor } from '@testing-library/react';
+// import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'bun:test';
 import { createStore } from 'jotai';
 import { Loadable } from 'jotai/vanilla/utils/loadable';
-import { describe, expect, it } from 'vitest';
 
 import { readFileContent, writeFileContent } from '../io/filesystem';
 import { activePaneAtom, openFileEntryAtom } from './editorActions';

@@ -1,6 +1,7 @@
 import { Node } from '@tiptap/pm/model';
 import { TextSelection } from '@tiptap/pm/state';
 import { Editor, Predicate } from '@tiptap/react';
+import { expect } from 'bun:test';
 import { format } from 'prettier';
 
 /**

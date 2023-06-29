@@ -4,10 +4,6 @@ import { render, screen, setup } from '../test/test-utils';
 import { FileEntryTree } from './FileEntryTree';
 
 describe('FileEntryTree component', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
   it('should render a file', () => {
     const { fileEntry } = makeFile('File 1.pdf');
     render(<FileEntryTree files={[fileEntry]} root selectedFiles={[]} onFileClick={noop} />);

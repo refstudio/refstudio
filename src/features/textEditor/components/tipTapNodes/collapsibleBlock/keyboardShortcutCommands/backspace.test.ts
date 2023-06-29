@@ -1,4 +1,5 @@
 import { Editor } from '@tiptap/react';
+import { describe, expect, it } from 'bun:test';
 
 import { EDITOR_EXTENSIONS } from '../../../tipTapEditorConfigs';
 import { defaultCollapsibleBlock } from '../../test-fixtures';
