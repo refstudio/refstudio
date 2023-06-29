@@ -4,8 +4,8 @@ import { getUploadsDir } from '../../io/filesystem';
 import { runPDFIngestion } from '../ingestion';
 import { callSidecar } from '../sidecar';
 
-vi.mock('./sidecar');
-vi.mock('../io/filesystem');
+vi.mock('../sidecar');
+vi.mock('../../io/filesystem');
 
 describe('runPDFIngestion', () => {
   beforeEach(() => {

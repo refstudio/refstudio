@@ -10,8 +10,8 @@ import { PaneConfig } from '../../../settings/types';
 import { render, screen, userEvent } from '../../../test/test-utils';
 import { OpenAiSettingsPane } from './OpenAiSettingsPane';
 
-vi.mock('../../../settings/settingsManager');
-vi.mock('../../../events');
+vi.mock('../../../../settings/settingsManager');
+vi.mock('../../../../events');
 
 const panelConfig: PaneConfig = {
   id: 'project-openai',

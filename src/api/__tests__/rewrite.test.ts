@@ -4,8 +4,8 @@ import { askForRewrite } from '../rewrite';
 import { callSidecar } from '../sidecar';
 import { RewriteChoice } from '../types';
 
-vi.mock('./sidecar');
-vi.mock('../io/filesystem');
+vi.mock('../sidecar');
+vi.mock('../../io/filesystem');
 
 describe('askForRewrite', () => {
   beforeEach(() => {

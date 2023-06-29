@@ -13,7 +13,7 @@ import { EditorContentAtoms } from '../types/EditorContentAtoms';
 import { FileEntry } from '../types/FileEntry';
 import { PaneId } from '../types/PaneGroup';
 
-vi.mock('../io/filesystem');
+vi.mock('../../io/filesystem');
 
 describe('fileActions', () => {
   let store: ReturnType<typeof createStore>;

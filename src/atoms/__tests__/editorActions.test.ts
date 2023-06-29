@@ -20,7 +20,7 @@ import { runGetAtomHook, runSetAtomHook } from '../test-utils';
 import { buildEditorId } from '../types/EditorData';
 import { PaneId } from '../types/PaneGroup';
 
-vi.mock('../io/filesystem');
+vi.mock('../../io/filesystem');
 
 describe('fileActions', () => {
   afterEach(() => {

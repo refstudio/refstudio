@@ -11,7 +11,7 @@ import {
 } from '../../settings/settingsManager';
 import { callSidecar } from '../sidecar';
 
-vi.mock('../settings/settingsManager');
+vi.mock('../../settings/settingsManager');
 vi.mock('@tauri-apps/api/shell');
 
 const mockSettings: SettingsSchema = {
