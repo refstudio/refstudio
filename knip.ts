@@ -7,6 +7,8 @@ const config: KnipConfig = {
   ignoreBinaries: ['poetry'],
   ignoreExportsUsedInFile: true,
   ignoreDependencies: [
+    // referenced in vite.config.ts (`provider: 'c8'`)
+    '@vitest/coverage-c8',
     // referenced in scripts/codegen.sh
     'json-schema-to-typescript',
     // Prettier auto-loads this plugin, see https://github.com/webpro/knip/issues/70
