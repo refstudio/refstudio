@@ -10,8 +10,8 @@ import {
 import { PaneConfig } from '../../types';
 import { GeneralSettingsPane } from '../GeneralSettingsPane';
 
-vi.mock('../settingsManager');
-vi.mock('../../events');
+vi.mock('../../settingsManager');
+vi.mock('../../../events');
 
 const panelConfig: PaneConfig = {
   id: 'project-general',

@@ -7,9 +7,9 @@ import { noop } from '../../../../lib/noop';
 import { act, fireEvent, mockListenEvent, screen, setupWithJotaiProvider, waitFor } from '../../../../test/test-utils';
 import { ReferencesDropZone } from '../ReferencesDropZone';
 
-vi.mock('../../../events');
-vi.mock('../../../io/filesystem');
-vi.mock('../../../api/ingestion');
+vi.mock('../../../../events');
+vi.mock('../../../../io/filesystem');
+vi.mock('../../../../api/ingestion');
 
 describe('ReferencesDropZone', () => {
   afterEach(() => {
