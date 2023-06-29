@@ -43,6 +43,18 @@ class Reference(RefStudioModel):
     metadata: dict[str, Any] = {}
 
 
+class ReferencePatch(RefStudioModel):
+    """
+    ReferencePatch is the input type for updating a Reference's metadata.
+    """
+    data: dict[str, Any]
+
+
+class ReferenceUpdate(RefStudioModel):
+    source_filename: str
+    patch: ReferencePatch
+
+
 class ReferenceDelete(RefStudioModel):
     source_filenames: list[str]
 
@@ -75,6 +87,11 @@ class IngestStatusResponse(RefStudioModel):
     reference_statuses: list[ReferenceStatus]
 
 
+class UpdateStatusResponse(RefStudioModel):
+    status: ResponseStatus
+    message: str
+
+
 class DeleteStatusResponse(RefStudioModel):
     status: ResponseStatus
     message: str
@@ -95,6 +112,7 @@ class CliCommands(RefStudioModel):
     ingest_status: IngestStatusResponse
     rewrite: list[RewriteChoice]
     chat: list[ChatResponseChoice]
+    update: UpdateStatusResponse
     delete: DeleteStatusResponse
 
 

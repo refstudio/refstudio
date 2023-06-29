@@ -19,6 +19,7 @@ export interface CliCommands {
   ingest_status: IngestStatusResponse;
   rewrite: RewriteChoice[];
   chat: ChatResponseChoice[];
+  update: UpdateStatusResponse;
   delete: DeleteStatusResponse;
 }
 export interface IngestResponse {
@@ -67,6 +68,10 @@ export interface RewriteChoice {
 export interface ChatResponseChoice {
   index: number;
   text: string;
+}
+export interface UpdateStatusResponse {
+  status: ResponseStatus;
+  message: string;
 }
 export interface DeleteStatusResponse {
   status: ResponseStatus;

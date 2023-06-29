@@ -22,6 +22,19 @@ logger.addHandler(handler)
 logger.disabled = os.environ.get("SIDECAR_ENABLE_LOGGING", "false").lower() == "true"
 
 
+def update_reference(data: dict):
+    patch = typing.ReferencePatch(
+        data=data.get('patch', {})
+    )
+    reference_update = typing.ReferenceUpdate(
+        source_filename=data.get('source_filename'),
+        patch=patch
+    )
+    storage = JsonStorage(settings.REFERENCES_JSON_PATH)
+    storage.load()
+    storage.update(reference_update=reference_update)
+
+
 def delete_references(source_filenames: list[str] = [], all_: bool = False):
     storage = JsonStorage(settings.REFERENCES_JSON_PATH)
     storage.load()
@@ -106,20 +119,45 @@ class JsonStorage:
         )
         sys.stdout.write(response.json())
     
-    def update(self, target: typing.Reference):
+    def update(self, reference_update: typing.ReferenceUpdate):
         """
         Update a Reference in storage with the target reference.
         This is used when the client has updated the reference in the UI.
+
+        Parameters
+        ----------
+        reference_update : typing.ReferenceUpdate
         """
-        for i, source in enumerate(self.references):
-            if source.filename_md5 == target.filename_md5:
-                logger.info(f"Updating reference {source.source_filename} ({source.filename_md5})")
-                self.references[i] = target
-                break
-        else:
-            logger.info(f"Unable to find reference {target.source_filename} ({target.filename_md5})")
+        refs = {
+            ref.source_filename: ref for ref in self.references
+        }
+
+        source_filename = reference_update.source_filename
+        patch = reference_update.patch
+
+        try:
+            target = refs[source_filename]
+        except KeyError:
+            msg = f"Unable to update {source_filename}: not found in storage"
+            logger.error(msg)
+            response = typing.UpdateStatusResponse(
+                status=typing.ResponseStatus.ERROR,
+                message=msg
+            )
+            sys.stdout.write(response.json())
             return
+        
+        logger.info(f"Updating {source_filename} with new values: {patch.data}")
+        refs[source_filename] = target.copy(update=patch.data)
+        
+        self.references = list(refs.values())
         self.save()
+
+        response = typing.UpdateStatusResponse(
+            status=typing.ResponseStatus.OK,
+            message=""
+        )
+        sys.stdout.write(response.json())
     
     def create_corpus(self):
         for ref in self.references:

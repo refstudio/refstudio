@@ -40,6 +40,7 @@ The application current has three main functions:
 3. Rewrite
 4. Chat
 5. Delete (References)
+6. Update (References)
 
 ### Ingest
 `Ingest` is called when a Refstudio user uploads Reference documents.
@@ -212,5 +213,59 @@ $ poetry run python main.py delete --source_filenames file-does-not-exist.pdf | 
 {
   "status": "error",
   "message": "Unable to delete file-does-not-exist.pdf: not found in storage"
+}
+```
+
+### Update (References)
+`Update` updates a Reference's metadata in project storage. It is called when a user updates details about a Reference.
+
+It takes an input argument of `--data` which is a dictionary containing a key for `source_filename` and `patch`. `source_filename` acts as the unique ID for the Reference to update and `patch` is a dictionary containing the corresponding fields and values to be used for the update. 
+
+To run `update`:
+
+```bash
+$ poetry run python main.py update --data '{"source_filename": "grobid-fails.pdf", "patch": {"title": "a title that was missing"}}'
+
+# Example:
+$ poetry run python main.py update --data '{"source_filename": "grobid-fails.pdf", "patch": {"title": "a title that was missing"}}'
+| jq
+
+# Response:
+{
+  "status": "ok",
+  "message": ""
+}
+
+# Another Example (error):
+$ poetry run python main.py update --data '{"source_filename": "does-not-exist.pdf", "patch": {"title": "a different title than before"}}' | jq
+
+# Response (error)
+{
+  "status": "error",
+  "message": "Unable to update does-not-exist.pdf: not found in storage"
+}
+
+# Full example showing the update
+$ cat .storage/references.json | jq '.[] | select(.source_filename | contains("fails")) | {"source_filename": .source_filename, "title": .title}'
+
+{
+  "source_filename": "grobid-fails.pdf",
+  "title": null
+}
+
+# run the update
+$ poetry run python main.py update --data '{"source_filename": "grobid-fails.pdf", "patch": {"title": "a title that was missing"}}'
+
+{
+  "status": "ok",
+  "message": ""
+}
+
+# check that it worked
+$ cat .storage/references.json | jq '.[] | select(.source_filename | contains("fails")) | {"source_filename": .source_filename, "title": .title}'
+
+{
+  "source_filename": "grobid-fails.pdf",
+  "title": "a title that was missing"
 }
 ```
