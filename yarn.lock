@@ -818,7 +818,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@popperjs/core@npm:^2.9.0":
+"@popperjs/core@npm:^2.11.8, @popperjs/core@npm:^2.9.0":
   version: 2.11.8
   resolution: "@popperjs/core@npm:2.11.8"
   checksum: e5c69fdebf52a4012f6a1f14817ca8e9599cb1be73dd1387e1785e2ed5e5f0862ff817f420a87c7fc532add1f88a12e25aeb010ffcbdc98eace3d55ce2139cf0
@@ -1030,7 +1030,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@testing-library/dom@npm:^9.0.0":
+"@testing-library/dom@npm:^9.0.0, @testing-library/dom@npm:^9.3.1":
   version: 9.3.1
   resolution: "@testing-library/dom@npm:9.3.1"
   dependencies:
@@ -6526,13 +6526,16 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "refstudio@workspace:."
   dependencies:
+    "@popperjs/core": ^2.11.8
     "@tanstack/react-query": ^4.29.13
     "@tauri-apps/api": ^1.2.0
     "@tauri-apps/cli": ^1.2.3
+    "@testing-library/dom": ^9.3.1
     "@testing-library/jest-dom": ^5.16.5
     "@testing-library/react": ^14.0.0
     "@testing-library/user-event": ^14.4.3
     "@tiptap/core": ^2.0.3
+    "@tiptap/extension-code-block": ^2.0.3
     "@tiptap/extension-code-block-lowlight": ^2.0.3
     "@tiptap/extension-color": ^2.0.3
     "@tiptap/extension-document": ^2.0.3
