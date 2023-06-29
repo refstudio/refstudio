@@ -37,14 +37,11 @@ describe('unsetPartiallySelectedCollapsibleBlocks', () => {
   });
 
   it('should not do anything if the collapsible block is completely selected', () => {
+    setUpEditorWithSelection(editor, '<p>|First paragraph</p>' + defaultCollapsibleBlock + '<p>Last paragraph</p>');
+
     const initialDoc = editor.state.doc;
 
-    const commandResult = editor
-      .chain()
-      .setContent('<p>First paragraph</p>' + defaultCollapsibleBlock + '<p>Last paragraph</p>')
-      .selectAll()
-      .command(unsetPartiallySelectedCollapsibleBlocks)
-      .run();
+    const commandResult = editor.chain().selectAll().command(unsetPartiallySelectedCollapsibleBlocks).run();
     expect(commandResult).toBe(false);
     expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
   });
