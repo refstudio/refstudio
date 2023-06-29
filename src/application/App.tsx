@@ -6,11 +6,11 @@ import { ImperativePanelHandle, Panel, PanelGroup } from 'react-resizable-panels
 import { openReferenceAtom } from '../atoms/editorActions';
 import { PrimarySideBar, PrimarySideBarPane } from '../components/PrimarySideBar';
 import { VerticalResizeHandle } from '../components/VerticalResizeHandle';
-import { emitEvent, RefStudioEvents } from '../events';
+import { RefStudioEvents, emitEvent } from '../events';
 import { AIPanel } from '../features/ai/AIPanel';
 import { ReferencesDropZone } from '../features/references/components/ReferencesDropZone';
 import { ReferencesPanel } from '../features/references/sidebar/ReferencesPanel';
-import { SettingsModalOpener } from '../settings/__tests__/SettingsModalOpener';
+import { SettingsModalOpener } from '../settings/SettingsModalOpener';
 import { PdfViewerAPI } from '../types/PdfViewerAPI';
 import { ApplicationFrame } from '../wrappers/ApplicationFrame';
 import { EventsListener } from '../wrappers/EventsListener';

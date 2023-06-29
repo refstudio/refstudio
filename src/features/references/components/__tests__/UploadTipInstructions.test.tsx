@@ -4,7 +4,7 @@ import { emitEvent, RefStudioEvents } from '../../../../events';
 import { act, screen, setupWithJotaiProvider } from '../../../../test/test-utils';
 import { UploadTipInstructions } from '../UploadTipInstructions';
 
-vi.mock('../../../events');
+vi.mock('../../../../events');
 
 describe('UploadTipInstructions', () => {
   it('should display tip instructions', () => {

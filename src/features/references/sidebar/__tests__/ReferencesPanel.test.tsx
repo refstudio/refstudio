@@ -7,7 +7,7 @@ import { REFERENCES } from '../../test-fixtures';
 import { ReferencesList } from '../ReferencesList';
 import { ReferencesPanel } from '../ReferencesPanel';
 
-vi.mock('../../../events');
+vi.mock('../../../../events');
 
 describe('ReferencesPanel', () => {
   it('should display welcome message with empty references', () => {

@@ -11,8 +11,8 @@ import {
 } from '../settingsManager';
 
 vi.mock('tauri-settings');
-vi.mock('../io/filesystem');
-vi.mock('../io/readEnv');
+vi.mock('../../io/filesystem');
+vi.mock('../../io/readEnv');
 
 describe('settings', () => {
   beforeEach(() => {
