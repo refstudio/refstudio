@@ -4,12 +4,13 @@ import { Loadable } from 'jotai/vanilla/utils/loadable';
 import { describe, expect, it } from 'vitest';
 
 import { readFileContent, writeFileContent } from '../io/filesystem';
-import { activePaneAtom, openFileEntryAtom } from './editorActions';
+import { activePaneAtom, closeEditorFromPaneAtom, moveEditorToPaneAtom, openFileEntryAtom } from './editorActions';
 import { activePaneContentAtom, focusPaneAtom } from './paneActions';
 import { makeFile } from './test-fixtures';
 import { runGetAtomHook, runSetAtomHook } from './test-utils';
 import { EditorContent } from './types/EditorContent';
 import { EditorContentAtoms } from './types/EditorContentAtoms';
+import { EditorData } from './types/EditorData';
 import { FileEntry } from './types/FileEntry';
 import { PaneId } from './types/PaneGroup';
 
@@ -18,10 +19,13 @@ vi.mock('../io/filesystem');
 describe('fileActions', () => {
   let store: ReturnType<typeof createStore>;
   let fileEntry: FileEntry;
+  let editorData: EditorData;
   let fileContentAtoms: EditorContentAtoms;
 
   beforeEach(() => {
-    fileEntry = makeFile('file.txt').fileEntry;
+    const file = makeFile('file.txt');
+    fileEntry = file.fileEntry;
+    editorData = file.editorData;
 
     vi.mocked(readFileContent).mockResolvedValue({ type: 'text', textContent: 'File content' });
 
@@ -49,6 +53,44 @@ describe('fileActions', () => {
     });
 
     expect(activePane.current.id).toBe(paneToFocus);
+  });
+
+  it('should focus another pane when the last file is closed', () => {
+    const openFileEntry = runSetAtomHook(openFileEntryAtom, store);
+    const moveEditorToPane = runSetAtomHook(moveEditorToPaneAtom, store);
+    const activePane = runGetAtomHook(activePaneAtom, store);
+    const closeEditorFromPane = runSetAtomHook(closeEditorFromPaneAtom, store);
+
+    const initialPaneId = activePane.current.id;
+    const otherPaneId: PaneId = initialPaneId === 'LEFT' ? 'RIGHT' : 'LEFT';
+
+    const { fileEntry: fileEntry2, editorData: editorData2 } = makeFile('File2.txt');
+
+    act(() => {
+      openFileEntry.current(fileEntry2);
+      moveEditorToPane.current({ editorId: editorData2.id, fromPaneId: initialPaneId, toPaneId: otherPaneId });
+    });
+
+    expect(activePane.current.id).toBe(otherPaneId);
+
+    act(() => {
+      closeEditorFromPane.current({ editorId: editorData2.id, paneId: otherPaneId });
+    });
+
+    expect(activePane.current.id).toBe(initialPaneId);
+  });
+
+  it('should not focus another pane when the last file of a pane is closed but no other pane contains files', () => {
+    const activePane = runGetAtomHook(activePaneAtom, store);
+    const closeEditorFromPane = runSetAtomHook(closeEditorFromPaneAtom, store);
+
+    const initialPaneId = activePane.current.id;
+
+    act(() => {
+      closeEditorFromPane.current({ editorId: editorData.id, paneId: initialPaneId });
+    });
+
+    expect(activePane.current.id).toBe(initialPaneId);
   });
 
   it('should return the content of the active pane', () => {

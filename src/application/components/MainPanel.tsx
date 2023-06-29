@@ -2,13 +2,14 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback } from 'react';
 import { Panel, PanelGroup } from 'react-resizable-panels';
 
-import { closeEditorFromPaneAtom, selectEditorInPaneAtom } from '../../atoms/editorActions';
+import { selectEditorInPaneAtom } from '../../atoms/editorActions';
 import { focusPaneAtom, leftPaneAtom, rightPaneAtom } from '../../atoms/paneActions';
 import { EditorContentAtoms } from '../../atoms/types/EditorContentAtoms';
-import { PaneContent } from '../../atoms/types/PaneGroup';
+import { PaneContent, PaneEditorId } from '../../atoms/types/PaneGroup';
 import { Spinner } from '../../components/Spinner';
 import { TabPane } from '../../components/TabPane';
 import { VerticalResizeHandle } from '../../components/VerticalResizeHandle';
+import { emitEvent, RefStudioEvents } from '../../events';
 import { ReferencesTableView } from '../../features/references/editor/ReferencesTableView';
 import { ReferenceView } from '../../features/references/editor/ReferenceView';
 import { TipTapView } from '../../features/textEditor/editor/TipTapView';
@@ -66,8 +67,11 @@ export function MainPanelPane({ pane, pdfViewerRef }: MainPanelPaneProps & MainP
   }));
 
   const selectFileInPane = useSetAtom(selectEditorInPaneAtom);
-  const closeFileInPane = useSetAtom(closeEditorFromPaneAtom);
   const focusPane = useSetAtom(focusPaneAtom);
+
+  const handleCloseClick = (paneEditorId: PaneEditorId) => {
+    emitEvent(RefStudioEvents.editors.close, paneEditorId);
+  };
 
   return (
     <div className="flex h-full flex-col" onClick={() => focusPane(pane.id)} onFocus={() => focusPane(pane.id)}>
@@ -76,7 +80,7 @@ export function MainPanelPane({ pane, pdfViewerRef }: MainPanelPaneProps & MainP
           items={items}
           value={activeFile?.id}
           onClick={(editorId) => selectFileInPane({ paneId: pane.id, editorId })}
-          onCloseClick={(editorId) => closeFileInPane({ paneId: pane.id, editorId })}
+          onCloseClick={(editorId) => handleCloseClick({ paneId: pane.id, editorId })}
         />
       </div>
       <div className="flex w-full grow overflow-hidden">

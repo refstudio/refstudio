@@ -81,6 +81,14 @@ export const removeEditorFromPane = atom(null, (get, set, { editorId, paneId }: 
   let updatedActiveEditor = panes[paneId].activeEditorId;
   if (updatedActiveEditor === editorId) {
     updatedActiveEditor = updatedOpenEditors.length > 0 ? updatedOpenEditors[updatedOpenEditors.length - 1] : undefined;
+    if (updatedOpenEditors.length === 0) {
+      const nonEmptyPaneId = Object.keys(panes).find((_paneId) => panes[_paneId as PaneId].openEditorIds.length > 0) as
+        | PaneId
+        | undefined;
+      if (nonEmptyPaneId) {
+        set(activePaneIdAtom, nonEmptyPaneId);
+      }
+    }
   }
 
   set(updatePaneGroup, {

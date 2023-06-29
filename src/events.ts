@@ -3,6 +3,7 @@ import { emit, EventCallback, EventName, listen } from '@tauri-apps/api/event';
 export const RefStudioEvents = {
   menu: {
     file: {
+      close: 'refstudio://menu/file/close',
       save: 'refstudio://menu/file/save',
     },
     settings: 'refstudio://menu/settings',
@@ -10,6 +11,9 @@ export const RefStudioEvents = {
       open: 'refstudio://menu/references/open',
       upload: 'refstudio://menu/references/upload',
     },
+  },
+  editors: {
+    close: 'refstudio://editors/close',
   },
   references: {
     ingestion: {
