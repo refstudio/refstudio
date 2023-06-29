@@ -69,6 +69,7 @@
     "@vitejs/plugin-react": "^3.0.0",
     "@vitest/coverage-c8": "^0.31.4",
     "@vitest/ui": "^0.31.4",
+    "bun-types": "^0.6.11",
     "eslint": "^8.41.0",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-jest-dom": "^5.0.1",

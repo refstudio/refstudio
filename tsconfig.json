@@ -15,7 +15,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "types": ["vitest/globals"]
+    "types": ["vitest/globals", "bun-types"]
   },
   "include": ["src", ".eslintrc.cjs"],
   "references": [{ "path": "./tsconfig.node.json" }]

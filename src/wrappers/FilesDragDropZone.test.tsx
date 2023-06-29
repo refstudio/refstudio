@@ -1,14 +1,16 @@
+import { afterEach, describe, it, jest } from 'bun:test';
+
 import { noop } from '../lib/noop';
 import { fireEvent, render, screen } from '../test/test-utils';
 import { FilesDragDropZone } from './FilesDragDropZone';
 
-const onFileDropStarted = vi.fn();
-const onFileDropCanceled = vi.fn();
-const onFileDrop = vi.fn();
+const onFileDropStarted = jest.fn();
+const onFileDropCanceled = jest.fn();
+const onFileDrop = jest.fn();
 
 describe('FilesDragDropZone', () => {
   afterEach(() => {
-    vi.resetAllMocks();
+    jest.restoreAllMocks();
   });
 
   it('should render with children', () => {

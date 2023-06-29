@@ -2253,6 +2253,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bun-types@npm:^0.6.11":
+  version: 0.6.11
+  resolution: "bun-types@npm:0.6.11"
+  checksum: 262fcbad19138832beae335928ea7cb540676f9eb9137ad24eb26552163d72c86b932b7e171d16ee1497e1b6d020e9bdfde5d2587d01b84e970e54844385e6b3
+  languageName: node
+  linkType: hard
+
 "c8@npm:^7.13.0":
   version: 7.14.0
   resolution: "c8@npm:7.14.0"
@@ -6202,6 +6209,7 @@ __metadata:
     "@vitest/coverage-c8": ^0.31.4
     "@vitest/ui": ^0.31.4
     autoprefixer: ^10.4.14
+    bun-types: ^0.6.11
     classnames: ^2.3.2
     eslint: ^8.41.0
     eslint-plugin-import: ^2.27.5
