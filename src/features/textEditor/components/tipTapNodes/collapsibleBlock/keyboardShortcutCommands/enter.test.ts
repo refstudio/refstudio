@@ -71,11 +71,7 @@ describe('Enter keyboard shortcut command', () => {
   });
 
   it('should not do anything when the selection is not in a collapsible block', () => {
-    editor
-      .chain()
-      .setContent('<p>Some content</p>' + defaultCollapsibleBlock)
-      .setTextSelection(2)
-      .run();
+    setUpEditorWithSelection(editor, '<p>|Some content</p>' + defaultCollapsibleBlock);
     const initialDoc = editor.state.doc;
 
     const commandResult = enter({ editor });

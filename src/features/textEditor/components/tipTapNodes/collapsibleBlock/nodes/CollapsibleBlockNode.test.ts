@@ -1,15 +1,8 @@
-import { TextSelection } from '@tiptap/pm/state';
-import { Editor, getText } from '@tiptap/react';
+import { Editor } from '@tiptap/react';
 
 import { EDITOR_EXTENSIONS } from '../../../tipTapEditorConfigs';
-import {
-  collapsedEmptyCollapsibleBlock,
-  defaultCollapsibleBlock,
-  defaultUncollapsedCollapsibleBlock,
-  oneLineCollapsibleBlock,
-  uncollapsedCollapsibleBlockWithEmptyContent,
-} from '../../test-fixtures';
-import { findNodesByNodeType } from '../../test-utils';
+import { defaultCollapsibleBlockWithCursor, oneLineCollapsibleBlock } from '../../test-fixtures';
+import { findNodesByNodeType, getPrettyHTMLWithSelection, setUpEditorWithSelection } from '../../test-utils';
 
 describe('CollapsibleBlockNode commands', () => {
   const editor = new Editor({
@@ -17,86 +10,114 @@ describe('CollapsibleBlockNode commands', () => {
   });
 
   describe('toggleCollapsedCollapsibleBlock command', () => {
-    beforeEach(() => {
-      editor.commands.setContent(defaultCollapsibleBlock);
-    });
-
     it('should uncollapse with command', () => {
-      const { from } = TextSelection.near(editor.state.doc.resolve(0));
-
+      const [from] = setUpEditorWithSelection(editor, defaultCollapsibleBlockWithCursor);
       // The node is collapsed by default
-      let collapsibleBlocks = findNodesByNodeType(editor.state.doc, 'collapsibleBlock');
+      const collapsibleBlocks = findNodesByNodeType(editor.state.doc, 'collapsibleBlock');
       expect(collapsibleBlocks).toHaveLength(1);
 
-      let [collapsibleBlock] = collapsibleBlocks;
+      const [collapsibleBlock] = collapsibleBlocks;
       expect(collapsibleBlock.attrs.folded).toBe(true);
 
       // Uncollapse node
       const commandResult = editor.commands.toggleCollapsedCollapsibleBlock(from);
       expect(commandResult).toBe(true);
 
-      collapsibleBlocks = findNodesByNodeType(editor.state.doc, 'collapsibleBlock');
-      expect(collapsibleBlocks).toHaveLength(1);
-
-      [collapsibleBlock] = collapsibleBlocks;
-      expect(collapsibleBlock.attrs.folded).toBe(false);
+      expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
+        "<collapsible-block folded='false'>
+          <collapsible-summary>|Header</collapsible-summary>
+          <collapsible-content>
+            <p>Content Line 1</p>
+            <p>Content Line 2</p>
+          </collapsible-content>
+        </collapsible-block>"
+      `);
     });
 
     it('should collapse with command', () => {
-      editor.commands.setContent(defaultUncollapsedCollapsibleBlock);
-      const { from } = TextSelection.near(editor.state.doc.resolve(0));
+      const [from] = setUpEditorWithSelection(
+        editor,
+        `<collapsible-block folded='false'>
+            <collapsible-summary>|Header</collapsible-summary>
+            <collapsible-content>
+                <p>Content Line 1</p>
+                <p>Content Line 2</p>
+            </collapsible-content>
+        </collapsible-block>`,
+      );
 
       // The node is uncollapsed
-      let collapsibleBlocks = findNodesByNodeType(editor.state.doc, 'collapsibleBlock');
+      const collapsibleBlocks = findNodesByNodeType(editor.state.doc, 'collapsibleBlock');
       expect(collapsibleBlocks).toHaveLength(1);
 
-      let [collapsibleBlock] = collapsibleBlocks;
+      const [collapsibleBlock] = collapsibleBlocks;
       expect(collapsibleBlock.attrs.folded).toBe(false);
 
       // Collapse the node
       const commandResult = editor.commands.toggleCollapsedCollapsibleBlock(from);
       expect(commandResult).toBe(true);
 
-      collapsibleBlocks = findNodesByNodeType(editor.state.doc, 'collapsibleBlock');
-      expect(collapsibleBlocks).toHaveLength(1);
-
-      [collapsibleBlock] = collapsibleBlocks;
-      expect(collapsibleBlock.attrs.folded).toBe(true);
+      expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
+        "<collapsible-block folded='true'>
+          <collapsible-summary>|Header</collapsible-summary>
+          <collapsible-content>
+            <p>Content Line 1</p>
+            <p>Content Line 2</p>
+          </collapsible-content>
+        </collapsible-block>"
+      `);
     });
 
     it('should add empty content when uncollapsing', () => {
-      editor.commands.setContent(collapsedEmptyCollapsibleBlock);
-      const { from } = TextSelection.near(editor.state.doc.resolve(0));
+      const [from] = setUpEditorWithSelection(
+        editor,
+        `<collapsible-block folded='true'>
+          <collapsible-summary>|</collapsible-summary>
+        </collapsible-block>`,
+      );
 
-      let collapsibleContents = findNodesByNodeType(editor.state.doc, 'collapsibleContent');
+      const collapsibleContents = findNodesByNodeType(editor.state.doc, 'collapsibleContent');
       expect(collapsibleContents).toHaveLength(0);
 
       const commandResult = editor.commands.toggleCollapsedCollapsibleBlock(from);
       expect(commandResult).toBe(true);
 
-      collapsibleContents = findNodesByNodeType(editor.state.doc, 'collapsibleContent');
-      expect(collapsibleContents).toHaveLength(1);
+      expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
+        "<collapsible-block folded='false'>
+          <collapsible-summary>|</collapsible-summary>
+          <collapsible-content><p></p></collapsible-content>
+        </collapsible-block>"
+      `);
     });
 
     it('should remove empty content when collapsing', () => {
-      editor.commands.setContent(uncollapsedCollapsibleBlockWithEmptyContent);
-      const { from } = TextSelection.near(editor.state.doc.resolve(0));
+      const [from] = setUpEditorWithSelection(
+        editor,
+        `<collapsible-block folded='false'>
+            <collapsible-summary>|</collapsible-summary>
+            <collapsible-content>
+                <p></p>
+            </collapsible-content>
+        </collapsible-block>`,
+      );
 
-      let collapsibleContents = findNodesByNodeType(editor.state.doc, 'collapsibleContent');
+      const collapsibleContents = findNodesByNodeType(editor.state.doc, 'collapsibleContent');
       expect(collapsibleContents).toHaveLength(1);
 
       const commandResult = editor.commands.toggleCollapsedCollapsibleBlock(from);
       expect(commandResult).toBe(true);
 
-      collapsibleContents = findNodesByNodeType(editor.state.doc, 'collapsibleContent');
-      expect(collapsibleContents).toHaveLength(0);
+      expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
+        "<collapsible-block folded='true'>
+          <collapsible-summary>|</collapsible-summary>
+        </collapsible-block>"
+      `);
     });
 
     it('should not do anything if run from a paragraph', () => {
-      editor.commands.setContent('<p></p>');
-      const initialDoc = editor.state.doc;
+      const [from] = setUpEditorWithSelection(editor, '<p>|</p>');
 
-      const { from } = TextSelection.near(editor.state.doc.resolve(0));
+      const initialDoc = editor.state.doc;
 
       const commandResult = editor.commands.toggleCollapsedCollapsibleBlock(from);
       expect(commandResult).toBe(false);
@@ -106,43 +127,42 @@ describe('CollapsibleBlockNode commands', () => {
 
   describe('setCollapsibleBlock command', () => {
     it('should wrap paragraph in a collapsible block', () => {
-      editor.commands.setContent('<p></p>');
+      setUpEditorWithSelection(editor, '<p>|</p>');
 
-      let collapsibleBlocks = findNodesByNodeType(editor.state.doc, 'collapsibleBlock');
-      expect(collapsibleBlocks).toHaveLength(0);
-
-      const commandResult = editor.chain().setTextSelection(0).setCollapsibleBlock().run();
+      const commandResult = editor.commands.setCollapsibleBlock();
       expect(commandResult).toBe(true);
 
-      collapsibleBlocks = findNodesByNodeType(editor.state.doc, 'collapsibleBlock');
-      expect(collapsibleBlocks).toHaveLength(1);
+      expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
+        "<collapsible-block folded='true'>
+          <collapsible-summary>|</collapsible-summary>
+        </collapsible-block>"
+      `);
     });
 
     it('should not do anything if content is already in a collapsible block', () => {
-      editor.commands.setContent(defaultCollapsibleBlock);
+      setUpEditorWithSelection(editor, defaultCollapsibleBlockWithCursor);
       const initialDoc = editor.state.doc;
 
-      const commandResult = editor.chain().setTextSelection(0).setCollapsibleBlock().run();
+      const commandResult = editor.commands.setCollapsibleBlock();
       expect(commandResult).toBe(false);
+
       expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
     });
 
     it('should not do anything if block cannot be turned into collapsible block', () => {
-      editor.commands.setContent('<h1>Some content</h1>');
+      setUpEditorWithSelection(editor, '<h1>|Some content</h1>');
       const initialDoc = editor.state.doc;
 
-      const commandResult = editor.chain().setTextSelection(0).setCollapsibleBlock().run();
+      const commandResult = editor.commands.setCollapsibleBlock();
       expect(commandResult).toBe(false);
       expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
     });
 
     it('should not do anything if selection is not empty', () => {
-      editor.commands.setContent('<p>Some text</p>');
+      setUpEditorWithSelection(editor, '<p>|Some| text</p>');
       const initialDoc = editor.state.doc;
 
-      const selection = TextSelection.between(editor.state.doc.resolve(0), editor.state.doc.resolve(5));
-
-      const commandResult = editor.chain().setTextSelection(selection).setCollapsibleBlock().run();
+      const commandResult = editor.commands.setCollapsibleBlock();
       expect(commandResult).toBe(false);
       expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
     });
@@ -150,115 +170,135 @@ describe('CollapsibleBlockNode commands', () => {
 
   describe('unsetCollapsibleBlock command', () => {
     it('should unwrap block and add all its content blocks to the document', () => {
-      editor.commands.setContent(defaultCollapsibleBlock);
+      setUpEditorWithSelection(editor, defaultCollapsibleBlockWithCursor);
 
       expect(editor.state.doc.childCount).toBe(1);
 
-      const commandResult = editor.chain().setTextSelection(0).unsetCollapsibleBlock().run();
+      const commandResult = editor.commands.unsetCollapsibleBlock();
       expect(commandResult).toBe(true);
 
-      expect(editor.state.doc.childCount).toBe(3);
-      expect(getText(editor.state.doc.child(0))).toBe('Header');
-      expect(getText(editor.state.doc.child(1))).toBe('Content Line 1');
-      expect(getText(editor.state.doc.child(2))).toBe('Content Line 2');
+      expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
+        "<p>|Header</p>
+        <p>Content Line 1</p>
+        <p>Content Line 2</p>"
+      `);
     });
 
     it('should unwrap block and add its content block to the document', () => {
-      editor.commands.setContent(oneLineCollapsibleBlock);
+      setUpEditorWithSelection(editor, oneLineCollapsibleBlock);
 
-      expect(editor.state.doc.childCount).toBe(1);
-
-      const commandResult = editor.chain().setTextSelection(0).unsetCollapsibleBlock().run();
+      const commandResult = editor.commands.unsetCollapsibleBlock();
       expect(commandResult).toBe(true);
 
-      expect(editor.state.doc.childCount).toBe(2);
-      expect(getText(editor.state.doc.child(0))).toBe('Header');
-      expect(getText(editor.state.doc.child(1))).toBe('Content Line');
+      expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
+        "<p>|Header</p>
+        <p>Content Line</p>"
+      `);
     });
 
     it('should not do anything if content is not in a collapsible block', () => {
-      editor.commands.setContent('<p></p>');
+      setUpEditorWithSelection(editor, '<p>|</p>');
       const initialDoc = editor.state.doc;
 
-      const commandResult = editor.chain().setTextSelection(0).unsetCollapsibleBlock().run();
+      const commandResult = editor.commands.unsetCollapsibleBlock();
       expect(commandResult).toBe(false);
       expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
     });
 
     it('should not do anything if the selection is not empty', () => {
-      editor.commands.setContent(defaultCollapsibleBlock);
+      setUpEditorWithSelection(
+        editor,
+        `<collapsible-block>
+          <collapsible-summary>|Header</collapsible-summary>
+          <collapsible-content>
+              <p>Co|ntent Line 1</p>
+              <p>Content Line 2</p>
+          </collapsible-content>
+        </collapsible-block>`,
+      );
       const initialDoc = editor.state.doc;
 
-      const selection = TextSelection.between(editor.state.doc.resolve(0), editor.state.doc.resolve(10));
-
-      const commandResult = editor.chain().setTextSelection(selection).unsetCollapsibleBlock().run();
+      const commandResult = editor.commands.unsetCollapsibleBlock();
       expect(commandResult).toBe(false);
       expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
     });
   });
 
   describe('splitCollapsibleBlock command', () => {
-    beforeEach(() => {
-      editor.commands.setContent(defaultCollapsibleBlock);
-    });
-
     it('should split collapsible block into 2 collapsible blocks', () => {
-      expect(findNodesByNodeType(editor.state.doc, 'collapsibleBlock')).toHaveLength(1);
-      const [initialContent] = findNodesByNodeType(editor.state.doc, 'collapsibleContent');
-      expect(initialContent).toBeDefined();
+      setUpEditorWithSelection(
+        editor,
+        `<collapsible-block>
+          <collapsible-summary>Hea|der</collapsible-summary>
+          <collapsible-content>
+              <p>Content Line 1</p>
+              <p>Content Line 2</p>
+          </collapsible-content>
+        </collapsible-block>`,
+      );
 
-      // 6 corresponds to the carret being in the middle of the word 'Header'
-      const commandResult = editor.chain().setTextSelection(6).splitCollapsibleBlock().run();
+      const commandResult = editor.commands.splitCollapsibleBlock();
       expect(commandResult).toBe(true);
 
       const collapsibleBlocks = findNodesByNodeType(editor.state.doc, 'collapsibleBlock');
       expect(collapsibleBlocks).toHaveLength(2);
 
-      // The summary should have been split: 'Hea' | 'der'
-      const [firstSummaries, secondSummaries] = collapsibleBlocks.map((collapsibleBlock) =>
-        findNodesByNodeType(collapsibleBlock, 'collapsibleSummary'),
-      );
-      expect(firstSummaries).toHaveLength(1);
-      expect(getText(firstSummaries[0])).toBe('Hea');
-      expect(secondSummaries).toHaveLength(1);
-      expect(getText(secondSummaries[0])).toBe('der');
-
-      // The content should still be in the first collapsible block
-      const [firstCollapsibleBlock, secondCollapsibleBlock] = collapsibleBlocks;
-      const firstBlockContentBlocks = findNodesByNodeType(firstCollapsibleBlock, 'collapsibleContent');
-      expect(firstBlockContentBlocks).toHaveLength(1);
-      expect(firstBlockContentBlocks[0].toJSON()).toEqual(initialContent.toJSON());
-
-      // The second block should not have content
-      expect(findNodesByNodeType(secondCollapsibleBlock, 'collapsibleContent')).toHaveLength(0);
+      expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
+        "<collapsible-block folded='true'>
+          <collapsible-summary>Hea</collapsible-summary>
+          <collapsible-content>
+            <p>Content Line 1</p>
+            <p>Content Line 2</p>
+          </collapsible-content>
+        </collapsible-block>
+        <collapsible-block folded='true'>
+          <collapsible-summary>|der</collapsible-summary>
+        </collapsible-block>"
+      `);
     });
 
     it('should split collapsed collapsible block with no content into 2 collapsible blocks', () => {
-      editor.commands.setContent(collapsedEmptyCollapsibleBlock);
+      setUpEditorWithSelection(
+        editor,
+        `<collapsible-block folded='false'>
+          <collapsible-summary>|</collapsible-summary>
+        </collapsible-block>`,
+      );
 
-      expect(findNodesByNodeType(editor.state.doc, 'collapsibleBlock')).toHaveLength(1);
-      expect(findNodesByNodeType(editor.state.doc, 'collapsibleContent')).toHaveLength(0);
-
-      const commandResult = editor.chain().setTextSelection(0).splitCollapsibleBlock().run();
+      const commandResult = editor.commands.splitCollapsibleBlock();
       expect(commandResult).toBe(true);
 
-      expect(findNodesByNodeType(editor.state.doc, 'collapsibleBlock')).toHaveLength(2);
-      // No content should have been created
-      expect(findNodesByNodeType(editor.state.doc, 'collapsibleContent')).toHaveLength(0);
+      expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
+        "<collapsible-block folded='false'>
+          <collapsible-summary></collapsible-summary>
+        </collapsible-block>
+        <collapsible-block folded='false'>
+          <collapsible-summary>|</collapsible-summary>
+        </collapsible-block>"
+      `);
     });
 
     it('should not do anything if the selection is not empty', () => {
-      // 6 corresponds to the carret being in the middle of the word 'Header'
-      const selection = TextSelection.between(editor.state.doc.resolve(6), editor.state.doc.resolve(7));
+      setUpEditorWithSelection(
+        editor,
+        `<collapsible-block>
+          <collapsible-summary>Hea|d|er</collapsible-summary>
+          <collapsible-content>
+              <p>Content Line 1</p>
+              <p>Content Line 2</p>
+          </collapsible-content>
+        </collapsible-block>`,
+      );
+
       const initialDoc = editor.state.doc;
 
-      const commandResult = editor.chain().setTextSelection(selection).splitCollapsibleBlock().run();
+      const commandResult = editor.commands.splitCollapsibleBlock();
       expect(commandResult).toBe(false);
       expect(editor.state.doc.toJSON()).toEqual(initialDoc.toJSON());
     });
 
     it('should not do anything if the block is not a collapsibleBlock', () => {
-      editor.commands.setContent('<p></p>');
+      setUpEditorWithSelection(editor, '<p>|</p>');
       const initialDoc = editor.state.doc;
 
       const commandResult = editor.chain().setTextSelection(0).splitCollapsibleBlock().run();
