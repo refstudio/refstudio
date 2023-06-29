@@ -1,17 +1,17 @@
-import { noop } from '../../../lib/noop';
+import { noop } from '../../../../lib/noop';
 import {
   getCachedSetting,
   initSettings,
   saveCachedSettings,
   setCachedSetting,
   SettingsSchema,
-} from '../../../settings/settingsManager';
-import { PaneConfig } from '../../../settings/types';
-import { render, screen, userEvent } from '../../../test/test-utils';
-import { OpenAiSettingsPane } from './OpenAiSettingsPane';
+} from '../../../../settings/settingsManager';
+import { PaneConfig } from '../../../../settings/types';
+import { render, screen, userEvent } from '../../../../test/test-utils';
+import { OpenAiSettingsPane } from '../OpenAiSettingsPane';
 
-vi.mock('../../../../../settings/settingsManager');
-vi.mock('../../../../../events');
+vi.mock('../../../../settings/settingsManager');
+vi.mock('../../../../events');
 
 const panelConfig: PaneConfig = {
   id: 'project-openai',
