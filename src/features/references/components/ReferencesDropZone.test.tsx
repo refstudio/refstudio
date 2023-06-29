@@ -5,6 +5,7 @@ import { listenEvent, RefStudioEvents } from '../../../events';
 import { uploadFiles } from '../../../io/filesystem';
 import { noop } from '../../../lib/noop';
 import { act, fireEvent, mockListenEvent, screen, setupWithJotaiProvider, waitFor } from '../../../test/test-utils';
+import { REFERENCES } from '../test-fixtures';
 import { ReferencesDropZone } from './ReferencesDropZone';
 
 vi.mock('../../../events');
@@ -70,16 +71,7 @@ describe('ReferencesDropZone', () => {
 
   it('should start ingestion on PDF upload', async () => {
     vi.mocked(listenEvent).mockResolvedValue(noop);
-    const REFERENCE = {
-      id: 'ref.id',
-      citationKey: 'citationKey',
-      title: 'title',
-      abstract: '',
-      authors: [],
-      filename: 'title.pdf',
-      publishedDate: '2023-06-22',
-    };
-    vi.mocked(runPDFIngestion).mockResolvedValue([REFERENCE]);
+    vi.mocked(runPDFIngestion).mockResolvedValue([REFERENCES[0]]);
 
     const { store } = setupWithJotaiProvider(<ReferencesDropZone>APP</ReferencesDropZone>);
     const syncInProgress = runGetAtomHook(referencesSyncInProgressAtom, store);
@@ -95,7 +87,7 @@ describe('ReferencesDropZone', () => {
       },
     });
 
-    const file = new File(['(⌐□_□)'], 'chucknorris.pdf', { type: 'application/pdf' });
+    const file = new File(['(⌐□_□)'], REFERENCES[0].filename, { type: 'application/pdf' });
 
     fireEvent.drop(target, {
       dataTransfer: {
@@ -115,6 +107,6 @@ describe('ReferencesDropZone', () => {
     });
 
     expect(references.current).toHaveLength(1);
-    expect(references.current).toStrictEqual([REFERENCE]);
+    expect(references.current).toStrictEqual([REFERENCES[0]]);
   });
 });

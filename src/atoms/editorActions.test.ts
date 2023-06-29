@@ -204,9 +204,11 @@ describe('fileActions', () => {
 
     const reference: ReferenceItem = {
       id: 'reference',
+      filepath: '/path/to/reference.pdf',
       filename: 'reference.pdf',
       citationKey: 'citationKey',
       title: 'Reference',
+      status: 'complete',
       authors: [],
     };
     const editorId = buildEditorId('reference', reference.id);

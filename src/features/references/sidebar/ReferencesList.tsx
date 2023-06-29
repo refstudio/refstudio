@@ -74,5 +74,6 @@ function ReferencesItemStatusLabel({ status }: { status: ReferenceItemStatus }) 
       );
     default:
       assertNever(status);
+      return null;
   }
 }
