@@ -1,6 +1,6 @@
-import { noop } from '../lib/noop';
-import { fireEvent, render, screen } from '../test/test-utils';
-import { FilesDragDropZone } from './FilesDragDropZone';
+import { noop } from '../../lib/noop';
+import { fireEvent, render, screen } from '../../test/test-utils';
+import { FilesDragDropZone } from '../FilesDragDropZone';
 
 const onFileDropStarted = vi.fn();
 const onFileDropCanceled = vi.fn();
