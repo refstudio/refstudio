@@ -5,7 +5,7 @@ import { Panel, PanelGroup } from 'react-resizable-panels';
 import { selectEditorInPaneAtom } from '../../atoms/editorActions';
 import { focusPaneAtom, leftPaneAtom, rightPaneAtom } from '../../atoms/paneActions';
 import { EditorContentAtoms } from '../../atoms/types/EditorContentAtoms';
-import { PaneContent, PaneEditorId } from '../../atoms/types/PaneGroup';
+import { PaneContent } from '../../atoms/types/PaneGroup';
 import { Spinner } from '../../components/Spinner';
 import { TabPane } from '../../components/TabPane';
 import { VerticalResizeHandle } from '../../components/VerticalResizeHandle';
@@ -69,10 +69,6 @@ export function MainPanelPane({ pane, pdfViewerRef }: MainPanelPaneProps & MainP
   const selectFileInPane = useSetAtom(selectEditorInPaneAtom);
   const focusPane = useSetAtom(focusPaneAtom);
 
-  const handleCloseClick = (paneEditorId: PaneEditorId) => {
-    emitEvent(RefStudioEvents.editors.close, paneEditorId);
-  };
-
   return (
     <div className="flex h-full flex-col" onClick={() => focusPane(pane.id)} onFocus={() => focusPane(pane.id)}>
       <div className="grow-0">
@@ -80,7 +76,7 @@ export function MainPanelPane({ pane, pdfViewerRef }: MainPanelPaneProps & MainP
           items={items}
           value={activeFile?.id}
           onClick={(editorId) => selectFileInPane({ paneId: pane.id, editorId })}
-          onCloseClick={(editorId) => handleCloseClick({ paneId: pane.id, editorId })}
+          onCloseClick={(editorId) => emitEvent(RefStudioEvents.editors.close, { paneId: pane.id, editorId })}
         />
       </div>
       <div className="flex w-full grow overflow-hidden">

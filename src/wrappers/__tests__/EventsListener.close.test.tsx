@@ -1,15 +1,15 @@
 import { createStore } from 'jotai';
 
-import { activePaneAtom, openFileEntryAtom } from '../atoms/editorActions';
-import { makeFile } from '../atoms/test-fixtures';
-import { runGetAtomHook } from '../atoms/test-utils';
-import { EditorData } from '../atoms/types/EditorData';
-import { FileEntry } from '../atoms/types/FileEntry';
-import { PaneEditorId } from '../atoms/types/PaneGroup';
-import { emitEvent, RefStudioEvents } from '../events';
-import { readFileContent } from '../io/filesystem';
-import { act, mockListenEvent, setupWithJotaiProvider } from '../test/test-utils';
-import { EventsListener } from './EventsListener';
+import { activePaneAtom, openFileEntryAtom } from '../../atoms/editorActions';
+import { makeFile } from '../../atoms/test-fixtures';
+import { runGetAtomHook } from '../../atoms/test-utils';
+import { EditorData } from '../../atoms/types/EditorData';
+import { FileEntry } from '../../atoms/types/FileEntry';
+import { PaneEditorId } from '../../atoms/types/PaneGroup';
+import { emitEvent, RefStudioEvents } from '../../events';
+import { readFileContent } from '../../io/filesystem';
+import { act, mockListenEvent, setupWithJotaiProvider } from '../../test/test-utils';
+import { EventsListener } from '../EventsListener';
 
 vi.mock('../events');
 vi.mock('../io/filesystem');
