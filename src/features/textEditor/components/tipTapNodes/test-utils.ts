@@ -32,18 +32,6 @@ export function findNodesByNodeType(node: Node, nodeType: string) {
 }
 
 /**
- * Gets the text in a node
- *
- * @param node the node to get text from
- * @returns All text contained in the node and its children, concatenated in one string
- */
-export function getText(node: Node) {
-  return filterDescendants(node, (n) => n.isText)
-    .map((textNode) => textNode.text!)
-    .join('');
-}
-
-/**
  * Set both content and selection for an editor.
  *
  * The selection is determined by the position of the "|" character.

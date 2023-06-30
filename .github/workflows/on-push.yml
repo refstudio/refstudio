@@ -50,6 +50,8 @@ jobs:
         uses: ./.github/actions/setup-node
       - name: ESLint
         run: yarn run lint:check
+      - name: knip
+        run: yarn knip
 
   typescript:
     needs: setup-js
