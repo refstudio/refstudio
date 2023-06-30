@@ -38,8 +38,7 @@ function useCloseActiveEditor() {
   const editorId = activePane.activeEditorId;
   const paneId = activePane.id;
 
-  return () =>
-    emitEvent(RefStudioEvents.editors.close, { editorId, paneId });
+  return () => emitEvent(RefStudioEvents.editors.close, { editorId, paneId });
 }
 
 function useCloseEditor() {
