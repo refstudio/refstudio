@@ -5,7 +5,7 @@ import { IngestResponse } from './types';
 
 function parsePdfIngestionResponse(response: IngestResponse, uploadsDir: string): ReferenceItem[] {
   return response.references.map((reference) => ({
-    id: reference.filename_md5,
+    id: reference.source_filename,
     filepath: `${uploadsDir}/${reference.source_filename}`,
     filename: reference.source_filename,
     citationKey: reference.citation_key ?? 'unknown',

@@ -1,4 +1,5 @@
 import json
+import os
 from datetime import date
 from pathlib import Path
 
@@ -23,8 +24,9 @@ def _copy_fixture_to_temp_dir(source_path: Path, write_path: Path) -> None:
         f.write(file_bytes)
 
 
-def test_main(monkeypatch, tmp_path, capsys):
+def test_run_ingest(monkeypatch, tmp_path, capsys):
     # directories where ingest will write files
+    staging_dir = tmp_path.joinpath(".staging")
     grobid_output_dir = tmp_path.joinpath(".grobid")
     json_storage_dir = tmp_path.joinpath(".storage")
 
@@ -45,7 +47,7 @@ def test_main(monkeypatch, tmp_path, capsys):
     monkeypatch.setattr(ingest.GrobidClient, "process", mock_grobid_client_process)
 
     pdf_directory = tmp_path.joinpath("uploads")
-    ingest.main(pdf_directory)
+    ingest.run_ingest(pdf_directory)
 
     # check that the expected output was printed to stdout
     captured = capsys.readouterr()
@@ -70,14 +72,18 @@ def test_main(monkeypatch, tmp_path, capsys):
     assert references[1]['authors'][0]['full_name'] == "Pedro Domingos"
     assert references[1]['citation_key'] == "domingos"
 
-    # check that the expected directories and files were created
-    # grobid output
-    assert grobid_output_dir.exists()
-    assert grobid_output_dir.joinpath("test.tei.xml").exists()
-    assert grobid_output_dir.joinpath("grobid-fails_500.txt").exists()
-    # json creation and storage - successfully parsed references are stored as json
-    assert json_storage_dir.exists()
-    assert json_storage_dir.joinpath("test.json").exists()
+    # check that all temporary files were cleaned up ...
+    assert len(os.listdir(staging_dir)) == 0
+    assert len(os.listdir(grobid_output_dir)) == 0
+    assert len(os.listdir(json_storage_dir)) == 1
+
+    # ... except for the references.json file
+    references_json_path = json_storage_dir.joinpath("references.json")
+    assert references_json_path.exists()
+
+    # references.json should contain the same references in stdout
+    with open(references_json_path, "r") as f:
+        assert json.load(f) == output['references']
 
 
 def test_ingest_add_citation_keys(tmp_path):
@@ -87,7 +93,6 @@ def test_ingest_add_citation_keys(tmp_path):
     # we'll be copying this reference and modifying it for each test
     base_reference = Reference(
         source_filename="test.pdf",
-        filename_md5="asdf",
         status="complete"
     )
     fake_data = [
@@ -220,12 +225,10 @@ def test_ingest_get_statuses(monkeypatch, capsys):
     mock_references = [
         Reference(
             source_filename="completed.pdf",
-            filename_md5="abcdef123",
             status=typing.IngestStatus.COMPLETE
         ),
         Reference(
             source_filename="failed.pdf",
-            filename_md5="abcdef123",
             status=typing.IngestStatus.FAILURE
         ),
     ]
