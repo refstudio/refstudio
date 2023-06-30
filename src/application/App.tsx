@@ -2,6 +2,7 @@ import { useSetAtom } from 'jotai';
 import React, { useCallback, useEffect, useState } from 'react';
 import { VscChevronUp } from 'react-icons/vsc';
 import { ImperativePanelHandle, Panel, PanelGroup } from 'react-resizable-panels';
+import { useEffectOnce } from 'usehooks-ts';
 
 import { openReferenceAtom } from '../atoms/editorActions';
 import { PrimarySideBar, PrimarySideBarPane } from '../components/PrimarySideBar';
@@ -10,6 +11,7 @@ import { emitEvent, RefStudioEvents } from '../events';
 import { AIPanel } from '../features/ai/AIPanel';
 import { ReferencesDropZone } from '../features/references/components/ReferencesDropZone';
 import { ReferencesPanel } from '../features/references/sidebar/ReferencesPanel';
+import { ensureProjectFileStructure } from '../io/filesystem';
 import { SettingsModalOpener } from '../settings/SettingsModalOpener';
 import { PdfViewerAPI } from '../types/PdfViewerAPI';
 import { ApplicationFrame } from '../wrappers/ApplicationFrame';
@@ -18,6 +20,8 @@ import { MainPanel } from './components/MainPanel';
 import { ExplorerPanel } from './sidebar/ExplorerPanel';
 
 function App() {
+  useEffectOnce(() => void ensureProjectFileStructure());
+
   const pdfViewerRef = React.useRef<PdfViewerAPI>(null);
   const updatePDFViewerWidth = useCallback(() => {
     pdfViewerRef.current?.updateWidth();
