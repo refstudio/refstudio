@@ -1,4 +1,4 @@
-import { ReferenceItem } from '../../types/ReferenceItem';
+import { ReferenceItem } from '../../../types/ReferenceItem';
 
 export const REFERENCES: ReferenceItem[] = [
   {

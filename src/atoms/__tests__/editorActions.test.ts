@@ -16,10 +16,10 @@ import {
 } from '../editorActions';
 import { leftPaneAtom, rightPaneAtom } from '../paneActions';
 import { setReferencesAtom } from '../referencesState';
-import { makeFile, makeFolder } from '../test-fixtures';
-import { runGetAtomHook, runSetAtomHook } from '../test-utils';
 import { buildEditorId } from '../types/EditorData';
 import { PaneId } from '../types/PaneGroup';
+import { makeFile, makeFolder } from './test-fixtures';
+import { runGetAtomHook, runSetAtomHook } from './test-utils';
 
 vi.mock('../../io/filesystem');
 

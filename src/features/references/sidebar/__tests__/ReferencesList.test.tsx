@@ -1,6 +1,6 @@
 import { noop } from '../../../../lib/noop';
 import { render, screen, setup, within } from '../../../../test/test-utils';
-import { REFERENCES } from '../../test-fixtures';
+import { REFERENCES } from '../../__tests__/test-fixtures';
 import { ReferencesList } from '../ReferencesList';
 
 describe('ReferencesList', () => {

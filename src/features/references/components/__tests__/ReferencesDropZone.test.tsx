@@ -1,11 +1,11 @@
 import { runPDFIngestion } from '../../../../api/ingestion';
+import { runGetAtomHook } from '../../../../atoms/__tests__/test-utils';
 import { getReferencesAtom, referencesSyncInProgressAtom } from '../../../../atoms/referencesState';
-import { runGetAtomHook } from '../../../../atoms/test-utils';
-import { listenEvent, RefStudioEvents } from '../../../../events';
+import { RefStudioEvents, listenEvent } from '../../../../events';
 import { uploadFiles } from '../../../../io/filesystem';
 import { noop } from '../../../../lib/noop';
 import { act, fireEvent, mockListenEvent, screen, setupWithJotaiProvider, waitFor } from '../../../../test/test-utils';
-import { REFERENCES } from '../../test-fixtures';
+import { REFERENCES } from '../../__tests__/test-fixtures';
 import { ReferencesDropZone } from '../ReferencesDropZone';
 
 vi.mock('../../../../events');

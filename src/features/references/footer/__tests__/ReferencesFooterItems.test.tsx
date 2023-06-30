@@ -1,10 +1,10 @@
+import { runGetAtomHook, runSetAtomHook } from '../../../../atoms/__tests__/test-utils';
 import { activePaneAtom } from '../../../../atoms/editorActions';
 import { referencesSyncInProgressAtom, setReferencesAtom } from '../../../../atoms/referencesState';
-import { runGetAtomHook, runSetAtomHook } from '../../../../atoms/test-utils';
 import { buildEditorId } from '../../../../atoms/types/EditorData';
-import { emitEvent, RefStudioEvents } from '../../../../events';
+import { RefStudioEvents, emitEvent } from '../../../../events';
 import { act, mockListenEvent, screen, setupWithJotaiProvider } from '../../../../test/test-utils';
-import { REFERENCES } from '../../test-fixtures';
+import { REFERENCES } from '../../__tests__/test-fixtures';
 import { ReferencesFooterItems } from '../ReferencesFooterItems';
 
 vi.mock('../../../../events');
