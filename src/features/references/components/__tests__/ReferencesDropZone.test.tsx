@@ -1,7 +1,7 @@
 import { runPDFIngestion } from '../../../../api/ingestion';
 import { runGetAtomHook } from '../../../../atoms/__tests__/test-utils';
 import { getReferencesAtom, referencesSyncInProgressAtom } from '../../../../atoms/referencesState';
-import { RefStudioEvents, listenEvent } from '../../../../events';
+import { listenEvent, RefStudioEvents } from '../../../../events';
 import { uploadFiles } from '../../../../io/filesystem';
 import { noop } from '../../../../lib/noop';
 import { act, fireEvent, mockListenEvent, screen, setupWithJotaiProvider, waitFor } from '../../../../test/test-utils';

@@ -2,7 +2,7 @@ import { runGetAtomHook, runSetAtomHook } from '../../../../atoms/__tests__/test
 import { activePaneAtom } from '../../../../atoms/editorActions';
 import { referencesSyncInProgressAtom, setReferencesAtom } from '../../../../atoms/referencesState';
 import { buildEditorId } from '../../../../atoms/types/EditorData';
-import { RefStudioEvents, emitEvent } from '../../../../events';
+import { emitEvent, RefStudioEvents } from '../../../../events';
 import { act, mockListenEvent, screen, setupWithJotaiProvider } from '../../../../test/test-utils';
 import { REFERENCES } from '../../__tests__/test-fixtures';
 import { ReferencesFooterItems } from '../ReferencesFooterItems';
