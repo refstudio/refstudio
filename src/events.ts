@@ -41,7 +41,7 @@ export const RefStudioEvents = {
   },
   references: {
     ingestion: {
-      run: 'refstudio://references/ingestion/ru',
+      run: 'refstudio://references/ingestion/run',
     },
   },
 } as const;
