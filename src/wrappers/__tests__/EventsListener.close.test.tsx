@@ -11,9 +11,9 @@ import { readFileContent } from '../../io/filesystem';
 import { act, mockListenEvent, setupWithJotaiProvider } from '../../test/test-utils';
 import { EventsListener } from '../EventsListener';
 
-vi.mock('../events');
-vi.mock('../io/filesystem');
-vi.mock('../lib/noop');
+vi.mock('../../events');
+vi.mock('../../io/filesystem');
+vi.mock('../../lib/noop');
 
 describe('EventsListener.close', () => {
   let store: ReturnType<typeof createStore>;
@@ -35,7 +35,7 @@ describe('EventsListener.close', () => {
     vi.clearAllMocks();
   });
 
-  it.skip.each([{ event: RefStudioEvents.menu.file.close }, { event: RefStudioEvents.editors.close }])(
+  it.each([{ event: RefStudioEvents.menu.file.close }, { event: RefStudioEvents.editors.close }])(
     'should listen to $event events',
     ({ event }) => {
       const mockData = mockListenEvent();
@@ -66,7 +66,7 @@ describe('EventsListener.close', () => {
   });
 
   it(`should close the given file when ${RefStudioEvents.editors.close} event is triggered`, () => {
-    const mockData = mockListenEvent<PaneEditorId>();
+    const mockData = mockListenEvent();
     const activePane = runGetAtomHook(activePaneAtom, store);
 
     const { fileEntry: fileEntry2, editorData: editorData2 } = makeFile('File2.txt');

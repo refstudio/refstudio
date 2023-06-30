@@ -3,7 +3,7 @@ import { render } from '@testing-library/react';
 import { default as userEvent } from '@testing-library/user-event';
 import { createStore, Provider } from 'jotai';
 
-import { listenEvent, RefStudioEventCallback } from '../events';
+import { listenEvent, RefStudioEventCallback, RefStudioEventName, RefStudioEventPayload } from '../events';
 import { noop } from '../lib/noop';
 
 function customRender(ui: React.ReactElement, options = {}) {
@@ -58,17 +58,20 @@ export function setupWithJotaiProvider(jsx: React.ReactNode, store?: ReturnType<
  *   act(() => mock.trigger())                                    // To simulate the registered event to be triggered
  *
  */
-export function mockListenEvent<Payload = void>() {
-  const current: Record<string, (payload: Payload) => void> = {};
+export function mockListenEvent() {
+  const current: { [Event in RefStudioEventName]?: (payload?: RefStudioEventPayload<Event>) => void } = {};
 
-  vi.mocked(listenEvent).mockImplementation((event: string, handler: RefStudioEventCallback<Payload>) => {
-    current[event] = (payload: Payload) => handler({ event, windowLabel: '', id: 0, payload });
-    return Promise.resolve(noop);
-  });
+  vi.mocked(listenEvent).mockImplementation(
+    <Event extends RefStudioEventName>(event: Event, handler: RefStudioEventCallback<Event>) => {
+      current[event] = ((payload) =>
+        handler({ event, windowLabel: '', id: 0, payload: payload! })) as (typeof current)[Event];
+      return Promise.resolve(noop);
+    },
+  );
 
-  const trigger = (eventName: string, payload: Payload) => {
+  const trigger = <Event extends RefStudioEventName>(eventName: Event, payload?: RefStudioEventPayload<Event>) => {
     if (eventName in current) {
-      return current[eventName](payload);
+      return current[eventName]?.(payload);
     } else {
       throw new Error(`Received unexpected event ${eventName}`);
     }
