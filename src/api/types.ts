@@ -31,7 +31,6 @@ export interface IngestResponse {
  */
 export interface Reference {
   source_filename: string;
-  filename_md5: string;
   status: IngestStatus;
   citation_key?: string;
   title?: string;

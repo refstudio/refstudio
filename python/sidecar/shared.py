@@ -1,4 +1,3 @@
-import hashlib
 import os
 import sys
 from datetime import datetime
@@ -37,15 +36,6 @@ def parse_date(date_str: str) -> datetime:
         return datetime.strptime(date_str, "%Y-%m-%d").date()
     except ValueError:
         return None
-
-
-def get_filename_md5(filename: str) -> str:
-    """
-    Get the MD5 hash of a filename
-    :param filename: str
-    :return: str
-    """
-    return hashlib.md5(filename.encode()).hexdigest()
 
 
 def get_first_author_surname(authors: List[Author]) -> str:

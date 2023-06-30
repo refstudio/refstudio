@@ -41,7 +41,6 @@ describe('runPDFIngestion', () => {
       references: [
         {
           source_filename: 'file.pdf',
-          filename_md5: 'md5',
           status: 'complete',
         },
       ],
@@ -49,7 +48,7 @@ describe('runPDFIngestion', () => {
 
     const response = await runPDFIngestion();
     expect(response).toHaveLength(1);
-    expect(response[0].id).toBe('md5');
+    expect(response[0].id).toBe('file.pdf');
     expect(response[0].filename).toBe('file.pdf');
   });
 
@@ -59,7 +58,6 @@ describe('runPDFIngestion', () => {
       references: [
         {
           source_filename: 'file.pdf',
-          filename_md5: 'md5',
           status: 'complete',
           authors: [
             {
