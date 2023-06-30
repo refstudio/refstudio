@@ -93,7 +93,6 @@ def test_ingest_add_citation_keys(tmp_path):
     # we'll be copying this reference and modifying it for each test
     base_reference = Reference(
         source_filename="test.pdf",
-        filename_md5="asdf",
         status="complete"
     )
     fake_data = [
@@ -226,12 +225,10 @@ def test_ingest_get_statuses(monkeypatch, capsys):
     mock_references = [
         Reference(
             source_filename="completed.pdf",
-            filename_md5="abcdef123",
             status=typing.IngestStatus.COMPLETE
         ),
         Reference(
             source_filename="failed.pdf",
-            filename_md5="abcdef123",
             status=typing.IngestStatus.FAILURE
         ),
     ]

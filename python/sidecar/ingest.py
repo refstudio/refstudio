@@ -13,7 +13,7 @@ from grobid_client.grobid_client import (GrobidClient,
 from sidecar import shared, typing
 
 from .settings import REFERENCES_JSON_PATH, UPLOADS_DIR
-from .shared import HiddenPrints, chunk_text, get_filename_md5
+from .shared import HiddenPrints, chunk_text
 from .storage import JsonStorage
 from .typing import Author, IngestResponse, Reference
 
@@ -344,7 +344,6 @@ class PDFIngestion:
                 Reference(
                     source_filename=source_pdf,
                     status=typing.IngestStatus.FAILURE,
-                    filename_md5=get_filename_md5(source_pdf),
                     citation_key="untitled",
                 )
             )
@@ -436,7 +435,6 @@ class PDFIngestion:
 
             ref = Reference(
                 source_filename=source_pdf,
-                filename_md5=get_filename_md5(source_pdf),
                 status=typing.IngestStatus.COMPLETE,
                 title=header.get("title"),
                 authors=header.get("authors"),

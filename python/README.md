@@ -63,7 +63,6 @@ $ poetry run python main.py ingest --pdf_directory=tests/fixtures/pdf/ | jq
   "references": [
     {
       "source_filename": "test.pdf",
-      "filename_md5": "754dc77d28e62763c4916970d595a10f",
       "title": "A Few Useful Things to Know about Machine Learning",
       "abstract": "... PDF abstract here ...",
       "contents": "... PDF body here ...",
@@ -91,7 +90,6 @@ $ poetry run python main.py ingest --pdf_directory=tests/fixtures/pdf/ | jq
     },
     {
       "source_filename": "grobid-fails.pdf",
-      "filename_md5": "35765b170578ba4bcd412305e78ebf6b",
       "title": null,
       "abstract": null,
       "contents": null,
