@@ -98,9 +98,6 @@
         "source_filename": {
           "type": "string"
         },
-        "filename_md5": {
-          "type": "string"
-        },
         "status": {
           "$ref": "#/definitions/IngestStatus"
         },
@@ -141,7 +138,6 @@
       },
       "required": [
         "source_filename",
-        "filename_md5",
         "status"
       ]
     },

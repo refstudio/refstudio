@@ -31,7 +31,6 @@ class IngestStatus(str, Enum):
 class Reference(RefStudioModel):
     """A reference for an academic paper / PDF"""
     source_filename: str
-    filename_md5: str
     status: IngestStatus
     citation_key: str | None = None
     title: str | None = None

@@ -1,7 +1,6 @@
 [
   {
     "source_filename": "some_file.pdf",
-    "filename_md5": "abc123",
     "status": "complete",
     "title": "Some title",
     "abstract": null,
@@ -66,7 +65,6 @@
   },
   {
     "source_filename": "another_file.pdf",
-    "filename_md5": "abcdefg123",
     "status": "complete",
     "title": "Another title",
     "abstract": null,
