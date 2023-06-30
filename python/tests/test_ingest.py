@@ -191,7 +191,7 @@ def test_ingest_add_citation_keys(monkeypatch, tmp_path):
 
     for i, ref in enumerate(tested):
         if i == 0:
-            assert ref.citation_key == f"smith"
+            assert ref.citation_key == "smith"
         else:
             assert ref.citation_key == f"smith{chr(97 + i)}"
 
@@ -209,7 +209,7 @@ def test_ingest_add_citation_keys(monkeypatch, tmp_path):
     ## should be smith2021a, smith2021b, smith2021c
     for i, ref in enumerate(tested):
         if i == 0:
-            assert ref.citation_key == f"smith2021"
+            assert ref.citation_key == "smith2021"
         else:
             assert ref.citation_key == f"smith2021{chr(97 + i)}"
 
