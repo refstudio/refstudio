@@ -1,33 +1,39 @@
 import { atom, Getter } from 'jotai';
 
 import { isNonNullish } from '../../lib/isNonNullish';
-import { PaneContent, PaneFileId, PaneId, PaneState } from '../types/PaneGroup';
+import { PaneContent, PaneEditorId, PaneId, PaneState } from '../types/PaneGroup';
 import { activePaneIdAtom } from './activePane';
-import { fileContentAtom } from './fileContent';
-import { filesDataAtom } from './fileData';
+import { editorsContentStateAtom } from './editorContent';
+import { editorsDataAtom } from './editorData';
 
 type PaneGroupState = Record<PaneId, PaneState>;
 
-/** This atom contains data about the panes: the list of open files and the active file */
+/** This atom contains data about the panes: the list of open editors and the active editor */
 export const paneGroupAtom = atom<PaneGroupState>({
   LEFT: {
-    openFiles: [],
+    openEditorIds: [],
   },
   RIGHT: {
-    openFiles: [],
+    openEditorIds: [],
   },
 });
 
 export function getPane(get: Getter, paneId: PaneId): PaneContent {
   const panes = get(paneGroupAtom);
-  const filesData = get(filesDataAtom);
-  const openFiles = get(fileContentAtom);
+  const editorsData = get(editorsDataAtom);
+  const openEditors = get(editorsContentStateAtom);
   const pane = panes[paneId];
+
+  const editorContentAtoms = pane.activeEditorId && openEditors.get(pane.activeEditorId);
+
+  if (pane.activeEditorId && !editorContentAtoms) {
+    throw new Error('Editor content is not loaded in memory');
+  }
+
   return {
     id: paneId,
-    files: pane.openFiles.map((id) => filesData.get(id)).filter(isNonNullish),
-    activeFile: pane.activeFile,
-    activeFileContent: pane.activeFile ? openFiles.get(pane.activeFile) : undefined,
+    openEditors: pane.openEditorIds.map((id) => editorsData.get(id)).filter(isNonNullish),
+    activeEditor: pane.activeEditorId ? { id: pane.activeEditorId, contentAtoms: editorContentAtoms! } : undefined,
   };
 }
 
@@ -47,47 +53,55 @@ export const updatePaneGroup = atom(
 );
 
 /**
- * Adds a file to the list of open files of the given pane
- * Please note that this atom does not check that file exists or is loaded in memory
+ * Adds an editor to the list of open editors of the given pane
+ * Please note that this atom does not check that editor content is loaded in memory
  * */
-export const addFileToPane = atom(null, (get, set, { fileId, paneId }: PaneFileId) => {
+export const addEditorToPane = atom(null, (get, set, { editorId, paneId }: PaneEditorId) => {
   const panes = get(paneGroupAtom);
   set(updatePaneGroup, {
     paneId,
-    openFiles: panes[paneId].openFiles.includes(fileId)
-      ? panes[paneId].openFiles // File was already open
-      : [...panes[paneId].openFiles, fileId], // Add file to the list of open files
+    openEditorIds: panes[paneId].openEditorIds.includes(editorId)
+      ? panes[paneId].openEditorIds // Editor was already open
+      : [...panes[paneId].openEditorIds, editorId], // Add editor to the list of open editors
   });
 });
 
-/** Removes a file from the list of open files */
-export const removeFileFromPane = atom(null, (get, set, { fileId, paneId }: PaneFileId) => {
+/** Removes an editor from the list of open editors */
+export const removeEditorFromPane = atom(null, (get, set, { editorId, paneId }: PaneEditorId) => {
   const panes = get(paneGroupAtom);
 
-  if (!panes[paneId].openFiles.includes(fileId)) {
-    console.warn('File is not open in the given pane ', fileId, paneId);
+  if (!panes[paneId].openEditorIds.includes(editorId)) {
+    console.warn('Editor is not open in the given pane ', editorId, paneId);
     return;
   }
 
-  const updatedOpenFiles = panes[paneId].openFiles.filter((_fileId) => _fileId !== fileId);
+  const updatedOpenEditors = panes[paneId].openEditorIds.filter((_editorId) => _editorId !== editorId);
+
+  // If the active editor was the editor being removed, make the last editor of the pane the new active one
+  let updatedActiveEditor = panes[paneId].activeEditorId;
+  if (updatedActiveEditor === editorId) {
+    updatedActiveEditor = updatedOpenEditors.length > 0 ? updatedOpenEditors[updatedOpenEditors.length - 1] : undefined;
+  }
+
   set(updatePaneGroup, {
     paneId,
-    openFiles: updatedOpenFiles,
+    openEditorIds: updatedOpenEditors,
+    activeEditorId: updatedActiveEditor,
   });
 });
 
-/** Updates the active file of the pane */
-export const selectFileInPaneAtom = atom(null, (get, set, { fileId, paneId }: PaneFileId) => {
+/** Updates the active editor of the pane */
+export const selectEditorInPaneAtom = atom(null, (get, set, { editorId, paneId }: PaneEditorId) => {
   const panes = get(paneGroupAtom);
 
-  if (!panes[paneId].openFiles.includes(fileId)) {
-    console.warn('File not open in the given pane ', fileId, paneId);
+  if (!panes[paneId].openEditorIds.includes(editorId)) {
+    console.warn('Editor not open in the given pane ', editorId, paneId);
     return;
   }
 
   set(activePaneIdAtom, paneId);
   set(updatePaneGroup, {
     paneId,
-    activeFile: fileId,
+    activeEditorId: editorId,
   });
 });

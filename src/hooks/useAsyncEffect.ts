@@ -12,7 +12,7 @@ import React from 'react';
  */
 export function useAsyncEffect<V, E>(
   effect: (isMounted: () => boolean) => V | Promise<V>,
-  destroy?: (result?: V) => void,
+  destroy?: (result: V) => void,
   inputs?: unknown[],
   onError?: (err: E) => void,
 ): void {
@@ -27,10 +27,10 @@ export function useAsyncEffect<V, E>(
       .then((_effectResult) => (effectResult = _effectResult))
       .catch((err: E) => onError?.(err));
 
-    return function () {
+    return () => {
       mounted = false;
 
-      if (hasDestroy) {
+      if (hasDestroy && effectResult !== undefined) {
         destroy(effectResult);
       }
     };

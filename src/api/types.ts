@@ -5,10 +5,22 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
+/**
+ * An enumeration.
+ */
+export type IngestStatus = 'processing' | 'failure' | 'complete';
+/**
+ * An enumeration.
+ */
+export type ResponseStatus = 'ok' | 'error';
+
 export interface CliCommands {
   ingest: IngestResponse;
+  ingest_status: IngestStatusResponse;
   rewrite: RewriteChoice[];
   chat: ChatResponseChoice[];
+  update: UpdateStatusResponse;
+  delete: DeleteStatusResponse;
 }
 export interface IngestResponse {
   project_name: string;
@@ -19,7 +31,7 @@ export interface IngestResponse {
  */
 export interface Reference {
   source_filename: string;
-  filename_md5: string;
+  status: IngestStatus;
   citation_key?: string;
   title?: string;
   abstract?: string;
@@ -40,6 +52,14 @@ export interface Chunk {
   vector?: number[];
   metadata?: {};
 }
+export interface IngestStatusResponse {
+  status: ResponseStatus;
+  reference_statuses: ReferenceStatus[];
+}
+export interface ReferenceStatus {
+  source_filename: string;
+  status: IngestStatus;
+}
 export interface RewriteChoice {
   index: number;
   text: string;
@@ -47,4 +67,12 @@ export interface RewriteChoice {
 export interface ChatResponseChoice {
   index: number;
   text: string;
+}
+export interface UpdateStatusResponse {
+  status: ResponseStatus;
+  message: string;
+}
+export interface DeleteStatusResponse {
+  status: ResponseStatus;
+  message: string;
 }

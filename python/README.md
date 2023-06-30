@@ -36,8 +36,11 @@ $ poetry run pytest --cov=. tests
 
 The application current has three main functions:
 1. Ingest
-2. Rewrite
-3. Chat
+2. Ingest Status
+3. Rewrite
+4. Chat
+5. Delete (References)
+6. Update (References)
 
 ### Ingest
 `Ingest` is called when a Refstudio user uploads Reference documents.
@@ -60,7 +63,6 @@ $ poetry run python main.py ingest --pdf_directory=tests/fixtures/pdf/ | jq
   "references": [
     {
       "source_filename": "test.pdf",
-      "filename_md5": "754dc77d28e62763c4916970d595a10f",
       "title": "A Few Useful Things to Know about Machine Learning",
       "abstract": "... PDF abstract here ...",
       "contents": "... PDF body here ...",
@@ -88,13 +90,45 @@ $ poetry run python main.py ingest --pdf_directory=tests/fixtures/pdf/ | jq
     },
     {
       "source_filename": "grobid-fails.pdf",
-      "filename_md5": "35765b170578ba4bcd412305e78ebf6b",
       "title": null,
       "abstract": null,
       "contents": null,
       "authors": [],
       "chunks": [],
       "metadata": {}
+    }
+  ]
+}
+```
+
+### Ingest Status
+`ingest_status` is called while `ingest` is running in the background, to check the status of each uploaded file.
+
+It does not take any input and returns a dictionary of various statuses.
+
+To run `ingest_status`:
+
+```bash
+$ poetry run python main.py ingest_status | jq
+
+# Example:
+$ poetry run python main.py ingest_status | jq
+
+# Response:
+{
+  "status": "ok",
+  "reference_statuses": [
+    {
+      "source_filename": "A Few Useful Things to Know about Machine Learning.pdf",
+      "status": "complete"
+    },
+    {
+      "source_filename": "2301.10140.pdf",
+      "status": "pending"
+    },
+    {
+      "source_filename": "grobid-fails.pdf",
+      "status": "failure"
     }
   ]
 }
@@ -148,4 +182,88 @@ $ poetry run python main.py --text "What can you tell me about hidden feedback l
     "text": "Hidden feedback loops in machine learning refer to situations where two systems indirectly influence each other through the world, leading to changes in behavior that may not be immediately visible. These loops may exist between completely disjoint systems and can make analyzing the effect of proposed changes extremely difficult, adding cost to even simple improvements. It is recommended to look carefully for hidden feedback loops and remove them whenever feasible."
   }
 ]
+```
+
+### Delete (References)
+`delete` removes a Reference from project storage. It is called when a Reference is deleted from the UI.
+
+It takes a list of `source_filenames` as input and returns a response status. Alternatively, you can use the `--all` parameter to delete all References in storage.
+
+To run `delete`:
+
+```bash
+$ poetry run python main.py delete --source_filenames grobid-fails.pdf "Machine Learning at Scale.pdf"
+
+
+# Example:
+$ poetry run python main.py delete --source_filenames grobid-fails.pdf "Machine Learning at Scale.pdf" | jq
+
+# Response:
+{
+  "status": "ok",
+  "message": ""
+}
+
+# Another Example (error):
+$ poetry run python main.py delete --source_filenames file-does-not-exist.pdf | jq
+
+# Error Response:
+{
+  "status": "error",
+  "message": "Unable to delete file-does-not-exist.pdf: not found in storage"
+}
+```
+
+### Update (References)
+`Update` updates a Reference's metadata in project storage. It is called when a user updates details about a Reference.
+
+It takes an input argument of `--data` which is a dictionary containing a key for `source_filename` and `patch`. `source_filename` acts as the unique ID for the Reference to update and `patch` is a dictionary containing the corresponding fields and values to be used for the update. 
+
+To run `update`:
+
+```bash
+$ poetry run python main.py update --data '{"source_filename": "grobid-fails.pdf", "patch": {"title": "a title that was missing"}}'
+
+# Example:
+$ poetry run python main.py update --data '{"source_filename": "grobid-fails.pdf", "patch": {"title": "a title that was missing"}}'
+| jq
+
+# Response:
+{
+  "status": "ok",
+  "message": ""
+}
+
+# Another Example (error):
+$ poetry run python main.py update --data '{"source_filename": "does-not-exist.pdf", "patch": {"title": "a different title than before"}}' | jq
+
+# Response (error)
+{
+  "status": "error",
+  "message": "Unable to update does-not-exist.pdf: not found in storage"
+}
+
+# Full example showing the update
+$ cat .storage/references.json | jq '.[] | select(.source_filename | contains("fails")) | {"source_filename": .source_filename, "title": .title}'
+
+{
+  "source_filename": "grobid-fails.pdf",
+  "title": null
+}
+
+# run the update
+$ poetry run python main.py update --data '{"source_filename": "grobid-fails.pdf", "patch": {"title": "a title that was missing"}}'
+
+{
+  "status": "ok",
+  "message": ""
+}
+
+# check that it worked
+$ cat .storage/references.json | jq '.[] | select(.source_filename | contains("fails")) | {"source_filename": .source_filename, "title": .title}'
+
+{
+  "source_filename": "grobid-fails.pdf",
+  "title": "a title that was missing"
+}
 ```

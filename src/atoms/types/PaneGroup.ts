@@ -1,23 +1,19 @@
-import { Atom } from 'jotai';
-import { Loadable } from 'jotai/vanilla/utils/loadable';
-
-import { FileContent } from './FileContent';
-import { FileData, FileId } from './FileData';
+import { EditorContentAtoms } from './EditorContentAtoms';
+import { EditorData, EditorId } from './EditorData';
 
 export type PaneId = 'LEFT' | 'RIGHT';
 
-export interface PaneFileId {
+export interface PaneEditorId {
   paneId: PaneId;
-  fileId: FileId;
+  editorId: EditorId;
 }
 export interface PaneState {
-  openFiles: FileId[];
-  activeFile?: FileId;
+  openEditorIds: EditorId[];
+  activeEditorId?: EditorId;
 }
 
 export interface PaneContent {
   id: PaneId;
-  files: FileData[];
-  activeFile?: FileId;
-  activeFileContent?: Atom<Loadable<FileContent>>;
+  openEditors: EditorData[];
+  activeEditor?: { id: EditorId; contentAtoms: EditorContentAtoms };
 }

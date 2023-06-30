@@ -1,8 +1,9 @@
 import json
+import os
 from datetime import date
 from pathlib import Path
 
-from sidecar import ingest
+from sidecar import ingest, storage, typing
 from sidecar.typing import Author, Reference
 
 FIXTURES_DIR = Path(__file__).parent.joinpath("fixtures")
@@ -23,8 +24,9 @@ def _copy_fixture_to_temp_dir(source_path: Path, write_path: Path) -> None:
         f.write(file_bytes)
 
 
-def test_main(monkeypatch, tmp_path, capsys):
+def test_run_ingest(monkeypatch, tmp_path, capsys):
     # directories where ingest will write files
+    staging_dir = tmp_path.joinpath(".staging")
     grobid_output_dir = tmp_path.joinpath(".grobid")
     json_storage_dir = tmp_path.joinpath(".storage")
 
@@ -45,7 +47,7 @@ def test_main(monkeypatch, tmp_path, capsys):
     monkeypatch.setattr(ingest.GrobidClient, "process", mock_grobid_client_process)
 
     pdf_directory = tmp_path.joinpath("uploads")
-    ingest.main(pdf_directory)
+    ingest.run_ingest(pdf_directory)
 
     # check that the expected output was printed to stdout
     captured = capsys.readouterr()
@@ -70,14 +72,18 @@ def test_main(monkeypatch, tmp_path, capsys):
     assert references[1]['authors'][0]['full_name'] == "Pedro Domingos"
     assert references[1]['citation_key'] == "domingos"
 
-    # check that the expected directories and files were created
-    # grobid output
-    assert grobid_output_dir.exists()
-    assert grobid_output_dir.joinpath("test.tei.xml").exists()
-    assert grobid_output_dir.joinpath("grobid-fails_500.txt").exists()
-    # json creation and storage - successfully parsed references are stored as json
-    assert json_storage_dir.exists()
-    assert json_storage_dir.joinpath("test.json").exists()
+    # check that all temporary files were cleaned up ...
+    assert len(os.listdir(staging_dir)) == 0
+    assert len(os.listdir(grobid_output_dir)) == 0
+    assert len(os.listdir(json_storage_dir)) == 1
+
+    # ... except for the references.json file
+    references_json_path = json_storage_dir.joinpath("references.json")
+    assert references_json_path.exists()
+
+    # references.json should contain the same references in stdout
+    with open(references_json_path, "r") as f:
+        assert json.load(f) == output['references']
 
 
 def test_ingest_add_citation_keys(tmp_path):
@@ -85,7 +91,10 @@ def test_ingest_add_citation_keys(tmp_path):
 
     # set up base reference with required fields
     # we'll be copying this reference and modifying it for each test
-    base_reference = Reference(source_filename="test.pdf", filename_md5="asdf")
+    base_reference = Reference(
+        source_filename="test.pdf",
+        status="complete"
+    )
     fake_data = [
         {
             "full_name": "John Smith",
@@ -189,3 +198,85 @@ def test_ingest_add_citation_keys(tmp_path):
     ## should be smith2021a, smith2021b, smith2021c
     for i, ref in enumerate(tested):
         assert ref.citation_key == f"smith2021{chr(97 + i)}"
+
+
+def test_ingest_get_statuses(monkeypatch, capsys):
+    ingest.UPLOADS_DIR = FIXTURES_DIR.joinpath("pdf")
+
+    # test: JsonStorage path does not exist
+    # expect: all `uploads` are in process
+    jstore = storage.JsonStorage("does_not_exist.json")
+    fetcher = ingest.IngestStatusFetcher(storage=jstore)
+    _ = fetcher.emit_statuses()
+
+    captured = capsys.readouterr()
+    output = json.loads(captured.out)
+    statuses = output['reference_statuses']
+
+    assert output['status'] == "ok"
+    assert len(statuses) == 2
+    for ref in statuses:
+        ref['status'] == "processing"
+
+    
+    # test: stored references should be checked against uploads
+    # expect: stored references return stored status,
+    #   uploads (not yet stored) return processeding
+    mock_references = [
+        Reference(
+            source_filename="completed.pdf",
+            status=typing.IngestStatus.COMPLETE
+        ),
+        Reference(
+            source_filename="failed.pdf",
+            status=typing.IngestStatus.FAILURE
+        ),
+    ]
+    mock_uploads = [
+        Path("completed.pdf"),  # retain mock_reference.status
+        Path("failed.pdf"),  # retain mock_reference.status
+        Path("not_yet_processed.pdf")  # not in mock_reference -> `processing`
+    ]
+
+    def mock_storage_load(*args, **kwargs):
+        # do nothing since we also mock references propery
+        pass
+
+    jstore = storage.JsonStorage("to_be_mocked.json")
+    monkeypatch.setattr(jstore, 'load', mock_storage_load)
+    monkeypatch.setattr(jstore, 'references', mock_references)
+
+    fetcher = ingest.IngestStatusFetcher(storage=jstore)
+    monkeypatch.setattr(fetcher, 'uploads', mock_uploads)
+
+    _ = fetcher.emit_statuses()
+
+    captured = capsys.readouterr()
+    output = json.loads(captured.out)
+    statuses = output['reference_statuses']
+
+    assert output['status'] == "ok"
+    assert len(statuses) == 3
+    for ref in statuses:
+        if ref['source_filename'] == "completed.pdf":
+            ref['status'] == "completed"
+        elif ref['source_filename'] == 'failed.pdf':
+            ref['status'] == "failure"
+        else:
+            ref['status'] == "processing"
+    
+
+    # test: Exception on storage load should return error status
+    # expect: response status = error, ref statuses = []
+    def mock_storage_load_raises_exception(*args, **kwargs):
+        raise Exception
+
+    monkeypatch.setattr(jstore, 'load', mock_storage_load_raises_exception)
+    _ = fetcher.emit_statuses()
+
+    captured = capsys.readouterr()
+    output = json.loads(captured.out)
+    statuses = output['reference_statuses']
+
+    assert output['status'] == "error"
+    assert len(statuses) == 0

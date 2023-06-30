@@ -10,6 +10,7 @@ def get_arg_parser():
     subparsers = parser.add_subparsers(
         dest="command",
     )
+
     ingest_parser = subparsers.add_parser(
         "ingest",
         description="Ingest PDFs",
@@ -17,6 +18,12 @@ def get_arg_parser():
     ingest_parser.add_argument(
         "--pdf_directory",
         type=str,
+    )
+
+    ingest_status_parser = subparsers.add_parser(  # noqa: F841
+        "ingest_status",
+        description="Retrieve ingestion status of uploads"
+
     )
 
     ai_parser = subparsers.add_parser(
@@ -35,5 +42,28 @@ def get_arg_parser():
     chat_parser.add_argument(
         "--text",
         type=str,
+    )
+
+    update_parser = subparsers.add_parser(  # noqa: F481
+        "update",
+        description="Update metadata for a Reference"
+    )
+    update_parser.add_argument(
+        "--data",
+        type=str,
+    )
+
+    delete_parser = subparsers.add_parser(
+        "delete",
+        description="Deletes a Reference"
+    )
+    delete_parser.add_argument(
+        "--source_filenames",
+        nargs="*",
+        type=str
+    )
+    delete_parser.add_argument(
+        "--all",
+        action="store_true"
     )
     return parser

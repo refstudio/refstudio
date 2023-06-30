@@ -1,23 +1,13 @@
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 
-import { listenEvent, RefStudioEvents } from '../events';
-import { useAsyncEffect } from '../hooks/useAsyncEffect';
+import { RefStudioEvents } from '../events';
+import { useListenEvent } from '../hooks/useListenEvent';
 import { SettingsModal } from './SettingsModal';
 
 export function SettingsModalOpener() {
   const [open, setOpen] = useState(false);
 
-  const listenSettingsMenuEvent = useCallback(
-    (isMounted: () => boolean) =>
-      listenEvent(RefStudioEvents.menu.settings, () => {
-        if (isMounted()) {
-          setOpen((curr) => !curr);
-        }
-      }),
-    [],
-  );
-
-  useAsyncEffect(listenSettingsMenuEvent, (unregister) => unregister?.());
+  useListenEvent(RefStudioEvents.menu.settings, () => setOpen((curr) => !curr));
 
   if (!open) {
     return null;

@@ -1,17 +1,16 @@
-import { VscClose } from 'react-icons/vsc';
+import { cx } from '../lib/cx';
+import { TabCloseButton } from './TabCloseButton';
 
-import { cx } from '../cx';
-
-export function TabPane({
+export function TabPane<K extends string>({
   items,
   value,
   onClick,
   onCloseClick,
 }: {
-  items: { key: string; text: string; value: string }[];
-  value?: string;
-  onClick(value: string): void;
-  onCloseClick(value: string): void;
+  items: { text: string; value: K; isDirty?: boolean }[];
+  value?: K;
+  onClick(value: K): void;
+  onCloseClick(value: K): void;
 }) {
   return (
     <div
@@ -26,7 +25,8 @@ export function TabPane({
         <TabItem
           active={item.value === value}
           content={item.text}
-          key={item.key}
+          isDirty={item.isDirty}
+          key={item.value}
           onClick={() => onClick(item.value)}
           onCloseClick={() => onCloseClick(item.value)}
         />
@@ -38,11 +38,13 @@ export function TabPane({
 export function TabItem({
   active,
   content,
+  isDirty,
   onClick,
   onCloseClick,
 }: {
   active: boolean;
   content: React.ReactNode;
+  isDirty?: boolean;
   onClick: () => void;
   onCloseClick: () => void;
 }) {
@@ -66,14 +68,7 @@ export function TabItem({
       }}
     >
       <span>{content}</span>
-      <VscClose
-        className="invisible group-hover:visible"
-        role="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          onCloseClick();
-        }}
-      />
+      <TabCloseButton isDirty={isDirty} onClick={onCloseClick} />
     </div>
   );
 }

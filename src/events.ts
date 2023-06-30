@@ -2,7 +2,14 @@ import { emit, EventCallback, EventName, listen } from '@tauri-apps/api/event';
 
 export const RefStudioEvents = {
   menu: {
+    file: {
+      save: 'refstudio://menu/file/save',
+    },
     settings: 'refstudio://menu/settings',
+    references: {
+      open: 'refstudio://menu/references/open',
+      upload: 'refstudio://menu/references/upload',
+    },
   },
   references: {
     ingestion: {
@@ -11,11 +18,11 @@ export const RefStudioEvents = {
   },
 };
 
-export function emitEvent(event: EventName) {
-  void emit(event);
+export function emitEvent<Payload>(event: EventName, payload?: Payload) {
+  void emit(event, payload);
 }
 
-export type RefStudioEventCallback<Payload = undefined> = EventCallback<Payload>;
+export type RefStudioEventCallback<Payload> = EventCallback<Payload>;
 
 export async function listenEvent<EventPayload = void>(event: string, fn: RefStudioEventCallback<EventPayload>) {
   return listen<EventPayload>(event, fn);

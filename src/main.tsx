@@ -5,7 +5,7 @@ import { Provider } from 'jotai';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
-import App from './App';
+import App from './application/App';
 
 const queryClient = new QueryClient();
 
