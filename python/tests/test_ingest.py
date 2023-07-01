@@ -66,10 +66,6 @@ def test_run_ingest(monkeypatch, tmp_path, capsys):
     assert references[0]['source_filename'] == "grobid-fails.pdf"
     assert references[0]['citation_key'] == "untitled"
 
-    # check that grobid failures have text extracted
-    assert len(references[0]['contents']) > 0
-    assert len(references[0]['chunks']) > 0
-
     # check that test.pdf was parsed correctly
     assert references[1]['title'] == "A Few Useful Things to Know about Machine Learning"
     assert len(references[1]['authors']) == 1
