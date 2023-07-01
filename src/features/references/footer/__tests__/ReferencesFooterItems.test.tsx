@@ -2,7 +2,7 @@ import { activePaneAtom } from '../../../../atoms/editorActions';
 import { referencesSyncInProgressAtom, setReferencesAtom } from '../../../../atoms/referencesState';
 import { runGetAtomHook, runSetAtomHook } from '../../../../atoms/test-utils';
 import { buildEditorId } from '../../../../atoms/types/EditorData';
-import { emitEvent, RefStudioEvents } from '../../../../events';
+import { emitEvent } from '../../../../events';
 import { act, mockListenEvent, screen, setupWithJotaiProvider } from '../../../../test/test-utils';
 import { REFERENCES } from '../../test-fixtures';
 import { ReferencesFooterItems } from '../ReferencesFooterItems';
@@ -36,19 +36,18 @@ describe('ReferencesFooterItems component', () => {
     expect(screen.getByText('References ingestion...')).toBeInTheDocument();
   });
 
-  it(`should emit ${RefStudioEvents.menu.references.open} on click`, async () => {
+  it(`should emit ${'refstudio://menu/references/open'} on click`, async () => {
     const { user } = setupWithJotaiProvider(<ReferencesFooterItems />);
     await user.click(screen.getByRole('listitem'));
-    expect(vi.mocked(emitEvent)).toHaveBeenCalledWith(RefStudioEvents.menu.references.open);
+    expect(vi.mocked(emitEvent)).toHaveBeenCalledWith('refstudio://menu/references/open');
   });
 
-  it(`should listen ${RefStudioEvents.menu.references.open} to open references`, () => {
+  it(`should listen ${'refstudio://menu/references/open'} to open references`, () => {
     const mockData = mockListenEvent();
     const { store } = setupWithJotaiProvider(<ReferencesFooterItems />);
 
-    expect(mockData.registeredEventName).toBeDefined();
-    expect(mockData.registeredEventName).toBe(RefStudioEvents.menu.references.open);
-    act(() => mockData.trigger());
+    expect(mockData.registeredEventNames).toContain('refstudio://menu/references/open');
+    act(() => mockData.trigger('refstudio://menu/references/open'));
 
     const opened = runGetAtomHook(activePaneAtom, store);
     expect(opened.current.openEditorIds).toHaveLength(1);

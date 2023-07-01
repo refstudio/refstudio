@@ -2,13 +2,14 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback } from 'react';
 import { Panel, PanelGroup } from 'react-resizable-panels';
 
-import { closeEditorFromPaneAtom, selectEditorInPaneAtom } from '../../atoms/editorActions';
+import { selectEditorInPaneAtom } from '../../atoms/editorActions';
 import { focusPaneAtom, leftPaneAtom, rightPaneAtom } from '../../atoms/paneActions';
 import { EditorContentAtoms } from '../../atoms/types/EditorContentAtoms';
 import { PaneContent } from '../../atoms/types/PaneGroup';
 import { Spinner } from '../../components/Spinner';
 import { TabPane } from '../../components/TabPane';
 import { VerticalResizeHandle } from '../../components/VerticalResizeHandle';
+import { emitEvent } from '../../events';
 import { ReferencesTableView } from '../../features/references/editor/ReferencesTableView';
 import { ReferenceView } from '../../features/references/editor/ReferenceView';
 import { TipTapView } from '../../features/textEditor/editor/TipTapView';
@@ -66,7 +67,6 @@ export function MainPanelPane({ pane, pdfViewerRef }: MainPanelPaneProps & MainP
   }));
 
   const selectFileInPane = useSetAtom(selectEditorInPaneAtom);
-  const closeFileInPane = useSetAtom(closeEditorFromPaneAtom);
   const focusPane = useSetAtom(focusPaneAtom);
 
   return (
@@ -76,7 +76,7 @@ export function MainPanelPane({ pane, pdfViewerRef }: MainPanelPaneProps & MainP
           items={items}
           value={activeFile?.id}
           onClick={(editorId) => selectFileInPane({ paneId: pane.id, editorId })}
-          onCloseClick={(editorId) => closeFileInPane({ paneId: pane.id, editorId })}
+          onCloseClick={(editorId) => emitEvent('refstudio://editors/close', { paneId: pane.id, editorId })}
         />
       </div>
       <div className="flex w-full grow overflow-hidden">

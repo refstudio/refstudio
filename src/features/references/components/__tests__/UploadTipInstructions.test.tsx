@@ -1,6 +1,6 @@
 import { referencesSyncInProgressAtom } from '../../../../atoms/referencesState';
 import { runSetAtomHook } from '../../../../atoms/test-utils';
-import { emitEvent, RefStudioEvents } from '../../../../events';
+import { emitEvent } from '../../../../events';
 import { act, screen, setupWithJotaiProvider } from '../../../../test/test-utils';
 import { UploadTipInstructions } from '../UploadTipInstructions';
 
@@ -27,6 +27,6 @@ describe('UploadTipInstructions', () => {
     const { user } = setupWithJotaiProvider(<UploadTipInstructions />);
     await user.click(screen.getByText(/here/));
 
-    expect(vi.mocked(emitEvent)).toHaveBeenCalledWith(RefStudioEvents.menu.references.upload);
+    expect(vi.mocked(emitEvent)).toHaveBeenCalledWith('refstudio://menu/references/upload');
   });
 });

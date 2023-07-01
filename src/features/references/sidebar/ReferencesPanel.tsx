@@ -4,7 +4,7 @@ import { VscNewFile, VscOpenPreview } from 'react-icons/vsc';
 import { getReferencesAtom } from '../../../atoms/referencesState';
 import { PanelSection } from '../../../components/PanelSection';
 import { PanelWrapper } from '../../../components/PanelWrapper';
-import { emitEvent, RefStudioEvents } from '../../../events';
+import { emitEvent } from '../../../events';
 import { ReferenceItem } from '../../../types/ReferenceItem';
 import { ResetReferencesInstructions } from '../components/ResetReferencesInstructions';
 import { UploadTipInstructions } from '../components/UploadTipInstructions';
@@ -18,11 +18,11 @@ export function ReferencesPanel({ onRefClicked }: ReferencesPanelProps) {
   const references = useAtomValue(getReferencesAtom);
 
   const handleAddReferences = () => {
-    emitEvent(RefStudioEvents.menu.references.upload);
+    emitEvent('refstudio://menu/references/upload');
   };
 
   const handleOpenReferences = () => {
-    emitEvent(RefStudioEvents.menu.references.open);
+    emitEvent('refstudio://menu/references/open');
   };
 
   return (

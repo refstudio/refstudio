@@ -5,13 +5,16 @@
  * @param callback the event callback function
  */
 
-import { listenEvent } from '../events';
+import { listenEvent, RefStudioEventName, RefStudioEventPayload } from '../events';
 import { useAsyncEffect } from './useAsyncEffect';
 
-export function useListenEvent<Payload>(eventName: string, callback: (p: Payload) => void) {
+export function useListenEvent<Event extends RefStudioEventName>(
+  eventName: Event,
+  callback: (p: RefStudioEventPayload<Event>) => void,
+) {
   useAsyncEffect(
     (isMounted) =>
-      listenEvent<Payload>(eventName, (evt) => {
+      listenEvent<Event>(eventName, (evt) => {
         if (isMounted()) {
           callback(evt.payload);
         }
