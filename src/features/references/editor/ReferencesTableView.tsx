@@ -1,31 +1,41 @@
 import './ReferenceView.css';
 
 import { useAtomValue } from 'jotai';
-import DataGrid from 'react-data-grid';
+import { useState } from 'react';
+import DataGrid, { Column, RenderEditCellProps, SelectColumn } from 'react-data-grid';
 
 import { getReferencesAtom } from '../../../atoms/referencesState';
+import { ReferenceItem } from '../../../types/ReferenceItem';
 import { UploadTipInstructions } from '../components/UploadTipInstructions';
 
 export function ReferencesTableView() {
   const references = useAtomValue(getReferencesAtom);
 
-  return (
-    <div className="w-full overflow-y-auto p-6">
-      {references.length === 0 && <UploadTipInstructions />}
+  const [selectedRows, setSelectedRows] = useState((): ReadonlySet<string> => new Set());
 
+  const columns: Column<ReferenceItem>[] = [
+    SelectColumn,
+    { key: 'citationKey', name: 'Citation Key', frozen: true, resizable: true, width: 120 },
+    { key: 'title', name: 'Title', editable: true, editor: TextEditor },
+    { key: 'publishedDate', name: 'Date', width: 120 },
+    {
+      key: 'authors',
+      name: 'Authors',
+      formatter: ({ row }) => row.authors.map((a) => a.fullName).join(', '),
+    },
+  ];
+  return (
+    <div className="flex w-full flex-col overflow-y-auto p-6">
+      {references.length === 0 && <UploadTipInstructions />}
       <DataGrid
-        columns={[
-          { key: 'citationKey', name: 'Citation Key' },
-          { key: 'title', name: 'Title' },
-          { key: 'date', name: 'Date' },
-          { key: 'authors', name: 'Authors' },
-        ]}
+        className="grow"
+        columns={columns}
+        rowKeyGetter={(row) => row.id}
         rows={references.map((reference) => ({
-          citationKey: reference.citationKey,
-          title: reference.title,
-          date: reference.publishedDate,
-          authors: reference.authors.map((a) => a.fullName),
+          ...reference,
         }))}
+        selectedRows={selectedRows}
+        onSelectedRowsChange={setSelectedRows}
       />
 
       {/* <table className="w-full border border-slate-300 text-left text-gray-500 ">
@@ -57,5 +67,27 @@ export function ReferencesTableView() {
         </tbody>
       </table> */}
     </div>
+  );
+}
+
+function autoFocusAndSelect(input: HTMLInputElement | null) {
+  input?.focus();
+  input?.select();
+}
+
+export default function TextEditor<TRow, TSummaryRow>({
+  row,
+  column,
+  onRowChange,
+  onClose,
+}: RenderEditCellProps<TRow, TSummaryRow>) {
+  return (
+    <input
+      className="debug w-full px-2"
+      ref={autoFocusAndSelect}
+      value={row[column.key as keyof TRow] as unknown as string}
+      onBlur={() => onClose(true, false)}
+      onChange={(event) => onRowChange({ ...row, [column.key]: event.target.value })}
+    />
   );
 }
