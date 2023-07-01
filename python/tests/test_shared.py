@@ -15,10 +15,6 @@ def test_parse_date():
     assert shared.parse_date("abc") is None
 
 
-def test_get_filename_md5():
-    assert shared.get_filename_md5("test.pdf") == "754dc77d28e62763c4916970d595a10f"
-
-
 def test_get_first_author_surname():
     a = [
         Author(full_name="Dan Vanderkam", given_name="Dan", surname="Vanderkam"),
@@ -40,7 +36,6 @@ def test_create_citation_key():
     test_data = [
         {
             "source_filename": "abc.pdf",
-            "filename_md5": "some_md5",
             "status": "complete",
             "authors": [
                 Author(full_name="Dan Vanderkam", given_name="Dan", surname="Vanderkam"),
@@ -51,7 +46,6 @@ def test_create_citation_key():
         },
         {
             "source_filename": "abc.pdf",
-            "filename_md5": "some_md5",
             "status": "complete",
             "authors": [
                 Author(full_name="Jeff Hammerbacher", given_name="Jeff", surname="Hammerbacher")
@@ -60,14 +54,12 @@ def test_create_citation_key():
         },
         {
             "source_filename": "abc.pdf",
-            "filename_md5": "some_md5",
             "status": "complete",
             "authors": [],
             "published_date": None,
         },
         {
             "source_filename": "abc.pdf",
-            "filename_md5": "some_md5",
             "status": "complete",
             "authors": [],
             "published_date": date(2020, 1, 1),
@@ -78,6 +70,13 @@ def test_create_citation_key():
     assert shared.create_citation_key(references[1]) == "hammerbacher"
     assert shared.create_citation_key(references[2]) == "untitled"
     assert shared.create_citation_key(references[3]) == "untitled2020"
+
+
+def test_extract_text_from_pdf():
+    test_filepath = "tests/fixtures/pdf/grobid-fails.pdf"
+    text = shared.extract_text_from_pdf(test_filepath)
+    assert isinstance(text, str)
+    assert len(text) > 0
 
 
 def test_chunk_text():
