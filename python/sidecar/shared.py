@@ -78,13 +78,45 @@ def create_citation_key(ref: Reference) -> str:
     return key.lower()
 
 
+def extract_text_from_pdf(pdf_path: str) -> str:
+    """
+    Extract raw text from a PDF file
+
+    Parameters
+    ----------
+    pdf_path : str
+        Path to PDF file
+    
+    Returns
+    -------
+    str
+        Raw text extracted from PDF
+    """
+    import pypdf
+
+    reader = pypdf.PdfReader(pdf_path)
+    text = ""
+    for page in reader.pages:
+        text += page.extract_text()
+    return text
+
+
 def chunk_text(text: str, chunk_size: int = 1000, chunk_overlap: int = 200) -> List[Chunk]:
     """
     Chunk text into smaller pieces for embedding
-    :param text:
-    :param chunk_size:
-    :param chunk_overlap:
-    :return:
+
+    Parameters
+    ----------
+    text : str
+        Text to chunk
+    chunk_size : int, optional
+        Size of each chunk, by default 1000
+    chunk_overlap : int, optional
+        Number of characters to overlap between chunks, by default 200
+
+    Returns
+    -------
+    List[Chunk]
     """
     if not text:
         return []

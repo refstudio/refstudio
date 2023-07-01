@@ -13,7 +13,6 @@ from grobid_client.grobid_client import (GrobidClient,
 from sidecar import shared, typing
 
 from .settings import REFERENCES_JSON_PATH, UPLOADS_DIR
-from .shared import HiddenPrints, chunk_text
 from .storage import JsonStorage
 from .typing import Author, IngestResponse, Reference
 
@@ -224,7 +223,7 @@ class PDFIngestion:
         # 
         # Longer-term, we should probably fork the Grobid client and make changes 
         # to better suit our use-case.
-        with HiddenPrints():
+        with shared.HiddenPrints():
             try:
                 client = GrobidClient(GROBID_SERVER_URL, timeout=timeout)
             except ServerUnavailableException as e:
@@ -339,12 +338,18 @@ class PDFIngestion:
         references = []
         for file in txt_files:
             logger.info(f"Creating Reference from file: {file.name}")
+
             source_pdf = f"{file.stem.rpartition('_')[0]}.pdf"
+            source_pdf_path = os.path.join(self.staging_dir, source_pdf)
+            full_text = shared.extract_text_from_pdf(source_pdf_path)
+
             references.append(
                 Reference(
                     source_filename=source_pdf,
                     status=typing.IngestStatus.FAILURE,
                     citation_key="untitled",
+                    contents=full_text,
+                    chunks=shared.chunk_text(full_text),
                 )
             )
         return references
@@ -465,7 +470,7 @@ class PDFIngestion:
                 published_date=pub_date,
                 abstract=doc.get("abstract"),
                 contents=doc.get("body"),
-                chunks=chunk_text(doc.get("body"))
+                chunks=shared.chunk_text(doc.get("body"))
             )
             ref.citation_key = shared.create_citation_key(ref)
             successes.append(ref)
