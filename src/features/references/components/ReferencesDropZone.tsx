@@ -5,7 +5,6 @@ import { VscFilePdf } from 'react-icons/vsc';
 
 import { runPDFIngestion } from '../../../api/ingestion';
 import { referencesSyncInProgressAtom, setReferencesAtom } from '../../../atoms/referencesState';
-import { RefStudioEvents } from '../../../events';
 import { useListenEvent } from '../../../hooks/useListenEvent';
 import { uploadFiles } from '../../../io/filesystem';
 import { cx } from '../../../lib/cx';
@@ -38,7 +37,7 @@ export function ReferencesDropZone({ children }: { children: React.ReactNode }) 
     onSuccess: () => setVisible(false),
   });
 
-  useListenEvent(RefStudioEvents.menu.references.upload, () => inputRef.current?.click());
+  useListenEvent('refstudio://menu/references/upload', () => inputRef.current?.click());
 
   const handleFilesUpload = (uploadedFiles: FileList) => {
     setSyncInProgress(true);

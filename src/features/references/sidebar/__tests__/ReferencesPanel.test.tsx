@@ -1,6 +1,6 @@
 import { getReferencesAtom, setReferencesAtom } from '../../../../atoms/referencesState';
 import { runGetAtomHook, runSetAtomHook } from '../../../../atoms/test-utils';
-import { emitEvent, RefStudioEvents } from '../../../../events';
+import { emitEvent } from '../../../../events';
 import { noop } from '../../../../lib/noop';
 import { act, screen, setupWithJotaiProvider, within } from '../../../../test/test-utils';
 import { REFERENCES } from '../../test-fixtures';
@@ -29,8 +29,8 @@ describe('ReferencesPanel', () => {
   });
 
   it.each([
-    { title: 'Add References', event: RefStudioEvents.menu.references.upload },
-    { title: 'Open References', event: RefStudioEvents.menu.references.open },
+    { title: 'Add References', event: 'refstudio://menu/references/upload' },
+    { title: 'Open References', event: 'refstudio://menu/references/open' },
   ])('should trigger $title on click', async ({ title, event }) => {
     const { user } = setupWithJotaiProvider(<ReferencesPanel onRefClicked={noop} />);
     await user.click(screen.getByTitle(title));

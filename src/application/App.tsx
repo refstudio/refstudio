@@ -7,7 +7,7 @@ import { useEffectOnce } from 'usehooks-ts';
 import { openReferenceAtom } from '../atoms/editorActions';
 import { PrimarySideBar, PrimarySideBarPane } from '../components/PrimarySideBar';
 import { VerticalResizeHandle } from '../components/VerticalResizeHandle';
-import { emitEvent, RefStudioEvents } from '../events';
+import { emitEvent } from '../events';
 import { AIPanel } from '../features/ai/AIPanel';
 import { ReferencesDropZone } from '../features/references/components/ReferencesDropZone';
 import { ReferencesPanel } from '../features/references/sidebar/ReferencesPanel';
@@ -75,7 +75,7 @@ function LeftSidePanelWrapper() {
     }
   }, [leftPanelRef, primaryPaneCollapsed]);
 
-  const openSettings = React.useCallback(() => emitEvent(RefStudioEvents.menu.settings), []);
+  const openSettings = React.useCallback(() => emitEvent('refstudio://menu/settings'), []);
 
   return (
     <>

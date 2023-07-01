@@ -9,7 +9,7 @@ import { PaneContent } from '../../atoms/types/PaneGroup';
 import { Spinner } from '../../components/Spinner';
 import { TabPane } from '../../components/TabPane';
 import { VerticalResizeHandle } from '../../components/VerticalResizeHandle';
-import { emitEvent, RefStudioEvents } from '../../events';
+import { emitEvent } from '../../events';
 import { ReferencesTableView } from '../../features/references/editor/ReferencesTableView';
 import { ReferenceView } from '../../features/references/editor/ReferenceView';
 import { TipTapView } from '../../features/textEditor/editor/TipTapView';
@@ -76,7 +76,7 @@ export function MainPanelPane({ pane, pdfViewerRef }: MainPanelPaneProps & MainP
           items={items}
           value={activeFile?.id}
           onClick={(editorId) => selectFileInPane({ paneId: pane.id, editorId })}
-          onCloseClick={(editorId) => emitEvent(RefStudioEvents.editors.close, { paneId: pane.id, editorId })}
+          onCloseClick={(editorId) => emitEvent('refstudio://editors/close', { paneId: pane.id, editorId })}
         />
       </div>
       <div className="flex w-full grow overflow-hidden">

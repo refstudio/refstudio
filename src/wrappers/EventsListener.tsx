@@ -3,7 +3,7 @@ import { atom, useAtomValue, useSetAtom } from 'jotai';
 import { activePaneAtom, closeEditorFromPaneAtom } from '../atoms/editorActions';
 import { activePaneContentAtom } from '../atoms/paneActions';
 import { PaneEditorId } from '../atoms/types/PaneGroup';
-import { emitEvent, RefStudioEvents } from '../events';
+import { emitEvent } from '../events';
 import { useListenEvent } from '../hooks/useListenEvent';
 import { asyncNoop, noop } from '../lib/noop';
 
@@ -12,9 +12,9 @@ export function EventsListener({ children }: { children?: React.ReactNode }) {
   const closeActiveEditor = useCloseActiveEditor();
   const closeEditor = useCloseEditor();
 
-  useListenEvent(RefStudioEvents.menu.file.save, saveActiveFile);
-  useListenEvent(RefStudioEvents.menu.file.close, closeActiveEditor);
-  useListenEvent(RefStudioEvents.editors.close, closeEditor);
+  useListenEvent('refstudio://menu/file/save', saveActiveFile);
+  useListenEvent('refstudio://menu/file/close', closeActiveEditor);
+  useListenEvent('refstudio://editors/close', closeEditor);
 
   return <>{children}</>;
 }
@@ -38,7 +38,7 @@ function useCloseActiveEditor() {
   const editorId = activePane.activeEditorId;
   const paneId = activePane.id;
 
-  return () => emitEvent(RefStudioEvents.editors.close, { editorId, paneId });
+  return () => emitEvent('refstudio://editors/close', { editorId, paneId });
 }
 
 function useCloseEditor() {

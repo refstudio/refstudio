@@ -1,6 +1,5 @@
 import { act } from '@testing-library/react';
 
-import { RefStudioEvents } from '../../events';
 import { noop } from '../../lib/noop';
 import { mockListenEvent, render, screen } from '../../test/test-utils';
 import { getCachedSetting, initSettings, saveCachedSettings, setCachedSetting } from '../settingsManager';
@@ -35,10 +34,10 @@ describe('SettingsModalOpener component', () => {
     expect(screen.queryByRole('menuitem', { name: 'Open AI' })).not.toBeInTheDocument();
     expect(screen.queryByRole('menuitem', { name: 'Config' })).not.toBeInTheDocument();
 
-    expect(mockData.registeredEventNames).toContain(RefStudioEvents.menu.settings);
+    expect(mockData.registeredEventNames).toContain('refstudio://menu/settings');
 
     // Trigger the settings event to open the modal
-    act(() => mockData.trigger(RefStudioEvents.menu.settings));
+    act(() => mockData.trigger('refstudio://menu/settings'));
 
     expect(screen.getByRole('menuitem', { name: 'General' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Open AI' })).toBeInTheDocument();
@@ -50,14 +49,14 @@ describe('SettingsModalOpener component', () => {
 
     render(<SettingsModalOpener />);
     expect(screen.queryByRole('menuitem', { name: 'General' })).not.toBeInTheDocument();
-    expect(mockData.registeredEventNames).toContain(RefStudioEvents.menu.settings);
+    expect(mockData.registeredEventNames).toContain('refstudio://menu/settings');
 
     // Open
-    act(() => mockData.trigger(RefStudioEvents.menu.settings));
+    act(() => mockData.trigger('refstudio://menu/settings'));
     expect(screen.getByRole('menuitem', { name: 'General' })).toBeInTheDocument();
 
     // Close
-    act(() => mockData.trigger(RefStudioEvents.menu.settings));
+    act(() => mockData.trigger('refstudio://menu/settings'));
     expect(screen.queryByRole('menuitem', { name: 'General' })).not.toBeInTheDocument();
   });
 });
