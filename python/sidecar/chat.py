@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from sidecar import prompts, settings
 from sidecar.ranker import BM25Ranker
 from sidecar.storage import JsonStorage
-from sidecar.typing import ChatResponseChoice
+from sidecar.typing import ChatResponseChoice, Chunk
 
 load_dotenv()
 openai.api_key = os.environ.get("OPENAI_API_KEY")
@@ -61,10 +61,18 @@ class Chat:
             ChatResponseChoice(index=choice['index'], text=choice["message"]["content"])
             for choice in response['choices']
         ]
+    
+    def prepare_documents_for_prompt(self, docs: list[Chunk]) -> str:
+        text = ""
+        for chunk in docs:
+            source_str = f"\nSource: {chunk.metadata['source_filename']}, p{chunk.metadata['page_num']}"
+            text += f"{source_str} - {chunk.text}\n"
+        return text
 
     def ask_question(self, n_choices: int = 1) -> dict:
         docs = self.get_relevant_documents()
-        prompt = prompts.create_prompt_for_chat(query=self.input_text, context=docs)
+        context_str = self.prepare_documents_for_prompt(docs=docs)
+        prompt = prompts.create_prompt_for_chat(query=self.input_text, context=context_str)
         messages = self.prepare_messages_for_chat(text=prompt)
         response = self.call_model(messages=messages, n_choices=n_choices)
         choices = self.prepare_choices_for_client(response=response)

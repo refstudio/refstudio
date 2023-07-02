@@ -10,11 +10,19 @@ class BM25Ranker:
     def get_top_n(self, query: str, limit: int = 5) -> list:
         """
         Rank documents based on input text
-        :param input_text: str
-        :param limit: int
-        :return: list
+
+        Parameters
+        ----------
+        input_text : str
+            Input text to be used as query
+        limit : int, default 5
+            Number of documents to return
+
+        Returns
+        -------
+        list
         """
         tokenized_query = query.lower().split()
-        docs = self.ranker.get_top_n(tokenized_query, self.storage.corpus, n=limit)
+        docs = self.ranker.get_top_n(tokenized_query, self.storage.chunks, n=limit)
         return docs
     
