@@ -1953,6 +1953,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ag-grid-community@npm:^30.0.2":
+  version: 30.0.2
+  resolution: "ag-grid-community@npm:30.0.2"
+  checksum: 4c202dc4b2199ce8af9fe1cc1703017b8bbcb464c53efea8c9a7f2a3bd31d4e34dd6ea960b5032da5b88013c2a2a91da1cfd7946de8f6f0ce518cdc888bf9ee5
+  languageName: node
+  linkType: hard
+
+"ag-grid-react@npm:^30.0.2":
+  version: 30.0.2
+  resolution: "ag-grid-react@npm:30.0.2"
+  dependencies:
+    prop-types: ^15.8.1
+  peerDependencies:
+    ag-grid-community: ~30.0.1
+    react: ^16.3.0 || ^17.0.0 || ^18.0.0
+    react-dom: ^16.3.0 || ^17.0.0 || ^18.0.0
+  checksum: 2808fadac6f6b7d164148ba74db02ca65f7986c268476c1c244c3537bbce0d5bbc95b6d0a345fdc7c0c12c4c68e9d2e3273a333ecb79a4c6686520659bc75365
+  languageName: node
+  linkType: hard
+
 "agent-base@npm:6, agent-base@npm:^6.0.2":
   version: 6.0.2
   resolution: "agent-base@npm:6.0.2"
@@ -2588,7 +2608,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"clsx@npm:^1.1.1, clsx@npm:^1.2.1":
+"clsx@npm:^1.2.1":
   version: 1.2.1
   resolution: "clsx@npm:1.2.1"
   checksum: 30befca8019b2eb7dbad38cff6266cf543091dae2825c856a62a8ccf2c3ab9c2907c4d12b288b73101196767f66812365400a227581484a05f968b0307cfaf12
@@ -6360,18 +6380,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-data-grid@npm:^7.0.0-beta.34":
-  version: 7.0.0-canary.49
-  resolution: "react-data-grid@npm:7.0.0-canary.49"
-  dependencies:
-    clsx: ^1.1.1
-  peerDependencies:
-    react: ^16.14 || ^17.0
-    react-dom: ^16.14 || ^17.0
-  checksum: fe57d441a5e56dac39a0f7e06979a27d5606515653ead31fc06f9c2fe08ebaf88ff4ab70f1565dd356b343cf4612137dea2d188a40a7e246b85dd5aa2589da04
-  languageName: node
-  linkType: hard
-
 "react-dom@npm:^18.2.0":
   version: 18.2.0
   resolution: "react-dom@npm:18.2.0"
@@ -6568,6 +6576,8 @@ __metadata:
     "@vitejs/plugin-react": ^3.0.0
     "@vitest/coverage-c8": ^0.31.4
     "@vitest/ui": ^0.31.4
+    ag-grid-community: ^30.0.2
+    ag-grid-react: ^30.0.2
     autoprefixer: ^10.4.14
     classnames: ^2.3.2
     eslint: ^8.41.0
@@ -6592,7 +6602,6 @@ __metadata:
     prettier: ^2.8.8
     prettier-plugin-tailwindcss: ^0.3.0
     react: ^18.2.0
-    react-data-grid: ^7.0.0-beta.34
     react-dom: ^18.2.0
     react-icons: ^4.8.0
     react-pdf: ^6.2.2
