@@ -6,7 +6,7 @@ import { openFilePathAtom, openReferenceAtom } from '../../../atoms/editorAction
 import { getReferencesAtom } from '../../../atoms/referencesState';
 import { PanelSection } from '../../../components/PanelSection';
 import { PanelWrapper } from '../../../components/PanelWrapper';
-import { emitEvent, RefStudioEvents } from '../../../events';
+import { emitEvent } from '../../../events';
 import { useDebouncedCallback } from '../../../hooks/useDebouncedCallback';
 import { ReferenceItem } from '../../../types/ReferenceItem';
 import { ResetReferencesInstructions } from '../components/ResetReferencesInstructions';
@@ -24,15 +24,15 @@ export function ReferencesPanel() {
   }, [references]);
 
   const handleAddReferences = () => {
-    emitEvent(RefStudioEvents.menu.references.upload);
+    emitEvent('refstudio://menu/references/upload');
   };
 
   const handleOpenReferences = () => {
-    emitEvent(RefStudioEvents.menu.references.open);
+    emitEvent('refstudio://menu/references/open');
   };
 
   const handleExportReferences = () => {
-    emitEvent(RefStudioEvents.menu.references.export);
+    emitEvent('refstudio://menu/references/export');
   };
 
   const handleRefClicked = (reference: ReferenceItem, openPdf?: boolean) => {

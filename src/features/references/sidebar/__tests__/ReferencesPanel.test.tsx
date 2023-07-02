@@ -1,6 +1,6 @@
 import { runSetAtomHook } from '../../../../atoms/__tests__/test-utils';
 import { setReferencesAtom } from '../../../../atoms/referencesState';
-import { emitEvent, RefStudioEvents } from '../../../../events';
+import { emitEvent, RefStudioEventName } from '../../../../events';
 import { act, screen, setupWithJotaiProvider } from '../../../../test/test-utils';
 import { REFERENCES } from '../../__tests__/test-fixtures';
 import { ReferencesPanel } from '../ReferencesPanel';
@@ -18,10 +18,10 @@ describe('ReferencesPanel', () => {
     expect(screen.getByText(/welcome to your refstudio references library/i)).toBeInTheDocument();
   });
 
-  it.each([
-    { title: 'Add References', event: RefStudioEvents.menu.references.upload },
-    { title: 'Open References', event: RefStudioEvents.menu.references.open },
-    { title: 'Export References (NOT IMPLEMENTED)', event: RefStudioEvents.menu.references.export },
+  it.each<{ title: string; event: RefStudioEventName }>([
+    { title: 'Add References', event: 'refstudio://menu/references/upload' },
+    { title: 'Open References', event: 'refstudio://menu/references/open' },
+    { title: 'Export References (NOT IMPLEMENTED)', event: 'refstudio://menu/references/export' },
   ])('should trigger $title on click', async ({ title, event }) => {
     const { user } = setupWithJotaiProvider(<ReferencesPanel />);
     await user.click(screen.getByTitle(title));

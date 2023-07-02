@@ -6,7 +6,6 @@ import { activePaneAtom, closeEditorFromPaneAtom, openFileEntryAtom } from '../.
 import { activePaneContentAtom } from '../../atoms/paneActions';
 import { EditorData } from '../../atoms/types/EditorData';
 import { FileEntry } from '../../atoms/types/FileEntry';
-import { RefStudioEvents } from '../../events';
 import { readFileContent, writeFileContent } from '../../io/filesystem';
 import { asyncNoop } from '../../lib/noop';
 import { act, mockListenEvent, screen, setupWithJotaiProvider } from '../../test/test-utils';
@@ -42,15 +41,15 @@ describe('EventsListener.save', () => {
     expect(screen.getByText('Child')).toBeInTheDocument();
   });
 
-  it(`should listen to ${RefStudioEvents.menu.file.save} events`, () => {
+  it(`should listen to ${'refstudio://menu/file/save'} events`, () => {
     const mockData = mockListenEvent();
 
     setupWithJotaiProvider(<EventsListener />, store);
 
-    expect(mockData.registeredEventName).toBe(RefStudioEvents.menu.file.save);
+    expect(mockData.registeredEventNames).toContain('refstudio://menu/file/save');
   });
 
-  it(`should call saveFile when ${RefStudioEvents.menu.file.save} event is triggered`, () => {
+  it(`should call saveFile when ${'refstudio://menu/file/save'} event is triggered`, () => {
     const mockData = mockListenEvent();
     const activePaneContent = store.get(activePaneContentAtom);
     const { updateEditorContentBufferAtom } = activePaneContent.activeEditor!.contentAtoms;
@@ -63,26 +62,26 @@ describe('EventsListener.save', () => {
 
     act(() => {
       updateFileBuffer.current({ type: 'text', textContent: updatedContent });
-      mockData.trigger();
+      mockData.trigger('refstudio://menu/file/save');
     });
 
     expect(writeFileContent).toHaveBeenCalledTimes(1);
     expect(writeFileContent).toHaveBeenCalledWith(fileEntry.path, updatedContent);
   });
 
-  it(`should not call saveFile when ${RefStudioEvents.menu.file.save} event is triggered without content changes`, () => {
+  it(`should not call saveFile when ${'refstudio://menu/file/save'} event is triggered without content changes`, () => {
     const mockData = mockListenEvent();
 
     setupWithJotaiProvider(<EventsListener />, store);
 
     act(() => {
-      mockData.trigger();
+      mockData.trigger('refstudio://menu/file/save');
     });
 
     expect(writeFileContent).toHaveBeenCalledTimes(0);
   });
 
-  it(`should call asyncNoop ${RefStudioEvents.menu.file.save} event is triggered without content changes`, () => {
+  it(`should call asyncNoop ${'refstudio://menu/file/save'} event is triggered without content changes`, () => {
     const activePaneId = store.get(activePaneAtom).id;
     store.set(closeEditorFromPaneAtom, { editorId: editorData.id, paneId: activePaneId });
     const mockData = mockListenEvent();
@@ -90,7 +89,7 @@ describe('EventsListener.save', () => {
     setupWithJotaiProvider(<EventsListener />, store);
 
     act(() => {
-      mockData.trigger();
+      mockData.trigger('refstudio://menu/file/save');
     });
 
     expect(asyncNoop).toHaveBeenCalledTimes(1);

@@ -66,6 +66,10 @@ def test_run_ingest(monkeypatch, tmp_path, capsys):
     assert references[0]['source_filename'] == "grobid-fails.pdf"
     assert references[0]['citation_key'] == "untitled"
 
+    # check that grobid failures have text extracted
+    assert len(references[0]['contents']) > 0
+    assert len(references[0]['chunks']) > 0
+
     # check that test.pdf was parsed correctly
     assert references[1]['title'] == "A Few Useful Things to Know about Machine Learning"
     assert len(references[1]['authors']) == 1
@@ -86,7 +90,7 @@ def test_run_ingest(monkeypatch, tmp_path, capsys):
         assert json.load(f) == output['references']
 
 
-def test_ingest_add_citation_keys(tmp_path):
+def test_ingest_add_citation_keys(monkeypatch, tmp_path):
     ingestion = ingest.PDFIngestion(input_dir=tmp_path)
 
     # set up base reference with required fields
@@ -114,7 +118,8 @@ def test_ingest_add_citation_keys(tmp_path):
     ]
 
 
-    # test - references with unique citation keys should not be modified
+    # test: references with different authors
+    # expect: should have unique citation keys
     refs = []
     for d in fake_data:
         reference = base_reference.copy()
@@ -128,7 +133,8 @@ def test_ingest_add_citation_keys(tmp_path):
         assert ref.citation_key == d["expected_citation_key"]
 
 
-    # test - references with no author and no published year
+    # test: references with no author and no published year
+    # expect: should have citation key "untitled" appeneded with a number
     refs = []
     for i in range(5):
         reference = base_reference.copy()
@@ -137,12 +143,15 @@ def test_ingest_add_citation_keys(tmp_path):
     
     tested = ingestion._add_citation_keys(refs)
 
-    ## should be untitled1, untitled2, untitled3, etc.
     for i, ref in enumerate(tested):
-        assert ref.citation_key == f"untitled{i + 1}"
+        if i == 0:
+            assert ref.citation_key == "untitled"
+        else:
+            assert ref.citation_key == f"untitled{i - 1 + 1}"
     
 
-    # test - references with no author but with published years
+    # test: references with no author but with published years
+    # expect: should have citation key "untitled" appeneded with the year
     refs = []
     for i in range(3):
         reference = base_reference.copy()
@@ -152,12 +161,12 @@ def test_ingest_add_citation_keys(tmp_path):
     
     tested = ingestion._add_citation_keys(refs)
 
-    ## should be untitled2020, untitled2021, untitled2022, etc.
     for i, ref in enumerate(tested):
         assert ref.citation_key == f"untitled{ref.published_date.year}"
 
 
-    # test - references with no author and duplicate published years
+    # test: references with no author and duplicate published years
+    # expect: should have citation key "untitled" appeneded with year and a letter
     refs = []
     for i in range(3):
         reference = base_reference.copy()
@@ -167,12 +176,15 @@ def test_ingest_add_citation_keys(tmp_path):
     
     tested = ingestion._add_citation_keys(refs)
 
-    ## should be untitled2020a, untitled2020b, untitled2021c, etc.
     for i, ref in enumerate(tested):
-        expected = f"untitled{ref.published_date.year}{chr(97 + i)}"
+        if i == 0:
+            expected = f"untitled{ref.published_date.year}"
+        else:
+            expected = f"untitled{ref.published_date.year}{chr(97 + i)}"
         assert ref.citation_key == expected
     
-    # test - references with same author and no published year
+    # test: references with same author last name and no published year
+    # expect: should have citation key of author's last name appended with a letter
     refs = []
     for i in range(3):
         reference = base_reference.copy()
@@ -181,11 +193,14 @@ def test_ingest_add_citation_keys(tmp_path):
 
     tested = ingestion._add_citation_keys(refs)
 
-    ## should be smitha, smithb, smithc
     for i, ref in enumerate(tested):
-        assert ref.citation_key == f"smith{chr(97 + i)}"
+        if i == 0:
+            assert ref.citation_key == "smith"
+        else:
+            assert ref.citation_key == f"smith{chr(97 + i)}"
 
-    # test - references with same author and same published year
+    # test: references with same author and same published years
+    # expect: should have citation key of author's last name + year + letter
     refs = []
     for i in range(3):
         reference = base_reference.copy()
@@ -197,7 +212,55 @@ def test_ingest_add_citation_keys(tmp_path):
 
     ## should be smith2021a, smith2021b, smith2021c
     for i, ref in enumerate(tested):
-        assert ref.citation_key == f"smith2021{chr(97 + i)}"
+        if i == 0:
+            assert ref.citation_key == "smith2021"
+        else:
+            assert ref.citation_key == f"smith2021{chr(97 + i)}"
+
+    # test: ingesting new references should not modify existing citation keys
+    # expect: previously created citation keys should be unchanged ...
+    #   ... but new references should have unique citation keys
+    existing_refs = [
+        Reference(
+            source_filename='test.pdf', status=typing.IngestStatus.PROCESSING,
+            authors=[Author(full_name="Kathy Jones")], published_date=date(2021, 1, 1),
+            citation_key='jones2021'
+        ),
+        Reference(
+            source_filename='test.pdf', status=typing.IngestStatus.PROCESSING,
+            authors=[Author(full_name="Kathy Jones")], published_date=date(2021, 1, 1),
+            citation_key='jones2021a'
+        ),
+        Reference(
+            source_filename='test.pdf', status=typing.IngestStatus.PROCESSING,
+            authors=[Author(full_name="John Smith")], citation_key='smith'
+        ),
+        Reference(
+            source_filename='test.pdf', status=typing.IngestStatus.PROCESSING,
+            citation_key='untitled'
+        ),
+        Reference(
+            source_filename='test.pdf', status=typing.IngestStatus.PROCESSING,
+            citation_key='untitled1'
+        ),
+    ]
+    new_refs = [
+        Reference(
+            source_filename='test.pdf', status=typing.IngestStatus.PROCESSING,
+            authors=[Author(full_name="Kathy Jones")], published_date=date(2021, 1, 1)
+        ),
+        Reference(
+            source_filename='test.pdf', status=typing.IngestStatus.PROCESSING,
+            authors=[Author(full_name="John Smith")],
+        ),
+        Reference(source_filename='test.pdf', status=typing.IngestStatus.PROCESSING),
+    ]
+    monkeypatch.setattr(ingestion, 'references', existing_refs)
+
+    tested = ingestion._add_citation_keys(new_refs)
+    new_keys = sorted([ref.citation_key for ref in tested])
+
+    assert new_keys == sorted(['jones2021b', 'smitha', 'untitled2'])
 
 
 def test_ingest_get_statuses(monkeypatch, capsys):
