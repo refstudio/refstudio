@@ -349,7 +349,6 @@ class PDFIngestion:
                     status=typing.IngestStatus.FAILURE,
                     citation_key="untitled",
                     contents=full_text,
-                    chunks=shared.chunk_text(full_text),
                 )
             )
         return references
@@ -459,6 +458,7 @@ class PDFIngestion:
                 doc = json.load(fin)
 
             source_pdf = f"{file.stem}.pdf"
+
             header = self._parse_header(doc)
             pub_date = shared.parse_date(header.get("published_date", ""))
 
@@ -470,7 +470,6 @@ class PDFIngestion:
                 published_date=pub_date,
                 abstract=doc.get("abstract"),
                 contents=doc.get("body"),
-                chunks=shared.chunk_text(doc.get("body"))
             )
             ref.citation_key = shared.create_citation_key(ref)
             successes.append(ref)
@@ -489,6 +488,9 @@ class PDFIngestion:
 
         # append new references to any we have previously loaded
         for ref in new_references:
+            logger.info(f"Creating text chunks for Reference: {ref.source_filename}")
+            ref.chunks = shared.chunk_reference(ref)
+
             self.references.append(ref)
 
     def _save_references(self) -> None:

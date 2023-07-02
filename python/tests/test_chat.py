@@ -33,7 +33,7 @@ def test_chat_ask_question(monkeypatch, capsys):
 
     _ = chat.ask_question(
         input_text="This is a question about something",
-        n_options=1
+        n_choices=1
     )
     captured = capsys.readouterr()
     output = json.loads(captured.out)

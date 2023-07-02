@@ -1,6 +1,7 @@
 from datetime import date, datetime
+from pathlib import Path
 
-from sidecar import shared
+from sidecar import settings, shared
 from sidecar.typing import Author, Reference
 
 
@@ -100,3 +101,23 @@ def test_chunk_text():
     assert len(chunks) == len(long_text) // (chunk_size - 200) + 1
     assert isinstance(chunks[0], shared.Chunk)
     assert chunks[0].text == long_text[:chunk_size]
+
+
+def test_chunk_reference(monkeypatch):
+    filepath = "tests/fixtures/pdf/test.pdf"
+    filepath = Path(__name__).parent.joinpath(filepath)
+    monkeypatch.setattr(settings, "UPLOADS_DIR", filepath.parent)
+
+    reference = Reference(
+        source_filename="test.pdf",
+        status="complete",
+    )
+    chunks = shared.chunk_reference(reference)
+
+    assert len(chunks) > 0
+    assert isinstance(chunks[0], shared.Chunk)
+
+    for chunk in chunks:
+        assert chunk.text is not None
+        assert chunk.metadata != {}
+        assert chunk.metadata['page_num'] is not None
