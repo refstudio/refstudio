@@ -2,7 +2,7 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import './ReferenceView.css';
 
-import { AgGridReact } from 'ag-grid-react';
+import { AgGridReact } from 'ag-grid-react/lib/agGridReact';
 import { useAtomValue } from 'jotai';
 
 import { getReferencesAtom } from '../../../atoms/referencesState';
