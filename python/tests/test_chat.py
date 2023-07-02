@@ -31,11 +31,9 @@ def test_chat_ask_question(monkeypatch, capsys):
     
     monkeypatch.setattr(chat.Chat, "call_model", mock_call_model)
 
-    storage_path = Path(__file__).parent.joinpath("fixtures/data/references.json")
     _ = chat.ask_question(
         input_text="This is a question about something",
-        n_options=1,
-        storage_path=storage_path
+        n_options=1
     )
     captured = capsys.readouterr()
     output = json.loads(captured.out)

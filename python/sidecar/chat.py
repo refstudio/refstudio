@@ -1,11 +1,10 @@
 import json
 import os
 import sys
-from pathlib import Path
 
 import openai
 from dotenv import load_dotenv
-from sidecar import prompts
+from sidecar import prompts, settings
 from sidecar.ranker import BM25Ranker
 from sidecar.storage import JsonStorage
 from sidecar.typing import ChatResponseChoice
@@ -13,20 +12,12 @@ from sidecar.typing import ChatResponseChoice
 load_dotenv()
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 
-# TODO - move this into settings or env vars
-REFERENCES_STORAGE_PATH = Path(
-    "~/Library/Application Support/com.tauri.dev/project-x/.storage/references.json"
-).expanduser()
 
-
-# TODO - remove storage_path from this function
-# it's only hear to make testing easier for right now
 def ask_question(
         input_text: str,
-        n_options: int = 1,
-        storage_path: str = REFERENCES_STORAGE_PATH,
+        n_options: int = 1
     ):
-    storage = JsonStorage(filepath=storage_path)
+    storage = JsonStorage(filepath=settings.REFERENCES_JSON_PATH)
     storage.load()
     ranker = BM25Ranker(storage=storage)
     chat = Chat(input_text=input_text, storage=storage, ranker=ranker)
