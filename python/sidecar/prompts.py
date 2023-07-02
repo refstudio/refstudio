@@ -1,6 +1,18 @@
+from sidecar.typing import Chunk
+
+
 def create_prompt_for_summarize(text: str) -> str:
     prompt = f"Please rewrite the following text in a more concise manner:\nTEXT: {text}"
     return prompt
+
+
+def prepare_chunks_for_prompt(chunks: list[Chunk]) -> str:
+    text = ""
+    for chunk in chunks:
+        source_str = f"\nSource: {chunk.metadata['source_filename']}, p{chunk.metadata['page_num']}"
+        text += f"{source_str} - {chunk.text}\n"
+    return text
+
 
 def create_prompt_for_chat(query: str, context: str) -> str:
     prompt = (
