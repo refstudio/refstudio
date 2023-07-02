@@ -74,8 +74,10 @@ def test_create_citation_key():
 
 
 def test_extract_text_from_pdf():
-    test_filepath = "tests/fixtures/pdf/grobid-fails.pdf"
+    pdf_file = "fixtures/pdf/grobid-fails.pdf"
+    test_filepath = Path(__file__).parent.joinpath(pdf_file)
     text = shared.extract_text_from_pdf(test_filepath)
+
     assert isinstance(text, str)
     assert len(text) > 0
 
