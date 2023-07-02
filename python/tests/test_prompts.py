@@ -44,10 +44,10 @@ def test_create_prompt_for_chat():
         "Question: What is the capital of the United States?\n"
         "Answer: The capital of the United States is Washington, D.C. (world-capitals.pdf, p1)"
         "\n---------\n"
-        f"\nSource: test.pdf, p1 - This is a test\n"
-        f"\nSource: test.pdf, p2 - This is another test\n"
+        "\nSource: test.pdf, p1 - This is a test\n"
+        "\nSource: test.pdf, p2 - This is another test\n"
         "\n---------\n"
-        f"\nQuestion: What is this?\n"
+        "\nQuestion: What is this?\n"
         "Answer: "
     )
     query = "What is this?"
