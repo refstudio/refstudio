@@ -15,13 +15,13 @@ openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 def ask_question(
         input_text: str,
-        n_options: int = 1
+        n_choices: int = 1
     ):
     storage = JsonStorage(filepath=settings.REFERENCES_JSON_PATH)
     storage.load()
     ranker = BM25Ranker(storage=storage)
     chat = Chat(input_text=input_text, storage=storage, ranker=ranker)
-    choices = chat.ask_question(n_options=n_options)
+    choices = chat.ask_question(n_choices=n_choices)
     sys.stdout.write(json.dumps([c.dict() for c in choices]))
 
 
@@ -40,11 +40,11 @@ class Chat:
         docs = self.ranker.get_top_n(query=self.input_text, limit=5)
         return docs
 
-    def call_model(self, messages: list, n_options: int = 1):
+    def call_model(self, messages: list, n_choices: int = 1):
         response = openai.ChatCompletion.create(
             model=os.environ["OPENAI_CHAT_MODEL"],
             messages=messages,
-            n=n_options,  # number of completions to generate
+            n=n_choices,  # number of completions to generate
             temperature=0,  # 0 = no randomness, deterministic
             # max_tokens=200,
         )
@@ -62,10 +62,10 @@ class Chat:
             for choice in response['choices']
         ]
 
-    def ask_question(self, n_options: int = 1) -> dict:
+    def ask_question(self, n_choices: int = 1) -> dict:
         docs = self.get_relevant_documents()
         prompt = prompts.create_prompt_for_chat(query=self.input_text, context=docs)
         messages = self.prepare_messages_for_chat(text=prompt)
-        response = self.call_model(messages=messages, n_options=n_options)
+        response = self.call_model(messages=messages, n_choices=n_choices)
         choices = self.prepare_choices_for_client(response=response)
         return choices

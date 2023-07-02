@@ -19,7 +19,7 @@ if __name__ == '__main__':
         rewrite.summarize(args.text)
     
     if args.command == "chat":
-        chat.ask_question(args.text)
+        chat.ask_question(args.text, n_choices=args.n_choices)
     
     if args.command == "update":
         data = json.loads(args.data)
