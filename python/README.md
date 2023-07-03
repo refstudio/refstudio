@@ -37,6 +37,7 @@ $ poetry run pytest --cov=. tests
 The application current has three main functions:
 1. Ingest
 2. Ingest Status
+2. Ingest References
 3. Rewrite
 4. Chat
 5. Delete (References)
@@ -129,6 +130,63 @@ $ poetry run python main.py ingest_status | jq
     {
       "source_filename": "grobid-fails.pdf",
       "status": "failure"
+    }
+  ]
+}
+```
+
+### Ingest References
+`ingest_references` is called to retrieve reference documents.
+
+It takes an input directory containing PDFs and returns the ingested references. The resulting output of `ingest_references` is a set of References which are both stored on the filesystem. 
+
+To run `ingest_references`:
+
+```bash
+$ poetry run python main.py ingest_references --pdf_directory=path/to/docs/
+
+# Example:
+$ poetry run python main.py ingest_references --pdf_directory=tests/fixtures/pdf/ | jq
+
+# Response:
+{
+  "project_name": "fixtures",
+  "references": [
+    {
+      "source_filename": "test.pdf",
+      "title": "A Few Useful Things to Know about Machine Learning",
+      "abstract": "... PDF abstract here ...",
+      "contents": "... PDF body here ...",
+      "authors": [
+        {
+          "full_name": "Pedro Domingos",
+          "given_name": "Pedro",
+          "surname": "Domingos",
+          "email": "pedrod@cs.washington.edu"
+        }
+      ],
+      "chunks": [
+        {
+          "text": "... parsed chunks of PDF body ...",
+          "vector": [],
+          "metadata": {}
+        },
+        {
+          "text": "... parsed chunks of PDF body ...",
+          "vector": [],
+          "metadata": {}
+        }
+      ],
+      "metadata": {}
+    },
+    {
+      "source_filename": "grobid-fails.pdf",
+      "title": null,
+      "abstract": null,
+      "contents": null,
+      "authors": [],
+      "chunks": [],
+      "metadata": {}
     }
   ]
 }
