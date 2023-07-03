@@ -1,5 +1,5 @@
-import { buildEditorId, EditorData } from './types/EditorData';
-import { FileEntry, FileFileEntry, FolderFileEntry } from './types/FileEntry';
+import { buildEditorId, EditorData } from '../types/EditorData';
+import { FileEntry, FileFileEntry, FolderFileEntry } from '../types/FileEntry';
 
 export function makeFile(name: string): { fileEntry: FileFileEntry; editorData: EditorData } {
   const filePath = './' + name;

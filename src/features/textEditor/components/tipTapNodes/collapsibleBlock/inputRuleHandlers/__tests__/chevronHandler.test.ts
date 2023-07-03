@@ -1,7 +1,7 @@
 import { Editor } from '@tiptap/react';
 
 import { EDITOR_EXTENSIONS } from '../../../../tipTapEditorConfigs';
-import { getPrettyHTMLWithSelection, setUpEditorWithSelection } from '../../../test-utils';
+import { getPrettyHTMLWithSelection, setUpEditorWithSelection } from '../../../__tests__/test-utils';
 import { chevronHandler } from '../chevronHandler';
 
 describe('Chevron input rule handler', () => {

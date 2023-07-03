@@ -1,9 +1,9 @@
 import { createStore } from 'jotai';
 
+import { makeFile } from '../../atoms/__tests__/test-fixtures';
+import { runSetAtomHook } from '../../atoms/__tests__/test-utils';
 import { activePaneAtom, closeEditorFromPaneAtom, openFileEntryAtom } from '../../atoms/editorActions';
 import { activePaneContentAtom } from '../../atoms/paneActions';
-import { makeFile } from '../../atoms/test-fixtures';
-import { runSetAtomHook } from '../../atoms/test-utils';
 import { EditorData } from '../../atoms/types/EditorData';
 import { FileEntry } from '../../atoms/types/FileEntry';
 import { readFileContent, writeFileContent } from '../../io/filesystem';

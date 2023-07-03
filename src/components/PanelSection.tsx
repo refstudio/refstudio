@@ -13,7 +13,7 @@ export function PanelSection({
   title: string;
   children: React.ReactNode;
   grow?: boolean;
-  rightIcons?: { key: string; Icon: IconType; title?: string; onClick: () => void }[];
+  rightIcons?: { key: string; Icon: IconType; title?: string; className?: string; onClick: () => void }[];
 }) {
   const [expanded, setExpanded] = useState(true);
 
@@ -40,9 +40,9 @@ export function PanelSection({
             'invisible group-hover/panel-section:visible',
           )}
         >
-          {rightIcons.map(({ key, Icon, title: iconTitle, onClick }) => (
+          {rightIcons.map(({ key, Icon, title: iconTitle, className, onClick }) => (
             <Icon
-              className="cursor-pointer hover:bg-slate-200"
+              className={cx('cursor-pointer hover:bg-slate-200', className)}
               key={key}
               size={20}
               title={iconTitle}
@@ -55,7 +55,7 @@ export function PanelSection({
           ))}
         </div>
       </div>
-      {expanded && <div className={cx({ 'overflow-y-auto': grow })}>{children}</div>}
+      {expanded && <div className={cx({ 'z-10 overflow-y-auto': grow })}>{children}</div>}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { makeFile, makeFolder } from '../../atoms/test-fixtures';
+import { makeFile, makeFolder } from '../../atoms/__tests__/test-fixtures';
 import { noop } from '../../lib/noop';
 import { render, screen, setup } from '../../test/test-utils';
 import { FileEntryTree } from '../FileEntryTree';

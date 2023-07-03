@@ -32,6 +32,11 @@ def get_statuses():
     status_fetcher = IngestStatusFetcher(storage=storage)
     status_fetcher.emit_statuses()
 
+def get_references(pdf_directory: str):
+    pdf_directory = Path(pdf_directory)
+    ingest = PDFIngestion(input_dir=pdf_directory)
+    response = ingest.create_ingest_response()
+    sys.stdout.write(response.json())
 
 class PDFIngestion:
 
