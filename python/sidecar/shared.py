@@ -1,4 +1,3 @@
-import hashlib
 import os
 import sys
 from datetime import datetime
@@ -9,6 +8,16 @@ from .typing import Author, Chunk, Reference
 
 def get_word_count(text: str) -> int:
     return len(text.strip().split(" "))
+
+
+def remove_file(filepath: str) -> None:
+    """
+    Removes a file located at `filepath`.
+    """
+    try:
+        os.remove(filepath)
+    except OSError:
+        pass
 
 
 def parse_date(date_str: str) -> datetime:
@@ -27,15 +36,6 @@ def parse_date(date_str: str) -> datetime:
         return datetime.strptime(date_str, "%Y-%m-%d").date()
     except ValueError:
         return None
-
-
-def get_filename_md5(filename: str) -> str:
-    """
-    Get the MD5 hash of a filename
-    :param filename: str
-    :return: str
-    """
-    return hashlib.md5(filename.encode()).hexdigest()
 
 
 def get_first_author_surname(authors: List[Author]) -> str:
@@ -78,13 +78,45 @@ def create_citation_key(ref: Reference) -> str:
     return key.lower()
 
 
+def extract_text_from_pdf(pdf_path: str) -> str:
+    """
+    Extract raw text from a PDF file
+
+    Parameters
+    ----------
+    pdf_path : str
+        Path to PDF file
+    
+    Returns
+    -------
+    str
+        Raw text extracted from PDF
+    """
+    import pypdf
+
+    reader = pypdf.PdfReader(pdf_path)
+    text = ""
+    for page in reader.pages:
+        text += page.extract_text()
+    return text
+
+
 def chunk_text(text: str, chunk_size: int = 1000, chunk_overlap: int = 200) -> List[Chunk]:
     """
     Chunk text into smaller pieces for embedding
-    :param text:
-    :param chunk_size:
-    :param chunk_overlap:
-    :return:
+
+    Parameters
+    ----------
+    text : str
+        Text to chunk
+    chunk_size : int, optional
+        Size of each chunk, by default 1000
+    chunk_overlap : int, optional
+        Number of characters to overlap between chunks, by default 200
+
+    Returns
+    -------
+    List[Chunk]
     """
     if not text:
         return []

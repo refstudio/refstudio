@@ -20,6 +20,9 @@
         "$ref": "#/definitions/ChatResponseChoice"
       }
     },
+    "update": {
+      "$ref": "#/definitions/UpdateStatusResponse"
+    },
     "delete": {
       "$ref": "#/definitions/DeleteStatusResponse"
     }
@@ -29,6 +32,7 @@
     "ingest_status",
     "rewrite",
     "chat",
+    "update",
     "delete"
   ],
   "definitions": {
@@ -94,9 +98,6 @@
         "source_filename": {
           "type": "string"
         },
-        "filename_md5": {
-          "type": "string"
-        },
         "status": {
           "$ref": "#/definitions/IngestStatus"
         },
@@ -137,7 +138,6 @@
       },
       "required": [
         "source_filename",
-        "filename_md5",
         "status"
       ]
     },
@@ -234,6 +234,22 @@
       "required": [
         "index",
         "text"
+      ]
+    },
+    "UpdateStatusResponse": {
+      "title": "UpdateStatusResponse",
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "message"
       ]
     },
     "DeleteStatusResponse": {

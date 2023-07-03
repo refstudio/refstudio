@@ -7,6 +7,7 @@ const MENU_REFERENCES_OPEN: &str = "refstudio://menu/references/open";
 const MENU_REFERENCES_UPLOAD: &str = "refstudio://menu/references/upload";
 const MENU_FILE_SAVE: &str = "refstudio://menu/file/save";
 const MENU_FILE_NEW: &str = "refstudio://menu/file/new";
+const MENU_FILE_CLOSE: &str = "refstudio://menu/file/close";
 
 impl AppMenu {
     pub fn get_menu(context: &Context<EmbeddedAssets>) -> Menu {
@@ -32,8 +33,11 @@ impl AppMenu {
                 .add_item(CustomMenuItem::new(MENU_FILE_SAVE, "Save").accelerator("cmdOrControl+S"))
                 .add_item(
                     CustomMenuItem::new(MENU_FILE_NEW, "New File").accelerator("cmdOrControl + N"),
+                )
+                .add_item(
+                    CustomMenuItem::new(MENU_FILE_CLOSE, "Close Editor")
+                        .accelerator("cmdOrControl+W"),
                 ),
-            // .add_item(CustomMenuItem::new("tauri://menu/file/close".to_string(), "Close File"))
         );
 
         let edit_menu = Submenu::new(
@@ -64,9 +68,7 @@ impl AppMenu {
             "Window",
             Menu::new()
                 .add_native_item(MenuItem::Minimize)
-                .add_native_item(MenuItem::Zoom)
-                .add_native_item(MenuItem::Separator)
-                .add_native_item(MenuItem::CloseWindow),
+                .add_native_item(MenuItem::Zoom),
         );
 
         Menu::new()

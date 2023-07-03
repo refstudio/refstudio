@@ -19,6 +19,7 @@ export interface CliCommands {
   ingest_status: IngestStatusResponse;
   rewrite: RewriteChoice[];
   chat: ChatResponseChoice[];
+  update: UpdateStatusResponse;
   delete: DeleteStatusResponse;
 }
 export interface IngestResponse {
@@ -30,7 +31,6 @@ export interface IngestResponse {
  */
 export interface Reference {
   source_filename: string;
-  filename_md5: string;
   status: IngestStatus;
   citation_key?: string;
   title?: string;
@@ -67,6 +67,10 @@ export interface RewriteChoice {
 export interface ChatResponseChoice {
   index: number;
   text: string;
+}
+export interface UpdateStatusResponse {
+  status: ResponseStatus;
+  message: string;
 }
 export interface DeleteStatusResponse {
   status: ResponseStatus;
