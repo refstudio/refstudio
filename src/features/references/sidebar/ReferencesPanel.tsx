@@ -2,7 +2,8 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import { VscDesktopDownload, VscNewFile, VscOpenPreview } from 'react-icons/vsc';
 
-import { openFilePathAtom, openReferenceAtom } from '../../../atoms/editorActions';
+import { openReferenceAtom } from '../../../atoms/editorActions';
+import { openFilePathAtom } from '../../../atoms/fileEntryActions';
 import { getReferencesAtom } from '../../../atoms/referencesState';
 import { PanelSection } from '../../../components/PanelSection';
 import { PanelWrapper } from '../../../components/PanelWrapper';

@@ -7,7 +7,7 @@ import { addEditorData, editorsDataAtom, setEditorDataIsDirtyAtom } from './core
 import { addEditorToPane, selectEditorInPaneAtom } from './core/paneGroup';
 import { targetPaneIdFor } from './editorActions';
 import { buildEditorId } from './types/EditorData';
-import { FileEntry } from './types/FileEntry';
+import { FileEntry, FileFileEntry } from './types/FileEntry';
 import { PaneId } from './types/PaneGroup';
 
 /** Open a file in a pane (depending on the file extension) */
@@ -34,6 +34,19 @@ export const openFileEntryAtom = atom(null, (get, set, file: FileEntry) => {
   // Select editor in pane
   set(selectEditorInPaneAtom, { editorId, paneId: targetPaneId });
 });
+
+export const openFilePathAtom = atom(null, (get, set, filePath: string) => {
+  const fileEntry: FileFileEntry = {
+    path: filePath,
+    name: filePath.split('/').pop() ?? '',
+    fileExtension: filePath.split('.').pop() ?? '',
+    isDotfile: false,
+    isFile: true,
+    isFolder: false,
+  };
+  set(openFileEntryAtom, fileEntry);
+});
+
 /** Create a new file and open it in the LEFT pane */
 export const createFileAtom = atom(null, async (get, set) => {
   const openEditorNames = [...get(editorsDataAtom).values()].map(({ title }) => title);

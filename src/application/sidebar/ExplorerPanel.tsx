@@ -1,53 +1,39 @@
-import { useQuery } from '@tanstack/react-query';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { VscCloseAll, VscSplitHorizontal } from 'react-icons/vsc';
 
+import { fileExplorerEntriesAtom } from '../../atoms/core/fileExplorerEntry';
 import { closeAllEditorsAtom, moveEditorToPaneAtom, selectEditorInPaneAtom } from '../../atoms/editorActions';
-import { openFileEntryAtom } from '../../atoms/fileEntryActions';
+import { openFilePathAtom } from '../../atoms/fileEntryActions';
+import { refreshFileTreeAtom } from '../../atoms/fileExplorerActions';
 import { leftPaneAtom, rightPaneAtom } from '../../atoms/paneActions';
 import { EditorId, parseEditorId } from '../../atoms/types/EditorData';
-import { FileEntry, FileFileEntry } from '../../atoms/types/FileEntry';
 import { PaneId } from '../../atoms/types/PaneGroup';
 import { EditorsList } from '../../components/EditorsList';
-import { FileEntryTree } from '../../components/FileEntryTree';
+import { FileEntryNode } from '../../components/FileEntryNode';
 import { PanelSection } from '../../components/PanelSection';
 import { PanelWrapper } from '../../components/PanelWrapper';
-import { readAllProjectFiles } from '../../io/filesystem';
+import { useAsyncEffect } from '../../hooks/useAsyncEffect';
 import { isNonNullish } from '../../lib/isNonNullish';
 
 export function ExplorerPanel() {
   const left = useAtomValue(leftPaneAtom);
   const right = useAtomValue(rightPaneAtom);
+  const rootFileExplorerEntry = useAtomValue(fileExplorerEntriesAtom);
+
   const selectFileInPane = useSetAtom(selectEditorInPaneAtom);
-  const openFile = useSetAtom(openFileEntryAtom);
+  const openFile = useSetAtom(openFilePathAtom);
   const closeAllFiles = useSetAtom(closeAllEditorsAtom);
   const moveEditorToPane = useSetAtom(moveEditorToPaneAtom);
+  const refreshFileTree = useSetAtom(refreshFileTreeAtom);
 
-  const { data: allFiles } = useQuery({
-    queryKey: ['allFiles'],
-    queryFn: readAllProjectFiles,
-    initialData: [],
-  });
-
-  const flattenFiles: (files: FileEntry[]) => FileFileEntry[] = useCallback(
-    (files: FileEntry[]) => files.flatMap((file) => (file.isFolder ? flattenFiles(file.children) : file)),
-    [],
-  );
-
-  const flattenedFiles = useMemo(() => flattenFiles(allFiles), [allFiles, flattenFiles]);
+  useAsyncEffect(refreshFileTree);
 
   const handleOpenFile = useCallback(
-    (filePath: string) => {
-      const file = flattenedFiles.find((f) => f.path === filePath);
-      if (!file) {
-        console.warn('This file does not exist');
-        return;
-      }
-      console.log('file', file);
-      openFile(file);
+    (editorId: EditorId) => {
+      openFile(parseEditorId(editorId).id);
     },
-    [flattenedFiles, openFile],
+    [openFile],
   );
 
   const handleMoveEditor = useCallback(
@@ -97,10 +83,9 @@ export function ExplorerPanel() {
         )}
       </PanelSection>
       <PanelSection grow title="Project X">
-        <FileEntryTree
-          files={allFiles}
+        <FileEntryNode
+          fileExplorerEntry={rootFileExplorerEntry}
           paddingLeft="1.25rem"
-          root
           selectedFiles={[left.activeEditor?.id, right.activeEditor?.id]
             .filter(isNonNullish)
             .map((editorId) => parseEditorId(editorId).id)}
