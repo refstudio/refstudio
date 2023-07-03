@@ -1,5 +1,5 @@
+import { runSetAtomHook } from '../../../../atoms/__tests__/test-utils';
 import { referencesSyncInProgressAtom } from '../../../../atoms/referencesState';
-import { runSetAtomHook } from '../../../../atoms/test-utils';
 import { emitEvent } from '../../../../events';
 import { act, screen, setupWithJotaiProvider } from '../../../../test/test-utils';
 import { UploadTipInstructions } from '../UploadTipInstructions';

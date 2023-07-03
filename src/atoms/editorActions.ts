@@ -36,6 +36,18 @@ export const openFileEntryAtom = atom(null, (get, set, file: FileEntry) => {
   set(selectEditorInPaneAtom, { editorId, paneId: targetPaneId });
 });
 
+export const openFilePathAtom = atom(null, (get, set, filePath: string) => {
+  const fileEntry: FileFileEntry = {
+    path: filePath,
+    name: filePath.split('/').pop() ?? '',
+    fileExtension: filePath.split('.').pop() ?? '',
+    isDotfile: false,
+    isFile: true,
+    isFolder: false,
+  };
+  set(openFileEntryAtom, fileEntry);
+});
+
 /** Open a reference in the right pane */
 export const openReferenceAtom = atom(null, (get, set, referenceId: string) => {
   const editorId = buildEditorId('reference', referenceId);

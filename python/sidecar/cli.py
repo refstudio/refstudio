@@ -23,7 +23,15 @@ def get_arg_parser():
     ingest_status_parser = subparsers.add_parser(  # noqa: F841
         "ingest_status",
         description="Retrieve ingestion status of uploads"
+    )
 
+    ingest_references_parser = subparsers.add_parser(
+        "ingest_references",
+        description="Retrieve ingested PDF references"
+    )
+    ingest_references_parser.add_argument(
+        "--pdf_directory",
+        type=str,
     )
 
     ai_parser = subparsers.add_parser(

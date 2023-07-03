@@ -10,15 +10,16 @@ import {
   closeEditorFromPaneAtom,
   moveEditorToPaneAtom,
   openFileEntryAtom,
+  openFilePathAtom,
   openReferenceAtom,
   selectEditorInPaneAtom,
 } from '../editorActions';
 import { leftPaneAtom, rightPaneAtom } from '../paneActions';
 import { setReferencesAtom } from '../referencesState';
-import { makeFile, makeFolder } from '../test-fixtures';
-import { runGetAtomHook, runSetAtomHook } from '../test-utils';
 import { buildEditorId } from '../types/EditorData';
 import { PaneId } from '../types/PaneGroup';
+import { makeFile, makeFolder } from './test-fixtures';
+import { runGetAtomHook, runSetAtomHook } from './test-utils';
 
 vi.mock('../../io/filesystem');
 
@@ -53,6 +54,23 @@ describe('fileActions', () => {
     expect(leftPane.current.openEditors.length).toBe(1);
     expect(leftPane.current.openEditors).toContainEqual(editorData);
     expect(leftPane.current.activeEditor!.id).toBe(editorData.id);
+  });
+
+  it('should open TXT filePath in the left pane, and be active', () => {
+    const store = createStore();
+    const openFile = runSetAtomHook(openFilePathAtom, store);
+    const leftPane = runGetAtomHook(leftPaneAtom, store);
+
+    expect(leftPane.current.activeEditor).toBeUndefined();
+
+    const filePath = '/some/absolute/path/file.txt';
+    act(() => openFile.current(filePath));
+
+    expect(leftPane.current.id).toBe('LEFT' as PaneId);
+    expect(leftPane.current.openEditors.length).toBe(1);
+
+    const editorId = buildEditorId('text', filePath);
+    expect(leftPane.current.activeEditor!.id).toBe(editorId);
   });
 
   it('should open PDF file in the right pane, and be active', () => {
@@ -96,9 +114,11 @@ describe('fileActions', () => {
 
     const reference: ReferenceItem = {
       id: 'reference',
+      filepath: '/path/to/reference.pdf',
       filename: 'reference.pdf',
       citationKey: 'citationKey',
       title: 'Reference',
+      status: 'complete',
       authors: [],
     };
     const editorId = buildEditorId('reference', reference.id);
@@ -184,9 +204,11 @@ describe('fileActions', () => {
 
     const reference: ReferenceItem = {
       id: 'reference',
+      filepath: '/path/to/reference.pdf',
       filename: 'reference.pdf',
       citationKey: 'citationKey',
       title: 'Reference',
+      status: 'complete',
       authors: [],
     };
     const editorId = buildEditorId('reference', reference.id);
