@@ -1,89 +1,73 @@
-import { useMemo, useState } from 'react';
+import { useAtom, useAtomValue } from 'jotai';
+import { useMemo } from 'react';
 import { VscChevronDown, VscChevronRight, VscFile } from 'react-icons/vsc';
 
-import { FileEntry, FolderFileEntry } from '../atoms/types/FileEntry';
+import { FileExplorerEntry, FileExplorerFileEntry, FileExplorerFolderEntry } from '../atoms/types/FileExplorerEntry';
 import { FileNode } from './FileNode';
 
-interface FileEntryTreePropsBase {
-  files: FileEntry[];
+interface FileEntryNodeProps {
+  fileExplorerEntry: FileExplorerFolderEntry;
   onFileClick: (filePath: string) => void;
   selectedFiles: string[];
   paddingLeft?: string;
 }
 
-interface RootFileEntryTreeProps extends FileEntryTreePropsBase {
-  root: true;
-}
+export function FileEntryTree(props: FileEntryNodeProps) {
+  const { fileExplorerEntry, onFileClick, selectedFiles, paddingLeft = '0' } = props;
+  const files = useAtomValue(fileExplorerEntry.children);
 
-interface NonRootFileEntryTreeProps extends FileEntryTreePropsBase {
-  root?: false;
-  folderName: string;
-}
-
-type FileEntryTreeProps = RootFileEntryTreeProps | NonRootFileEntryTreeProps;
-
-export function FileEntryTree(props: FileEntryTreeProps) {
-  const { files, onFileClick, paddingLeft = '0', root, selectedFiles } = props;
-  const [collapsed, setCollapsed] = useState(true);
+  const [collapsed, toggleCollapsed] = useAtom(fileExplorerEntry.collapsedAtom);
 
   const folderEntries = useMemo(
     () =>
       files
-        .filter((file) => !file.isDotfile)
-        .filter((file): file is FolderFileEntry => file.isFolder)
-        .sort(alphabeticallySortFileEntries),
+        .filter((file): file is FileExplorerFolderEntry => file.isFolder)
+        .sort(alphabeticallySortFileExplorerEntries),
     [files],
   );
 
   const fileEntries = useMemo(
     () =>
       files
-        .filter((file) => !file.isDotfile)
-        .filter((file) => file.isFile)
-        .sort(alphabeticallySortFileEntries),
+        .filter((file): file is FileExplorerFileEntry => !file.isFolder)
+        .sort(alphabeticallySortFileExplorerEntries),
     [files],
   );
 
-  return (
-    <div className="flex w-full flex-col">
-      {!root && (
-        <FileNode
-          VscIcon={collapsed ? VscChevronRight : VscChevronDown}
-          bold
-          fileName={props.folderName}
-          paddingLeft={`calc(${paddingLeft} - 1rem)`}
-          onClick={() => setCollapsed((currentState) => !currentState)}
+  const { root } = fileExplorerEntry;
+
+  return <div className="flex w-full flex-col">
+    {!root && <FileNode
+      VscIcon={collapsed ? VscChevronRight : VscChevronDown}
+      bold
+      fileName={fileExplorerEntry.name}
+      paddingLeft={`calc(${paddingLeft} - 1rem)`}
+      onClick={toggleCollapsed}
+    />}
+    {(root || !collapsed) && <>
+      {folderEntries.map((folder) => (
+        <FileEntryTree
+          {...props}
+          fileExplorerEntry={folder}
+          key={folder.path}
+          paddingLeft={`calc(${paddingLeft} + 1rem)`}
         />
-      )}
-      {(root || !collapsed) && (
-        <>
-          {folderEntries.map((folder) => (
-            <FileEntryTree
-              {...props}
-              files={folder.children}
-              folderName={folder.name}
-              key={folder.path}
-              paddingLeft={`calc(${paddingLeft} + 1rem)`}
-              root={false}
-            />
-          ))}
-          {fileEntries.map((file) => (
-            <FileNode
-              VscIcon={VscFile}
-              fileName={file.name}
-              key={file.path}
-              paddingLeft={paddingLeft}
-              selected={selectedFiles.includes(file.path)}
-              onClick={() => onFileClick(file.path)}
-            />
-          ))}
-        </>
-      )}
-    </div>
-  );
+      ))}
+      {fileEntries.map((file) => (
+        <FileNode
+          VscIcon={VscFile}
+          fileName={file.name}
+          key={file.path}
+          paddingLeft={paddingLeft}
+          selected={selectedFiles.includes(file.path)}
+          onClick={() => onFileClick(file.path)}
+        />
+      ))}
+    </>}
+  </div>;
 }
 
-function alphabeticallySortFileEntries(fileA: FileEntry, fileB: FileEntry) {
+function alphabeticallySortFileExplorerEntries(fileA: FileExplorerEntry, fileB: FileExplorerEntry) {
   const fileNameA = fileA.name.toLowerCase();
   const fileNameB = fileB.name.toLowerCase();
 

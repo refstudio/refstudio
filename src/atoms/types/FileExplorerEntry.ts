@@ -1,17 +1,16 @@
 import { WritableAtom } from 'jotai';
 
-import { EditorId } from './EditorData';
 import { FileEntry } from './FileEntry';
 
 interface FileExplorerEntryBase {
   name: string;
+  path: string;
   isTemporary?: boolean;
   // renameAtom
   // deleteAtom
 }
 
 export interface FileExplorerFileEntry extends FileExplorerEntryBase {
-  editorId: EditorId;
   isFolder: false;
 }
 

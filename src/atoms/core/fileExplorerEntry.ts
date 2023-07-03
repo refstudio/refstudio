@@ -1,6 +1,5 @@
 import { atom } from 'jotai';
 
-import { buildEditorId } from '../types/EditorData';
 import { FileEntry, FolderFileEntry } from '../types/FileEntry';
 import {
   FileExplorerEntry,
@@ -23,6 +22,7 @@ function createFileExplorerFolderEntry(
   return {
     isFolder: true,
     root,
+    path: 'root',
     children: atom(
       (get) => get(filesAtom),
       (get, set, updatedFiles: FileEntry[]) => {
@@ -33,29 +33,30 @@ function createFileExplorerFolderEntry(
         // Update file children and keep temporary files
         const updatedFileEntries = [...updatedFileFileEntries.map(createFileExplorerEntry), ...temporaryFiles];
 
-        // Create a dict { [folderName]: folder }
+        // Create a dict { [folderPath]: folder }
         const folders = Object.assign(
           {},
           ...updatedFiles
             .filter((f) => !f.isDotfile)
             .filter((f): f is FolderFileEntry => f.isFolder)
-            .map((f) => ({ [f.name]: f })),
+            .map((f) => ({ [f.path]: f })),
         ) as Record<string, FolderFileEntry>;
 
         const updatedFolderEntries = currentFiles
           .filter((f): f is FileExplorerFolderEntry => f.isFolder)
-          .filter((f) => f.name in folders);
+          .filter((f) => f.path in folders);
 
         // Recursively update children
         updatedFolderEntries.forEach((folderEntry) => {
-          set(folderEntry.children, folders[folderEntry.name].children);
+          set(folderEntry.children, folders[folderEntry.path].children);
         });
 
-        const currentFolderNames = new Set(currentFiles.filter((f) => f.isFolder).map((f) => f.name));
-        const newFolderNames = Object.keys(folders).filter((name) => !currentFolderNames.has(name));
+        // Create entries for the new folders
+        const currentFolderNames = new Set(currentFiles.filter((f) => f.isFolder).map((f) => f.path));
+        const newFolderPaths = Object.keys(folders).filter((path) => !currentFolderNames.has(path));
 
-        newFolderNames.forEach((name) => {
-          updatedFolderEntries.push(createFileExplorerFolderEntry(folders[name].children, folders[name].name));
+        newFolderPaths.forEach((path) => {
+          updatedFolderEntries.push(createFileExplorerFolderEntry(folders[path].children, folders[path].name));
         });
 
         set(filesAtom, [...updatedFolderEntries, ...updatedFileEntries]);
@@ -80,7 +81,7 @@ function createFileExplorerEntry(file: FileEntry): FileExplorerEntry {
     return {
       isFolder: false,
       name: file.name,
-      editorId: buildEditorId('text', file.path),
+      path: file.path,
     };
   } else {
     return createFileExplorerFolderEntry(file.children, file.name);

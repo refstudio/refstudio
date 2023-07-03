@@ -2,6 +2,7 @@ import { atom } from 'jotai';
 import { loadable } from 'jotai/utils';
 
 import { writeFileContent } from '../../io/filesystem';
+import { refreshFileTreeAtom } from '../fileExplorerActions';
 import { EditorContent } from '../types/EditorContent';
 import { EditorContentAtoms } from '../types/EditorContentAtoms';
 import { EditorId, parseEditorId } from '../types/EditorData';
@@ -42,6 +43,8 @@ export function createEditorContentAtoms(
           const success = await writeFileContent(path, editorContent.textContent);
           if (success) {
             set(setEditorDataIsDirtyAtom, { editorId, isDirty: false });
+            // Refresh file tree after saving file
+            void set(refreshFileTreeAtom);
           }
           return;
         }

@@ -10,7 +10,7 @@ import { leftPaneAtom, rightPaneAtom } from '../../atoms/paneActions';
 import { EditorId, parseEditorId } from '../../atoms/types/EditorData';
 import { PaneId } from '../../atoms/types/PaneGroup';
 import { EditorsList } from '../../components/EditorsList';
-import { FileEntryNode } from '../../components/FileEntryNode';
+import { FileEntryTree } from '../../components/FileEntryTree';
 import { PanelSection } from '../../components/PanelSection';
 import { PanelWrapper } from '../../components/PanelWrapper';
 import { useAsyncEffect } from '../../hooks/useAsyncEffect';
@@ -30,8 +30,8 @@ export function ExplorerPanel() {
   useAsyncEffect(refreshFileTree);
 
   const handleOpenFile = useCallback(
-    (editorId: EditorId) => {
-      openFile(parseEditorId(editorId).id);
+    (filePath: string) => {
+      openFile(filePath);
     },
     [openFile],
   );
@@ -83,7 +83,7 @@ export function ExplorerPanel() {
         )}
       </PanelSection>
       <PanelSection grow title="Project X">
-        <FileEntryNode
+        <FileEntryTree
           fileExplorerEntry={rootFileExplorerEntry}
           paddingLeft="1.25rem"
           selectedFiles={[left.activeEditor?.id, right.activeEditor?.id]
