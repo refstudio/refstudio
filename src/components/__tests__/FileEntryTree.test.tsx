@@ -1,23 +1,27 @@
-import { makeFile, makeFolder } from '../../atoms/__tests__/test-fixtures';
+import { makeFileExplorerFileEntry, makeFileExplorerFolderEntry } from '../../atoms/__tests__/test-fixtures';
+import { FileExplorerFileEntry, FileExplorerFolderEntry } from '../../atoms/types/FileExplorerEntry';
 import { noop } from '../../lib/noop';
 import { act, render, screen, setup } from '../../test/test-utils';
 import { FileEntryTree } from '../FileEntryTree';
 
 describe('FileEntryTree component', () => {
+  let fileEntry: FileExplorerFileEntry;
+  let folderEntry: FileExplorerFolderEntry;
   beforeEach(() => {
     vi.clearAllMocks();
+
+    fileEntry = makeFileExplorerFileEntry('File 1.pdf');
+    folderEntry = makeFileExplorerFolderEntry('root', [fileEntry], true).folderEntry;
   });
 
   it('should render a file', () => {
-    const { fileEntry } = makeFile('File 1.pdf');
-    render(<FileEntryTree files={[fileEntry]} root selectedFiles={[]} onFileClick={noop} />);
+    render(<FileEntryTree fileExplorerEntry={folderEntry} selectedFiles={[]} onFileClick={noop} />);
     expect(screen.getByText(fileEntry.name)).toBeInTheDocument();
   });
 
   it('should call onFileClick with file path', async () => {
-    const { fileEntry } = makeFile('File 1.pdf');
     const onClick = vi.fn();
-    const { user } = setup(<FileEntryTree files={[fileEntry]} root selectedFiles={[]} onFileClick={onClick} />);
+    const { user } = setup(<FileEntryTree fileExplorerEntry={folderEntry} selectedFiles={[]} onFileClick={onClick} />);
 
     await user.click(screen.getByText(fileEntry.name));
 
@@ -26,24 +30,17 @@ describe('FileEntryTree component', () => {
   });
 
   it('should render a folder and its children', async () => {
-    const { fileEntry } = makeFile('File 1.pdf');
-    const folderEntry = makeFolder('Folder 1', [fileEntry]);
-    const { user } = setup(<FileEntryTree files={[folderEntry]} root selectedFiles={[]} onFileClick={noop} />);
-    expect(screen.getByText(folderEntry.name)).toBeInTheDocument();
+    const file = makeFileExplorerFileEntry('File 1.pdf');
+    const { folderEntry: folder } = makeFileExplorerFolderEntry('Folder', [file], false);
+
+    const { user } = setup(<FileEntryTree fileExplorerEntry={folder} selectedFiles={[]} onFileClick={noop} />);
+    expect(screen.getByText(folder.name)).toBeInTheDocument();
 
     // Folder is collapsed by default
-    expect(screen.queryByText(fileEntry.name)).not.toBeInTheDocument();
+    expect(screen.queryByText(file.name)).not.toBeInTheDocument();
     await act(async () => {
-      await user.click(screen.getByText(folderEntry.name));
+      await user.click(screen.getByText(folder.name));
     });
-    expect(screen.getByText(fileEntry.name)).toBeInTheDocument();
-  });
-
-  it('should not render dotfiles', () => {
-    const { fileEntry } = makeFile('File 1.pdf');
-    const { fileEntry: dotfileFileEntry } = makeFile('.file2');
-    render(<FileEntryTree files={[fileEntry, dotfileFileEntry]} root selectedFiles={[]} onFileClick={noop} />);
-    expect(screen.getByText(fileEntry.name)).toBeInTheDocument();
-    expect(screen.queryByText(dotfileFileEntry.name)).not.toBeInTheDocument();
+    expect(screen.getByText(file.name)).toBeInTheDocument();
   });
 });

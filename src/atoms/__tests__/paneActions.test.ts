@@ -2,7 +2,7 @@ import { act, waitFor } from '@testing-library/react';
 import { createStore } from 'jotai';
 import { Loadable } from 'jotai/vanilla/utils/loadable';
 
-import { readFileContent, writeFileContent } from '../../io/filesystem';
+import { readAllProjectFiles, readFileContent, writeFileContent } from '../../io/filesystem';
 import { activePaneAtom, closeEditorFromPaneAtom, moveEditorToPaneAtom } from '../editorActions';
 import { openFileEntryAtom } from '../fileEntryActions';
 import { activePaneContentAtom, focusPaneAtom } from '../paneActions';
@@ -158,6 +158,7 @@ describe('fileActions', () => {
 
   it('should call writeFileContent when using saveFileAtom', async () => {
     vi.mocked(writeFileContent).mockResolvedValueOnce(true);
+    vi.mocked(readAllProjectFiles).mockResolvedValueOnce([]);
 
     const {
       loadableEditorContentAtom: loadableFileAtom,
@@ -179,6 +180,7 @@ describe('fileActions', () => {
     });
 
     expect(writeFileContent).toHaveBeenCalledOnce();
+    expect(readAllProjectFiles).toHaveBeenCalledOnce();
   });
 
   it('should not call writeFileContent if the file buffer is empty', async () => {
