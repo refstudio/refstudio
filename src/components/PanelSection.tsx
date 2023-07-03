@@ -55,7 +55,7 @@ export function PanelSection({
           ))}
         </div>
       </div>
-      {expanded && <div className={cx({ 'overflow-y-auto': grow })}>{children}</div>}
+      {expanded && <div className={cx({ 'z-10 overflow-y-auto': grow })}>{children}</div>}
     </div>
   );
 }

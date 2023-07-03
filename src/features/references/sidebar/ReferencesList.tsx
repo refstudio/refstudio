@@ -38,7 +38,7 @@ export function ReferencesList({
             {/* ACTIONS */}
             <div
               className={cx(
-                'absolute right-1 top-1', // position
+                'absolute right-4 top-1 rounded-md', // position: ;
                 'bg-white px-1 py-1 ', // style
                 'hidden gap-2 group-hover/ref-item:flex', // hidden / show on hover
               )}

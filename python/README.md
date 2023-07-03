@@ -34,14 +34,14 @@ $ poetry run pytest --cov=. tests
 
 ## Commands
 
-The application current has three main functions:
+The application has the following main functions:
 1. Ingest
-2. Ingest Status
-2. Ingest References
-3. Rewrite
-4. Chat
-5. Delete (References)
-6. Update (References)
+1. Ingest Status
+1. Ingest References
+1. Rewrite
+1. Chat
+1. Delete (References)
+1. Update (References)
 
 ### Ingest
 `Ingest` is called when a Refstudio user uploads Reference documents.
