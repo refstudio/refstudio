@@ -9,7 +9,6 @@ import { PanelWrapper } from '../../../components/PanelWrapper';
 import { emitEvent } from '../../../events';
 import { useDebouncedCallback } from '../../../hooks/useDebouncedCallback';
 import { ReferenceItem } from '../../../types/ReferenceItem';
-import { ResetReferencesInstructions } from '../components/ResetReferencesInstructions';
 import { UploadTipInstructions } from '../components/UploadTipInstructions';
 import { ReferencesList } from './ReferencesList';
 
@@ -84,7 +83,6 @@ export function ReferencesPanel() {
           )}
 
           <UploadTipInstructions />
-          <ResetReferencesInstructions />
         </div>
       </PanelSection>
     </PanelWrapper>

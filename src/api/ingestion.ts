@@ -25,3 +25,20 @@ export async function runPDFIngestion(): Promise<ReferenceItem[]> {
   const response = await callSidecar('ingest', ['--pdf_directory', String(uploadsDir)]);
   return parsePdfIngestionResponse(response, uploadsDir);
 }
+
+export async function getIngestedReferences(): Promise<ReferenceItem[]> {
+  const uploadsDir = await getUploadsDir();
+  const response = await callSidecar('ingest_references', ['--pdf_directory', String(uploadsDir)]);
+  return parsePdfIngestionResponse(response, uploadsDir);
+}
+
+export async function getIngestionStatus() {
+  const response = await callSidecar('ingest_status', []);
+  return {
+    status: response.status,
+    references: response.reference_statuses.map((refStatus) => ({
+      filename: refStatus.source_filename,
+      status: refStatus.status,
+    })),
+  };
+}
