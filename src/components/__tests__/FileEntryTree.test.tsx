@@ -1,6 +1,6 @@
 import { makeFile, makeFolder } from '../../atoms/test-fixtures';
 import { noop } from '../../lib/noop';
-import { render, screen, setup } from '../../test/test-utils';
+import { act, render, screen, setup } from '../../test/test-utils';
 import { FileEntryTree } from '../FileEntryTree';
 
 describe('FileEntryTree component', () => {
@@ -25,12 +25,18 @@ describe('FileEntryTree component', () => {
     expect(onClick).toHaveBeenCalledWith(fileEntry.path);
   });
 
-  it('should render a folder and its children', () => {
+  it('should render a folder and its children', async () => {
     const { fileEntry } = makeFile('File 1.pdf');
     const folderEntry = makeFolder('Folder 1', [fileEntry]);
-    render(<FileEntryTree files={[folderEntry]} root selectedFiles={[]} onFileClick={noop} />);
-    expect(screen.getByText(fileEntry.name)).toBeInTheDocument();
+    const { user } = setup(<FileEntryTree files={[folderEntry]} root selectedFiles={[]} onFileClick={noop} />);
     expect(screen.getByText(folderEntry.name)).toBeInTheDocument();
+
+    // Folder is collapsed by default
+    expect(screen.queryByText(fileEntry.name)).not.toBeInTheDocument();
+    await act(async () => {
+      await user.click(screen.getByText(folderEntry.name));
+    });
+    expect(screen.getByText(fileEntry.name)).toBeInTheDocument();
   });
 
   it('should not render dotfiles', () => {

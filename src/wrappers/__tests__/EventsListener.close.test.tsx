@@ -1,6 +1,7 @@
 import { createStore } from 'jotai';
 
-import { activePaneAtom, openFileEntryAtom } from '../../atoms/editorActions';
+import { activePaneAtom } from '../../atoms/editorActions';
+import { openFileEntryAtom } from '../../atoms/fileEntryActions';
 import { makeFile } from '../../atoms/test-fixtures';
 import { runGetAtomHook } from '../../atoms/test-utils';
 import { EditorData } from '../../atoms/types/EditorData';
