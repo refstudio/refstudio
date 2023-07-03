@@ -1,8 +1,8 @@
 import { Editor } from '@tiptap/react';
 
 import { EDITOR_EXTENSIONS } from '../../../../tipTapEditorConfigs';
-import { defaultCollapsibleBlock } from '../../../test-fixtures';
-import { getPrettyHTMLWithSelection, setUpEditorWithSelection } from '../../../test-utils';
+import { defaultCollapsibleBlock } from '../../../__tests__/test-fixtures';
+import { getPrettyHTMLWithSelection, setUpEditorWithSelection } from '../../../__tests__/test-utils';
 import { modEnter } from '../modEnter';
 
 describe('Mod-Enter keyboard shortcut command', () => {

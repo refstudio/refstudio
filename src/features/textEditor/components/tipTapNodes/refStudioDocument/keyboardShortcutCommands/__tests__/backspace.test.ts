@@ -1,8 +1,8 @@
 import { Editor, getText } from '@tiptap/react';
 
 import { EDITOR_EXTENSIONS } from '../../../../tipTapEditorConfigs';
-import { defaultParagraph } from '../../../test-fixtures';
-import { getPrettyHTMLWithSelection, getSelectedText, setUpEditorWithSelection } from '../../../test-utils';
+import { defaultParagraph } from '../../../__tests__/test-fixtures';
+import { getPrettyHTMLWithSelection, getSelectedText, setUpEditorWithSelection } from '../../../__tests__/test-utils';
 import { backspace } from '../backspace';
 
 describe('Backspace keyboard shortcut command', () => {

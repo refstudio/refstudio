@@ -9,6 +9,7 @@ interface RefStudioEvents {
   'refstudio://menu/settings': undefined;
   'refstudio://menu/references/open': undefined;
   'refstudio://menu/references/upload': undefined;
+  'refstudio://menu/references/export': undefined;
   'refstudio://editors/close': PaneEditorId;
   'refstudio://references/ingestion/run': undefined;
 }

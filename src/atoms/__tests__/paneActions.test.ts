@@ -6,13 +6,13 @@ import { readFileContent, writeFileContent } from '../../io/filesystem';
 import { activePaneAtom, closeEditorFromPaneAtom, moveEditorToPaneAtom } from '../editorActions';
 import { openFileEntryAtom } from '../fileEntryActions';
 import { activePaneContentAtom, focusPaneAtom } from '../paneActions';
-import { makeFile } from '../test-fixtures';
-import { runGetAtomHook, runSetAtomHook } from '../test-utils';
 import { EditorContent } from '../types/EditorContent';
 import { EditorContentAtoms } from '../types/EditorContentAtoms';
 import { EditorData } from '../types/EditorData';
 import { FileFileEntry } from '../types/FileEntry';
 import { PaneId } from '../types/PaneGroup';
+import { makeFile } from './test-fixtures';
+import { runGetAtomHook, runSetAtomHook } from './test-utils';
 
 vi.mock('../../io/filesystem');
 

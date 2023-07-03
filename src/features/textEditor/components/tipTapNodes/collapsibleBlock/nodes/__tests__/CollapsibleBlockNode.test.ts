@@ -1,8 +1,12 @@
 import { Editor } from '@tiptap/react';
 
 import { EDITOR_EXTENSIONS } from '../../../../tipTapEditorConfigs';
-import { defaultCollapsibleBlockWithCursor, oneLineCollapsibleBlock } from '../../../test-fixtures';
-import { findNodesByNodeType, getPrettyHTMLWithSelection, setUpEditorWithSelection } from '../../../test-utils';
+import { defaultCollapsibleBlockWithCursor, oneLineCollapsibleBlock } from '../../../__tests__/test-fixtures';
+import {
+  findNodesByNodeType,
+  getPrettyHTMLWithSelection,
+  setUpEditorWithSelection,
+} from '../../../__tests__/test-utils';
 
 describe('CollapsibleBlockNode commands', () => {
   const editor = new Editor({
