@@ -84,7 +84,7 @@ export const deleteFileAtom = atom(null, async (get, set, filePath: string) => {
   }
 
   if (fileExplorerEntry.isFolder) {
-    throw new Error(`Delete folders is not supported: ${filePath}`);
+    throw new Error(`Deleting folders is not supported yet: ${filePath}`);
   }
 
   // Remove file from disk
