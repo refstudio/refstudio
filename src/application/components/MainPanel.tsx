@@ -121,7 +121,7 @@ export function MainPaneViewContent({ activeEditorAtoms, pdfViewerRef }: MainPan
     case 'reference':
       return <ReferenceView referenceId={data.referenceId} />;
     case 'references':
-      return <ReferencesTableView />;
+      return <ReferencesTableView defaultFilter={data.filter} />;
     default: {
       assertNever(data);
       return null;

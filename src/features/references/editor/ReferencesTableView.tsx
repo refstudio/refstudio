@@ -18,9 +18,9 @@ import { UploadTipInstructions } from '../components/UploadTipInstructions';
 import { loadColumnsState, resetColumnsState, saveColumnsState } from './columnsState';
 import { authorsFormatter, firstAuthorFormatter } from './formatters';
 
-export function ReferencesTableView() {
+export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: string }) {
   const references = useAtomValue(getReferencesAtom);
-  const [quickFilter, setQuickFilter] = useState('');
+  const [quickFilter, setQuickFilter] = useState(defaultFilter);
   const [numberOfSelectedRows, setNumberOfSelectedRows] = useState(0);
 
   const gridRef = useRef<AgGridReact<ReferenceItem>>(null);

@@ -1,15 +1,17 @@
 import { VscFile, VscFilePdf, VscTrash } from 'react-icons/vsc';
 
 import { cx } from '../../../lib/cx';
-import { ReferenceItem } from '../../../types/ReferenceItem';
+import { Author, ReferenceItem } from '../../../types/ReferenceItem';
 import { ReferencesItemStatusLabel } from '../components/ReferencesItemStatusLabel';
 
 export function ReferencesList({
   references,
   onRefClicked,
+  onAuthorClicked,
 }: {
   references: ReferenceItem[];
   onRefClicked: (item: ReferenceItem, openPdf?: boolean) => void;
+  onAuthorClicked: (author: Author, item: ReferenceItem) => void;
 }) {
   const handleClickFor: (ref: ReferenceItem, openPdf: boolean) => React.MouseEventHandler = (ref, openPdf) => (e) => {
     e.preventDefault();
@@ -29,7 +31,21 @@ export function ReferencesList({
           >
             <div className="truncate whitespace-nowrap">{reference.title}</div>
             <div className="whitespace truncate text-xs">
-              {reference.authors.map(({ lastName }) => lastName).join(', ')}
+              {reference.authors.map((author, index) => (
+                <span key={author.fullName}>
+                  {index > 0 && ', '}
+                  <span
+                    className="hover:underline"
+                    onClick={(evt) => {
+                      evt.stopPropagation();
+                      evt.preventDefault();
+                      onAuthorClicked(author, reference);
+                    }}
+                  >
+                    {author.lastName}
+                  </span>
+                </span>
+              ))}
             </div>
             <div className="mt-2 flex justify-between text-xs">
               <div className="font-mono">[{reference.citationKey}]</div>

@@ -20,6 +20,7 @@ export interface JsonEditorContent {
 
 export interface ReferencesEditorContent {
   type: 'references';
+  filter?: string;
 }
 
 export interface ReferenceEditorContent {

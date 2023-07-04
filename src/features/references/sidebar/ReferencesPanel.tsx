@@ -2,19 +2,20 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import { VscDesktopDownload, VscNewFile, VscOpenPreview } from 'react-icons/vsc';
 
-import { openFilePathAtom, openReferenceAtom } from '../../../atoms/editorActions';
+import { openFilePathAtom, openReferenceAtom, openReferencesAtom } from '../../../atoms/editorActions';
 import { getReferencesAtom } from '../../../atoms/referencesState';
 import { PanelSection } from '../../../components/PanelSection';
 import { PanelWrapper } from '../../../components/PanelWrapper';
 import { emitEvent } from '../../../events';
 import { useDebouncedCallback } from '../../../hooks/useDebouncedCallback';
-import { ReferenceItem } from '../../../types/ReferenceItem';
+import { Author, ReferenceItem } from '../../../types/ReferenceItem';
 import { UploadTipInstructions } from '../components/UploadTipInstructions';
 import { ReferencesList } from './ReferencesList';
 
 export function ReferencesPanel() {
   const references = useAtomValue(getReferencesAtom);
   const openReference = useSetAtom(openReferenceAtom);
+  const openReferences = useSetAtom(openReferencesAtom);
   const openFilePath = useSetAtom(openFilePathAtom);
 
   const [visibleReferences, setVisibleReferences] = useState(references);
@@ -41,6 +42,8 @@ export function ReferencesPanel() {
       openReference(reference.id);
     }
   };
+
+  const handleAuthorClicked = (author: Author) => openReferences(author.lastName);
 
   const handleFilterChanged = (filter: string) => {
     if (filter.trim() === '') {
@@ -76,7 +79,11 @@ export function ReferencesPanel() {
       >
         <div className="min-h-[200px] ">
           <FilterInput placeholder="Filter (e.g. title, author)" onChange={handleFilterChanged} />
-          <ReferencesList references={visibleReferences} onRefClicked={handleRefClicked} />
+          <ReferencesList
+            references={visibleReferences}
+            onAuthorClicked={handleAuthorClicked}
+            onRefClicked={handleRefClicked}
+          />
 
           {references.length === 0 && (
             <div className="p-2">Welcome to your RefStudio references library. Start by uploading some PDFs.</div>

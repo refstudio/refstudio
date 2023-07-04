@@ -10,7 +10,7 @@ export interface ReferenceItem {
   authors: Author[];
 }
 
-interface Author {
+export interface Author {
   fullName: string;
   lastName: string;
 }
