@@ -1,4 +1,5 @@
 import { IconType } from 'react-icons';
+
 import { cx } from '../../../lib/cx';
 
 export function TopActionIcon({
@@ -24,7 +25,7 @@ export function TopActionIcon({
           'pointer-events-none bg-slate-100 text-slate-400': disabled,
         },
       )}
-      onClick={onClick}
+      onClick={() => !disabled && onClick && onClick()}
     >
       <Icon />
       {action}
