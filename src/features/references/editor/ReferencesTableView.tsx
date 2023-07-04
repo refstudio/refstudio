@@ -15,8 +15,8 @@ import { ReferenceItem, ReferenceItemStatus } from '../../../types/ReferenceItem
 import { ReferencesItemStatusLabel } from '../components/ReferencesItemStatusLabel';
 import { TopActionIcon } from '../components/TopActionIcon';
 import { UploadTipInstructions } from '../components/UploadTipInstructions';
-import { authorsFormatter, firstAuthorFormatter } from './formatters';
 import { loadColumnsState, resetColumnsState, saveColumnsState } from './grid/columnsState';
+import { authorsFormatter, firstAuthorFormatter } from './grid/formatters';
 
 export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: string }) {
   const references = useAtomValue(getReferencesAtom);
