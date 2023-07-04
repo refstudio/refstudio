@@ -2,12 +2,20 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import './ReferenceView.css';
 
-import { ColDef, GetRowIdParams, ICellRendererParams, NewValueParams, SelectionChangedEvent } from 'ag-grid-community';
+import {
+  ColDef,
+  ColumnApi,
+  ColumnState,
+  GetRowIdParams,
+  ICellRendererParams,
+  NewValueParams,
+  SelectionChangedEvent,
+} from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react/lib/agGridReact';
 import { useAtomValue } from 'jotai';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { IconType } from 'react-icons';
-import { VscDesktopDownload, VscNewFile, VscTrash } from 'react-icons/vsc';
+import { VscDesktopDownload, VscKebabVertical, VscNewFile, VscTable, VscTrash } from 'react-icons/vsc';
 
 import { getReferencesAtom } from '../../../atoms/referencesState';
 import { emitEvent } from '../../../events';
@@ -21,15 +29,10 @@ export function ReferencesTableView() {
   const [quickFilter, setQuickFilter] = useState('');
   const [numberOfSelectedRows, setNumberOfSelectedRows] = useState(0);
 
-  const handleTextEdit = useCallback(({ oldValue, newValue }: NewValueParams<ReferenceItem, 'string'>) => {
+  const handleTitleEdit = useCallback(({ oldValue, newValue }: NewValueParams<ReferenceItem, 'string'>) => {
     console.log('EDIT');
     console.log(`${oldValue} -> ${newValue}`);
   }, []);
-
-  const authorsFormatter = useCallback(
-    ({ value }: { value: ReferenceItem['authors'] }) => value.map((a) => a.fullName.split(' ').pop()).join(', '),
-    [],
-  );
 
   const onSelectionChanged = useCallback((event: SelectionChangedEvent) => {
     const rowCount = event.api.getSelectedNodes().length;
@@ -49,22 +52,30 @@ export function ReferencesTableView() {
       {
         field: 'citationKey',
         headerName: 'Cite Key',
-        pinned: true,
+        initialPinned: 'left',
+        initialWidth: 160,
         sortable: true,
-        width: 160,
         flex: undefined,
         checkboxSelection: true,
         headerCheckboxSelection: true,
       },
       {
         field: 'authors',
+        colId: 'first_author',
         headerName: 'First Author',
-        valueGetter: (param) => param.data?.authors[0],
-        valueFormatter: ({ value }: { value?: ReferenceItem['authors'][0] }) => value?.fullName ?? '',
+        valueFormatter: firstAuthorFormatter,
       },
-      { field: 'title', filter: true, sortable: true, flex: 1, editable: true, onCellValueChanged: handleTextEdit },
-      { field: 'abstract', flex: 2, filter: true },
-      { field: 'publishedDate', filter: true, sortable: true, width: 140, flex: undefined },
+      {
+        field: 'title',
+        filter: true,
+        sortable: true,
+        initialSort: 'asc',
+        initialFlex: 1,
+        editable: true,
+        onCellValueChanged: handleTitleEdit,
+      },
+      { field: 'abstract', flex: 2, filter: true, sortable: true },
+      { field: 'publishedDate', filter: true, sortable: true, initialWidth: 140, initialFlex: undefined },
       {
         field: 'authors',
         valueFormatter: authorsFormatter,
@@ -72,14 +83,16 @@ export function ReferencesTableView() {
       },
       {
         field: 'status',
-        width: 120,
+        initialWidth: 120,
         sortable: true,
         filter: true,
         cellRenderer: StatusCell,
       },
     ],
-    [handleTextEdit, authorsFormatter],
+    [handleTitleEdit],
   );
+
+  const gridRef = useRef<AgGridReact<ReferenceItem>>(null);
 
   return (
     <div className="flex w-full flex-col overflow-y-auto p-6">
@@ -95,12 +108,13 @@ export function ReferencesTableView() {
           value={quickFilter}
           onInput={(e) => setQuickFilter(e.currentTarget.value)}
         />
-        <div className="text-md flex gap-2">
+        <div className="text-md flex items-center gap-2">
           <TopActionItem
             action="Add"
             icon={VscNewFile}
             onClick={() => emitEvent('refstudio://menu/references/upload')}
           />
+          <VscKebabVertical />
           <TopActionItem
             action="Remove"
             disabled={numberOfSelectedRows === 0}
@@ -108,6 +122,12 @@ export function ReferencesTableView() {
             selectedCount={numberOfSelectedRows}
           />
           <TopActionItem action="Export" disabled icon={VscDesktopDownload} />
+          <VscKebabVertical />
+          <TopActionItem
+            action="Reset Cols"
+            icon={VscTable}
+            onClick={() => resetColumnsState(gridRef.current!.columnApi)}
+          />
         </div>
       </div>
 
@@ -118,13 +138,49 @@ export function ReferencesTableView() {
         defaultColDef={defaultColDef}
         getRowId={(params: GetRowIdParams<ReferenceItem>) => params.data.id}
         quickFilterText={quickFilter}
+        ref={gridRef}
         rowData={references}
         rowSelection="multiple"
         suppressRowClickSelection
+        onColumnMoved={(params) => saveColumnsState(params.columnApi, !params.finished)}
+        onColumnResized={(params) => saveColumnsState(params.columnApi, !params.finished)}
+        onColumnValueChanged={(params) => saveColumnsState(params.columnApi)}
+        onGridReady={(params) => loadColumnsState(params.columnApi)}
         onSelectionChanged={onSelectionChanged}
+        onSortChanged={(params) => saveColumnsState(params.columnApi)}
       />
     </div>
   );
+}
+
+const COLUMNS_STATE_STORAGE_KEY = 'referencesTableView.cols';
+function loadColumnsState(columnApi: ColumnApi) {
+  const cols = localStorage.getItem(COLUMNS_STATE_STORAGE_KEY);
+  if (cols) {
+    const state = JSON.parse(cols) as ColumnState[];
+    columnApi.applyColumnState({ state, applyOrder: true });
+  }
+}
+
+function saveColumnsState(columnApi: ColumnApi, ignoreSave = false) {
+  if (!ignoreSave) {
+    const cols = columnApi.getColumnState();
+    localStorage.setItem(COLUMNS_STATE_STORAGE_KEY, JSON.stringify(cols));
+  }
+}
+
+function resetColumnsState(columnApi: ColumnApi) {
+  columnApi.resetColumnState();
+  localStorage.removeItem(COLUMNS_STATE_STORAGE_KEY);
+}
+
+function firstAuthorFormatter({ value }: { value: ReferenceItem['authors'] }) {
+  const [author = undefined] = value;
+  return author?.fullName ?? '';
+}
+
+function authorsFormatter({ value }: { value: ReferenceItem['authors'] }) {
+  return value.map((a) => a.fullName.split(' ').pop()).join(', ');
 }
 
 function StatusCell({ value }: ICellRendererParams<ReferenceItem, ReferenceItemStatus>) {
