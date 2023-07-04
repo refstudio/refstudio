@@ -2,10 +2,9 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback } from 'react';
 import { VscCloseAll, VscSplitHorizontal } from 'react-icons/vsc';
 
-import { fileExplorerEntriesAtom } from '../../atoms/core/fileExplorerEntry';
 import { closeAllEditorsAtom, moveEditorToPaneAtom, selectEditorInPaneAtom } from '../../atoms/editorActions';
 import { openFilePathAtom } from '../../atoms/fileEntryActions';
-import { refreshFileTreeAtom } from '../../atoms/fileExplorerActions';
+import { fileExplorerAtom, refreshFileTreeAtom } from '../../atoms/fileExplorerActions';
 import { leftPaneAtom, rightPaneAtom } from '../../atoms/paneActions';
 import { EditorId, parseEditorId } from '../../atoms/types/EditorData';
 import { PaneId } from '../../atoms/types/PaneGroup';
@@ -19,7 +18,7 @@ import { isNonNullish } from '../../lib/isNonNullish';
 export function ExplorerPanel() {
   const left = useAtomValue(leftPaneAtom);
   const right = useAtomValue(rightPaneAtom);
-  const rootFileExplorerEntry = useAtomValue(fileExplorerEntriesAtom);
+  const rootFileExplorerEntry = useAtomValue(fileExplorerAtom);
 
   const selectFileInPane = useSetAtom(selectEditorInPaneAtom);
   const openFile = useSetAtom(openFilePathAtom);

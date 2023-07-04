@@ -63,7 +63,7 @@ export function makeFileExplorerFolderEntry(
       name,
       path: folderPath,
       createFileAtom: atom(null, createFileMock),
-      children: atom(children, updateChildrenMock),
+      childrenAtom: atom(children, updateChildrenMock),
       collapsedAtom: atom(
         (get) => get(collapsedAtom),
         (get, set) => set(collapsedAtom, !get(collapsedAtom)),

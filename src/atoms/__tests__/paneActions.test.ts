@@ -16,7 +16,7 @@ import { runGetAtomHook, runSetAtomHook } from './test-utils';
 
 vi.mock('../../io/filesystem');
 
-describe('fileActions', () => {
+describe('paneActions', () => {
   let store: ReturnType<typeof createStore>;
   let fileEntry: FileFileEntry;
   let editorData: EditorData;

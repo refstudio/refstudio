@@ -21,7 +21,7 @@ import { runGetAtomHook, runSetAtomHook } from './test-utils';
 
 vi.mock('../../io/filesystem');
 
-describe('fileActions', () => {
+describe('editorActions', () => {
   afterEach(() => {
     vi.clearAllMocks();
   });

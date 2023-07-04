@@ -14,7 +14,7 @@ interface FileEntryTreeProps {
 
 export function FileEntryTree(props: FileEntryTreeProps) {
   const { fileExplorerEntry, onFileClick, selectedFiles, paddingLeft = '0' } = props;
-  const files = useAtomValue(fileExplorerEntry.children);
+  const files = useAtomValue(fileExplorerEntry.childrenAtom);
 
   const [collapsed, toggleCollapsed] = useAtom(fileExplorerEntry.collapsedAtom);
 

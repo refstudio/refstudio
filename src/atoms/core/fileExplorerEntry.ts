@@ -8,13 +8,25 @@ import {
   RootFileExplorerEntry,
 } from '../types/FileExplorerEntry';
 
-export const fileExplorerEntriesAtom = atom<RootFileExplorerEntry>(createFileExplorerFolderEntry([], 'root', true));
+export const fileExplorerEntriesAtom = atom<RootFileExplorerEntry>(
+  createFileExplorerFolderEntry([], 'root', 'root', true),
+);
 
-function createFileExplorerFolderEntry(files: FileEntry[], folderName: 'root', root: true): RootFileExplorerEntry;
-function createFileExplorerFolderEntry(files: FileEntry[], folderName: string): FileExplorerFolderEntry;
+function createFileExplorerFolderEntry(
+  files: FileEntry[],
+  folderName: 'root',
+  entryPath: 'root',
+  root: true,
+): RootFileExplorerEntry;
 function createFileExplorerFolderEntry(
   files: FileEntry[],
   folderName: string,
+  entryPath: string,
+): FileExplorerFolderEntry;
+function createFileExplorerFolderEntry(
+  files: FileEntry[],
+  folderName: string,
+  entryPath: string,
   root?: boolean,
 ): FileExplorerFolderEntry {
   const filesAtom = atom<FileExplorerEntry[]>(files.filter((file) => !file.isDotfile).map(createFileExplorerEntry));
@@ -22,11 +34,8 @@ function createFileExplorerFolderEntry(
   return {
     isFolder: true,
     root,
-    path: 'root',
-    children: atom(
-      (get) => get(filesAtom),
-      (get, set, updatedFiles: FileEntry[]) => updateFolderChildren(get, set, updatedFiles, filesAtom),
-    ),
+    path: entryPath,
+    childrenAtom: atom((get) => get(filesAtom), updateFolderChildren(filesAtom)),
     createFileAtom: atom(null, (get, set, file: FileExplorerFileEntry) => {
       const currentFiles = get(filesAtom);
       set(filesAtom, [...currentFiles, file]);
@@ -49,47 +58,44 @@ function createFileExplorerEntry(file: FileEntry): FileExplorerEntry {
       path: file.path,
     };
   } else {
-    return createFileExplorerFolderEntry(file.children, file.name);
+    return createFileExplorerFolderEntry(file.children, file.name, file.path);
   }
 }
 
-function updateFolderChildren(
-  get: Getter,
-  set: Setter,
-  updatedFiles: FileEntry[],
-  filesAtom: PrimitiveAtom<FileExplorerEntry[]>,
-) {
-  const currentFiles = get(filesAtom);
-  const updatedFileFileEntries = updatedFiles.filter((f) => !f.isDotfile).filter((f) => !f.isFolder);
+function updateFolderChildren(filesAtom: PrimitiveAtom<FileExplorerEntry[]>) {
+  return (get: Getter, set: Setter, updatedFiles: FileEntry[]) => {
+    const currentFiles = get(filesAtom);
+    const updatedFileFileEntries = updatedFiles.filter((f) => !f.isDotfile).filter((f) => !f.isFolder);
 
-  // Update children files
-  const updatedFileEntries = updatedFileFileEntries.map(createFileExplorerEntry);
+    // Update children files
+    const updatedFileEntries = updatedFileFileEntries.map(createFileExplorerEntry);
 
-  // Create a dict of children folders { [folderPath]: folder }
-  const folders = Object.assign(
-    {},
-    ...updatedFiles
-      .filter((f) => !f.isDotfile)
-      .filter((f): f is FolderFileEntry => f.isFolder)
-      .map((f) => ({ [f.path]: f })),
-  ) as Record<string, FolderFileEntry>;
+    // Create a dict of children folders { [folderPath]: folder }
+    const folders = Object.assign(
+      {},
+      ...updatedFiles
+        .filter((f) => !f.isDotfile)
+        .filter((f): f is FolderFileEntry => f.isFolder)
+        .map((f) => ({ [f.path]: f })),
+    ) as Record<string, FolderFileEntry>;
 
-  const updatedFolderEntries = currentFiles
-    .filter((f): f is FileExplorerFolderEntry => f.isFolder)
-    .filter((f) => f.path in folders);
+    const updatedFolderEntries = currentFiles
+      .filter((f): f is FileExplorerFolderEntry => f.isFolder)
+      .filter((f) => f.path in folders);
 
-  // Recursively update children
-  updatedFolderEntries.forEach((folderEntry) => {
-    set(folderEntry.children, folders[folderEntry.path].children);
-  });
+    // Recursively update children
+    updatedFolderEntries.forEach((folderEntry) => {
+      set(folderEntry.childrenAtom, folders[folderEntry.path].children);
+    });
 
-  // Create entries for the new folders
-  const currentFolderNames = new Set(currentFiles.filter((f) => f.isFolder).map((f) => f.path));
-  const newFolderPaths = Object.keys(folders).filter((path) => !currentFolderNames.has(path));
+    // Create entries for the new folders
+    const currentFolderNames = new Set(currentFiles.filter((f) => f.isFolder).map((f) => f.path));
+    const newFolderPaths = Object.keys(folders).filter((path) => !currentFolderNames.has(path));
 
-  newFolderPaths.forEach((path) => {
-    updatedFolderEntries.push(createFileExplorerFolderEntry(folders[path].children, folders[path].name));
-  });
+    newFolderPaths.forEach((path) => {
+      updatedFolderEntries.push(createFileExplorerFolderEntry(folders[path].children, folders[path].name, path));
+    });
 
-  set(filesAtom, [...updatedFolderEntries, ...updatedFileEntries]);
+    set(filesAtom, [...updatedFolderEntries, ...updatedFileEntries]);
+  };
 }
