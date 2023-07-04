@@ -5,8 +5,6 @@ import { FileEntry } from './FileEntry';
 interface FileExplorerEntryBase {
   name: string;
   path: string;
-  // renameAtom
-  // deleteAtom
 }
 
 export interface FileExplorerFileEntry extends FileExplorerEntryBase {

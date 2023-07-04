@@ -1,3 +1,5 @@
+import 'react-contexify/dist/ReactContexify.css';
+
 import React, { useCallback, useEffect, useState } from 'react';
 import { VscChevronUp } from 'react-icons/vsc';
 import { ImperativePanelHandle, Panel, PanelGroup } from 'react-resizable-panels';
@@ -16,6 +18,7 @@ import { ApplicationFrame } from '../wrappers/ApplicationFrame';
 import { EventsListener } from '../wrappers/EventsListener';
 import { MainPanel } from './components/MainPanel';
 import { ExplorerPanel } from './sidebar/ExplorerPanel';
+import { FileExplorerContextMenus } from './sidebar/fileExplorerContextMenu/FileExplorerContextMenus';
 
 function App() {
   useEffectOnce(() => void ensureProjectFileStructure());
@@ -41,6 +44,7 @@ function App() {
             </Panel>
             <RightPanelWrapper />
           </PanelGroup>
+          <FileExplorerContextMenus />
         </ApplicationFrame>
         <SettingsModalOpener />
       </ReferencesDropZone>

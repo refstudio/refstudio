@@ -17,6 +17,7 @@ export function EditorsList({ editors, onClick, paddingLeft = '0', rightAction, 
       {editors.map((editor) => (
         <FileNode
           VscIcon={VscFile}
+          fileId={editor.id}
           fileName={editor.title}
           key={editor.id}
           paddingLeft={paddingLeft}

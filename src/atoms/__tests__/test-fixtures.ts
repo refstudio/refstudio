@@ -1,7 +1,7 @@
 import { atom } from 'jotai';
 import { Mock } from 'vitest';
 
-import { buildEditorId, EditorData } from '../types/EditorData';
+import { buildEditorIdFromPath, EditorData } from '../types/EditorData';
 import { FileEntry, FileFileEntry, FolderFileEntry } from '../types/FileEntry';
 import { FileExplorerEntry, FileExplorerFileEntry, FileExplorerFolderEntry } from '../types/FileExplorerEntry';
 
@@ -17,7 +17,7 @@ export function makeFileAndEditor(name: string): { fileEntry: FileFileEntry; edi
       isFile: true,
     },
     editorData: {
-      id: buildEditorId('text', filePath),
+      id: buildEditorIdFromPath(filePath),
       title: name,
     },
   };

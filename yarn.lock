@@ -6396,6 +6396,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-contexify@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "react-contexify@npm:6.0.0"
+  dependencies:
+    clsx: ^1.2.1
+  peerDependencies:
+    react: ">=16"
+    react-dom: ">=16"
+  checksum: 242cfc88521b8847650d36ca6485f654101c472aeb910c97e166ff718a9b1df8def9b6e6e1a83c5566836b2a0d73d74ff29d5ee4dd097c88766190b2550c39f3
+  languageName: node
+  linkType: hard
+
 "react-dom@npm:^18.2.0":
   version: 18.2.0
   resolution: "react-dom@npm:18.2.0"
@@ -6620,6 +6632,7 @@ __metadata:
     prettier: ^2.8.8
     prettier-plugin-tailwindcss: ^0.3.0
     react: ^18.2.0
+    react-contexify: ^6.0.0
     react-dom: ^18.2.0
     react-icons: ^4.8.0
     react-pdf: ^6.2.2

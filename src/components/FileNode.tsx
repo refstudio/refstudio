@@ -1,5 +1,6 @@
 import { IconType } from 'react-icons';
 
+import { useFileExplorerContextMenu } from '../application/sidebar/fileExplorerContextMenu/useFileExplorerContextMenu';
 import { cx } from '../lib/cx';
 
 export interface RightAction {
@@ -10,6 +11,8 @@ export interface RightAction {
 
 interface FileNodeProps {
   bold?: boolean;
+  contextMenuId?: string;
+  fileId: string;
   fileName: string;
   onClick: () => void;
   paddingLeft: string;
@@ -18,7 +21,18 @@ interface FileNodeProps {
   VscIcon: IconType;
 }
 
-export function FileNode({ bold, fileName, onClick, paddingLeft, rightAction, selected, VscIcon }: FileNodeProps) {
+export function FileNode({
+  bold,
+  contextMenuId = '',
+  fileName,
+  fileId,
+  onClick,
+  paddingLeft,
+  rightAction,
+  selected,
+  VscIcon,
+}: FileNodeProps) {
+  const show = useFileExplorerContextMenu(contextMenuId, { id: fileId });
   return (
     <div
       className={cx('cursor-pointer select-none', 'flex flex-row items-center gap-1 py-1', 'group', {
@@ -27,6 +41,7 @@ export function FileNode({ bold, fileName, onClick, paddingLeft, rightAction, se
       })}
       style={{ paddingLeft }}
       onClick={onClick}
+      onContextMenu={show}
     >
       <div className="flex h-full w-full items-center gap-1">
         <VscIcon />

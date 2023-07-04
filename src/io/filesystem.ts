@@ -6,6 +6,7 @@ import {
   readBinaryFile,
   readDir,
   readTextFile,
+  removeFile,
   writeBinaryFile,
   writeTextFile,
 } from '@tauri-apps/api/fs';
@@ -170,4 +171,14 @@ function sortedFileEntries(entries: FileEntry[]): FileEntry[] {
         };
       }
     });
+}
+
+export async function deleteFile(filePath: string): Promise<boolean> {
+  try {
+    await removeFile(filePath);
+    return true;
+  } catch (err) {
+    console.error('Error', err);
+    return false;
+  }
 }

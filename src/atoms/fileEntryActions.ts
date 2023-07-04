@@ -1,13 +1,14 @@
 import { exists } from '@tauri-apps/api/fs';
 import { atom } from 'jotai';
 
-import { getBaseDir } from '../io/filesystem';
+import { deleteFile, getBaseDir } from '../io/filesystem';
 import { editorsContentStateAtom, loadEditorContent, loadFileEntry } from './core/editorContent';
 import { addEditorData, editorsDataAtom, setEditorDataIsDirtyAtom } from './core/editorData';
 import { addEditorToPane, selectEditorInPaneAtom } from './core/paneGroup';
-import { targetPaneIdFor } from './editorActions';
-import { buildEditorId } from './types/EditorData';
-import { FileEntry, FileFileEntry } from './types/FileEntry';
+import { closeEditorFromAllPanesAtom, targetPaneIdFor } from './editorActions';
+import { getFileExplorerEntryFromPathAtom, refreshFileTreeAtom } from './fileExplorerActions';
+import { buildEditorIdFromPath } from './types/EditorData';
+import { FileEntry, getFileFileEntryFromPath } from './types/FileEntry';
 import { PaneId } from './types/PaneGroup';
 
 /** Open a file in a pane (depending on the file extension) */
@@ -17,7 +18,7 @@ export const openFileEntryAtom = atom(null, (get, set, file: FileEntry) => {
     return;
   }
 
-  const editorId = buildEditorId('text', file.path);
+  const editorId = buildEditorIdFromPath(file.path);
   // Load file in memory
   const currentOpenEditors = get(editorsContentStateAtom);
   if (!currentOpenEditors.has(editorId)) {
@@ -36,14 +37,7 @@ export const openFileEntryAtom = atom(null, (get, set, file: FileEntry) => {
 });
 
 export const openFilePathAtom = atom(null, (get, set, filePath: string) => {
-  const fileEntry: FileFileEntry = {
-    path: filePath,
-    name: filePath.split('/').pop() ?? '',
-    fileExtension: filePath.split('.').pop() ?? '',
-    isDotfile: false,
-    isFile: true,
-    isFolder: false,
-  };
+  const fileEntry = getFileFileEntryFromPath(filePath);
   set(openFileEntryAtom, fileEntry);
 });
 
@@ -52,7 +46,7 @@ export const createFileAtom = atom(null, async (get, set) => {
   const openEditorNames = [...get(editorsDataAtom).values()].map(({ title }) => title);
   const fileName = await generateFileName(openEditorNames);
   const filePath = `${await getBaseDir()}/${fileName}`;
-  const editorId = buildEditorId('text', filePath);
+  const editorId = buildEditorIdFromPath(filePath);
 
   // Load editor in memory
   set(loadEditorContent, { editorId, editorContent: { type: 'text', textContent: '<p></p>' } });
@@ -81,3 +75,28 @@ async function generateFileName(openEditorNames: string[]) {
 async function isValidName(name: string, openEditorNames: string[]) {
   return !openEditorNames.includes(name) && !(await exists(`${await getBaseDir()}/${name}`));
 }
+
+export const deleteFileAtom = atom(null, async (get, set, filePath: string) => {
+  const fileExplorerEntry = get(getFileExplorerEntryFromPathAtom(filePath));
+
+  if (!fileExplorerEntry) {
+    throw new Error(`File or folder does not exist: ${filePath}`);
+  }
+
+  if (fileExplorerEntry.isFolder) {
+    throw new Error(`Delete folders is not supported: ${filePath}`);
+  }
+
+  // Remove file from disk
+  const success = await deleteFile(filePath);
+  if (!success) {
+    return;
+  }
+
+  // Remove file from open editors
+  const editorId = buildEditorIdFromPath(filePath);
+  set(closeEditorFromAllPanesAtom, editorId);
+
+  // Refresh file explorer
+  await set(refreshFileTreeAtom);
+});
