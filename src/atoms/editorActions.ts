@@ -61,7 +61,7 @@ export const openReferenceAtom = atom(null, (get, set, referenceId: string) => {
   // Load editor in memory
   const currentOpenEditors = get(editorsContentStateAtom);
   if (!currentOpenEditors.has(editorId)) {
-    set(loadEditorContent, { editorId, editorContent: { type: 'reference', referenceId } });
+    set(loadEditorContent, { editorId, editorContent: { type: 'reference', referenceId: editorId } });
   }
 
   // Add to editor entries atom

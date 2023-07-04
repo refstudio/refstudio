@@ -5,7 +5,7 @@ import './ReferenceView.css';
 import { ColDef, GetRowIdParams, ICellRendererParams, NewValueParams, SelectionChangedEvent } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react/lib/agGridReact';
 import { useAtomValue } from 'jotai';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { VscDesktopDownload, VscKebabVertical, VscNewFile, VscTable, VscTrash } from 'react-icons/vsc';
 
 import { getReferencesAtom } from '../../../atoms/referencesState';
@@ -21,6 +21,9 @@ import { authorsFormatter, firstAuthorFormatter } from './grid/formatters';
 export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: string }) {
   const references = useAtomValue(getReferencesAtom);
   const [quickFilter, setQuickFilter] = useState(defaultFilter);
+
+  useEffect(() => setQuickFilter(defaultFilter), [defaultFilter]);
+
   const [numberOfSelectedRows, setNumberOfSelectedRows] = useState(0);
 
   const gridRef = useRef<AgGridReact<ReferenceItem>>(null);
@@ -95,6 +98,7 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
       <div className="relative mb-4 flex items-center justify-between gap-10">
         <input
           className="grow border border-slate-400 bg-slate-50 px-4 py-1 outline-none"
+          data-testid="filter-text-box"
           id="filter-text-box"
           placeholder="Search within references..."
           ref={autoFocusAndSelect}
@@ -120,7 +124,7 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
           <TopActionIcon
             action="Reset Cols"
             icon={VscTable}
-            onClick={() => resetColumnsState(gridRef.current!.columnApi)}
+            onClick={() => resetColumnsState(() => gridRef.current!.columnApi.resetColumnState())}
           />
         </div>
       </div>
@@ -136,12 +140,14 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
         rowData={references}
         rowSelection="multiple"
         suppressRowClickSelection
-        onColumnMoved={(params) => saveColumnsState(params.columnApi, !params.finished)}
-        onColumnResized={(params) => saveColumnsState(params.columnApi, !params.finished)}
-        onColumnValueChanged={(params) => saveColumnsState(params.columnApi)}
-        onGridReady={(params) => loadColumnsState(params.columnApi)}
+        onColumnMoved={(params) => saveColumnsState(() => params.columnApi.getColumnState(), !params.finished)}
+        onColumnResized={(params) => saveColumnsState(() => params.columnApi.getColumnState(), !params.finished)}
+        onColumnValueChanged={(params) => saveColumnsState(() => params.columnApi.getColumnState())}
+        onGridReady={(params) =>
+          loadColumnsState((cols) => params.columnApi.applyColumnState({ state: cols, applyOrder: true }))
+        }
         onSelectionChanged={onSelectionChanged}
-        onSortChanged={(params) => saveColumnsState(params.columnApi)}
+        onSortChanged={(params) => saveColumnsState(() => params.columnApi.getColumnState())}
       />
     </div>
   );

@@ -27,6 +27,7 @@ export function ReferencesList({
             className="group/ref-item relative cursor-pointer bg-white p-1 px-4 even:bg-slate-50 hover:bg-slate-200"
             key={reference.id}
             role="listitem"
+            title={reference.title}
             onClick={handleClickFor(reference, false)}
           >
             <div className="truncate whitespace-nowrap">{reference.title}</div>

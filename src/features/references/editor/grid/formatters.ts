@@ -1,4 +1,4 @@
-import { ReferenceItem } from '../../../types/ReferenceItem';
+import { ReferenceItem } from '../../../../types/ReferenceItem';
 
 export function firstAuthorFormatter({ value }: { value: ReferenceItem['authors'] }) {
   const [author = undefined] = value;
