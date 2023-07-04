@@ -5,7 +5,6 @@ import { FileEntry } from './FileEntry';
 interface FileExplorerEntryBase {
   name: string;
   path: string;
-  isTemporary?: boolean;
   // renameAtom
   // deleteAtom
 }
