@@ -3,8 +3,6 @@ import { VscAdd } from 'react-icons/vsc';
 import { screen, setupWithJotaiProvider } from '../../../../test/test-utils';
 import { TopActionIcon } from '../TopActionIcon';
 
-vi.mock('../../../../events');
-
 describe('TopActionIcon', () => {
   it('should display action text', () => {
     setupWithJotaiProvider(<TopActionIcon action="ACTION" icon={VscAdd} />);
