@@ -64,7 +64,8 @@ describe('fileExplorerActions', () => {
 
   it('should update file tree, but keep collapsed/uncollapsed states', async () => {
     const { fileEntry: nestedFile1 } = makeFile('Nested File 1.pdf');
-    const rootFolder1 = makeFolder('Root folder 1', [nestedFile1]);
+    const nestedFolder = makeFolder('Nested folder', []);
+    const rootFolder1 = makeFolder('Root folder 1', [nestedFolder, nestedFile1]);
     const { fileEntry: nestedFile2 } = makeFile('Nested File 2.pdf');
     const rootFolder2 = makeFolder('Root folder 2', [nestedFile2]);
     const { fileEntry: nestedFile3 } = makeFile('Nested File 3.pdf');
@@ -88,6 +89,7 @@ describe('fileExplorerActions', () => {
     expect(stringifyFileExplorerState(fileExplorer, store)).toMatchInlineSnapshot(`
       "
       v Root folder 1
+        > Nested folder (0)
         Nested File 1.pdf
       > Root folder 2 (1)
       > Root folder 3 (1)
@@ -100,6 +102,7 @@ describe('fileExplorerActions', () => {
     expect(stringifyFileExplorerState(fileExplorer, store)).toMatchInlineSnapshot(`
       "
       v Root folder 1
+        > Nested folder (0)
         Nested File 1.pdf
       > Root folder 2 (1)
       > Root folder 4 (1)
