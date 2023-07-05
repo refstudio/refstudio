@@ -95,7 +95,7 @@ jobs:
       - name: Setup Python
         uses: ./.github/actions/setup-python
       - name: PyTest
-        run: poetry run pytest python/tests --cov=python --cov-report=xml
+        run: poetry run pytest python/tests --cov=python --cov-report=xml:python/coverage.xml
       - name: Upload python coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
