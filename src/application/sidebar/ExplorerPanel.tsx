@@ -13,7 +13,7 @@ import { PanelSection } from '../../components/PanelSection';
 import { PanelWrapper } from '../../components/PanelWrapper';
 import { useAsyncEffect } from '../../hooks/useAsyncEffect';
 import { isNonNullish } from '../../lib/isNonNullish';
-import { FileEntryTree } from './FileExplorer';
+import { FileExplorer } from './FileExplorer';
 
 export function ExplorerPanel() {
   const left = useAtomValue(leftPaneAtom);
@@ -75,7 +75,7 @@ export function ExplorerPanel() {
         )}
       </PanelSection>
       <PanelSection grow title="Project X">
-        <FileEntryTree
+        <FileExplorer
           fileExplorerEntry={rootFileExplorerEntry}
           paddingLeft="1.25rem"
           selectedFiles={[left.activeEditor?.id, right.activeEditor?.id]

@@ -1,8 +1,10 @@
 import { atom } from 'jotai';
 
+import { UPLOADS_DIR } from '../io/filesystem';
 import { editorsContentStateAtom, loadEditorContent, unloadEditorContent } from './core/editorContent';
 import { addEditorData, removeEditorData } from './core/editorData';
 import { addEditorToPane, paneGroupAtom, removeEditorFromPane, selectEditorInPaneAtom } from './core/paneGroup';
+import { openFilePathAtom } from './fileEntryActions';
 import { getDerivedReferenceAtom } from './referencesState';
 import { buildEditorId, EditorId } from './types/EditorData';
 import { FileFileEntry } from './types/FileEntry';
@@ -54,6 +56,18 @@ export const openReferencesAtom = atom(null, (_get, set, filter?: string) => {
 
   // Select editor in pane
   set(selectEditorInPaneAtom, { editorId, paneId });
+});
+
+/** Open the PDF file corresponding to the given reference */
+export const openReferencePdfAtom = atom(null, (get, set, referenceId: string) => {
+  const reference = get(getDerivedReferenceAtom(referenceId));
+
+  if (!reference) {
+    console.warn('Cannot open PDF file for a reference that does not exist: ', referenceId);
+    return;
+  }
+
+  set(openFilePathAtom, `/${UPLOADS_DIR}/${reference.filename}`);
 });
 
 /** Removes editor from the given pane and unload content from memory if the editor is not open in another pane */
