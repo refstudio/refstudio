@@ -9,11 +9,11 @@ import { leftPaneAtom, rightPaneAtom } from '../../atoms/paneActions';
 import { EditorId, parseEditorId } from '../../atoms/types/EditorData';
 import { PaneId } from '../../atoms/types/PaneGroup';
 import { EditorsList } from '../../components/EditorsList';
-import { FileEntryTree } from '../../components/FileEntryTree';
 import { PanelSection } from '../../components/PanelSection';
 import { PanelWrapper } from '../../components/PanelWrapper';
 import { useAsyncEffect } from '../../hooks/useAsyncEffect';
 import { isNonNullish } from '../../lib/isNonNullish';
+import { FileEntryTree } from './FileExplorer';
 
 export function ExplorerPanel() {
   const left = useAtomValue(leftPaneAtom);
@@ -27,13 +27,6 @@ export function ExplorerPanel() {
   const refreshFileTree = useSetAtom(refreshFileTreeAtom);
 
   useAsyncEffect(refreshFileTree);
-
-  const handleOpenFile = useCallback(
-    (filePath: string) => {
-      openFile(filePath);
-    },
-    [openFile],
-  );
 
   const handleMoveEditor = useCallback(
     ({ editorId, fromPaneId, toPaneId }: { editorId: EditorId; fromPaneId: PaneId; toPaneId: PaneId }) =>
@@ -88,7 +81,7 @@ export function ExplorerPanel() {
           selectedFiles={[left.activeEditor?.id, right.activeEditor?.id]
             .filter(isNonNullish)
             .map((editorId) => parseEditorId(editorId).id)}
-          onFileClick={handleOpenFile}
+          onFileClick={openFile}
         />
       </PanelSection>
     </PanelWrapper>

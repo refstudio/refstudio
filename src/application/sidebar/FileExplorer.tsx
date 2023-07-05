@@ -2,8 +2,8 @@ import { useAtom, useAtomValue } from 'jotai';
 import { useMemo } from 'react';
 import { VscChevronDown, VscChevronRight, VscFile } from 'react-icons/vsc';
 
-import { FileExplorerEntry, FileExplorerFileEntry, FileExplorerFolderEntry } from '../atoms/types/FileExplorerEntry';
-import { FileNode } from './FileNode';
+import { FileExplorerEntry, FileExplorerFileEntry, FileExplorerFolderEntry } from '../../atoms/types/FileExplorerEntry';
+import { FileNode } from '../../components/FileNode';
 
 interface FileEntryTreeProps {
   fileExplorerEntry: FileExplorerFolderEntry;
@@ -16,7 +16,7 @@ export function FileEntryTree(props: FileEntryTreeProps) {
   const { fileExplorerEntry, onFileClick, selectedFiles, paddingLeft = '0' } = props;
   const files = useAtomValue(fileExplorerEntry.childrenAtom);
 
-  const [collapsed, toggleCollapsed] = useAtom(fileExplorerEntry.collapsedAtom);
+  const [collapsed, setCollapsed] = useAtom(fileExplorerEntry.collapsedAtom);
 
   const folderEntries = useMemo(
     () =>
@@ -42,7 +42,7 @@ export function FileEntryTree(props: FileEntryTreeProps) {
           bold
           fileName={fileExplorerEntry.name}
           paddingLeft={`calc(${paddingLeft} - 1rem)`}
-          onClick={toggleCollapsed}
+          onClick={() => setCollapsed(!collapsed)}
         />
       )}
       {(root || !collapsed) && (

@@ -53,7 +53,6 @@ export function makeFileExplorerFolderEntry(
   const createFileMock = vi.fn();
   const updateChildrenMock = vi.fn();
 
-  const collapsedAtom = atom(true);
   return {
     createFileMock,
     updateChildrenMock,
@@ -64,10 +63,7 @@ export function makeFileExplorerFolderEntry(
       path: folderPath,
       createFileAtom: atom(null, createFileMock),
       childrenAtom: atom(children, updateChildrenMock),
-      collapsedAtom: atom(
-        (get) => get(collapsedAtom),
-        (get, set) => set(collapsedAtom, !get(collapsedAtom)),
-      ),
+      collapsedAtom: atom(true),
     } as const,
   };
 }

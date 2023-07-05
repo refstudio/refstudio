@@ -32,7 +32,7 @@ impl AppMenu {
             Menu::new()
                 .add_item(CustomMenuItem::new(MENU_FILE_SAVE, "Save").accelerator("cmdOrControl+S"))
                 .add_item(
-                    CustomMenuItem::new(MENU_FILE_NEW, "New File").accelerator("cmdOrControl + N"),
+                    CustomMenuItem::new(MENU_FILE_NEW, "New File").accelerator("cmdOrControl+N"),
                 )
                 .add_item(
                     CustomMenuItem::new(MENU_FILE_CLOSE, "Close Editor")

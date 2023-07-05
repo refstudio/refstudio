@@ -35,11 +35,8 @@ describe('fileEntryActions', () => {
     expect(paneContent.activeEditor!.id).toMatchInlineSnapshot('"refstudio://text//baseDir/Untitled-1"');
   });
 
-  it('should create a with the first available name', async () => {
-    vi.mocked(exists).mockImplementation((path) => {
-      console.log('test');
-      return Promise.resolve(path === '/baseDir/Untitled-1');
-    });
+  it('should create a file with the first available name', async () => {
+    vi.mocked(exists).mockImplementation((path) => Promise.resolve(path === '/baseDir/Untitled-1'));
     const createFile = runSetAtomHook(createFileAtom, store);
 
     await act(async () => {

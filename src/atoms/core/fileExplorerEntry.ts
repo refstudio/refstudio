@@ -30,7 +30,6 @@ function createFileExplorerFolderEntry(
   root?: boolean,
 ): FileExplorerFolderEntry {
   const filesAtom = atom<FileExplorerEntry[]>(files.filter((file) => !file.isDotfile).map(createFileExplorerEntry));
-  const collapsedAtom = atom(true);
   return {
     isFolder: true,
     root,
@@ -40,12 +39,7 @@ function createFileExplorerFolderEntry(
       const currentFiles = get(filesAtom);
       set(filesAtom, [...currentFiles, file]);
     }),
-    collapsedAtom: atom(
-      (get) => get(collapsedAtom),
-      (get, set) => {
-        set(collapsedAtom, !get(collapsedAtom));
-      },
-    ),
+    collapsedAtom: atom(true),
     name: folderName,
   };
 }

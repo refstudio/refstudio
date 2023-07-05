@@ -1,10 +1,10 @@
-import { makeFileExplorerFileEntry, makeFileExplorerFolderEntry } from '../../atoms/__tests__/test-fixtures';
-import { FileExplorerFileEntry, FileExplorerFolderEntry } from '../../atoms/types/FileExplorerEntry';
-import { noop } from '../../lib/noop';
-import { act, render, screen, setup } from '../../test/test-utils';
-import { FileEntryTree } from '../FileEntryTree';
+import { makeFileExplorerFileEntry, makeFileExplorerFolderEntry } from '../../../atoms/__tests__/test-fixtures';
+import { FileExplorerFileEntry, FileExplorerFolderEntry } from '../../../atoms/types/FileExplorerEntry';
+import { noop } from '../../../lib/noop';
+import { act, render, screen, setup } from '../../../test/test-utils';
+import { FileEntryTree } from '../FileExplorer';
 
-describe('FileEntryTree component', () => {
+describe('FileExplorer', () => {
   let fileEntry: FileExplorerFileEntry;
   let folderEntry: FileExplorerFolderEntry;
   beforeEach(() => {

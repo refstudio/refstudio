@@ -51,7 +51,7 @@ describe('fileExplorerActions', () => {
     expect(folder.isFolder).toBe(true);
 
     const toggleCollapsed = runSetAtomHook(folder.collapsedAtom, store);
-    act(() => toggleCollapsed.current());
+    act(() => toggleCollapsed.current(false));
 
     expect(stringifyFileExplorerState(fileExplorer, store)).toMatchInlineSnapshot(`
       "
@@ -84,8 +84,8 @@ describe('fileExplorerActions', () => {
 
     expect(folder.isFolder).toBe(true);
 
-    const toggleCollapsed = runSetAtomHook(folder.collapsedAtom, store);
-    act(() => toggleCollapsed.current());
+    const setCollapsed = runSetAtomHook(folder.collapsedAtom, store);
+    act(() => setCollapsed.current(false));
     expect(stringifyFileExplorerState(fileExplorer, store)).toMatchInlineSnapshot(`
       "
       v Root folder 1
