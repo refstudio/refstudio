@@ -1,5 +1,4 @@
 import json
-import logging
 import os
 import shutil
 import sys
@@ -12,28 +11,12 @@ from grobid_client.grobid_client import (GrobidClient,
                                          ServerUnavailableException)
 from sidecar import shared, typing
 
-from .settings import REFERENCES_JSON_PATH, UPLOADS_DIR
-from .shared import HiddenPrints, chunk_text
+from .settings import REFERENCES_JSON_PATH, UPLOADS_DIR, logger
 from .storage import JsonStorage
 from .typing import Author, IngestResponse, Reference
 
 load_dotenv()
-
-logging.root.setLevel(logging.NOTSET)
-
-logger = logging.getLogger(__name__)
-handler = logging.FileHandler(
-    os.path.join(
-        os.environ.get("SIDECAR_LOG_DIR", "/tmp"), "refstudio-sidecar.log"
-    )
-)
-handler.setLevel(logging.INFO)
-
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-handler.setFormatter(formatter)
-
-logger.addHandler(handler)
-logger.disabled = os.environ.get("SIDECAR_ENABLE_LOGGING", "false").lower() == "true"
+logger = logger.getChild(__name__)
 
 GROBID_SERVER_URL = "https://kermitt2-grobid.hf.space"
 
@@ -49,6 +32,11 @@ def get_statuses():
     status_fetcher = IngestStatusFetcher(storage=storage)
     status_fetcher.emit_statuses()
 
+def get_references(pdf_directory: str):
+    pdf_directory = Path(pdf_directory)
+    ingest = PDFIngestion(input_dir=pdf_directory)
+    response = ingest.create_ingest_response()
+    sys.stdout.write(response.json())
 
 class PDFIngestion:
 
@@ -224,7 +212,7 @@ class PDFIngestion:
         # 
         # Longer-term, we should probably fork the Grobid client and make changes 
         # to better suit our use-case.
-        with HiddenPrints():
+        with shared.HiddenPrints():
             try:
                 client = GrobidClient(GROBID_SERVER_URL, timeout=timeout)
             except ServerUnavailableException as e:
@@ -339,72 +327,102 @@ class PDFIngestion:
         references = []
         for file in txt_files:
             logger.info(f"Creating Reference from file: {file.name}")
+
             source_pdf = f"{file.stem.rpartition('_')[0]}.pdf"
+            source_pdf_path = os.path.join(self.staging_dir, source_pdf)
+            full_text = shared.extract_text_from_pdf(source_pdf_path)
+
             references.append(
                 Reference(
                     source_filename=source_pdf,
                     status=typing.IngestStatus.FAILURE,
                     citation_key="untitled",
+                    contents=full_text,
+                    chunks=shared.chunk_text(full_text),
                 )
             )
         return references
     
-    def _add_citation_keys(self, references: list[Reference]) -> list[Reference]:
+    def _add_citation_keys(self, new_references: list[Reference]) -> list[Reference]:
         """
         Adds unique citation keys for a list of Reference objects based on Pandoc
         citation key formatting rules.
 
-        Because citation keys are unique, we need to create them after all References
-        have been created. This is because the citation key is based on the Reference's
-        author surname and published date. If two References have the same author surname
-        and published date, then the citation key is appended with a, b, c, etc.
+        A citation key is based on the Reference's first author surname
+        and published date.
 
-        If a Reference does not have an author surname or published date, then the citation
-        key becomes "untitled" and is appended with 1, 2, 3, etc.
+        If two References have the same author surname and published date, 
+        then the citation key is appended with a, b, c, etc.
+
+        If a Reference does not have an author surname or published date,
+        then the citation key becomes "untitled" and is appended with 1, 2, 3, etc.
+
+        If a Reference already has a citation key, then it is not modified.
 
         https://quarto.org/docs/authoring/footnotes-and-citations.html#sec-citations
 
         Parameters
         ----------
-        references : list[References]
+        new_references : list[References]
+            List of newly uploaded References that need citation keys
 
         Returns
         -------
         references : list[Reference]
             List of References, each with a unique `citation_key` field
-        
-        Notes
-        -----
-        1. Two References with different author surnames and different published year:
-            - (Smith, 2018) and (Jones, 2020) => citation keys: smith2018 and jones2020
-        2. Two References with different author surnames and no published year:
-            - (Smith, None) and (Jones, None) => citation keys: smith and jones
-        3. Two References with the same author surname but different published years:
-            - (Smith, 2020) and (Smith, 2021) => citation keys: smith2020 and smith2021
-        4. Two References with the same author surname and published year:
-            - (Smith, 2020) and (Smith, 2020) => citation keys: smith2020a and smith2020b
-        5. Two References with the same author surname and no published year:
-            - (Smith, None) and (Smith, None) => citation keys: smitha and smithb 
-        6. Two References with no author surname and different published years:
-            - (None, 2020) and (None, 2021) => citation keys: untitled2020 and untitled2021
-        7. Two References with no author surname and no published year:
-            - (None, None) and (None, None) => citation keys: untitled1 and untitled2
         """
-        ref_key_groups = defaultdict(list)
-        for ref in references:
+
+        # we must determine the max current "appended" index for key
+        # (e.g. 1, 2, 3, a, b, c, etc.)
+        # this will determine the starting index for new references
+        # 
+        # we do this by incrementing from what the citation key would have 
+        # been in its "unappended" format -- what the key would be if we did not 
+        # have any other references
+        max_existing_index_by_key = {}
+        for ref in self.references:
             key = shared.create_citation_key(ref)
-            ref_key_groups[key].append(ref)
-        
-        for key, refs in ref_key_groups.items():
-            if len(refs) == 1:
-                refs[0].citation_key = key
-            elif key == "untitled":
-                for i, ref in enumerate(refs):
-                    ref.citation_key = f"{key}{i + 1}"
+            if key not in max_existing_index_by_key:
+                max_existing_index_by_key[key] = 1
             else:
-                for i, ref in enumerate(refs):
-                    ref.citation_key = f"{key}{chr(97 + i)}"
-        return references
+                max_existing_index_by_key[key] += 1
+
+        new_ref_key_groups = defaultdict(list)
+        for ref in new_references:
+            key = shared.create_citation_key(ref)
+            new_ref_key_groups[key].append(ref)
+        
+        for key, new_refs_for_key in new_ref_key_groups.items():
+            idx = max_existing_index_by_key.get(key, 0)
+
+            # if no existing references ... 
+            if idx == 0:
+                for i, ref in enumerate(new_refs_for_key):
+                    # first ref always gets the "unappended" key
+                    # this is necessary to maintain consistency upon new uploads
+                    if i == 0:
+                        ref.citation_key = f"{key}"
+                    else:
+                        if key == "untitled":
+                            # untitled refs get numbered 1, 2, 3, etc.
+                            ref.citation_key = f"{key}{i}"
+                        else:
+                            # others get numbered a, b, c, etc.
+                            ref.citation_key = f"{key}{chr(97 + i)}"
+
+            # if existing references, append as necessary starting 
+            # from existing max index for the key
+            if idx > 0:
+                for i, ref in enumerate(new_refs_for_key):
+                    if key == "untitled":
+                        # untitleds start at 1
+                        ref.citation_key = f"{key}{idx + i}"
+                    else:
+                        # others start at a = chr(97)
+                        # so need to subtract 1 since idx >= 1
+                        ref.citation_key = f"{key}{chr(97 + idx - 1 + i)}"
+
+        return new_references
 
     def _create_references(self) -> None:
         """
@@ -441,7 +459,7 @@ class PDFIngestion:
                 published_date=pub_date,
                 abstract=doc.get("abstract"),
                 contents=doc.get("body"),
-                chunks=chunk_text(doc.get("body"))
+                chunks=shared.chunk_text(doc.get("body"))
             )
             ref.citation_key = shared.create_citation_key(ref)
             successes.append(ref)

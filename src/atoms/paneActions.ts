@@ -16,3 +16,5 @@ export const activePaneContentAtom = atom((get) => {
 export const focusPaneAtom = atom(null, (_get, set, paneId: PaneId) => {
   set(activePaneIdAtom, paneId);
 });
+
+export const activeEditorAtom = atom((get) => get(activePaneContentAtom).activeEditor);

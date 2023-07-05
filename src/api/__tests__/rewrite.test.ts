@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest';
-
 import { askForRewrite } from '../rewrite';
 import { callSidecar } from '../sidecar';
 import { RewriteChoice } from '../types';

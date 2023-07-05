@@ -1,5 +1,3 @@
-import { describe, expect } from 'vitest';
-
 import { chatWithAI } from '../chat';
 import { callSidecar } from '../sidecar';
 

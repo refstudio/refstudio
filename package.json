@@ -27,6 +27,10 @@
     "tauri:dev:debug": "DEV_TOOLS=1 tauri dev"
   },
   "dependencies": {
+    "@ag-grid-community/client-side-row-model": "^30.0.3",
+    "@ag-grid-community/core": "^30.0.3",
+    "@ag-grid-community/react": "^30.0.3",
+    "@ag-grid-community/styles": "^30.0.3",
     "@popperjs/core": "^2.11.8",
     "@tanstack/react-query": "^4.29.13",
     "@tauri-apps/api": "^1.2.0",

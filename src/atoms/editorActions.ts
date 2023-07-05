@@ -1,40 +1,17 @@
 import { atom } from 'jotai';
 
-import { editorsContentStateAtom, loadEditorContent, loadFileEntry, unloadEditorContent } from './core/editorContent';
+import { UPLOADS_DIR } from '../io/filesystem';
+import { editorsContentStateAtom, loadEditorContent, unloadEditorContent } from './core/editorContent';
 import { addEditorData, removeEditorData } from './core/editorData';
 import { addEditorToPane, paneGroupAtom, removeEditorFromPane, selectEditorInPaneAtom } from './core/paneGroup';
+import { openFilePathAtom } from './fileEntryActions';
 import { getDerivedReferenceAtom } from './referencesState';
 import { buildEditorId, EditorId } from './types/EditorData';
-import { FileEntry, FileFileEntry } from './types/FileEntry';
+import { FileFileEntry } from './types/FileEntry';
 import { PaneEditorId, PaneId } from './types/PaneGroup';
 
 export { activePaneAtom } from './core/activePane';
 export { selectEditorInPaneAtom } from './core/paneGroup';
-
-/** Open a file in a pane (depending on the file extension) */
-export const openFileEntryAtom = atom(null, (get, set, file: FileEntry) => {
-  if (file.isFolder) {
-    console.warn('Cannot open directory ', file.path);
-    return;
-  }
-
-  const editorId = buildEditorId('text', file.path);
-  // Load file in memory
-  const currentOpenEditors = get(editorsContentStateAtom);
-  if (!currentOpenEditors.has(editorId)) {
-    set(loadFileEntry, file);
-  }
-
-  // Add to editor entries atom
-  set(addEditorData, { id: editorId, title: file.name });
-
-  // Add editor to panes state
-  const targetPaneId = targetPaneIdFor(file);
-  set(addEditorToPane, { editorId, paneId: targetPaneId });
-
-  // Select editor in pane
-  set(selectEditorInPaneAtom, { editorId, paneId: targetPaneId });
-});
 
 /** Open a reference in the right pane */
 export const openReferenceAtom = atom(null, (get, set, referenceId: string) => {
@@ -49,7 +26,7 @@ export const openReferenceAtom = atom(null, (get, set, referenceId: string) => {
   // Load editor in memory
   const currentOpenEditors = get(editorsContentStateAtom);
   if (!currentOpenEditors.has(editorId)) {
-    set(loadEditorContent, { editorId, editorContent: { type: 'reference', referenceId } });
+    set(loadEditorContent, { editorId, editorContent: { type: 'reference', referenceId: editorId } });
   }
 
   // Add to editor entries atom
@@ -64,11 +41,11 @@ export const openReferenceAtom = atom(null, (get, set, referenceId: string) => {
 });
 
 /** Open the references pane in the right pane */
-export const openReferencesAtom = atom(null, (_get, set) => {
+export const openReferencesAtom = atom(null, (_get, set, filter?: string) => {
   const editorId = buildEditorId('references');
 
   // Load in memory
-  set(loadEditorContent, { editorId, editorContent: { type: 'references' } });
+  set(loadEditorContent, { editorId, editorContent: { type: 'references', filter } });
 
   // Add to editor entries atom
   set(addEditorData, { id: editorId, title: 'RefStudio References' });
@@ -79,6 +56,18 @@ export const openReferencesAtom = atom(null, (_get, set) => {
 
   // Select editor in pane
   set(selectEditorInPaneAtom, { editorId, paneId });
+});
+
+/** Open the PDF file corresponding to the given reference */
+export const openReferencePdfAtom = atom(null, (get, set, referenceId: string) => {
+  const reference = get(getDerivedReferenceAtom(referenceId));
+
+  if (!reference) {
+    console.warn('Cannot open PDF file for a reference that does not exist: ', referenceId);
+    return;
+  }
+
+  set(openFilePathAtom, `/${UPLOADS_DIR}/${reference.filename}`);
 });
 
 /** Removes editor from the given pane and unload content from memory if the editor is not open in another pane */
@@ -116,7 +105,7 @@ export const moveEditorToPaneAtom = atom(null, (_get, set, { editorId, fromPaneI
   set(selectEditorInPaneAtom, { paneId: toPaneId, editorId });
 });
 
-function targetPaneIdFor(file: FileFileEntry): PaneId {
+export function targetPaneIdFor(file: FileFileEntry): PaneId {
   switch (file.fileExtension) {
     case 'pdf':
     case 'xml':

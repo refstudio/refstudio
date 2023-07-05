@@ -1,10 +1,11 @@
 import { runPDFIngestion } from '../../../../api/ingestion';
+import { runGetAtomHook } from '../../../../atoms/__tests__/test-utils';
 import { getReferencesAtom, referencesSyncInProgressAtom } from '../../../../atoms/referencesState';
-import { runGetAtomHook } from '../../../../atoms/test-utils';
-import { listenEvent, RefStudioEvents } from '../../../../events';
+import { listenEvent } from '../../../../events';
 import { uploadFiles } from '../../../../io/filesystem';
 import { noop } from '../../../../lib/noop';
 import { act, fireEvent, mockListenEvent, screen, setupWithJotaiProvider, waitFor } from '../../../../test/test-utils';
+import { REFERENCES } from '../../__tests__/test-fixtures';
 import { ReferencesDropZone } from '../ReferencesDropZone';
 
 vi.mock('../../../../events');
@@ -51,35 +52,26 @@ describe('ReferencesDropZone', () => {
     });
   });
 
-  it('should open file explorer on RefStudioEvents.menu.references.upload', () => {
+  it('should open file explorer on [refstudio://menu/references/upload]', () => {
     const mockData = mockListenEvent();
     setupWithJotaiProvider(<ReferencesDropZone>APP</ReferencesDropZone>);
 
     // Expect to be registered
-    expect(mockData.registeredEventName).toBe(RefStudioEvents.menu.references.upload);
+    expect(mockData.registeredEventNames).toContain('refstudio://menu/references/upload');
 
     const input = screen.getByRole<HTMLInputElement>('form');
     const clickFn = vi.fn();
     input.click = clickFn;
 
     // Trigger menu action
-    act(() => mockData.trigger());
+    act(() => mockData.trigger('refstudio://menu/references/upload'));
 
     expect(clickFn).toHaveBeenCalled();
   });
 
   it('should start ingestion on PDF upload', async () => {
     vi.mocked(listenEvent).mockResolvedValue(noop);
-    const REFERENCE = {
-      id: 'ref.id',
-      citationKey: 'citationKey',
-      title: 'title',
-      abstract: '',
-      authors: [],
-      filename: 'title.pdf',
-      publishedDate: '2023-06-22',
-    };
-    vi.mocked(runPDFIngestion).mockResolvedValue([REFERENCE]);
+    vi.mocked(runPDFIngestion).mockResolvedValue([REFERENCES[0]]);
 
     const { store } = setupWithJotaiProvider(<ReferencesDropZone>APP</ReferencesDropZone>);
     const syncInProgress = runGetAtomHook(referencesSyncInProgressAtom, store);
@@ -95,7 +87,7 @@ describe('ReferencesDropZone', () => {
       },
     });
 
-    const file = new File(['(⌐□_□)'], 'chucknorris.pdf', { type: 'application/pdf' });
+    const file = new File(['(⌐□_□)'], REFERENCES[0].filename, { type: 'application/pdf' });
 
     fireEvent.drop(target, {
       dataTransfer: {
@@ -115,6 +107,6 @@ describe('ReferencesDropZone', () => {
     });
 
     expect(references.current).toHaveLength(1);
-    expect(references.current).toStrictEqual([REFERENCE]);
+    expect(references.current).toStrictEqual([REFERENCES[0]]);
   });
 });

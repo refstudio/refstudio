@@ -8,6 +8,9 @@
     "ingest_status": {
       "$ref": "#/definitions/IngestStatusResponse"
     },
+    "ingest_references": {
+      "$ref": "#/definitions/IngestResponse"
+    },
     "rewrite": {
       "type": "array",
       "items": {
@@ -30,6 +33,7 @@
   "required": [
     "ingest",
     "ingest_status",
+    "ingest_references",
     "rewrite",
     "chat",
     "update",

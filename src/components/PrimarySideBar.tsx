@@ -19,7 +19,7 @@ export function PrimarySideBar({
     { pane: 'References', Icon: VscLibrary },
   ];
   return (
-    <div className="flex select-none flex-col gap-1 bg-black text-white" role="menubar">
+    <div className="flex select-none flex-col gap-1 bg-slate-800 text-white" role="menubar">
       {panes.map(({ pane, Icon }) => (
         <Icon
           aria-label={pane}

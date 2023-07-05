@@ -1,7 +1,7 @@
 import { useAtomValue } from 'jotai';
 
 import { referencesSyncInProgressAtom } from '../../../atoms/referencesState';
-import { emitEvent, RefStudioEvents } from '../../../events';
+import { emitEvent } from '../../../events';
 
 export function UploadTipInstructions() {
   const syncInProgress = useAtomValue(referencesSyncInProgressAtom);
@@ -11,9 +11,12 @@ export function UploadTipInstructions() {
   }
 
   return (
-    <div className="my-2 bg-yellow-50 p-1 text-sm italic" data-testid={UploadTipInstructions.name}>
+    <div
+      className="m-4 rounded-md border border-solid border-blue-400 bg-blue-50 p-1 text-sm italic text-slate-500"
+      data-testid={UploadTipInstructions.name}
+    >
       <strong>TIP:</strong> Click{' '}
-      <span className="cursor-pointer underline" onClick={() => emitEvent(RefStudioEvents.menu.references.upload)}>
+      <span className="cursor-pointer underline" onClick={() => emitEvent('refstudio://menu/references/upload')}>
         here
       </span>{' '}
       or drag/drop PDF files for upload.

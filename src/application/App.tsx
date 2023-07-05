@@ -1,13 +1,11 @@
-import { useSetAtom } from 'jotai';
 import React, { useCallback, useEffect, useState } from 'react';
 import { VscChevronUp } from 'react-icons/vsc';
 import { ImperativePanelHandle, Panel, PanelGroup } from 'react-resizable-panels';
 import { useEffectOnce } from 'usehooks-ts';
 
-import { openReferenceAtom } from '../atoms/editorActions';
 import { PrimarySideBar, PrimarySideBarPane } from '../components/PrimarySideBar';
 import { VerticalResizeHandle } from '../components/VerticalResizeHandle';
-import { emitEvent, RefStudioEvents } from '../events';
+import { emitEvent } from '../events';
 import { AIPanel } from '../features/ai/AIPanel';
 import { ReferencesDropZone } from '../features/references/components/ReferencesDropZone';
 import { ReferencesPanel } from '../features/references/sidebar/ReferencesPanel';
@@ -54,7 +52,6 @@ function LeftSidePanelWrapper() {
   const leftPanelRef = React.useRef<ImperativePanelHandle>(null);
   const [primaryPaneCollapsed, setPrimaryPaneCollapsed] = useState(false);
   const [primaryPane, setPrimaryPane] = useState<PrimarySideBarPane>('Explorer');
-  const openReference = useSetAtom(openReferenceAtom);
 
   const handleSideBarClick = (selectedPane: PrimarySideBarPane) => {
     if (selectedPane === primaryPane) {
@@ -75,7 +72,7 @@ function LeftSidePanelWrapper() {
     }
   }, [leftPanelRef, primaryPaneCollapsed]);
 
-  const openSettings = React.useCallback(() => emitEvent(RefStudioEvents.menu.settings), []);
+  const openSettings = React.useCallback(() => emitEvent('refstudio://menu/settings'), []);
 
   return (
     <>
@@ -92,7 +89,7 @@ function LeftSidePanelWrapper() {
         onCollapse={(collapsed) => setPrimaryPaneCollapsed(collapsed)}
       >
         {primaryPane === 'Explorer' && <ExplorerPanel />}
-        {primaryPane === 'References' && <ReferencesPanel onRefClicked={(reference) => openReference(reference.id)} />}
+        {primaryPane === 'References' && <ReferencesPanel />}
       </Panel>
       <VerticalResizeHandle />
     </>
@@ -117,7 +114,7 @@ function RightPanelWrapper() {
       <Panel collapsible order={3} ref={panelRef} onCollapse={setClosed}>
         <AIPanel onCloseClick={() => setClosed(true)} />
         {closed && (
-          <div className="absolute bottom-0 right-0 flex border border-slate-300 bg-slate-100 px-4 py-2">
+          <div className="absolute bottom-0 right-0 flex border border-b-0 border-slate-300 bg-slate-100 px-4 py-2">
             <div
               className="flex w-60 cursor-pointer select-none items-center justify-between"
               onClick={() => setClosed(false)}

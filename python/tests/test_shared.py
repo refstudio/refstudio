@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from pathlib import Path
 
 from sidecar import shared
 from sidecar.typing import Author, Reference
@@ -70,6 +71,15 @@ def test_create_citation_key():
     assert shared.create_citation_key(references[1]) == "hammerbacher"
     assert shared.create_citation_key(references[2]) == "untitled"
     assert shared.create_citation_key(references[3]) == "untitled2020"
+
+
+def test_extract_text_from_pdf():
+    pdf_file = "fixtures/pdf/grobid-fails.pdf"
+    test_filepath = Path(__file__).parent.joinpath(pdf_file)
+    text = shared.extract_text_from_pdf(test_filepath)
+
+    assert isinstance(text, str)
+    assert len(text) > 0
 
 
 def test_chunk_text():

@@ -1,15 +1,20 @@
+import { getIngestedReferences } from '../../../../api/ingestion';
+import { runGetAtomHook, runSetAtomHook } from '../../../../atoms/__tests__/test-utils';
 import { activePaneAtom } from '../../../../atoms/editorActions';
 import { referencesSyncInProgressAtom, setReferencesAtom } from '../../../../atoms/referencesState';
-import { runGetAtomHook, runSetAtomHook } from '../../../../atoms/test-utils';
 import { buildEditorId } from '../../../../atoms/types/EditorData';
-import { emitEvent, RefStudioEvents } from '../../../../events';
-import { act, mockListenEvent, screen, setupWithJotaiProvider } from '../../../../test/test-utils';
-import { REFERENCES } from '../../test-fixtures';
+import { emitEvent } from '../../../../events';
+import { act, mockListenEvent, screen, setupWithJotaiProvider, waitFor } from '../../../../test/test-utils';
+import { REFERENCES } from '../../__tests__/test-fixtures';
 import { ReferencesFooterItems } from '../ReferencesFooterItems';
 
 vi.mock('../../../../events');
+vi.mock('../../../../api/ingestion');
 
 describe('ReferencesFooterItems component', () => {
+  beforeEach(() => {
+    vi.mocked(getIngestedReferences).mockResolvedValue([]);
+  });
   afterEach(() => {
     vi.resetAllMocks();
   });
@@ -17,6 +22,16 @@ describe('ReferencesFooterItems component', () => {
   it('should render empty without loading', () => {
     setupWithJotaiProvider(<ReferencesFooterItems />);
     expect(screen.getByText('References: 0')).toBeInTheDocument();
+  });
+
+  it('should render ingested references', async () => {
+    const [oneReference] = REFERENCES;
+    vi.mocked(getIngestedReferences).mockResolvedValue([oneReference]);
+    setupWithJotaiProvider(<ReferencesFooterItems />);
+    expect(screen.getByText('References: 0')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('References: 1')).toBeInTheDocument();
+    });
   });
 
   it('should render number of references ingested', () => {
@@ -36,19 +51,18 @@ describe('ReferencesFooterItems component', () => {
     expect(screen.getByText('References ingestion...')).toBeInTheDocument();
   });
 
-  it(`should emit ${RefStudioEvents.menu.references.open} on click`, async () => {
+  it(`should emit ${'refstudio://menu/references/open'} on click`, async () => {
     const { user } = setupWithJotaiProvider(<ReferencesFooterItems />);
     await user.click(screen.getByRole('listitem'));
-    expect(vi.mocked(emitEvent)).toHaveBeenCalledWith(RefStudioEvents.menu.references.open);
+    expect(vi.mocked(emitEvent)).toHaveBeenCalledWith('refstudio://menu/references/open');
   });
 
-  it(`should listen ${RefStudioEvents.menu.references.open} to open references`, () => {
+  it(`should listen ${'refstudio://menu/references/open'} to open references`, () => {
     const mockData = mockListenEvent();
     const { store } = setupWithJotaiProvider(<ReferencesFooterItems />);
 
-    expect(mockData.registeredEventName).toBeDefined();
-    expect(mockData.registeredEventName).toBe(RefStudioEvents.menu.references.open);
-    act(() => mockData.trigger());
+    expect(mockData.registeredEventNames).toContain('refstudio://menu/references/open');
+    act(() => mockData.trigger('refstudio://menu/references/open'));
 
     const opened = runGetAtomHook(activePaneAtom, store);
     expect(opened.current.openEditorIds).toHaveLength(1);
