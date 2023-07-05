@@ -1,7 +1,7 @@
 import { ColumnState } from 'ag-grid-community';
 
+import { mockLocalStorage } from '../../../../../test/mockLocalStorage';
 import { COLUMNS_STATE_STORAGE_KEY, loadColumnsState, resetColumnsState, saveColumnsState } from '../columnsState';
-import { mockLocalStorage } from './mockLocalStorage';
 
 vi.mock('ag-grid-community');
 

@@ -1,7 +1,7 @@
 import { EditorContentType } from './EditorContent';
 
-export type EditorId = `refstudio://${EditorContentType}/${string}`;
 export type EditorIdFor<T extends EditorContentType> = `refstudio://${T}/${string}`;
+export type EditorId = EditorIdFor<EditorContentType>;
 
 export interface EditorData {
   id: EditorId;

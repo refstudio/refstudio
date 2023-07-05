@@ -59,7 +59,6 @@ interface MainPanelPaneProps {
 export function MainPanelPane({ pane, pdfViewerRef }: MainPanelPaneProps & MainPanelProps) {
   const { openEditors, activeEditor: activeFile, activeEditor } = pane;
   const activeEditorAtoms = activeEditor?.contentAtoms;
-  console.log(MainPanelPane.name, activeEditor);
 
   const items = openEditors.map(({ id: editorId, title, isDirty }) => ({
     text: title,
@@ -109,7 +108,6 @@ export function MainPaneViewContent({ activeEditorAtoms, pdfViewerRef }: MainPan
   }
 
   const { data } = loadableEditorContent;
-  console.log(MainPaneViewContent.name, loadableEditorContent);
 
   switch (data.type) {
     case 'xml':
