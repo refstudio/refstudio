@@ -12,6 +12,7 @@ interface RefStudioEvents {
   'refstudio://menu/references/export': undefined;
   'refstudio://editors/close': PaneEditorId;
   'refstudio://references/ingestion/run': undefined;
+  'refstudio://references/remove': { filenames: string[] };
 }
 
 export type RefStudioEventName = keyof RefStudioEvents;

@@ -2,7 +2,7 @@ import { runGetAtomHook, runSetAtomHook } from '../../../../atoms/__tests__/test
 import { activePaneContentAtom } from '../../../../atoms/paneActions';
 import { setReferencesAtom } from '../../../../atoms/referencesState';
 import { buildEditorId } from '../../../../atoms/types/EditorData';
-import { emitEvent, RefStudioEventName } from '../../../../events';
+import { emitEvent, RefStudioEventName, RefStudioEventPayload } from '../../../../events';
 import { act, screen, setupWithJotaiProvider, waitFor, within } from '../../../../test/test-utils';
 import { REFERENCES } from '../../__tests__/test-fixtures';
 import { ReferencesPanel } from '../ReferencesPanel';
@@ -97,5 +97,22 @@ describe('ReferencesPanel', () => {
     const active = runGetAtomHook(activePaneContentAtom, store);
     expect(active.current.activeEditor?.id).toBeDefined();
     expect(active.current.activeEditor?.id).toBe(buildEditorId('references'));
+  });
+
+  it(`should emit ${'refstudio://references/remove' as RefStudioEventName} on remove clicked`, async () => {
+    const { store, user } = setupWithJotaiProvider(<ReferencesPanel />);
+    const setReferences = runSetAtomHook(setReferencesAtom, store);
+    const [ref1] = REFERENCES;
+    act(() => setReferences.current(REFERENCES));
+
+    const elem = screen.getByRole('listitem', { name: ref1.title });
+
+    await user.hover(elem);
+    await user.click(within(elem).getByTitle('Remove Reference'));
+
+    expect(vi.mocked(emitEvent)).toBeCalled();
+    expect(vi.mocked(emitEvent)).toBeCalledWith<
+      [RefStudioEventName, RefStudioEventPayload<'refstudio://references/remove'>]
+    >('refstudio://references/remove', { filenames: [ref1.filename] });
   });
 });

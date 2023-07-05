@@ -26,6 +26,13 @@ export async function runPDFIngestion(): Promise<ReferenceItem[]> {
   return parsePdfIngestionResponse(response, uploadsDir);
 }
 
+export async function removeReferences(fileNames: string[]) {
+  const response = await callSidecar('delete', ['--source_filenames', ...fileNames]);
+  if (response.status === 'error') {
+    throw new Error('Error removing references: ' + response.message);
+  }
+}
+
 export async function getIngestedReferences(): Promise<ReferenceItem[]> {
   const uploadsDir = await getUploadsDir();
   const response = await callSidecar('ingest_references', ['--pdf_directory', String(uploadsDir)]);

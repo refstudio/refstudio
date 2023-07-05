@@ -3,6 +3,7 @@ import { atom, useAtomValue, useSetAtom } from 'jotai';
 import { activePaneAtom, closeEditorFromPaneAtom } from '../atoms/editorActions';
 import { createFileAtom } from '../atoms/fileEntryActions';
 import { activeEditorAtom } from '../atoms/paneActions';
+import { removeReferencesAtom } from '../atoms/referencesState';
 import { PaneEditorId } from '../atoms/types/PaneGroup';
 import { emitEvent } from '../events';
 import { useListenEvent } from '../hooks/useListenEvent';
@@ -13,11 +14,13 @@ export function EventsListener({ children }: { children?: React.ReactNode }) {
   const closeActiveEditor = useCloseActiveEditor();
   const closeEditor = useCloseEditor();
   const createFile = useCreateFile();
+  const removeReferences = useRemoveReferences();
 
   useListenEvent('refstudio://menu/file/save', saveActiveFile);
   useListenEvent('refstudio://menu/file/close', closeActiveEditor);
   useListenEvent('refstudio://menu/file/new', createFile);
   useListenEvent('refstudio://editors/close', closeEditor);
+  useListenEvent('refstudio://references/remove', removeReferences);
 
   return <>{children}</>;
 }
@@ -52,4 +55,9 @@ function useCloseEditor() {
   const closeEditorFromPane = useSetAtom(closeEditorFromPaneAtom);
 
   return (paneEditorId: PaneEditorId) => closeEditorFromPane(paneEditorId);
+}
+
+function useRemoveReferences() {
+  const removeReferences = useSetAtom(removeReferencesAtom);
+  return ({ filenames }: { filenames: string[] }) => void removeReferences(filenames);
 }

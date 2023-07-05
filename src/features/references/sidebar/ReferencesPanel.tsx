@@ -46,6 +46,10 @@ export function ReferencesPanel() {
 
   const handleAuthorClicked = (author: Author) => openReferences(author.lastName);
 
+  const handleRemoveClicked = (reference: ReferenceItem) => {
+    emitEvent('refstudio://references/remove', { filenames: [reference.filename] });
+  };
+
   const handleFilterChanged = (filter: string) => {
     if (filter.trim() === '') {
       return setVisibleReferences(references);
@@ -84,6 +88,7 @@ export function ReferencesPanel() {
             references={visibleReferences}
             onAuthorClicked={handleAuthorClicked}
             onRefClicked={handleRefClicked}
+            onRemoveClicked={handleRemoveClicked}
           />
 
           {references.length === 0 && (
