@@ -1,2 +1,4 @@
 github_checks:
   annotations: false
+fixes:
+  - "before/*.py"::python/"
