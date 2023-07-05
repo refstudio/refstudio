@@ -1,4 +1,4 @@
-import { ColumnState } from 'ag-grid-community';
+import { ColumnState } from '@ag-grid-community/core';
 
 import { mockLocalStorage } from '../../../../../test/mockLocalStorage';
 import { COLUMNS_STATE_STORAGE_KEY, loadColumnsState, resetColumnsState, saveColumnsState } from '../columnsState';
