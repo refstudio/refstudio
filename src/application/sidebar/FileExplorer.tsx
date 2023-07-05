@@ -1,8 +1,7 @@
 import { useAtom, useAtomValue } from 'jotai';
-import { useMemo } from 'react';
 import { VscChevronDown, VscChevronRight, VscFile } from 'react-icons/vsc';
 
-import { FileExplorerEntry, FileExplorerFileEntry, FileExplorerFolderEntry } from '../../atoms/types/FileExplorerEntry';
+import { FileExplorerFolderEntry } from '../../atoms/types/FileExplorerEntry';
 import { FileNode } from '../../components/FileNode';
 
 interface FileEntryTreeProps {
@@ -17,20 +16,6 @@ export function FileEntryTree(props: FileEntryTreeProps) {
   const files = useAtomValue(fileExplorerEntry.childrenAtom);
 
   const [collapsed, setCollapsed] = useAtom(fileExplorerEntry.collapsedAtom);
-
-  const folderEntries = useMemo(
-    () =>
-      files
-        .filter((file): file is FileExplorerFolderEntry => file.isFolder)
-        .sort(alphabeticallySortFileExplorerEntries),
-    [files],
-  );
-
-  const fileEntries = useMemo(
-    () =>
-      files.filter((file): file is FileExplorerFileEntry => !file.isFolder).sort(alphabeticallySortFileExplorerEntries),
-    [files],
-  );
 
   const { root } = fileExplorerEntry;
 
@@ -47,33 +32,29 @@ export function FileEntryTree(props: FileEntryTreeProps) {
       )}
       {(root || !collapsed) && (
         <>
-          {folderEntries.map((folder) => (
-            <FileEntryTree
-              {...props}
-              fileExplorerEntry={folder}
-              key={folder.path}
-              paddingLeft={`calc(${paddingLeft} + 1rem)`}
-            />
-          ))}
-          {fileEntries.map((file) => (
-            <FileNode
-              VscIcon={VscFile}
-              fileName={file.name}
-              key={file.path}
-              paddingLeft={paddingLeft}
-              selected={selectedFiles.includes(file.path)}
-              onClick={() => onFileClick(file.path)}
-            />
+          {files.map((fileEntry) => (
+            fileEntry.isFolder ?
+              (
+                <FileEntryTree
+                  {...props}
+                  fileExplorerEntry={fileEntry}
+                  key={fileEntry.path}
+                  paddingLeft={`calc(${paddingLeft} + 1rem)`}
+                />
+              ) :
+              (
+                <FileNode
+                  VscIcon={VscFile}
+                  fileName={fileEntry.name}
+                  key={fileEntry.path}
+                  paddingLeft={paddingLeft}
+                  selected={selectedFiles.includes(fileEntry.path)}
+                  onClick={() => onFileClick(fileEntry.path)}
+                />
+              )
           ))}
         </>
       )}
     </div>
   );
-}
-
-function alphabeticallySortFileExplorerEntries(fileA: FileExplorerEntry, fileB: FileExplorerEntry) {
-  const fileNameA = fileA.name.toLowerCase();
-  const fileNameB = fileB.name.toLowerCase();
-
-  return fileNameA < fileNameB ? -1 : fileNameA > fileNameB ? 1 : 0;
 }

@@ -1,21 +1,15 @@
-import { atom, Getter, PrimitiveAtom, Setter } from 'jotai';
+import { atom, Getter, Setter, WritableAtom } from 'jotai';
 
 import { FileEntry, FolderFileEntry } from '../types/FileEntry';
-import {
-  FileExplorerEntry,
-  FileExplorerFileEntry,
-  FileExplorerFolderEntry,
-  RootFileExplorerEntry,
-} from '../types/FileExplorerEntry';
+import { FileExplorerEntry, FileExplorerFolderEntry, RootFileExplorerEntry } from '../types/FileExplorerEntry';
 
-export const fileExplorerEntriesAtom = atom<RootFileExplorerEntry>(
-  createFileExplorerFolderEntry([], 'root', 'root', true),
-);
+export const fileExplorerEntriesAtom = atom<RootFileExplorerEntry>(createFileExplorerFolderEntry([], 'root', '', true));
 
+/** Recursively creates a file explorer entry and its atoms from an array of file entries */
 function createFileExplorerFolderEntry(
   files: FileEntry[],
   folderName: 'root',
-  entryPath: 'root',
+  entryPath: '',
   root: true,
 ): RootFileExplorerEntry;
 function createFileExplorerFolderEntry(
@@ -29,21 +23,32 @@ function createFileExplorerFolderEntry(
   entryPath: string,
   root?: boolean,
 ): FileExplorerFolderEntry {
-  const filesAtom = atom<FileExplorerEntry[]>(files.filter((file) => !file.isDotfile).map(createFileExplorerEntry));
+  const filesAtom = createFilesAtom(files.filter((file) => !file.isDotfile).map(createFileExplorerEntry));
   return {
     isFolder: true,
     root,
     path: entryPath,
     childrenAtom: atom((get) => get(filesAtom), updateFolderChildren(filesAtom)),
-    createFileAtom: atom(null, (get, set, file: FileExplorerFileEntry) => {
-      const currentFiles = get(filesAtom);
-      set(filesAtom, [...currentFiles, file]);
-    }),
     collapsedAtom: atom(true),
     name: folderName,
   };
 }
 
+/**
+ * Creates the atom containing file explorer entry.
+ * The atom is responsible for keeping the entries sorted
+ */
+function createFilesAtom(files: FileExplorerEntry[]) {
+  const filesAtom = atom<FileExplorerEntry[], [FileExplorerEntry[]], undefined>(
+    files.sort(compareFileExplorerEntries),
+    (_get, set, fileExplorerEntries: FileExplorerEntry[]) => {
+      set(filesAtom, fileExplorerEntries.sort(compareFileExplorerEntries));
+    },
+  );
+  return filesAtom;
+}
+
+/** Creates a file explorer entry depending on the type of the given file entry (file or folder) */
 function createFileExplorerEntry(file: FileEntry): FileExplorerEntry {
   if (file.isFile) {
     return {
@@ -56,7 +61,12 @@ function createFileExplorerEntry(file: FileEntry): FileExplorerEntry {
   }
 }
 
-function updateFolderChildren(filesAtom: PrimitiveAtom<FileExplorerEntry[]>) {
+/**
+ * Update function for a folder explorer entry children atom
+ *
+ * This filters out dotfiles, updates the files and recursively updates the children entries for a folder
+ * */
+function updateFolderChildren(filesAtom: WritableAtom<FileExplorerEntry[], [FileExplorerEntry[]], undefined>) {
   return (get: Getter, set: Setter, updatedFiles: FileEntry[]) => {
     const currentFiles = get(filesAtom);
     const updatedFileFileEntries = updatedFiles.filter((f) => !f.isDotfile).filter((f) => !f.isFolder);
@@ -92,4 +102,28 @@ function updateFolderChildren(filesAtom: PrimitiveAtom<FileExplorerEntry[]>) {
 
     set(filesAtom, [...updatedFolderEntries, ...updatedFileEntries]);
   };
+}
+
+/**
+ * Compare function to sort file explorer entries.
+ *
+ * A folder always comes before a file
+ * Entries of the same type are alphabetically sorted
+ * */
+function compareFileExplorerEntries(
+  fileExplorerEntryA: FileExplorerEntry,
+  fileExplorerEntryB: FileExplorerEntry,
+): -1 | 0 | 1 {
+  if (fileExplorerEntryA.isFolder && !fileExplorerEntryB.isFolder) {
+    return -1;
+  }
+
+  if (!fileExplorerEntryA.isFolder && fileExplorerEntryB.isFolder) {
+    return 1;
+  }
+
+  const fileExplorerEntryNameA = fileExplorerEntryA.name.toLowerCase();
+  const fileExplorerEntryNameB = fileExplorerEntryB.name.toLowerCase();
+
+  return fileExplorerEntryNameA < fileExplorerEntryNameB ? -1 : fileExplorerEntryNameA > fileExplorerEntryNameB ? 1 : 0;
 }

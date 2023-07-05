@@ -16,7 +16,6 @@ export interface FileExplorerFileEntry extends FileExplorerEntryBase {
 export interface FileExplorerFolderEntry extends FileExplorerEntryBase {
   isFolder: true;
   childrenAtom: WritableAtom<FileExplorerEntry[], [files: FileEntry[]], void>;
-  createFileAtom: WritableAtom<null, [file: FileExplorerFileEntry], void>;
   collapsedAtom: WritableAtom<boolean, [updatedValue: boolean], void>;
   root?: boolean;
 }

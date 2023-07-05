@@ -61,7 +61,6 @@ export function makeFileExplorerFolderEntry(
       root,
       name,
       path: folderPath,
-      createFileAtom: atom(null, createFileMock),
       childrenAtom: atom(children, updateChildrenMock),
       collapsedAtom: atom(true),
     } as const,
