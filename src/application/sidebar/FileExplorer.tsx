@@ -32,27 +32,25 @@ export function FileEntryTree(props: FileEntryTreeProps) {
       )}
       {(root || !collapsed) && (
         <>
-          {files.map((fileEntry) => (
-            fileEntry.isFolder ?
-              (
-                <FileEntryTree
-                  {...props}
-                  fileExplorerEntry={fileEntry}
-                  key={fileEntry.path}
-                  paddingLeft={`calc(${paddingLeft} + 1rem)`}
-                />
-              ) :
-              (
-                <FileNode
-                  VscIcon={VscFile}
-                  fileName={fileEntry.name}
-                  key={fileEntry.path}
-                  paddingLeft={paddingLeft}
-                  selected={selectedFiles.includes(fileEntry.path)}
-                  onClick={() => onFileClick(fileEntry.path)}
-                />
-              )
-          ))}
+          {files.map((fileEntry) =>
+            fileEntry.isFolder ? (
+              <FileEntryTree
+                {...props}
+                fileExplorerEntry={fileEntry}
+                key={fileEntry.path}
+                paddingLeft={`calc(${paddingLeft} + 1rem)`}
+              />
+            ) : (
+              <FileNode
+                VscIcon={VscFile}
+                fileName={fileEntry.name}
+                key={fileEntry.path}
+                paddingLeft={paddingLeft}
+                selected={selectedFiles.includes(fileEntry.path)}
+                onClick={() => onFileClick(fileEntry.path)}
+              />
+            ),
+          )}
         </>
       )}
     </div>
