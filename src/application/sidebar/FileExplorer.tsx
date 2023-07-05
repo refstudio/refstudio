@@ -4,14 +4,14 @@ import { VscChevronDown, VscChevronRight, VscFile } from 'react-icons/vsc';
 import { FileExplorerFolderEntry } from '../../atoms/types/FileExplorerEntry';
 import { FileNode } from '../../components/FileNode';
 
-interface FileEntryTreeProps {
+interface FileExplorerProps {
   fileExplorerEntry: FileExplorerFolderEntry;
   onFileClick: (filePath: string) => void;
   selectedFiles: string[];
   paddingLeft?: string;
 }
 
-export function FileEntryTree(props: FileEntryTreeProps) {
+export function FileExplorer(props: FileExplorerProps) {
   const { fileExplorerEntry, onFileClick, selectedFiles, paddingLeft = '0' } = props;
   const files = useAtomValue(fileExplorerEntry.childrenAtom);
 
@@ -34,7 +34,7 @@ export function FileEntryTree(props: FileEntryTreeProps) {
         <>
           {files.map((fileEntry) =>
             fileEntry.isFolder ? (
-              <FileEntryTree
+              <FileExplorer
                 {...props}
                 fileExplorerEntry={fileEntry}
                 key={fileEntry.path}
