@@ -152,9 +152,10 @@ function convertTauriFileEntryToFileEntry(entry: TauriFileEntry, baseDir: string
   }
 }
 
-export async function deleteFile(filePath: string): Promise<boolean> {
+export async function deleteFile(relativePath: string): Promise<boolean> {
+  const path = (await getBaseDir()) + relativePath;
   try {
-    await removeFile(filePath);
+    await removeFile(path);
     return true;
   } catch (err) {
     console.error('Error', err);
