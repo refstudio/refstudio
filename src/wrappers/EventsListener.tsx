@@ -1,7 +1,8 @@
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 
 import { activePaneAtom, closeEditorFromPaneAtom } from '../atoms/editorActions';
-import { activePaneContentAtom } from '../atoms/paneActions';
+import { createFileAtom } from '../atoms/fileEntryActions';
+import { activeEditorAtom } from '../atoms/paneActions';
 import { PaneEditorId } from '../atoms/types/PaneGroup';
 import { emitEvent } from '../events';
 import { useListenEvent } from '../hooks/useListenEvent';
@@ -11,21 +12,27 @@ export function EventsListener({ children }: { children?: React.ReactNode }) {
   const saveActiveFile = useSaveActiveFile();
   const closeActiveEditor = useCloseActiveEditor();
   const closeEditor = useCloseEditor();
+  const createFile = useCreateFile();
 
   useListenEvent('refstudio://menu/file/save', saveActiveFile);
   useListenEvent('refstudio://menu/file/close', closeActiveEditor);
+  useListenEvent('refstudio://menu/file/new', createFile);
   useListenEvent('refstudio://editors/close', closeEditor);
 
   return <>{children}</>;
 }
 
 function useSaveActiveFile() {
-  const activePaneContent = useAtomValue(activePaneContentAtom);
-  const saveFile = useSetAtom(
-    activePaneContent.activeEditor?.contentAtoms.saveEditorContentAtom ?? atom(null, asyncNoop),
-  );
+  const activeEditor = useAtomValue(activeEditorAtom);
+  const saveFile = useSetAtom(activeEditor?.contentAtoms.saveEditorContentAtom ?? atom(null, asyncNoop));
 
   return () => void saveFile();
+}
+
+function useCreateFile() {
+  const createFile = useSetAtom(createFileAtom);
+
+  return () => void createFile();
 }
 
 function useCloseActiveEditor() {

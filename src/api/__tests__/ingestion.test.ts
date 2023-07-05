@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest';
-
 import { getUploadsDir } from '../../io/filesystem';
 import { getIngestedReferences, getIngestionStatus, runPDFIngestion } from '../ingestion';
 import { callSidecar } from '../sidecar';

@@ -1,52 +1,15 @@
 import { atom } from 'jotai';
 
-import { editorsContentStateAtom, loadEditorContent, loadFileEntry, unloadEditorContent } from './core/editorContent';
+import { editorsContentStateAtom, loadEditorContent, unloadEditorContent } from './core/editorContent';
 import { addEditorData, removeEditorData } from './core/editorData';
 import { addEditorToPane, paneGroupAtom, removeEditorFromPane, selectEditorInPaneAtom } from './core/paneGroup';
 import { getDerivedReferenceAtom } from './referencesState';
 import { buildEditorId, EditorId } from './types/EditorData';
-import { FileEntry, FileFileEntry } from './types/FileEntry';
+import { FileFileEntry } from './types/FileEntry';
 import { PaneEditorId, PaneId } from './types/PaneGroup';
 
 export { activePaneAtom } from './core/activePane';
 export { selectEditorInPaneAtom } from './core/paneGroup';
-
-/** Open a file in a pane (depending on the file extension) */
-export const openFileEntryAtom = atom(null, (get, set, file: FileEntry) => {
-  if (file.isFolder) {
-    console.warn('Cannot open directory ', file.path);
-    return;
-  }
-
-  const editorId = buildEditorId('text', file.path);
-  // Load file in memory
-  const currentOpenEditors = get(editorsContentStateAtom);
-  if (!currentOpenEditors.has(editorId)) {
-    set(loadFileEntry, file);
-  }
-
-  // Add to editor entries atom
-  set(addEditorData, { id: editorId, title: file.name });
-
-  // Add editor to panes state
-  const targetPaneId = targetPaneIdFor(file);
-  set(addEditorToPane, { editorId, paneId: targetPaneId });
-
-  // Select editor in pane
-  set(selectEditorInPaneAtom, { editorId, paneId: targetPaneId });
-});
-
-export const openFilePathAtom = atom(null, (get, set, filePath: string) => {
-  const fileEntry: FileFileEntry = {
-    path: filePath,
-    name: filePath.split('/').pop() ?? '',
-    fileExtension: filePath.split('.').pop() ?? '',
-    isDotfile: false,
-    isFile: true,
-    isFolder: false,
-  };
-  set(openFileEntryAtom, fileEntry);
-});
 
 /** Open a reference in the right pane */
 export const openReferenceAtom = atom(null, (get, set, referenceId: string) => {
@@ -128,7 +91,7 @@ export const moveEditorToPaneAtom = atom(null, (_get, set, { editorId, fromPaneI
   set(selectEditorInPaneAtom, { paneId: toPaneId, editorId });
 });
 
-function targetPaneIdFor(file: FileFileEntry): PaneId {
+export function targetPaneIdFor(file: FileFileEntry): PaneId {
   switch (file.fileExtension) {
     case 'pdf':
     case 'xml':

@@ -5,6 +5,7 @@ import { PaneEditorId } from './atoms/types/PaneGroup';
 interface RefStudioEvents {
   'refstudio://menu/file/close': undefined;
   'refstudio://menu/file/save': undefined;
+  'refstudio://menu/file/new': undefined;
   'refstudio://menu/settings': undefined;
   'refstudio://menu/references/open': undefined;
   'refstudio://menu/references/upload': undefined;

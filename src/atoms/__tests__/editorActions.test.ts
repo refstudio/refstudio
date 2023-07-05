@@ -1,6 +1,5 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { createStore, useAtomValue } from 'jotai';
-import { describe, expect, it } from 'vitest';
 
 import { readFileContent } from '../../io/filesystem';
 import { ReferenceItem } from '../../types/ReferenceItem';
@@ -9,21 +8,20 @@ import {
   closeAllEditorsAtom,
   closeEditorFromPaneAtom,
   moveEditorToPaneAtom,
-  openFileEntryAtom,
-  openFilePathAtom,
   openReferenceAtom,
   selectEditorInPaneAtom,
 } from '../editorActions';
+import { openFileEntryAtom, openFilePathAtom } from '../fileEntryActions';
 import { leftPaneAtom, rightPaneAtom } from '../paneActions';
 import { setReferencesAtom } from '../referencesState';
 import { buildEditorId } from '../types/EditorData';
 import { PaneId } from '../types/PaneGroup';
-import { makeFile, makeFolder } from './test-fixtures';
+import { makeFileAndEditor, makeFolder } from './test-fixtures';
 import { runGetAtomHook, runSetAtomHook } from './test-utils';
 
 vi.mock('../../io/filesystem');
 
-describe('fileActions', () => {
+describe('editorActions', () => {
   afterEach(() => {
     vi.clearAllMocks();
   });
@@ -44,7 +42,7 @@ describe('fileActions', () => {
     const openFile = runSetAtomHook(openFileEntryAtom, store);
     const leftPane = runGetAtomHook(leftPaneAtom, store);
 
-    const { fileEntry: fileToOpen, editorData } = makeFile('file.txt');
+    const { fileEntry: fileToOpen, editorData } = makeFileAndEditor('file.txt');
     expect(leftPane.current.openEditors).not.toContainEqual(editorData);
     expect(leftPane.current.activeEditor).toBeUndefined();
 
@@ -78,7 +76,7 @@ describe('fileActions', () => {
     const openFile = runSetAtomHook(openFileEntryAtom, store);
     const rightPane = runGetAtomHook(rightPaneAtom, store);
 
-    const { fileEntry: fileToOpen, editorData } = makeFile('file.pdf');
+    const { fileEntry: fileToOpen, editorData } = makeFileAndEditor('file.pdf');
     expect(rightPane.current.openEditors).not.toContainEqual(fileToOpen);
     expect(rightPane.current.activeEditor).toBeUndefined();
 
@@ -95,7 +93,7 @@ describe('fileActions', () => {
     const openFile = runSetAtomHook(openFileEntryAtom, store);
     const leftPane = runGetAtomHook(leftPaneAtom, store);
 
-    const { fileEntry: fileToOpen } = makeFile('file.txt');
+    const { fileEntry: fileToOpen } = makeFileAndEditor('file.txt');
     expect(leftPane.current.openEditors.length).toBe(0);
 
     act(() => {
@@ -143,8 +141,8 @@ describe('fileActions', () => {
     const closeFileFromPane = runSetAtomHook(closeEditorFromPaneAtom, store);
     const leftPane = runGetAtomHook(leftPaneAtom, store);
 
-    const { fileEntry: fileA, editorData: editorDataA } = makeFile('fileA.txt');
-    const { fileEntry: fileB } = makeFile('fileB.txt');
+    const { fileEntry: fileA, editorData: editorDataA } = makeFileAndEditor('fileA.txt');
+    const { fileEntry: fileB } = makeFileAndEditor('fileB.txt');
 
     act(() => {
       openFile.current(fileA);
@@ -165,8 +163,8 @@ describe('fileActions', () => {
     const closeFileFromPane = runSetAtomHook(closeEditorFromPaneAtom, store);
     const leftPane = runGetAtomHook(leftPaneAtom, store);
 
-    const { fileEntry: fileOpened, editorData: openedEditorData } = makeFile('fileA.txt');
-    const { editorData: notOpenedEditorData } = makeFile('fileB.txt');
+    const { fileEntry: fileOpened, editorData: openedEditorData } = makeFileAndEditor('fileA.txt');
+    const { editorData: notOpenedEditorData } = makeFileAndEditor('fileB.txt');
 
     act(() => {
       openFile.current(fileOpened);
@@ -188,7 +186,7 @@ describe('fileActions', () => {
     const selectFileInPane = runSetAtomHook(selectEditorInPaneAtom, store);
     const leftPane = runGetAtomHook(leftPaneAtom, store);
 
-    const { editorData } = makeFile('fileA.txt');
+    const { editorData } = makeFileAndEditor('fileA.txt');
 
     act(() => {
       selectFileInPane.current({ paneId: leftPane.current.id, editorId: editorData.id });
@@ -231,8 +229,8 @@ describe('fileActions', () => {
     const leftPane = runGetAtomHook(leftPaneAtom, store);
     const rightPane = runGetAtomHook(rightPaneAtom, store);
 
-    const { fileEntry: fileA, editorData: fileAData } = makeFile('file.txt');
-    const { fileEntry: fileB, editorData: fileBData } = makeFile('file.pdf');
+    const { fileEntry: fileA, editorData: fileAData } = makeFileAndEditor('file.txt');
+    const { fileEntry: fileB, editorData: fileBData } = makeFileAndEditor('file.pdf');
 
     act(() => {
       openFile.current(fileA);
@@ -256,7 +254,7 @@ describe('fileActions', () => {
     const rightPane = runGetAtomHook(rightPaneAtom, store);
     const moveEditorToPane = runSetAtomHook(moveEditorToPaneAtom, store);
 
-    const { fileEntry, editorData } = makeFile('file.txt');
+    const { fileEntry, editorData } = makeFileAndEditor('file.txt');
 
     act(() => {
       openFile.current(fileEntry);
@@ -280,7 +278,7 @@ describe('fileActions', () => {
     const rightPane = runGetAtomHook(rightPaneAtom, store);
     const moveEditorToPane = runSetAtomHook(moveEditorToPaneAtom, store);
 
-    const { fileEntry: fileA, editorData } = makeFile('file.txt');
+    const { fileEntry: fileA, editorData } = makeFileAndEditor('file.txt');
 
     act(() => {
       openFile.current(fileA);
@@ -305,8 +303,8 @@ describe('fileActions', () => {
     const activePane = runGetAtomHook(activePaneAtom, store);
     const moveEditorToPane = runSetAtomHook(moveEditorToPaneAtom, store);
 
-    const { fileEntry: fileA, editorData: fileAData } = makeFile('file1.txt');
-    const { fileEntry: fileB, editorData: fileBData } = makeFile('file2.txt');
+    const { fileEntry: fileA, editorData: fileAData } = makeFileAndEditor('file1.txt');
+    const { fileEntry: fileB, editorData: fileBData } = makeFileAndEditor('file2.txt');
 
     act(() => {
       openFile.current(fileA);
@@ -335,7 +333,7 @@ describe('fileActions', () => {
     const rightPane = runGetAtomHook(rightPaneAtom, store);
     const moveEditorToPane = runSetAtomHook(moveEditorToPaneAtom, store);
 
-    const { fileEntry: fileA, editorData } = makeFile('file.txt');
+    const { fileEntry: fileA, editorData } = makeFileAndEditor('file.txt');
 
     act(() => {
       openFile.current(fileA);
@@ -358,9 +356,9 @@ describe('fileActions', () => {
     const closeFileFromPane = runSetAtomHook(closeEditorFromPaneAtom, store);
     const leftPane = runGetAtomHook(leftPaneAtom, store);
 
-    const { fileEntry: fileA } = makeFile('fileA.txt');
-    const { fileEntry: fileB, editorData: editorDataB } = makeFile('fileB.txt');
-    const { fileEntry: fileC, editorData: editorDataC } = makeFile('fileC.txt');
+    const { fileEntry: fileA } = makeFileAndEditor('fileA.txt');
+    const { fileEntry: fileB, editorData: editorDataB } = makeFileAndEditor('fileB.txt');
+    const { fileEntry: fileC, editorData: editorDataC } = makeFileAndEditor('fileC.txt');
 
     act(() => {
       openFile.current(fileA);
@@ -383,9 +381,9 @@ describe('fileActions', () => {
     const closeFileFromPane = runSetAtomHook(closeEditorFromPaneAtom, store);
     const leftPane = runGetAtomHook(leftPaneAtom, store);
 
-    const { fileEntry: fileA } = makeFile('fileA.txt');
-    const { fileEntry: fileB, editorData: editorDataB } = makeFile('fileB.txt');
-    const { fileEntry: fileC, editorData: editorDataC } = makeFile('fileC.txt');
+    const { fileEntry: fileA } = makeFileAndEditor('fileA.txt');
+    const { fileEntry: fileB, editorData: editorDataB } = makeFileAndEditor('fileB.txt');
+    const { fileEntry: fileC, editorData: editorDataC } = makeFileAndEditor('fileC.txt');
 
     act(() => {
       openFile.current(fileA);
@@ -408,8 +406,8 @@ describe('fileActions', () => {
     const closeFileFromPane = runSetAtomHook(closeEditorFromPaneAtom, store);
     const leftPane = runGetAtomHook(leftPaneAtom, store);
 
-    const { fileEntry: fileA, editorData: editorDataA } = makeFile('fileA.txt');
-    const { fileEntry: fileB, editorData: editorDataB } = makeFile('fileB.txt');
+    const { fileEntry: fileA, editorData: editorDataA } = makeFileAndEditor('fileA.txt');
+    const { fileEntry: fileB, editorData: editorDataB } = makeFileAndEditor('fileB.txt');
 
     act(() => {
       openFile.current(fileA);
@@ -451,7 +449,7 @@ describe('fileActions', () => {
       textContent: 'some content',
     });
 
-    const { fileEntry: fileA } = makeFile('fileA.txt');
+    const { fileEntry: fileA } = makeFileAndEditor('fileA.txt');
 
     act(() => {
       openFile.current(fileA);

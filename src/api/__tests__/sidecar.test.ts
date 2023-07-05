@@ -1,5 +1,4 @@
 import { Command, SpawnOptions } from '@tauri-apps/api/shell';
-import { describe, it } from 'vitest';
 
 import { noop } from '../../lib/noop';
 import {
