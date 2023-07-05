@@ -26,25 +26,198 @@ This is the structure of the response:
 ```
 
 """
-import nltk
 import argparse
 import requests
-import os
-
-s2_api_key = os.environ.get("S2_API_KEY")
 
 
 class SearchSemanticScholar:
     # Declaring stopwords as a class variable
-    nltk.download("stopwords")
-    from nltk.corpus import stopwords
 
-    stopwords = set(stopwords.words("english"))
+    stopwords = set(
+        [
+            "i",
+            "me",
+            "my",
+            "myself",
+            "we",
+            "our",
+            "ours",
+            "ourselves",
+            "you",
+            "you're",
+            "you've",
+            "you'll",
+            "you'd",
+            "your",
+            "yours",
+            "yourself",
+            "yourselves",
+            "he",
+            "him",
+            "his",
+            "himself",
+            "she",
+            "she's",
+            "her",
+            "hers",
+            "herself",
+            "it",
+            "it's",
+            "its",
+            "itself",
+            "they",
+            "them",
+            "their",
+            "theirs",
+            "themselves",
+            "what",
+            "which",
+            "who",
+            "whom",
+            "this",
+            "that",
+            "that'll",
+            "these",
+            "those",
+            "am",
+            "is",
+            "are",
+            "was",
+            "were",
+            "be",
+            "been",
+            "being",
+            "have",
+            "has",
+            "had",
+            "having",
+            "do",
+            "does",
+            "did",
+            "doing",
+            "a",
+            "an",
+            "the",
+            "and",
+            "but",
+            "if",
+            "or",
+            "because",
+            "as",
+            "until",
+            "while",
+            "of",
+            "at",
+            "by",
+            "for",
+            "with",
+            "about",
+            "against",
+            "between",
+            "into",
+            "through",
+            "during",
+            "before",
+            "after",
+            "above",
+            "below",
+            "to",
+            "from",
+            "up",
+            "down",
+            "in",
+            "out",
+            "on",
+            "off",
+            "over",
+            "under",
+            "again",
+            "further",
+            "then",
+            "once",
+            "here",
+            "there",
+            "when",
+            "where",
+            "why",
+            "how",
+            "all",
+            "any",
+            "both",
+            "each",
+            "few",
+            "more",
+            "most",
+            "other",
+            "some",
+            "such",
+            "no",
+            "nor",
+            "not",
+            "only",
+            "own",
+            "same",
+            "so",
+            "than",
+            "too",
+            "very",
+            "s",
+            "t",
+            "can",
+            "will",
+            "just",
+            "don",
+            "don't",
+            "should",
+            "should've",
+            "now",
+            "d",
+            "ll",
+            "m",
+            "o",
+            "re",
+            "ve",
+            "y",
+            "ain",
+            "aren",
+            "aren't",
+            "couldn",
+            "couldn't",
+            "didn",
+            "didn't",
+            "doesn",
+            "doesn't",
+            "hadn",
+            "hadn't",
+            "hasn",
+            "hasn't",
+            "haven",
+            "haven't",
+            "isn",
+            "isn't",
+            "ma",
+            "mightn",
+            "mightn't",
+            "mustn",
+            "mustn't",
+            "needn",
+            "needn't",
+            "shan",
+            "shan't",
+            "shouldn",
+            "shouldn't",
+            "wasn",
+            "wasn't",
+            "weren",
+            "weren't",
+            "won",
+            "won't",
+            "wouldn",
+            "wouldn't",
+        ]
+    )
     # add more stopwords here
-    stopwords.update(["please", "review"])
-
-    def __init__(self, api_key):
-        self.api_key = api_key
+    stopwords.update(["please", "review", "paper", "article", "articles", "papers"])
 
     # Removes unnecessary words from search query
     def preprocess_query(self, query):
@@ -59,7 +232,7 @@ class SearchSemanticScholar:
     def search(self, query, limit=20, fields=["title", "abstract", "venue", "year"]):
         query = self.preprocess_query(query)
         url = f'https://api.semanticscholar.org/graph/v1/paper/search?query={query}&limit={limit}&fields={",".join(fields)}'
-        headers = {"Accept": "*/*", "x-api-key": self.api_key}
+        headers = {"Accept": "*/*"}
         response = requests.get(url, headers=headers, timeout=30)
         return response.json()
 
@@ -81,16 +254,9 @@ if __name__ == "__main__":
         default=20,
         help="number of search results to return",
     )
-    parser.add_argument(
-        "-ak",
-        "--api_key",
-        type=str,
-        required=True,
-        help="S2 API key",
-        default=s2_api_key,
-    )
+
     args = parser.parse_args()
 
-    paper_search = SearchSemanticScholar(args.api_key)
+    paper_search = SearchSemanticScholar()
     result = paper_search.search(args.query, args.limit)
     print(result)
