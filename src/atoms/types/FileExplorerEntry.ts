@@ -1,4 +1,4 @@
-import { WritableAtom } from 'jotai';
+import { PrimitiveAtom, WritableAtom } from 'jotai';
 
 import { FileEntry } from './FileEntry';
 
@@ -16,7 +16,7 @@ export interface FileExplorerFileEntry extends FileExplorerEntryBase {
 export interface FileExplorerFolderEntry extends FileExplorerEntryBase {
   isFolder: true;
   childrenAtom: WritableAtom<FileExplorerEntry[], [files: FileEntry[]], void>;
-  collapsedAtom: WritableAtom<boolean, [updatedValue: boolean], void>;
+  collapsedAtom: PrimitiveAtom<boolean>;
   root?: boolean;
 }
 
