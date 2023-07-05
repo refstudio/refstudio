@@ -7,7 +7,6 @@ import { act, mockListenEvent, setupWithJotaiProvider, waitFor } from '../../tes
 import { EventsListener } from '../EventsListener';
 
 vi.mock('../../events');
-vi.mock('../../io/filesystem');
 
 describe('EventsListener.close', () => {
   let store: ReturnType<typeof createStore>;
