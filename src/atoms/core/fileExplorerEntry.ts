@@ -39,13 +39,13 @@ function createFileExplorerFolderEntry(
  * The atom is responsible for keeping the entries sorted
  */
 function createFilesAtom(files: FileExplorerEntry[]) {
-  const filesAtom = atom<FileExplorerEntry[], [FileExplorerEntry[]], undefined>(
-    files.sort(compareFileExplorerEntries),
+  const filesAtom = atom<FileExplorerEntry[]>(files.sort(compareFileExplorerEntries));
+  return atom(
+    (get) => get(filesAtom),
     (_get, set, fileExplorerEntries: FileExplorerEntry[]) => {
       set(filesAtom, fileExplorerEntries.sort(compareFileExplorerEntries));
     },
   );
-  return filesAtom;
 }
 
 /** Creates a file explorer entry depending on the type of the given file entry (file or folder) */
@@ -66,7 +66,9 @@ function createFileExplorerEntry(file: FileEntry): FileExplorerEntry {
  *
  * This filters out dotfiles, updates the files and recursively updates the children entries for a folder
  * */
-function updateFolderChildren(filesAtom: WritableAtom<FileExplorerEntry[], [FileExplorerEntry[]], undefined>) {
+function updateFolderChildren(
+  filesAtom: WritableAtom<FileExplorerEntry[], [fileExplorerEntries: FileExplorerEntry[]], void>,
+) {
   return (get: Getter, set: Setter, updatedFiles: FileEntry[]) => {
     const currentFiles = get(filesAtom);
     const updatedFileFileEntries = updatedFiles.filter((f) => !f.isDotfile).filter((f) => !f.isFolder);
