@@ -1,9 +1,12 @@
 import json
+from pathlib import Path
 
-from sidecar import chat
+from sidecar import chat, settings
+
+from .test_ingest import _copy_fixture_to_temp_dir
 
 
-def test_chat_ask_question(monkeypatch, capsys):
+def test_chat_ask_question(monkeypatch, capsys, tmp_path):
     def mock_call_model(*args, **kwargs):
         response = {
             "choices": [
@@ -29,6 +32,14 @@ def test_chat_ask_question(monkeypatch, capsys):
         return response
     
     monkeypatch.setattr(chat.Chat, "call_model", mock_call_model)
+    
+    # copy references.json to temp dir and mock settings.REFERENCES_JSON_PATH
+    test_file = "fixtures/data/references.json"
+    path_to_test_file = Path(__file__).parent.joinpath(test_file)
+    mocked_path = tmp_path.joinpath("references.json")
+
+    _copy_fixture_to_temp_dir(path_to_test_file, mocked_path)
+    monkeypatch.setattr(settings, "REFERENCES_JSON_PATH", mocked_path)
 
     _ = chat.ask_question(
         input_text="This is a question about something",

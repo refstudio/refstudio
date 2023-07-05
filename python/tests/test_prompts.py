@@ -12,8 +12,7 @@ def test_prepare_chunks_for_prompt():
     chunks = [
         Chunk(
             text="This is a test",
-            metadata={
-                "source_filename": "test.pdf", "page_num": 1}
+            metadata={"source_filename": "test.pdf", "page_num": 1}
         ),
         Chunk(
             text="This is another test",
