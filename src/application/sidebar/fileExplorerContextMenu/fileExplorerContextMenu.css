@@ -1,11 +1,15 @@
 body {
-  --contexify-menu-bgColor: rgba(40, 40, 40, 0.98);
-  --contexify-separator-color: #4c4c4c;
-  --contexify-item-color: #fff;
-  --contexify-activeItem-color: #fff;
-  --contexify-activeItem-bgColor: #3498db;
-  --contexify-rightSlot-color: #6f6e77;
-  --contexify-activeRightSlot-color: #fff;
-  --contexify-arrow-color: #6f6e77;
-  --contexify-activeArrow-color: #fff;
+  --contexify-menu-bgColor: #f1f5f9;
+  --contexify-item-color: #000000;
+  --contexify-activeItem-color: #000000;
+  --contexify-activeItem-bgColor: #e2e8f0;
+}
+
+.contextMenu {
+  @apply p-1;
+  min-width: min-content;
+}
+
+.contextMenu .contexify_itemContent {
+  @apply px-2 py-0.5;
 }

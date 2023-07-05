@@ -6,14 +6,15 @@ export const FILE_EXPLORER_FILE_MENU_ID = 'FileExplorerFileContextMenu';
 
 export function FileExplorerFileContextMenu() {
   return (
-    <Menu id={FILE_EXPLORER_FILE_MENU_ID}>
+    <Menu animation={false} className="contextMenu" id={FILE_EXPLORER_FILE_MENU_ID}>
+      <Item disabled>Rename...</Item>
       <Item
         onClick={({ props: { id: untypedId } }) => {
           const id = untypedId as string;
           emitEvent('refstudio://explorer/delete', { path: id });
         }}
       >
-        Delete
+        Delete File
       </Item>
     </Menu>
   );
