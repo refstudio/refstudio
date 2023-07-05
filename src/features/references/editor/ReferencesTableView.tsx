@@ -5,7 +5,7 @@ import './ReferenceView.css';
 import { ColDef, GetRowIdParams, ICellRendererParams, NewValueParams, SelectionChangedEvent } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react/lib/agGridReact';
 import { useAtomValue } from 'jotai';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { VscDesktopDownload, VscKebabVertical, VscNewFile, VscTable, VscTrash } from 'react-icons/vsc';
 
 import { getReferencesAtom } from '../../../atoms/referencesState';
@@ -85,7 +85,7 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
         initialWidth: 120,
         sortable: true,
         filter: true,
-        cellRenderer: StatusCell,
+        cellRenderer: memo(StatusCell),
       },
     ],
     [handleTitleEdit],
