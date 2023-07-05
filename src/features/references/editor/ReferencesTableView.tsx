@@ -1,9 +1,17 @@
-import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-alpine.css';
+import '@ag-grid-community/styles/ag-grid.css';
+import '@ag-grid-community/styles/ag-theme-alpine.css';
 import './ReferenceView.css';
 
-import { ColDef, GetRowIdParams, ICellRendererParams, NewValueParams, SelectionChangedEvent } from 'ag-grid-community';
-import { AgGridReact } from 'ag-grid-react/lib/agGridReact';
+import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
+import {
+  ColDef,
+  GetRowIdParams,
+  ICellRendererParams,
+  ModuleRegistry,
+  NewValueParams,
+  SelectionChangedEvent,
+} from '@ag-grid-community/core';
+import { AgGridReact } from '@ag-grid-community/react';
 import { useAtomValue } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { VscDesktopDownload, VscKebabVertical, VscNewFile, VscTable, VscTrash } from 'react-icons/vsc';
@@ -17,6 +25,8 @@ import { TopActionIcon } from '../components/TopActionIcon';
 import { UploadTipInstructions } from '../components/UploadTipInstructions';
 import { loadColumnsState, resetColumnsState, saveColumnsState } from './grid/columnsState';
 import { authorsFormatter, firstAuthorFormatter } from './grid/formatters';
+
+ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: string }) {
   const references = useAtomValue(getReferencesAtom);
