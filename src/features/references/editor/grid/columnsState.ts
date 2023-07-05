@@ -1,4 +1,4 @@
-import { ColumnState } from 'ag-grid-community';
+import { ColumnState } from '@ag-grid-community/core';
 
 export const COLUMNS_STATE_STORAGE_KEY = 'referencesTableView.cols';
 
