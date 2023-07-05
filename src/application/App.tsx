@@ -114,7 +114,7 @@ function RightPanelWrapper() {
       <Panel collapsible order={3} ref={panelRef} onCollapse={setClosed}>
         <AIPanel onCloseClick={() => setClosed(true)} />
         {closed && (
-          <div className="absolute bottom-0 right-0 flex border border-slate-300 bg-slate-100 px-4 py-2">
+          <div className="absolute bottom-0 right-0 flex border border-b-0 border-slate-300 bg-slate-100 px-4 py-2">
             <div
               className="flex w-60 cursor-pointer select-none items-center justify-between"
               onClick={() => setClosed(false)}
