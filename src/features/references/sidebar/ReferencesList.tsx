@@ -1,15 +1,17 @@
 import { VscFile, VscFilePdf, VscTrash } from 'react-icons/vsc';
 
-import { assertNever } from '../../../lib/assertNever';
 import { cx } from '../../../lib/cx';
-import { ReferenceItem, ReferenceItemStatus } from '../../../types/ReferenceItem';
+import { Author, ReferenceItem } from '../../../types/ReferenceItem';
+import { ReferencesItemStatusLabel } from '../components/ReferencesItemStatusLabel';
 
 export function ReferencesList({
   references,
   onRefClicked,
+  onAuthorClicked,
 }: {
   references: ReferenceItem[];
   onRefClicked: (item: ReferenceItem, openPdf?: boolean) => void;
+  onAuthorClicked: (author: Author, item: ReferenceItem) => void;
 }) {
   const handleClickFor: (ref: ReferenceItem, openPdf: boolean) => React.MouseEventHandler = (ref, openPdf) => (e) => {
     e.preventDefault();
@@ -25,11 +27,26 @@ export function ReferencesList({
             className="group/ref-item relative cursor-pointer bg-white p-1 px-4 even:bg-slate-50 hover:bg-slate-200"
             key={reference.id}
             role="listitem"
+            title={reference.title}
             onClick={handleClickFor(reference, false)}
           >
             <div className="truncate whitespace-nowrap">{reference.title}</div>
             <div className="whitespace truncate text-xs">
-              {reference.authors.map(({ lastName }) => lastName).join(', ')}
+              {reference.authors.map((author, index) => (
+                <span key={author.fullName}>
+                  {index > 0 && ', '}
+                  <span
+                    className="hover:underline"
+                    onClick={(evt) => {
+                      evt.stopPropagation();
+                      evt.preventDefault();
+                      onAuthorClicked(author, reference);
+                    }}
+                  >
+                    {author.lastName}
+                  </span>
+                </span>
+              ))}
             </div>
             <div className="mt-2 flex justify-between text-xs">
               <div className="font-mono">[{reference.citationKey}]</div>
@@ -52,28 +69,4 @@ export function ReferencesList({
       </ul>
     </div>
   );
-}
-
-function ReferencesItemStatusLabel({ status }: { status: ReferenceItemStatus }) {
-  switch (status) {
-    case 'processing':
-      return (
-        <span className="rounded-md border border-orange-400 bg-white/60 px-1 py-0.5 uppercase text-orange-400">
-          processing
-        </span>
-      );
-    case 'failure':
-      return (
-        <span className="rounded-md border border-red-400 bg-white/60 px-1 py-0.5 uppercase text-red-400">failure</span>
-      );
-    case 'complete':
-      return (
-        <span className="rounded-md border border-green-400 bg-white/60 px-1 py-0.5 uppercase text-green-400">
-          complete
-        </span>
-      );
-    default:
-      assertNever(status);
-      return null;
-  }
 }
