@@ -1,39 +1,24 @@
-"""
-to run the script, use the following command:
+'''
+Author: Shaurya
+This script performs a search on Semantic Scholar and retrieves information about a set of papers.
 
-```
-python search.py -q "machine learning"
- ```
+Instructions:
+The script takes two command line arguments:
+--query: The term you want to search on Semantic Scholar, written in quotation marks (e.g., "brain computer interface").
+--limit: Optional, the maximum number of papers to retrieve. Default is 10.
 
-This is the structure of the response:
+Run the script like so from your terminal:
+    python search.py --query "computational linguistics" --limit 10
+'''
 
-```json
-{
-  "total": 0,
-  "offset": 0,
-  "next": 0,
-  "data": [
-    {
-      "paperId": "",
-      "title": "",
-      "abstract": "",
-      "venue": "",
-      "year": 0
-    },
-    . . .
-  ]
-}
-```
-
-"""
 import argparse
-import requests
+from semanticscholar import SemanticScholar
 
-
-class SearchSemanticScholar:
-    # Declaring stopwords as a class variable
-
-    stopwords = set(
+class Search:
+    # Initialize the SemanticScholar API client and stopwords set
+    def __init__(self):
+        self.s2 = SemanticScholar()
+        self.stopwords = set(
         [
             "i",
             "me",
@@ -216,47 +201,35 @@ class SearchSemanticScholar:
             "wouldn't",
         ]
     )
-    # add more stopwords here
-    stopwords.update(["please", "review", "paper", "article", "articles", "papers"])
-
-    # Removes unnecessary words from search query
+    
+    # Method to preprocess the query
     def preprocess_query(self, query):
+        # convert query to lowercase and remove stopwords
         query = query.lower()
-        # remove stopwords from the query
-        query = " ".join([word for word in query.split() if word not in self.stopwords])
-        # space between the query is removed, replaced with '+'
-        query = query.replace(" ", "+")
+        query = '+'.join([word for word in query.split() if word not in self.stopwords])
         return query
 
-    # Performs a search
-    def search(self, query, limit=20, fields=["title", "abstract", "venue", "year"]):
+    # Method to perform the search
+    # Other search fields can be found here: 
+    # https://github.com/danielnsilva/semanticscholar/blob/da433a1f45e0c17bbd58300de0602c969602675a/semanticscholar/Paper.py#L93
+    def search(self, query, limit=10, search_fields = ['title', 'abstract', 'venue', 'year', 'corpusId', 'citationCount', 'openAccessPdf']):
+        # Preprocess the query
         query = self.preprocess_query(query)
-        url = f'https://api.semanticscholar.org/graph/v1/paper/search?query={query}&limit={limit}&fields={",".join(fields)}'
-        headers = {"Accept": "*/*"}
-        response = requests.get(url, headers=headers, timeout=30)
-        return response.json()
+        results = self.s2.search_paper(query, limit=limit, fields=search_fields)
+        results_list = []
+        # For each result, create a dictionary with desired fields
+        for item in results[:limit]:
+            result = {field: getattr(item, field, None) for field in search_fields}
+            results_list.append(result)
+        return results_list
 
-
+# Main function to parse arguments and perform the search
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Semantic Scholar Paper Search")
-    parser.add_argument(
-        "-q",
-        "--query",
-        type=str,
-        required=True,
-        help="search query",
-        default="machine learning",
-    )
-    parser.add_argument(
-        "-l",
-        "--limit",
-        type=int,
-        default=20,
-        help="number of search results to return",
-    )
-
+    parser = argparse.ArgumentParser(description='Semantic Scholar search')
+    parser.add_argument('--query', type=str, required=True, help='Search query for the Semantic Scholar search')
+    parser.add_argument('--limit', type=int, default=10, help='Limit for the number of search results')
     args = parser.parse_args()
 
-    paper_search = SearchSemanticScholar()
-    result = paper_search.search(args.query, args.limit)
-    print(result)
+    ss = Search()
+    results = ss.search(args.query, args.limit)
+    print(results)
