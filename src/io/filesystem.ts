@@ -40,7 +40,7 @@ export async function getAppDataDir() {
   return appDataDir();
 }
 
-export async function getBaseDir() {
+async function getBaseDir() {
   return join(await appDataDir(), PROJECT_NAME);
 }
 export async function getUploadsDir() {
@@ -58,8 +58,6 @@ export async function ensureProjectFileStructure() {
     await ensureFile(baseDir, 'file 3.refstudio', FILE3_CONTENT);
 
     console.log('Project structure created with success. Folder: ', baseDir);
-
-    return baseDir;
   } catch (err) {
     console.error('ERROR', err);
     throw new Error('Error ensuring file struture');
@@ -74,13 +72,14 @@ async function ensureFile(baseDir: string, fileName: string, content: string) {
 }
 
 export async function readAllProjectFiles() {
-  const entries = await readDir(await getBaseDir(), { recursive: true });
-  const fileEntries = entries.map(convertTauriFileEntryToFileEntry);
-  return sortedFileEntries(fileEntries);
+  const baseDir = await getBaseDir();
+  const entries = await readDir(baseDir, { recursive: true });
+  return entries.map((entry) => convertTauriFileEntryToFileEntry(entry, baseDir));
 }
 
-export async function writeFileContent(path: string, textContent: string) {
+export async function writeFileContent(relativePath: string, textContent: string) {
   try {
+    const path = (await getBaseDir()) + relativePath;
     await writeTextFile(path, textContent);
     return true;
   } catch (err) {
@@ -101,73 +100,53 @@ export async function uploadFiles(files: File[]) {
 }
 
 export async function readFileContent(file: FileFileEntry): Promise<EditorContent> {
+  const path = (await getBaseDir()) + file.path;
   switch (file.fileExtension) {
     case 'xml': {
-      const textContent = await readTextFile(file.path);
+      const textContent = await readTextFile(path);
       return { type: 'xml', textContent };
     }
     case 'json': {
-      const textContent = await readTextFile(file.path);
+      const textContent = await readTextFile(path);
       return { type: 'json', textContent };
     }
     case 'pdf': {
-      const binaryContent = await readBinaryFile(file.path);
+      const binaryContent = await readBinaryFile(path);
       return { type: 'pdf', binaryContent };
     }
     default: {
-      const textContent = await readTextFile(file.path);
+      const textContent = await readTextFile(path);
       return { type: 'text', textContent };
     }
   }
 }
 
-function convertTauriFileEntryToFileEntry(entry: TauriFileEntry): FileEntry {
+function convertTauriFileEntryToFileEntry(entry: TauriFileEntry, baseDir: string): FileEntry {
   const isFolder = !!entry.children;
 
   const name = entry.name ?? '';
   const isDotfile = name.startsWith('.');
 
+  const relativePath = entry.path.replace(new RegExp(`^${baseDir}`), '');
+
   if (isFolder) {
     return {
       name,
-      path: entry.path,
+      path: relativePath,
       isFolder,
       isFile: !isFolder,
       isDotfile,
-      children: entry.children!.map(convertTauriFileEntryToFileEntry),
+      children: entry.children!.map((child) => convertTauriFileEntryToFileEntry(child, baseDir)),
     };
   } else {
     const fileExtension = name.split('.').pop()?.toLowerCase() ?? '';
     return {
       name,
-      path: entry.path,
+      path: relativePath,
       fileExtension,
       isFolder,
       isDotfile,
       isFile: !isFolder,
     };
   }
-}
-
-function sortedFileEntries(entries: FileEntry[]): FileEntry[] {
-  return entries
-    .sort((fileA, fileB) => {
-      if (fileA.isFile) {
-        return -1;
-      }
-      if (fileB.isFile) {
-        return 1;
-      }
-      return fileA.name.localeCompare(fileB.name);
-    })
-    .map((entry) => {
-      if (entry.isFile) {
-        return entry;
-      } else {
-        return {
-          ...entry,
-          children: sortedFileEntries(entry.children),
-        };
-      }
-    });
 }
