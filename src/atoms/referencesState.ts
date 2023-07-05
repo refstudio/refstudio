@@ -1,6 +1,7 @@
 import { atom } from 'jotai';
 
 import { removeReferences } from '../api/ingestion';
+import { isNonNullish } from '../lib/isNonNullish';
 import { ReferenceItem } from '../types/ReferenceItem';
 import { closeEditorFromPaneAtom } from './editorActions';
 import { refreshFileTreeAtom } from './fileExplorerActions';
@@ -34,9 +35,11 @@ const removeReferenceAtom = atom(null, (get, set, id: string) => {
   set(setReferencesAtom, newReferences);
 });
 
-export const removeReferencesAtom = atom(null, async (get, set, filenames: string[]) => {
-  const allReferences = get(getReferencesAtom);
-  const referencesToRemove = allReferences.filter((ref) => filenames.includes(ref.filename));
+export const removeReferencesAtom = atom(null, async (get, set, ids: string[]) => {
+  const referencesToRemove = ids
+    .map((id) => get(getDerivedReferenceAtom(id)))
+    .filter((ref) => ref)
+    .filter(isNonNullish);
 
   // Close any open editor with references (details or pdf) about to be removed
   referencesToRemove.forEach((reference) => {

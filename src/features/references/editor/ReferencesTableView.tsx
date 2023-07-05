@@ -109,7 +109,7 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
 
   const handleOnBulkRemove = () =>
     emitEvent('refstudio://references/remove', {
-      filenames: selectedReferences.map((r) => r.filename),
+      referenceIds: selectedReferences.map((r) => r.id),
     });
 
   return (

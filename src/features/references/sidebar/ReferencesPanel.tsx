@@ -47,7 +47,7 @@ export function ReferencesPanel() {
   const handleAuthorClicked = (author: Author) => openReferences(author.lastName);
 
   const handleRemoveClicked = (reference: ReferenceItem) => {
-    emitEvent('refstudio://references/remove', { filenames: [reference.filename] });
+    emitEvent('refstudio://references/remove', { referenceIds: [reference.id] });
   };
 
   const handleFilterChanged = (filter: string) => {

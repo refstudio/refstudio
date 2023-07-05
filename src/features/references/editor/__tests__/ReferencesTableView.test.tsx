@@ -1,6 +1,6 @@
 import { runSetAtomHook } from '../../../../atoms/__tests__/test-utils';
 import { setReferencesAtom } from '../../../../atoms/referencesState';
-import { emitEvent, RefStudioEventName } from '../../../../events';
+import { emitEvent, RefStudioEventName, RefStudioEventPayload } from '../../../../events';
 import { act, screen, setupWithJotaiProvider, waitFor, within } from '../../../../test/test-utils';
 import { REFERENCES } from '../../__tests__/test-fixtures';
 import { UploadTipInstructions } from '../../components/UploadTipInstructions';
@@ -130,6 +130,10 @@ describe('ReferencesTableView component', () => {
 
     await user.click(within(screen.getByTestId('actions-menu')).getByText('Remove'));
 
-    expect(vi.mocked(emitEvent)).not.toHaveBeenCalled();
+    expect(vi.mocked(emitEvent)).not.toHaveBeenCalledWith<
+      [RefStudioEventName, RefStudioEventPayload<'refstudio://references/remove'>]
+    >('refstudio://references/remove', {
+      referenceIds: [ref1.id, ref2.id],
+    });
   });
 });

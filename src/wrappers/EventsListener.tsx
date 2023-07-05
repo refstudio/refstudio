@@ -59,5 +59,5 @@ function useCloseEditor() {
 
 function useRemoveReferences() {
   const removeReferences = useSetAtom(removeReferencesAtom);
-  return ({ filenames }: { filenames: string[] }) => void removeReferences(filenames);
+  return ({ referenceIds }: { referenceIds: string[] }) => void removeReferences(referenceIds);
 }

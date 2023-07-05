@@ -113,6 +113,6 @@ describe('ReferencesPanel', () => {
     expect(vi.mocked(emitEvent)).toBeCalled();
     expect(vi.mocked(emitEvent)).toBeCalledWith<
       [RefStudioEventName, RefStudioEventPayload<'refstudio://references/remove'>]
-    >('refstudio://references/remove', { filenames: [ref1.filename] });
+    >('refstudio://references/remove', { referenceIds: [ref1.id] });
   });
 });
