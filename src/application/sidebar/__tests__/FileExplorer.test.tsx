@@ -2,7 +2,7 @@ import { makeFileExplorerFileEntry, makeFileExplorerFolderEntry } from '../../..
 import { FileExplorerFileEntry, FileExplorerFolderEntry } from '../../../atoms/types/FileExplorerEntry';
 import { noop } from '../../../lib/noop';
 import { act, render, screen, setup } from '../../../test/test-utils';
-import { FileEntryTree } from '../FileExplorer';
+import { FileExplorer } from '../FileExplorer';
 
 describe('FileExplorer', () => {
   let fileEntry: FileExplorerFileEntry;
@@ -15,13 +15,13 @@ describe('FileExplorer', () => {
   });
 
   it('should render a file', () => {
-    render(<FileEntryTree fileExplorerEntry={folderEntry} selectedFiles={[]} onFileClick={noop} />);
+    render(<FileExplorer fileExplorerEntry={folderEntry} selectedFiles={[]} onFileClick={noop} />);
     expect(screen.getByText(fileEntry.name)).toBeInTheDocument();
   });
 
   it('should call onFileClick with file path', async () => {
     const onClick = vi.fn();
-    const { user } = setup(<FileEntryTree fileExplorerEntry={folderEntry} selectedFiles={[]} onFileClick={onClick} />);
+    const { user } = setup(<FileExplorer fileExplorerEntry={folderEntry} selectedFiles={[]} onFileClick={onClick} />);
 
     await user.click(screen.getByText(fileEntry.name));
 
@@ -33,7 +33,7 @@ describe('FileExplorer', () => {
     const file = makeFileExplorerFileEntry('File 1.pdf');
     const { folderEntry: folder } = makeFileExplorerFolderEntry('Folder', [file], false);
 
-    const { user } = setup(<FileEntryTree fileExplorerEntry={folder} selectedFiles={[]} onFileClick={noop} />);
+    const { user } = setup(<FileExplorer fileExplorerEntry={folder} selectedFiles={[]} onFileClick={noop} />);
     expect(screen.getByText(folder.name)).toBeInTheDocument();
 
     // Folder is collapsed by default

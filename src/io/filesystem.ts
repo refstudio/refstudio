@@ -31,7 +31,7 @@ In the cycling world, power meters are the typical way to objectively measure pe
 `;
 
 const PROJECT_NAME = 'project-x';
-const UPLOADS_DIR = 'uploads';
+export const UPLOADS_DIR = 'uploads';
 
 export async function getConfigDir() {
   return appConfigDir();
