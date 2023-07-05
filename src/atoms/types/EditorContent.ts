@@ -1,3 +1,5 @@
+import { EditorIdFor } from './EditorData';
+
 export interface TextEditorContent {
   type: 'text';
   textContent: string;
@@ -20,11 +22,12 @@ export interface JsonEditorContent {
 
 export interface ReferencesEditorContent {
   type: 'references';
+  filter?: string;
 }
 
 export interface ReferenceEditorContent {
   type: 'reference';
-  referenceId: string;
+  referenceId: EditorIdFor<'reference'>;
 }
 
 export type EditorContent =

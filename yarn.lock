@@ -12,6 +12,42 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ag-grid-community/client-side-row-model@npm:^30.0.3":
+  version: 30.0.3
+  resolution: "@ag-grid-community/client-side-row-model@npm:30.0.3"
+  dependencies:
+    "@ag-grid-community/core": ~30.0.3
+  checksum: a9335b5b96f8d834c690e6861697f206d86186eaab41f60fffc3e171040483c50a2ed748f66c2ba5158ee6b2a710e118e312bedc57a721532c7267e2d24ed911
+  languageName: node
+  linkType: hard
+
+"@ag-grid-community/core@npm:^30.0.3, @ag-grid-community/core@npm:~30.0.3":
+  version: 30.0.3
+  resolution: "@ag-grid-community/core@npm:30.0.3"
+  checksum: 68a216e90d0a735f864d69ac14c2d003900e7f03e4d3dddb8d85ecce9741a7215531044fdcdb9fb34aa97010094b05b387f06d9ccf6070fb022ddaf30188e1d2
+  languageName: node
+  linkType: hard
+
+"@ag-grid-community/react@npm:^30.0.3":
+  version: 30.0.3
+  resolution: "@ag-grid-community/react@npm:30.0.3"
+  dependencies:
+    prop-types: ^15.8.1
+  peerDependencies:
+    "@ag-grid-community/core": ~30.0.3
+    react: ^16.3.0 || ^17.0.0 || ^18.0.0
+    react-dom: ^16.3.0 || ^17.0.0 || ^18.0.0
+  checksum: 944a0a9cb6db2ac14ae4d44a3c3172e6c169b186888202ab76a4370d739770ef7ace74c772702dde0be223173cfe3b2aa3ed645f2022cd2d4207e9a72c602024
+  languageName: node
+  linkType: hard
+
+"@ag-grid-community/styles@npm:^30.0.3":
+  version: 30.0.3
+  resolution: "@ag-grid-community/styles@npm:30.0.3"
+  checksum: 8885d2ba45ebaa27d1aa618d09307c981ea6302deb07d819beb3f2da724bff5edeff81150cab60adbb758c2d9035cf12c914fcac74809cb2de964fec9d97aba1
+  languageName: node
+  linkType: hard
+
 "@alloc/quick-lru@npm:^5.2.0":
   version: 5.2.0
   resolution: "@alloc/quick-lru@npm:5.2.0"
@@ -6526,6 +6562,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "refstudio@workspace:."
   dependencies:
+    "@ag-grid-community/client-side-row-model": ^30.0.3
+    "@ag-grid-community/core": ^30.0.3
+    "@ag-grid-community/react": ^30.0.3
+    "@ag-grid-community/styles": ^30.0.3
     "@popperjs/core": ^2.11.8
     "@tanstack/react-query": ^4.29.13
     "@tauri-apps/api": ^1.2.0

@@ -80,7 +80,7 @@ export function mockListenEvent() {
   return {
     trigger,
     get registeredEventNames() {
-      return Object.keys(current);
+      return Object.keys(current) as RefStudioEventName[];
     },
   };
 }

@@ -97,17 +97,17 @@ interface MainPaneViewContentProps {
 
 export function MainPaneViewContent({ activeEditorAtoms, pdfViewerRef }: MainPaneViewContentProps) {
   const { loadableEditorContentAtom } = activeEditorAtoms;
-  const loadableFileContent = useAtomValue(loadableEditorContentAtom);
+  const loadableEditorContent = useAtomValue(loadableEditorContentAtom);
 
-  if (loadableFileContent.state === 'loading') {
+  if (loadableEditorContent.state === 'loading') {
     return <Spinner />;
   }
 
-  if (loadableFileContent.state === 'hasError') {
-    return <strong>Error: {String(loadableFileContent.error)}</strong>;
+  if (loadableEditorContent.state === 'hasError') {
+    return <strong>Error: {String(loadableEditorContent.error)}</strong>;
   }
 
-  const { data } = loadableFileContent;
+  const { data } = loadableEditorContent;
 
   switch (data.type) {
     case 'xml':
@@ -121,7 +121,7 @@ export function MainPaneViewContent({ activeEditorAtoms, pdfViewerRef }: MainPan
     case 'reference':
       return <ReferenceView referenceId={data.referenceId} />;
     case 'references':
-      return <ReferencesTableView />;
+      return <ReferencesTableView defaultFilter={data.filter} />;
     default: {
       assertNever(data);
       return null;

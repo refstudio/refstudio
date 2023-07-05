@@ -1,25 +1,10 @@
 import json
-import logging
-import os
 import sys
 
 from sidecar import settings, typing
+from sidecar.settings import logger
 
-logging.root.setLevel(logging.NOTSET)
-
-logger = logging.getLogger(__name__)
-handler = logging.FileHandler(
-    os.path.join(
-        os.environ.get("SIDECAR_LOG_DIR", "/tmp"), "refstudio-sidecar.log"
-    )
-)
-handler.setLevel(logging.INFO)
-
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-handler.setFormatter(formatter)
-
-logger.addHandler(handler)
-logger.disabled = os.environ.get("SIDECAR_ENABLE_LOGGING", "false").lower() == "true"
+logger = logger.getChild(__name__)
 
 
 def update_reference(data: dict):

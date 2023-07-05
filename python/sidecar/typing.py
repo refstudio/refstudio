@@ -109,6 +109,7 @@ class ChatResponseChoice(RefStudioModel):
 class CliCommands(RefStudioModel):
     ingest: IngestResponse
     ingest_status: IngestStatusResponse
+    ingest_references: IngestResponse
     rewrite: list[RewriteChoice]
     chat: list[ChatResponseChoice]
     update: UpdateStatusResponse

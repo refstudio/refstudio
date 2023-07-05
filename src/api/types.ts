@@ -17,6 +17,7 @@ export type ResponseStatus = 'ok' | 'error';
 export interface CliCommands {
   ingest: IngestResponse;
   ingest_status: IngestStatusResponse;
+  ingest_references: IngestResponse;
   rewrite: RewriteChoice[];
   chat: ChatResponseChoice[];
   update: UpdateStatusResponse;

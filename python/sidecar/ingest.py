@@ -1,5 +1,4 @@
 import json
-import logging
 import os
 import shutil
 import sys
@@ -12,27 +11,12 @@ from grobid_client.grobid_client import (GrobidClient,
                                          ServerUnavailableException)
 from sidecar import shared, typing
 
-from .settings import REFERENCES_JSON_PATH, UPLOADS_DIR
+from .settings import REFERENCES_JSON_PATH, UPLOADS_DIR, logger
 from .storage import JsonStorage
 from .typing import Author, IngestResponse, Reference
 
 load_dotenv()
-
-logging.root.setLevel(logging.NOTSET)
-
-logger = logging.getLogger(__name__)
-handler = logging.FileHandler(
-    os.path.join(
-        os.environ.get("SIDECAR_LOG_DIR", "/tmp"), "refstudio-sidecar.log"
-    )
-)
-handler.setLevel(logging.INFO)
-
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-handler.setFormatter(formatter)
-
-logger.addHandler(handler)
-logger.disabled = os.environ.get("SIDECAR_ENABLE_LOGGING", "false").lower() == "true"
+logger = logger.getChild(__name__)
 
 GROBID_SERVER_URL = "https://kermitt2-grobid.hf.space"
 
@@ -48,6 +32,11 @@ def get_statuses():
     status_fetcher = IngestStatusFetcher(storage=storage)
     status_fetcher.emit_statuses()
 
+def get_references(pdf_directory: str):
+    pdf_directory = Path(pdf_directory)
+    ingest = PDFIngestion(input_dir=pdf_directory)
+    response = ingest.create_ingest_response()
+    sys.stdout.write(response.json())
 
 class PDFIngestion:
 

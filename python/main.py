@@ -15,6 +15,9 @@ if __name__ == '__main__':
     if args.command == "ingest_status":
         ingest.get_statuses()
 
+    if args.command == "ingest_references":
+        ingest.get_references(args.pdf_directory)
+
     if args.command == "rewrite":
         rewrite.summarize(args.text)
     
