@@ -40,7 +40,7 @@ export async function getAppDataDir() {
   return appDataDir();
 }
 
-export async function getBaseDir() {
+async function getBaseDir() {
   return join(await appDataDir(), PROJECT_NAME);
 }
 export async function getUploadsDir() {
