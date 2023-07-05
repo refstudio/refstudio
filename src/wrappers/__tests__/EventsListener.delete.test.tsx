@@ -31,7 +31,7 @@ describe('EventsListener.close', () => {
 
   it(`should delete the file when the refstudio://explorer/delete event is triggered`, async () => {
     const mockData = mockListenEvent();
-    const { fileEntry } = makeFile('Root File.txt');
+    const fileEntry = makeFile('Root File.txt');
     vi.mocked(readAllProjectFiles).mockResolvedValue([fileEntry]);
     await store.set(refreshFileTreeAtom);
 
