@@ -5,11 +5,8 @@ import { buildEditorIdFromPath, EditorData } from '../types/EditorData';
 import { FileEntry, FileFileEntry, FolderFileEntry } from '../types/FileEntry';
 import { FileExplorerEntry, FileExplorerFileEntry, FileExplorerFolderEntry } from '../types/FileExplorerEntry';
 
-export function makeFileAndEditor(
-  name: string,
-  parentPath = './',
-): { fileEntry: FileFileEntry; editorData: EditorData } {
-  const filePath = parentPath + name;
+export function makeFileAndEditor(name: string, parentPath = ''): { fileEntry: FileFileEntry; editorData: EditorData } {
+  const filePath = `${parentPath}/${name}`;
   return {
     fileEntry: {
       name,
@@ -25,18 +22,18 @@ export function makeFileAndEditor(
     },
   };
 }
-export function makeFile(name: string, parentPath = './'): FileFileEntry {
+export function makeFile(name: string, parentPath = ''): FileFileEntry {
   return makeFileAndEditor(name, parentPath).fileEntry;
 }
-export function makeFolder(name: string, children: FileEntry[] = [], parentPath = './'): FolderFileEntry {
-  const path = parentPath + name;
+export function makeFolder(name: string, children: FileEntry[] = [], parentPath = ''): FolderFileEntry {
+  const path = `${parentPath}/${name}`;
   return {
     name,
     path,
     isFolder: true,
     isDotfile: false,
     isFile: false,
-    children: children.map((child) => ({ ...child, path: `${path}/${child.path}` })),
+    children: children.map((child) => ({ ...child, path: path + child.path })),
   };
 }
 export function makeFileExplorerFileEntry(name: string): FileExplorerFileEntry {

@@ -13,14 +13,14 @@ export const refreshFileTreeAtom = atom(null, async (get, set) => {
 });
 
 export const getFileExplorerEntryFromPathAtom = (filePath: string) =>
-  atom((get) => getFileExplorerEntryFromPath(filePath, get));
+  atom((get) => getFileExplorerEntryFromPath(filePath.split('/').slice(1), get));
 
 function getFileExplorerEntryFromPath(
-  path: string,
+  path: string[],
   get: Getter,
   fileExplorerEntry: FileExplorerEntry = get(fileExplorerAtom),
 ): FileExplorerEntry | null {
-  if (fileExplorerEntry.path === path) {
+  if (path.length === 0) {
     return fileExplorerEntry;
   }
 
@@ -28,10 +28,14 @@ function getFileExplorerEntryFromPath(
     return null;
   }
 
-  const nextLevelEntry = get(fileExplorerEntry.childrenAtom).find((childEntry) => path.startsWith(childEntry.path));
-  if (nextLevelEntry) {
-    return getFileExplorerEntryFromPath(path, get, nextLevelEntry);
+  const [nextLevelEntryName, ...rest] = path;
+
+  const nextLevelEntry = get(fileExplorerEntry.childrenAtom).find(
+    (childEntry) => childEntry.name === nextLevelEntryName,
+  );
+  if (!nextLevelEntry) {
+    return null;
   }
 
-  return null;
+  return getFileExplorerEntryFromPath(rest, get, nextLevelEntry);
 }
