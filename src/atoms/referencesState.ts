@@ -3,7 +3,7 @@ import { atom } from 'jotai';
 import { removeReferences } from '../api/ingestion';
 import { isNonNullish } from '../lib/isNonNullish';
 import { ReferenceItem } from '../types/ReferenceItem';
-import { closeEditorFromPaneAtom } from './editorActions';
+import { closeEditorFromAllPanesAtom } from './editorActions';
 import { refreshFileTreeAtom } from './fileExplorerActions';
 import { buildEditorId } from './types/EditorData';
 
@@ -44,8 +44,9 @@ export const removeReferencesAtom = atom(null, async (get, set, ids: string[]) =
   // Close any open editor with references (details or pdf) about to be removed
   referencesToRemove.forEach((reference) => {
     const editorId = buildEditorId('reference', reference.id);
-    set(closeEditorFromPaneAtom, { paneId: 'LEFT', editorId });
-    set(closeEditorFromPaneAtom, { paneId: 'RIGHT', editorId });
+    set(closeEditorFromAllPanesAtom, editorId);
+    const editorPdfId = buildEditorId('pdf', reference.filepath);
+    set(closeEditorFromAllPanesAtom, editorPdfId);
   });
 
   // Remove references from BE
