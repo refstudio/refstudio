@@ -1,9 +1,9 @@
-import { exists } from '@tauri-apps/api/fs';
 import { atom } from 'jotai';
 
-import { deleteFile, getBaseDir } from '../io/filesystem';
+import { deleteFile } from '../io/filesystem';
 import { editorsContentStateAtom, loadEditorContent, loadFileEntry } from './core/editorContent';
 import { addEditorData, editorsDataAtom, setEditorDataIsDirtyAtom } from './core/editorData';
+import { fileExplorerEntriesAtom } from './core/fileExplorerEntry';
 import { addEditorToPane, selectEditorInPaneAtom } from './core/paneGroup';
 import { closeEditorFromAllPanesAtom, targetPaneIdFor } from './editorActions';
 import { getFileExplorerEntryFromPathAtom, refreshFileTreeAtom } from './fileExplorerActions';
@@ -41,11 +41,14 @@ export const openFilePathAtom = atom(null, (get, set, filePath: string) => {
   set(openFileEntryAtom, fileEntry);
 });
 
-/** Create a new file and open it in the LEFT pane */
-export const createFileAtom = atom(null, async (get, set) => {
+/** Create a new file in the root of the project directory and open it in the LEFT pane */
+export const createFileAtom = atom(null, (get, set) => {
+  const fileExplorerEntries = get(fileExplorerEntriesAtom);
+  const rootFileNames = get(fileExplorerEntries.childrenAtom).map(({ name }) => name);
   const openEditorNames = [...get(editorsDataAtom).values()].map(({ title }) => title);
-  const fileName = await generateFileName(openEditorNames);
-  const filePath = `${await getBaseDir()}/${fileName}`;
+
+  const fileName = generateFileName(new Set([...rootFileNames, ...openEditorNames]));
+  const filePath = `/${fileName}`;
   const editorId = buildEditorIdFromPath(filePath);
 
   // Load editor in memory
@@ -63,19 +66,14 @@ export const createFileAtom = atom(null, async (get, set) => {
   set(selectEditorInPaneAtom, { editorId, paneId });
 });
 
-async function generateFileName(openEditorNames: string[]) {
+function generateFileName(existingFileNames: Set<string>) {
   const nameFromIndex = (index: number) => `Untitled-${index}`;
   let i = 1;
-  while (!(await isValidName(nameFromIndex(i), openEditorNames))) {
+  while (existingFileNames.has(nameFromIndex(i))) {
     i++;
   }
   return nameFromIndex(i);
 }
-
-async function isValidName(name: string, openEditorNames: string[]) {
-  return !openEditorNames.includes(name) && !(await exists(`${await getBaseDir()}/${name}`));
-}
-
 export const deleteFileAtom = atom(null, async (get, set, filePath: string) => {
   const fileExplorerEntry = get(getFileExplorerEntryFromPathAtom(filePath));
 

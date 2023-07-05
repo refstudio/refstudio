@@ -34,7 +34,7 @@ function useSaveActiveFile() {
 function useCreateFile() {
   const createFile = useSetAtom(createFileAtom);
 
-  return () => void createFile();
+  return () => createFile();
 }
 
 function useCloseActiveEditor() {

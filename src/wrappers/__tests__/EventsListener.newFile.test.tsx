@@ -1,24 +1,18 @@
-import { exists } from '@tauri-apps/api/fs';
 import { createStore } from 'jotai';
 
 import { runGetAtomHook } from '../../atoms/__tests__/test-utils';
 import { activePaneContentAtom } from '../../atoms/paneActions';
 import { RefStudioEventName } from '../../events';
-import { getBaseDir } from '../../io/filesystem';
 import { act, mockListenEvent, setupWithJotaiProvider, waitFor } from '../../test/test-utils';
 import { EventsListener } from '../EventsListener';
 
 vi.mock('../../events');
-vi.mock('../../io/filesystem');
-vi.mock('@tauri-apps/api/fs');
 
 describe('EventsListener.close', () => {
   let store: ReturnType<typeof createStore>;
 
   beforeEach(() => {
     store = createStore();
-    vi.mocked(exists).mockResolvedValue(false);
-    vi.mocked(getBaseDir).mockResolvedValue('/root');
   });
 
   afterEach(() => {
