@@ -11,7 +11,7 @@ import { EditorContentAtoms } from '../types/EditorContentAtoms';
 import { EditorData } from '../types/EditorData';
 import { FileFileEntry } from '../types/FileEntry';
 import { PaneId } from '../types/PaneGroup';
-import { makeFile } from './test-fixtures';
+import { makeFileAndEditor } from './test-fixtures';
 import { runGetAtomHook, runSetAtomHook } from './test-utils';
 
 vi.mock('../../io/filesystem');
@@ -23,7 +23,7 @@ describe('paneActions', () => {
   let fileContentAtoms: EditorContentAtoms;
 
   beforeEach(() => {
-    const file = makeFile('file.txt');
+    const file = makeFileAndEditor('file.txt');
     fileEntry = file.fileEntry;
     editorData = file.editorData;
 
@@ -64,7 +64,7 @@ describe('paneActions', () => {
     const initialPaneId = activePane.current.id;
     const otherPaneId: PaneId = initialPaneId === 'LEFT' ? 'RIGHT' : 'LEFT';
 
-    const { fileEntry: fileEntry2, editorData: editorData2 } = makeFile('File2.txt');
+    const { fileEntry: fileEntry2, editorData: editorData2 } = makeFileAndEditor('File2.txt');
 
     act(() => {
       openFileEntry.current(fileEntry2);

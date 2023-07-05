@@ -5,7 +5,7 @@ import { buildEditorId, EditorData } from '../types/EditorData';
 import { FileEntry, FileFileEntry, FolderFileEntry } from '../types/FileEntry';
 import { FileExplorerEntry, FileExplorerFileEntry, FileExplorerFolderEntry } from '../types/FileExplorerEntry';
 
-export function makeFile(name: string): { fileEntry: FileFileEntry; editorData: EditorData } {
+export function makeFileAndEditor(name: string): { fileEntry: FileFileEntry; editorData: EditorData } {
   const filePath = './' + name;
   return {
     fileEntry: {
@@ -21,6 +21,9 @@ export function makeFile(name: string): { fileEntry: FileFileEntry; editorData: 
       title: name,
     },
   };
+}
+export function makeFile(name: string): FileFileEntry {
+  return makeFileAndEditor(name).fileEntry;
 }
 export function makeFolder(name: string, children: FileEntry[] = []): FolderFileEntry {
   return {

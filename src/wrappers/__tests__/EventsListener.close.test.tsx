@@ -1,6 +1,6 @@
 import { createStore } from 'jotai';
 
-import { makeFile } from '../../atoms/__tests__/test-fixtures';
+import { makeFileAndEditor } from '../../atoms/__tests__/test-fixtures';
 import { runGetAtomHook } from '../../atoms/__tests__/test-utils';
 import { activePaneAtom } from '../../atoms/editorActions';
 import { openFileEntryAtom } from '../../atoms/fileEntryActions';
@@ -25,7 +25,7 @@ describe('EventsListener.close', () => {
     vi.mocked(readFileContent).mockResolvedValue({ type: 'text', textContent: 'Lorem Ipsum' });
     store = createStore();
 
-    const file = makeFile('File.txt');
+    const file = makeFileAndEditor('File.txt');
     fileEntry = file.fileEntry;
     editorData = file.editorData;
 
@@ -70,7 +70,7 @@ describe('EventsListener.close', () => {
     const mockData = mockListenEvent();
     const activePane = runGetAtomHook(activePaneAtom, store);
 
-    const { fileEntry: fileEntry2, editorData: editorData2 } = makeFile('File2.txt');
+    const { fileEntry: fileEntry2, editorData: editorData2 } = makeFileAndEditor('File2.txt');
 
     act(() => store.set(openFileEntryAtom, fileEntry2));
 

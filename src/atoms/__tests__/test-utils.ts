@@ -25,10 +25,10 @@ export function stringifyFileExplorerState(
     const children = store.get(fileExplorerEntry.childrenAtom);
     if (fileExplorerEntry.root) {
       return `\n${children.map((child) => stringifyFileExplorerState(child, store)).join('\n')}\n`;
-    } else if (store.get(fileExplorerEntry.collapsedAtom)) {
-      return `${' '.repeat(indent)}> ${fileExplorerEntry.name} (${children.length})`;
     } else {
-      return `${' '.repeat(indent)}v ${fileExplorerEntry.name}\n${children
+      const arrowCharacter = store.get(fileExplorerEntry.collapsedAtom) ? '>' : 'v';
+      const hasChildren = children.length > 0;
+      return `${' '.repeat(indent)}${arrowCharacter} ${fileExplorerEntry.name}${hasChildren ? '\n' : ''}${children
         .map((child) => stringifyFileExplorerState(child, store, indent + 2))
         .join('\n')}`;
     }
