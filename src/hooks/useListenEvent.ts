@@ -16,7 +16,11 @@ export function useListenEvent<Event extends RefStudioEventName>(
     (isMounted) =>
       listenEvent<Event>(eventName, (evt) => {
         if (isMounted()) {
-          callback(evt.payload);
+          // Note: The payload is null when there is no payload.
+          //       This will break our implementation (typing),
+          //       so we need to make the fallback and cast
+          const payload = (evt.payload ?? undefined) as RefStudioEventPayload<Event>;
+          callback(payload);
         }
       }),
     (releaseHandle) => releaseHandle(),

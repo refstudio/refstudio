@@ -24,7 +24,7 @@ export const openReferenceAtom = atom(null, (get, set, referenceId: string) => {
   // Load editor in memory
   const currentOpenEditors = get(editorsContentStateAtom);
   if (!currentOpenEditors.has(editorId)) {
-    set(loadEditorContent, { editorId, editorContent: { type: 'reference', referenceId } });
+    set(loadEditorContent, { editorId, editorContent: { type: 'reference', referenceId: editorId } });
   }
 
   // Add to editor entries atom
@@ -39,11 +39,11 @@ export const openReferenceAtom = atom(null, (get, set, referenceId: string) => {
 });
 
 /** Open the references pane in the right pane */
-export const openReferencesAtom = atom(null, (_get, set) => {
+export const openReferencesAtom = atom(null, (_get, set, filter?: string) => {
   const editorId = buildEditorId('references');
 
   // Load in memory
-  set(loadEditorContent, { editorId, editorContent: { type: 'references' } });
+  set(loadEditorContent, { editorId, editorContent: { type: 'references', filter } });
 
   // Add to editor entries atom
   set(addEditorData, { id: editorId, title: 'RefStudio References' });

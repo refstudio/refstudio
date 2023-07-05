@@ -4,10 +4,11 @@ import { useAtomValue } from 'jotai';
 import { useMemo } from 'react';
 
 import { getDerivedReferenceAtom } from '../../../atoms/referencesState';
-import { ReferenceEditorContent } from '../../../atoms/types/EditorContent';
+import { EditorIdFor, parseEditorId } from '../../../atoms/types/EditorData';
 
-export function ReferenceView({ referenceId }: Pick<ReferenceEditorContent, 'referenceId'>) {
-  const referenceAtom = useMemo(() => getDerivedReferenceAtom(referenceId), [referenceId]);
+export function ReferenceView({ referenceId }: { referenceId: EditorIdFor<'reference'> }) {
+  const { id } = parseEditorId(referenceId);
+  const referenceAtom = useMemo(() => getDerivedReferenceAtom(id), [id]);
   const reference = useAtomValue(referenceAtom);
 
   if (!reference) {
