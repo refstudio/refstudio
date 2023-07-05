@@ -1,6 +1,7 @@
 import os
 import sys
 from datetime import datetime
+from pathlib import Path
 from typing import List
 
 import pypdf
@@ -156,7 +157,7 @@ def chunk_reference(
     -------
     List[Chunk]
     """
-    filepath = os.path.join(settings.UPLOADS_DIR, ref.source_filename)
+    filepath = Path(settings.UPLOADS_DIR).joinpath(ref.source_filename)
     try:
         reader = pypdf.PdfReader(filepath)
     except FileNotFoundError:

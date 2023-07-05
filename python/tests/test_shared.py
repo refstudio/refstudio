@@ -4,6 +4,8 @@ from pathlib import Path
 from sidecar import settings, shared
 from sidecar.typing import Author, Reference
 
+from .test_ingest import _copy_fixture_to_temp_dir
+
 
 def test_get_word_count():
     assert shared.get_word_count("Hello World") == 2
@@ -105,10 +107,13 @@ def test_chunk_text():
     assert chunks[0].text == long_text[:chunk_size]
 
 
-def test_chunk_reference(monkeypatch):
-    filepath = "tests/fixtures/pdf/test.pdf"
-    filepath = Path(__name__).parent.joinpath(filepath)
-    monkeypatch.setattr(settings, "UPLOADS_DIR", filepath.parent)
+def test_chunk_reference(monkeypatch, tmp_path):
+    test_file = "fixtures/pdf/test.pdf" 
+    filepath = Path(__file__).parent.joinpath(test_file)
+
+    # mock uploads directory
+    _copy_fixture_to_temp_dir(filepath, tmp_path.joinpath("test.pdf"))
+    monkeypatch.setattr(settings, "UPLOADS_DIR", tmp_path)
 
     reference = Reference(
         source_filename="test.pdf",
