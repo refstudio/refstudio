@@ -2,7 +2,6 @@ import { ChangeEvent, KeyboardEvent, useCallback, useMemo, useState } from 'reac
 
 import { cx } from '../lib/cx';
 
-
 interface FileNameInputProps {
   fileName: string;
   onCancel: () => void;
@@ -19,10 +18,13 @@ export function FileNameInput({ fileName, onCancel, onSubmit }: FileNameInputPro
     return fileName.length - extensionLength;
   }, [fileName]);
 
-  const focusAndSelect = useCallback((input: HTMLInputElement | null) => {
-    input?.focus();
-    input?.setSelectionRange(0, nameLength);
-  }, [nameLength]);
+  const focusAndSelect = useCallback(
+    (input: HTMLInputElement | null) => {
+      input?.focus();
+      input?.setSelectionRange(0, nameLength);
+    },
+    [nameLength],
+  );
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => setValue(e.target.value);
 

@@ -35,7 +35,9 @@ export function FileExplorer(props: FileExplorerProps) {
           paddingLeft={`calc(${paddingLeft} - 1rem)`}
           onCancelRename={() => setPathBeingRenamed(null)}
           onClick={() => setCollapsed(!collapsed)}
-          onFileRename={(newName: string) => emitEvent('refstudio://explorer/rename', { path: fileExplorerEntry.path, newName })}
+          onFileRename={(newName: string) =>
+            emitEvent('refstudio://explorer/rename', { path: fileExplorerEntry.path, newName })
+          }
         />
       )}
       {(root || !collapsed) && (
@@ -60,7 +62,9 @@ export function FileExplorer(props: FileExplorerProps) {
                 selected={selectedFiles.includes(fileEntry.path)}
                 onCancelRename={() => setPathBeingRenamed(null)}
                 onClick={() => onFileClick(fileEntry.path)}
-                onFileRename={(newName: string) => emitEvent('refstudio://explorer/rename', { path: fileEntry.path, newName })}
+                onFileRename={(newName: string) =>
+                  emitEvent('refstudio://explorer/rename', { path: fileEntry.path, newName })
+                }
               />
             ),
           )}
