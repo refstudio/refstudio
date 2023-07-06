@@ -10,6 +10,8 @@ from sidecar.ranker import BM25Ranker
 from sidecar.storage import JsonStorage
 from sidecar.typing import ChatResponseChoice
 
+from python.sidecar.typing import ChatRequest
+
 load_dotenv()
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 
@@ -20,12 +22,10 @@ REFERENCES_STORAGE_PATH = Path(
 
 
 # TODO - remove storage_path from this function
-# it's only hear to make testing easier for right now
-def ask_question(
-        input_text: str,
-        n_options: int = 1,
-        storage_path: str = REFERENCES_STORAGE_PATH,
-    ):
+# it's only here to make testing easier for right now
+def ask_question(request: ChatRequest, storage_path: str = REFERENCES_STORAGE_PATH):
+    input_text = request.text
+    n_options = 1
     storage = JsonStorage(filepath=storage_path)
     storage.load()
     ranker = BM25Ranker(storage=storage)

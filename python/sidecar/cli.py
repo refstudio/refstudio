@@ -8,7 +8,7 @@ def get_arg_parser():
         action="store_true",
     )
     parser.add_argument(
-        'subcommand',
+        'command',
         choices=[
             'ingest',
             'ingest_status',
@@ -17,11 +17,11 @@ def get_arg_parser():
             'update',
             'delete',
         ],
-        required=True
     )
     parser.add_argument(
-        'params_json',
+        'param_json',
         type=str,
-        required=False,
+        nargs='?',
+        default='null'
     )
     return parser

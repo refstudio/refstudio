@@ -4,6 +4,8 @@ import sys
 
 import openai
 from dotenv import load_dotenv
+from python.sidecar.typing import RewriteRequest
+
 from sidecar import prompts
 from sidecar.typing import RewriteChoice
 
@@ -11,7 +13,9 @@ load_dotenv()
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 
-def summarize(text: str, n_options: int = 1) -> str:
+def summarize(arg: RewriteRequest) -> str:
+    text = arg.text
+    n_options = 1
     prompt = prompts.create_prompt_for_summarize(text)
     chat = Rewriter(prompt, n_options)
     response = chat.get_response()

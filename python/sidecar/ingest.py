@@ -13,7 +13,7 @@ from sidecar import shared, typing
 
 from .settings import REFERENCES_JSON_PATH, UPLOADS_DIR, logger
 from .storage import JsonStorage
-from .typing import Author, IngestResponse, Reference
+from .typing import Author, IngestRequest, IngestResponse, Reference
 
 load_dotenv()
 logger = logger.getChild(__name__)
@@ -21,8 +21,8 @@ logger = logger.getChild(__name__)
 GROBID_SERVER_URL = "https://kermitt2-grobid.hf.space"
 
 
-def run_ingest(pdf_directory: str):
-    pdf_directory = Path(pdf_directory)
+def run_ingest(args: IngestRequest):
+    pdf_directory = Path(args.pdf_directory)
     ingest = PDFIngestion(input_dir=pdf_directory)
     ingest.run()
 
@@ -32,8 +32,8 @@ def get_statuses():
     status_fetcher = IngestStatusFetcher(storage=storage)
     status_fetcher.emit_statuses()
 
-def get_references(pdf_directory: str):
-    pdf_directory = Path(pdf_directory)
+def get_references(args: IngestRequest):
+    pdf_directory = Path(args.pdf_directory)
     ingest = PDFIngestion(input_dir=pdf_directory)
     response = ingest.create_ingest_response()
     sys.stdout.write(response.json())
@@ -68,13 +68,13 @@ class PDFIngestion:
 
         for ref in self.references:
             self._remove_temporary_files_for_reference(ref)
-        
+
         logger.info(f"Finished ingestion for project: {self.project_name}")
 
     def _create_directories(self) -> None:
         if not self.staging_dir.exists():
             self.staging_dir.mkdir()
-        
+
         if not self.grobid_output_dir.exists():
             self.grobid_output_dir.mkdir()
 
@@ -110,9 +110,9 @@ class PDFIngestion:
 
     def _load_references(self) -> list[Reference]:
         """
-        Loads existing References list for project. If none exist, this will 
+        Loads existing References list for project. If none exist, this will
         be an empty list.
-        References that have been previously processed will not be ingested 
+        References that have been previously processed will not be ingested
         again.
         """
         filepath = self.storage_dir.joinpath('references.json')
@@ -126,7 +126,7 @@ class PDFIngestion:
 
     def _get_files_to_ingest(self) -> list[Path]:
         """
-        Determines which files need to be ingested by comparing the list of 
+        Determines which files need to be ingested by comparing the list of
         already processed References against files found in `uploads`.
         """
         if not self._check_for_uploaded_files():
@@ -150,8 +150,8 @@ class PDFIngestion:
 
     def _copy_uploads_to_staging(self) -> None:
         """
-        Copies PDF files in need of ingestion from `self.input_dir` to 
-        `self.staging_dir` so that files in `uploads` are not mutated and are 
+        Copies PDF files in need of ingestion from `self.input_dir` to
+        `self.staging_dir` so that files in `uploads` are not mutated and are
         only processed once.
         """
         files_to_ingest = self._get_files_to_ingest()
@@ -163,7 +163,7 @@ class PDFIngestion:
 
     def _remove_temporary_files_for_reference(self, ref: Reference) -> None:
         """
-        Removes a Reference's temporary files that were created during 
+        Removes a Reference's temporary files that were created during
         various stages of ingestion.
         """
         staging_path = self.staging_dir.joinpath(ref.source_filename)
@@ -186,20 +186,20 @@ class PDFIngestion:
         json_filename = f"{Path(ref.source_filename).stem}.json"
         json_path = self.storage_dir.joinpath(json_filename)
         shared.remove_file(json_path)
-    
+
     def _call_grobid_for_staging(self) -> None:
         """
         Call Grobid server for all files in `.staging` directory.
 
         Files that are successfully parsed result in a `{filename}.tei.xml`
         file being written to `.grobid`. Files that are unable to be parsed
-        are also written to `.grobid`, but their file names are structured 
+        are also written to `.grobid`, but their file names are structured
         as `{filename}_{errorcode}.txt` (e.g. some-pdf_500.txt)
         """
         if not self._check_for_staging_files():
             logger.info("No staging files found for Grobid processing")
             sys.exit()
-        
+
         num_files = len(list(self.staging_dir.glob("*.pdf")))
         timeout = 30 * num_files
 
@@ -209,8 +209,8 @@ class PDFIngestion:
         # This is a problem because the Tauri client <-> sidecar communicate over stdout.
         # So we need to wrap all Grobid calls inside of `HiddenPrints` to prevent `print`
         # messages from ending up in stdout (https://stackoverflow.com/a/45669280).
-        # 
-        # Longer-term, we should probably fork the Grobid client and make changes 
+        #
+        # Longer-term, we should probably fork the Grobid client and make changes
         # to better suit our use-case.
         with shared.HiddenPrints():
             try:
@@ -274,7 +274,7 @@ class PDFIngestion:
 
     def _parse_header(self, document: dict) -> dict:
         """
-        Parses the `header` elements of a Grobid document and returns a 
+        Parses the `header` elements of a Grobid document and returns a
         dictionary of parsed header fields.
 
         Parameters
@@ -342,7 +342,7 @@ class PDFIngestion:
                 )
             )
         return references
-    
+
     def _add_citation_keys(self, new_references: list[Reference]) -> list[Reference]:
         """
         Adds unique citation keys for a list of Reference objects based on Pandoc
@@ -351,7 +351,7 @@ class PDFIngestion:
         A citation key is based on the Reference's first author surname
         and published date.
 
-        If two References have the same author surname and published date, 
+        If two References have the same author surname and published date,
         then the citation key is appended with a, b, c, etc.
 
         If a Reference does not have an author surname or published date,
@@ -375,9 +375,9 @@ class PDFIngestion:
         # we must determine the max current "appended" index for key
         # (e.g. 1, 2, 3, a, b, c, etc.)
         # this will determine the starting index for new references
-        # 
-        # we do this by incrementing from what the citation key would have 
-        # been in its "unappended" format -- what the key would be if we did not 
+        #
+        # we do this by incrementing from what the citation key would have
+        # been in its "unappended" format -- what the key would be if we did not
         # have any other references
         max_existing_index_by_key = {}
         for ref in self.references:
@@ -391,11 +391,11 @@ class PDFIngestion:
         for ref in new_references:
             key = shared.create_citation_key(ref)
             new_ref_key_groups[key].append(ref)
-        
+
         for key, new_refs_for_key in new_ref_key_groups.items():
             idx = max_existing_index_by_key.get(key, 0)
 
-            # if no existing references ... 
+            # if no existing references ...
             if idx == 0:
                 for i, ref in enumerate(new_refs_for_key):
                     # first ref always gets the "unappended" key
@@ -410,7 +410,7 @@ class PDFIngestion:
                             # others get numbered a, b, c, etc.
                             ref.citation_key = f"{key}{chr(97 + i)}"
 
-            # if existing references, append as necessary starting 
+            # if existing references, append as necessary starting
             # from existing max index for the key
             if idx > 0:
                 for i, ref in enumerate(new_refs_for_key):
@@ -426,7 +426,7 @@ class PDFIngestion:
 
     def _create_references(self) -> None:
         """
-        Creates new Reference objects, appending them to any we have 
+        Creates new Reference objects, appending them to any we have
         previously loaded.
         """
         json_files = list(self.storage_dir.glob("*.json"))
@@ -503,13 +503,13 @@ class PDFIngestion:
             project_name=self.project_name,
             references=self.references,
         )
-    
+
 
 class IngestStatusFetcher:
     def __init__(self, storage: JsonStorage):
         self.storage = storage
         self.uploads = list(UPLOADS_DIR.glob("*.pdf"))
-    
+
     def _emit_ingest_status_response(
             self,
             response_status: typing.ResponseStatus,
@@ -529,7 +529,7 @@ class IngestStatusFetcher:
         """
         Handles scenario where `references.json` does not exist.
 
-        In this case, all files in `upload` will be in process since 
+        In this case, all files in `upload` will be in process since
         ingest has not created the `references.json` file for storage.
         """
         statuses = []
@@ -541,10 +541,10 @@ class IngestStatusFetcher:
                 )
             )
         return statuses
-    
+
     def _compare_uploads_against_references_json(self) -> list[typing.ReferenceStatus]:
         """
-        Compares files in `uploads` directory against References stored 
+        Compares files in `uploads` directory against References stored
         in `references.json` to determine ingestion status.
 
         Files that are not yet in `references.json` are in process.

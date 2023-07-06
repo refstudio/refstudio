@@ -118,10 +118,6 @@ class ChatRequest(RefStudioModel):
     text: str
 
 
-class UpdateRequest(RefStudioModel):
-    data: str
-
-
 class DeleteRequest(RefStudioModel):
     source_filenames: list[str]
     all: bool = False
@@ -138,7 +134,7 @@ class CliCommands(RefStudioModel):
     """"Rewrites a block of text in a more concise manner"""
     chat: tuple[ChatRequest, list[ChatResponseChoice]]
     """Chat with the AI"""
-    update: tuple[UpdateRequest, UpdateStatusResponse]
+    update: tuple[ReferenceUpdate, UpdateStatusResponse]
     """Update metadata for a Reference"""
     delete: tuple[DeleteRequest, DeleteStatusResponse]
     """Deletes a Reference"""
