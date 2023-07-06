@@ -10,39 +10,47 @@ export interface RightAction {
   VscIcon: IconType;
 }
 
-interface FileNodeProps {
+interface FileNodePropsBase {
   bold?: boolean;
   contextMenuId?: string;
   fileId: string;
   fileName: string;
-  isEditMode?: boolean;
   onClick: () => void;
-  onFileRename: (newName: string) => void;
-  onCancelRename: () => void;
   paddingLeft: string;
   rightAction?: RightAction;
   selected?: boolean;
   VscIcon: IconType;
 }
 
+interface NonEditableFileNodeProps extends FileNodePropsBase {
+  isEditMode?: false;
+}
+
+interface EditableFileNodeProps extends FileNodePropsBase {
+  isEditMode: true;
+  isNameValid: (name: string) => boolean;
+  onFileRename: (newName: string) => void;
+  onCancelRename: () => void;
+}
+
+type FileNodeProps = NonEditableFileNodeProps | EditableFileNodeProps;
+
 export function FileNode({
   bold,
   contextMenuId = '',
   fileName,
   fileId,
-  isEditMode,
   onClick,
-  onCancelRename,
-  onFileRename,
   paddingLeft,
   rightAction,
   selected,
   VscIcon,
+  ...editableProps
 }: FileNodeProps) {
   const show = useFileExplorerContextMenu(contextMenuId, { id: fileId });
   return (
     <div
-      className={cx('cursor-pointer select-none', 'flex flex-row items-center gap-1 py-1 pr-1', 'group', {
+      className={cx('cursor-pointer select-none', 'flex flex-row items-center gap-1 py-1', 'group', {
         'bg-slate-100': selected,
         'hover:bg-slate-200': !selected,
       })}
@@ -52,8 +60,13 @@ export function FileNode({
     >
       <div className="flex h-full w-full items-center gap-1">
         <VscIcon />
-        {isEditMode ? (
-          <FileNameInput fileName={fileName} onCancel={onCancelRename} onSubmit={onFileRename} />
+        {editableProps.isEditMode ? (
+          <FileNameInput
+            fileName={fileName}
+            isNameValid={editableProps.isNameValid}
+            onCancel={editableProps.onCancelRename}
+            onSubmit={editableProps.onFileRename}
+          />
         ) : (
           <>
             <div

@@ -6,10 +6,12 @@ interface FileNameInputProps {
   fileName: string;
   onCancel: () => void;
   onSubmit: (newValue: string) => void;
+  isNameValid: (name: string) => boolean;
 }
 
-export function FileNameInput({ fileName, onCancel, onSubmit }: FileNameInputProps) {
+export function FileNameInput({ fileName, isNameValid, onCancel, onSubmit }: FileNameInputProps) {
   const [value, setValue] = useState(fileName);
+  const isValueValid = useMemo(() => value === fileName || isNameValid(value), [isNameValid, fileName, value]);
 
   const nameLength = useMemo(() => {
     const parts = fileName.split('.');
@@ -32,7 +34,7 @@ export function FileNameInput({ fileName, onCancel, onSubmit }: FileNameInputPro
     if (e.code === 'Enter') {
       e.preventDefault();
       e.stopPropagation();
-      if (value.length === 0) {
+      if (!isValueValid) {
         return;
       } else if (value !== fileName) {
         onSubmit(value);
@@ -48,8 +50,8 @@ export function FileNameInput({ fileName, onCancel, onSubmit }: FileNameInputPro
 
   return (
     <input
-      className={cx('w-full !border-none', {
-        'focus:border-red-600': value.length === 0,
+      className={cx('w-full outline-none border border-blue-400', {
+        'border-red-600': !isValueValid,
       })}
       ref={focusAndSelect}
       value={value}

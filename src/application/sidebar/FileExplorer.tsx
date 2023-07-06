@@ -1,4 +1,5 @@
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useCallback } from 'react';
 import { VscChevronDown, VscChevronRight, VscFile } from 'react-icons/vsc';
 
 import { fileExplorerEntryPathBeingRenamed } from '../../atoms/fileExplorerActions';
@@ -9,7 +10,7 @@ import { FILE_EXPLORER_FILE_MENU_ID } from './fileExplorerContextMenu/FileExplor
 
 interface FileExplorerProps {
   fileExplorerEntry: FileExplorerFolderEntry;
-  filePathBeingRenamed: string | null;
+  filePathBeingRenamed?: string | null;
   onFileClick: (filePath: string) => void;
   selectedFiles: string[];
   paddingLeft?: string;
@@ -23,6 +24,17 @@ export function FileExplorer(props: FileExplorerProps) {
 
   const [collapsed, setCollapsed] = useAtom(fileExplorerEntry.collapsedAtom);
 
+  const isNameValid = useCallback((name: string) => {
+    if (name.startsWith('.')) {
+      return false;
+    }
+    if (name.includes('/')) {
+      return false;
+    }
+
+    return !files.find(file => file.name === name);
+  }, [files]);
+
   const { root } = fileExplorerEntry;
   return (
     <div className="flex w-full flex-col">
@@ -33,11 +45,7 @@ export function FileExplorer(props: FileExplorerProps) {
           fileId={fileExplorerEntry.path}
           fileName={fileExplorerEntry.name}
           paddingLeft={`calc(${paddingLeft} - 1rem)`}
-          onCancelRename={() => setPathBeingRenamed(null)}
           onClick={() => setCollapsed(!collapsed)}
-          onFileRename={(newName: string) =>
-            emitEvent('refstudio://explorer/rename', { path: fileExplorerEntry.path, newName })
-          }
         />
       )}
       {(root || !collapsed) && (
@@ -57,6 +65,7 @@ export function FileExplorer(props: FileExplorerProps) {
                 fileId={fileEntry.path}
                 fileName={fileEntry.name}
                 isEditMode={filePathBeingRenamed === fileEntry.path}
+                isNameValid={isNameValid}
                 key={fileEntry.path}
                 paddingLeft={paddingLeft}
                 selected={selectedFiles.includes(fileEntry.path)}
