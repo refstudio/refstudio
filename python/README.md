@@ -283,7 +283,7 @@ $ poetry run python main.py delete '{ "source_filenames": ["file-does-not-exist.
 
 `Update` updates a Reference's metadata in project storage. It is called when a user updates details about a Reference.
 
-It takes an input argument of `--data` which is a dictionary containing a key for `source_filename` and `patch`. `source_filename` acts as the unique ID for the Reference to update and `patch` is a dictionary containing the corresponding fields and values to be used for the update.
+Its input argument has a key for `source_filename` and `patch`. `source_filename` acts as the unique ID for the Reference to update and `patch` is a dictionary containing the corresponding fields and values to be used for the update.
 
 To run `update`:
 
