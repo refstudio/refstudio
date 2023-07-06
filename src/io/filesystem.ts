@@ -10,7 +10,7 @@ import {
   writeBinaryFile,
   writeTextFile,
 } from '@tauri-apps/api/fs';
-import { appConfigDir, appDataDir, join } from '@tauri-apps/api/path';
+import { appConfigDir, appDataDir, join, sep } from '@tauri-apps/api/path';
 
 import { EditorContent } from '../atoms/types/EditorContent';
 import { FileEntry, FileFileEntry } from '../atoms/types/FileEntry';
@@ -31,7 +31,11 @@ In the cycling world, power meters are the typical way to objectively measure pe
 `;
 
 const PROJECT_NAME = 'project-x';
-export const UPLOADS_DIR = 'uploads';
+const UPLOADS_DIR = 'uploads';
+
+export function makeUploadPath(filename: string) {
+  return `${sep}${UPLOADS_DIR}${sep}${filename}`;
+}
 
 export async function getConfigDir() {
   return appConfigDir();
@@ -90,7 +94,6 @@ export async function writeFileContent(relativePath: string, textContent: string
 }
 
 export async function uploadFiles(files: File[]) {
-  console.log('upload', files);
   const uploadsDir = await join(await getBaseDir(), UPLOADS_DIR);
   for (const file of files) {
     const path = await join(uploadsDir, file.name);

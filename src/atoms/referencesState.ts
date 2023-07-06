@@ -54,16 +54,12 @@ export const removeReferencesAtom = atom(null, async (get, set, ids: string[]) =
   await removeReferences(referencesToRemove.map((ref) => ref.filename));
 
   // Remove files from filesystem
-  const success = await Promise.all(
-    referencesToRemove.map((reference) => deleteFile('/uploads/' + reference.filename)),
-  );
+  const success = await Promise.all(referencesToRemove.map((reference) => deleteFile(reference.filepath)));
   if (success.some((s) => !s)) {
     console.warn('Error deleting some files');
   }
 
   // Update visible references
-  // const references = await getIngestedReferences();
-  // set(setReferencesAtom, references);
   referencesToRemove.forEach((reference) => set(removeReferenceAtom, reference.id));
 
   // Refresh file explorer

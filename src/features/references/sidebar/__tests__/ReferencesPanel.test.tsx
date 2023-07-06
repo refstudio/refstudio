@@ -1,9 +1,11 @@
-import { runGetAtomHook, runSetAtomHook } from '../../../../atoms/__tests__/test-utils';
+import { createStore } from 'jotai';
+
+import { runGetAtomHook } from '../../../../atoms/__tests__/test-utils';
 import { activePaneContentAtom } from '../../../../atoms/paneActions';
 import { setReferencesAtom } from '../../../../atoms/referencesState';
 import { buildEditorId } from '../../../../atoms/types/EditorData';
 import { emitEvent, RefStudioEventName, RefStudioEventPayload } from '../../../../events';
-import { act, screen, setupWithJotaiProvider, waitFor, within } from '../../../../test/test-utils';
+import { screen, setupWithJotaiProvider, waitFor, within } from '../../../../test/test-utils';
 import { REFERENCES } from '../../__tests__/test-fixtures';
 import { ReferencesPanel } from '../ReferencesPanel';
 
@@ -11,6 +13,13 @@ vi.mock('../../../../events');
 vi.mock('../../../../io/filesystem');
 
 describe('ReferencesPanel', () => {
+  let store: ReturnType<typeof createStore>;
+  const [ref1, ref2] = REFERENCES;
+
+  beforeEach(() => {
+    store = createStore();
+    store.set(setReferencesAtom, REFERENCES);
+  });
   afterEach(() => {
     vi.resetAllMocks();
   });
@@ -32,22 +41,15 @@ describe('ReferencesPanel', () => {
   });
 
   it('should display ReferencesList with references', () => {
-    const { store } = setupWithJotaiProvider(<ReferencesPanel />);
-    const setReferences = runSetAtomHook(setReferencesAtom, store);
-
-    act(() => setReferences.current(REFERENCES));
+    setupWithJotaiProvider(<ReferencesPanel />, store);
 
     expect(screen.queryByText(/welcome to your refstudio references library/i)).not.toBeInTheDocument();
-    expect(screen.getByText(REFERENCES[0].title)).toBeInTheDocument();
-    expect(screen.getByText(REFERENCES[1].title)).toBeInTheDocument();
+    expect(screen.getByText(ref1.title)).toBeInTheDocument();
+    expect(screen.getByText(ref2.title)).toBeInTheDocument();
   });
 
   it('should filter ReferencesList with text', async () => {
-    const { store, user } = setupWithJotaiProvider(<ReferencesPanel />);
-    const setReferences = runSetAtomHook(setReferencesAtom, store);
-
-    const [ref1, ref2] = REFERENCES;
-    act(() => setReferences.current(REFERENCES));
+    const { user } = setupWithJotaiProvider(<ReferencesPanel />, store);
 
     await user.type(screen.getByPlaceholderText('Filter (e.g. title, author)'), ref1.title);
 
@@ -57,12 +59,9 @@ describe('ReferencesPanel', () => {
   });
 
   it('should open reference on click', async () => {
-    const { store, user } = setupWithJotaiProvider(<ReferencesPanel />);
-    const setReferences = runSetAtomHook(setReferencesAtom, store);
-    const [ref1] = REFERENCES;
-    act(() => setReferences.current(REFERENCES));
+    const { user } = setupWithJotaiProvider(<ReferencesPanel />, store);
 
-    await user.click(screen.getByText(ref1.title));
+    await user.click(screen.getByRole('listitem', { name: ref1.title }));
 
     const active = runGetAtomHook(activePaneContentAtom, store);
     expect(active.current.activeEditor?.id).toBeDefined();
@@ -70,10 +69,7 @@ describe('ReferencesPanel', () => {
   });
 
   it('should open reference PDF on PDF icon click', async () => {
-    const { store, user } = setupWithJotaiProvider(<ReferencesPanel />);
-    const setReferences = runSetAtomHook(setReferencesAtom, store);
-    const [ref1] = REFERENCES;
-    act(() => setReferences.current(REFERENCES));
+    const { user } = setupWithJotaiProvider(<ReferencesPanel />, store);
 
     const elem = screen.getByRole('listitem', { name: ref1.title });
 
@@ -86,10 +82,7 @@ describe('ReferencesPanel', () => {
   });
 
   it('should open references table on author click', async () => {
-    const { store, user } = setupWithJotaiProvider(<ReferencesPanel />);
-    const setReferences = runSetAtomHook(setReferencesAtom, store);
-    const [ref1] = REFERENCES;
-    act(() => setReferences.current(REFERENCES));
+    const { user } = setupWithJotaiProvider(<ReferencesPanel />, store);
 
     const elem = screen.getAllByText(ref1.authors[0].lastName);
     await user.click(elem[0]);
@@ -97,13 +90,16 @@ describe('ReferencesPanel', () => {
     const active = runGetAtomHook(activePaneContentAtom, store);
     expect(active.current.activeEditor?.id).toBeDefined();
     expect(active.current.activeEditor?.id).toBe(buildEditorId('references'));
+    const editorContent = store.get(active.current.activeEditor!.contentAtoms.loadableEditorContentAtom);
+    if (editorContent.state === 'hasData' && editorContent.data.type === 'references') {
+      expect(editorContent.data.filter).toBe(ref1.authors[0].lastName);
+    } else {
+      fail('Unexpected editorContent');
+    }
   });
 
   it(`should emit ${'refstudio://references/remove' as RefStudioEventName} on remove clicked`, async () => {
-    const { store, user } = setupWithJotaiProvider(<ReferencesPanel />);
-    const setReferences = runSetAtomHook(setReferencesAtom, store);
-    const [ref1] = REFERENCES;
-    act(() => setReferences.current(REFERENCES));
+    const { user } = setupWithJotaiProvider(<ReferencesPanel />, store);
 
     const elem = screen.getByRole('listitem', { name: ref1.title });
 
