@@ -22,12 +22,12 @@ function parsePdfIngestionResponse(response: IngestResponse): ReferenceItem[] {
 
 export async function runPDFIngestion(): Promise<ReferenceItem[]> {
   const uploadsDir = await getUploadsDir();
-  const response = await callSidecar('ingest', ['--pdf_directory', String(uploadsDir)]);
+  const response = await callSidecar('ingest', { pdf_directory: uploadsDir });
   return parsePdfIngestionResponse(response);
 }
 
 export async function removeReferences(fileNames: string[]) {
-  const response = await callSidecar('delete', ['--source_filenames', ...fileNames]);
+  const response = await callSidecar('delete', { source_filenames: fileNames });
   if (response.status === 'error') {
     throw new Error('Error removing references: ' + response.message);
   }
@@ -35,12 +35,12 @@ export async function removeReferences(fileNames: string[]) {
 
 export async function getIngestedReferences(): Promise<ReferenceItem[]> {
   const uploadsDir = await getUploadsDir();
-  const response = await callSidecar('ingest_references', ['--pdf_directory', String(uploadsDir)]);
+  const response = await callSidecar('ingest_references', { pdf_directory: uploadsDir });
   return parsePdfIngestionResponse(response);
 }
 
 export async function getIngestionStatus() {
-  const response = await callSidecar('ingest_status', []);
+  const response = await callSidecar('ingest_status', null);
   return {
     status: response.status,
     references: response.reference_statuses.map((refStatus) => ({

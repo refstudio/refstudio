@@ -57,6 +57,7 @@ describe('sidecar', () => {
     let env: undefined | Record<string, string>;
     vi.mocked(Command).mockImplementation((program: string, args?: string | string[], options?: SpawnOptions) => {
       env = options?.env;
+      expect(args).toEqual([`{"text": "Hello chatbot!"}`]);
       return {
         execute: () => ({
           stdout: JSON.stringify({}),
@@ -64,7 +65,7 @@ describe('sidecar', () => {
       } as unknown as Command;
     });
 
-    await callSidecar('chat', []);
+    await callSidecar('chat', { text: 'Hello chatbot!' });
 
     expect(vi.mocked(getCachedSetting).mock.calls.length).toBeGreaterThan(0);
     expect(Object.keys(env ?? {}).length).toBe(7);
@@ -91,6 +92,6 @@ describe('sidecar', () => {
         } as unknown as Command),
     );
 
-    await expect(callSidecar('chat', [])).rejects.toThrow('error details');
+    await expect(callSidecar('chat', { text: 'Hello chatbot!' })).rejects.toThrow('error details');
   });
 });
