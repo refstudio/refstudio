@@ -6,47 +6,28 @@ import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-mod
 import {
   ColDef,
   GetRowIdParams,
-  ICellEditorParams,
-  ICellRendererParams,
-  KeyCode,
   ModuleRegistry,
   NewValueParams,
   SelectionChangedEvent,
+  SuppressKeyboardEventParams,
 } from '@ag-grid-community/core';
 import { AgGridReact } from '@ag-grid-community/react';
 import { useAtomValue, useSetAtom } from 'jotai';
-import {
-  forwardRef,
-  KeyboardEventHandler,
-  memo,
-  useCallback,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import {
-  VscDesktopDownload,
-  VscFile,
-  VscFilePdf,
-  VscKebabVertical,
-  VscNewFile,
-  VscTable,
-  VscTrash,
-} from 'react-icons/vsc';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { VscDesktopDownload, VscKebabVertical, VscNewFile, VscTable, VscTrash } from 'react-icons/vsc';
 
-import { openReferenceAtom, openReferencePdfAtom } from '../../../atoms/editorActions';
 import { getReferencesAtom, updateReferenceAtom } from '../../../atoms/referencesState';
 import { emitEvent } from '../../../events';
-import { autoFocus, autoFocusAndSelect } from '../../../lib/autoFocusAndSelect';
+import { autoFocusAndSelect } from '../../../lib/autoFocusAndSelect';
 import { isNonNullish } from '../../../lib/isNonNullish';
-import { Author, ReferenceItem, ReferenceItemStatus } from '../../../types/ReferenceItem';
-import { ReferencesItemStatusLabel } from '../components/ReferencesItemStatusLabel';
+import { ReferenceItem } from '../../../types/ReferenceItem';
 import { TopActionIcon } from '../components/TopActionIcon';
 import { UploadTipInstructions } from '../components/UploadTipInstructions';
+import { ActionsCell } from './grid/ActionsCell';
+import { AuthorsEditor } from './grid/AuthorsEditor';
 import { loadColumnsState, resetColumnsState, saveColumnsState } from './grid/columnsState';
 import { authorsFormatter, firstAuthorFormatter } from './grid/formatters';
+import { StatusCell } from './grid/StatusCell';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
@@ -126,6 +107,7 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
         field: 'authors',
         valueFormatter: authorsFormatter,
         editable: true,
+        suppressKeyboardEvent: (params) => params.editing && suppressShiftEnter(params),
         cellEditor: memo(AuthorsEditor),
         cellEditorPopupPosition: 'under',
         cellEditorPopup: true,
@@ -220,93 +202,9 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
   );
 }
 
-function StatusCell({ value }: ICellRendererParams<ReferenceItem, ReferenceItemStatus>) {
-  if (!value) {
-    return null;
-  }
-  return (
-    <span className="text-[10px]">
-      <ReferencesItemStatusLabel status={value} />
-    </span>
-  );
+function suppressShiftEnter(params: SuppressKeyboardEventParams) {
+  const KEY_ENTER = 'Enter';
+  const { event } = params;
+  const { key } = event;
+  return key === KEY_ENTER && event.shiftKey;
 }
-
-function ActionsCell({ data: reference }: ICellRendererParams<ReferenceItem, ReferenceItemStatus>) {
-  const openReference = useSetAtom(openReferenceAtom);
-  const openReferencePdf = useSetAtom(openReferencePdfAtom);
-
-  if (!reference) {
-    return null;
-  }
-  return (
-    <div className="flex h-full w-full items-center justify-center gap-2">
-      <VscFile
-        className="shrink-0 cursor-pointer"
-        size={20}
-        title="Open Reference Details"
-        onClick={() => openReference(reference.id)}
-      />
-      <VscFilePdf
-        className="shrink-0 cursor-pointer"
-        size={20}
-        title="Open Reference PDF"
-        onClick={() => openReferencePdf(reference.id)}
-      />
-    </div>
-  );
-}
-
-const AuthorsEditor = forwardRef((props: ICellEditorParams<ReferenceItem, Author[]>, ref) => {
-  const [value, setValue] = useState((props.value ?? []).map((v) => v.fullName).join('\n'));
-
-  const onKeyDown: KeyboardEventHandler = (event) => {
-    const { key } = event;
-    console.log('on key down', key, event.shiftKey ? 'YES SHIFT' : 'NO SHIFT');
-    if (event.shiftKey && key === KeyCode.ENTER) {
-      // shift+enter allows for newlines
-      event.stopPropagation();
-      event.preventDefault();
-      console.log('SHIFT');
-    }
-  };
-
-  useImperativeHandle(ref, () => ({
-    // the final value to send to the grid, on completion of editing
-    getValue: () =>
-      value
-        .split('\n')
-        .map((line) => line.trim())
-        .filter((line) => line.length > 0)
-        .map((fullName) => ({
-          fullName,
-          lastName: fullName.split(' ').pop() ?? '',
-        })) as Author[],
-
-    // Gets called once before editing starts, to give editor a chance to
-    // cancel the editing before it even starts.
-    isCancelBeforeStart: () => false,
-
-    // Gets called once when editing is finished (eg if Enter is pressed).
-    // If you return true, then the result of the edit will be ignored.
-    isCancelAfterEnd: () => false,
-  }));
-
-  return (
-    <div className="flex flex-col gap-2 border border-slate-200 p-1">
-      <textarea
-        className="border-none bg-slate-100 p-2 outline-none"
-        ref={autoFocus}
-        rows={(props.value?.length ?? 0) + 1}
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        onKeyDown={onKeyDown}
-      />
-      <p className="text-xs italic text-slate-500">
-        NOTE: One author per line. <br />
-        SHIFT+ENTER to create new lines.
-      </p>
-    </div>
-  );
-});
-
-AuthorsEditor.displayName = 'AuthorsEditor';
