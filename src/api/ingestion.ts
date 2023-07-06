@@ -33,6 +33,17 @@ export async function removeReferences(fileNames: string[]) {
   }
 }
 
+export async function updateReference(filename: string, patch: Partial<ReferenceItem>) {
+  const patchString = JSON.stringify({
+    source_filename: filename,
+    patch,
+  });
+  const response = await callSidecar('update', ['--data', patchString]);
+  if (response.status === 'error') {
+    throw new Error('Error updating reference: ' + response.message);
+  }
+}
+
 export async function getIngestedReferences(): Promise<ReferenceItem[]> {
   const uploadsDir = await getUploadsDir();
   const response = await callSidecar('ingest_references', ['--pdf_directory', String(uploadsDir)]);

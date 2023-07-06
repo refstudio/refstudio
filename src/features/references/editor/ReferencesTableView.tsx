@@ -6,14 +6,26 @@ import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-mod
 import {
   ColDef,
   GetRowIdParams,
+  ICellEditorParams,
   ICellRendererParams,
+  KeyCode,
   ModuleRegistry,
   NewValueParams,
   SelectionChangedEvent,
 } from '@ag-grid-community/core';
 import { AgGridReact } from '@ag-grid-community/react';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  forwardRef,
+  KeyboardEventHandler,
+  memo,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   VscDesktopDownload,
   VscFile,
@@ -25,11 +37,11 @@ import {
 } from 'react-icons/vsc';
 
 import { openReferenceAtom, openReferencePdfAtom } from '../../../atoms/editorActions';
-import { getReferencesAtom } from '../../../atoms/referencesState';
+import { getReferencesAtom, updateReferenceAtom } from '../../../atoms/referencesState';
 import { emitEvent } from '../../../events';
-import { autoFocusAndSelect } from '../../../lib/autoFocusAndSelect';
+import { autoFocus, autoFocusAndSelect } from '../../../lib/autoFocusAndSelect';
 import { isNonNullish } from '../../../lib/isNonNullish';
-import { ReferenceItem, ReferenceItemStatus } from '../../../types/ReferenceItem';
+import { Author, ReferenceItem, ReferenceItemStatus } from '../../../types/ReferenceItem';
 import { ReferencesItemStatusLabel } from '../components/ReferencesItemStatusLabel';
 import { TopActionIcon } from '../components/TopActionIcon';
 import { UploadTipInstructions } from '../components/UploadTipInstructions';
@@ -40,6 +52,7 @@ ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: string }) {
   const references = useAtomValue(getReferencesAtom);
+  const updateReference = useSetAtom(updateReferenceAtom);
   const [quickFilter, setQuickFilter] = useState(defaultFilter);
 
   useEffect(() => setQuickFilter(defaultFilter), [defaultFilter]);
@@ -48,10 +61,13 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
 
   const gridRef = useRef<AgGridReact<ReferenceItem>>(null);
 
-  const handleTitleEdit = useCallback(({ oldValue, newValue }: NewValueParams<ReferenceItem, 'string'>) => {
-    console.log('EDIT');
-    console.log(`${oldValue} -> ${newValue}`);
-  }, []);
+  const handleCellValueChanged = useCallback(
+    (params: NewValueParams<ReferenceItem>) => {
+      console.log('EDIT', params.oldValue, params.newValue);
+      void updateReference(params.data.id, params.data);
+    },
+    [updateReference],
+  );
 
   const onSelectionChanged = useCallback((event: SelectionChangedEvent<ReferenceItem>) => {
     const rows = event.api.getSelectedNodes();
@@ -75,8 +91,10 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
         initialWidth: 160,
         sortable: true,
         flex: undefined,
+        editable: true,
         checkboxSelection: true,
         headerCheckboxSelection: true,
+        onCellValueChanged: handleCellValueChanged,
       },
       {
         field: 'authors',
@@ -91,7 +109,7 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
         initialSort: 'asc',
         initialFlex: 1,
         editable: true,
-        onCellValueChanged: handleTitleEdit,
+        onCellValueChanged: handleCellValueChanged,
       },
       { field: 'abstract', flex: 2, filter: true, sortable: true },
       {
@@ -99,13 +117,20 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
         headerName: 'Published',
         filter: true,
         sortable: true,
+        editable: true,
         initialWidth: 140,
         initialFlex: undefined,
+        onCellValueChanged: handleCellValueChanged,
       },
       {
         field: 'authors',
         valueFormatter: authorsFormatter,
+        editable: true,
+        cellEditor: memo(AuthorsEditor),
+        cellEditorPopupPosition: 'under',
+        cellEditorPopup: true,
         filter: true,
+        onCellValueChanged: handleCellValueChanged,
       },
       {
         field: 'status',
@@ -124,7 +149,7 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
         cellRenderer: memo(ActionsCell),
       },
     ],
-    [handleTitleEdit],
+    [handleCellValueChanged],
   );
 
   const handleOnBulkRemove = () =>
@@ -230,3 +255,58 @@ function ActionsCell({ data: reference }: ICellRendererParams<ReferenceItem, Ref
     </div>
   );
 }
+
+const AuthorsEditor = forwardRef((props: ICellEditorParams<ReferenceItem, Author[]>, ref) => {
+  const [value, setValue] = useState((props.value ?? []).map((v) => v.fullName).join('\n'));
+
+  const onKeyDown: KeyboardEventHandler = (event) => {
+    const { key } = event;
+    console.log('on key down', key, event.shiftKey ? 'YES SHIFT' : 'NO SHIFT');
+    if (event.shiftKey && key === KeyCode.ENTER) {
+      // shift+enter allows for newlines
+      event.stopPropagation();
+      event.preventDefault();
+      console.log('SHIFT');
+    }
+  };
+
+  useImperativeHandle(ref, () => ({
+    // the final value to send to the grid, on completion of editing
+    getValue: () =>
+      value
+        .split('\n')
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0)
+        .map((fullName) => ({
+          fullName,
+          lastName: fullName.split(' ').pop() ?? '',
+        })) as Author[],
+
+    // Gets called once before editing starts, to give editor a chance to
+    // cancel the editing before it even starts.
+    isCancelBeforeStart: () => false,
+
+    // Gets called once when editing is finished (eg if Enter is pressed).
+    // If you return true, then the result of the edit will be ignored.
+    isCancelAfterEnd: () => false,
+  }));
+
+  return (
+    <div className="flex flex-col gap-2 border border-slate-200 p-1">
+      <textarea
+        className="border-none bg-slate-100 p-2 outline-none"
+        ref={autoFocus}
+        rows={(props.value?.length ?? 0) + 1}
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onKeyDown={onKeyDown}
+      />
+      <p className="text-xs italic text-slate-500">
+        NOTE: One author per line. <br />
+        SHIFT+ENTER to create new lines.
+      </p>
+    </div>
+  );
+});
+
+AuthorsEditor.displayName = 'AuthorsEditor';
