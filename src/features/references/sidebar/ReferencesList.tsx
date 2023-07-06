@@ -8,10 +8,12 @@ export function ReferencesList({
   references,
   onRefClicked,
   onAuthorClicked,
+  onRemoveClicked,
 }: {
   references: ReferenceItem[];
   onRefClicked: (item: ReferenceItem, openPdf?: boolean) => void;
   onAuthorClicked: (author: Author, item: ReferenceItem) => void;
+  onRemoveClicked: (item: ReferenceItem) => void;
 }) {
   const handleClickFor: (ref: ReferenceItem, openPdf: boolean) => React.MouseEventHandler = (ref, openPdf) => (e) => {
     e.preventDefault();
@@ -62,7 +64,16 @@ export function ReferencesList({
             >
               <VscFile size={20} title="Open Reference" onClick={handleClickFor(reference, false)} />
               <VscFilePdf size={20} title="Open PDF" onClick={handleClickFor(reference, true)} />
-              <VscTrash className="text-slate-600/50" size={20} title="NOT IMPLEMENTED" />
+              <VscTrash
+                className="text-slate-600"
+                size={20}
+                title="Remove Reference"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  onRemoveClicked(reference);
+                }}
+              />
             </div>
           </li>
         ))}

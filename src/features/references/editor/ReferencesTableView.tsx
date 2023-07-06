@@ -12,13 +12,23 @@ import {
   SelectionChangedEvent,
 } from '@ag-grid-community/core';
 import { AgGridReact } from '@ag-grid-community/react';
-import { useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { VscDesktopDownload, VscKebabVertical, VscNewFile, VscTable, VscTrash } from 'react-icons/vsc';
+import {
+  VscDesktopDownload,
+  VscFile,
+  VscFilePdf,
+  VscKebabVertical,
+  VscNewFile,
+  VscTable,
+  VscTrash,
+} from 'react-icons/vsc';
 
+import { openReferenceAtom, openReferencePdfAtom } from '../../../atoms/editorActions';
 import { getReferencesAtom } from '../../../atoms/referencesState';
 import { emitEvent } from '../../../events';
 import { autoFocusAndSelect } from '../../../lib/autoFocusAndSelect';
+import { isNonNullish } from '../../../lib/isNonNullish';
 import { ReferenceItem, ReferenceItemStatus } from '../../../types/ReferenceItem';
 import { ReferencesItemStatusLabel } from '../components/ReferencesItemStatusLabel';
 import { TopActionIcon } from '../components/TopActionIcon';
@@ -34,7 +44,7 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
 
   useEffect(() => setQuickFilter(defaultFilter), [defaultFilter]);
 
-  const [numberOfSelectedRows, setNumberOfSelectedRows] = useState(0);
+  const [selectedReferences, setSelectedReferences] = useState<ReferenceItem[]>([]);
 
   const gridRef = useRef<AgGridReact<ReferenceItem>>(null);
 
@@ -43,9 +53,9 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
     console.log(`${oldValue} -> ${newValue}`);
   }, []);
 
-  const onSelectionChanged = useCallback((event: SelectionChangedEvent) => {
-    const rowCount = event.api.getSelectedNodes().length;
-    setNumberOfSelectedRows(rowCount);
+  const onSelectionChanged = useCallback((event: SelectionChangedEvent<ReferenceItem>) => {
+    const rows = event.api.getSelectedNodes();
+    setSelectedReferences(rows.map((row) => row.data).filter(isNonNullish));
   }, []);
 
   const defaultColDef = useMemo<ColDef>(
@@ -84,7 +94,14 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
         onCellValueChanged: handleTitleEdit,
       },
       { field: 'abstract', flex: 2, filter: true, sortable: true },
-      { field: 'publishedDate', filter: true, sortable: true, initialWidth: 140, initialFlex: undefined },
+      {
+        field: 'publishedDate',
+        headerName: 'Published',
+        filter: true,
+        sortable: true,
+        initialWidth: 140,
+        initialFlex: undefined,
+      },
       {
         field: 'authors',
         valueFormatter: authorsFormatter,
@@ -97,9 +114,23 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
         filter: true,
         cellRenderer: memo(StatusCell),
       },
+      {
+        field: 'id',
+        colId: 'actions',
+        headerName: '',
+        sortable: false,
+        filter: false,
+        width: 80,
+        cellRenderer: memo(ActionsCell),
+      },
     ],
     [handleTitleEdit],
   );
+
+  const handleOnBulkRemove = () =>
+    emitEvent('refstudio://references/remove', {
+      referenceIds: selectedReferences.map((r) => r.id),
+    });
 
   return (
     <div className="flex w-full flex-col overflow-y-auto p-6">
@@ -116,7 +147,7 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
           value={quickFilter}
           onInput={(e) => setQuickFilter(e.currentTarget.value)}
         />
-        <div className="text-md flex items-center gap-2">
+        <div className="text-md flex items-center gap-2" data-testid="actions-menu">
           <TopActionIcon
             action="Add"
             icon={VscNewFile}
@@ -125,9 +156,10 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
           <VscKebabVertical />
           <TopActionIcon
             action="Remove"
-            disabled={numberOfSelectedRows === 0}
+            disabled={selectedReferences.length === 0}
             icon={VscTrash}
-            selectedCount={numberOfSelectedRows}
+            selectedCount={selectedReferences.length}
+            onClick={handleOnBulkRemove}
           />
           <TopActionIcon action="Export" disabled icon={VscDesktopDownload} />
           <VscKebabVertical />
@@ -171,5 +203,30 @@ function StatusCell({ value }: ICellRendererParams<ReferenceItem, ReferenceItemS
     <span className="text-[10px]">
       <ReferencesItemStatusLabel status={value} />
     </span>
+  );
+}
+
+function ActionsCell({ data: reference }: ICellRendererParams<ReferenceItem, ReferenceItemStatus>) {
+  const openReference = useSetAtom(openReferenceAtom);
+  const openReferencePdf = useSetAtom(openReferencePdfAtom);
+
+  if (!reference) {
+    return null;
+  }
+  return (
+    <div className="flex h-full w-full items-center justify-center gap-2">
+      <VscFile
+        className="shrink-0 cursor-pointer"
+        size={20}
+        title="Open Reference Details"
+        onClick={() => openReference(reference.id)}
+      />
+      <VscFilePdf
+        className="shrink-0 cursor-pointer"
+        size={20}
+        title="Open Reference PDF"
+        onClick={() => openReferencePdf(reference.id)}
+      />
+    </div>
   );
 }

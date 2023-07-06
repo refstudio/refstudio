@@ -25,6 +25,7 @@ describe('TopActionIcon', () => {
     const handler = vi.fn();
     const { user } = setupWithJotaiProvider(<TopActionIcon action="ACTION" disabled icon={VscAdd} onClick={handler} />);
     expect(screen.getByText(/ACTION/)).toHaveClass('pointer-events-none');
+    expect(screen.getByText(/ACTION/)).toHaveAttribute('aria-disabled', 'true');
     await user.click(screen.getByText(/ACTION/));
     expect(handler).toHaveBeenCalledTimes(0);
   });

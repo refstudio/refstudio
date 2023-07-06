@@ -4,6 +4,7 @@ import { activePaneAtom, closeEditorFromPaneAtom } from '../atoms/editorActions'
 import { createFileAtom, deleteFileAtom, renameFileAtom } from '../atoms/fileEntryActions';
 import { fileExplorerEntryPathBeingRenamed } from '../atoms/fileExplorerActions';
 import { activeEditorAtom } from '../atoms/paneActions';
+import { removeReferencesAtom } from '../atoms/referencesState';
 import { PaneEditorId } from '../atoms/types/PaneGroup';
 import { emitEvent, RefStudioEventPayload } from '../events';
 import { useListenEvent } from '../hooks/useListenEvent';
@@ -15,12 +16,14 @@ export function EventsListener({ children }: { children?: React.ReactNode }) {
   const closeEditor = useCloseEditor();
   const createFile = useCreateFile();
   const renameFile = useRenameFile();
+  const removeReferences = useRemoveReferences();
   const deleteFile = useDeleteFile();
 
   useListenEvent('refstudio://menu/file/save', saveActiveFile);
   useListenEvent('refstudio://menu/file/close', closeActiveEditor);
   useListenEvent('refstudio://menu/file/new', createFile);
   useListenEvent('refstudio://editors/close', closeEditor);
+  useListenEvent('refstudio://references/remove', removeReferences);
   useListenEvent('refstudio://explorer/rename', renameFile);
   useListenEvent('refstudio://explorer/delete', deleteFile);
 
@@ -57,6 +60,11 @@ function useCloseEditor() {
   const closeEditorFromPane = useSetAtom(closeEditorFromPaneAtom);
 
   return (paneEditorId: PaneEditorId) => closeEditorFromPane(paneEditorId);
+}
+
+function useRemoveReferences() {
+  const removeReferences = useSetAtom(removeReferencesAtom);
+  return ({ referenceIds }: { referenceIds: string[] }) => void removeReferences(referenceIds);
 }
 
 function useRenameFile() {

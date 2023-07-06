@@ -4,6 +4,7 @@ import { createRef, useState } from 'react';
 import { VscFilePdf } from 'react-icons/vsc';
 
 import { runPDFIngestion } from '../../../api/ingestion';
+import { refreshFileTreeAtom } from '../../../atoms/fileExplorerActions';
 import { referencesSyncInProgressAtom, setReferencesAtom } from '../../../atoms/referencesState';
 import { useListenEvent } from '../../../hooks/useListenEvent';
 import { uploadFiles } from '../../../io/filesystem';
@@ -17,6 +18,7 @@ function validReferencesFiles(file: File) {
 export function ReferencesDropZone({ children }: { children: React.ReactNode }) {
   const [visible, setVisible] = useState(false);
   const setReferences = useSetAtom(setReferencesAtom);
+  const refreshFileTree = useSetAtom(refreshFileTreeAtom);
   const setSyncInProgress = useSetAtom(referencesSyncInProgressAtom);
 
   const inputRef = createRef<HTMLInputElement>();
@@ -26,6 +28,7 @@ export function ReferencesDropZone({ children }: { children: React.ReactNode }) 
     onSuccess: (updatedReferences) => {
       setReferences(updatedReferences);
       setSyncInProgress(false);
+      void refreshFileTree();
     },
   });
 

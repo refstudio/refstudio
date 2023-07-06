@@ -5,6 +5,7 @@ import { referencesSyncInProgressAtom, setReferencesAtom } from '../../../../ato
 import { buildEditorId } from '../../../../atoms/types/EditorData';
 import { emitEvent } from '../../../../events';
 import { act, mockListenEvent, screen, setupWithJotaiProvider, waitFor } from '../../../../test/test-utils';
+import { ReferenceItem } from '../../../../types/ReferenceItem';
 import { REFERENCES } from '../../__tests__/test-fixtures';
 import { ReferencesFooterItems } from '../ReferencesFooterItems';
 
@@ -12,15 +13,21 @@ vi.mock('../../../../events');
 vi.mock('../../../../api/ingestion');
 
 describe('ReferencesFooterItems component', () => {
+  let resolveFn: (item: ReferenceItem[]) => void;
   beforeEach(() => {
-    vi.mocked(getIngestedReferences).mockResolvedValue([]);
+    vi.mocked(getIngestedReferences).mockReturnValue(
+      new Promise((resolve) => {
+        resolveFn = resolve;
+      }),
+    );
   });
   afterEach(() => {
     vi.resetAllMocks();
   });
 
-  it('should render empty without loading', () => {
+  it('should render with 0 references, and no sync in progess indicator', () => {
     setupWithJotaiProvider(<ReferencesFooterItems />);
+
     expect(screen.getByText('References: 0')).toBeInTheDocument();
   });
 
@@ -42,13 +49,19 @@ describe('ReferencesFooterItems component', () => {
     expect(screen.getByText(`References: ${REFERENCES.length}`)).toBeInTheDocument();
   });
 
-  it('should render loading spinner', () => {
+  it('should render sync in progress spinner', () => {
     const { store } = setupWithJotaiProvider(<ReferencesFooterItems />);
     const setSync = runSetAtomHook(referencesSyncInProgressAtom, store);
 
     expect(screen.queryByText('References ingestion...')).not.toBeInTheDocument();
     act(() => setSync.current(true));
     expect(screen.getByText('References ingestion...')).toBeInTheDocument();
+  });
+
+  it('should render number of references returned by getIngestedReferences', async () => {
+    setupWithJotaiProvider(<ReferencesFooterItems />);
+    act(() => resolveFn(REFERENCES));
+    expect(await screen.findByText(`References: ${REFERENCES.length}`)).toBeInTheDocument();
   });
 
   it(`should emit ${'refstudio://menu/references/open'} on click`, async () => {

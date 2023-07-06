@@ -6,6 +6,7 @@ import { ReferenceItem } from '../../types/ReferenceItem';
 import {
   activePaneAtom,
   closeAllEditorsAtom,
+  closeEditorFromAllPanesAtom,
   closeEditorFromPaneAtom,
   moveEditorToPaneAtom,
   openReferenceAtom,
@@ -155,6 +156,32 @@ describe('editorActions', () => {
     });
 
     expect(leftPane.current.openEditors.length).toBe(1);
+  });
+
+  it('should close opened files from all panes', () => {
+    const store = createStore();
+    const openFile = runSetAtomHook(openFileEntryAtom, store);
+    const closeEditorFromAllPanes = runSetAtomHook(closeEditorFromAllPanesAtom, store);
+    const leftPane = runGetAtomHook(leftPaneAtom, store);
+    const rightPane = runGetAtomHook(rightPaneAtom, store);
+
+    const { fileEntry: fileA, editorData: editorDataA } = makeFileAndEditor('fileA.txt');
+    const { fileEntry: fileB, editorData: editorDataB } = makeFileAndEditor('fileB.pdf');
+
+    act(() => {
+      openFile.current(fileA);
+      openFile.current(fileB);
+    });
+    expect(leftPane.current.openEditors.length).toBe(1);
+    expect(rightPane.current.openEditors.length).toBe(1);
+
+    act(() => {
+      closeEditorFromAllPanes.current(editorDataA.id);
+      closeEditorFromAllPanes.current(editorDataB.id);
+    });
+
+    expect(leftPane.current.openEditors.length).toBe(0);
+    expect(rightPane.current.openEditors.length).toBe(0);
   });
 
   it('should not fail trying to close file that is not opened in pane', () => {
