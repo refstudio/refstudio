@@ -31,7 +31,7 @@ In the cycling world, power meters are the typical way to objectively measure pe
 `;
 
 const PROJECT_NAME = 'project-x';
-const UPLOADS_DIR = 'uploads';
+export const UPLOADS_DIR = 'uploads';
 
 export async function getConfigDir() {
   return appConfigDir();
@@ -80,7 +80,7 @@ export async function readAllProjectFiles() {
 
 export async function writeFileContent(relativePath: string, textContent: string) {
   try {
-    const path = (await getBaseDir()) + relativePath;
+    const path = await join(await getBaseDir(), relativePath);
     await writeTextFile(path, textContent);
     return true;
   } catch (err) {
@@ -101,7 +101,7 @@ export async function uploadFiles(files: File[]) {
 }
 
 export async function readFileContent(file: FileFileEntry): Promise<EditorContent> {
-  const path = (await getBaseDir()) + file.path;
+  const path = await join(await getBaseDir(), file.path);
   switch (file.fileExtension) {
     case 'xml': {
       const textContent = await readTextFile(path);
@@ -153,7 +153,7 @@ function convertTauriFileEntryToFileEntry(entry: TauriFileEntry, baseDir: string
 }
 
 export async function deleteFile(relativePath: string): Promise<boolean> {
-  const path = (await getBaseDir()) + relativePath;
+  const path = await join(await getBaseDir(), relativePath);
   try {
     await removeFile(path);
     return true;

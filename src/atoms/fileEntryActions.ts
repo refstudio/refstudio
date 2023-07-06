@@ -36,7 +36,7 @@ export const openFileEntryAtom = atom(null, (get, set, file: FileEntry) => {
   set(selectEditorInPaneAtom, { editorId, paneId: targetPaneId });
 });
 
-export const openFilePathAtom = atom(null, (get, set, filePath: string) => {
+export const openFilePathAtom = atom(null, (_get, set, filePath: string) => {
   const fileEntry = getFileFileEntryFromPath(filePath);
   set(openFileEntryAtom, fileEntry);
 });
