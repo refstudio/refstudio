@@ -1,5 +1,6 @@
-import { ChangeEvent, KeyboardEvent, useCallback, useMemo, useState } from 'react';
+import { ChangeEvent, KeyboardEvent, useMemo, useState } from 'react';
 
+import { autoFocusAndSelectWithSelectionRange } from '../lib/autoFocusAndSelect';
 import { cx } from '../lib/cx';
 
 interface FileNameInputProps {
@@ -20,13 +21,7 @@ export function FileNameInput({ fileName, isNameValid, onCancel, onSubmit }: Fil
     return fileName.length - extensionLength;
   }, [fileName]);
 
-  const focusAndSelect = useCallback(
-    (input: HTMLInputElement | null) => {
-      input?.focus();
-      input?.setSelectionRange(0, nameLength);
-    },
-    [nameLength],
-  );
+  const focusAndSelect = useMemo(() => autoFocusAndSelectWithSelectionRange(0, nameLength), [nameLength]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => setValue(e.target.value);
 
