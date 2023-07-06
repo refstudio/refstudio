@@ -3,7 +3,7 @@ import { atom } from 'jotai';
 import { readFileContent } from '../../io/filesystem';
 import { EditorContent } from '../types/EditorContent';
 import { EditorContentAtoms } from '../types/EditorContentAtoms';
-import { buildEditorId, EditorId } from '../types/EditorData';
+import { buildEditorIdFromPath, EditorId } from '../types/EditorData';
 import { FileFileEntry } from '../types/FileEntry';
 import { createEditorContentAtoms } from './createEditorContentAtoms';
 
@@ -17,7 +17,7 @@ export const loadFileEntry = atom(null, (get, set, file: FileFileEntry) => {
   const currentOpenEditors = get(editorsContentStateAtom);
   const updatedMap = new Map(currentOpenEditors);
 
-  const editorId = buildEditorId('text', file.path);
+  const editorId = buildEditorIdFromPath(file.path);
   updatedMap.set(editorId, createEditorContentAtoms(editorId, readFileContent(file)));
   set(editorsContentStateAtom, updatedMap);
 });

@@ -3,6 +3,7 @@ import { VscChevronDown, VscChevronRight, VscFile } from 'react-icons/vsc';
 
 import { FileExplorerFolderEntry } from '../../atoms/types/FileExplorerEntry';
 import { FileNode } from '../../components/FileNode';
+import { FILE_EXPLORER_FILE_MENU_ID } from './fileExplorerContextMenu/FileExplorerFileContextMenu';
 
 interface FileExplorerProps {
   fileExplorerEntry: FileExplorerFolderEntry;
@@ -25,6 +26,7 @@ export function FileExplorer(props: FileExplorerProps) {
         <FileNode
           VscIcon={collapsed ? VscChevronRight : VscChevronDown}
           bold
+          fileId={fileExplorerEntry.path}
           fileName={fileExplorerEntry.name}
           paddingLeft={`calc(${paddingLeft} - 1rem)`}
           onClick={() => setCollapsed(!collapsed)}
@@ -43,6 +45,8 @@ export function FileExplorer(props: FileExplorerProps) {
             ) : (
               <FileNode
                 VscIcon={VscFile}
+                contextMenuId={FILE_EXPLORER_FILE_MENU_ID}
+                fileId={fileEntry.path}
                 fileName={fileEntry.name}
                 key={fileEntry.path}
                 paddingLeft={paddingLeft}

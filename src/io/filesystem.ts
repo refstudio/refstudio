@@ -6,6 +6,7 @@ import {
   readBinaryFile,
   readDir,
   readTextFile,
+  removeFile,
   writeBinaryFile,
   writeTextFile,
 } from '@tauri-apps/api/fs';
@@ -79,7 +80,7 @@ export async function readAllProjectFiles() {
 
 export async function writeFileContent(relativePath: string, textContent: string) {
   try {
-    const path = (await getBaseDir()) + relativePath;
+    const path = await join(await getBaseDir(), relativePath);
     await writeTextFile(path, textContent);
     return true;
   } catch (err) {
@@ -100,7 +101,7 @@ export async function uploadFiles(files: File[]) {
 }
 
 export async function readFileContent(file: FileFileEntry): Promise<EditorContent> {
-  const path = (await getBaseDir()) + file.path;
+  const path = await join(await getBaseDir(), file.path);
   switch (file.fileExtension) {
     case 'xml': {
       const textContent = await readTextFile(path);
@@ -148,5 +149,16 @@ function convertTauriFileEntryToFileEntry(entry: TauriFileEntry, baseDir: string
       isDotfile,
       isFile: !isFolder,
     };
+  }
+}
+
+export async function deleteFile(relativePath: string): Promise<boolean> {
+  const path = await join(await getBaseDir(), relativePath);
+  try {
+    await removeFile(path);
+    return true;
+  } catch (err) {
+    console.error('Error', err);
+    return false;
   }
 }

@@ -2,9 +2,9 @@ import { createStore } from 'jotai';
 
 import { readAllProjectFiles } from '../../io/filesystem';
 import { act } from '../../test/test-utils';
-import { fileExplorerAtom, refreshFileTreeAtom } from '../fileExplorerActions';
+import { fileExplorerAtom, getFileExplorerEntryFromPathAtom, refreshFileTreeAtom } from '../fileExplorerActions';
 import { FileExplorerFolderEntry } from '../types/FileExplorerEntry';
-import { makeFile, makeFileAndEditor, makeFolder } from './test-fixtures';
+import { makeFile, makeFolder } from './test-fixtures';
 import { runSetAtomHook, stringifyFileExplorerState } from './test-utils';
 
 vi.mock('../../io/filesystem');
@@ -12,8 +12,8 @@ vi.mock('../../io/filesystem');
 describe('fileExplorerActions', () => {
   let store: ReturnType<typeof createStore>;
 
-  const { fileEntry: rootFile } = makeFileAndEditor('Root File.txt');
-  const { fileEntry: nestedFile } = makeFileAndEditor('Nested File.pdf');
+  const rootFile = makeFile('Root File.txt');
+  const nestedFile = makeFile('Nested File.pdf', '');
   const rootFolder = makeFolder('Root folder', [nestedFile]);
 
   beforeEach(() => {
@@ -122,5 +122,33 @@ describe('fileExplorerActions', () => {
       Root file 3.txt
       "
     `);
+  });
+
+  it('should return the correct file entry', async () => {
+    await store.set(refreshFileTreeAtom);
+
+    const fileExplorerEntryAtom = getFileExplorerEntryFromPathAtom(`${rootFolder.path}/${nestedFile.name}`);
+    const fileExplorerEntry = store.get(fileExplorerEntryAtom);
+
+    expect(fileExplorerEntry).not.toBeNull();
+    expect(fileExplorerEntry!.name).toBe(nestedFile.name);
+  });
+
+  it('should return null if the entry does not exist', async () => {
+    await store.set(refreshFileTreeAtom);
+
+    const fileExplorerEntryAtom = getFileExplorerEntryFromPathAtom(`${rootFolder.path}/fakeFile`);
+    const fileExplorerEntry = store.get(fileExplorerEntryAtom);
+
+    expect(fileExplorerEntry).toBeNull();
+  });
+
+  it('should return null if the path is not valid', async () => {
+    await store.set(refreshFileTreeAtom);
+
+    const fileExplorerEntryAtom = getFileExplorerEntryFromPathAtom(`${rootFile.path}/${nestedFile.name}`);
+    const fileExplorerEntry = store.get(fileExplorerEntryAtom);
+
+    expect(fileExplorerEntry).toBeNull();
   });
 });
