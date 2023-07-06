@@ -4,10 +4,9 @@ import sys
 
 import openai
 from dotenv import load_dotenv
-from python.sidecar.typing import RewriteRequest
 
 from sidecar import prompts
-from sidecar.typing import RewriteChoice
+from sidecar.typing import RewriteChoice, RewriteRequest
 
 load_dotenv()
 openai.api_key = os.environ.get("OPENAI_API_KEY")

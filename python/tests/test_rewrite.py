@@ -1,8 +1,7 @@
 import json
 
 from sidecar import rewrite
-
-from python.sidecar.typing import RewriteRequest
+from sidecar.typing import RewriteRequest
 
 
 def test_summarize(monkeypatch, capsys):

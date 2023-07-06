@@ -3,8 +3,7 @@ import sys
 
 from sidecar import settings, typing
 from sidecar.settings import logger
-
-from python.sidecar.typing import DeleteRequest, ReferenceUpdate
+from sidecar.typing import DeleteRequest, ReferenceUpdate
 
 logger = logger.getChild(__name__)
 

@@ -8,9 +8,7 @@ from dotenv import load_dotenv
 from sidecar import prompts
 from sidecar.ranker import BM25Ranker
 from sidecar.storage import JsonStorage
-from sidecar.typing import ChatResponseChoice
-
-from python.sidecar.typing import ChatRequest
+from sidecar.typing import ChatRequest, ChatResponseChoice
 
 load_dotenv()
 openai.api_key = os.environ.get("OPENAI_API_KEY")

@@ -2,8 +2,7 @@ import json
 from pathlib import Path
 
 from sidecar import chat
-
-from python.sidecar.typing import ChatRequest
+from sidecar.typing import ChatRequest
 
 
 def test_chat_ask_question(monkeypatch, capsys):

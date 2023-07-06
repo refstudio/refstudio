@@ -1,7 +1,7 @@
 import inspect
 from argparse import ArgumentParser
 
-from python.sidecar.typing import CliCommands
+from sidecar.typing import CliCommands
 
 
 def get_arg_parser():

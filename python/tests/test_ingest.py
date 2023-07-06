@@ -4,9 +4,7 @@ from datetime import date
 from pathlib import Path
 
 from sidecar import ingest, storage, typing
-from sidecar.typing import Author, Reference
-
-from python.sidecar.typing import IngestRequest
+from sidecar.typing import Author, IngestRequest, Reference
 
 FIXTURES_DIR = Path(__file__).parent.joinpath("fixtures")
 
