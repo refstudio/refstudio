@@ -61,7 +61,7 @@ export function SettingsModal({ open, onCloseClick }: { open: boolean; onCloseCl
   }
 
   return (
-    <div className="z-99 fixed left-0 top-0 flex h-screen w-screen items-center justify-center">
+    <div className="fixed left-0 top-0 flex h-screen w-screen items-center justify-center">
       <div className="pointer-events-none absolute left-0 top-0 h-full w-full bg-slate-400/60" />
       <div
         className={cx(

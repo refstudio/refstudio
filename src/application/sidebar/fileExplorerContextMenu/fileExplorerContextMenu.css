@@ -6,8 +6,7 @@ body {
 }
 
 .contextMenu {
-  @apply p-1;
-  min-width: min-content;
+  @apply min-w-min p-1;
 }
 
 .contextMenu .contexify_itemContent {
