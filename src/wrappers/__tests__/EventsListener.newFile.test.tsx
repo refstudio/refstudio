@@ -8,6 +8,8 @@ import { EventsListener } from '../EventsListener';
 
 vi.mock('../../events');
 
+const newFileEventName: RefStudioEventName = 'refstudio://menu/file/new';
+
 describe('EventsListener.close', () => {
   let store: ReturnType<typeof createStore>;
 
@@ -19,15 +21,15 @@ describe('EventsListener.close', () => {
     vi.clearAllMocks();
   });
 
-  it(`should listen to refstudio://menu/file/new events`, () => {
+  it(`should listen to ${newFileEventName} events`, () => {
     const mockData = mockListenEvent();
 
     setupWithJotaiProvider(<EventsListener />, store);
 
-    expect(mockData.registeredEventNames).toContain<RefStudioEventName>('refstudio://menu/file/new');
+    expect(mockData.registeredEventNames).toContain<RefStudioEventName>(newFileEventName);
   });
 
-  it(`should create a new file when refstudio://menu/file/new event is triggered`, async () => {
+  it(`should create a new file when ${newFileEventName} event is triggered`, async () => {
     const mockData = mockListenEvent();
     const activePaneContent = runGetAtomHook(activePaneContentAtom, store);
 
@@ -35,7 +37,7 @@ describe('EventsListener.close', () => {
 
     setupWithJotaiProvider(<EventsListener />, store);
 
-    act(() => mockData.trigger('refstudio://menu/file/new'));
+    act(() => mockData.trigger(newFileEventName));
 
     await waitFor(() => {
       expect(activePaneContent.current.openEditors).toHaveLength(1);
