@@ -57,7 +57,7 @@ describe('sidecar', () => {
     let env: undefined | Record<string, string>;
     vi.mocked(Command).mockImplementation((program: string, args?: string | string[], options?: SpawnOptions) => {
       env = options?.env;
-      expect(args).toEqual([`{"text": "Hello chatbot!"}`]);
+      expect(args).toEqual(['chat', `{"text":"Hello chatbot!"}`]);
       return {
         execute: () => ({
           stdout: JSON.stringify({}),
