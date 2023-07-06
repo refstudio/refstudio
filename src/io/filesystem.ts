@@ -6,6 +6,7 @@ import {
   readBinaryFile,
   readDir,
   readTextFile,
+  removeFile,
   writeBinaryFile,
   writeTextFile,
 } from '@tauri-apps/api/fs';
@@ -148,5 +149,17 @@ function convertTauriFileEntryToFileEntry(entry: TauriFileEntry, baseDir: string
       isDotfile,
       isFile: !isFolder,
     };
+  }
+}
+
+export async function deleteFile(relativePath: string): Promise<boolean> {
+  console.log('Trying to delete file', relativePath);
+  const path = (await getBaseDir()) + relativePath;
+  try {
+    await removeFile(path);
+    return true;
+  } catch (err) {
+    console.error('Error', err);
+    return false;
   }
 }

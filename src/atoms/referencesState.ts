@@ -1,6 +1,7 @@
 import { atom } from 'jotai';
 
 import { removeReferences } from '../api/ingestion';
+import { deleteFile } from '../io/filesystem';
 import { isNonNullish } from '../lib/isNonNullish';
 import { ReferenceItem } from '../types/ReferenceItem';
 import { closeEditorFromAllPanesAtom } from './editorActions';
@@ -53,7 +54,12 @@ export const removeReferencesAtom = atom(null, async (get, set, ids: string[]) =
   await removeReferences(referencesToRemove.map((ref) => ref.filename));
 
   // Remove files from filesystem
-  // TODO
+  const success = await Promise.all(
+    referencesToRemove.map((reference) => deleteFile('/uploads/' + reference.filename)),
+  );
+  if (success.some((s) => !s)) {
+    console.warn('Error deleting some files');
+  }
 
   // Update visible references
   // const references = await getIngestedReferences();
