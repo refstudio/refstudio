@@ -12,10 +12,19 @@ import {
   SelectionChangedEvent,
 } from '@ag-grid-community/core';
 import { AgGridReact } from '@ag-grid-community/react';
-import { useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { VscDesktopDownload, VscKebabVertical, VscNewFile, VscTable, VscTrash } from 'react-icons/vsc';
+import {
+  VscDesktopDownload,
+  VscFile,
+  VscFilePdf,
+  VscKebabVertical,
+  VscNewFile,
+  VscTable,
+  VscTrash,
+} from 'react-icons/vsc';
 
+import { openReferenceAtom, openReferencePdfAtom } from '../../../atoms/editorActions';
 import { getReferencesAtom } from '../../../atoms/referencesState';
 import { emitEvent } from '../../../events';
 import { autoFocusAndSelect } from '../../../lib/autoFocusAndSelect';
@@ -90,7 +99,14 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
         onCellValueChanged: handleTitleEdit,
       },
       { field: 'abstract', flex: 2, filter: true, sortable: true },
-      { field: 'publishedDate', filter: true, sortable: true, initialWidth: 140, initialFlex: undefined },
+      {
+        field: 'publishedDate',
+        headerName: 'Published',
+        filter: true,
+        sortable: true,
+        initialWidth: 140,
+        initialFlex: undefined,
+      },
       {
         field: 'authors',
         valueFormatter: authorsFormatter,
@@ -102,6 +118,15 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
         sortable: true,
         filter: true,
         cellRenderer: memo(StatusCell),
+      },
+      {
+        field: 'id',
+        colId: 'actions',
+        headerName: '',
+        sortable: false,
+        filter: false,
+        width: 80,
+        cellRenderer: memo(ActionsCell),
       },
     ],
     [handleTitleEdit],
@@ -183,5 +208,30 @@ function StatusCell({ value }: ICellRendererParams<ReferenceItem, ReferenceItemS
     <span className="text-[10px]">
       <ReferencesItemStatusLabel status={value} />
     </span>
+  );
+}
+
+function ActionsCell({ data: reference }: ICellRendererParams<ReferenceItem, ReferenceItemStatus>) {
+  const openReference = useSetAtom(openReferenceAtom);
+  const openReferencePdf = useSetAtom(openReferencePdfAtom);
+
+  if (!reference) {
+    return null;
+  }
+  return (
+    <div className="flex h-full w-full items-center justify-center gap-2">
+      <VscFile
+        className="shrink-0 cursor-pointer"
+        size={20}
+        title="Open Reference Details"
+        onClick={() => openReference(reference.id)}
+      />
+      <VscFilePdf
+        className="shrink-0 cursor-pointer"
+        size={20}
+        title="Open Reference PDF"
+        onClick={() => openReferencePdf(reference.id)}
+      />
+    </div>
   );
 }

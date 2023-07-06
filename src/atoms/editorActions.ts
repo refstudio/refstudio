@@ -103,16 +103,6 @@ export const closeAllEditorsAtom = atom(null, (get, set) => {
   panes.RIGHT.openEditorIds.forEach((editorId) => set(closeEditorFromPaneAtom, { editorId, paneId: 'RIGHT' }));
 });
 
-export const closeEditorFromAllPanesAtom = atom(null, (get, set, editorId: EditorId) => {
-  const panes = get(paneGroupAtom);
-
-  Object.keys(panes).forEach((paneId) => {
-    if (panes[paneId as PaneId].openEditorIds.includes(editorId)) {
-      set(closeEditorFromPaneAtom, { paneId: paneId as PaneId, editorId });
-    }
-  });
-});
-
 interface MoveEditorPayload {
   editorId: EditorId;
   fromPaneId: PaneId;
