@@ -17,3 +17,15 @@ export interface FolderFileEntry extends FileEntryBase {
 }
 
 export type FileEntry = FileFileEntry | FolderFileEntry;
+
+export function getFileFileEntryFromPath(filePath: string): FileFileEntry {
+  const name = filePath.split('/').pop() ?? '';
+  return {
+    path: filePath,
+    name,
+    fileExtension: name.split('.').pop() ?? '',
+    isDotfile: name.startsWith('.'),
+    isFile: true,
+    isFolder: false,
+  };
+}

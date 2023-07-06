@@ -87,6 +87,16 @@ export const closeEditorFromPaneAtom = atom(null, (get, set, { editorId, paneId 
   }
 });
 
+export const closeEditorFromAllPanesAtom = atom(null, (get, set, editorId: EditorId) => {
+  const panes = get(paneGroupAtom);
+
+  Object.keys(panes).forEach((paneId) => {
+    if (panes[paneId as PaneId].openEditorIds.includes(editorId)) {
+      set(closeEditorFromPaneAtom, { paneId: paneId as PaneId, editorId });
+    }
+  });
+});
+
 export const closeAllEditorsAtom = atom(null, (get, set) => {
   const panes = get(paneGroupAtom);
   panes.LEFT.openEditorIds.forEach((editorId) => set(closeEditorFromPaneAtom, { editorId, paneId: 'LEFT' }));

@@ -1,12 +1,12 @@
 import { atom } from 'jotai';
 import { Mock } from 'vitest';
 
-import { buildEditorId, EditorData } from '../types/EditorData';
+import { buildEditorIdFromPath, EditorData } from '../types/EditorData';
 import { FileEntry, FileFileEntry, FolderFileEntry } from '../types/FileEntry';
 import { FileExplorerEntry, FileExplorerFileEntry, FileExplorerFolderEntry } from '../types/FileExplorerEntry';
 
-export function makeFileAndEditor(name: string): { fileEntry: FileFileEntry; editorData: EditorData } {
-  const filePath = './' + name;
+export function makeFileAndEditor(name: string, parentPath = ''): { fileEntry: FileFileEntry; editorData: EditorData } {
+  const filePath = `${parentPath}/${name}`;
   return {
     fileEntry: {
       name,
@@ -17,22 +17,23 @@ export function makeFileAndEditor(name: string): { fileEntry: FileFileEntry; edi
       isFile: true,
     },
     editorData: {
-      id: buildEditorId('text', filePath),
+      id: buildEditorIdFromPath(filePath),
       title: name,
     },
   };
 }
-export function makeFile(name: string): FileFileEntry {
-  return makeFileAndEditor(name).fileEntry;
+export function makeFile(name: string, parentPath = ''): FileFileEntry {
+  return makeFileAndEditor(name, parentPath).fileEntry;
 }
-export function makeFolder(name: string, children: FileEntry[] = []): FolderFileEntry {
+export function makeFolder(name: string, children: FileEntry[] = [], parentPath = ''): FolderFileEntry {
+  const path = `${parentPath}/${name}`;
   return {
     name,
-    path: './' + name,
+    path,
     isFolder: true,
     isDotfile: false,
     isFile: false,
-    children,
+    children: children.map((child) => ({ ...child, path: path + child.path })),
   };
 }
 export function makeFileExplorerFileEntry(name: string): FileExplorerFileEntry {
