@@ -24,16 +24,19 @@ export function FileExplorer(props: FileExplorerProps) {
 
   const [collapsed, setCollapsed] = useAtom(fileExplorerEntry.collapsedAtom);
 
-  const isNameValid = useCallback((name: string) => {
-    if (name.startsWith('.')) {
-      return false;
-    }
-    if (name.includes('/')) {
-      return false;
-    }
+  const isNameValid = useCallback(
+    (name: string) => {
+      if (name.startsWith('.')) {
+        return false;
+      }
+      if (name.includes('/')) {
+        return false;
+      }
 
-    return !files.find(file => file.name === name);
-  }, [files]);
+      return !files.find((file) => file.name === name);
+    },
+    [files],
+  );
 
   const { root } = fileExplorerEntry;
   return (

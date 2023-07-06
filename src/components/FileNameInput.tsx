@@ -50,7 +50,7 @@ export function FileNameInput({ fileName, isNameValid, onCancel, onSubmit }: Fil
 
   return (
     <input
-      className={cx('w-full outline-none border border-blue-400', {
+      className={cx('w-full border border-blue-400 outline-none', {
         'border-red-600': !isValueValid,
       })}
       ref={focusAndSelect}
