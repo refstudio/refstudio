@@ -8,10 +8,10 @@ if __name__ == '__main__':
 
     if args.debug:
         print(args)
-    
+
     if args.command == "ingest":
         ingest.run_ingest(args.pdf_directory)
-    
+
     if args.command == "ingest_status":
         ingest.get_statuses()
 
@@ -20,10 +20,10 @@ if __name__ == '__main__':
 
     if args.command == "rewrite":
         rewrite.summarize(args.text)
-    
+
     if args.command == "chat":
         chat.ask_question(args.text)
-    
+
     if args.command == "update":
         data = json.loads(args.data)
         storage.update_reference(data)
@@ -33,4 +33,3 @@ if __name__ == '__main__':
             storage.delete_references(all_=args.all)
         else:
             storage.delete_references(source_filenames=args.source_filenames)
-        

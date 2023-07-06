@@ -106,14 +106,42 @@ class ChatResponseChoice(RefStudioModel):
     text: str
 
 
+class IngestRequest(RefStudioModel):
+    pdf_directory: str
+
+
+class RewriteRequest(RefStudioModel):
+    text: str
+
+
+class ChatRequest(RefStudioModel):
+    text: str
+
+
+class UpdateRequest(RefStudioModel):
+    data: str
+
+
+class DeleteRequest(RefStudioModel):
+    source_filenames: list[str]
+    all: bool = False
+
+
 class CliCommands(RefStudioModel):
-    ingest: IngestResponse
-    ingest_status: IngestStatusResponse
-    ingest_references: IngestResponse
-    rewrite: list[RewriteChoice]
-    chat: list[ChatResponseChoice]
-    update: UpdateStatusResponse
-    delete: DeleteStatusResponse
+    ingest: tuple[IngestRequest, IngestResponse]
+    """Ingest PDFs"""
+    ingest_status: tuple[None, IngestStatusResponse]
+    """Retrieve ingestion status of uploads"""
+    ingest_references: tuple[IngestRequest, IngestResponse]
+    """Retrieve ingested PDF references"""
+    rewrite: tuple[RewriteRequest, list[RewriteChoice]]
+    """"Rewrites a block of text in a more concise manner"""
+    chat: tuple[ChatRequest, list[ChatResponseChoice]]
+    """Chat with the AI"""
+    update: tuple[UpdateRequest, UpdateStatusResponse]
+    """Update metadata for a Reference"""
+    delete: tuple[DeleteRequest, DeleteStatusResponse]
+    """Deletes a Reference"""
 
 
 Reference.update_forward_refs()
