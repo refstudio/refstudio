@@ -81,6 +81,10 @@ class ReferenceStatus(RefStudioModel):
     status: IngestStatus
 
 
+class IngestRequest(RefStudioModel):
+    pdf_directory: str
+
+
 class IngestStatusResponse(RefStudioModel):
     status: ResponseStatus
     reference_statuses: list[ReferenceStatus]
@@ -91,9 +95,18 @@ class UpdateStatusResponse(RefStudioModel):
     message: str
 
 
+class DeleteRequest(RefStudioModel):
+    source_filenames: list[str]
+    all: bool = False
+
+
 class DeleteStatusResponse(RefStudioModel):
     status: ResponseStatus
     message: str
+
+
+class RewriteRequest(RefStudioModel):
+    text: str
 
 
 class RewriteChoice(RefStudioModel):
@@ -101,26 +114,13 @@ class RewriteChoice(RefStudioModel):
     text: str
 
 
-class ChatResponseChoice(RefStudioModel):
-    index: int
-    text: str
-
-
-class IngestRequest(RefStudioModel):
-    pdf_directory: str
-
-
-class RewriteRequest(RefStudioModel):
-    text: str
-
-
 class ChatRequest(RefStudioModel):
     text: str
 
 
-class DeleteRequest(RefStudioModel):
-    source_filenames: list[str]
-    all: bool = False
+class ChatResponseChoice(RefStudioModel):
+    index: int
+    text: str
 
 
 class CliCommands(RefStudioModel):
@@ -137,6 +137,7 @@ class CliCommands(RefStudioModel):
     update: tuple[ReferenceUpdate, UpdateStatusResponse]
     """Update metadata for a Reference"""
     delete: tuple[DeleteRequest, DeleteStatusResponse]
+    """Deletes a Reference"""
 
 
 Reference.update_forward_refs()
