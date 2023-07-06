@@ -25,20 +25,23 @@ if __name__ == '__main__':
     if args.command == "ingest":
         ingest.run_ingest(param_obj)
 
-    if args.command == "ingest_status":
+    elif args.command == "ingest_status":
         ingest.get_statuses()
 
-    if args.command == "ingest_references":
+    elif args.command == "ingest_references":
         ingest.get_references(param_obj)
 
-    if args.command == "rewrite":
+    elif args.command == "rewrite":
         rewrite.summarize(param_obj)
 
-    if args.command == "chat":
+    elif args.command == "chat":
         chat.ask_question(param_obj)
 
-    if args.command == "update":
+    elif args.command == "update":
         storage.update_reference(param_obj)
 
-    if args.command == "delete":
+    elif args.command == "delete":
         storage.delete_references(param_obj)
+
+    else:
+        raise NotImplementedError(f'Command {args.command} is not implemented.')

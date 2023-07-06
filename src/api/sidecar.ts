@@ -5,7 +5,10 @@ import { Command } from '@tauri-apps/api/shell';
 import { getCachedSetting } from '../settings/settingsManager';
 import { CliCommands } from './types';
 
-export async function callSidecar<T extends keyof CliCommands>(subcommand: T, args: string[]): Promise<CliCommands[T]> {
+export async function callSidecar<T extends keyof CliCommands>(
+  subcommand: T,
+  args: string[],
+): Promise<CliCommands[T][1]> {
   const generalSettings = getCachedSetting('general');
   const openAISettings = getCachedSetting('openAI');
   const sidecarSettings = getCachedSetting('sidecar');
@@ -30,7 +33,7 @@ export async function callSidecar<T extends keyof CliCommands>(subcommand: T, ar
   }
   console.log('output: ', output.stdout);
 
-  const response = JSON.parse(output.stdout) as CliCommands[T];
+  const response = JSON.parse(output.stdout) as CliCommands[T][1];
   console.log('response', response);
   return response;
 }
