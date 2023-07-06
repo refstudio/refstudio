@@ -53,6 +53,10 @@ export async function getUploadsDir() {
   return join(await getBaseDir(), UPLOADS_DIR);
 }
 
+export function isInUploadsDir(relativePath: string) {
+  return relativePath.startsWith(`${sep}${UPLOADS_DIR}`);
+}
+
 export async function ensureProjectFileStructure() {
   try {
     const baseDir = await getBaseDir();

@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { TriggerEvent, useContextMenu } from 'react-contexify';
 
-import { UPLOADS_DIR } from '../../../io/filesystem';
+import { isInUploadsDir } from '../../../io/filesystem';
 
 export interface FileExplorerContextMenuProps {
   id: string;
@@ -13,7 +13,7 @@ export function useFileExplorerContextMenu(id: string, props: FileExplorerContex
   const show = useCallback(
     (e: TriggerEvent) => {
       // Context menu is disabled for the uploads directory
-      if (!props.id.startsWith(`/${UPLOADS_DIR}`)) {
+      if (!isInUploadsDir(props.id)) {
         originalShow({ event: e });
       }
     },
