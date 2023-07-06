@@ -1,10 +1,10 @@
 import { createStore } from 'jotai';
 
-import { runGetAtomHook, runSetAtomHook } from '../../../../atoms/__tests__/test-utils';
+import { runGetAtomHook } from '../../../../atoms/__tests__/test-utils';
 import { activePaneContentAtom } from '../../../../atoms/paneActions';
 import { setReferencesAtom } from '../../../../atoms/referencesState';
 import { buildEditorId } from '../../../../atoms/types/EditorData';
-import { emitEvent } from '../../../../events';
+import { emitEvent, RefStudioEventName, RefStudioEventPayload } from '../../../../events';
 import { getAppDataDir } from '../../../../io/filesystem';
 import { screen, setupWithJotaiProvider, waitFor, within } from '../../../../test/test-utils';
 import { REFERENCES } from '../../__tests__/test-fixtures';
@@ -22,8 +22,7 @@ describe('ReferencesTableView component', () => {
 
   beforeEach(() => {
     store = createStore();
-    const setReferences = runSetAtomHook(setReferencesAtom, store);
-    setReferences.current(REFERENCES);
+    store.set(setReferencesAtom, REFERENCES);
   });
 
   afterEach(() => {
@@ -118,5 +117,34 @@ describe('ReferencesTableView component', () => {
 
     expect(active.current.activeEditor?.id).toBeDefined();
     expect(active.current.activeEditor?.id).toBe(buildEditorId('pdf', ref1.filepath));
+  });
+
+  it(`should not emit ${'refstudio://references/remove' as RefStudioEventName} with NO selections`, async () => {
+    const { user } = setupWithJotaiProvider(<ReferencesTableView />, store);
+
+    const actionsMenu = screen.getByTestId('actions-menu');
+    await user.hover(actionsMenu);
+    const removeBtn = within(actionsMenu).getByText('Remove');
+    await user.click(removeBtn);
+
+    expect(removeBtn).toHaveAttribute('aria-disabled', 'true');
+    expect(vi.mocked(emitEvent)).not.toHaveBeenCalled();
+  });
+
+  // Note: This test can't run because there is a weird issue when clicking remove ("TypeError: Cannot read properties of undefined (reading 'contains')")
+  // https://github.com/ag-grid/ag-grid/issues/6179
+  it.skip(`should emit ${'refstudio://references/remove' as RefStudioEventName} with SOME selections`, async () => {
+    const { user } = setupWithJotaiProvider(<ReferencesTableView />, store);
+
+    await user.type(screen.getByText(ref1.title), ' ', { skipClick: false }); // select row
+    await user.type(screen.getByText(ref2.title), ' ', { skipClick: false }); // select row
+
+    await user.click(within(screen.getByTestId('actions-menu')).getByText('Remove'));
+
+    expect(vi.mocked(emitEvent)).toHaveBeenCalledWith<
+      [RefStudioEventName, RefStudioEventPayload<'refstudio://references/remove'>]
+    >('refstudio://references/remove', {
+      referenceIds: [ref1.id, ref2.id],
+    });
   });
 });

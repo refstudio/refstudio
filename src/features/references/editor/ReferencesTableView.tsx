@@ -28,6 +28,7 @@ import { openReferenceAtom, openReferencePdfAtom } from '../../../atoms/editorAc
 import { getReferencesAtom } from '../../../atoms/referencesState';
 import { emitEvent } from '../../../events';
 import { autoFocusAndSelect } from '../../../lib/autoFocusAndSelect';
+import { isNonNullish } from '../../../lib/isNonNullish';
 import { ReferenceItem, ReferenceItemStatus } from '../../../types/ReferenceItem';
 import { ReferencesItemStatusLabel } from '../components/ReferencesItemStatusLabel';
 import { TopActionIcon } from '../components/TopActionIcon';
@@ -43,7 +44,7 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
 
   useEffect(() => setQuickFilter(defaultFilter), [defaultFilter]);
 
-  const [numberOfSelectedRows, setNumberOfSelectedRows] = useState(0);
+  const [selectedReferences, setSelectedReferences] = useState<ReferenceItem[]>([]);
 
   const gridRef = useRef<AgGridReact<ReferenceItem>>(null);
 
@@ -52,9 +53,9 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
     console.log(`${oldValue} -> ${newValue}`);
   }, []);
 
-  const onSelectionChanged = useCallback((event: SelectionChangedEvent) => {
-    const rowCount = event.api.getSelectedNodes().length;
-    setNumberOfSelectedRows(rowCount);
+  const onSelectionChanged = useCallback((event: SelectionChangedEvent<ReferenceItem>) => {
+    const rows = event.api.getSelectedNodes();
+    setSelectedReferences(rows.map((row) => row.data).filter(isNonNullish));
   }, []);
 
   const defaultColDef = useMemo<ColDef>(
@@ -126,6 +127,11 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
     [handleTitleEdit],
   );
 
+  const handleOnBulkRemove = () =>
+    emitEvent('refstudio://references/remove', {
+      referenceIds: selectedReferences.map((r) => r.id),
+    });
+
   return (
     <div className="flex w-full flex-col overflow-y-auto p-6">
       {references.length === 0 && <UploadTipInstructions />}
@@ -141,7 +147,7 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
           value={quickFilter}
           onInput={(e) => setQuickFilter(e.currentTarget.value)}
         />
-        <div className="text-md flex items-center gap-2">
+        <div className="text-md flex items-center gap-2" data-testid="actions-menu">
           <TopActionIcon
             action="Add"
             icon={VscNewFile}
@@ -150,9 +156,10 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
           <VscKebabVertical />
           <TopActionIcon
             action="Remove"
-            disabled={numberOfSelectedRows === 0}
+            disabled={selectedReferences.length === 0}
             icon={VscTrash}
-            selectedCount={numberOfSelectedRows}
+            selectedCount={selectedReferences.length}
+            onClick={handleOnBulkRemove}
           />
           <TopActionIcon action="Export" disabled icon={VscDesktopDownload} />
           <VscKebabVertical />

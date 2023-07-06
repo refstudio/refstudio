@@ -17,6 +17,7 @@ export function TopActionIcon({
 }) {
   return (
     <span
+      aria-disabled={disabled}
       className={cx(
         'flex items-center gap-1 rounded-md px-2 py-1',
         'cursor-pointer',

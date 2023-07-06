@@ -1,6 +1,5 @@
 import { atom } from 'jotai';
 
-import { UPLOADS_DIR } from '../io/filesystem';
 import { editorsContentStateAtom, loadEditorContent, unloadEditorContent } from './core/editorContent';
 import { addEditorData, removeEditorData } from './core/editorData';
 import { addEditorToPane, paneGroupAtom, removeEditorFromPane, selectEditorInPaneAtom } from './core/paneGroup';
@@ -67,7 +66,7 @@ export const openReferencePdfAtom = atom(null, (get, set, referenceId: string) =
     return;
   }
 
-  set(openFilePathAtom, `/${UPLOADS_DIR}/${reference.filename}`);
+  set(openFilePathAtom, reference.filepath);
 });
 
 /** Removes editor from the given pane and unload content from memory if the editor is not open in another pane */
