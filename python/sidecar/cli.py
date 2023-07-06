@@ -1,4 +1,7 @@
+import inspect
 from argparse import ArgumentParser
+
+from python.sidecar.typing import CliCommands
 
 
 def get_arg_parser():
@@ -9,19 +12,14 @@ def get_arg_parser():
     )
     parser.add_argument(
         'command',
-        choices=[
-            'ingest',
-            'ingest_status',
-            'rewrite',
-            'chat',
-            'update',
-            'delete',
-        ],
+        # To add a new Sidecar command, add it to the CliCommands class.
+        choices=[*inspect.signature(CliCommands).parameters.keys()],
     )
     parser.add_argument(
         'param_json',
         type=str,
         nargs='?',
-        default='null'
+        default='null',
+        help='Command argument as JSON. Expected schema depends on the command.'
     )
     return parser

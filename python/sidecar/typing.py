@@ -137,7 +137,6 @@ class CliCommands(RefStudioModel):
     update: tuple[ReferenceUpdate, UpdateStatusResponse]
     """Update metadata for a Reference"""
     delete: tuple[DeleteRequest, DeleteStatusResponse]
-    """Deletes a Reference"""
 
 
 Reference.update_forward_refs()
