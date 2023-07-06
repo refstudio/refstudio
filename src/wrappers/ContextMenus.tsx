@@ -1,3 +1,5 @@
+import './contextMenu.css';
+
 import { FileExplorerFileContextMenu } from '../application/sidebar/fileExplorerContextMenu/FileExplorerFileContextMenu';
 
 interface ContextMenusProps {

@@ -5,10 +5,11 @@ body {
   --contexify-activeItem-bgColor: #e2e8f0;
 }
 
-.contextMenu {
+/* This is the class name defined by react-contexify */
+.contexify {
   @apply min-w-min p-1;
 }
 
-.contextMenu .contexify_itemContent {
+.contexify .contexify_itemContent {
   @apply px-2 py-0.5;
 }
