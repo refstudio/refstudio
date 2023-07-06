@@ -124,8 +124,10 @@ describe('ReferencesTableView component', () => {
 
     const actionsMenu = screen.getByTestId('actions-menu');
     await user.hover(actionsMenu);
-    await user.click(within(actionsMenu).getByText('Remove'));
+    const removeBtn = within(actionsMenu).getByText('Remove');
+    await user.click(removeBtn);
 
+    expect(removeBtn).toHaveAttribute('aria-disabled', 'true');
     expect(vi.mocked(emitEvent)).not.toHaveBeenCalled();
   });
 

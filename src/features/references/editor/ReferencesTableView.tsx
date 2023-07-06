@@ -55,12 +55,7 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
 
   const onSelectionChanged = useCallback((event: SelectionChangedEvent<ReferenceItem>) => {
     const rows = event.api.getSelectedNodes();
-    setSelectedReferences(
-      rows
-        .map((row) => row.data)
-        .filter((row) => row)
-        .filter(isNonNullish),
-    );
+    setSelectedReferences(rows.map((row) => row.data).filter(isNonNullish));
   }, []);
 
   const defaultColDef = useMemo<ColDef>(

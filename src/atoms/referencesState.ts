@@ -37,10 +37,7 @@ const removeReferenceAtom = atom(null, (get, set, id: string) => {
 });
 
 export const removeReferencesAtom = atom(null, async (get, set, ids: string[]) => {
-  const referencesToRemove = ids
-    .map((id) => get(getDerivedReferenceAtom(id)))
-    .filter((ref) => ref)
-    .filter(isNonNullish);
+  const referencesToRemove = ids.map((id) => get(getDerivedReferenceAtom(id))).filter(isNonNullish);
 
   // Close any open editor with references (details or pdf) about to be removed
   referencesToRemove.forEach((reference) => {
