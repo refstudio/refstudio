@@ -117,6 +117,6 @@ describe('ReferencesTableView component', () => {
     const active = runGetAtomHook(activePaneContentAtom, store);
 
     expect(active.current.activeEditor?.id).toBeDefined();
-    expect(active.current.activeEditor?.id).toBe(buildEditorId('text', ref1.filepath));
+    expect(active.current.activeEditor?.id).toBe(buildEditorId('pdf', ref1.filepath));
   });
 });
