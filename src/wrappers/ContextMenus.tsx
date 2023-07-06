@@ -1,4 +1,4 @@
-import './contextMenu.css';
+import './contextMenus.css';
 
 import { FileExplorerFileContextMenu } from '../application/sidebar/fileExplorerContextMenu/FileExplorerFileContextMenu';
 
