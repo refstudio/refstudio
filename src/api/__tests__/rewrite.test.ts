@@ -16,7 +16,7 @@ describe('askForRewrite', () => {
     const REWRITE_REQUEST_TEXT = 'Some text to rewrite';
     await askForRewrite(REWRITE_REQUEST_TEXT);
     expect(vi.mocked(callSidecar).mock.calls).toHaveLength(1);
-    expect(vi.mocked(callSidecar).mock.calls[0]).toStrictEqual(['rewrite', ['--text', REWRITE_REQUEST_TEXT]]);
+    expect(vi.mocked(callSidecar).mock.calls[0]).toStrictEqual(['rewrite', { text: REWRITE_REQUEST_TEXT }]);
   });
 
   it('Should return text from first RewriteChoice', async () => {
