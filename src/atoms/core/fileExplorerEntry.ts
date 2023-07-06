@@ -3,6 +3,10 @@ import { atom, Getter, Setter, WritableAtom } from 'jotai';
 import { FileEntry, FolderFileEntry } from '../types/FileEntry';
 import { FileExplorerEntry, FileExplorerFolderEntry, RootFileExplorerEntry } from '../types/FileExplorerEntry';
 
+/** Atom containing the relative path of the file currently being renamed */
+export const pathBeingRenamed = atom<string | null>(null);
+
+/** Atom containing the file tree */
 export const fileExplorerEntriesAtom = atom<RootFileExplorerEntry>(createFileExplorerFolderEntry([], 'root', '', true));
 
 /** Recursively creates a file explorer entry and its atoms from an array of file entries */

@@ -13,6 +13,7 @@ interface RefStudioEvents {
   'refstudio://editors/close': PaneEditorId;
   'refstudio://references/ingestion/run': undefined;
   'refstudio://explorer/delete': { path: string };
+  'refstudio://explorer/rename': { path: string; newName?: string };
 }
 
 export type RefStudioEventName = keyof RefStudioEvents;

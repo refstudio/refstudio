@@ -42,3 +42,21 @@ export const setEditorDataIsDirtyAtom = atom(
     set(editorsDataAtom, updatedEditorsData);
   },
 );
+
+interface RenameEditorDataPayload {
+  editorId: EditorId;
+  newEditorId: EditorId;
+  newName: string;
+}
+export const renameEditorDataAtom = atom(
+  null,
+  (get, set, { editorId, newEditorId, newName }: RenameEditorDataPayload) => {
+    const editorData = get(editorsDataAtom).get(editorId);
+    if (!editorData) {
+      console.warn('Trying to rename editor data that is not loaded', editorId);
+      return;
+    }
+    set(addEditorData, { ...editorData, id: newEditorId, title: newName });
+    set(removeEditorData, editorId);
+  },
+);
