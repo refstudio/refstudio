@@ -1,12 +1,13 @@
-# Refstudio Backend (Tauri Sidecar)
+# RefStudio Backend (Tauri Sidecar)
 
 This is the backend for Refstudio. It is written in Python and runs as a [Tauri resource](https://tauri.app/v1/guides/building/resources/).
 
 At a high-level, Tauri allows for "[sidecars](https://tauri.app/v1/guides/building/sidecar/)" written in other languages to be bundled with a Tauri application. These sidecars are typically shipped as an executable that communicates with the Tauri client (front-end) via `stdout`. We create our Python executable via [PyInstaller](https://pyinstaller.org/en/stable/index.html).
 
-For Refstudio, we bundle our Python application as a [resource](https://tauri.app/v1/guides/building/resources) rather than a sidecar as we found the sidecar pattern works best with a single embedded executable. This would have required us to use PyInstaller's [--onefile](https://pyinstaller.org/en/stable/usage.html#cmdoption-F) mode which resulted in the Python app being [significantly more slow](https://github.com/refstudio/refstudio/issues/48#issuecomment-1563627135) than PyInstaller's default [--onedir](https://pyinstaller.org/en/stable/usage.html#cmdoption-D) mode. Bundling the Python app as a _resource_ allowed us to use `--onedir` mode and still use Tauri's [command API](https://tauri.app/v1/api/js/shell#command) to call the application.
+For RefStudio, we bundle our Python application as a [resource](https://tauri.app/v1/guides/building/resources) rather than a sidecar as we found the sidecar pattern works best with a single embedded executable. This would have required us to use PyInstaller's [--onefile](https://pyinstaller.org/en/stable/usage.html#cmdoption-F) mode which resulted in the Python app being [significantly more slow](https://github.com/refstudio/refstudio/issues/48#issuecomment-1563627135) than PyInstaller's default [--onedir](https://pyinstaller.org/en/stable/usage.html#cmdoption-D) mode. Bundling the Python app as a _resource_ allowed us to use `--onedir` mode and still use Tauri's [command API](https://tauri.app/v1/api/js/shell#command) to call the application.
 
 ## Tooling
+
 We use [poetry](https://python-poetry.org/) for Python dependency management. We also recommend using [pyenv](https://github.com/pyenv/pyenv) for Python version management.
 
 ## Development
@@ -43,7 +44,10 @@ The application has the following main functions:
 1. Delete (References)
 1. Update (References)
 
+Parameters to commands are passed in via a single JSON-encoded argument.
+
 ### Ingest
+
 `Ingest` is called when a Refstudio user uploads Reference documents.
 
 It takes an input directory containing PDFs and runs an ingestion pipeline. This pipeline uses [Grobid](https://github.com/kermitt2/grobid) to parse the PDFs, converts the resulting `.tei.xml` files to JSON, and performs additional parsing and metadata extraction.
@@ -53,10 +57,10 @@ The resulting output of `ingest` is a set of References which are both stored on
 To run `ingest`:
 
 ```bash
-$ poetry run python main.py ingest --pdf_directory=path/to/docs/
+$ poetry run python main.py ingest '{ "pdf_directory": "path/to/docs/" }'
 
 # Example:
-$ poetry run python main.py ingest --pdf_directory=tests/fixtures/pdf/ | jq
+$ poetry run python main.py ingest '{ "pdf_directory": "tests/fixtures/pdf/" }' | jq
 
 # Response:
 {
@@ -103,6 +107,7 @@ $ poetry run python main.py ingest --pdf_directory=tests/fixtures/pdf/ | jq
 ```
 
 ### Ingest Status
+
 `ingest_status` is called while `ingest` is running in the background, to check the status of each uploaded file.
 
 It does not take any input and returns a dictionary of various statuses.
@@ -136,17 +141,18 @@ $ poetry run python main.py ingest_status | jq
 ```
 
 ### Ingest References
+
 `ingest_references` is called to retrieve reference documents.
 
-It takes an input directory containing PDFs and returns the ingested references. The resulting output of `ingest_references` is a set of References which are both stored on the filesystem. 
+It takes an input directory containing PDFs and returns the ingested references. The resulting output of `ingest_references` is a set of References which are both stored on the filesystem.
 
 To run `ingest_references`:
 
 ```bash
-$ poetry run python main.py ingest_references --pdf_directory=path/to/docs/
+$ poetry run python main.py ingest_references '{ "pdf_directory": "path/to/docs/" }'
 
 # Example:
-$ poetry run python main.py ingest_references --pdf_directory=tests/fixtures/pdf/ | jq
+$ poetry run python main.py ingest_references '{ "pdf_directory": "tests/fixtures/pdf/" }' | jq
 
 # Response:
 {
@@ -201,10 +207,10 @@ It takes an input of text and returns a list of rewrite `choices`.
 To run `rewrite`:
 
 ```bash
-$ poetry run python main.py rewrite --text="Some text that the user would like to rewrite in a more concise fashion."
+$ poetry run python main.py rewrite '{"text": "Some text that the user would like to rewrite in a more concise fashion."}'
 
 # Example:
-$ poetry run python main.py rewrite --text "In the cycling world, power meters are the typical way to objectively measure performance. Your speed is dependent on a lot of factors, like wind, road surface, and elevation. One's heart rate is largely a function of genetics, but also things like temperature. The amount of power you are outputting to the pedals though, is a direct measure of how much work you're doing, regardless of wind, elevation, your body weight, etc." | jq
+$ poetry run python main.py rewrite '{"text": "In the cycling world, power meters are the typical way to objectively measure performance. Your speed is dependent on a lot of factors, like wind, road surface, and elevation. One'\''s heart rate is largely a function of genetics, but also things like temperature. The amount of power you are outputting to the pedals though, is a direct measure of how much work you'\''re doing, regardless of wind, elevation, your body weight, etc." }' | jq
 
 # Response:
 [
@@ -226,12 +232,12 @@ It takes an input question and returns a response of answer `choices`.
 To run `chat`:
 
 ```bash
-$ poetry run python main.py chat --text="Some question about information contained with the uploaded reference documents"
+$ poetry run python main.py chat '{"text": "Some question about information contained with the uploaded reference documents"}'
 
 # Note that we've uploaded a Reference document titled Hidden Technical Debt in Machine Learning Systems (https://proceedings.neurips.cc/paper_files/paper/2015/file/86df7dcfd896fcaf2674f757a2463eba-Paper.pdf)
 
 # Example:
-$ poetry run python main.py --text "What can you tell me about hidden feedback loops in machine learning?" | jq
+$ poetry run python main.py '{"text": "What can you tell me about hidden feedback loops in machine learning?"}' | jq
 
 # Response:
 [
@@ -243,18 +249,19 @@ $ poetry run python main.py --text "What can you tell me about hidden feedback l
 ```
 
 ### Delete (References)
+
 `delete` removes a Reference from project storage. It is called when a Reference is deleted from the UI.
 
-It takes a list of `source_filenames` as input and returns a response status. Alternatively, you can use the `--all` parameter to delete all References in storage.
+It takes a list of `source_filenames` as input and returns a response status. Alternatively, you can use the `all` parameter to delete all References in storage.
 
 To run `delete`:
 
 ```bash
-$ poetry run python main.py delete --source_filenames grobid-fails.pdf "Machine Learning at Scale.pdf"
+$ poetry run python main.py delete '{ "source_filenames": ["grobid-fails.pdf", "Machine Learning at Scale.pdf"] }'
 
 
 # Example:
-$ poetry run python main.py delete --source_filenames grobid-fails.pdf "Machine Learning at Scale.pdf" | jq
+$ poetry run python main.py delete '{ "source_filenames": ["grobid-fails.pdf", "Machine Learning at Scale.pdf"] }' | jq
 
 # Response:
 {
@@ -263,7 +270,7 @@ $ poetry run python main.py delete --source_filenames grobid-fails.pdf "Machine 
 }
 
 # Another Example (error):
-$ poetry run python main.py delete --source_filenames file-does-not-exist.pdf | jq
+$ poetry run python main.py delete '{ "source_filenames": ["file-does-not-exist.pdf"] }' | jq
 
 # Error Response:
 {
@@ -273,17 +280,18 @@ $ poetry run python main.py delete --source_filenames file-does-not-exist.pdf | 
 ```
 
 ### Update (References)
+
 `Update` updates a Reference's metadata in project storage. It is called when a user updates details about a Reference.
 
-It takes an input argument of `--data` which is a dictionary containing a key for `source_filename` and `patch`. `source_filename` acts as the unique ID for the Reference to update and `patch` is a dictionary containing the corresponding fields and values to be used for the update. 
+It takes an input argument of `--data` which is a dictionary containing a key for `source_filename` and `patch`. `source_filename` acts as the unique ID for the Reference to update and `patch` is a dictionary containing the corresponding fields and values to be used for the update.
 
 To run `update`:
 
 ```bash
-$ poetry run python main.py update --data '{"source_filename": "grobid-fails.pdf", "patch": {"title": "a title that was missing"}}'
+$ poetry run python main.py update '{"source_filename": "grobid-fails.pdf", "patch": {"title": "a title that was missing"}}'
 
 # Example:
-$ poetry run python main.py update --data '{"source_filename": "grobid-fails.pdf", "patch": {"title": "a title that was missing"}}'
+$ poetry run python main.py update '{"source_filename": "grobid-fails.pdf", "patch": {"title": "a title that was missing"}}'
 | jq
 
 # Response:
@@ -293,7 +301,7 @@ $ poetry run python main.py update --data '{"source_filename": "grobid-fails.pdf
 }
 
 # Another Example (error):
-$ poetry run python main.py update --data '{"source_filename": "does-not-exist.pdf", "patch": {"title": "a different title than before"}}' | jq
+$ poetry run python main.py update '{"source_filename": "does-not-exist.pdf", "patch": {"title": "a different title than before"}}' | jq
 
 # Response (error)
 {
@@ -310,7 +318,7 @@ $ cat .storage/references.json | jq '.[] | select(.source_filename | contains("f
 }
 
 # run the update
-$ poetry run python main.py update --data '{"source_filename": "grobid-fails.pdf", "patch": {"title": "a title that was missing"}}'
+$ poetry run python main.py update '{"source_filename": "grobid-fails.pdf", "patch": {"title": "a title that was missing"}}'
 
 {
   "status": "ok",
