@@ -2,6 +2,8 @@ import json
 
 from sidecar import rewrite
 
+from python.sidecar.typing import RewriteRequest
+
 
 def test_summarize(monkeypatch, capsys):
     def mock_call_model(*args, **kwargs):
@@ -27,13 +29,14 @@ def test_summarize(monkeypatch, capsys):
             }
         }
         return response
-    
+
     monkeypatch.setattr(rewrite.Rewriter, "call_model", mock_call_model)
 
-    _ = rewrite.summarize("This is a test")
+    _ = rewrite.summarize(RewriteRequest(text="This is a test"))
     captured = capsys.readouterr()
     output = json.loads(captured.out)
 
     assert len(output) == 1
     assert output[0]["index"] == 0
+    assert output[0]["text"] == "This is a mocked response"
     assert output[0]["text"] == "This is a mocked response"

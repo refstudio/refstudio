@@ -3,6 +3,8 @@ from pathlib import Path
 
 from sidecar import chat
 
+from python.sidecar.typing import ChatRequest
+
 
 def test_chat_ask_question(monkeypatch, capsys):
     def mock_call_model(*args, **kwargs):
@@ -33,7 +35,7 @@ def test_chat_ask_question(monkeypatch, capsys):
 
     storage_path = Path(__file__).parent.joinpath("fixtures/data/references.json")
     _ = chat.ask_question(
-        input_text="This is a question about something",
+        request=ChatRequest(text="This is a question about something"),
         storage_path=storage_path
     )
     captured = capsys.readouterr()
@@ -41,4 +43,5 @@ def test_chat_ask_question(monkeypatch, capsys):
 
     assert len(output) == 1
     assert output[0]["index"] == 0
+    assert output[0]["text"] == "This is a mocked response"
     assert output[0]["text"] == "This is a mocked response"
