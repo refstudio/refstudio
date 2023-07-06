@@ -15,10 +15,10 @@ import { ensureProjectFileStructure } from '../io/filesystem';
 import { SettingsModalOpener } from '../settings/SettingsModalOpener';
 import { PdfViewerAPI } from '../types/PdfViewerAPI';
 import { ApplicationFrame } from '../wrappers/ApplicationFrame';
+import { ContextMenus } from '../wrappers/ContextMenus';
 import { EventsListener } from '../wrappers/EventsListener';
 import { MainPanel } from './components/MainPanel';
 import { ExplorerPanel } from './sidebar/ExplorerPanel';
-import { FileExplorerContextMenus } from './sidebar/fileExplorerContextMenu/FileExplorerContextMenus';
 
 function App() {
   useEffectOnce(() => void ensureProjectFileStructure());
@@ -32,19 +32,20 @@ function App() {
     <EventsListener>
       <ReferencesDropZone>
         <ApplicationFrame>
-          <PanelGroup
-            autoSaveId="refstudio"
-            className="relative h-full"
-            direction="horizontal"
-            onLayout={updatePDFViewerWidth}
-          >
-            <LeftSidePanelWrapper />
-            <Panel defaultSize={60} order={2}>
-              <MainPanel pdfViewerRef={pdfViewerRef} />
-            </Panel>
-            <RightPanelWrapper />
-          </PanelGroup>
-          <FileExplorerContextMenus />
+          <ContextMenus>
+            <PanelGroup
+              autoSaveId="refstudio"
+              className="relative h-full"
+              direction="horizontal"
+              onLayout={updatePDFViewerWidth}
+            >
+              <LeftSidePanelWrapper />
+              <Panel defaultSize={60} order={2}>
+                <MainPanel pdfViewerRef={pdfViewerRef} />
+              </Panel>
+              <RightPanelWrapper />
+            </PanelGroup>
+          </ContextMenus>
         </ApplicationFrame>
         <SettingsModalOpener />
       </ReferencesDropZone>
