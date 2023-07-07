@@ -6,10 +6,12 @@ import {
   readBinaryFile,
   readDir,
   readTextFile,
+  removeFile,
+  renameFile as tauriRenameFile,
   writeBinaryFile,
   writeTextFile,
 } from '@tauri-apps/api/fs';
-import { appConfigDir, appDataDir, join } from '@tauri-apps/api/path';
+import { appConfigDir, appDataDir, join, sep } from '@tauri-apps/api/path';
 
 import { EditorContent } from '../atoms/types/EditorContent';
 import { FileEntry, FileFileEntry } from '../atoms/types/FileEntry';
@@ -32,6 +34,10 @@ In the cycling world, power meters are the typical way to objectively measure pe
 const PROJECT_NAME = 'project-x';
 const UPLOADS_DIR = 'uploads';
 
+export function makeUploadPath(filename: string) {
+  return `${sep}${UPLOADS_DIR}${sep}${filename}`;
+}
+
 export async function getConfigDir() {
   return appConfigDir();
 }
@@ -47,15 +53,27 @@ export async function getUploadsDir() {
   return join(await getBaseDir(), UPLOADS_DIR);
 }
 
+export function makeNewFilePath(fileName: string) {
+  return `${sep}${fileName}`;
+}
+
+export function splitFilePath(filePath: string): string[] {
+  return filePath.split(sep);
+}
+
+export function isInUploadsDir(relativePath: string) {
+  return relativePath.startsWith(`${sep}${UPLOADS_DIR}`);
+}
+
 export async function ensureProjectFileStructure() {
   try {
     const baseDir = await getBaseDir();
     await createDir(baseDir, { recursive: true });
-    await createDir(await join(baseDir, UPLOADS_DIR), { recursive: true });
+    await createDir(await getUploadsDir(), { recursive: true });
 
-    await ensureFile(baseDir, 'file 1.refstudio', INITIAL_CONTENT);
-    await ensureFile(baseDir, 'file 2.refstudio', FILE2_CONTENT);
-    await ensureFile(baseDir, 'file 3.refstudio', FILE3_CONTENT);
+    await ensureFile('file 1.refstudio', INITIAL_CONTENT);
+    await ensureFile('file 2.refstudio', FILE2_CONTENT);
+    await ensureFile('file 3.refstudio', FILE3_CONTENT);
 
     console.log('Project structure created with success. Folder: ', baseDir);
   } catch (err) {
@@ -64,8 +82,8 @@ export async function ensureProjectFileStructure() {
   }
 }
 
-async function ensureFile(baseDir: string, fileName: string, content: string) {
-  const path = await join(baseDir, fileName);
+async function ensureFile(fileName: string, content: string) {
+  const path = await getAbsolutePath(fileName);
   if (!(await exists(path))) {
     await writeTextFile(path, content);
   }
@@ -79,7 +97,7 @@ export async function readAllProjectFiles() {
 
 export async function writeFileContent(relativePath: string, textContent: string) {
   try {
-    const path = (await getBaseDir()) + relativePath;
+    const path = await getAbsolutePath(relativePath);
     await writeTextFile(path, textContent);
     return true;
   } catch (err) {
@@ -89,10 +107,8 @@ export async function writeFileContent(relativePath: string, textContent: string
 }
 
 export async function uploadFiles(files: File[]) {
-  console.log('upload', files);
-  const uploadsDir = await join(await getBaseDir(), UPLOADS_DIR);
   for (const file of files) {
-    const path = await join(uploadsDir, file.name);
+    const path = await getAbsolutePath(file.name);
     const bytes = await file.arrayBuffer();
     await writeBinaryFile(path, bytes, { dir: BaseDirectory.Home });
   }
@@ -100,7 +116,7 @@ export async function uploadFiles(files: File[]) {
 }
 
 export async function readFileContent(file: FileFileEntry): Promise<EditorContent> {
-  const path = (await getBaseDir()) + file.path;
+  const path = await getAbsolutePath(file.path);
   switch (file.fileExtension) {
     case 'xml': {
       const textContent = await readTextFile(path);
@@ -127,7 +143,7 @@ function convertTauriFileEntryToFileEntry(entry: TauriFileEntry, baseDir: string
   const name = entry.name ?? '';
   const isDotfile = name.startsWith('.');
 
-  const relativePath = entry.path.replace(new RegExp(`^${baseDir}`), '');
+  const relativePath = getRelativePath(entry.path, baseDir);
 
   if (isFolder) {
     return {
@@ -149,4 +165,46 @@ function convertTauriFileEntryToFileEntry(entry: TauriFileEntry, baseDir: string
       isFile: !isFolder,
     };
   }
+}
+
+export async function deleteFile(relativePath: string): Promise<boolean> {
+  const path = await getAbsolutePath(relativePath);
+  try {
+    await removeFile(path);
+    return true;
+  } catch (err) {
+    console.error('Error', err);
+    return false;
+  }
+}
+
+export async function renameFile(
+  relativePath: string,
+  newName: string,
+): Promise<{ success: false } | { success: true; newPath: string }> {
+  const path = await getAbsolutePath(relativePath);
+  const parentPath = path.split(sep);
+  parentPath.pop();
+  const stringParentPath = await join(...parentPath);
+
+  const newPath = await join(stringParentPath, newName);
+  try {
+    if (await exists(newPath)) {
+      throw new Error(`Another file with the same name already exists: ${newPath}`);
+    }
+    await tauriRenameFile(path, newPath);
+    const newRelativePath = getRelativePath(newPath, await getBaseDir());
+    return { success: true, newPath: newRelativePath };
+  } catch (err) {
+    console.error('Error', err);
+    return { success: false };
+  }
+}
+
+async function getAbsolutePath(relativePath: string) {
+  return join(await getBaseDir(), relativePath);
+}
+
+function getRelativePath(absolutePath: string, baseDir: string) {
+  return absolutePath.replace(new RegExp(`^${baseDir}`), '');
 }

@@ -1,3 +1,5 @@
+import 'react-contexify/dist/ReactContexify.css';
+
 import React, { useCallback, useEffect, useState } from 'react';
 import { VscChevronUp } from 'react-icons/vsc';
 import { ImperativePanelHandle, Panel, PanelGroup } from 'react-resizable-panels';
@@ -13,6 +15,7 @@ import { ensureProjectFileStructure } from '../io/filesystem';
 import { SettingsModalOpener } from '../settings/SettingsModalOpener';
 import { PdfViewerAPI } from '../types/PdfViewerAPI';
 import { ApplicationFrame } from '../wrappers/ApplicationFrame';
+import { ContextMenus } from '../wrappers/ContextMenus';
 import { EventsListener } from '../wrappers/EventsListener';
 import { MainPanel } from './components/MainPanel';
 import { ExplorerPanel } from './sidebar/ExplorerPanel';
@@ -29,18 +32,20 @@ function App() {
     <EventsListener>
       <ReferencesDropZone>
         <ApplicationFrame>
-          <PanelGroup
-            autoSaveId="refstudio"
-            className="relative h-full"
-            direction="horizontal"
-            onLayout={updatePDFViewerWidth}
-          >
-            <LeftSidePanelWrapper />
-            <Panel defaultSize={60} order={2}>
-              <MainPanel pdfViewerRef={pdfViewerRef} />
-            </Panel>
-            <RightPanelWrapper />
-          </PanelGroup>
+          <ContextMenus>
+            <PanelGroup
+              autoSaveId="refstudio"
+              className="relative h-full"
+              direction="horizontal"
+              onLayout={updatePDFViewerWidth}
+            >
+              <LeftSidePanelWrapper />
+              <Panel defaultSize={60} order={2}>
+                <MainPanel pdfViewerRef={pdfViewerRef} />
+              </Panel>
+              <RightPanelWrapper />
+            </PanelGroup>
+          </ContextMenus>
         </ApplicationFrame>
         <SettingsModalOpener />
       </ReferencesDropZone>

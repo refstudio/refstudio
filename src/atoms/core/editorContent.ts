@@ -3,7 +3,7 @@ import { atom } from 'jotai';
 import { readFileContent } from '../../io/filesystem';
 import { EditorContent } from '../types/EditorContent';
 import { EditorContentAtoms } from '../types/EditorContentAtoms';
-import { buildEditorId, EditorId } from '../types/EditorData';
+import { buildEditorIdFromPath, EditorId } from '../types/EditorData';
 import { FileFileEntry } from '../types/FileEntry';
 import { createEditorContentAtoms } from './createEditorContentAtoms';
 
@@ -17,7 +17,7 @@ export const loadFileEntry = atom(null, (get, set, file: FileFileEntry) => {
   const currentOpenEditors = get(editorsContentStateAtom);
   const updatedMap = new Map(currentOpenEditors);
 
-  const editorId = buildEditorId('text', file.path);
+  const editorId = buildEditorIdFromPath(file.path);
   updatedMap.set(editorId, createEditorContentAtoms(editorId, readFileContent(file)));
   set(editorsContentStateAtom, updatedMap);
 });
@@ -46,4 +46,27 @@ export const unloadEditorContent = atom(null, (get, set, editorId: EditorId) => 
   const updatedMap = new Map(currentOpenEditors);
   updatedMap.delete(editorId);
   set(editorsContentStateAtom, updatedMap);
+});
+
+interface UpdateEditorIdPayload {
+  editorId: EditorId;
+  newEditorId: EditorId;
+}
+export const updateEditorContentIdAtom = atom(null, (get, set, { editorId, newEditorId }: UpdateEditorIdPayload) => {
+  const editorsContentState = get(editorsContentStateAtom);
+  const editorContent = editorsContentState.get(editorId);
+  /* c8 ignore next 4 */
+  if (!editorContent) {
+    console.warn('Trying to update the id of editor content that is not loaded', editorId);
+    return;
+  }
+
+  // Update the editorId atom
+  set(editorContent.editorIdAtom, newEditorId);
+
+  // Update the map to move the entry from `[editorId]` to `[newEditorId]`
+  const updatedEditorsContentState = new Map(get(editorsContentStateAtom));
+  updatedEditorsContentState.set(newEditorId, updatedEditorsContentState.get(editorId)!);
+  updatedEditorsContentState.delete(editorId);
+  set(editorsContentStateAtom, updatedEditorsContentState);
 });

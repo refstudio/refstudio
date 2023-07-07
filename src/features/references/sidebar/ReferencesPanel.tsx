@@ -2,8 +2,7 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import { VscDesktopDownload, VscNewFile, VscOpenPreview } from 'react-icons/vsc';
 
-import { openReferenceAtom, openReferencesAtom } from '../../../atoms/editorActions';
-import { openFilePathAtom } from '../../../atoms/fileEntryActions';
+import { openReferenceAtom, openReferencePdfAtom, openReferencesAtom } from '../../../atoms/editorActions';
 import { getReferencesAtom } from '../../../atoms/referencesState';
 import { PanelSection } from '../../../components/PanelSection';
 import { PanelWrapper } from '../../../components/PanelWrapper';
@@ -17,7 +16,7 @@ export function ReferencesPanel() {
   const references = useAtomValue(getReferencesAtom);
   const openReference = useSetAtom(openReferenceAtom);
   const openReferences = useSetAtom(openReferencesAtom);
-  const openFilePath = useSetAtom(openFilePathAtom);
+  const openReferencePdf = useSetAtom(openReferencePdfAtom);
 
   const [visibleReferences, setVisibleReferences] = useState(references);
   useEffect(() => {
@@ -38,13 +37,17 @@ export function ReferencesPanel() {
 
   const handleRefClicked = (reference: ReferenceItem, openPdf?: boolean) => {
     if (openPdf) {
-      openFilePath(reference.filepath);
+      openReferencePdf(reference.id);
     } else {
       openReference(reference.id);
     }
   };
 
   const handleAuthorClicked = (author: Author) => openReferences(author.lastName);
+
+  const handleRemoveClicked = (reference: ReferenceItem) => {
+    emitEvent('refstudio://references/remove', { referenceIds: [reference.id] });
+  };
 
   const handleFilterChanged = (filter: string) => {
     if (filter.trim() === '') {
@@ -84,6 +87,7 @@ export function ReferencesPanel() {
             references={visibleReferences}
             onAuthorClicked={handleAuthorClicked}
             onRefClicked={handleRefClicked}
+            onRemoveClicked={handleRemoveClicked}
           />
 
           {references.length === 0 && (
