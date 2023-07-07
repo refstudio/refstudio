@@ -11,7 +11,6 @@ import { EventsListener } from '../EventsListener';
 vi.mock('../../events');
 vi.mock('../../io/filesystem');
 
-
 const renameEventName: RefStudioEventName = 'refstudio://explorer/rename';
 
 describe('EventsListener.rename', () => {
