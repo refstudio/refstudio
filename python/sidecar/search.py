@@ -7,7 +7,7 @@ from stopwords import stopwords
 import sys
 import json
 
-class Search:
+class Searcher:
     # Initialize the SemanticScholar API client and stopwords set
     def __init__(self):
         self.s2 = SemanticScholar()
@@ -45,7 +45,7 @@ def search(
     '''
 
     # Create a Search object
-    search = Search()
+    search = Searcher()
     # Preprocess the query (e.g., lowercase, remove stopwords)
     query = search.preprocess_query(query)
     # Perform the search using Semantic Scholar's API
