@@ -10,6 +10,8 @@ import { EventsListener } from '../EventsListener';
 vi.mock('../../events');
 vi.mock('../../io/filesystem');
 
+const deleteEventName: RefStudioEventName = 'refstudio://explorer/delete';
+
 describe('EventsListener.close', () => {
   let store: ReturnType<typeof createStore>;
 
@@ -21,15 +23,15 @@ describe('EventsListener.close', () => {
     vi.clearAllMocks();
   });
 
-  it(`should listen to refstudio://explorer/delete events`, () => {
+  it(`should listen to ${deleteEventName} events`, () => {
     const mockData = mockListenEvent();
 
     setupWithJotaiProvider(<EventsListener />, store);
 
-    expect(mockData.registeredEventNames).toContain<RefStudioEventName>('refstudio://explorer/delete');
+    expect(mockData.registeredEventNames).toContain<RefStudioEventName>(deleteEventName);
   });
 
-  it(`should delete the file when the refstudio://explorer/delete event is triggered`, async () => {
+  it(`should delete the file when the ${deleteEventName} event is triggered`, async () => {
     const mockData = mockListenEvent();
     const fileEntry = makeFile('Root File.txt');
     vi.mocked(readAllProjectFiles).mockResolvedValue([fileEntry]);
@@ -37,7 +39,7 @@ describe('EventsListener.close', () => {
 
     setupWithJotaiProvider(<EventsListener />, store);
 
-    act(() => mockData.trigger('refstudio://explorer/delete', { path: fileEntry.path }));
+    act(() => mockData.trigger(deleteEventName, { path: fileEntry.path }));
 
     await waitFor(() => {
       expect(deleteFile).toHaveBeenCalledTimes(1);

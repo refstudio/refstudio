@@ -1,11 +1,12 @@
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 
 import { activePaneAtom, closeEditorFromPaneAtom } from '../atoms/editorActions';
-import { createFileAtom, deleteFileAtom } from '../atoms/fileEntryActions';
+import { createFileAtom, deleteFileAtom, renameFileAtom } from '../atoms/fileEntryActions';
+import { fileExplorerEntryPathBeingRenamed } from '../atoms/fileExplorerActions';
 import { activeEditorAtom } from '../atoms/paneActions';
 import { removeReferencesAtom } from '../atoms/referencesState';
 import { PaneEditorId } from '../atoms/types/PaneGroup';
-import { emitEvent } from '../events';
+import { emitEvent, RefStudioEventPayload } from '../events';
 import { useListenEvent } from '../hooks/useListenEvent';
 import { asyncNoop, noop } from '../lib/noop';
 
@@ -14,6 +15,7 @@ export function EventsListener({ children }: { children?: React.ReactNode }) {
   const closeActiveEditor = useCloseActiveEditor();
   const closeEditor = useCloseEditor();
   const createFile = useCreateFile();
+  const renameFile = useRenameFile();
   const removeReferences = useRemoveReferences();
   const deleteFile = useDeleteFile();
 
@@ -22,6 +24,7 @@ export function EventsListener({ children }: { children?: React.ReactNode }) {
   useListenEvent('refstudio://menu/file/new', createFile);
   useListenEvent('refstudio://editors/close', closeEditor);
   useListenEvent('refstudio://references/remove', removeReferences);
+  useListenEvent('refstudio://explorer/rename', renameFile);
   useListenEvent('refstudio://explorer/delete', deleteFile);
 
   return <>{children}</>;
@@ -64,8 +67,21 @@ function useRemoveReferences() {
   return ({ referenceIds }: { referenceIds: string[] }) => void removeReferences(referenceIds);
 }
 
+function useRenameFile() {
+  const markFilePathAsBeingRenamed = useSetAtom(fileExplorerEntryPathBeingRenamed);
+  const renameFile = useSetAtom(renameFileAtom);
+
+  return ({ path, newName }: RefStudioEventPayload<'refstudio://explorer/rename'>) => {
+    if (!newName) {
+      markFilePathAsBeingRenamed(path);
+    } else {
+      void renameFile({ filePath: path, newName });
+    }
+  };
+}
+
 function useDeleteFile() {
   const deleteFile = useSetAtom(deleteFileAtom);
 
-  return ({ path }: { path: string }) => void deleteFile(path);
+  return ({ path }: RefStudioEventPayload<'refstudio://explorer/delete'>) => void deleteFile(path);
 }
