@@ -3,7 +3,7 @@ import { createStore } from 'jotai';
 import { makeFileExplorerFileEntry, makeFileExplorerFolderEntry } from '../../../atoms/__tests__/test-fixtures';
 import { fileExplorerEntryPathBeingRenamed } from '../../../atoms/fileExplorerActions';
 import { FileExplorerFileEntry, FileExplorerFolderEntry } from '../../../atoms/types/FileExplorerEntry';
-import { emitEvent, RefStudioEventName } from '../../../events';
+import { emitEvent, RefStudioEventName, RefStudioEventPayload } from '../../../events';
 import { noop } from '../../../lib/noop';
 import { act, render, screen, setup, setupWithJotaiProvider } from '../../../test/test-utils';
 import { FileExplorer } from '../FileExplorer';
@@ -47,8 +47,9 @@ describe('FileExplorer', () => {
   it('should render a folder and its children', async () => {
     const file = makeFileExplorerFileEntry('File 1.pdf');
     const { folderEntry: folder } = makeFileExplorerFolderEntry('Folder', [file], false);
+    const { folderEntry: rootFolder } = makeFileExplorerFolderEntry('', [folder], true);
 
-    const { user } = setup(<FileExplorer fileExplorerEntry={folder} selectedFiles={[]} onFileClick={noop} />);
+    const { user } = setup(<FileExplorer fileExplorerEntry={rootFolder} selectedFiles={[]} onFileClick={noop} />);
     expect(screen.getByText(folder.name)).toBeInTheDocument();
 
     // Folder is collapsed by default
@@ -70,12 +71,24 @@ describe('FileExplorer', () => {
     expect(inputElement).toHaveFocus();
   });
 
-  it(`should not emit ${renameEventName} when a file with the same name already exists`, async () => {
-    const file1 = makeFileExplorerFileEntry('File 1.pdf');
-    const file2 = makeFileExplorerFileEntry('File 2.pdf');
-    const { folderEntry: root } = makeFileExplorerFolderEntry('', [file1, file2], true);
+  it(`should emit ${renameEventName} when submitting the new name`, async () => {
+    const { user } = setupWithJotaiProvider(
+      <FileExplorer fileExplorerEntry={folderEntry} selectedFiles={[]} onFileClick={noop} />,
+      store,
+    );
 
-    store.set(fileExplorerEntryPathBeingRenamed, file1.path);
+    await user.keyboard('File 2{Enter}');
+    expect(emitEvent).toHaveBeenCalledTimes(1);
+    expect(emitEvent).toHaveBeenCalledWith<
+      ['refstudio://explorer/rename', RefStudioEventPayload<'refstudio://explorer/rename'>]
+    >('refstudio://explorer/rename', { path: fileEntry.path, newName: 'File 2.pdf' });
+  });
+
+  it(`should not emit ${renameEventName} when a file with the same name already exists`, async () => {
+    const file2 = makeFileExplorerFileEntry('File 2.pdf');
+    const { folderEntry: root } = makeFileExplorerFolderEntry('', [fileEntry, file2], true);
+
+    store.set(fileExplorerEntryPathBeingRenamed, fileEntry.path);
 
     const { user } = setupWithJotaiProvider(
       <FileExplorer fileExplorerEntry={root} selectedFiles={[]} onFileClick={noop} />,
@@ -86,7 +99,7 @@ describe('FileExplorer', () => {
     expect(emitEvent).not.toHaveBeenCalled();
   });
 
-  it(`should not emit ${renameEventName} when the name strats with a '.'`, async () => {
+  it(`should not emit ${renameEventName} when the name starts with a '.'`, async () => {
     const { user } = setupWithJotaiProvider(
       <FileExplorer fileExplorerEntry={folderEntry} selectedFiles={[]} onFileClick={noop} />,
       store,
