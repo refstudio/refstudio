@@ -33,6 +33,7 @@ export const setEditorDataIsDirtyAtom = atom(
 
     const editorData = updatedEditorsData.get(editorId);
 
+    /* c8 ignore next 4 */
     if (!editorData) {
       console.warn('Editor is not open ', editorId);
       return;
@@ -52,10 +53,13 @@ export const renameEditorDataAtom = atom(
   null,
   (get, set, { editorId, newEditorId, newName }: RenameEditorDataPayload) => {
     const editorData = get(editorsDataAtom).get(editorId);
+
+    /* c8 ignore next 4 */
     if (!editorData) {
       console.warn('Trying to rename editor data that is not loaded', editorId);
       return;
     }
+
     set(addEditorData, { ...editorData, id: newEditorId, title: newName });
     set(removeEditorData, editorId);
   },

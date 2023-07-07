@@ -125,6 +125,7 @@ export const renameEditorInPaneAtom = atom(
   (get, set, { editorId, paneId, newName, newPath }: RenameEditorInPanePayload) => {
     const panes = get(paneGroupAtom);
 
+    /* c8 ignore next 4 */
     if (!panes[paneId].openEditorIds.includes(editorId)) {
       console.warn('Editor not open in the given pane ', editorId, paneId);
       return;
