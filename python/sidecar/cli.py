@@ -74,4 +74,24 @@ def get_arg_parser():
         "--all",
         action="store_true"
     )
+
+    search_parser = subparsers.add_parser(
+        "search",
+        description="Search for a paper"
+    )
+
+    search_parser.add_argument(
+        "--query",
+        type=str,
+        required=True,
+        help="Search query for the Semantic Scholar search",
+    )
+
+    search_parser.add_argument(
+        "--limit",
+        type=int,
+        default=10,
+        help="Limit for the number of search results",
+    )
+
     return parser
