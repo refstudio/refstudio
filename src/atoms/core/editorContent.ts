@@ -47,3 +47,26 @@ export const unloadEditorContent = atom(null, (get, set, editorId: EditorId) => 
   updatedMap.delete(editorId);
   set(editorsContentStateAtom, updatedMap);
 });
+
+interface UpdateEditorIdPayload {
+  editorId: EditorId;
+  newEditorId: EditorId;
+}
+export const updateEditorContentIdAtom = atom(null, (get, set, { editorId, newEditorId }: UpdateEditorIdPayload) => {
+  const editorsContentState = get(editorsContentStateAtom);
+  const editorContent = editorsContentState.get(editorId);
+  /* c8 ignore next 4 */
+  if (!editorContent) {
+    console.warn('Trying to update the id of editor content that is not loaded', editorId);
+    return;
+  }
+
+  // Update the editorId atom
+  set(editorContent.editorIdAtom, newEditorId);
+
+  // Update the map to move the entry from `[editorId]` to `[newEditorId]`
+  const updatedEditorsContentState = new Map(get(editorsContentStateAtom));
+  updatedEditorsContentState.set(newEditorId, updatedEditorsContentState.get(editorId)!);
+  updatedEditorsContentState.delete(editorId);
+  set(editorsContentStateAtom, updatedEditorsContentState);
+});

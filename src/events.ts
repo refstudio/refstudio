@@ -14,6 +14,7 @@ interface RefStudioEvents {
   'refstudio://references/ingestion/run': undefined;
   'refstudio://references/remove': { referenceIds: string[] };
   'refstudio://explorer/delete': { path: string };
+  'refstudio://explorer/rename': { path: string; newName?: string };
 }
 
 export type RefStudioEventName = keyof RefStudioEvents;

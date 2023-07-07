@@ -7,7 +7,7 @@ import { openFileEntryAtom } from '../../atoms/fileEntryActions';
 import { EditorData } from '../../atoms/types/EditorData';
 import { FileEntry } from '../../atoms/types/FileEntry';
 import { PaneEditorId } from '../../atoms/types/PaneGroup';
-import { emitEvent } from '../../events';
+import { emitEvent, RefStudioEventName } from '../../events';
 import { readFileContent } from '../../io/filesystem';
 import { act, mockListenEvent, setupWithJotaiProvider } from '../../test/test-utils';
 import { EventsListener } from '../EventsListener';
@@ -15,6 +15,9 @@ import { EventsListener } from '../EventsListener';
 vi.mock('../../events');
 vi.mock('../../io/filesystem');
 vi.mock('../../lib/noop');
+
+const menuCloseEventName: RefStudioEventName = 'refstudio://menu/file/close';
+const editorCloseEventName: RefStudioEventName = 'refstudio://editors/close';
 
 describe('EventsListener.close', () => {
   let store: ReturnType<typeof createStore>;
@@ -36,7 +39,7 @@ describe('EventsListener.close', () => {
     vi.clearAllMocks();
   });
 
-  it.each([{ event: 'refstudio://menu/file/close' }, { event: 'refstudio://editors/close' }])(
+  it.each([{ event: menuCloseEventName }, { event: editorCloseEventName }])(
     'should listen to $event events',
     ({ event }) => {
       const mockData = mockListenEvent();
@@ -47,7 +50,7 @@ describe('EventsListener.close', () => {
     },
   );
 
-  it(`should trigger ${'refstudio://editors/close'} with correct payload when ${'refstudio://menu/file/close'} event is triggered`, () => {
+  it(`should trigger ${editorCloseEventName} with correct payload when ${menuCloseEventName} event is triggered`, () => {
     const mockData = mockListenEvent();
     const mockedEmitEvent = vi.mocked(emitEvent);
 
@@ -56,17 +59,17 @@ describe('EventsListener.close', () => {
     setupWithJotaiProvider(<EventsListener />, store);
 
     act(() => {
-      mockData.trigger('refstudio://menu/file/close');
+      mockData.trigger(menuCloseEventName);
     });
 
     expect(mockedEmitEvent).toHaveBeenCalledTimes(1);
-    expect(mockedEmitEvent).toHaveBeenCalledWith<[string, PaneEditorId]>('refstudio://editors/close', {
+    expect(mockedEmitEvent).toHaveBeenCalledWith<[string, PaneEditorId]>(editorCloseEventName, {
       editorId: editorData.id,
       paneId: activePaneId,
     });
   });
 
-  it(`should close the given file when ${'refstudio://editors/close'} event is triggered`, () => {
+  it(`should close the given file when ${editorCloseEventName} event is triggered`, () => {
     const mockData = mockListenEvent();
     const activePane = runGetAtomHook(activePaneAtom, store);
 
@@ -79,7 +82,7 @@ describe('EventsListener.close', () => {
     setupWithJotaiProvider(<EventsListener />, store);
 
     act(() => {
-      mockData.trigger('refstudio://editors/close', { editorId: editorData.id, paneId: activePane.current.id });
+      mockData.trigger(editorCloseEventName, { editorId: editorData.id, paneId: activePane.current.id });
     });
 
     expect(activePane.current.openEditorIds).toHaveLength(1);
