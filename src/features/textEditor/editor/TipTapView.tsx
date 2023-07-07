@@ -1,3 +1,6 @@
+import { useAtomValue, useSetAtom } from 'jotai';
+
+import { activeEditorIdAtom } from '../../../atoms/core/activePane';
 import { TextEditorContent } from '../../../atoms/types/EditorContent';
 import { EditorContentAtoms } from '../../../atoms/types/EditorContentAtoms';
 import { TipTapEditor } from '../components/TipTapEditor';
@@ -8,5 +11,20 @@ interface TipTapViewProps {
 }
 
 export function TipTapView({ file, activeEditorContentAtoms }: TipTapViewProps) {
-  return <TipTapEditor activeEditorContentAtoms={activeEditorContentAtoms} editorContent={file.textContent} />;
+  const { editorIdAtom, updateEditorContentBufferAtom, saveEditorContentInMemoryAtom } = activeEditorContentAtoms;
+
+  const updateFileBuffer = useSetAtom(updateEditorContentBufferAtom);
+  const saveFileInMemory = useSetAtom(saveEditorContentInMemoryAtom);
+
+  const editorId = useAtomValue(editorIdAtom);
+  const activeEditorId = useAtomValue(activeEditorIdAtom);
+
+  return (
+    <TipTapEditor
+      editorContent={file.textContent}
+      isActive={editorId === activeEditorId}
+      saveFileInMemory={saveFileInMemory}
+      updateFileBuffer={updateFileBuffer}
+    />
+  );
 }

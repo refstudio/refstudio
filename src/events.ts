@@ -15,6 +15,7 @@ interface RefStudioEvents {
   'refstudio://references/remove': { referenceIds: string[] };
   'refstudio://explorer/delete': { path: string };
   'refstudio://explorer/rename': { path: string; newName?: string };
+  'refstudio://ai/suggestion/insert': { text: string };
 }
 
 export type RefStudioEventName = keyof RefStudioEvents;

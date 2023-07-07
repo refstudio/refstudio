@@ -13,3 +13,8 @@ export const activePaneAtom = atom<PaneState & { id: PaneId }>((get) => {
   const activePaneId = get(activePaneIdAtom);
   return { ...get(paneGroupAtom)[activePaneId], id: activePaneId };
 });
+
+export const activeEditorIdAtom = atom((get) => {
+  const activePane = get(activePaneAtom);
+  return activePane.activeEditorId ?? null;
+});

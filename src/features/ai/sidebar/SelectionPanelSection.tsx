@@ -5,6 +5,7 @@ import { useDebounce } from 'usehooks-ts';
 import { askForRewrite } from '../../../api/rewrite';
 import { selectionAtom } from '../../../atoms/selectionState';
 import { PanelSection } from '../../../components/PanelSection';
+import { emitEvent } from '../../../events';
 
 export function SelectionPanelSection() {
   const selection = useAtomValue(selectionAtom);
@@ -36,9 +37,12 @@ export function SelectionPanelSection() {
           {rewrite && (
             <>
               <div className="border border-green-100 bg-green-50 p-4">{rewrite}</div>
-              {/* <button className="rounded-xl bg-green-100 hover:bg-green-200" onClick={handleReplaceClicked}>
-                          REPLACE
-                        </button> */}
+              <button
+                className="rounded-xl bg-green-100 hover:bg-green-200"
+                onClick={() => emitEvent('refstudio://ai/suggestion/insert', { text: rewrite })}
+              >
+                REPLACE
+              </button>
             </>
           )}
         </div>
