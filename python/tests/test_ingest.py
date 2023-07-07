@@ -3,7 +3,7 @@ import os
 from datetime import date
 from pathlib import Path
 
-from sidecar import ingest, settings, storage, typing
+from sidecar import ingest, storage, typing
 from sidecar.typing import Author, Reference
 
 FIXTURES_DIR = Path(__file__).parent.joinpath("fixtures")
@@ -34,8 +34,6 @@ def test_run_ingest(monkeypatch, tmp_path, capsys):
     for pdf in FIXTURES_DIR.joinpath("pdf").glob("*.pdf"):
         write_path = tmp_path.joinpath("uploads", pdf.name)
         _copy_fixture_to_temp_dir(pdf, write_path)
-
-    monkeypatch.setattr(settings, 'UPLOADS_DIR', tmp_path.joinpath("uploads"))
 
     # grobid server takes an input directory of PDFs
     # if grobid successfully parses the file, it creates a {pdfname}.tei.xml file
