@@ -1,6 +1,7 @@
 import { emit, EventCallback, listen } from '@tauri-apps/api/event';
 
 import { PaneEditorId } from './atoms/types/PaneGroup';
+import { NotificationItemType } from './notifications/types';
 
 interface RefStudioEvents {
   'refstudio://menu/file/close': undefined;
@@ -13,7 +14,10 @@ interface RefStudioEvents {
   'refstudio://editors/close': PaneEditorId;
   'refstudio://references/ingestion/run': undefined;
   'refstudio://references/remove': { referenceIds: string[] };
+  'refstudio://references/load': undefined;
   'refstudio://explorer/delete': { path: string };
+  'refstudio://notifications/clear': { type?: NotificationItemType };
+  'refstudio://notifications/new': { type: NotificationItemType; title: string; details?: string };
 }
 
 export type RefStudioEventName = keyof RefStudioEvents;

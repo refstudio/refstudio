@@ -12,6 +12,7 @@ import { AIPanel } from '../features/ai/AIPanel';
 import { ReferencesDropZone } from '../features/references/components/ReferencesDropZone';
 import { ReferencesPanel } from '../features/references/sidebar/ReferencesPanel';
 import { ensureProjectFileStructure } from '../io/filesystem';
+import { notifyInfo } from '../notifications/notifications';
 import { SettingsModalOpener } from '../settings/SettingsModalOpener';
 import { PdfViewerAPI } from '../types/PdfViewerAPI';
 import { ApplicationFrame } from '../wrappers/ApplicationFrame';
@@ -21,7 +22,11 @@ import { MainPanel } from './components/MainPanel';
 import { ExplorerPanel } from './sidebar/ExplorerPanel';
 
 function App() {
-  useEffectOnce(() => void ensureProjectFileStructure());
+  useEffectOnce(() => {
+    notifyInfo('Application Startup');
+    void ensureProjectFileStructure();
+    emitEvent('refstudio://references/load');
+  });
 
   const pdfViewerRef = React.useRef<PdfViewerAPI>(null);
   const updatePDFViewerWidth = useCallback(() => {

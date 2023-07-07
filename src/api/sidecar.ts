@@ -23,14 +23,16 @@ export async function callSidecar<T extends keyof CliCommands>(subcommand: T, ar
   };
 
   const command = new Command('call-sidecar', [subcommand, ...args], { env });
-  console.log('command', subcommand, args.join(', '), command);
+  console.log('sidecar command ' + subcommand, args.join(', '), command);
   const output = await command.execute();
   if (output.stderr) {
-    throw new Error(output.stderr);
+    const error = new Error('Error executing sidecar command');
+    console.log(error, output.stderr);
+    throw error;
   }
-  console.log('output: ', output.stdout);
+  console.log('sidecar output: ', output.stdout);
 
   const response = JSON.parse(output.stdout) as CliCommands[T];
-  console.log('response', response);
+  console.log('sidecar response', response);
   return response;
 }

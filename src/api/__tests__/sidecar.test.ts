@@ -91,6 +91,6 @@ describe('sidecar', () => {
         } as unknown as Command),
     );
 
-    await expect(callSidecar('chat', [])).rejects.toThrow('error details');
+    await expect(callSidecar('chat', [])).rejects.toThrow();
   });
 });
