@@ -92,7 +92,7 @@ describe('fileEntryActions', () => {
     expect(activePane.current.openEditorIds).not.toContain(editorData.id);
   });
 
-  it('should throw an error if the file does not exist', async () => {
+  it('should throw an error when trying to delete a file that does not exist', async () => {
     const deleteFile = runSetAtomHook(deleteFileAtom, store);
     await expect(() => deleteFile.current('./fakePath/fakeFile')).rejects.toThrowError(/does not exist/);
   });
@@ -194,5 +194,48 @@ describe('fileEntryActions', () => {
     });
     expect(writeFileContent).toHaveBeenCalledTimes(1);
     expect(writeFileContent).toHaveBeenCalledWith(newPath, textContent);
+  });
+
+  it('should throw an error when trying to rename a file that does not exist', async () => {
+    const renameFile = runSetAtomHook(renameFileAtom, store);
+    await expect(() => renameFile.current({ filePath: './fakePath/fakeFile', newName: '' })).rejects.toThrowError(
+      /does not exist/,
+    );
+  });
+
+  it('should throw an error when trying to rename a folder', async () => {
+    const folderEntry = makeFolder('Folder');
+    vi.mocked(readAllProjectFiles).mockResolvedValueOnce([folderEntry]);
+    await store.set(refreshFileTreeAtom);
+
+    const renameFile = runSetAtomHook(renameFileAtom, store);
+    await expect(() => renameFile.current({ filePath: folderEntry.path, newName: '' })).rejects.toThrowError(
+      /Renaming folders is not supported/,
+    );
+  });
+
+  it('should do nothing if renaming fails', async () => {
+    const fileEntry = makeFile('File.txt');
+    vi.mocked(readAllProjectFiles).mockResolvedValue([fileEntry]);
+    await store.set(refreshFileTreeAtom);
+
+    store.set(openFileEntryAtom, fileEntry);
+    const activePaneContent = runGetAtomHook(activePaneContentAtom, store);
+
+    vi.mocked(renameFileFromDisk).mockResolvedValueOnce({ success: false });
+
+    const newName = 'Updated File.txt';
+
+    const renameFile = runSetAtomHook(renameFileAtom, store);
+    await act(async () => {
+      await renameFile.current({ filePath: fileEntry.path, newName });
+    });
+
+    expect(activePaneContent.current.openEditors).toHaveLength(1);
+    expect(activePaneContent.current.openEditors[0].id).toBe(buildEditorId('text', fileEntry.path));
+    expect(activePaneContent.current.openEditors[0].title).toBe(fileEntry.name);
+
+    expect(activePaneContent.current.activeEditor).toBeDefined();
+    expect(activePaneContent.current.activeEditor!.id).toBe(buildEditorId('text', fileEntry.path));
   });
 });
