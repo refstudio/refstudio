@@ -1,13 +1,14 @@
 import { atom } from 'jotai';
 
 import { generateId } from '../lib/generateId';
-import { NotificationItem, NotificationItemType } from '../notifications/types';
+import { MutableNotificationItem, NotificationItem, NotificationItemType } from '../notifications/types';
 
 /**
+ * Core database
+ *
  * List of notification items sorted descending of creation time (most recent in the begining)
  */
-const notificationsAtom = atom<NotificationItem[]>([]);
-const readOnlyNotificationsAtom = atom<readonly Readonly<NotificationItem>[]>((get) => get(notificationsAtom));
+const notificationsAtom = atom<readonly MutableNotificationItem[]>([]);
 
 export const clearNotificationsAtom = atom(null, (get, set, type?: NotificationItemType) => {
   if (!type) {
@@ -19,10 +20,16 @@ export const clearNotificationsAtom = atom(null, (get, set, type?: NotificationI
   );
 });
 
-// export const hasNotificationsAtom = atom((get) => get(notificationsAtom).length > 0);
-// export const latestNotificationAtom = atom((get) => get(readOnlyNotificationsAtom)[0]);
+export const hasNotificationsAtom = atom((get) => get(notificationsAtom).length > 0);
+export const latestNotificationAtom = atom((get) => {
+  const notifications = get(notificationsAtom);
+  if (notifications.length === 0) {
+    throw new Error('Notifications list is empty. Ensire you call hasNotificationsAtom before');
+  }
+  return notifications[0];
+});
 
-export const listNotificationsAtom = atom<readonly Readonly<NotificationItem>[]>((get) => get(notificationsAtom));
+export const listNotificationsAtom = atom<readonly NotificationItem[]>((get) => get(notificationsAtom));
 
 export const notificationsTypeStatsAtom = atom((get) => {
   const stats: Record<NotificationItemType, number> = {
@@ -30,7 +37,7 @@ export const notificationsTypeStatsAtom = atom((get) => {
     warning: 0,
     error: 0,
   };
-  get(readOnlyNotificationsAtom).forEach((n) => (stats[n.type] += 1));
+  get(notificationsAtom).forEach((n) => (stats[n.type] += 1));
   return stats;
 });
 

@@ -80,7 +80,7 @@ function NotificationsPopup({
   onClear,
   onClose,
 }: {
-  notifications: readonly Readonly<NotificationItem>[];
+  notifications: readonly NotificationItem[];
   type?: NotificationItemType;
   onClear: (type?: NotificationItemType) => void;
   onClose: () => void;
