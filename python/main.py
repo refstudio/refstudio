@@ -25,7 +25,7 @@ if __name__ == '__main__':
         chat.ask_question(args.text)
     
     if args.command == "search":
-        search.search(args.query)
+        search.search(query=args.query, limit=args.limit)
     
     if args.command == "update":
         data = json.loads(args.data)
