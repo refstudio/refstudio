@@ -39,3 +39,5 @@ function getFileExplorerEntryFromPath(
 
   return getFileExplorerEntryFromPath(rest, get, nextLevelEntry);
 }
+
+export { pathBeingRenamed as fileExplorerEntryPathBeingRenamed } from './core/fileExplorerEntry';

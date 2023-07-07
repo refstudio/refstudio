@@ -2,6 +2,7 @@ import { IconType } from 'react-icons';
 
 import { useFileExplorerContextMenu } from '../application/sidebar/fileExplorerContextMenu/useFileExplorerContextMenu';
 import { cx } from '../lib/cx';
+import { FileNameInput } from './FileNameInput';
 
 export interface RightAction {
   title?: string;
@@ -9,7 +10,7 @@ export interface RightAction {
   VscIcon: IconType;
 }
 
-interface FileNodeProps {
+interface FileNodePropsBase {
   bold?: boolean;
   contextMenuId?: string;
   fileId: string;
@@ -21,6 +22,19 @@ interface FileNodeProps {
   VscIcon: IconType;
 }
 
+interface NonEditableFileNodeProps extends FileNodePropsBase {
+  isEditMode?: false;
+}
+
+interface EditableFileNodeProps extends FileNodePropsBase {
+  isEditMode: true;
+  isNameValid: (name: string) => boolean;
+  onFileRename: (newName: string) => void;
+  onCancelRename: () => void;
+}
+
+type FileNodeProps = NonEditableFileNodeProps | EditableFileNodeProps;
+
 export function FileNode({
   bold,
   contextMenuId = '',
@@ -31,6 +45,7 @@ export function FileNode({
   rightAction,
   selected,
   VscIcon,
+  ...editableProps
 }: FileNodeProps) {
   const show = useFileExplorerContextMenu(contextMenuId, { id: fileId });
   return (
@@ -45,22 +60,33 @@ export function FileNode({
     >
       <div className="flex h-full w-full items-center gap-1">
         <VscIcon />
-        <div
-          className={cx('flex-1 truncate', {
-            'font-semibold': bold,
-          })}
-        >
-          {fileName}
-        </div>
-        {rightAction && (
-          <div
-            className="mr-2 hidden rounded-md p-0.5 hover:bg-gray-300 group-hover:block"
-            role="button"
-            title={rightAction.title}
-            onClick={rightAction.onClick}
-          >
-            <rightAction.VscIcon />
-          </div>
+        {editableProps.isEditMode ? (
+          <FileNameInput
+            fileName={fileName}
+            isNameValid={editableProps.isNameValid}
+            onCancel={editableProps.onCancelRename}
+            onSubmit={editableProps.onFileRename}
+          />
+        ) : (
+          <>
+            <div
+              className={cx('flex-1 truncate', {
+                'font-semibold': bold,
+              })}
+            >
+              {fileName}
+            </div>
+            {rightAction && (
+              <div
+                className="mr-2 hidden rounded-md p-0.5 hover:bg-gray-300 group-hover:block"
+                role="button"
+                title={rightAction.title}
+                onClick={rightAction.onClick}
+              >
+                <rightAction.VscIcon />
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
