@@ -19,9 +19,8 @@ export const clearNotificationsAtom = atom(null, (get, set, type?: NotificationI
   );
 });
 
-export const hasNotificationsAtom = atom((get) => get(notificationsAtom).length > 0);
-
-export const latestNotificationAtom = atom((get) => get(readOnlyNotificationsAtom)[0]);
+// export const hasNotificationsAtom = atom((get) => get(notificationsAtom).length > 0);
+// export const latestNotificationAtom = atom((get) => get(readOnlyNotificationsAtom)[0]);
 
 export const listNotificationsAtom = atom<readonly Readonly<NotificationItem>[]>((get) => get(notificationsAtom));
 
