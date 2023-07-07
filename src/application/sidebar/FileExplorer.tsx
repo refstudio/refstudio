@@ -1,4 +1,4 @@
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { useCallback } from 'react';
 import { VscChevronDown, VscChevronRight, VscFile } from 'react-icons/vsc';
 
@@ -10,17 +10,16 @@ import { FILE_EXPLORER_FILE_MENU_ID } from './fileExplorerContextMenu/FileExplor
 
 interface FileExplorerProps {
   fileExplorerEntry: FileExplorerFolderEntry;
-  filePathBeingRenamed?: string | null;
   onFileClick: (filePath: string) => void;
   selectedFiles: string[];
   paddingLeft?: string;
 }
 
 export function FileExplorer(props: FileExplorerProps) {
-  const { fileExplorerEntry, filePathBeingRenamed, onFileClick, selectedFiles, paddingLeft = '0' } = props;
+  const { fileExplorerEntry, onFileClick, selectedFiles, paddingLeft = '0' } = props;
   const files = useAtomValue(fileExplorerEntry.childrenAtom);
 
-  const setPathBeingRenamed = useSetAtom(fileExplorerEntryPathBeingRenamed);
+  const [pathBeingRenamed, setPathBeingRenamed] = useAtom(fileExplorerEntryPathBeingRenamed);
 
   const [collapsed, setCollapsed] = useAtom(fileExplorerEntry.collapsedAtom);
 
@@ -67,7 +66,7 @@ export function FileExplorer(props: FileExplorerProps) {
                 contextMenuId={FILE_EXPLORER_FILE_MENU_ID}
                 fileId={fileEntry.path}
                 fileName={fileEntry.name}
-                isEditMode={filePathBeingRenamed === fileEntry.path}
+                isEditMode={pathBeingRenamed === fileEntry.path}
                 isNameValid={isNameValid}
                 key={fileEntry.path}
                 paddingLeft={paddingLeft}

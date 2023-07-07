@@ -49,6 +49,7 @@ export function FileNameInput({ fileName, isNameValid, onCancel, onSubmit }: Fil
         'border-red-600': !isValueValid,
       })}
       ref={focusAndSelect}
+      role="textbox"
       value={value}
       onBlur={onCancel}
       onChange={handleChange}

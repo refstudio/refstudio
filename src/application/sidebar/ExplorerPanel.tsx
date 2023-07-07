@@ -4,11 +4,7 @@ import { VscCloseAll, VscSplitHorizontal } from 'react-icons/vsc';
 
 import { closeAllEditorsAtom, moveEditorToPaneAtom, selectEditorInPaneAtom } from '../../atoms/editorActions';
 import { openFilePathAtom } from '../../atoms/fileEntryActions';
-import {
-  fileExplorerAtom,
-  fileExplorerEntryPathBeingRenamed,
-  refreshFileTreeAtom,
-} from '../../atoms/fileExplorerActions';
+import { fileExplorerAtom, refreshFileTreeAtom } from '../../atoms/fileExplorerActions';
 import { leftPaneAtom, rightPaneAtom } from '../../atoms/paneActions';
 import { EditorId, parseEditorId } from '../../atoms/types/EditorData';
 import { PaneId } from '../../atoms/types/PaneGroup';
@@ -23,7 +19,6 @@ export function ExplorerPanel() {
   const left = useAtomValue(leftPaneAtom);
   const right = useAtomValue(rightPaneAtom);
   const rootFileExplorerEntry = useAtomValue(fileExplorerAtom);
-  const filePathBeingRenamed = useAtomValue(fileExplorerEntryPathBeingRenamed);
 
   const selectFileInPane = useSetAtom(selectEditorInPaneAtom);
   const openFile = useSetAtom(openFilePathAtom);
@@ -82,7 +77,6 @@ export function ExplorerPanel() {
       <PanelSection grow title="Project X">
         <FileExplorer
           fileExplorerEntry={rootFileExplorerEntry}
-          filePathBeingRenamed={filePathBeingRenamed}
           paddingLeft="1.25rem"
           selectedFiles={[left.activeEditor?.id, right.activeEditor?.id]
             .filter(isNonNullish)
