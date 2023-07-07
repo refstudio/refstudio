@@ -54,6 +54,8 @@ describe('EventsListener.rename', () => {
     vi.mocked(readAllProjectFiles).mockResolvedValue([fileEntry]);
     await store.set(refreshFileTreeAtom);
 
+    vi.mocked(renameFile).mockResolvedValueOnce({ success: true, newPath: '' });
+
     const mockData = mockListenEvent();
     setupWithJotaiProvider(<EventsListener />, store);
 

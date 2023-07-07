@@ -1,7 +1,7 @@
 import { atom, Getter } from 'jotai';
 
 import { isNonNullish } from '../../lib/isNonNullish';
-import { buildEditorIdFromPath } from '../types/EditorData';
+import { buildEditorIdFromPath, EditorId } from '../types/EditorData';
 import { PaneContent, PaneEditorId, PaneId, PaneState } from '../types/PaneGroup';
 import { activePaneIdAtom } from './activePane';
 import { editorsContentStateAtom, updateEditorContentIdAtom } from './editorContent';
@@ -152,5 +152,18 @@ export const renameEditorInPaneAtom = atom(
     // Update the active editor id if needed
     const newActiveEditorId = panes[paneId].activeEditorId === editorId ? newEditorId : panes[paneId].activeEditorId;
     set(updatePaneGroup, { paneId, activeEditorId: newActiveEditorId, openEditorIds: newOpenEditorIds });
+  },
+);
+
+export const renameEditorAtom = atom(
+  null,
+  (get, set, { editorId, newName, newPath }: { editorId: EditorId; newName: string; newPath: string }) => {
+    const panes = get(paneGroupAtom);
+
+    Object.keys(panes).forEach((paneId) => {
+      if (panes[paneId as PaneId].openEditorIds.includes(editorId)) {
+        set(renameEditorInPaneAtom, { editorId, paneId: paneId as PaneId, newName, newPath });
+      }
+    });
   },
 );

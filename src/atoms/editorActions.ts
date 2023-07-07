@@ -2,13 +2,7 @@ import { atom } from 'jotai';
 
 import { editorsContentStateAtom, loadEditorContent, unloadEditorContent } from './core/editorContent';
 import { addEditorData, removeEditorData } from './core/editorData';
-import {
-  addEditorToPane,
-  paneGroupAtom,
-  removeEditorFromPane,
-  renameEditorInPaneAtom,
-  selectEditorInPaneAtom,
-} from './core/paneGroup';
+import { addEditorToPane, paneGroupAtom, removeEditorFromPane, selectEditorInPaneAtom } from './core/paneGroup';
 import { openFilePathAtom } from './fileEntryActions';
 import { getDerivedReferenceAtom } from './referencesState';
 import { buildEditorId, EditorId } from './types/EditorData';
@@ -119,19 +113,6 @@ export const moveEditorToPaneAtom = atom(null, (_get, set, { editorId, fromPaneI
   set(addEditorToPane, { paneId: toPaneId, editorId });
   set(selectEditorInPaneAtom, { paneId: toPaneId, editorId });
 });
-
-export const renameEditorAtom = atom(
-  null,
-  (get, set, { editorId, newName, newPath }: { editorId: EditorId; newName: string; newPath: string }) => {
-    const panes = get(paneGroupAtom);
-
-    Object.keys(panes).forEach((paneId) => {
-      if (panes[paneId as PaneId].openEditorIds.includes(editorId)) {
-        set(renameEditorInPaneAtom, { editorId, paneId: paneId as PaneId, newName, newPath });
-      }
-    });
-  },
-);
 
 export function targetPaneIdFor(file: FileFileEntry): PaneId {
   switch (file.fileExtension) {
