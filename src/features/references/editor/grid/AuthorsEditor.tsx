@@ -36,6 +36,7 @@ export const AuthorsEditor = forwardRef((props: ICellEditorParams<ReferenceItem,
   );
 });
 AuthorsEditor.displayName = 'AuthorsEditor';
+
 function parseAuthorsFromString(lines: string) {
   return lines
     .split('\n')

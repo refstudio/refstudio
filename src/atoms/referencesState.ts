@@ -63,7 +63,11 @@ export const updateReferenceAtom = atom(null, async (get, set, id: string, updat
 function patchEntry(key: keyof ReferenceItem, original: ReferenceItem, updated: ReferenceItem): Partial<ReferenceItem> {
   const originalValue = original[key];
   const updatedValue = updated[key];
+  return { [key]: updatedValue };
+
+  console.log('values', key, originalValue, updatedValue);
   if (JSON.stringify(originalValue) !== JSON.stringify(updatedValue)) {
+    console.log('values', key, originalValue, updatedValue);
     return { [key]: updatedValue };
   }
   return {};
