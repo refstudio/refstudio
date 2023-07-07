@@ -49,7 +49,7 @@ export const openReferencesAtom = atom(null, (_get, set, filter?: string) => {
   // Add to editor entries atom
   set(addEditorData, { id: editorId, title: 'RefStudio References' });
 
-  const paneId: PaneId = 'RIGHT';
+  const paneId: PaneId = 'LEFT';
   // Add editor to panes state
   set(addEditorToPane, { editorId, paneId });
 
