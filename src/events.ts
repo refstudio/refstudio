@@ -18,6 +18,7 @@ interface RefStudioEvents {
   'refstudio://explorer/delete': { path: string };
   'refstudio://notifications/clear': { type?: NotificationItemType };
   'refstudio://notifications/new': { type: NotificationItemType; title: string; details?: string };
+  'refstudio://explorer/rename': { path: string; newName?: string };
 }
 
 export type RefStudioEventName = keyof RefStudioEvents;
