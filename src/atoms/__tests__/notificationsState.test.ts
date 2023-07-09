@@ -4,6 +4,7 @@ import { createStore } from 'jotai';
 import { NotificationItemType } from '../../notifications/types';
 import {
   addNotificationAtom,
+  clearNotificationsAtom,
   hasNotificationsAtom,
   latestNotificationAtom,
   listNotificationsAtom,
@@ -65,5 +66,36 @@ describe('notificationsState', () => {
     const latestNotification = runGetAtomHook(latestNotificationAtom, store);
     expect(latestNotification.current.details).toBeDefined();
     expect(latestNotification.current.details).toBe('details');
+  });
+
+  const TOTAL_INFO = 3;
+  const TOTAL_WARNING = 4;
+  const TOTAL_ERROR = 2;
+  const TOTAL = TOTAL_INFO + TOTAL_WARNING + TOTAL_ERROR;
+  it.each<{ expectedLengthAfterClear: number; type?: NotificationItemType }>([
+    { expectedLengthAfterClear: 0, type: undefined },
+    { expectedLengthAfterClear: TOTAL - TOTAL_INFO, type: 'info' },
+    { expectedLengthAfterClear: TOTAL - TOTAL_WARNING, type: 'warning' },
+    { expectedLengthAfterClear: TOTAL - TOTAL_ERROR, type: 'error' },
+  ])('should clear all $type notifications', ({ type, expectedLengthAfterClear }) => {
+    const addNotification = runSetAtomHook(addNotificationAtom, store);
+    const notifications = runGetAtomHook(listNotificationsAtom, store);
+    const clearNotifications = runSetAtomHook(clearNotificationsAtom, store);
+
+    act(() => {
+      addNotification.current('info', 'title 1', 'details 1');
+      addNotification.current('info', 'title 2', 'details 2');
+      addNotification.current('info', 'title 3', 'details 3');
+      addNotification.current('warning', 'title warning 1', 'details warning 1');
+      addNotification.current('warning', 'title warning 2', 'details warning 2');
+      addNotification.current('warning', 'title warning 3', 'details warning 3');
+      addNotification.current('warning', 'title warning 4', 'details warning 4');
+      addNotification.current('error', 'error 1', 'details error 1');
+      addNotification.current('error', 'error 2', 'details error 2');
+    });
+
+    expect(notifications.current).not.toHaveLength(0);
+    act(() => clearNotifications.current(type));
+    expect(notifications.current).toHaveLength(expectedLengthAfterClear);
   });
 });
