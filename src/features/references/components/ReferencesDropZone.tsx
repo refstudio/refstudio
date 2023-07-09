@@ -30,6 +30,7 @@ export function ReferencesDropZone({ children }: { children: React.ReactNode }) 
       setReferences(updatedReferences);
       setSyncInProgress(false);
       void refreshFileTree();
+      notifyInfo('References upload completed');
     },
   });
 
@@ -38,11 +39,10 @@ export function ReferencesDropZone({ children }: { children: React.ReactNode }) 
       const files = Array.from(uploadedFiles).filter(validReferencesFiles);
       notifyInfo(
         'References upload started...',
-        `Uploading ${files.length} files: \n\n` + files.map((f) => `- ${f}`).join('\n'),
+        `Uploading ${files.length} files: \n\n` + files.map((f) => `- ${f.name}`).join('\n'),
       );
       await uploadFiles(files);
       ingestMutation.mutate();
-      notifyInfo('References upload completed');
     },
     onSuccess: () => setVisible(false),
   });
