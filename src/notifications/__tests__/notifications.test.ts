@@ -61,6 +61,6 @@ describe('notifications', () => {
     { type: 'error' },
   ])('should emit event to clear $type notifications', ({ type }) => {
     clearNotifications(type);
-    expect(vi.mocked(emitEvent)).toHaveBeenCalledWith(eventClear, type);
+    expect(vi.mocked(emitEvent)).toHaveBeenCalledWith(eventClear, { type });
   });
 });
