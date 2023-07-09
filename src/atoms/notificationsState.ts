@@ -22,7 +22,7 @@ export const clearNotificationsAtom = atom(null, (get, set, type?: NotificationI
 
 export const hasNotificationsAtom = atom((get) => get(notificationsAtom).length > 0);
 export const latestNotificationAtom = atom((get) => {
-  const notifications = get(notificationsAtom);
+  const notifications = get(listNotificationsAtom);
   if (notifications.length === 0) {
     throw new Error('Notifications list is empty. Ensire you call hasNotificationsAtom before');
   }

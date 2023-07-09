@@ -14,7 +14,7 @@ export function FooterItem({
   title?: string;
   hidden?: boolean;
   icon: React.ReactNode;
-  text: string;
+  text?: React.ReactNode;
   onClick?: () => void;
 }) {
   if (hidden) {
@@ -34,7 +34,8 @@ export function FooterItem({
       title={title}
       onClick={onClick}
     >
-      {icon} <span>{text}</span>
+      {icon}
+      {text && <span>{text}</span>}
     </span>
   );
 }

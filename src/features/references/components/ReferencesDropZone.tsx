@@ -9,6 +9,7 @@ import { referencesSyncInProgressAtom, setReferencesAtom } from '../../../atoms/
 import { useListenEvent } from '../../../hooks/useListenEvent';
 import { uploadFiles } from '../../../io/filesystem';
 import { cx } from '../../../lib/cx';
+import { notifyInfo } from '../../../notifications/notifications';
 import { FilesDragDropZone } from '../../../wrappers/FilesDragDropZone';
 
 function validReferencesFiles(file: File) {
@@ -34,8 +35,14 @@ export function ReferencesDropZone({ children }: { children: React.ReactNode }) 
 
   const uploadAndIngestMutation = useMutation({
     mutationFn: async (uploadedFiles: FileList) => {
-      await uploadFiles(Array.from(uploadedFiles).filter(validReferencesFiles));
+      const files = Array.from(uploadedFiles).filter(validReferencesFiles);
+      notifyInfo(
+        'References upload started...',
+        `Uploading ${files.length} files: \n\n` + files.map((f) => `- ${f}`).join('\n'),
+      );
+      await uploadFiles(files);
       ingestMutation.mutate();
+      notifyInfo('References upload completed');
     },
     onSuccess: () => setVisible(false),
   });
