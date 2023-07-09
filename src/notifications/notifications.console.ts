@@ -2,7 +2,7 @@ import { notifyErr, notifyError, notifyInfo, notifyWarning } from './notificatio
 
 const { log, warn, error } = console;
 
-function prefixTitle(title: unknown) {
+export function prefixTitle(title: unknown) {
   return `(console) ${String(title)}`;
 }
 
