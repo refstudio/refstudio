@@ -9,7 +9,7 @@ import { cx } from '../../lib/cx';
 import { NotificationItemType } from '../types';
 import { NotificationsPopup } from './NotificationsPopup';
 
-export function FooterNotificationsItem() {
+export function FooterNotificationItems() {
   const [popupFilter, setPopupFilter] = useState<NotificationItemType>();
   const [popupVisible, setPopupVisible] = useState(false);
 
@@ -33,22 +33,31 @@ export function FooterNotificationsItem() {
 
   return (
     <>
-      <FooterItem hidden={stats.info === 0} icon={<VscInfo />} text={stats.info} onClick={() => togglePopup('info')} />
+      <FooterItem
+        hidden={stats.info === 0}
+        icon={<VscInfo />}
+        text={stats.info}
+        title="infos"
+        onClick={() => togglePopup('info')}
+      />
       <FooterItem
         hidden={stats.warning === 0}
         icon={<VscWarning />}
         text={stats.warning}
+        title="warnings"
         onClick={() => togglePopup('warning')}
       />
       <FooterItem
         hidden={stats.error === 0}
         icon={<VscError />}
         text={stats.error}
+        title="errors"
         onClick={() => togglePopup('error')}
       />
       <FooterItem
         className={cx({ ' !bg-red-500 !text-white': stats.error > 0 })}
         icon={notifications.length > 0 ? <VscBellDot /> : <VscBell />}
+        title="notifications"
         onClick={() => togglePopup(undefined)}
       />
       {popupVisible && (

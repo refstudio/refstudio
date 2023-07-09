@@ -20,15 +20,19 @@ export function NotificationsPopup({
   useOnClickOutside(ref, onClose);
 
   return (
-    <div className="absolute bottom-8 right-0 flex min-w-[600px] max-w-[200px]  flex-col bg-slate-800" ref={ref}>
+    <div
+      className="absolute bottom-8 right-0 flex min-w-[600px] max-w-[200px]  flex-col bg-slate-800"
+      data-testid={NotificationsPopup.name}
+      ref={ref}
+    >
       <div className="flex justify-between bg-black p-2">
         <strong className="uppercase">
           {notifications.length > 0 && <span>{type ?? 'ALL'} NOTIFICATIONS</span>}
           {notifications.length === 0 && <span>NO NEW NOTIFICATIONS</span>}
         </strong>
-        <VscClearAll className="cursor-pointer" size={20} onClick={() => onClear(type)} />
+        <VscClearAll className="cursor-pointer" size={20} title="Clear All" onClick={() => onClear(type)} />
       </div>
-      <div className="flex max-h-[600px] flex-col divide-y divide-slate-600 overflow-auto">
+      <div className="flex max-h-[600px] flex-col divide-y divide-slate-600 overflow-auto" role="treegrid">
         {notifications
           .filter((n) => !type || n.type === type)
           .map((notif) => (
@@ -43,15 +47,24 @@ function NotificationItemWidget({ item, expanded }: { item: Readonly<Notificatio
   useEffect(() => {
     setShowDetails(expanded);
   }, [expanded]);
+
   const hasDetails = !!item.details;
   const date = new Date(item.when);
   return (
-    <div className="flex flex-col px-2 py-2 hover:bg-slate-900/50">
+    <div
+      aria-expanded={showDetails}
+      className="flex flex-col px-2 py-2 hover:bg-slate-900/50"
+      role="row"
+      title={item.title}
+    >
       <div
         className={cx('flex items-center gap-2', {
           'cursor-pointer': hasDetails, //
         })}
-        onClick={() => setShowDetails(!showDetails)}
+        onClick={() => {
+          const show = !showDetails;
+          setShowDetails(show);
+        }}
       >
         <NotificationIcon type={item.type} />
         <span className="font-mono">
