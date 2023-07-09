@@ -1,11 +1,21 @@
 import { emitEvent, RefStudioEventName } from '../../events';
-import { clearNotifications, notifyErr, notifyError, notifyInfo, notifyWarning } from '../notifications';
+import {
+  clearNotifications,
+  hideNotifications,
+  notifyErr,
+  notifyError,
+  notifyInfo,
+  notifyWarning,
+  showNotifications,
+} from '../notifications';
 import { NotificationItemType } from '../types';
 
 vi.mock('../../events');
 
 const eventNew: RefStudioEventName = 'refstudio://notifications/new';
 const eventClear: RefStudioEventName = 'refstudio://notifications/clear';
+const eventShowNotifications: RefStudioEventName = 'refstudio://notifications/popup/open';
+const eventHideNotifications: RefStudioEventName = 'refstudio://notifications/popup/close';
 
 describe('notifications', () => {
   it('should emit event to create info notification', () => {
@@ -62,5 +72,20 @@ describe('notifications', () => {
   ])('should emit event to clear $type notifications', ({ type }) => {
     clearNotifications(type);
     expect(vi.mocked(emitEvent)).toHaveBeenCalledWith(eventClear, { type });
+  });
+
+  it.each<{ type?: NotificationItemType }>([
+    { type: undefined },
+    { type: 'info' },
+    { type: 'warning' },
+    { type: 'error' },
+  ])('should emit event to show notifications of type $type', ({ type }) => {
+    showNotifications(type);
+    expect(vi.mocked(emitEvent)).toHaveBeenCalledWith(eventShowNotifications, { type });
+  });
+
+  it('should emit event to hide notifications popup', () => {
+    hideNotifications();
+    expect(vi.mocked(emitEvent)).toHaveBeenCalledWith(eventHideNotifications);
   });
 });

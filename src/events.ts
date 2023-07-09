@@ -11,6 +11,7 @@ interface RefStudioEvents {
   'refstudio://menu/references/open': undefined;
   'refstudio://menu/references/upload': undefined;
   'refstudio://menu/references/export': undefined;
+  'refstudio://menu/view/notifications': undefined;
   'refstudio://editors/close': PaneEditorId;
   'refstudio://references/ingestion/run': undefined;
   'refstudio://references/remove': { referenceIds: string[] };
@@ -18,6 +19,8 @@ interface RefStudioEvents {
   'refstudio://explorer/delete': { path: string };
   'refstudio://notifications/clear': { type?: NotificationItemType };
   'refstudio://notifications/new': { type: NotificationItemType; title: string; details?: string };
+  'refstudio://notifications/popup/open': { type?: NotificationItemType };
+  'refstudio://notifications/popup/close': undefined;
   'refstudio://explorer/rename': { path: string; newName?: string };
 }
 

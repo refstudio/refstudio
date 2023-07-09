@@ -1,35 +1,42 @@
 import { useAtomValue } from 'jotai';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import { VscBell, VscBellDot, VscError, VscInfo, VscWarning } from 'react-icons/vsc';
 
-import { listNotificationsAtom, notificationsTypeStatsAtom } from '../../atoms/notificationsState';
+import {
+  listNotificationsAtom,
+  notificationsPopupAtom,
+  notificationsTypeStatsAtom,
+} from '../../atoms/notificationsState';
 import { FooterItem } from '../../components/footer/FooterItem';
 import { cx } from '../../lib/cx';
-import { clearNotifications } from '../notifications';
+import { clearNotifications, hideNotifications, showNotifications } from '../notifications';
 import { NotificationItemType } from '../types';
 import { NotificationsPopup } from './NotificationsPopup';
 
 export function FooterNotificationItems() {
-  const [popupFilter, setPopupFilter] = useState<NotificationItemType>();
-  const [popupVisible, setPopupVisible] = useState(false);
-
   const notifications = useAtomValue(listNotificationsAtom);
   const stats = useAtomValue(notificationsTypeStatsAtom);
 
-  const togglePopup = useCallback(
-    (filter?: NotificationItemType) => {
-      setPopupFilter(filter);
-      setPopupVisible(true);
-    },
-    [setPopupFilter, setPopupVisible],
-  );
+  const notificationsPopup = useAtomValue(notificationsPopupAtom);
 
   useEffect(() => {
     if (notifications.length > 0 && notifications[0].type === 'error') {
-      setPopupFilter('error');
-      setPopupVisible(true);
+      showNotifications('error');
     }
   }, [notifications]);
+
+  const onFooterItemClicked = useCallback(
+    (type?: NotificationItemType) => {
+      if (!notificationsPopup.open) {
+        showNotifications(type);
+      } else if (notificationsPopup.type !== type) {
+        showNotifications(type);
+      } else {
+        hideNotifications();
+      }
+    },
+    [notificationsPopup],
+  );
 
   return (
     <>
@@ -38,37 +45,36 @@ export function FooterNotificationItems() {
         icon={<VscInfo />}
         text={stats.info}
         title="infos"
-        onClick={() => togglePopup('info')}
+        onClick={() => onFooterItemClicked('info')}
       />
       <FooterItem
         hidden={stats.warning === 0}
         icon={<VscWarning />}
         text={stats.warning}
         title="warnings"
-        onClick={() => togglePopup('warning')}
+        onClick={() => onFooterItemClicked('warning')}
       />
       <FooterItem
         hidden={stats.error === 0}
         icon={<VscError />}
         text={stats.error}
         title="errors"
-        onClick={() => togglePopup('error')}
+        onClick={() => onFooterItemClicked('error')}
       />
       <FooterItem
         className={cx({ ' !bg-red-500 !text-white': stats.error > 0 })}
         icon={notifications.length > 0 ? <VscBellDot /> : <VscBell />}
         title="notifications"
-        onClick={() => togglePopup(undefined)}
+        onClick={() => onFooterItemClicked(undefined)}
       />
-      {popupVisible && (
+      {notificationsPopup.open && (
         <NotificationsPopup
           notifications={notifications}
-          type={popupFilter}
+          type={notificationsPopup.type}
           onClear={(type) => {
             clearNotifications(type);
-            setPopupVisible(false);
+            hideNotifications();
           }}
-          onClose={() => setPopupVisible(false)}
         />
       )}
     </>

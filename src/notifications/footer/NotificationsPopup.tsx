@@ -1,6 +1,5 @@
-import { createRef, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { VscChevronDown, VscChevronRight, VscClearAll, VscError, VscInfo, VscWarning } from 'react-icons/vsc';
-import { useOnClickOutside } from 'usehooks-ts';
 
 import { cx } from '../../lib/cx';
 import { NotificationItem, NotificationItemType } from '../types';
@@ -9,21 +8,15 @@ export function NotificationsPopup({
   notifications,
   type,
   onClear,
-  onClose,
 }: {
   notifications: readonly NotificationItem[];
   type?: NotificationItemType;
   onClear: (type?: NotificationItemType) => void;
-  onClose: () => void;
 }) {
-  const ref = createRef<HTMLDivElement>();
-  useOnClickOutside(ref, onClose);
-
   return (
     <div
       className="absolute bottom-8 right-0 flex min-w-[600px] max-w-[200px]  flex-col bg-slate-800"
       data-testid={NotificationsPopup.name}
-      ref={ref}
     >
       <div className="flex justify-between bg-black p-2">
         <strong className="uppercase">

@@ -55,3 +55,10 @@ export const addNotificationAtom = atom(
     set(notificationsAtom, [notification, ...notifications]);
   },
 );
+
+/**
+ * Open/Closed notifications popup
+ *
+ * Controls if the notification popup is open and what type of notification should be shown (if any)
+ */
+export const notificationsPopupAtom = atom<{ open: boolean; type?: NotificationItemType }>({ open: false });

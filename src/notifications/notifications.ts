@@ -22,3 +22,11 @@ export function notifyErr(err: unknown, title?: string, details?: string) {
 export function clearNotifications(type?: NotificationItemType) {
   emitEvent('refstudio://notifications/clear', { type });
 }
+
+export function showNotifications(type?: NotificationItemType) {
+  emitEvent('refstudio://notifications/popup/open', { type });
+}
+
+export function hideNotifications() {
+  emitEvent('refstudio://notifications/popup/close');
+}

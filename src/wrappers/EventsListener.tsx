@@ -10,7 +10,13 @@ import { emitEvent, RefStudioEventPayload } from '../events';
 import { useLoadReferencesListener } from '../features/references/eventListeners';
 import { useListenEvent } from '../hooks/useListenEvent';
 import { asyncNoop, noop } from '../lib/noop';
-import { useClearNotificationsListener, useCreateNotificationListener } from '../notifications/eventListeners';
+import {
+  useClearNotificationsListener,
+  useCreateNotificationListener,
+  useHideNotificationsPopupListener,
+  useShowNotificationsPopupListener,
+  useTauriViewNotificationMenuListener,
+} from '../notifications/eventListeners';
 
 export function EventsListener({ children }: { children?: React.ReactNode }) {
   const saveActiveFileListener = useSaveActiveFileListener();
@@ -20,20 +26,26 @@ export function EventsListener({ children }: { children?: React.ReactNode }) {
   const removeReferencesListener = useRemoveReferencesListener();
   const renameFileListener = useRenameFileListener();
   const deleteFileListener = useDeleteFileListener();
-  const createNotificationListener = useCreateNotificationListener();
-  const clearNotificationsListener = useClearNotificationsListener();
-  const loadReferencesListener = useLoadReferencesListener();
 
+  // Menu > File
   useListenEvent('refstudio://menu/file/save', saveActiveFileListener);
   useListenEvent('refstudio://menu/file/close', closeActiveEditorListener);
   useListenEvent('refstudio://menu/file/new', createFileListener);
+  // Editors
   useListenEvent('refstudio://editors/close', closeEditorListener);
-  useListenEvent('refstudio://references/remove', removeReferencesListener);
+  // Explorer
   useListenEvent('refstudio://explorer/rename', renameFileListener);
   useListenEvent('refstudio://explorer/delete', deleteFileListener);
-  useListenEvent('refstudio://notifications/new', createNotificationListener);
-  useListenEvent('refstudio://notifications/clear', clearNotificationsListener);
-  useListenEvent('refstudio://references/load', loadReferencesListener);
+  // References
+  useListenEvent('refstudio://references/remove', removeReferencesListener);
+  useListenEvent('refstudio://references/load', useLoadReferencesListener());
+  // Notifications
+  useListenEvent('refstudio://notifications/new', useCreateNotificationListener());
+  useListenEvent('refstudio://notifications/clear', useClearNotificationsListener());
+  // notifications popup
+  useListenEvent('refstudio://menu/view/notifications', useTauriViewNotificationMenuListener());
+  useListenEvent('refstudio://notifications/popup/open', useShowNotificationsPopupListener());
+  useListenEvent('refstudio://notifications/popup/close', useHideNotificationsPopupListener());
 
   return <>{children}</>;
 }
