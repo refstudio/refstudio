@@ -1,5 +1,5 @@
 import { emitEvent, RefStudioEventName } from '../../events';
-import { notifyError, notifyInfo, notifyWarning } from '../notifications';
+import { notifyErr, notifyError, notifyInfo, notifyWarning } from '../notifications';
 
 vi.mock('../../events');
 
@@ -30,6 +30,25 @@ describe('notifications', () => {
       type: 'error',
       title: 'title',
       details: 'details',
+    });
+  });
+
+  it('should emit event to create error notification from Error', () => {
+    const err = new Error('message');
+    notifyErr(err);
+    expect(vi.mocked(emitEvent)).toHaveBeenCalledWith(eventNew, {
+      type: 'error',
+      title: 'message',
+      details: err.stack,
+    });
+  });
+
+  it('should emit event to create error (notifiyErr) notification from string', () => {
+    notifyErr('message');
+    expect(vi.mocked(emitEvent)).toHaveBeenCalledWith(eventNew, {
+      type: 'error',
+      title: 'Error',
+      details: 'message',
     });
   });
 });

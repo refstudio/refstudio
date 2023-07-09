@@ -75,4 +75,16 @@ describe('notifications.console', () => {
     expect(vi.mocked(notifyWarning)).toHaveBeenCalledTimes(0);
     expect(vi.mocked(notifyError)).toHaveBeenCalledTimes(0);
   });
+
+  it('should not intercept if all parameters are false', () => {
+    resetInterceptor();
+    interceptConsoleMessages(false, false, false);
+    console.log('message');
+    console.warn('message');
+    console.error('message');
+
+    expect(vi.mocked(notifyInfo)).toHaveBeenCalledTimes(0);
+    expect(vi.mocked(notifyWarning)).toHaveBeenCalledTimes(0);
+    expect(vi.mocked(notifyError)).toHaveBeenCalledTimes(0);
+  });
 });
