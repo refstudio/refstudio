@@ -1,13 +1,13 @@
 import { createStore } from 'jotai';
 
 import { addNotificationAtom } from '../../../atoms/notificationsState';
-import { emitEvent } from '../../../events';
 import { screen, setupWithJotaiProvider, within } from '../../../test/test-utils';
+import { clearNotifications } from '../../notifications';
 import { NotificationItemType } from '../../types';
 import { FooterNotificationItems } from '../FooterNotificationItems';
 import { NotificationsPopup } from '../NotificationsPopup';
 
-vi.mock('../../../events');
+vi.mock('../../notifications');
 
 describe('FooterNotificationsItem', () => {
   let store: ReturnType<typeof createStore>;
@@ -155,7 +155,7 @@ describe('FooterNotificationsItem', () => {
     expect(getItems({ isExpanded: false })).toHaveLength(0);
   });
 
-  it('should emit clear event and close on CLEAR ALL click', async () => {
+  it('should call clearNotifications and close on CLEAR ALL click', async () => {
     const ITEMS = [
       { type: 'info' as NotificationItemType, title: 'Info Title 1', details: 'Details message 1' },
       { type: 'info' as NotificationItemType, title: 'Info Title 2', details: 'Details message 2' },
@@ -171,6 +171,6 @@ describe('FooterNotificationsItem', () => {
     await user.click(screen.getByTitle('Clear All'));
 
     expect(screen.queryByTestId(NotificationsPopup.name)).not.toBeInTheDocument();
-    expect(emitEvent).toHaveBeenCalledWith('refstudio://notifications/clear', { type: undefined });
+    expect(clearNotifications).toHaveBeenCalledWith(undefined);
   });
 });

@@ -1,9 +1,11 @@
 import { emitEvent, RefStudioEventName } from '../../events';
-import { notifyErr, notifyError, notifyInfo, notifyWarning } from '../notifications';
+import { clearNotifications, notifyErr, notifyError, notifyInfo, notifyWarning } from '../notifications';
+import { NotificationItemType } from '../types';
 
 vi.mock('../../events');
 
 const eventNew: RefStudioEventName = 'refstudio://notifications/new';
+const eventClear: RefStudioEventName = 'refstudio://notifications/clear';
 
 describe('notifications', () => {
   it('should emit event to create info notification', () => {
@@ -50,5 +52,15 @@ describe('notifications', () => {
       title: 'Error',
       details: 'message',
     });
+  });
+
+  it.each<{ type?: NotificationItemType }>([
+    { type: undefined },
+    { type: 'info' },
+    { type: 'warning' },
+    { type: 'error' },
+  ])('should emit event to clear $type notifications', ({ type }) => {
+    clearNotifications(type);
+    expect(vi.mocked(emitEvent)).toHaveBeenCalledWith(eventClear, type);
   });
 });

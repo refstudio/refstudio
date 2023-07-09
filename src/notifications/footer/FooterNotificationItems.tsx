@@ -4,8 +4,8 @@ import { VscBell, VscBellDot, VscError, VscInfo, VscWarning } from 'react-icons/
 
 import { listNotificationsAtom, notificationsTypeStatsAtom } from '../../atoms/notificationsState';
 import { FooterItem } from '../../components/footer/FooterItem';
-import { emitEvent } from '../../events';
 import { cx } from '../../lib/cx';
+import { clearNotifications } from '../notifications';
 import { NotificationItemType } from '../types';
 import { NotificationsPopup } from './NotificationsPopup';
 
@@ -65,7 +65,7 @@ export function FooterNotificationItems() {
           notifications={notifications}
           type={popupFilter}
           onClear={(type) => {
-            emitEvent('refstudio://notifications/clear', { type });
+            clearNotifications(type);
             setPopupVisible(false);
           }}
           onClose={() => setPopupVisible(false)}
