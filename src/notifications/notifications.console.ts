@@ -2,6 +2,10 @@ import { notifyErr, notifyError, notifyInfo, notifyWarning } from './notificatio
 
 const { log, warn, error } = console;
 
+function prefixTitle(title: unknown) {
+  return `(console) ${String(title)}`;
+}
+
 /**
  * Intercept all console.* calls and call notify
  *
@@ -13,14 +17,14 @@ const { log, warn, error } = console;
 export function interceptConsoleMessages(interceptLog = true, interceptWarning = true, interceptError = true) {
   console.log = interceptLog
     ? (message?: unknown, ...optionalParams: unknown[]) => {
-        notifyInfo(String(message), formatOptionalParams(optionalParams));
+        notifyInfo(prefixTitle(message), formatOptionalParams(optionalParams));
         log.apply(console, [message, ...optionalParams]);
       }
     : log;
 
   console.warn = interceptWarning
     ? (message?: unknown, ...optionalParams: unknown[]) => {
-        notifyWarning(String(message), formatOptionalParams(optionalParams));
+        notifyWarning(prefixTitle(message), formatOptionalParams(optionalParams));
         warn.apply(console, [message, ...optionalParams]);
       }
     : warn;
@@ -34,10 +38,10 @@ export function interceptConsoleMessages(interceptLog = true, interceptWarning =
           notifyErr(message);
         } else if (firstOptional instanceof Error) {
           // Sometimes the `firstOptional` is an Error. Let's use that and override the title
-          notifyErr(firstOptional, String(message));
+          notifyErr(firstOptional, prefixTitle(message));
         } else {
           // Otherwise a simple error message
-          notifyError(String(message), formatOptionalParams(optionalParams));
+          notifyError(prefixTitle(message), formatOptionalParams(optionalParams));
         }
 
         return error.apply(console, [message, ...optionalParams]);
