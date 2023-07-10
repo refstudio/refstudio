@@ -53,6 +53,14 @@ export async function getUploadsDir() {
   return join(await getBaseDir(), UPLOADS_DIR);
 }
 
+export function makeNewFilePath(fileName: string) {
+  return `${sep}${fileName}`;
+}
+
+export function splitFilePath(filePath: string): string[] {
+  return filePath.split(sep);
+}
+
 export function isInUploadsDir(relativePath: string) {
   return relativePath.startsWith(`${sep}${UPLOADS_DIR}`);
 }

@@ -51,6 +51,11 @@ def get_arg_parser():
         "--text",
         type=str,
     )
+    chat_parser.add_argument(
+        "--n_choices",
+        type=int,
+        default=1,
+    )
 
     update_parser = subparsers.add_parser(  # noqa: F481
         "update",
