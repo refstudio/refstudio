@@ -15,13 +15,44 @@ export type IngestStatus = 'processing' | 'failure' | 'complete';
 export type ResponseStatus = 'ok' | 'error';
 
 export interface CliCommands {
-  ingest: IngestResponse;
-  ingest_status: IngestStatusResponse;
-  ingest_references: IngestResponse;
-  rewrite: RewriteChoice[];
-  chat: ChatResponseChoice[];
-  update: UpdateStatusResponse;
-  delete: DeleteStatusResponse;
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  ingest: [IngestRequest, IngestResponse];
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  ingest_status: [null, IngestStatusResponse];
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  ingest_references: [IngestRequest, IngestResponse];
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  rewrite: [RewriteRequest, RewriteChoice[]];
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  chat: [ChatRequest, ChatResponseChoice[]];
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  update: [ReferenceUpdate, UpdateStatusResponse];
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  delete: [DeleteRequest, DeleteStatusResponse];
+}
+export interface IngestRequest {
+  pdf_directory: string;
 }
 export interface IngestResponse {
   project_name: string;
@@ -61,17 +92,38 @@ export interface ReferenceStatus {
   source_filename: string;
   status: IngestStatus;
 }
+export interface RewriteRequest {
+  text: string;
+}
 export interface RewriteChoice {
   index: number;
   text: string;
+}
+export interface ChatRequest {
+  text: string;
+  n_choices?: number;
 }
 export interface ChatResponseChoice {
   index: number;
   text: string;
 }
+export interface ReferenceUpdate {
+  source_filename: string;
+  patch: ReferencePatch;
+}
+/**
+ * ReferencePatch is the input type for updating a Reference's metadata.
+ */
+export interface ReferencePatch {
+  data: {};
+}
 export interface UpdateStatusResponse {
   status: ResponseStatus;
   message: string;
+}
+export interface DeleteRequest {
+  source_filenames: string[];
+  all?: boolean;
 }
 export interface DeleteStatusResponse {
   status: ResponseStatus;
