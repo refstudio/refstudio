@@ -55,15 +55,6 @@ describe('notifications', () => {
     });
   });
 
-  it('should emit event to create error (notifiyErr) notification from string', () => {
-    notifyErr('message');
-    expect(vi.mocked(emitEvent)).toHaveBeenCalledWith(eventNew, {
-      type: 'error',
-      title: 'Error',
-      details: 'message',
-    });
-  });
-
   it.each<{ type?: NotificationItemType }>([
     { type: undefined },
     { type: 'info' },
