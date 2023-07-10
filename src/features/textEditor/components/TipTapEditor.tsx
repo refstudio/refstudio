@@ -2,27 +2,25 @@ import './TipTapEditor.css';
 
 import { Editor, EditorContent, JSONContent } from '@tiptap/react';
 import { useSetAtom } from 'jotai';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { selectionAtom } from '../../../atoms/selectionState';
-import { EditorContentAtoms } from '../../../atoms/types/EditorContentAtoms';
+import { EditorContent as EditorContentType } from '../../../atoms/types/EditorContent';
+import { Spinner } from '../../../components/Spinner';
+import { useListenEvent } from '../../../hooks/useListenEvent';
 import { MenuBar } from './MenuBar';
 import { EDITOR_EXTENSIONS, transformPasted } from './tipTapEditorConfigs';
 
 interface EditorProps {
   editorContent: string | JSONContent | null;
-  activeEditorContentAtoms: EditorContentAtoms;
+  isActive: boolean;
+  saveFileInMemory: () => void;
+  updateFileBuffer: (editorContent: EditorContentType) => void;
 }
 
-export function TipTapEditor({ editorContent, activeEditorContentAtoms }: EditorProps) {
+export function TipTapEditor({ editorContent, isActive, saveFileInMemory, updateFileBuffer }: EditorProps) {
   const [editor, setEditor] = useState<Editor | null>(null);
   const setSelection = useSetAtom(selectionAtom);
-
-  const { updateEditorContentBufferAtom: updateFileBufferAtom, saveEditorContentInMemoryAtom: saveFileInMemoryAtom } =
-    activeEditorContentAtoms;
-
-  const updateFileBuffer = useSetAtom(updateFileBufferAtom);
-  const saveFileInMemory = useSetAtom(saveFileInMemoryAtom);
 
   useEffect(() => {
     const newEditor = new Editor({
@@ -48,8 +46,19 @@ export function TipTapEditor({ editorContent, activeEditorContentAtoms }: Editor
     };
   }, [editorContent, setSelection, saveFileInMemory, updateFileBuffer]);
 
+  const insertContent = useCallback(
+    ({ text }: { text: string }) => {
+      if (isActive) {
+        editor?.commands.insertContent(text);
+      }
+    },
+    [editor, isActive],
+  );
+
+  useListenEvent('refstudio://ai/suggestion/insert', insertContent);
+
   if (!editor) {
-    return <div>...</div>;
+    return <Spinner />;
   }
 
   return (

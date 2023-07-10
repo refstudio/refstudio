@@ -22,6 +22,7 @@ interface RefStudioEvents {
   'refstudio://notifications/popup/open': { type?: NotificationItemType };
   'refstudio://notifications/popup/close': undefined;
   'refstudio://explorer/rename': { path: string; newName?: string };
+  'refstudio://ai/suggestion/insert': { text: string };
 }
 
 export type RefStudioEventName = keyof RefStudioEvents;
