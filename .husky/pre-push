@@ -2,7 +2,6 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 yarn check
-yarn knip
 yarn test
 
 yarn codegen
