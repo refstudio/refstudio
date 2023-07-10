@@ -1,4 +1,4 @@
-import { getUploadsDir } from '../../io/filesystem';
+import { getSystemPath, getUploadsDir } from '../../io/filesystem';
 import { getIngestedReferences, getIngestionStatus, removeReferences, runPDFIngestion } from '../ingestion';
 import { callSidecar } from '../sidecar';
 import { DeleteStatusResponse } from '../types';
@@ -7,13 +7,11 @@ vi.mock('../sidecar');
 vi.mock('../../io/filesystem');
 
 describe('runPDFIngestion', () => {
-  beforeEach(() => {
+  afterEach(() => {
     vi.clearAllMocks();
   });
 
   it('should call sidecar ingest with upload dir arg', async () => {
-    const UPLOAD_DIR = '/some/upload/directory';
-    vi.mocked(getUploadsDir).mockResolvedValue(UPLOAD_DIR);
     vi.mocked(callSidecar).mockResolvedValue({
       project_name: 'project-name',
       references: [],
@@ -21,12 +19,11 @@ describe('runPDFIngestion', () => {
 
     await runPDFIngestion();
     expect(vi.mocked(callSidecar).mock.calls).toHaveLength(1);
-    expect(vi.mocked(callSidecar).mock.calls[0]).toStrictEqual(['ingest', ['--pdf_directory', UPLOAD_DIR]]);
+    const uploadsDir = await getSystemPath(getUploadsDir());
+    expect(vi.mocked(callSidecar).mock.calls[0]).toStrictEqual(['ingest', ['--pdf_directory', uploadsDir]]);
   });
 
   it('should call sidecar ingest_references with upload dir arg', async () => {
-    const UPLOAD_DIR = '/some/upload/directory';
-    vi.mocked(getUploadsDir).mockResolvedValue(UPLOAD_DIR);
     vi.mocked(callSidecar).mockResolvedValue({
       project_name: 'project-name',
       references: [],
@@ -34,7 +31,8 @@ describe('runPDFIngestion', () => {
 
     const result = await getIngestedReferences();
     expect(vi.mocked(callSidecar).mock.calls).toHaveLength(1);
-    expect(vi.mocked(callSidecar).mock.calls[0]).toStrictEqual(['ingest_references', ['--pdf_directory', UPLOAD_DIR]]);
+    const uploadsDir = await getSystemPath(getUploadsDir());
+    expect(vi.mocked(callSidecar).mock.calls[0]).toStrictEqual(['ingest_references', ['--pdf_directory', uploadsDir]]);
     expect(result).toStrictEqual([]);
   });
 
@@ -60,8 +58,6 @@ describe('runPDFIngestion', () => {
   });
 
   it('should call sidecar ingest_status', async () => {
-    const UPLOAD_DIR = '/some/upload/directory';
-    vi.mocked(getUploadsDir).mockResolvedValue(UPLOAD_DIR);
     vi.mocked(callSidecar).mockResolvedValue({
       status: 'ok',
       reference_statuses: [

@@ -5,7 +5,6 @@ import { activePaneContentAtom } from '../../../../atoms/paneActions';
 import { setReferencesAtom } from '../../../../atoms/referencesState';
 import { buildEditorId } from '../../../../atoms/types/EditorData';
 import { emitEvent, RefStudioEventName, RefStudioEventPayload } from '../../../../events';
-import { getAppDataDir } from '../../../../io/filesystem';
 import { screen, setupWithJotaiProvider, waitFor, within } from '../../../../test/test-utils';
 import { REFERENCES } from '../../__tests__/test-fixtures';
 import { UploadTipInstructions } from '../../components/UploadTipInstructions';
@@ -13,8 +12,6 @@ import { ReferencesTableView } from '../ReferencesTableView';
 
 vi.mock('../../../../events');
 vi.mock('../../../../io/filesystem');
-
-vi.mocked(getAppDataDir).mockResolvedValue('/');
 
 describe('ReferencesTableView component', () => {
   let store: ReturnType<typeof createStore>;
@@ -26,7 +23,7 @@ describe('ReferencesTableView component', () => {
   });
 
   afterEach(() => {
-    vi.resetAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render empty table with upload tips', () => {

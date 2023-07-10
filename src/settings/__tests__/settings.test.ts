@@ -19,7 +19,7 @@ describe('settings', () => {
     vi.mocked(readEnv).mockResolvedValue('some value');
   });
   afterEach(() => {
-    vi.resetAllMocks();
+    vi.clearAllMocks();
   });
 
   // eslint-disable-next-line vitest/expect-expect

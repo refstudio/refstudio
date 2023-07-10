@@ -1,4 +1,4 @@
-import { getUploadsDir, makeUploadPath } from '../io/filesystem';
+import { getSystemPath, getUploadsDir, makeUploadPath } from '../io/filesystem';
 import { ReferenceItem } from '../types/ReferenceItem';
 import { callSidecar } from './sidecar';
 import { IngestResponse } from './types';
@@ -21,7 +21,7 @@ function parsePdfIngestionResponse(response: IngestResponse): ReferenceItem[] {
 }
 
 export async function runPDFIngestion(): Promise<ReferenceItem[]> {
-  const uploadsDir = await getUploadsDir();
+  const uploadsDir = await getSystemPath(getUploadsDir());
   const response = await callSidecar('ingest', ['--pdf_directory', String(uploadsDir)]);
   return parsePdfIngestionResponse(response);
 }
@@ -34,7 +34,7 @@ export async function removeReferences(fileNames: string[]) {
 }
 
 export async function getIngestedReferences(): Promise<ReferenceItem[]> {
-  const uploadsDir = await getUploadsDir();
+  const uploadsDir = await getSystemPath(getUploadsDir());
   const response = await callSidecar('ingest_references', ['--pdf_directory', String(uploadsDir)]);
   return parsePdfIngestionResponse(response);
 }

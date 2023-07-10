@@ -22,7 +22,7 @@ describe('ReferencesFooterItems component', () => {
     );
   });
   afterEach(() => {
-    vi.resetAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render with 0 references, and no sync in progess indicator', () => {
