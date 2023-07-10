@@ -4,7 +4,6 @@ import sys
 
 import openai
 from dotenv import load_dotenv
-
 from sidecar import prompts
 from sidecar.typing import RewriteChoice, RewriteRequest
 
@@ -14,17 +13,17 @@ openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 def summarize(arg: RewriteRequest) -> str:
     text = arg.text
-    n_options = 1
+    n_choices = arg.n_choices
     prompt = prompts.create_prompt_for_summarize(text)
-    chat = Rewriter(prompt, n_options)
+    chat = Rewriter(prompt, n_choices)
     response = chat.get_response()
     sys.stdout.write(json.dumps([r.dict() for r in response]))
 
 
 class Rewriter:
-    def __init__(self, text: str, n_options: int = 1):
+    def __init__(self, text: str, n_choices: int = 1):
         self.text = text
-        self.n_options = int(n_options)
+        self.n_choices = int(n_choices)
 
     def get_response(self):
         messages = self.prepare_messages_for_chat(self.text)
@@ -42,9 +41,9 @@ class Rewriter:
         response = openai.ChatCompletion.create(
             model=os.environ["OPENAI_CHAT_MODEL"],
             messages=messages,
-            n=self.n_options,  # number of completions to generate
-            temperature=0,  # 0 = no randomness, deterministic
-            max_tokens=200,
+            n=self.n_choices,  # number of completions to generate
+            temperature=0.7,
+            # max_tokens=200,
         )
         return response
 

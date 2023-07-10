@@ -107,6 +107,7 @@ class DeleteStatusResponse(RefStudioModel):
 
 class RewriteRequest(RefStudioModel):
     text: str
+    n_choices: int = 1
 
 
 class RewriteChoice(RefStudioModel):
