@@ -44,7 +44,7 @@ describe('runPDFIngestion', () => {
     const filenames = ['filea.pdf', 'fileb.pdf'];
     const result = await removeReferences(filenames);
     expect(vi.mocked(callSidecar).mock.calls).toHaveLength(1);
-    expect(vi.mocked(callSidecar).mock.calls[0]).toStrictEqual(['delete', ['--source_filenames', ...filenames]]);
+    expect(vi.mocked(callSidecar).mock.calls[0]).toStrictEqual(['delete', { source_filenames: filenames }]);
     expect(result).toBeUndefined();
   });
 
@@ -74,7 +74,7 @@ describe('runPDFIngestion', () => {
 
     const result = await getIngestionStatus();
     expect(vi.mocked(callSidecar).mock.calls).toHaveLength(1);
-    expect(vi.mocked(callSidecar).mock.calls[0]).toStrictEqual(['ingest_status', []]);
+    expect(vi.mocked(callSidecar).mock.calls[0]).toStrictEqual(['ingest_status', null]);
     expect(result.status).toBe('ok');
     expect(result.references).toHaveLength(2);
     expect(result.references[0]).toStrictEqual({ filename: 'file-a.pdf', status: 'complete' });

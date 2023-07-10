@@ -8,6 +8,7 @@ const MENU_REFERENCES_UPLOAD: &str = "refstudio://menu/references/upload";
 const MENU_FILE_SAVE: &str = "refstudio://menu/file/save";
 const MENU_FILE_NEW: &str = "refstudio://menu/file/new";
 const MENU_FILE_CLOSE: &str = "refstudio://menu/file/close";
+const MENU_VIEW_NOTIFICATIONS: &str = "refstudio://menu/view/notifications";
 
 impl AppMenu {
     pub fn get_menu(context: &Context<EmbeddedAssets>) -> Menu {
@@ -61,7 +62,12 @@ impl AppMenu {
 
         let view_menu = Submenu::new(
             "View",
-            Menu::new().add_native_item(MenuItem::EnterFullScreen),
+            Menu::new()
+                .add_native_item(MenuItem::EnterFullScreen)
+                .add_item(
+                    CustomMenuItem::new(MENU_VIEW_NOTIFICATIONS, "Notifications")
+                        .accelerator("F11"),
+                ),
         );
 
         let window_menu = Submenu::new(

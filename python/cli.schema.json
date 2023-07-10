@@ -3,31 +3,101 @@
   "type": "object",
   "properties": {
     "ingest": {
-      "$ref": "#/definitions/IngestResponse"
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": [
+        {
+          "$ref": "#/definitions/IngestRequest"
+        },
+        {
+          "$ref": "#/definitions/IngestResponse"
+        }
+      ]
     },
     "ingest_status": {
-      "$ref": "#/definitions/IngestStatusResponse"
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/definitions/IngestStatusResponse"
+        }
+      ]
     },
     "ingest_references": {
-      "$ref": "#/definitions/IngestResponse"
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": [
+        {
+          "$ref": "#/definitions/IngestRequest"
+        },
+        {
+          "$ref": "#/definitions/IngestResponse"
+        }
+      ]
     },
     "rewrite": {
       "type": "array",
-      "items": {
-        "$ref": "#/definitions/RewriteChoice"
-      }
+      "minItems": 2,
+      "maxItems": 2,
+      "items": [
+        {
+          "$ref": "#/definitions/RewriteRequest"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RewriteChoice"
+          }
+        }
+      ]
     },
     "chat": {
       "type": "array",
-      "items": {
-        "$ref": "#/definitions/ChatResponseChoice"
-      }
+      "minItems": 2,
+      "maxItems": 2,
+      "items": [
+        {
+          "$ref": "#/definitions/ChatRequest"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ChatResponseChoice"
+          }
+        }
+      ]
     },
     "update": {
-      "$ref": "#/definitions/UpdateStatusResponse"
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": [
+        {
+          "$ref": "#/definitions/ReferenceUpdate"
+        },
+        {
+          "$ref": "#/definitions/UpdateStatusResponse"
+        }
+      ]
     },
     "delete": {
-      "$ref": "#/definitions/DeleteStatusResponse"
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": [
+        {
+          "$ref": "#/definitions/DeleteRequest"
+        },
+        {
+          "$ref": "#/definitions/DeleteStatusResponse"
+        }
+      ]
     }
   },
   "required": [
@@ -40,6 +110,18 @@
     "delete"
   ],
   "definitions": {
+    "IngestRequest": {
+      "title": "IngestRequest",
+      "type": "object",
+      "properties": {
+        "pdf_directory": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "pdf_directory"
+      ]
+    },
     "IngestStatus": {
       "title": "IngestStatus",
       "description": "An enumeration.",
@@ -208,6 +290,18 @@
         "reference_statuses"
       ]
     },
+    "RewriteRequest": {
+      "title": "RewriteRequest",
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ]
+    },
     "RewriteChoice": {
       "title": "RewriteChoice",
       "type": "object",
@@ -221,6 +315,22 @@
       },
       "required": [
         "index",
+        "text"
+      ]
+    },
+    "ChatRequest": {
+      "title": "ChatRequest",
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "n_choices": {
+          "default": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
         "text"
       ]
     },
@@ -240,6 +350,35 @@
         "text"
       ]
     },
+    "ReferencePatch": {
+      "title": "ReferencePatch",
+      "description": "ReferencePatch is the input type for updating a Reference's metadata.",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "data"
+      ]
+    },
+    "ReferenceUpdate": {
+      "title": "ReferenceUpdate",
+      "type": "object",
+      "properties": {
+        "source_filename": {
+          "type": "string"
+        },
+        "patch": {
+          "$ref": "#/definitions/ReferencePatch"
+        }
+      },
+      "required": [
+        "source_filename",
+        "patch"
+      ]
+    },
     "UpdateStatusResponse": {
       "title": "UpdateStatusResponse",
       "type": "object",
@@ -254,6 +393,25 @@
       "required": [
         "status",
         "message"
+      ]
+    },
+    "DeleteRequest": {
+      "title": "DeleteRequest",
+      "type": "object",
+      "properties": {
+        "source_filenames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "all": {
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "source_filenames"
       ]
     },
     "DeleteStatusResponse": {

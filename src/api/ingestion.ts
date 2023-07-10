@@ -27,7 +27,7 @@ export async function runPDFIngestion(): Promise<ReferenceItem[]> {
 }
 
 export async function removeReferences(fileNames: string[]) {
-  const response = await callSidecar('delete', ['--source_filenames', ...fileNames]);
+  const response = await callSidecar('delete', { source_filenames: fileNames });
   if (response.status === 'error') {
     throw new Error('Error removing references: ' + response.message);
   }
@@ -40,7 +40,7 @@ export async function getIngestedReferences(): Promise<ReferenceItem[]> {
 }
 
 export async function getIngestionStatus() {
-  const response = await callSidecar('ingest_status', []);
+  const response = await callSidecar('ingest_status', null);
   return {
     status: response.status,
     references: response.reference_statuses.map((refStatus) => ({

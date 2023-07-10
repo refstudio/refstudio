@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 from sidecar import chat, settings
+from sidecar.typing import ChatRequest
 
 from .test_ingest import _copy_fixture_to_temp_dir
 
@@ -30,7 +31,7 @@ def test_chat_ask_question(monkeypatch, capsys, tmp_path):
             }
         }
         return response
-    
+
     monkeypatch.setattr(chat.Chat, "call_model", mock_call_model)
     
     # copy references.json to temp dir and mock settings.REFERENCES_JSON_PATH
@@ -42,12 +43,12 @@ def test_chat_ask_question(monkeypatch, capsys, tmp_path):
     monkeypatch.setattr(settings, "REFERENCES_JSON_PATH", mocked_path)
 
     _ = chat.ask_question(
-        input_text="This is a question about something",
-        n_choices=1
+        request=ChatRequest(text="This is a question about something"),
     )
     captured = capsys.readouterr()
     output = json.loads(captured.out)
 
     assert len(output) == 1
     assert output[0]["index"] == 0
+    assert output[0]["text"] == "This is a mocked response"
     assert output[0]["text"] == "This is a mocked response"

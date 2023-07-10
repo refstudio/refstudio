@@ -5,7 +5,7 @@ export async function chatWithAI(text: string): Promise<string[]> {
     if (!text) {
       return [];
     }
-    const response = await callSidecar('chat', ['--text', String(text)]);
+    const response = await callSidecar('chat', { text });
     return response.map((choice) => choice.text);
   } catch (err) {
     return [`Chat error: ${String(err)}`];
