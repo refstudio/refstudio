@@ -15,6 +15,11 @@ export default {
           DEFAULT: 'hsl(var(--color-secondary) / <alpha-value>)',
           hover: 'hsl(var(--color-secondary-hover) / <alpha-value>)'
         }
+      },
+      zIndex: {
+        "modals":        99999,
+        'notifications': 88888,
+        'drop-zone':     55555,
       }
     },
   },

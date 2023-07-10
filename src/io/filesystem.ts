@@ -108,7 +108,7 @@ export async function writeFileContent(relativePath: string, textContent: string
 
 export async function uploadFiles(files: File[]) {
   for (const file of files) {
-    const path = await getAbsolutePath(file.name);
+    const path = await getAbsolutePath(await join(UPLOADS_DIR, file.name));
     const bytes = await file.arrayBuffer();
     await writeBinaryFile(path, bytes, { dir: BaseDirectory.Home });
   }
