@@ -35,7 +35,7 @@ export function NotificationsPopup({
     </div>
   );
 }
-function NotificationItemWidget({ item, expanded }: { item: Readonly<ReadonlyNotificationItem>; expanded?: boolean }) {
+function NotificationItemWidget({ item, expanded }: { item: ReadonlyNotificationItem; expanded?: boolean }) {
   const [showDetails, setShowDetails] = useState(expanded);
   useEffect(() => {
     setShowDetails(expanded);
