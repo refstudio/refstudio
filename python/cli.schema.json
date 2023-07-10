@@ -324,6 +324,10 @@
       "properties": {
         "text": {
           "type": "string"
+        },
+        "n_choices": {
+          "default": 1,
+          "type": "integer"
         }
       },
       "required": [

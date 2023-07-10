@@ -101,6 +101,7 @@ export interface RewriteChoice {
 }
 export interface ChatRequest {
   text: string;
+  n_choices?: number;
 }
 export interface ChatResponseChoice {
   index: number;
