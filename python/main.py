@@ -2,8 +2,7 @@ import inspect
 import json
 
 from sidecar import chat, cli, ingest, rewrite, storage
-
-from python.sidecar.typing import CliCommands
+from sidecar.typing import CliCommands
 
 if __name__ == '__main__':
     parser = cli.get_arg_parser()
