@@ -1,6 +1,6 @@
 import { useAtomValue, useSetAtom } from 'jotai';
 
-import { activeEditorIdAtom } from '../../../atoms/core/activePane';
+import { activeEditorIdAtom } from '../../../atoms/paneActions';
 import { TextEditorContent } from '../../../atoms/types/EditorContent';
 import { EditorContentAtoms } from '../../../atoms/types/EditorContentAtoms';
 import { TipTapEditor } from '../components/TipTapEditor';

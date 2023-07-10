@@ -1,4 +1,5 @@
 import { atom } from 'jotai';
+import { selectAtom } from 'jotai/utils';
 
 import { activePaneIdAtom } from './core/activePane';
 import { getPane } from './core/paneGroup';
@@ -17,4 +18,9 @@ export const focusPaneAtom = atom(null, (_get, set, paneId: PaneId) => {
   set(activePaneIdAtom, paneId);
 });
 
-export const activeEditorAtom = atom((get) => get(activePaneContentAtom).activeEditor);
+export const activeEditorAtom = selectAtom(
+  activePaneContentAtom,
+  (activePaneContent) => activePaneContent.activeEditor ?? null,
+);
+
+export const activeEditorIdAtom = selectAtom(activeEditorAtom, (editor) => editor?.id ?? null);
