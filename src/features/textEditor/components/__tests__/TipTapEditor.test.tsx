@@ -1,5 +1,4 @@
 import { clearMocks } from '@tauri-apps/api/mocks';
-import { createStore } from 'jotai';
 
 import { runGetAtomHook } from '../../../../atoms/__tests__/test-utils';
 import { selectionAtom } from '../../../../atoms/selectionState';
@@ -22,12 +21,6 @@ const insertContentEvent: RefStudioEventName = 'refstudio://ai/suggestion/insert
 vi.mock('../../../../events');
 
 describe('TipTapEditor', () => {
-  let store: ReturnType<typeof createStore>;
-
-  beforeEach(() => {
-    store = createStore();
-  });
-
   afterEach(() => {
     clearMocks();
   });
@@ -78,12 +71,10 @@ describe('TipTapEditor', () => {
   it.skip('should update selection atom when selection changes', async () => {
     const initialContent = 'Initial content';
 
-    const selection = runGetAtomHook(selectionAtom, store);
-
-    const { user } = setupWithJotaiProvider(
+    const { store, user } = setupWithJotaiProvider(
       <TipTapEditor editorContent={initialContent} isActive={false} saveFileInMemory={noop} updateFileBuffer={noop} />,
-      store,
     );
+    const selection = runGetAtomHook(selectionAtom, store);
 
     const textElement = screen.getByText(initialContent);
     await user.pointer([{ target: textElement, offset: 0 }, { offset: 7 }]);
@@ -102,7 +93,6 @@ describe('TipTapEditor', () => {
         saveFileInMemory={noop}
         updateFileBuffer={updateFileBuffer}
       />,
-      store,
     );
 
     const update = 'update';
