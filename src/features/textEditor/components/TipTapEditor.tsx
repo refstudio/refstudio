@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { selectionAtom } from '../../../atoms/selectionState';
 import { EditorContentAtoms } from '../../../atoms/types/EditorContentAtoms';
 import { MenuBar } from './MenuBar';
-import { EDITOR_EXTENSIONS, INITIAL_CONTENT, transformPasted } from './tipTapEditorConfigs';
+import { EDITOR_EXTENSIONS, transformPasted } from './tipTapEditorConfigs';
 
 interface EditorProps {
   editorContent: string | JSONContent | null;
@@ -27,7 +27,7 @@ export function TipTapEditor({ editorContent, activeEditorContentAtoms }: Editor
   useEffect(() => {
     const newEditor = new Editor({
       extensions: EDITOR_EXTENSIONS,
-      content: editorContent ?? INITIAL_CONTENT,
+      content: editorContent ?? '',
       onSelectionUpdate: (update) => {
         const updatedEditor = update.editor;
         const { from, to } = updatedEditor.view.state.selection;
