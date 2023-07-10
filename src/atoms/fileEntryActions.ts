@@ -1,10 +1,10 @@
 import { atom } from 'jotai';
 
-import { deleteFile } from '../io/filesystem';
+import { deleteFile, makeNewFilePath, renameFile } from '../io/filesystem';
 import { editorsContentStateAtom, loadEditorContent, loadFileEntry } from './core/editorContent';
 import { addEditorData, editorsDataAtom, setEditorDataIsDirtyAtom } from './core/editorData';
 import { fileExplorerEntriesAtom } from './core/fileExplorerEntry';
-import { addEditorToPane, selectEditorInPaneAtom } from './core/paneGroup';
+import { addEditorToPane, renameEditorAtom, selectEditorInPaneAtom } from './core/paneGroup';
 import { closeEditorFromAllPanesAtom, targetPaneIdFor } from './editorActions';
 import { getFileExplorerEntryFromPathAtom, refreshFileTreeAtom } from './fileExplorerActions';
 import { buildEditorIdFromPath } from './types/EditorData';
@@ -48,7 +48,7 @@ export const createFileAtom = atom(null, (get, set) => {
   const openEditorNames = [...get(editorsDataAtom).values()].map(({ title }) => title);
 
   const fileName = generateFileName(new Set([...rootFileNames, ...openEditorNames]));
-  const filePath = `/${fileName}`;
+  const filePath = makeNewFilePath(fileName);
   const editorId = buildEditorIdFromPath(filePath);
 
   // Load editor in memory
@@ -98,3 +98,30 @@ export const deleteFileAtom = atom(null, async (get, set, filePath: string) => {
   // Refresh file explorer
   await set(refreshFileTreeAtom);
 });
+export const renameFileAtom = atom(
+  null,
+  async (get, set, { filePath, newName }: { filePath: string; newName: string }) => {
+    const fileExplorerEntry = get(getFileExplorerEntryFromPathAtom(filePath));
+
+    if (!fileExplorerEntry) {
+      throw new Error(`File or folder does not exist: ${filePath}`);
+    }
+
+    if (fileExplorerEntry.isFolder) {
+      throw new Error(`Renaming folders is not supported yet: ${filePath}`);
+    }
+
+    // Rename file
+    const renameFileResult = await renameFile(filePath, newName);
+    if (!renameFileResult.success) {
+      return;
+    }
+
+    // Rename open editors
+    const editorId = buildEditorIdFromPath(filePath);
+    set(renameEditorAtom, { editorId, newName, newPath: renameFileResult.newPath });
+
+    // Refresh file explorer
+    await set(refreshFileTreeAtom);
+  },
+);

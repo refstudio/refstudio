@@ -1,8 +1,10 @@
 from datetime import date, datetime
 from pathlib import Path
 
-from sidecar import shared
+from sidecar import settings, shared
 from sidecar.typing import Author, Reference
+
+from .test_ingest import _copy_fixture_to_temp_dir
 
 
 def test_get_word_count():
@@ -103,3 +105,26 @@ def test_chunk_text():
     assert len(chunks) == len(long_text) // (chunk_size - 200) + 1
     assert isinstance(chunks[0], shared.Chunk)
     assert chunks[0].text == long_text[:chunk_size]
+
+
+def test_chunk_reference(monkeypatch, tmp_path):
+    test_file = "fixtures/pdf/test.pdf" 
+    filepath = Path(__file__).parent.joinpath(test_file)
+
+    # mock uploads directory
+    _copy_fixture_to_temp_dir(filepath, tmp_path.joinpath("test.pdf"))
+    monkeypatch.setattr(settings, "UPLOADS_DIR", tmp_path)
+
+    reference = Reference(
+        source_filename="test.pdf",
+        status="complete",
+    )
+    chunks = shared.chunk_reference(reference)
+
+    assert len(chunks) > 0
+    assert isinstance(chunks[0], shared.Chunk)
+
+    for chunk in chunks:
+        assert chunk.text is not None
+        assert chunk.metadata != {}
+        assert chunk.metadata['page_num'] is not None
