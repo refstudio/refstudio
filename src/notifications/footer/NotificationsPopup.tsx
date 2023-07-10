@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react';
 import { VscChevronDown, VscChevronRight, VscClearAll, VscError, VscInfo, VscWarning } from 'react-icons/vsc';
 
 import { cx } from '../../lib/cx';
-import { NotificationItem, NotificationItemType } from '../types';
+import { NotificationItemType, ReadonlyNotificationItem } from '../types';
 
 export function NotificationsPopup({
   notifications,
   type,
   onClear,
 }: {
-  notifications: readonly NotificationItem[];
+  notifications: readonly ReadonlyNotificationItem[];
   type?: NotificationItemType;
   onClear: (type?: NotificationItemType) => void;
 }) {
@@ -35,7 +35,7 @@ export function NotificationsPopup({
     </div>
   );
 }
-function NotificationItemWidget({ item, expanded }: { item: Readonly<NotificationItem>; expanded?: boolean }) {
+function NotificationItemWidget({ item, expanded }: { item: Readonly<ReadonlyNotificationItem>; expanded?: boolean }) {
   const [showDetails, setShowDetails] = useState(expanded);
   useEffect(() => {
     setShowDetails(expanded);

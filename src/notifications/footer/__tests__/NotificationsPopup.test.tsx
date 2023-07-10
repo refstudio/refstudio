@@ -1,12 +1,12 @@
 import { noop } from '../../../lib/noop';
 import { render, screen, setup } from '../../../test/test-utils';
-import { NotificationItem } from '../../types';
+import { ReadonlyNotificationItem } from '../../types';
 import { NotificationsPopup } from '../NotificationsPopup';
 
 describe('NotificationsPopup', () => {
   const when = new Date().toISOString();
   let id = 1;
-  const NOTIFICATIONS: readonly NotificationItem[] = [
+  const NOTIFICATIONS: readonly ReadonlyNotificationItem[] = [
     { id: String(id++), when, type: 'info', title: 'Title INFO 1', details: 'Some details for Title INFO 1' },
     { id: String(id++), when, type: 'info', title: 'Title INFO 2', details: 'Some details for Title INFO 2' },
     { id: String(id++), when, type: 'warning', title: 'Title warning 1', details: 'Some details for Title warning 1' },

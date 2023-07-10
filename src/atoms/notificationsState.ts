@@ -1,14 +1,14 @@
 import { atom } from 'jotai';
 
 import { generateId } from '../lib/generateId';
-import { MutableNotificationItem, NotificationItem, NotificationItemType } from '../notifications/types';
+import { NotificationItemType, ReadonlyNotificationItem } from '../notifications/types';
 
 /**
  * Core database
  *
  * List of notification items sorted descending of creation time (most recent in the begining)
  */
-const notificationsAtom = atom<readonly MutableNotificationItem[]>([]);
+const notificationsAtom = atom<readonly ReadonlyNotificationItem[]>([]);
 
 export const clearNotificationsAtom = atom(null, (get, set, type?: NotificationItemType) => {
   if (!type) {
@@ -24,12 +24,12 @@ export const hasNotificationsAtom = atom((get) => get(notificationsAtom).length 
 export const latestNotificationAtom = atom((get) => {
   const notifications = get(listNotificationsAtom);
   if (notifications.length === 0) {
-    throw new Error('Notifications list is empty. Ensire you call hasNotificationsAtom before');
+    throw new Error('Notifications list is empty. Ensure you call hasNotificationsAtom before');
   }
   return notifications[0];
 });
 
-export const listNotificationsAtom = atom<readonly NotificationItem[]>((get) => get(notificationsAtom));
+export const listNotificationsAtom = atom<readonly ReadonlyNotificationItem[]>((get) => get(notificationsAtom));
 
 export const notificationsTypeStatsAtom = atom((get) => {
   const stats: Record<NotificationItemType, number> = {
@@ -45,7 +45,7 @@ export const addNotificationAtom = atom(
   null,
   (get, set, type: NotificationItemType, title: string, details?: string) => {
     const notifications = get(notificationsAtom);
-    const notification: NotificationItem = {
+    const notification: ReadonlyNotificationItem = {
       id: generateId(10),
       when: new Date().toISOString(),
       type,

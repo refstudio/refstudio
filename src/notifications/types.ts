@@ -1,6 +1,6 @@
 export type NotificationItemType = 'info' | 'warning' | 'error';
 
-export interface MutableNotificationItem {
+export interface NotificationItem {
   type: NotificationItemType;
   id: string;
   when: string;
@@ -8,4 +8,4 @@ export interface MutableNotificationItem {
   details?: string;
 }
 
-export type NotificationItem = Readonly<MutableNotificationItem>;
+export type ReadonlyNotificationItem = Readonly<NotificationItem>;
