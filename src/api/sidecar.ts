@@ -5,7 +5,11 @@ import { Command } from '@tauri-apps/api/shell';
 import { getCachedSetting } from '../settings/settingsManager';
 import { CliCommands } from './types';
 
-export async function callSidecar<T extends keyof CliCommands>(subcommand: T, args: string[]): Promise<CliCommands[T]> {
+export async function callSidecar<
+  T extends keyof CliCommands,
+  CliCommandRequest = CliCommands[T][0],
+  CliCommandResponse = CliCommands[T][1],
+>(subcommand: T, arg: CliCommandRequest): Promise<CliCommandResponse> {
   const generalSettings = getCachedSetting('general');
   const openAISettings = getCachedSetting('openAI');
   const sidecarSettings = getCachedSetting('sidecar');
@@ -22,8 +26,8 @@ export async function callSidecar<T extends keyof CliCommands>(subcommand: T, ar
     SIDECAR_LOG_DIR: sidecarSettings.logging.path,
   };
 
-  const command = new Command('call-sidecar', [subcommand, ...args], { env });
-  console.log('sidecar command ' + subcommand, args.join(', '), command);
+  const command = new Command('call-sidecar', [subcommand, JSON.stringify(arg)], { env });
+  console.log('sidecar command ' + subcommand, arg, command);
   const output = await command.execute();
   if (output.stderr) {
     const error = new Error('Error executing sidecar command');
@@ -32,7 +36,7 @@ export async function callSidecar<T extends keyof CliCommands>(subcommand: T, ar
   }
   console.log('sidecar output: ', output.stdout);
 
-  const response = JSON.parse(output.stdout) as CliCommands[T];
+  const response = JSON.parse(output.stdout) as CliCommandResponse;
   console.log('sidecar response', response);
   return response;
 }

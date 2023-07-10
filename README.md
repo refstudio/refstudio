@@ -45,6 +45,8 @@ To automatically open the browser devtools you can launch the app via:
 $ yarn tauri:dev:debug
 ```
 
+You can find logs from the Python sidecar in `/tmp/refstudio-sidecar.log`.
+
 ### Reset
 
 To reset your local environment you should following these steps:

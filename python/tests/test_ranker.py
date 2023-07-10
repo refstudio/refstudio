@@ -19,14 +19,14 @@ def test_bm25_ranker():
     assert isinstance(docs, list)
 
     # relevant docs should be about Chicago
-    for doc in docs:
-        assert "chicago" in doc.lower()
+    for chunk in docs:
+        assert "chicago" in chunk.text.lower()
 
     docs = ranker.get_top_n(query="baseball", limit=2)
     assert len(docs) == 2
     assert isinstance(docs, list)
 
     # relevant docs should not be about Chicago
-    for doc in docs:
-        assert "chicago" not in doc.lower()
+    for chunk in docs:
+        assert "chicago" not in chunk.text.lower()
 
