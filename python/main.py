@@ -1,6 +1,6 @@
 import json
 
-from sidecar import chat, cli, ingest, rewrite, storage
+from sidecar import chat, cli, ingest, rewrite, storage, search
 
 if __name__ == '__main__':
     parser = cli.get_arg_parser()
@@ -23,6 +23,9 @@ if __name__ == '__main__':
     
     if args.command == "chat":
         chat.ask_question(args.text, n_choices=args.n_choices)
+    
+    if args.command == "search":
+        search.search(query=args.query, limit=args.limit)
     
     if args.command == "update":
         data = json.loads(args.data)
