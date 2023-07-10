@@ -15,7 +15,7 @@ export function NotificationsPopup({
 }) {
   return (
     <div
-      className="absolute bottom-8 right-0 flex min-w-[600px] max-w-[200px]  flex-col bg-slate-800"
+      className="absolute bottom-8 right-0 z-notifications flex min-w-[600px] max-w-[200px]  flex-col bg-slate-800"
       data-testid={NotificationsPopup.name}
     >
       <div className="flex justify-between bg-black p-2">

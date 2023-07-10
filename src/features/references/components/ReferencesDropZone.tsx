@@ -72,7 +72,7 @@ export function ReferencesDropZone({ children }: { children: React.ReactNode }) 
       />
       <div
         className={cx(
-          'absolute left-0 top-0 z-50 h-screen w-screen opacity-90',
+          'absolute left-0 top-0 z-drop-zone h-screen w-screen opacity-90',
           'flex flex-col items-center justify-center gap-4',
           'bg-slate-100 p-10 text-center text-xl',
           { hidden: !visible },
