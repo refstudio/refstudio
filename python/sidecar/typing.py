@@ -116,7 +116,7 @@ class RewriteChoice(RefStudioModel):
 
 class ChatRequest(RefStudioModel):
     text: str
-    n_options: int = 1
+    n_choices: int = 1
 
 
 class ChatResponseChoice(RefStudioModel):

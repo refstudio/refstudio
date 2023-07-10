@@ -14,7 +14,7 @@ openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 
 def ask_question(request: ChatRequest):
-    input_text = request.input_text
+    input_text = request.text
     n_choices = request.n_choices
     storage = JsonStorage(filepath=settings.REFERENCES_JSON_PATH)
     storage.load()
