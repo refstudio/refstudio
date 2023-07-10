@@ -14,16 +14,19 @@ openai.api_key = os.environ.get("OPENAI_API_KEY")
 def summarize(arg: RewriteRequest) -> str:
     text = arg.text
     n_choices = arg.n_choices
+    temperature = arg.temperature
+
     prompt = prompts.create_prompt_for_summarize(text)
-    chat = Rewriter(prompt, n_choices)
+    chat = Rewriter(prompt, n_choices, temperature)
     response = chat.get_response()
     sys.stdout.write(json.dumps([r.dict() for r in response]))
 
 
 class Rewriter:
-    def __init__(self, text: str, n_choices: int = 1):
+    def __init__(self, text: str, n_choices: int = 1, temperature: float = 0.7):
         self.text = text
         self.n_choices = int(n_choices)
+        self.temperature = temperature
 
     def get_response(self):
         messages = self.prepare_messages_for_chat(self.text)
@@ -42,8 +45,7 @@ class Rewriter:
             model=os.environ["OPENAI_CHAT_MODEL"],
             messages=messages,
             n=self.n_choices,  # number of completions to generate
-            temperature=0.7,
-            # max_tokens=200,
+            temperature=self.temperature,  # 0 = no randomness, deterministic
         )
         return response
 

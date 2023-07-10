@@ -94,6 +94,8 @@ export interface ReferenceStatus {
 }
 export interface RewriteRequest {
   text: string;
+  n_choices?: number;
+  temperature?: number;
 }
 export interface RewriteChoice {
   index: number;
