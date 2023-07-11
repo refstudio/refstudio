@@ -5,10 +5,10 @@ import { Loadable } from 'jotai/vanilla/utils/loadable';
 import { readAllProjectFiles, readFileContent, writeFileContent } from '../../io/filesystem';
 import { activePaneAtom, closeEditorFromPaneAtom, moveEditorToPaneAtom } from '../editorActions';
 import { openFileEntryAtom } from '../fileEntryActions';
-import { activePaneContentAtom, focusPaneAtom } from '../paneActions';
+import { activeEditorAtom, activeEditorIdAtom, activePaneContentAtom, focusPaneAtom } from '../paneActions';
 import { EditorContent } from '../types/EditorContent';
 import { EditorContentAtoms } from '../types/EditorContentAtoms';
-import { EditorData } from '../types/EditorData';
+import { buildEditorId, EditorData } from '../types/EditorData';
 import { FileFileEntry } from '../types/FileEntry';
 import { PaneId } from '../types/PaneGroup';
 import { makeFileAndEditor } from './test-fixtures';
@@ -225,5 +225,20 @@ describe('paneActions', () => {
     });
 
     expect(writeFileContent).not.toHaveBeenCalledOnce();
+  });
+
+  it('should return the active editor', () => {
+    const activeEditor = runGetAtomHook(activeEditorAtom, store);
+
+    expect(activeEditor.current).not.toBeNull();
+    expect(activeEditor.current!.id).toBe(buildEditorId('text', fileEntry.path));
+    expect(activeEditor.current!.contentAtoms).toBe(fileContentAtoms);
+  });
+
+  it('should return the active editor id', () => {
+    const activeEditorId = runGetAtomHook(activeEditorIdAtom, store);
+
+    expect(activeEditorId.current).not.toBeNull();
+    expect(activeEditorId.current).toBe(buildEditorId('text', fileEntry.path));
   });
 });

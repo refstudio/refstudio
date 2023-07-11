@@ -1,8 +1,11 @@
 import { useAtom, useAtomValue } from 'jotai';
+import { useCallback } from 'react';
 import { VscChevronDown, VscChevronRight, VscFile } from 'react-icons/vsc';
 
+import { fileExplorerEntryPathBeingRenamed } from '../../atoms/fileExplorerActions';
 import { FileExplorerFolderEntry } from '../../atoms/types/FileExplorerEntry';
 import { FileNode } from '../../components/FileNode';
+import { emitEvent } from '../../events';
 import { FILE_EXPLORER_FILE_MENU_ID } from './fileExplorerContextMenu/FileExplorerFileContextMenu';
 
 interface FileExplorerProps {
@@ -16,10 +19,25 @@ export function FileExplorer(props: FileExplorerProps) {
   const { fileExplorerEntry, onFileClick, selectedFiles, paddingLeft = '0' } = props;
   const files = useAtomValue(fileExplorerEntry.childrenAtom);
 
+  const [pathBeingRenamed, setPathBeingRenamed] = useAtom(fileExplorerEntryPathBeingRenamed);
+
   const [collapsed, setCollapsed] = useAtom(fileExplorerEntry.collapsedAtom);
 
-  const { root } = fileExplorerEntry;
+  const isNameValid = useCallback(
+    (name: string) => {
+      if (name.startsWith('.')) {
+        return false;
+      }
+      if (name.includes('/')) {
+        return false;
+      }
 
+      return !files.find((file) => file.name === name);
+    },
+    [files],
+  );
+
+  const { root } = fileExplorerEntry;
   return (
     <div className="flex w-full flex-col">
       {!root && (
@@ -48,10 +66,16 @@ export function FileExplorer(props: FileExplorerProps) {
                 contextMenuId={FILE_EXPLORER_FILE_MENU_ID}
                 fileId={fileEntry.path}
                 fileName={fileEntry.name}
+                isEditMode={pathBeingRenamed === fileEntry.path}
+                isNameValid={isNameValid}
                 key={fileEntry.path}
                 paddingLeft={paddingLeft}
                 selected={selectedFiles.includes(fileEntry.path)}
+                onCancelRename={() => setPathBeingRenamed(null)}
                 onClick={() => onFileClick(fileEntry.path)}
+                onFileRename={(newName: string) =>
+                  emitEvent('refstudio://explorer/rename', { path: fileEntry.path, newName })
+                }
               />
             ),
           )}

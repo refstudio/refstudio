@@ -2,16 +2,40 @@ import React from 'react';
 
 import { cx } from '../../lib/cx';
 
-export function FooterItem({ icon, text, onClick }: { icon: React.ReactNode; text: string; onClick?: () => void }) {
+export function FooterItem({
+  className,
+  title,
+  icon,
+  hidden = false,
+  text,
+  onClick,
+}: {
+  className?: string;
+  title?: string;
+  hidden?: boolean;
+  icon: React.ReactNode;
+  text?: React.ReactNode;
+  onClick?: () => void;
+}) {
+  if (hidden) {
+    return null;
+  }
+
   return (
     <span
-      className={cx('flex select-none items-center gap-2 px-2 py-1', {
-        'cursor-pointer hover:bg-slate-700': onClick,
-      })}
+      className={cx(
+        'flex select-none items-center gap-2 self-stretch px-2 py-1',
+        {
+          'cursor-pointer hover:bg-slate-700': onClick,
+        },
+        className,
+      )}
       role="listitem"
+      title={title}
       onClick={onClick}
     >
-      {icon} <span>{text}</span>
+      {icon}
+      {text && <span>{text}</span>}
     </span>
   );
 }

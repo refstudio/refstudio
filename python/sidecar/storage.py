@@ -3,33 +3,28 @@ import sys
 
 from sidecar import settings, typing
 from sidecar.settings import logger
+from sidecar.typing import DeleteRequest, ReferenceUpdate
 
 logger = logger.getChild(__name__)
 
 
-def update_reference(data: dict):
-    patch = typing.ReferencePatch(
-        data=data.get('patch', {})
-    )
-    reference_update = typing.ReferenceUpdate(
-        source_filename=data.get('source_filename'),
-        patch=patch
-    )
+def update_reference(reference_update: ReferenceUpdate):
     storage = JsonStorage(settings.REFERENCES_JSON_PATH)
     storage.load()
     storage.update(reference_update=reference_update)
 
 
-def delete_references(source_filenames: list[str] = [], all_: bool = False):
+def delete_references(delete_request: DeleteRequest):
     storage = JsonStorage(settings.REFERENCES_JSON_PATH)
     storage.load()
-    storage.delete(source_filenames=source_filenames, all_=all_)
+    storage.delete(source_filenames=delete_request.source_filenames, all_=delete_request.all)
 
 
 class JsonStorage:
     def __init__(self, filepath: str):
         self.filepath = filepath
         self.references = []
+        self.chunks = []
         self.corpus = []
         self.tokenized_corpus = []
 
@@ -56,11 +51,11 @@ class JsonStorage:
         contents = [ref.dict() for ref in self.references]
         with open(self.filepath, 'w') as f:
             json.dump(contents, f, indent=2, default=str)
-    
+
     def delete(self, source_filenames: list[str] = [], all_: bool = False):
         """
         Delete one or more References from storage.
-        
+
         Parameters
         ----------
         source_filenames : list[str]
@@ -72,7 +67,7 @@ class JsonStorage:
             msg = ("`delete` operation requires one of "
                    "`source_filenames` or `all_` input parameters")
             raise ValueError(msg)
-    
+
         # preprocess references into a dict of source_filename: Reference
         # so that we can simply do `del refs[filename]`
         refs = {
@@ -94,16 +89,16 @@ class JsonStorage:
                 )
                 sys.stdout.write(response.json())
                 return
-        
+
         self.references = list(refs.values())
         self.save()
-        
+
         response = typing.DeleteStatusResponse(
             status=typing.ResponseStatus.OK,
             message=""
         )
         sys.stdout.write(response.json())
-    
+
     def update(self, reference_update: typing.ReferenceUpdate):
         """
         Update a Reference in storage with the target reference.
@@ -131,10 +126,10 @@ class JsonStorage:
             )
             sys.stdout.write(response.json())
             return
-        
+
         logger.info(f"Updating {source_filename} with new values: {patch.data}")
         refs[source_filename] = target.copy(update=patch.data)
-        
+
         self.references = list(refs.values())
         self.save()
 
@@ -143,9 +138,10 @@ class JsonStorage:
             message=""
         )
         sys.stdout.write(response.json())
-    
+
     def create_corpus(self):
         for ref in self.references:
             for chunk in ref.chunks:
+                self.chunks.append(chunk)
                 self.corpus.append(chunk.text)
                 self.tokenized_corpus.append(chunk.text.lower().split())

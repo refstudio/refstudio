@@ -6,7 +6,7 @@ export async function askForRewrite(selection: string): Promise<string> {
       return '';
     }
 
-    const response = await callSidecar('rewrite', ['--text', String(selection)]);
+    const response = await callSidecar('rewrite', { text: selection });
     return response[0].text;
   } catch (err) {
     return `Rewrite error: ${String(err)}`;

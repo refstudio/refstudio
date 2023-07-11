@@ -1,11 +1,11 @@
-import { getIngestedReferences } from '../../../../api/ingestion';
+import { createStore } from 'jotai';
+
 import { runGetAtomHook, runSetAtomHook } from '../../../../atoms/__tests__/test-utils';
 import { activePaneAtom } from '../../../../atoms/editorActions';
 import { referencesSyncInProgressAtom, setReferencesAtom } from '../../../../atoms/referencesState';
 import { buildEditorId } from '../../../../atoms/types/EditorData';
 import { emitEvent } from '../../../../events';
-import { act, mockListenEvent, screen, setupWithJotaiProvider, waitFor } from '../../../../test/test-utils';
-import { ReferenceItem } from '../../../../types/ReferenceItem';
+import { act, mockListenEvent, screen, setupWithJotaiProvider } from '../../../../test/test-utils';
 import { REFERENCES } from '../../__tests__/test-fixtures';
 import { ReferencesFooterItems } from '../ReferencesFooterItems';
 
@@ -13,14 +13,6 @@ vi.mock('../../../../events');
 vi.mock('../../../../api/ingestion');
 
 describe('ReferencesFooterItems component', () => {
-  let resolveFn: (item: ReferenceItem[]) => void;
-  beforeEach(() => {
-    vi.mocked(getIngestedReferences).mockReturnValue(
-      new Promise((resolve) => {
-        resolveFn = resolve;
-      }),
-    );
-  });
   afterEach(() => {
     vi.resetAllMocks();
   });
@@ -31,21 +23,11 @@ describe('ReferencesFooterItems component', () => {
     expect(screen.getByText('References: 0')).toBeInTheDocument();
   });
 
-  it('should render ingested references', async () => {
-    const [oneReference] = REFERENCES;
-    vi.mocked(getIngestedReferences).mockResolvedValue([oneReference]);
-    setupWithJotaiProvider(<ReferencesFooterItems />);
-    expect(screen.getByText('References: 0')).toBeInTheDocument();
-    await waitFor(() => {
-      expect(screen.getByText('References: 1')).toBeInTheDocument();
-    });
-  });
-
   it('should render number of references ingested', () => {
-    const { store } = setupWithJotaiProvider(<ReferencesFooterItems />);
-    const setReferences = runSetAtomHook(setReferencesAtom, store);
+    const store = createStore();
+    store.set(setReferencesAtom, REFERENCES);
+    setupWithJotaiProvider(<ReferencesFooterItems />, store);
 
-    act(() => setReferences.current(REFERENCES));
     expect(screen.getByText(`References: ${REFERENCES.length}`)).toBeInTheDocument();
   });
 
@@ -56,12 +38,6 @@ describe('ReferencesFooterItems component', () => {
     expect(screen.queryByText('References ingestion...')).not.toBeInTheDocument();
     act(() => setSync.current(true));
     expect(screen.getByText('References ingestion...')).toBeInTheDocument();
-  });
-
-  it('should render number of references returned by getIngestedReferences', async () => {
-    setupWithJotaiProvider(<ReferencesFooterItems />);
-    act(() => resolveFn(REFERENCES));
-    expect(await screen.findByText(`References: ${REFERENCES.length}`)).toBeInTheDocument();
   });
 
   it(`should emit ${'refstudio://menu/references/open'} on click`, async () => {

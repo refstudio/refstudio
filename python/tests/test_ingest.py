@@ -3,8 +3,8 @@ import os
 from datetime import date
 from pathlib import Path
 
-from sidecar import ingest, storage, typing
-from sidecar.typing import Author, Reference
+from sidecar import ingest, settings, storage, typing
+from sidecar.typing import Author, IngestRequest, Reference
 
 FIXTURES_DIR = Path(__file__).parent.joinpath("fixtures")
 
@@ -35,6 +35,8 @@ def test_run_ingest(monkeypatch, tmp_path, capsys):
         write_path = tmp_path.joinpath("uploads", pdf.name)
         _copy_fixture_to_temp_dir(pdf, write_path)
 
+    monkeypatch.setattr(settings, 'UPLOADS_DIR', tmp_path.joinpath("uploads"))
+
     # grobid server takes an input directory of PDFs
     # if grobid successfully parses the file, it creates a {pdfname}.tei.xml file
     # if grobid fails to parse the file, it creates a {pdfname}_{errorcode}.txt file
@@ -43,11 +45,11 @@ def test_run_ingest(monkeypatch, tmp_path, capsys):
         for file_ in FIXTURES_DIR.joinpath("xml").glob("*"):
             write_path = grobid_output_dir.joinpath(file_.name)
             _copy_fixture_to_temp_dir(file_, write_path)
-    
+
     monkeypatch.setattr(ingest.GrobidClient, "process", mock_grobid_client_process)
 
     pdf_directory = tmp_path.joinpath("uploads")
-    ingest.run_ingest(pdf_directory)
+    ingest.run_ingest(IngestRequest(pdf_directory=str(pdf_directory)))
 
     # check that the expected output was printed to stdout
     captured = capsys.readouterr()
@@ -140,7 +142,7 @@ def test_ingest_add_citation_keys(monkeypatch, tmp_path):
         reference = base_reference.copy()
         reference.authors = []
         refs.append(reference)
-    
+
     tested = ingestion._add_citation_keys(refs)
 
     for i, ref in enumerate(tested):
@@ -148,7 +150,7 @@ def test_ingest_add_citation_keys(monkeypatch, tmp_path):
             assert ref.citation_key == "untitled"
         else:
             assert ref.citation_key == f"untitled{i - 1 + 1}"
-    
+
 
     # test: references with no author but with published years
     # expect: should have citation key "untitled" appeneded with the year
@@ -158,7 +160,7 @@ def test_ingest_add_citation_keys(monkeypatch, tmp_path):
         reference.published_date = date(2020 + i, 1, 1)
         reference.authors = []
         refs.append(reference)
-    
+
     tested = ingestion._add_citation_keys(refs)
 
     for i, ref in enumerate(tested):
@@ -173,7 +175,7 @@ def test_ingest_add_citation_keys(monkeypatch, tmp_path):
         reference.published_date = date(2020, 1, 1)
         reference.authors = []
         refs.append(reference)
-    
+
     tested = ingestion._add_citation_keys(refs)
 
     for i, ref in enumerate(tested):
@@ -182,7 +184,7 @@ def test_ingest_add_citation_keys(monkeypatch, tmp_path):
         else:
             expected = f"untitled{ref.published_date.year}{chr(97 + i)}"
         assert ref.citation_key == expected
-    
+
     # test: references with same author last name and no published year
     # expect: should have citation key of author's last name appended with a letter
     refs = []
@@ -281,7 +283,7 @@ def test_ingest_get_statuses(monkeypatch, capsys):
     for ref in statuses:
         ref['status'] == "processing"
 
-    
+
     # test: stored references should be checked against uploads
     # expect: stored references return stored status,
     #   uploads (not yet stored) return processeding
@@ -327,7 +329,7 @@ def test_ingest_get_statuses(monkeypatch, capsys):
             ref['status'] == "failure"
         else:
             ref['status'] == "processing"
-    
+
 
     # test: Exception on storage load should return error status
     # expect: response status = error, ref statuses = []
