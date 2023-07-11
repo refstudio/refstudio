@@ -1,6 +1,6 @@
 import { atom, Getter } from 'jotai';
 
-import { readAllProjectFiles, splitFilePath } from '../io/filesystem';
+import { readAllProjectFiles, splitRefStudioPath } from '../io/filesystem';
 import { fileExplorerEntriesAtom } from './core/fileExplorerEntry';
 import { FileExplorerEntry } from './types/FileExplorerEntry';
 
@@ -13,7 +13,7 @@ export const refreshFileTreeAtom = atom(null, async (get, set) => {
 });
 
 export const getFileExplorerEntryFromPathAtom = (filePath: string) =>
-  atom((get) => getFileExplorerEntryFromPath(splitFilePath(filePath).slice(1), get));
+  atom((get) => getFileExplorerEntryFromPath(splitRefStudioPath(filePath).slice(1), get));
 
 function getFileExplorerEntryFromPath(
   path: string[],

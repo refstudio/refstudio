@@ -21,7 +21,7 @@ describe('ReferencesPanel', () => {
     store.set(setReferencesAtom, REFERENCES);
   });
   afterEach(() => {
-    vi.resetAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should display welcome message with empty references', () => {

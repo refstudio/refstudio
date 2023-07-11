@@ -18,7 +18,7 @@ describe('ReferencesDropZone', () => {
   });
 
   afterEach(() => {
-    vi.resetAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render children with', () => {

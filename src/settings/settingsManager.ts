@@ -1,7 +1,7 @@
 import { SettingsManager } from 'tauri-settings';
 import { Path, PathValue } from 'tauri-settings/dist/types/dot-notation';
 
-import { getAppDataDir, getConfigDir } from '../io/filesystem';
+import { getSystemAppDataDir, getSystemConfigurationsDir } from '../io/filesystem';
 import { readEnv } from '../io/readEnv';
 
 export interface SettingsSchema {
@@ -31,7 +31,7 @@ export async function initSettings() {
   settingsManager = new SettingsManager<SettingsSchema>(
     {
       general: {
-        appDataDir: await getAppDataDir(),
+        appDataDir: await getSystemAppDataDir(),
         projectName: 'project-x',
       },
       openAI: {
@@ -47,7 +47,7 @@ export async function initSettings() {
       },
     },
     {
-      dir: await getConfigDir(),
+      dir: await getSystemConfigurationsDir(),
       fileName: 'refstudio-settings.json',
       prettify: true,
     },
