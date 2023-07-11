@@ -1,5 +1,5 @@
 import { useAtomValue, useSetAtom } from 'jotai';
-import { useCallback } from 'react';
+import { memo, useCallback } from 'react';
 import { Panel, PanelGroup } from 'react-resizable-panels';
 
 import { usePaneActiveEditorContentAtoms } from '../../atoms/hooks/usePaneActiveEditorContentAtoms';
@@ -56,7 +56,7 @@ interface MainPanelPaneProps {
   paneId: PaneId;
 }
 
-export function MainPanelPane({ paneId, pdfViewerRef }: MainPanelPaneProps & MainPanelProps) {
+const MainPanelPane = memo(({ paneId, pdfViewerRef }: MainPanelPaneProps & MainPanelProps) => {
   const activeEditorAtoms = usePaneActiveEditorContentAtoms(paneId);
 
   const focusPane = useSetAtom(focusPaneAtom);
@@ -75,14 +75,15 @@ export function MainPanelPane({ paneId, pdfViewerRef }: MainPanelPaneProps & Mai
       </div>
     </div>
   );
-}
+});
+MainPanelPane.displayName = 'MainPanelPane';
 
 interface MainPaneViewContentProps {
   activeEditorAtoms: EditorContentAtoms;
   pdfViewerRef: React.MutableRefObject<PdfViewerAPI | null>;
 }
 
-export function MainPaneViewContent({ activeEditorAtoms, pdfViewerRef }: MainPaneViewContentProps) {
+function MainPaneViewContent({ activeEditorAtoms, pdfViewerRef }: MainPaneViewContentProps) {
   const { loadableEditorContentAtom } = activeEditorAtoms;
   const loadableEditorContent = useAtomValue(loadableEditorContentAtom);
 
