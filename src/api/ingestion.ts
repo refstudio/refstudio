@@ -1,7 +1,7 @@
 import { getSystemPath, getUploadsDir, makeUploadPath } from '../io/filesystem';
 import { ReferenceItem } from '../types/ReferenceItem';
 import { callSidecar } from './sidecar';
-import { IngestResponse } from './types';
+import { IngestResponse, Reference } from './types';
 
 function parsePdfIngestionResponse(response: IngestResponse): ReferenceItem[] {
   return response.references.map((reference) => ({
@@ -34,11 +34,18 @@ export async function removeReferences(fileNames: string[]) {
 }
 
 export async function updateReference(filename: string, patch: Partial<ReferenceItem>) {
-  const patchString = JSON.stringify({
+  const referencePatch: Partial<Reference> = {
+    ...(patch.citationKey ? { citation_key: patch.citationKey } : {}),
+    ...(patch.title ? { title: patch.title } : {}),
+    ...(patch.publishedDate ? { published_date: patch.publishedDate } : {}),
+    ...(patch.authors ? { authors: patch.authors.map((a) => ({ full_name: a.fullName, surname: a.lastName })) } : {}),
+  };
+  const response = await callSidecar('update', {
     source_filename: filename,
-    patch,
+    patch: {
+      data: referencePatch,
+    },
   });
-  const response = await callSidecar('update', ['--data', patchString]);
   if (response.status === 'error') {
     throw new Error('Error updating reference: ' + response.message);
   }
