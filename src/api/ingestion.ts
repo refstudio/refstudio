@@ -22,7 +22,7 @@ function parsePdfIngestionResponse(response: IngestResponse): ReferenceItem[] {
 
 export async function runPDFIngestion(): Promise<ReferenceItem[]> {
   const uploadsDir = await getSystemPath(getUploadsDir());
-  const response = await callSidecar('ingest', ['--pdf_directory', String(uploadsDir)]);
+  const response = await callSidecar('ingest', { pdf_directory: String(uploadsDir) });
   return parsePdfIngestionResponse(response);
 }
 
@@ -35,7 +35,7 @@ export async function removeReferences(fileNames: string[]) {
 
 export async function getIngestedReferences(): Promise<ReferenceItem[]> {
   const uploadsDir = await getSystemPath(getUploadsDir());
-  const response = await callSidecar('ingest_references', ['--pdf_directory', String(uploadsDir)]);
+  const response = await callSidecar('ingest_references', { pdf_directory: String(uploadsDir) });
   return parsePdfIngestionResponse(response);
 }
 
