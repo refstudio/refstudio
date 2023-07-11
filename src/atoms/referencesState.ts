@@ -36,6 +36,7 @@ const removeReferenceAtom = atom(null, (get, set, id: string) => {
   set(setReferencesAtom, newReferences);
 });
 
+const UPDATABLE_FIELDS: (keyof ReferenceItem)[] = ['citationKey', 'title', 'publishedDate', 'authors'];
 export const updateReferenceAtom = atom(null, async (get, set, id: string, updatedReference: ReferenceItem) => {
   const reference = get(getDerivedReferenceAtom(id));
   if (!reference) {
@@ -43,13 +44,21 @@ export const updateReferenceAtom = atom(null, async (get, set, id: string, updat
     return;
   }
 
+  const patch: Partial<ReferenceItem> = UPDATABLE_FIELDS.reduce(
+    (acc, field) => ({
+      ...acc,
+      ...patchEntry(field, reference, updatedReference),
+    }),
+    {},
+  );
+
+  if (Object.keys(patch).length === 0) {
+    console.log('No change detected.');
+    return;
+  }
+
   // Call backend (patch of updatable fields)
-  await updateReference(reference.filename, {
-    ...patchEntry('citationKey', reference, updatedReference),
-    ...patchEntry('title', reference, updatedReference),
-    ...patchEntry('publishedDate', reference, updatedReference),
-    ...patchEntry('authors', reference, updatedReference),
-  });
+  await updateReference(reference.filename, patch);
 
   // Update local atoms
   const references = get(getReferencesAtom);
@@ -63,11 +72,9 @@ export const updateReferenceAtom = atom(null, async (get, set, id: string, updat
 function patchEntry(key: keyof ReferenceItem, original: ReferenceItem, updated: ReferenceItem): Partial<ReferenceItem> {
   const originalValue = original[key];
   const updatedValue = updated[key];
-  return { [key]: updatedValue };
-
   console.log('values', key, originalValue, updatedValue);
+
   if (JSON.stringify(originalValue) !== JSON.stringify(updatedValue)) {
-    console.log('values', key, originalValue, updatedValue);
     return { [key]: updatedValue };
   }
   return {};

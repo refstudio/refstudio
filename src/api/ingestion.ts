@@ -33,13 +33,35 @@ export async function removeReferences(fileNames: string[]) {
   }
 }
 
+const UPDATABLE_FIELDS: (keyof ReferenceItem)[] = ['citationKey', 'title', 'publishedDate', 'authors'];
+function applyPatch(
+  field: keyof ReferenceItem,
+  patch: Partial<ReferenceItem>,
+  fn: (patch: Partial<ReferenceItem>) => Partial<Reference>,
+) {
+  if (!UPDATABLE_FIELDS.includes(field)) {
+    return {};
+  }
+  if (!Object.hasOwn(patch, field)) {
+    return {};
+  }
+  return fn(patch);
+}
+
 export async function updateReference(filename: string, patch: Partial<ReferenceItem>) {
   const referencePatch: Partial<Reference> = {
-    ...(patch.citationKey ? { citation_key: patch.citationKey } : {}),
-    ...(patch.title ? { title: patch.title } : {}),
-    ...(patch.publishedDate ? { published_date: patch.publishedDate } : {}),
-    ...(patch.authors ? { authors: patch.authors.map((a) => ({ full_name: a.fullName, surname: a.lastName })) } : {}),
+    ...applyPatch('citationKey', patch, () => ({ citation_key: patch.citationKey })),
+    ...applyPatch('title', patch, () => ({ title: patch.title })),
+    ...applyPatch('publishedDate', patch, () => ({ published_date: patch.publishedDate })),
+    ...applyPatch('authors', patch, () => ({
+      authors: patch.authors!.map((a) => ({ full_name: a.fullName, surname: a.lastName })),
+    })),
   };
+
+  if (Object.keys(referencePatch).length === 0) {
+    return;
+  }
+
   const response = await callSidecar('update', {
     source_filename: filename,
     patch: {
