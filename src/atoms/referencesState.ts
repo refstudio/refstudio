@@ -62,7 +62,7 @@ export const updateReferenceAtom = atom(null, async (get, set, id: string, updat
 
   // Update local atoms
   const references = get(getReferencesAtom);
-  const updatedReferences = {} as ReferencesState;
+  const updatedReferences: ReferencesState = {};
   references.forEach((ref) => {
     updatedReferences[ref.id] = ref.id === updatedReference.id ? updatedReference : ref;
   });
@@ -72,7 +72,6 @@ export const updateReferenceAtom = atom(null, async (get, set, id: string, updat
 function patchEntry(key: keyof ReferenceItem, original: ReferenceItem, updated: ReferenceItem): Partial<ReferenceItem> {
   const originalValue = original[key];
   const updatedValue = updated[key];
-  console.log('values', key, originalValue, updatedValue);
 
   if (JSON.stringify(originalValue) !== JSON.stringify(updatedValue)) {
     return { [key]: updatedValue };

@@ -24,26 +24,23 @@ describe('ingestion.update', () => {
       publishedDate: '2023-07-01',
       authors: [{ fullName: 'Joe Doe Dundee', lastName: 'Dundee' }],
     });
-    expect(vi.mocked(callSidecar).mock.calls).toHaveLength(1);
-    expect(vi.mocked(callSidecar).mock.calls[0]).toStrictEqual<[string, ReferenceUpdate]>([
-      'update',
-      {
-        source_filename: ref1.filename,
-        patch: {
-          data: {
-            citation_key: 'doe2023xx',
-            title: ref1.title + ' NEW',
-            published_date: '2023-07-01',
-            authors: [
-              {
-                full_name: 'Joe Doe Dundee',
-                surname: 'Dundee',
-              },
-            ],
-          },
+    expect(callSidecar).toHaveBeenCalledTimes(1);
+    expect(callSidecar).toHaveBeenCalledWith<[string, ReferenceUpdate]>('update', {
+      source_filename: ref1.filename,
+      patch: {
+        data: {
+          citation_key: 'doe2023xx',
+          title: ref1.title + ' NEW',
+          published_date: '2023-07-01',
+          authors: [
+            {
+              full_name: 'Joe Doe Dundee',
+              surname: 'Dundee',
+            },
+          ],
         },
       },
-    ]);
+    });
   });
 
   it('should not call sidecar if update patch is empty', async () => {

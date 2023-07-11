@@ -34,13 +34,9 @@ export async function removeReferences(fileNames: string[]) {
 }
 
 const UPDATABLE_FIELDS: (keyof ReferenceItem)[] = ['citationKey', 'title', 'publishedDate', 'authors'];
-function applyPatch(
-  field: keyof ReferenceItem,
-  patch: Partial<ReferenceItem>,
-  fn: (patch: Partial<ReferenceItem>) => Partial<Reference>,
-) {
+function applyPatch(field: keyof ReferenceItem, patch: Partial<ReferenceItem>, getPatch: () => Partial<Reference>) {
   if (UPDATABLE_FIELDS.includes(field) && Object.hasOwn(patch, field)) {
-    return fn(patch);
+    return getPatch();
   }
   return {};
 }
