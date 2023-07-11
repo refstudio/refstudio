@@ -20,7 +20,7 @@ describe('runPDFIngestion', () => {
     await runPDFIngestion();
     expect(vi.mocked(callSidecar).mock.calls).toHaveLength(1);
     const uploadsDir = await getSystemPath(getUploadsDir());
-    expect(vi.mocked(callSidecar).mock.calls[0]).toStrictEqual(['ingest', ['--pdf_directory', uploadsDir]]);
+    expect(vi.mocked(callSidecar).mock.calls[0]).toStrictEqual(['ingest', { pdf_directory: uploadsDir }]);
   });
 
   it('should call sidecar ingest_references with upload dir arg', async () => {
@@ -32,7 +32,7 @@ describe('runPDFIngestion', () => {
     const result = await getIngestedReferences();
     expect(vi.mocked(callSidecar).mock.calls).toHaveLength(1);
     const uploadsDir = await getSystemPath(getUploadsDir());
-    expect(vi.mocked(callSidecar).mock.calls[0]).toStrictEqual(['ingest_references', ['--pdf_directory', uploadsDir]]);
+    expect(vi.mocked(callSidecar).mock.calls[0]).toStrictEqual(['ingest_references', { pdf_directory: uploadsDir }]);
     expect(result).toStrictEqual([]);
   });
 
