@@ -97,7 +97,7 @@ describe('ReferencesTableView component', () => {
     await user.click(buttons[0]);
 
     const activeEditorId = store.get(activeEditorIdAtom);
-    expect(activeEditorId).toBeDefined();
+    expect(activeEditorId).not.toBeNull();
     expect(activeEditorId).toBe(buildEditorId('reference', ref1.id));
   });
 
@@ -109,7 +109,7 @@ describe('ReferencesTableView component', () => {
     await user.click(buttons[0]);
 
     const activeEditorId = store.get(activeEditorIdAtom);
-    expect(activeEditorId).toBeDefined();
+    expect(activeEditorId).not.toBeNull();
     expect(activeEditorId).toBe(buildEditorId('pdf', ref1.filepath));
   });
 

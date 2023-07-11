@@ -65,7 +65,7 @@ describe('ReferencesPanel', () => {
     await user.click(screen.getByRole('listitem', { name: ref1.title }));
 
     const activeEditorId = runGetAtomHook(activeEditorIdAtom, store).current;
-    expect(activeEditorId).toBeDefined();
+    expect(activeEditorId).not.toBeNull();
     expect(activeEditorId).toBe(buildEditorId('reference', ref1.id));
   });
 
@@ -78,7 +78,7 @@ describe('ReferencesPanel', () => {
     await user.click(within(elem).getByTitle('Open PDF'));
 
     const activeEditorId = store.get(activeEditorIdAtom);
-    expect(activeEditorId).toBeDefined();
+    expect(activeEditorId).not.toBeNull();
     expect(activeEditorId).toBe(buildEditorId('pdf', ref1.filepath));
   });
 
@@ -89,7 +89,7 @@ describe('ReferencesPanel', () => {
     await user.click(elem[0]);
 
     const activeEditorId = store.get(activeEditorIdAtom);
-    expect(activeEditorId).toBeDefined();
+    expect(activeEditorId).not.toBeNull();
     expect(activeEditorId).toBe(buildEditorId('references'));
 
     const activeEditorContentAtoms = runHookWithJotaiProvider(useActiveEditorContentAtoms, store).current;
