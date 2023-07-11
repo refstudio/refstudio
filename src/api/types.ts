@@ -39,6 +39,11 @@ export interface CliCommands {
    * @minItems 2
    * @maxItems 2
    */
+  complete_text: [TextCompletionRequest, RewriteChoice[]];
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
   chat: [ChatRequest, ChatResponseChoice[]];
   /**
    * @minItems 2
@@ -100,6 +105,14 @@ export interface RewriteRequest {
 export interface RewriteChoice {
   index: number;
   text: string;
+}
+export interface TextCompletionRequest {
+  text: string;
+  n_choices?: number;
+  temperature?: number;
+  max_tokens?: number;
+  title?: string;
+  abstract?: string;
 }
 export interface ChatRequest {
   text: string;
