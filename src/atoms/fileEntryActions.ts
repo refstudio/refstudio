@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
 
-import { deleteFile, makeNewFilePath, renameFile } from '../io/filesystem';
+import { deleteFile, makeRefStudioPath, renameFile } from '../io/filesystem';
 import { editorsContentStateAtom, loadEditorContent, loadFileEntry } from './core/editorContent';
 import { addEditorData, editorsDataAtom, setEditorDataIsDirtyAtom } from './core/editorData';
 import { fileExplorerEntriesAtom } from './core/fileExplorerEntry';
@@ -48,7 +48,7 @@ export const createFileAtom = atom(null, (get, set) => {
   const openEditorNames = [...get(editorsDataAtom).values()].map(({ title }) => title);
 
   const fileName = generateFileName(new Set([...rootFileNames, ...openEditorNames]));
-  const filePath = makeNewFilePath(fileName);
+  const filePath = makeRefStudioPath(fileName);
   const editorId = buildEditorIdFromPath(filePath);
 
   // Load editor in memory

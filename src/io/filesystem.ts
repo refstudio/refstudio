@@ -1,5 +1,4 @@
 import {
-  BaseDirectory,
   createDir,
   exists,
   FileEntry as TauriFileEntry,
@@ -15,67 +14,112 @@ import { appConfigDir, appDataDir, join, sep } from '@tauri-apps/api/path';
 
 import { EditorContent } from '../atoms/types/EditorContent';
 import { FileEntry, FileFileEntry } from '../atoms/types/FileEntry';
-import { INITIAL_CONTENT } from '../features/textEditor/components/tipTapEditorConfigs';
-
-const FILE2_CONTENT = `# Lorem Buzzword
-
-We will regenerate our aptitude to evolve without decreasing our power to syndicate. Without development, you will lack cross-media CAE. A company that can streamline elegantly will (at some unspecified point in the future) be able to orchestrate correctly. The capacity to enable perfectly leads to the capacity to harness without devaluing our power to deliver. Do you have a infinitely reconfigurable scheme for coping with emerging methodologies? Is it more important for something to be dynamic or to be dynamic or to be leading-edge or to be dynamic or to be leading-edge or to be dynamic or to be best-of-breed? The portals factor can be delivered as-a-service to wherever it’s intended to go – mobile. It may seem mixed-up, but it's 100 percent true! Your budget for innovating should be at least one-half of your budget for innovating should be at least one-half of your budget for innovating should be at least one-half of your budget for innovating should be at least one-half of your budget for engaging should be at least one-half of your budget for harnessing. Our feature set is second to none, but our vertical, customized efficient, user-centric TQM and non-complex use is invariably considered a remarkable achievement.
-
-Without niches, you will lack affiliate-based compliance. A company that can synthesize courageously will (eventually) be able to engineer virtually than to strategize macro-intuitively. Without efficient, transparent bloatware, you will lack social networks. If all of this sounds astonishing to you, that's because it is! Quick: do you have a infinitely reconfigurable scheme for coping with emerging methodologies? Is it more important for something to be dynamic or to be customer-directed? What does the buzzword 'technologies' really mean? Think virally-distributed. Our functionality is unparalleled, but our C2C2C paradigms and easy use is usually considered a terrific achievement. We think that most C2C2C web-based applications use far too much Python, and not enough Java. Have you ever been unable to disintermediate your feature set? Free? We apply the proverb 'A rolling stone gathers no moss' not only to our power to repurpose. Our functionality is unparalleled, but our power to deliver. That is a remarkable achievement taking into account this month's financial state of things! If all of this comes off as mixed-up to you, that's because it is! What does the buzzword 'technologies' really mean? Think virally-distributed. Quick: do you have a infinitely reconfigurable scheme for coping with emerging methodologies? Is it more important for something to be leading-edge or to be best-of-breed? The portals factor can be summed up in one word: affiliate-based.
-
-`;
-
-const FILE3_CONTENT = `# Rewrite
-
-In the cycling world, power meters are the typical way to objectively measure performance. Your speed is dependent on a lot of factors, like wind, road surface, and elevation. One's heart rate is largely a function of genetics, but also things like temperature. The amount of power you are outputting to the pedals though, is a direct measure of how much work you're doing, regardless of wind, elevation, your body weight, etc.
-
-`;
+import { FILE2_CONTENT, FILE3_CONTENT, INITIAL_CONTENT } from './filesystem.sample-content';
 
 const PROJECT_NAME = 'project-x';
 const UPLOADS_DIR = 'uploads';
 
-export function makeUploadPath(filename: string) {
-  return `${sep}${UPLOADS_DIR}${sep}${filename}`;
-}
+// #####################################################################################
+// Top Level PATH API
+// #####################################################################################
 
-export async function getConfigDir() {
+/**
+ * System configurations directory for the Tauri app.
+ *
+ * Note that this path is "outside" of the project dir. Configurations are global.
+ * Should only be used by the configuration.
+ *
+ * @returns An operating-system absolute path
+ */
+export async function getSystemConfigurationsDir() {
   return appConfigDir();
 }
 
-export async function getAppDataDir() {
+/**
+ * System application data directory for the Tauri app.
+ *
+ * Note that this path is were the PROJECT_NAME directory should exist.
+ * Should only be used by the configuration and sidecar.
+ *
+ * @returns An operating-system absolute path
+ */
+export async function getSystemAppDataDir() {
   return appDataDir();
 }
 
-async function getBaseDir() {
+/**
+ * This is the refstudio project base dir.
+ *
+ * NOTE: For now the PROJECT_NAME is hard-coded
+ **/
+async function getProjectBaseDir() {
   return join(await appDataDir(), PROJECT_NAME);
 }
-export async function getUploadsDir() {
-  return join(await getBaseDir(), UPLOADS_DIR);
+
+/**
+ * Convert a ref-studio absolute path into operating-system absolute path
+ *
+ * (/folder/file.txt) -> (/usr/name/etc/tauri.foo/project-x/folder/file.txt)
+ *
+ * @param rsPath a ref-studio absolute path
+ **/
+export async function getSystemPath(rsPath: string) {
+  return join(await getProjectBaseDir(), rsPath);
 }
 
-export function makeNewFilePath(fileName: string) {
-  return `${sep}${fileName}`;
+/**
+ * Convert an operating-system absolute path into a ref-studio absolute path.
+ *
+ * (/usr/name/etc/tauri.foo/project-x/folder/file.txt) -> (/folder/file.txt)
+ *
+ * @param absolutePath an operating-system absolute path
+ * @returns
+ */
+export async function getRefStudioPath(absolutePath: string) {
+  const baseDir = await getProjectBaseDir();
+  return absolutePath.replace(new RegExp(`^${baseDir}`), '');
 }
 
-export function splitFilePath(filePath: string): string[] {
-  return filePath.split(sep);
+// #####################################################################################
+// UPLOADS
+// #####################################################################################
+export function getUploadsDir() {
+  return makeRefStudioPath(UPLOADS_DIR);
+}
+
+export function makeUploadPath(filename: string) {
+  return `${getUploadsDir()}${sep}${filename}`;
 }
 
 export function isInUploadsDir(relativePath: string) {
   return relativePath.startsWith(`${sep}${UPLOADS_DIR}`);
 }
 
+export async function uploadFiles(systemFiles: File[]) {
+  for (const file of systemFiles) {
+    const bytes = await file.arrayBuffer();
+    const systemUploadFilePath = await getSystemPath(makeUploadPath(file.name));
+    await writeBinaryFile(systemUploadFilePath, bytes);
+  }
+  return Array.from(systemFiles).map((file) => file.name);
+}
+
+// #####################################################################################
+// Project Structure and read project files
+// #####################################################################################
 export async function ensureProjectFileStructure() {
   try {
-    const baseDir = await getBaseDir();
-    await createDir(baseDir, { recursive: true });
-    await createDir(await getUploadsDir(), { recursive: true });
+    const systemBaseDir = await getSystemPath('');
+    await createDir(systemBaseDir, { recursive: true });
+
+    const systemUploadsDir = await getSystemPath(getUploadsDir());
+    await createDir(systemUploadsDir, { recursive: true });
 
     await ensureFile('file 1.refstudio', INITIAL_CONTENT);
     await ensureFile('file 2.refstudio', FILE2_CONTENT);
     await ensureFile('file 3.refstudio', FILE3_CONTENT);
 
-    console.log('Project structure created with success. Folder: ', baseDir);
+    console.log('Project structure created with success. Folder: ', systemBaseDir);
   } catch (err) {
     console.error('ERROR', err);
     throw new Error('Error ensuring file struture');
@@ -83,82 +127,38 @@ export async function ensureProjectFileStructure() {
 }
 
 async function ensureFile(fileName: string, content: string) {
-  const path = await getAbsolutePath(fileName);
-  if (!(await exists(path))) {
-    await writeTextFile(path, content);
+  const absoluteFilePath = await getSystemPath(fileName);
+  if (!(await exists(absoluteFilePath))) {
+    await writeTextFile(absoluteFilePath, content);
   }
 }
 
 export async function readAllProjectFiles() {
-  const baseDir = await getBaseDir();
-  const entries = await readDir(baseDir, { recursive: true });
-  return entries.map((entry) => convertTauriFileEntryToFileEntry(entry, baseDir));
+  const systemBaseDir = await getSystemPath('');
+  const entries = await readDir(systemBaseDir, { recursive: true });
+  return Promise.all(entries.map(convertTauriFileEntryToFileEntry));
 }
 
-export async function writeFileContent(relativePath: string, textContent: string) {
-  try {
-    const path = await getAbsolutePath(relativePath);
-    await writeTextFile(path, textContent);
-    return true;
-  } catch (err) {
-    console.error('Error', err);
-    return false;
-  }
-}
-
-export async function uploadFiles(files: File[]) {
-  for (const file of files) {
-    const path = await getAbsolutePath(await join(UPLOADS_DIR, file.name));
-    const bytes = await file.arrayBuffer();
-    await writeBinaryFile(path, bytes, { dir: BaseDirectory.Home });
-  }
-  return Array.from(files).map((file) => file.name);
-}
-
-export async function readFileContent(file: FileFileEntry): Promise<EditorContent> {
-  const path = await getAbsolutePath(file.path);
-  switch (file.fileExtension) {
-    case 'xml': {
-      const textContent = await readTextFile(path);
-      return { type: 'xml', textContent };
-    }
-    case 'json': {
-      const textContent = await readTextFile(path);
-      return { type: 'json', textContent };
-    }
-    case 'pdf': {
-      const binaryContent = await readBinaryFile(path);
-      return { type: 'pdf', binaryContent };
-    }
-    default: {
-      const textContent = await readTextFile(path);
-      return { type: 'text', textContent };
-    }
-  }
-}
-
-function convertTauriFileEntryToFileEntry(entry: TauriFileEntry, baseDir: string): FileEntry {
+async function convertTauriFileEntryToFileEntry(entry: TauriFileEntry): Promise<FileEntry> {
   const isFolder = !!entry.children;
-
   const name = entry.name ?? '';
   const isDotfile = name.startsWith('.');
-
-  const relativePath = getRelativePath(entry.path, baseDir);
+  const refStudioPath = await getRefStudioPath(entry.path);
 
   if (isFolder) {
     return {
       name,
-      path: relativePath,
+      path: refStudioPath,
       isFolder,
       isFile: !isFolder,
       isDotfile,
-      children: entry.children!.map((child) => convertTauriFileEntryToFileEntry(child, baseDir)),
+      children: await Promise.all(entry.children!.map(convertTauriFileEntryToFileEntry)),
     };
   } else {
     const fileExtension = name.split('.').pop()?.toLowerCase() ?? '';
     return {
       name,
-      path: relativePath,
+      path: refStudioPath,
       fileExtension,
       isFolder,
       isDotfile,
@@ -167,10 +167,31 @@ function convertTauriFileEntryToFileEntry(entry: TauriFileEntry, baseDir: string
   }
 }
 
-export async function deleteFile(relativePath: string): Promise<boolean> {
-  const path = await getAbsolutePath(relativePath);
+// #####################################################################################
+// file path utils
+// #####################################################################################
+// file.txt -> /file.txt
+export function makeRefStudioPath(fileName: string) {
+  return `${sep}${fileName}`;
+}
+
+// /some/absolute/path/file.txt -> ["", "some", "absolute", "path", "file.txt"]
+export function splitRefStudioPath(filePath: string): string[] {
+  return filePath.split(sep);
+}
+
+// /some/absolute/path/file.txt -> /some/absolute/path
+export function getParentFolder(filePath: string) {
+  return filePath.split(sep).slice(0, -1).join(sep);
+}
+
+// #####################################################################################
+// FILE Operations: read, write, delete, rename
+// #####################################################################################
+export async function writeFileContent(relativePath: string, textContent: string) {
   try {
-    await removeFile(path);
+    const systemPath = await getSystemPath(relativePath);
+    await writeTextFile(systemPath, textContent);
     return true;
   } catch (err) {
     console.error('Error', err);
@@ -178,33 +199,53 @@ export async function deleteFile(relativePath: string): Promise<boolean> {
   }
 }
 
-export async function renameFile(
-  relativePath: string,
-  newName: string,
-): Promise<{ success: false } | { success: true; newPath: string }> {
-  const path = await getAbsolutePath(relativePath);
-  const parentPath = path.split(sep);
-  parentPath.pop();
-  const stringParentPath = await join(...parentPath);
-
-  const newPath = await join(stringParentPath, newName);
-  try {
-    if (await exists(newPath)) {
-      throw new Error(`Another file with the same name already exists: ${newPath}`);
+export async function readFileContent(file: FileFileEntry): Promise<EditorContent> {
+  const systemPath = await getSystemPath(file.path);
+  switch (file.fileExtension) {
+    case 'xml': {
+      const textContent = await readTextFile(systemPath);
+      return { type: 'xml', textContent };
     }
-    await tauriRenameFile(path, newPath);
-    const newRelativePath = getRelativePath(newPath, await getBaseDir());
+    case 'json': {
+      const textContent = await readTextFile(systemPath);
+      return { type: 'json', textContent };
+    }
+    case 'pdf': {
+      const binaryContent = await readBinaryFile(systemPath);
+      return { type: 'pdf', binaryContent };
+    }
+    default: {
+      const textContent = await readTextFile(systemPath);
+      return { type: 'text', textContent };
+    }
+  }
+}
+
+export async function deleteFile(relativePath: string): Promise<boolean> {
+  const systemPath = await getSystemPath(relativePath);
+  try {
+    await removeFile(systemPath);
+    return true;
+  } catch (err) {
+    console.error('Error', err);
+    return false;
+  }
+}
+
+export async function renameFile(relativePath: string, newName: string): RenameFileResult {
+  const systemPath = await getSystemPath(relativePath);
+  const newSystemPath = await join(getParentFolder(systemPath), newName);
+  try {
+    if (await exists(newSystemPath)) {
+      console.warn(`Another file with the same name already exists: ${newSystemPath}`);
+      return { success: false };
+    }
+    await tauriRenameFile(systemPath, newSystemPath);
+    const newRelativePath = await getRefStudioPath(newSystemPath);
     return { success: true, newPath: newRelativePath };
   } catch (err) {
     console.error('Error', err);
     return { success: false };
   }
 }
-
-async function getAbsolutePath(relativePath: string) {
-  return join(await getBaseDir(), relativePath);
-}
-
-function getRelativePath(absolutePath: string, baseDir: string) {
-  return absolutePath.replace(new RegExp(`^${baseDir}`), '');
-}
+type RenameFileResult = Promise<{ success: false } | { success: true; newPath: string }>;

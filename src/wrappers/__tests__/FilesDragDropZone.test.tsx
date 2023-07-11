@@ -8,7 +8,7 @@ const onFileDrop = vi.fn();
 
 describe('FilesDragDropZone', () => {
   afterEach(() => {
-    vi.resetAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render with children', () => {
