@@ -296,6 +296,14 @@
       "properties": {
         "text": {
           "type": "string"
+        },
+        "n_choices": {
+          "default": 1,
+          "type": "integer"
+        },
+        "temperature": {
+          "default": 0.7,
+          "type": "number"
         }
       },
       "required": [
