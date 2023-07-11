@@ -39,13 +39,10 @@ function applyPatch(
   patch: Partial<ReferenceItem>,
   fn: (patch: Partial<ReferenceItem>) => Partial<Reference>,
 ) {
-  if (!UPDATABLE_FIELDS.includes(field)) {
-    return {};
+  if (UPDATABLE_FIELDS.includes(field) && Object.hasOwn(patch, field)) {
+    return fn(patch);
   }
-  if (!Object.hasOwn(patch, field)) {
-    return {};
-  }
-  return fn(patch);
+  return {};
 }
 
 export async function updateReference(filename: string, patch: Partial<ReferenceItem>) {

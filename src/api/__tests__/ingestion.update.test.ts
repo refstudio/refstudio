@@ -56,4 +56,14 @@ describe('ingestion.update', () => {
     await updateReference(ref1.filename, {});
     expect(vi.mocked(callSidecar).mock.calls).toHaveLength(0);
   });
+
+  it('should throw error if status is error from sidecar call', async () => {
+    const [ref1] = REFERENCES;
+    vi.mocked(callSidecar).mockResolvedValue({
+      status: 'error',
+      message: 'what!',
+    } as UpdateStatusResponse);
+
+    await expect(updateReference(ref1.filename, { title: ref1.title + ' updated' })).rejects.toThrow();
+  });
 });
