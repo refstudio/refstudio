@@ -17,3 +17,5 @@ export interface PaneContent {
   openEditors: EditorData[];
   activeEditor?: { id: EditorId; contentAtoms: EditorContentAtoms };
 }
+
+export type PaneGroupState = Record<PaneId, PaneState>;

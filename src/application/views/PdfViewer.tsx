@@ -1,7 +1,7 @@
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { memo, Ref, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 
 import { PdfEditorContent } from '../../atoms/types/EditorContent';
@@ -48,16 +48,35 @@ export function PdfViewer({ file, pdfViewerRef }: PdfViewerProps) {
     };
   }, [pdfViewerRef, debouncedUpdateWidth]);
 
-  const onDocumentLoadSuccess = (pdf: { numPages: number }) => {
+  const onDocumentLoadSuccess = useCallback((pdf: { numPages: number }) => {
     setNumPages(pdf.numPages);
-  };
+  }, []);
 
   return (
+    <PdfRenderer
+      containerRef={containerRef}
+      data={file.binaryContent}
+      numPages={numPages}
+      pdfViewerWidth={pdfViewerWidth}
+      onDocumentLoadSuccess={onDocumentLoadSuccess}
+    />
+  );
+}
+
+interface PdfRendererProps {
+  containerRef: Ref<HTMLDivElement>;
+  data: Uint8Array;
+  onDocumentLoadSuccess: (pdf: { numPages: number }) => void;
+  numPages: number | null;
+  pdfViewerWidth?: number;
+}
+const PdfRenderer = memo(
+  ({ containerRef, data, onDocumentLoadSuccess, numPages, pdfViewerWidth }: PdfRendererProps) => (
     <div className="pdf-viewer flex h-full w-full flex-col" ref={containerRef}>
       <Document
         className="flex-1 overflow-y-auto"
         externalLinkTarget="_blank"
-        file={{ data: file.binaryContent }}
+        file={{ data }}
         onLoadSuccess={onDocumentLoadSuccess}
       >
         {numPages &&
@@ -66,5 +85,6 @@ export function PdfViewer({ file, pdfViewerRef }: PdfViewerProps) {
           ))}
       </Document>
     </div>
-  );
-}
+  ),
+);
+PdfRenderer.displayName = 'PdfRenderer';

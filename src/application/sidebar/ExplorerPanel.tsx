@@ -5,7 +5,8 @@ import { VscCloseAll, VscSplitHorizontal } from 'react-icons/vsc';
 import { closeAllEditorsAtom, moveEditorToPaneAtom, selectEditorInPaneAtom } from '../../atoms/editorActions';
 import { openFilePathAtom } from '../../atoms/fileEntryActions';
 import { fileExplorerAtom, refreshFileTreeAtom } from '../../atoms/fileExplorerActions';
-import { leftPaneAtom, rightPaneAtom } from '../../atoms/paneActions';
+import { usePaneActiveEditorId } from '../../atoms/hooks/usePaneActiveEditorId';
+import { usePaneOpenEditorsData } from '../../atoms/hooks/usePaneOpenEditorsData';
 import { EditorId, parseEditorId } from '../../atoms/types/EditorData';
 import { PaneId } from '../../atoms/types/PaneGroup';
 import { EditorsList } from '../../components/EditorsList';
@@ -16,8 +17,10 @@ import { isNonNullish } from '../../lib/isNonNullish';
 import { FileExplorer } from './FileExplorer';
 
 export function ExplorerPanel() {
-  const left = useAtomValue(leftPaneAtom);
-  const right = useAtomValue(rightPaneAtom);
+  const leftPaneOpenEditors = usePaneOpenEditorsData('LEFT');
+  const leftPaneActiveEditorId = usePaneActiveEditorId('LEFT');
+  const rightPaneOpenEditors = usePaneOpenEditorsData('RIGHT');
+  const rightPaneActiveEditorId = usePaneActiveEditorId('RIGHT');
   const rootFileExplorerEntry = useAtomValue(fileExplorerAtom);
 
   const selectFileInPane = useSetAtom(selectEditorInPaneAtom);
@@ -37,7 +40,7 @@ export function ExplorerPanel() {
     [moveEditorToPane],
   );
 
-  const hasLeftAndRightPanelsFiles = left.openEditors.length > 0 && right.openEditors.length > 0;
+  const hasLeftAndRightPanelsFiles = leftPaneOpenEditors.length > 0 && rightPaneOpenEditors.length > 0;
 
   return (
     <PanelWrapper title="Explorer">
@@ -46,31 +49,31 @@ export function ExplorerPanel() {
         title="Open Files"
       >
         {hasLeftAndRightPanelsFiles && <div className="ml-4 text-xs font-bold">LEFT</div>}
-        {left.openEditors.length > 0 && (
+        {leftPaneOpenEditors.length > 0 && (
           <EditorsList
-            editors={left.openEditors}
+            editors={leftPaneOpenEditors}
             paddingLeft="1.5rem"
             rightAction={(editorId) => ({
-              onClick: handleMoveEditor({ editorId, fromPaneId: left.id, toPaneId: right.id }),
+              onClick: handleMoveEditor({ editorId, fromPaneId: 'LEFT', toPaneId: 'RIGHT' }),
               VscIcon: VscSplitHorizontal,
-              title: `Move to ${right.id} split pane`,
+              title: 'Move to RIGHT split pane',
             })}
-            selectedEditors={left.activeEditor ? [left.activeEditor.id] : []}
-            onClick={(editorId) => selectFileInPane({ paneId: left.id, editorId })}
+            selectedEditors={leftPaneActiveEditorId ? [leftPaneActiveEditorId] : []}
+            onClick={(editorId) => selectFileInPane({ paneId: 'LEFT', editorId })}
           />
         )}
         {hasLeftAndRightPanelsFiles && <div className="ml-4 text-xs font-bold">RIGHT</div>}
-        {right.openEditors.length > 0 && (
+        {rightPaneOpenEditors.length > 0 && (
           <EditorsList
-            editors={right.openEditors}
+            editors={rightPaneOpenEditors}
             paddingLeft="1.5rem"
             rightAction={(editorId) => ({
-              onClick: handleMoveEditor({ editorId, fromPaneId: right.id, toPaneId: left.id }),
+              onClick: handleMoveEditor({ editorId, fromPaneId: 'RIGHT', toPaneId: 'LEFT' }),
               VscIcon: VscSplitHorizontal,
-              title: `Move to ${right.id} split pane`,
+              title: `Move to RIGHT split pane`,
             })}
-            selectedEditors={right.activeEditor ? [right.activeEditor.id] : []}
-            onClick={(editorId) => selectFileInPane({ paneId: right.id, editorId })}
+            selectedEditors={rightPaneActiveEditorId ? [rightPaneActiveEditorId] : []}
+            onClick={(editorId) => selectFileInPane({ paneId: 'RIGHT', editorId })}
           />
         )}
       </PanelSection>
@@ -78,7 +81,7 @@ export function ExplorerPanel() {
         <FileExplorer
           fileExplorerEntry={rootFileExplorerEntry}
           paddingLeft="1.25rem"
-          selectedFiles={[left.activeEditor?.id, right.activeEditor?.id]
+          selectedFiles={[leftPaneActiveEditorId, rightPaneActiveEditorId]
             .filter(isNonNullish)
             .map((editorId) => parseEditorId(editorId).id)}
           onFileClick={openFile}

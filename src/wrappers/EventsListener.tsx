@@ -3,7 +3,7 @@ import { atom, useAtomValue, useSetAtom } from 'jotai';
 import { activePaneAtom, closeEditorFromPaneAtom } from '../atoms/editorActions';
 import { createFileAtom, deleteFileAtom, renameFileAtom } from '../atoms/fileEntryActions';
 import { fileExplorerEntryPathBeingRenamed } from '../atoms/fileExplorerActions';
-import { activeEditorAtom } from '../atoms/paneActions';
+import { useActiveEditorContentAtoms } from '../atoms/hooks/useActiveEditorContentAtoms';
 import { removeReferencesAtom } from '../atoms/referencesState';
 import { PaneEditorId } from '../atoms/types/PaneGroup';
 import { emitEvent, RefStudioEventPayload } from '../events';
@@ -51,8 +51,8 @@ export function EventsListener({ children }: { children?: React.ReactNode }) {
 }
 
 function useSaveActiveFileListener() {
-  const activeEditor = useAtomValue(activeEditorAtom);
-  const saveFile = useSetAtom(activeEditor?.contentAtoms.saveEditorContentAtom ?? atom(null, asyncNoop));
+  const activeEditor = useActiveEditorContentAtoms();
+  const saveFile = useSetAtom(activeEditor?.saveEditorContentAtom ?? atom(null, asyncNoop));
 
   return () => void saveFile();
 }

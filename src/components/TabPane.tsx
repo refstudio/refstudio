@@ -8,7 +8,7 @@ export function TabPane<K extends string>({
   onCloseClick,
 }: {
   items: { text: string; value: K; isDirty?: boolean }[];
-  value?: K;
+  value: K | null;
   onClick(value: K): void;
   onCloseClick(value: K): void;
 }) {
