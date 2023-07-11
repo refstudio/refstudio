@@ -1,5 +1,14 @@
 import { useEffect, useState } from 'react';
-import { VscChevronDown, VscChevronRight, VscClearAll, VscError, VscInfo, VscWarning } from 'react-icons/vsc';
+import {
+  VscArrowBoth,
+  VscChevronDown,
+  VscChevronRight,
+  VscClearAll,
+  VscClose,
+  VscError,
+  VscInfo,
+  VscWarning,
+} from 'react-icons/vsc';
 
 import { cx } from '../../lib/cx';
 import { NotificationItemType, ReadonlyNotificationItem } from '../types';
@@ -8,14 +17,20 @@ export function NotificationsPopup({
   notifications,
   type,
   onClear,
+  onClose,
 }: {
   notifications: readonly ReadonlyNotificationItem[];
   type?: NotificationItemType;
   onClear: (type?: NotificationItemType) => void;
+  onClose: () => void;
 }) {
+  const [fullWidth, setFullWidth] = useState(false);
   return (
     <div
-      className="absolute bottom-8 right-0 z-notifications flex min-w-[600px] max-w-[200px]  flex-col bg-slate-800"
+      className={cx('absolute bottom-8 right-0 z-notifications flex flex-col bg-slate-800', {
+        'min-w-[600px] max-w-[600px]': !fullWidth,
+        'min-w-[1024px] max-w-full': fullWidth,
+      })}
       data-testid={NotificationsPopup.name}
     >
       <div className="flex justify-between bg-black p-2">
@@ -23,7 +38,16 @@ export function NotificationsPopup({
           {notifications.length > 0 && <span>{type ?? 'ALL'} NOTIFICATIONS</span>}
           {notifications.length === 0 && <span>NO NEW NOTIFICATIONS</span>}
         </strong>
-        <VscClearAll className="cursor-pointer" size={20} title="Clear All" onClick={() => onClear(type)} />
+        <div className="flex gap-2">
+          <VscArrowBoth
+            className="cursor-pointer"
+            size={20}
+            title={fullWidth ? 'Collapse' : 'Expand'}
+            onClick={() => setFullWidth(!fullWidth)}
+          />
+          <VscClearAll className="cursor-pointer" size={20} title="Clear All" onClick={() => onClear(type)} />
+          <VscClose className="cursor-pointer" size={20} title="Close" onClick={onClose} />
+        </div>
       </div>
       <div className="flex max-h-[600px] flex-col divide-y divide-slate-600 overflow-auto" role="treegrid">
         {notifications
@@ -73,7 +97,7 @@ function NotificationItemWidget({ item, expanded }: { item: ReadonlyNotification
         )}
       </div>
       {showDetails && hasDetails && (
-        <pre className="max-h-[200px] overflow-auto bg-slate-900/75 p-2 text-sm">{item.details}</pre>
+        <pre className="max-h-[300px] overflow-auto bg-slate-900/75 p-2 text-sm">{item.details}</pre>
       )}
     </div>
   );

@@ -35,7 +35,7 @@ export function interceptConsoleMessages(interceptLog = true, interceptWarning =
 
         if (message instanceof Error) {
           // Sometimes the `message` is an Error.
-          notifyErr(message);
+          notifyErr(message, undefined, formatOptionalParams(optionalParams));
         } else if (firstOptional instanceof Error) {
           // Sometimes the `firstOptional` is an Error. Let's use that and override the title
           notifyErr(firstOptional, prefixTitle(message));
@@ -61,6 +61,13 @@ function formatOptionalParams(optionalParams: unknown[]) {
     return undefined;
   }
 
-  const output = optionalParams.map((param) => JSON.stringify(param, null, 2)).join('\n');
+  const output = optionalParams
+    .map((param) => {
+      if (typeof param === 'string') {
+        return param;
+      }
+      return JSON.stringify(param, null, 2);
+    })
+    .join('\n');
   return output;
 }

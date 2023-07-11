@@ -145,6 +145,17 @@ module.exports = {
     'testing-library/prefer-presence-queries': 'error',
     'testing-library/prefer-screen-queries': 'error',
     'testing-library/prefer-wait-for': 'error',
+    'import/no-restricted-paths': [
+      'error',
+      {
+        zones: [
+          {
+            from: './src/atoms/core',
+            target: './src/!(atoms)/**/*',
+          },
+        ],
+      },
+    ],
     'jsdoc/check-alignment': 'error',
     'jsdoc/check-indentation': 'off',
     'jsdoc/tag-lines': [

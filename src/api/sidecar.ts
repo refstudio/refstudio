@@ -30,7 +30,7 @@ export async function callSidecar<T extends keyof CliCommands>(
   const output = await command.execute();
   if (output.stderr) {
     const error = new Error('Error executing sidecar command');
-    console.log(error, output.stderr);
+    console.error(error, output.stderr);
     throw error;
   }
   console.log('sidecar output: ', output.stdout);
