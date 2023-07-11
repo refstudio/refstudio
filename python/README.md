@@ -221,6 +221,31 @@ $ poetry run python main.py rewrite '{"text": "In the cycling world, power meter
 ]
 ```
 
+### Text Completion
+
+Text Completion is called within the editor pane. It allows a user to trigger the LLM to write the next block of text in the document.
+
+It takes an input of text with additional optional parameters and returns a list of rewrite `choices`.
+
+To run `complete_text`:
+
+```bash
+
+$ poetry run python main.py complete_text "{\"text\": \"Machine learning systems automatically learn programs from data. This is often  \", \"n_choices\": 2, \"temperature\": 0.9, \"max_tokens\": 256}" | jq
+
+# Response
+[
+  {
+    "index": 0,
+    "text": "referred to as the process of training. During training, these systems are exposed to a vast amount of data and utilize various algorithms to extract patterns and insights. The goal of machine learning is to enable these systems to automatically make informed decisions or predictions without being explicitly programmed for each scenario."
+  },
+  {
+    "index": 1,
+    "text": "Machine learning systems automatically learn programs from data. This is often achieved through a process called training, where the machine learning algorithm is provided with a large amount of labeled data and guided to understand patterns and relationships within the dataset."
+  }
+]
+```
+
 ### Chat
 
 Chat allows a user to interact with their set of Reference documents (uploaded PDFs).
