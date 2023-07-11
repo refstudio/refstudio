@@ -1,5 +1,4 @@
-import { EditorContentAtoms } from './EditorContentAtoms';
-import { EditorData, EditorId } from './EditorData';
+import { EditorId } from './EditorData';
 
 export type PaneId = 'LEFT' | 'RIGHT';
 
@@ -10,12 +9,6 @@ export interface PaneEditorId {
 export interface PaneState {
   openEditorIds: EditorId[];
   activeEditorId?: EditorId;
-}
-
-export interface PaneContent {
-  id: PaneId;
-  openEditors: EditorData[];
-  activeEditor?: { id: EditorId; contentAtoms: EditorContentAtoms };
 }
 
 export type PaneGroupState = Record<PaneId, PaneState>;
