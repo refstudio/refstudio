@@ -33,6 +33,9 @@ if __name__ == '__main__':
     elif args.command == "rewrite":
         rewrite.summarize(param_obj)
 
+    elif args.command == "complete_text":
+        rewrite.complete_text(param_obj)
+
     elif args.command == "chat":
         chat.ask_question(param_obj)
 

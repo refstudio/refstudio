@@ -116,6 +116,15 @@ class RewriteChoice(RefStudioModel):
     text: str
 
 
+class TextCompletionRequest(RefStudioModel):
+    text: str
+    n_choices: int = 1
+    temperature: float = 0.7
+    max_tokens: int = 512
+    title: str = None
+    abstract: str = None
+
+
 class ChatRequest(RefStudioModel):
     text: str
     n_choices: int = 1
@@ -135,6 +144,8 @@ class CliCommands(RefStudioModel):
     """Retrieve ingested PDF references"""
     rewrite: tuple[RewriteRequest, list[RewriteChoice]]
     """"Rewrites a block of text in a more concise manner"""
+    complete_text: tuple[TextCompletionRequest, list[RewriteChoice]]
+    """Completes a body of text"""
     chat: tuple[ChatRequest, list[ChatResponseChoice]]
     """Chat with the AI"""
     update: tuple[ReferenceUpdate, UpdateStatusResponse]
