@@ -43,10 +43,7 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
   const gridRef = useRef<AgGridReact<ReferenceItem>>(null);
 
   const handleCellValueChanged = useCallback(
-    (params: NewValueParams<ReferenceItem>) => {
-      console.log('EDIT', params.oldValue, params.newValue);
-      void updateReference(params.data.id, params.data);
-    },
+    (params: NewValueParams<ReferenceItem>) => void updateReference(params.data.id, params.data),
     [updateReference],
   );
 
