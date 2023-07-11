@@ -4,6 +4,7 @@ import { ReferenceItem, ReferenceItemStatus } from '../../../../types/ReferenceI
 import { ReferencesItemStatusLabel } from '../../components/ReferencesItemStatusLabel';
 
 export function StatusCell({ value }: ICellRendererParams<ReferenceItem, ReferenceItemStatus>) {
+  /* c8 ignore next 3 */
   if (!value) {
     return null;
   }

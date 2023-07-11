@@ -9,6 +9,7 @@ export function ActionsCell({ data: reference }: ICellRendererParams<ReferenceIt
   const openReference = useSetAtom(openReferenceAtom);
   const openReferencePdf = useSetAtom(openReferencePdfAtom);
 
+  /* c8 ignore next 3 */
   if (!reference) {
     return null;
   }
