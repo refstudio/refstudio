@@ -11,12 +11,13 @@ import { act } from '../../test/test-utils';
 import { activePaneAtom } from '../editorActions';
 import { createFileAtom, deleteFileAtom, openFileEntryAtom, renameFileAtom } from '../fileEntryActions';
 import { refreshFileTreeAtom } from '../fileExplorerActions';
-import { activePaneContentAtom } from '../paneActions';
+import { usePaneActiveEditorContentAtoms } from '../hooks/usePaneActiveEditorContentAtoms';
+import { usePaneActiveEditorId } from '../hooks/usePaneActiveEditorId';
+import { usePaneOpenEditorsData } from '../hooks/usePaneOpenEditorsData';
 import { EditorContent } from '../types/EditorContent';
 import { buildEditorId } from '../types/EditorData';
-import { PaneId } from '../types/PaneGroup';
 import { makeFile, makeFileAndEditor, makeFolder } from './test-fixtures';
-import { runGetAtomHook, runSetAtomHook } from './test-utils';
+import { runGetAtomHook, runHookWithJotaiProvider, runSetAtomHook } from './test-utils';
 
 vi.mock('../../io/filesystem');
 
@@ -36,10 +37,9 @@ describe('fileEntryActions', () => {
 
     act(() => createFile.current());
 
-    const paneContent = store.get(activePaneContentAtom);
-    expect(paneContent.id).toBe<PaneId>('LEFT');
-    expect(paneContent.activeEditor).toBeDefined();
-    expect(paneContent.activeEditor!.id).toMatchInlineSnapshot('"refstudio://text//Untitled-1"');
+    const leftPaneActiveEditorId = runHookWithJotaiProvider(() => usePaneActiveEditorId('LEFT'), store).current;
+    expect(leftPaneActiveEditorId).not.toBeNull();
+    expect(leftPaneActiveEditorId).toMatchInlineSnapshot('"refstudio://text//Untitled-1"');
   });
 
   it('should create a file with the first available name', async () => {
@@ -52,10 +52,9 @@ describe('fileEntryActions', () => {
       createFile.current();
     });
 
-    const paneContent = store.get(activePaneContentAtom);
-    expect(paneContent.id).toBe<PaneId>('LEFT');
-    expect(paneContent.activeEditor).toBeDefined();
-    expect(paneContent.activeEditor!.id).toMatchInlineSnapshot('"refstudio://text//Untitled-3"');
+    const leftPaneActiveEditorId = runHookWithJotaiProvider(() => usePaneActiveEditorId('LEFT'), store).current;
+    expect(leftPaneActiveEditorId).not.toBeNull();
+    expect(leftPaneActiveEditorId).toMatchInlineSnapshot('"refstudio://text//Untitled-3"');
   });
 
   it('should delete the file', async () => {
@@ -131,10 +130,11 @@ describe('fileEntryActions', () => {
 
     store.set(openFileEntryAtom, fileEntry);
 
-    const activePaneContent = runGetAtomHook(activePaneContentAtom, store);
-    expect(activePaneContent.current.openEditors).toHaveLength(1);
-    expect(activePaneContent.current.openEditors[0].id).toBe(buildEditorId('text', fileEntry.path));
-    expect(activePaneContent.current.openEditors[0].title).toBe(fileEntry.name);
+    const leftPaneOpenEditorsData = runHookWithJotaiProvider(() => usePaneOpenEditorsData('LEFT'), store);
+    expect(leftPaneOpenEditorsData.current).toHaveLength(1);
+    expect(leftPaneOpenEditorsData.current[0].id).toBe(buildEditorId('text', fileEntry.path));
+    expect(leftPaneOpenEditorsData.current[0].title).toBe(fileEntry.name);
+    expect(leftPaneOpenEditorsData.current[0].isDirty).toBeFalsy();
 
     const newName = 'Updated File.txt';
     const newPath = '/new/path/to/file.txt';
@@ -145,9 +145,9 @@ describe('fileEntryActions', () => {
       await renameFile.current({ filePath: fileEntry.path, newName });
     });
 
-    expect(activePaneContent.current.openEditors).toHaveLength(1);
-    expect(activePaneContent.current.openEditors[0].id).toBe(buildEditorId('text', newPath));
-    expect(activePaneContent.current.openEditors[0].title).toBe(newName);
+    expect(leftPaneOpenEditorsData.current).toHaveLength(1);
+    expect(leftPaneOpenEditorsData.current[0].id).toBe(buildEditorId('text', newPath));
+    expect(leftPaneOpenEditorsData.current[0].title).toBe(newName);
   });
 
   it('should update editor content when renaming file', async () => {
@@ -161,14 +161,19 @@ describe('fileEntryActions', () => {
 
     store.set(openFileEntryAtom, fileEntry);
 
-    const activePaneContent = runGetAtomHook(activePaneContentAtom, store);
-    expect(activePaneContent.current.activeEditor).toBeDefined();
-    expect(activePaneContent.current.activeEditor!.id).toBe(buildEditorId('text', fileEntry.path));
-    const editorId = store.get(activePaneContent.current.activeEditor!.contentAtoms.editorIdAtom);
+    const leftPaneActiveEditorId = runHookWithJotaiProvider(() => usePaneActiveEditorId('LEFT'), store);
+    expect(leftPaneActiveEditorId.current).not.toBeNull();
+    expect(leftPaneActiveEditorId.current).toBe(buildEditorId('text', fileEntry.path));
+
+    const leftPaneActiveEditorContentAtoms = runHookWithJotaiProvider(
+      () => usePaneActiveEditorContentAtoms('LEFT'),
+      store,
+    ).current!;
+    const editorId = store.get(leftPaneActiveEditorContentAtoms.editorIdAtom);
     expect(editorId).toBe(buildEditorId('text', fileEntry.path));
     await act(async () => {
-      store.set(activePaneContent.current.activeEditor!.contentAtoms.updateEditorContentBufferAtom, editorContent);
-      await store.set(activePaneContent.current.activeEditor!.contentAtoms.saveEditorContentAtom);
+      store.set(leftPaneActiveEditorContentAtoms.updateEditorContentBufferAtom, editorContent);
+      await store.set(leftPaneActiveEditorContentAtoms.saveEditorContentAtom);
     });
     expect(writeFileContent).toHaveBeenCalledTimes(1);
     expect(writeFileContent).toHaveBeenCalledWith(fileEntry.path, textContent);
@@ -184,13 +189,13 @@ describe('fileEntryActions', () => {
       await renameFile.current({ filePath: fileEntry.path, newName });
     });
 
-    expect(activePaneContent.current.activeEditor).toBeDefined();
-    expect(activePaneContent.current.activeEditor!.id).toBe(buildEditorId('text', newPath));
-    const newEditorId = store.get(activePaneContent.current.activeEditor!.contentAtoms.editorIdAtom);
+    expect(leftPaneActiveEditorId.current).not.toBeNull();
+    expect(leftPaneActiveEditorId.current).toBe(buildEditorId('text', newPath));
+    const newEditorId = store.get(leftPaneActiveEditorContentAtoms.editorIdAtom);
     expect(newEditorId).toBe(buildEditorId('text', newPath));
     await act(async () => {
-      store.set(activePaneContent.current.activeEditor!.contentAtoms.updateEditorContentBufferAtom, editorContent);
-      await store.set(activePaneContent.current.activeEditor!.contentAtoms.saveEditorContentAtom);
+      store.set(leftPaneActiveEditorContentAtoms.updateEditorContentBufferAtom, editorContent);
+      await store.set(leftPaneActiveEditorContentAtoms.saveEditorContentAtom);
     });
     expect(writeFileContent).toHaveBeenCalledTimes(1);
     expect(writeFileContent).toHaveBeenCalledWith(newPath, textContent);
@@ -220,22 +225,31 @@ describe('fileEntryActions', () => {
     await store.set(refreshFileTreeAtom);
 
     store.set(openFileEntryAtom, fileEntry);
-    const activePaneContent = runGetAtomHook(activePaneContentAtom, store);
 
     vi.mocked(renameFileFromDisk).mockResolvedValueOnce({ success: false });
 
     const newName = 'Updated File.txt';
+
+    const leftPaneOpenEditorsData = runHookWithJotaiProvider(() => usePaneOpenEditorsData('LEFT'), store);
+    const leftPaneActiveEditorId = runHookWithJotaiProvider(() => usePaneActiveEditorId('LEFT'), store);
+
+    expect(leftPaneOpenEditorsData.current).toHaveLength(1);
+    expect(leftPaneOpenEditorsData.current[0].id).toBe(buildEditorId('text', fileEntry.path));
+    expect(leftPaneOpenEditorsData.current[0].title).toBe(fileEntry.name);
+
+    expect(leftPaneActiveEditorId.current).not.toBeNull();
+    expect(leftPaneActiveEditorId.current).toBe(buildEditorId('text', fileEntry.path));
 
     const renameFile = runSetAtomHook(renameFileAtom, store);
     await act(async () => {
       await renameFile.current({ filePath: fileEntry.path, newName });
     });
 
-    expect(activePaneContent.current.openEditors).toHaveLength(1);
-    expect(activePaneContent.current.openEditors[0].id).toBe(buildEditorId('text', fileEntry.path));
-    expect(activePaneContent.current.openEditors[0].title).toBe(fileEntry.name);
+    expect(leftPaneOpenEditorsData.current).toHaveLength(1);
+    expect(leftPaneOpenEditorsData.current[0].id).toBe(buildEditorId('text', fileEntry.path));
+    expect(leftPaneOpenEditorsData.current[0].title).toBe(fileEntry.name);
 
-    expect(activePaneContent.current.activeEditor).toBeDefined();
-    expect(activePaneContent.current.activeEditor!.id).toBe(buildEditorId('text', fileEntry.path));
+    expect(leftPaneActiveEditorId.current).not.toBeNull();
+    expect(leftPaneActiveEditorId.current).toBe(buildEditorId('text', fileEntry.path));
   });
 });

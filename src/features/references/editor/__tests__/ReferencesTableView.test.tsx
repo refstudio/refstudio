@@ -1,7 +1,6 @@
 import { createStore } from 'jotai';
 
-import { runGetAtomHook } from '../../../../atoms/__tests__/test-utils';
-import { activePaneContentAtom } from '../../../../atoms/paneActions';
+import { activeEditorIdAtom } from '../../../../atoms/paneActions';
 import { setReferencesAtom } from '../../../../atoms/referencesState';
 import { buildEditorId } from '../../../../atoms/types/EditorData';
 import { emitEvent, RefStudioEventName, RefStudioEventPayload } from '../../../../events';
@@ -97,10 +96,9 @@ describe('ReferencesTableView component', () => {
     expect(buttons).toHaveLength(REFERENCES.length);
     await user.click(buttons[0]);
 
-    const active = runGetAtomHook(activePaneContentAtom, store);
-
-    expect(active.current.activeEditor?.id).toBeDefined();
-    expect(active.current.activeEditor?.id).toBe(buildEditorId('reference', ref1.id));
+    const activeEditorId = store.get(activeEditorIdAtom);
+    expect(activeEditorId).toBeDefined();
+    expect(activeEditorId).toBe(buildEditorId('reference', ref1.id));
   });
 
   it('should open reference PDF details on click in icon Open Reference PDF', async () => {
@@ -110,10 +108,9 @@ describe('ReferencesTableView component', () => {
     expect(buttons).toHaveLength(REFERENCES.length);
     await user.click(buttons[0]);
 
-    const active = runGetAtomHook(activePaneContentAtom, store);
-
-    expect(active.current.activeEditor?.id).toBeDefined();
-    expect(active.current.activeEditor?.id).toBe(buildEditorId('pdf', ref1.filepath));
+    const activeEditorId = store.get(activeEditorIdAtom);
+    expect(activeEditorId).toBeDefined();
+    expect(activeEditorId).toBe(buildEditorId('pdf', ref1.filepath));
   });
 
   it(`should not emit ${'refstudio://references/remove' as RefStudioEventName} with NO selections`, async () => {

@@ -5,14 +5,15 @@ import { Loadable } from 'jotai/vanilla/utils/loadable';
 import { readAllProjectFiles, readFileContent, writeFileContent } from '../../io/filesystem';
 import { activePaneAtom, closeEditorFromPaneAtom, moveEditorToPaneAtom } from '../editorActions';
 import { openFileEntryAtom } from '../fileEntryActions';
-import { activeEditorAtom, activeEditorIdAtom, activePaneContentAtom, focusPaneAtom } from '../paneActions';
+import { useActiveEditorContentAtoms } from '../hooks/useActiveEditorContentAtoms';
+import { activeEditorIdAtom, focusPaneAtom } from '../paneActions';
 import { EditorContent } from '../types/EditorContent';
 import { EditorContentAtoms } from '../types/EditorContentAtoms';
 import { buildEditorId, EditorData } from '../types/EditorData';
 import { FileFileEntry } from '../types/FileEntry';
 import { PaneId } from '../types/PaneGroup';
 import { makeFileAndEditor } from './test-fixtures';
-import { runGetAtomHook, runSetAtomHook } from './test-utils';
+import { runGetAtomHook, runHookWithJotaiProvider, runSetAtomHook } from './test-utils';
 
 vi.mock('../../io/filesystem');
 
@@ -32,10 +33,10 @@ describe('paneActions', () => {
     store = createStore();
     store.set(openFileEntryAtom, fileEntry);
 
-    const pane = store.get(activePaneContentAtom);
-    expect(pane.activeEditor).toBeDefined();
+    const activeEditorContentAtoms = runHookWithJotaiProvider(useActiveEditorContentAtoms, store).current;
+    expect(activeEditorContentAtoms).not.toBeNull();
 
-    fileContentAtoms = pane.activeEditor!.contentAtoms;
+    fileContentAtoms = activeEditorContentAtoms!;
   });
 
   afterEach(() => {
@@ -94,7 +95,7 @@ describe('paneActions', () => {
   });
 
   it('should return the content of the active pane', () => {
-    const activePane = runGetAtomHook(activePaneContentAtom, store);
+    const activePane = runGetAtomHook(activePaneAtom, store);
     const focusPanel = runSetAtomHook(focusPaneAtom, store);
 
     const paneToFocus: PaneId = activePane.current.id === 'LEFT' ? 'RIGHT' : 'LEFT';
@@ -228,11 +229,13 @@ describe('paneActions', () => {
   });
 
   it('should return the active editor', () => {
-    const activeEditor = runGetAtomHook(activeEditorAtom, store);
+    const activeEditorId = store.get(activeEditorIdAtom);
+    const activeEditorContentAtoms = runHookWithJotaiProvider(useActiveEditorContentAtoms, store).current;
 
-    expect(activeEditor.current).not.toBeNull();
-    expect(activeEditor.current!.id).toBe(buildEditorId('text', fileEntry.path));
-    expect(activeEditor.current!.contentAtoms).toBe(fileContentAtoms);
+    expect(activeEditorId).not.toBeNull();
+    expect(activeEditorId).toBe(buildEditorId('text', fileEntry.path));
+    expect(activeEditorContentAtoms).not.toBeNull();
+    expect(activeEditorContentAtoms).toBe(fileContentAtoms);
   });
 
   it('should return the active editor id', () => {

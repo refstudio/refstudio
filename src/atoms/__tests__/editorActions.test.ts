@@ -3,8 +3,8 @@ import { createStore, useAtomValue } from 'jotai';
 
 import { readFileContent } from '../../io/filesystem';
 import { ReferenceItem } from '../../types/ReferenceItem';
+import { activePaneIdAtom } from '../core/activePane';
 import {
-  activePaneAtom,
   closeAllEditorsAtom,
   closeEditorFromAllPanesAtom,
   closeEditorFromPaneAtom,
@@ -13,103 +13,111 @@ import {
   selectEditorInPaneAtom,
 } from '../editorActions';
 import { openFileEntryAtom, openFilePathAtom } from '../fileEntryActions';
-import { leftPaneAtom, rightPaneAtom } from '../paneActions';
+import { usePaneActiveEditorContentAtoms } from '../hooks/usePaneActiveEditorContentAtoms';
+import { usePaneActiveEditorId } from '../hooks/usePaneActiveEditorId';
+import { usePaneOpenEditorsCount } from '../hooks/usePaneOpenEditorsCount';
+import { usePaneOpenEditorsData } from '../hooks/usePaneOpenEditorsData';
 import { setReferencesAtom } from '../referencesState';
-import { buildEditorId } from '../types/EditorData';
+import { buildEditorId, EditorData, EditorId } from '../types/EditorData';
 import { PaneId } from '../types/PaneGroup';
 import { makeFileAndEditor, makeFolder } from './test-fixtures';
-import { runGetAtomHook, runSetAtomHook } from './test-utils';
+import { runHookWithJotaiProvider, runSetAtomHook } from './test-utils';
 
 vi.mock('../../io/filesystem');
 
 describe('editorActions', () => {
+  let store: ReturnType<typeof createStore>;
+
+  let leftPaneOpenEditorsCount: { current: number };
+  let leftPaneActiveEditorId: { current: EditorId | null };
+  let leftPaneOpenEditorsData: { current: EditorData[] };
+
+  let rightPaneOpenEditorsCount: { current: number };
+  let rightPaneActiveEditorId: { current: EditorId | null };
+  let rightPaneOpenEditorsData: { current: EditorData[] };
+
+  beforeEach(() => {
+    store = createStore();
+    leftPaneOpenEditorsCount = runHookWithJotaiProvider(() => usePaneOpenEditorsCount('LEFT'), store);
+    leftPaneActiveEditorId = runHookWithJotaiProvider(() => usePaneActiveEditorId('LEFT'), store);
+    leftPaneOpenEditorsData = runHookWithJotaiProvider(() => usePaneOpenEditorsData('LEFT'), store);
+
+    rightPaneOpenEditorsCount = runHookWithJotaiProvider(() => usePaneOpenEditorsCount('RIGHT'), store);
+    rightPaneActiveEditorId = runHookWithJotaiProvider(() => usePaneActiveEditorId('RIGHT'), store);
+    rightPaneOpenEditorsData = runHookWithJotaiProvider(() => usePaneOpenEditorsData('RIGHT'), store);
+  });
+
   afterEach(() => {
     vi.clearAllMocks();
   });
 
   it('should be empty by default', () => {
-    const store = createStore();
-    const leftPane = runGetAtomHook(leftPaneAtom, store);
-    const rightPane = runGetAtomHook(rightPaneAtom, store);
-
-    expect(leftPane.current.openEditors.length).toBe(0);
-    expect(leftPane.current.activeEditor).toBeUndefined();
-    expect(rightPane.current.openEditors.length).toBe(0);
-    expect(rightPane.current.activeEditor).toBeUndefined();
+    expect(leftPaneOpenEditorsCount.current).toBe(0);
+    expect(leftPaneActiveEditorId.current).toBeNull();
+    expect(rightPaneOpenEditorsCount.current).toBe(0);
+    expect(rightPaneActiveEditorId.current).toBeNull();
   });
 
   it('should open TXT file in the left pane, and be active', () => {
-    const store = createStore();
     const openFile = runSetAtomHook(openFileEntryAtom, store);
-    const leftPane = runGetAtomHook(leftPaneAtom, store);
 
     const { fileEntry: fileToOpen, editorData } = makeFileAndEditor('file.txt');
-    expect(leftPane.current.openEditors).not.toContainEqual(editorData);
-    expect(leftPane.current.activeEditor).toBeUndefined();
+    expect(leftPaneOpenEditorsCount.current).toBe(0);
+    expect(leftPaneActiveEditorId.current).toBeNull();
 
     act(() => openFile.current(fileToOpen));
 
-    expect(leftPane.current.id).toBe('LEFT' as PaneId);
-    expect(leftPane.current.openEditors.length).toBe(1);
-    expect(leftPane.current.openEditors).toContainEqual(editorData);
-    expect(leftPane.current.activeEditor!.id).toBe(editorData.id);
+    expect(store.get(activePaneIdAtom)).toBe<PaneId>('LEFT');
+    expect(leftPaneOpenEditorsCount.current).toBe(1);
+    expect(leftPaneOpenEditorsData.current[0]).toStrictEqual(editorData);
+    expect(leftPaneActiveEditorId.current).toBe(editorData.id);
   });
 
   it('should open TXT filePath in the left pane, and be active', () => {
-    const store = createStore();
     const openFile = runSetAtomHook(openFilePathAtom, store);
-    const leftPane = runGetAtomHook(leftPaneAtom, store);
-
-    expect(leftPane.current.activeEditor).toBeUndefined();
 
     const filePath = '/some/absolute/path/file.txt';
     act(() => openFile.current(filePath));
 
-    expect(leftPane.current.id).toBe('LEFT' as PaneId);
-    expect(leftPane.current.openEditors.length).toBe(1);
+    expect(store.get(activePaneIdAtom)).toBe<PaneId>('LEFT');
+    expect(leftPaneOpenEditorsCount.current).toBe(1);
 
     const editorId = buildEditorId('text', filePath);
-    expect(leftPane.current.activeEditor!.id).toBe(editorId);
+    expect(leftPaneActiveEditorId.current).toBe(editorId);
   });
 
   it('should open PDF file in the right pane, and be active', () => {
-    const store = createStore();
     const openFile = runSetAtomHook(openFileEntryAtom, store);
-    const rightPane = runGetAtomHook(rightPaneAtom, store);
 
     const { fileEntry: fileToOpen, editorData } = makeFileAndEditor('file.pdf');
-    expect(rightPane.current.openEditors).not.toContainEqual(fileToOpen);
-    expect(rightPane.current.activeEditor).toBeUndefined();
+    expect(rightPaneOpenEditorsData.current).not.toContainEqual(fileToOpen);
+    expect(rightPaneActiveEditorId.current).toBeNull();
 
     act(() => openFile.current(fileToOpen));
 
-    expect(rightPane.current.id).toBe('RIGHT' as PaneId);
-    expect(rightPane.current.openEditors.length).toBe(1);
-    expect(rightPane.current.openEditors).toContainEqual(editorData);
-    expect(rightPane.current.activeEditor!.id).toBe(editorData.id);
+    expect(store.get(activePaneIdAtom)).toBe<PaneId>('RIGHT');
+    expect(rightPaneOpenEditorsCount.current).toBe(1);
+    expect(rightPaneOpenEditorsData.current).toContainEqual(editorData);
+    expect(rightPaneActiveEditorId.current).toBe(editorData.id);
   });
 
   it('should open file once in same panel', () => {
-    const store = createStore();
     const openFile = runSetAtomHook(openFileEntryAtom, store);
-    const leftPane = runGetAtomHook(leftPaneAtom, store);
 
     const { fileEntry: fileToOpen } = makeFileAndEditor('file.txt');
-    expect(leftPane.current.openEditors.length).toBe(0);
+    expect(leftPaneOpenEditorsCount.current).toBe(0);
 
     act(() => {
       openFile.current(fileToOpen);
       openFile.current(fileToOpen);
     });
 
-    expect(leftPane.current.openEditors.length).toBe(1);
+    expect(leftPaneOpenEditorsCount.current).toBe(1);
   });
 
   it('should open Reference in the right pane, and make it active', () => {
-    const store = createStore();
     const setReferences = runSetAtomHook(setReferencesAtom, store);
     const openReference = runSetAtomHook(openReferenceAtom, store);
-    const rightPane = runGetAtomHook(rightPaneAtom, store);
 
     const reference: ReferenceItem = {
       id: 'reference',
@@ -122,25 +130,23 @@ describe('editorActions', () => {
     };
     const editorId = buildEditorId('reference', reference.id);
 
-    expect(rightPane.current.openEditors.map(({ id }) => id)).not.toContain(editorId);
-    expect(rightPane.current.activeEditor).toBeUndefined();
+    expect(rightPaneOpenEditorsData.current.map(({ id }) => id)).not.toContain(editorId);
+    expect(rightPaneActiveEditorId.current).toBeNull();
 
     act(() => {
       setReferences.current([reference]);
       openReference.current(reference.id);
     });
 
-    expect(rightPane.current.id).toBe<PaneId>('RIGHT');
-    expect(rightPane.current.openEditors.length).toBe(1);
-    expect(rightPane.current.openEditors.map(({ id }) => id)).toContain(editorId);
-    expect(rightPane.current.activeEditor!.id).toBe(editorId);
+    expect(store.get(activePaneIdAtom)).toBe<PaneId>('RIGHT');
+    expect(rightPaneOpenEditorsCount.current).toBe(1);
+    expect(rightPaneOpenEditorsData.current.map(({ id }) => id)).toContain(editorId);
+    expect(rightPaneActiveEditorId.current).toBe(editorId);
   });
 
   it('should close opened file in same pane', () => {
-    const store = createStore();
     const openFile = runSetAtomHook(openFileEntryAtom, store);
     const closeFileFromPane = runSetAtomHook(closeEditorFromPaneAtom, store);
-    const leftPane = runGetAtomHook(leftPaneAtom, store);
 
     const { fileEntry: fileA, editorData: editorDataA } = makeFileAndEditor('fileA.txt');
     const { fileEntry: fileB } = makeFileAndEditor('fileB.txt');
@@ -149,21 +155,18 @@ describe('editorActions', () => {
       openFile.current(fileA);
       openFile.current(fileB);
     });
-    expect(leftPane.current.openEditors.length).toBe(2);
+    expect(leftPaneOpenEditorsCount.current).toBe(2);
 
     act(() => {
-      closeFileFromPane.current({ paneId: leftPane.current.id, editorId: editorDataA.id });
+      closeFileFromPane.current({ paneId: 'LEFT', editorId: editorDataA.id });
     });
 
-    expect(leftPane.current.openEditors.length).toBe(1);
+    expect(leftPaneOpenEditorsCount.current).toBe(1);
   });
 
   it('should close opened files from all panes', () => {
-    const store = createStore();
     const openFile = runSetAtomHook(openFileEntryAtom, store);
     const closeEditorFromAllPanes = runSetAtomHook(closeEditorFromAllPanesAtom, store);
-    const leftPane = runGetAtomHook(leftPaneAtom, store);
-    const rightPane = runGetAtomHook(rightPaneAtom, store);
 
     const { fileEntry: fileA, editorData: editorDataA } = makeFileAndEditor('fileA.txt');
     const { fileEntry: fileB, editorData: editorDataB } = makeFileAndEditor('fileB.pdf');
@@ -172,23 +175,21 @@ describe('editorActions', () => {
       openFile.current(fileA);
       openFile.current(fileB);
     });
-    expect(leftPane.current.openEditors.length).toBe(1);
-    expect(rightPane.current.openEditors.length).toBe(1);
+    expect(leftPaneOpenEditorsCount.current).toBe(1);
+    expect(rightPaneOpenEditorsCount.current).toBe(1);
 
     act(() => {
       closeEditorFromAllPanes.current(editorDataA.id);
       closeEditorFromAllPanes.current(editorDataB.id);
     });
 
-    expect(leftPane.current.openEditors.length).toBe(0);
-    expect(rightPane.current.openEditors.length).toBe(0);
+    expect(leftPaneOpenEditorsCount.current).toBe(0);
+    expect(rightPaneOpenEditorsCount.current).toBe(0);
   });
 
   it('should not fail trying to close file that is not opened in pane', () => {
-    const store = createStore();
     const openFile = runSetAtomHook(openFileEntryAtom, store);
     const closeFileFromPane = runSetAtomHook(closeEditorFromPaneAtom, store);
-    const leftPane = runGetAtomHook(leftPaneAtom, store);
 
     const { fileEntry: fileOpened, editorData: openedEditorData } = makeFileAndEditor('fileA.txt');
     const { editorData: notOpenedEditorData } = makeFileAndEditor('fileB.txt');
@@ -197,35 +198,31 @@ describe('editorActions', () => {
       openFile.current(fileOpened);
     });
 
-    expect(leftPane.current.openEditors).toContainEqual(openedEditorData);
-    expect(leftPane.current.openEditors).not.toContainEqual(notOpenedEditorData);
+    expect(leftPaneOpenEditorsData.current).toContainEqual(openedEditorData);
+    expect(leftPaneOpenEditorsData.current).not.toContainEqual(notOpenedEditorData);
 
     act(() => {
-      closeFileFromPane.current({ paneId: leftPane.current.id, editorId: notOpenedEditorData.id });
+      closeFileFromPane.current({ paneId: 'LEFT', editorId: notOpenedEditorData.id });
     });
 
-    expect(leftPane.current.openEditors).toContainEqual(openedEditorData);
-    expect(leftPane.current.openEditors).not.toContainEqual(notOpenedEditorData);
+    expect(leftPaneOpenEditorsData.current).toContainEqual(openedEditorData);
+    expect(leftPaneOpenEditorsData.current).not.toContainEqual(notOpenedEditorData);
   });
 
   it('should not fail trying to select file that is not opened in pane', () => {
-    const store = createStore();
     const selectFileInPane = runSetAtomHook(selectEditorInPaneAtom, store);
-    const leftPane = runGetAtomHook(leftPaneAtom, store);
 
     const { editorData } = makeFileAndEditor('fileA.txt');
 
     act(() => {
-      selectFileInPane.current({ paneId: leftPane.current.id, editorId: editorData.id });
+      selectFileInPane.current({ paneId: 'LEFT', editorId: editorData.id });
     });
 
-    expect(leftPane.current.openEditors).not.toContainEqual(editorData);
+    expect(leftPaneOpenEditorsData.current).not.toContainEqual(editorData);
   });
 
   it('should not fail when trying to open a reference that does not exist', () => {
-    const store = createStore();
     const openReference = runSetAtomHook(openReferenceAtom, store);
-    const rightPane = runGetAtomHook(rightPaneAtom, store);
 
     const reference: ReferenceItem = {
       id: 'reference',
@@ -238,23 +235,20 @@ describe('editorActions', () => {
     };
     const editorId = buildEditorId('reference', reference.id);
 
-    expect(rightPane.current.openEditors.map(({ id }) => id)).not.toContainEqual(editorId);
-    expect(rightPane.current.activeEditor).toBeUndefined();
+    expect(rightPaneOpenEditorsData.current.map(({ id }) => id)).not.toContainEqual(editorId);
+    expect(rightPaneActiveEditorId.current).toBeNull();
 
     act(() => {
       openReference.current(reference.id);
     });
 
-    expect(rightPane.current.openEditors.map(({ id }) => id)).not.toContainEqual(editorId);
-    expect(rightPane.current.activeEditor).toBeUndefined();
+    expect(rightPaneOpenEditorsData.current.map(({ id }) => id)).not.toContainEqual(editorId);
+    expect(rightPaneActiveEditorId.current).toBeNull();
   });
 
   it('should close all opened files with closeAllFilesAtom', () => {
-    const store = createStore();
     const openFile = runSetAtomHook(openFileEntryAtom, store);
     const closeAllFiles = runSetAtomHook(closeAllEditorsAtom, store);
-    const leftPane = runGetAtomHook(leftPaneAtom, store);
-    const rightPane = runGetAtomHook(rightPaneAtom, store);
 
     const { fileEntry: fileA, editorData: fileAData } = makeFileAndEditor('file.txt');
     const { fileEntry: fileB, editorData: fileBData } = makeFileAndEditor('file.pdf');
@@ -264,21 +258,18 @@ describe('editorActions', () => {
       openFile.current(fileB);
     });
 
-    const paneFiles = [...leftPane.current.openEditors, ...rightPane.current.openEditors];
+    const paneFiles = [...leftPaneOpenEditorsData.current, ...rightPaneOpenEditorsData.current];
     expect(paneFiles).toContainEqual(fileAData);
     expect(paneFiles).toContainEqual(fileBData);
 
     act(() => closeAllFiles.current());
 
-    const totalOpenedFiles = leftPane.current.openEditors.length + rightPane.current.openEditors.length;
+    const totalOpenedFiles = leftPaneOpenEditorsCount.current + rightPaneOpenEditorsCount.current;
     expect(totalOpenedFiles).toBe(0);
   });
 
   it('should move file from one tab to the other', () => {
-    const store = createStore();
     const openFile = runSetAtomHook(openFileEntryAtom, store);
-    const leftPane = runGetAtomHook(leftPaneAtom, store);
-    const rightPane = runGetAtomHook(rightPaneAtom, store);
     const moveEditorToPane = runSetAtomHook(moveEditorToPaneAtom, store);
 
     const { fileEntry, editorData } = makeFileAndEditor('file.txt');
@@ -287,22 +278,19 @@ describe('editorActions', () => {
       openFile.current(fileEntry);
     });
 
-    expect(leftPane.current.openEditors).toContainEqual(editorData);
-    expect(rightPane.current.openEditors).not.toContainEqual(editorData);
+    expect(leftPaneOpenEditorsData.current).toContainEqual(editorData);
+    expect(rightPaneOpenEditorsData.current).not.toContainEqual(editorData);
 
     act(() => {
       moveEditorToPane.current({ editorId: editorData.id, fromPaneId: 'LEFT', toPaneId: 'RIGHT' });
     });
 
-    expect(leftPane.current.openEditors).not.toContainEqual(editorData);
-    expect(rightPane.current.openEditors).toContainEqual(editorData);
+    expect(leftPaneOpenEditorsData.current).not.toContainEqual(editorData);
+    expect(rightPaneOpenEditorsData.current).toContainEqual(editorData);
   });
 
   it('should move file from one tab to same tab', () => {
-    const store = createStore();
     const openFile = runSetAtomHook(openFileEntryAtom, store);
-    const leftPane = runGetAtomHook(leftPaneAtom, store);
-    const rightPane = runGetAtomHook(rightPaneAtom, store);
     const moveEditorToPane = runSetAtomHook(moveEditorToPaneAtom, store);
 
     const { fileEntry: fileA, editorData } = makeFileAndEditor('file.txt');
@@ -311,23 +299,19 @@ describe('editorActions', () => {
       openFile.current(fileA);
     });
 
-    expect(leftPane.current.openEditors).toContainEqual(editorData);
-    expect(rightPane.current.openEditors).not.toContainEqual(editorData);
+    expect(leftPaneOpenEditorsData.current).toContainEqual(editorData);
+    expect(rightPaneOpenEditorsData.current).not.toContainEqual(editorData);
 
     act(() => {
       moveEditorToPane.current({ editorId: editorData.id, fromPaneId: 'LEFT', toPaneId: 'LEFT' });
     });
 
-    expect(leftPane.current.openEditors).toContainEqual(editorData);
-    expect(rightPane.current.openEditors).not.toContainEqual(editorData);
+    expect(leftPaneOpenEditorsData.current).toContainEqual(editorData);
+    expect(rightPaneOpenEditorsData.current).not.toContainEqual(editorData);
   });
 
   it('should make remaining file active when moving file from one pane to another', () => {
-    const store = createStore();
     const openFile = runSetAtomHook(openFileEntryAtom, store);
-    const leftPane = runGetAtomHook(leftPaneAtom, store);
-    const rightPane = runGetAtomHook(rightPaneAtom, store);
-    const activePane = runGetAtomHook(activePaneAtom, store);
     const moveEditorToPane = runSetAtomHook(moveEditorToPaneAtom, store);
 
     const { fileEntry: fileA, editorData: fileAData } = makeFileAndEditor('file1.txt');
@@ -338,26 +322,23 @@ describe('editorActions', () => {
       openFile.current(fileB);
     });
 
-    expect(activePane.current.id).toBe('LEFT');
-    expect(leftPane.current.activeEditor!.id).toBe(fileBData.id);
+    expect(store.get(activePaneIdAtom)).toBe<PaneId>('LEFT');
+    expect(leftPaneActiveEditorId.current).toBe(fileBData.id);
 
     act(() => {
       moveEditorToPane.current({ editorId: fileBData.id, fromPaneId: 'LEFT', toPaneId: 'RIGHT' });
     });
 
-    expect(activePane.current.id).toBe('RIGHT');
+    expect(store.get(activePaneIdAtom)).toBe<PaneId>('RIGHT');
 
-    expect(leftPane.current.openEditors).toContainEqual(fileAData);
-    expect(leftPane.current.activeEditor!.id).toBe(fileAData.id);
-    expect(rightPane.current.openEditors).toContainEqual(fileBData);
-    expect(rightPane.current.activeEditor!.id).toBe(fileBData.id);
+    expect(leftPaneOpenEditorsData.current).toContainEqual(fileAData);
+    expect(leftPaneActiveEditorId.current).toBe(fileAData.id);
+    expect(rightPaneOpenEditorsData.current).toContainEqual(fileBData);
+    expect(rightPaneActiveEditorId.current).toBe(fileBData.id);
   });
 
   it('should NOT move file if file is NOT opened', () => {
-    const store = createStore();
     const openFile = runSetAtomHook(openFileEntryAtom, store);
-    const leftPane = runGetAtomHook(leftPaneAtom, store);
-    const rightPane = runGetAtomHook(rightPaneAtom, store);
     const moveEditorToPane = runSetAtomHook(moveEditorToPaneAtom, store);
 
     const { fileEntry: fileA, editorData } = makeFileAndEditor('file.txt');
@@ -366,22 +347,20 @@ describe('editorActions', () => {
       openFile.current(fileA);
     });
 
-    expect(leftPane.current.openEditors).toContainEqual(editorData);
-    expect(rightPane.current.openEditors).not.toContainEqual(editorData);
+    expect(leftPaneOpenEditorsData.current).toContainEqual(editorData);
+    expect(rightPaneOpenEditorsData.current).not.toContainEqual(editorData);
 
     act(() => {
       moveEditorToPane.current({ editorId: editorData.id, fromPaneId: 'RIGHT', toPaneId: 'LEFT' });
     });
 
-    expect(leftPane.current.openEditors).toContainEqual(editorData);
-    expect(rightPane.current.openEditors).not.toContainEqual(editorData);
+    expect(leftPaneOpenEditorsData.current).toContainEqual(editorData);
+    expect(rightPaneOpenEditorsData.current).not.toContainEqual(editorData);
   });
 
   it('should make another file active, in same pane, after closing the active', () => {
-    const store = createStore();
     const openFile = runSetAtomHook(openFileEntryAtom, store);
     const closeFileFromPane = runSetAtomHook(closeEditorFromPaneAtom, store);
-    const leftPane = runGetAtomHook(leftPaneAtom, store);
 
     const { fileEntry: fileA } = makeFileAndEditor('fileA.txt');
     const { fileEntry: fileB, editorData: editorDataB } = makeFileAndEditor('fileB.txt');
@@ -393,20 +372,18 @@ describe('editorActions', () => {
       openFile.current(fileC);
     });
 
-    expect(leftPane.current.activeEditor!.id).toBe(editorDataC.id);
+    expect(leftPaneActiveEditorId.current).toBe(editorDataC.id);
 
     act(() => {
-      closeFileFromPane.current({ paneId: leftPane.current.id, editorId: editorDataC.id });
+      closeFileFromPane.current({ paneId: 'LEFT', editorId: editorDataC.id });
     });
 
-    expect(leftPane.current.activeEditor!.id).toBe(editorDataB.id);
+    expect(leftPaneActiveEditorId.current).toBe(editorDataB.id);
   });
 
   it('should not make another file active, in same pane, after closing other than the active', () => {
-    const store = createStore();
     const openFile = runSetAtomHook(openFileEntryAtom, store);
     const closeFileFromPane = runSetAtomHook(closeEditorFromPaneAtom, store);
-    const leftPane = runGetAtomHook(leftPaneAtom, store);
 
     const { fileEntry: fileA } = makeFileAndEditor('fileA.txt');
     const { fileEntry: fileB, editorData: editorDataB } = makeFileAndEditor('fileB.txt');
@@ -418,20 +395,18 @@ describe('editorActions', () => {
       openFile.current(fileC);
     });
 
-    expect(leftPane.current.activeEditor!.id).toBe(editorDataC.id);
+    expect(leftPaneActiveEditorId.current).toBe(editorDataC.id);
 
     act(() => {
-      closeFileFromPane.current({ paneId: leftPane.current.id, editorId: editorDataB.id });
+      closeFileFromPane.current({ paneId: 'LEFT', editorId: editorDataB.id });
     });
 
-    expect(leftPane.current.activeEditor!.id).toBe(editorDataC.id);
+    expect(leftPaneActiveEditorId.current).toBe(editorDataC.id);
   });
 
   it('should make active file undefined if it is the last one closed in the pane', () => {
-    const store = createStore();
     const openFile = runSetAtomHook(openFileEntryAtom, store);
     const closeFileFromPane = runSetAtomHook(closeEditorFromPaneAtom, store);
-    const leftPane = runGetAtomHook(leftPaneAtom, store);
 
     const { fileEntry: fileA, editorData: editorDataA } = makeFileAndEditor('fileA.txt');
     const { fileEntry: fileB, editorData: editorDataB } = makeFileAndEditor('fileB.txt');
@@ -441,35 +416,30 @@ describe('editorActions', () => {
       openFile.current(fileB);
     });
 
-    expect(leftPane.current.activeEditor!.id).toBe(editorDataB.id);
+    expect(leftPaneActiveEditorId.current).toBe(editorDataB.id);
 
     act(() => {
-      closeFileFromPane.current({ paneId: leftPane.current.id, editorId: editorDataB.id });
-      closeFileFromPane.current({ paneId: leftPane.current.id, editorId: editorDataA.id });
+      closeFileFromPane.current({ paneId: 'LEFT', editorId: editorDataB.id });
+      closeFileFromPane.current({ paneId: 'LEFT', editorId: editorDataA.id });
     });
 
-    expect(leftPane.current.activeEditor).toBeUndefined();
+    expect(leftPaneActiveEditorId.current).toBeNull();
   });
 
   it('should not open folder entries', () => {
-    const store = createStore();
     const openFileResult = runSetAtomHook(openFileEntryAtom, store);
-    const leftPane = runGetAtomHook(leftPaneAtom, store);
-    const rightPane = runGetAtomHook(rightPaneAtom, store);
 
-    expect(leftPane.current.openEditors.length).toBe(0);
-    expect(rightPane.current.openEditors.length).toBe(0);
+    expect(leftPaneOpenEditorsCount.current).toBe(0);
+    expect(rightPaneOpenEditorsCount.current).toBe(0);
 
     act(() => openFileResult.current(makeFolder('uploads')));
 
-    expect(leftPane.current.openEditors.length).toBe(0);
-    expect(rightPane.current.openEditors.length).toBe(0);
+    expect(leftPaneOpenEditorsCount.current).toBe(0);
+    expect(rightPaneOpenEditorsCount.current).toBe(0);
   });
 
   it('should read file content on openFile', async () => {
-    const store = createStore();
     const openFile = runSetAtomHook(openFileEntryAtom, store);
-    const leftPane = runGetAtomHook(leftPaneAtom, store);
 
     const mockedReadFileContent = vi.mocked(readFileContent).mockResolvedValue({
       type: 'text',
@@ -482,15 +452,18 @@ describe('editorActions', () => {
       openFile.current(fileA);
     });
 
-    expect(leftPane.current.activeEditor?.contentAtoms).toBeDefined();
+    const leftPaneActiveContentAtoms = runHookWithJotaiProvider(() => usePaneActiveEditorContentAtoms('LEFT'), store)
+      .current!;
+
+    expect(leftPaneActiveContentAtoms).not.toBeNull();
     const { result: activeFile } = renderHook(() =>
-      useAtomValue(leftPane.current.activeEditor!.contentAtoms.loadableEditorContentAtom, { store }),
+      useAtomValue(leftPaneActiveContentAtoms.loadableEditorContentAtom, { store }),
     );
 
     expect(activeFile.current.state).toBe('loading');
 
     await waitFor(() => {
-      expect(mockedReadFileContent.mock.calls).toHaveLength(1);
+      expect(mockedReadFileContent).toHaveBeenCalledTimes(1);
     });
 
     if (activeFile.current.state !== 'hasData') {
