@@ -57,7 +57,7 @@
         }
       ]
     },
-    "complete_text": {
+    "completion": {
       "type": "array",
       "minItems": 2,
       "maxItems": 2,
@@ -68,7 +68,7 @@
         {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/RewriteChoice"
+            "$ref": "#/definitions/TextCompletionChoice"
           }
         }
       ]
@@ -121,7 +121,7 @@
     "ingest_status",
     "ingest_references",
     "rewrite",
-    "complete_text",
+    "completion",
     "chat",
     "update",
     "delete"
@@ -370,6 +370,22 @@
         }
       },
       "required": [
+        "text"
+      ]
+    },
+    "TextCompletionChoice": {
+      "title": "TextCompletionChoice",
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "index",
         "text"
       ]
     },

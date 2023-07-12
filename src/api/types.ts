@@ -39,7 +39,7 @@ export interface CliCommands {
    * @minItems 2
    * @maxItems 2
    */
-  complete_text: [TextCompletionRequest, RewriteChoice[]];
+  completion: [TextCompletionRequest, TextCompletionChoice[]];
   /**
    * @minItems 2
    * @maxItems 2
@@ -113,6 +113,10 @@ export interface TextCompletionRequest {
   max_tokens?: number;
   title?: string;
   abstract?: string;
+}
+export interface TextCompletionChoice {
+  index: number;
+  text: string;
 }
 export interface ChatRequest {
   text: string;

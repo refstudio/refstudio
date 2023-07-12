@@ -105,15 +105,19 @@ class DeleteStatusResponse(RefStudioModel):
     message: str
 
 
+class TextSuggestionChoice(RefStudioModel):
+    index: int
+    text: str
+
+
 class RewriteRequest(RefStudioModel):
     text: str
     n_choices: int = 1
     temperature: float = 0.7
 
 
-class RewriteChoice(RefStudioModel):
-    index: int
-    text: str
+class RewriteChoice(TextSuggestionChoice):
+    pass
 
 
 class TextCompletionRequest(RefStudioModel):
@@ -123,6 +127,10 @@ class TextCompletionRequest(RefStudioModel):
     max_tokens: int = 512
     title: str = None
     abstract: str = None
+
+
+class TextCompletionChoice(TextSuggestionChoice):
+    pass
 
 
 class ChatRequest(RefStudioModel):
@@ -144,7 +152,7 @@ class CliCommands(RefStudioModel):
     """Retrieve ingested PDF references"""
     rewrite: tuple[RewriteRequest, list[RewriteChoice]]
     """"Rewrites a block of text in a more concise manner"""
-    complete_text: tuple[TextCompletionRequest, list[RewriteChoice]]
+    completion: tuple[TextCompletionRequest, list[TextCompletionChoice]]
     """Completes a body of text"""
     chat: tuple[ChatRequest, list[ChatResponseChoice]]
     """Chat with the AI"""

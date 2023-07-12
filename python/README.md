@@ -225,13 +225,13 @@ $ poetry run python main.py rewrite '{"text": "In the cycling world, power meter
 
 Text Completion is called within the editor pane. It allows a user to trigger the LLM to write the next block of text in the document.
 
-It takes an input of text with additional optional parameters and returns a list of rewrite `choices`.
+It takes an input of text with additional optional parameters and returns a list of `TextCompletionChoice`.
 
-To run `complete_text`:
+To run `completion`:
 
 ```bash
 
-$ poetry run python main.py complete_text "{\"text\": \"Machine learning systems automatically learn programs from data. This is often  \", \"n_choices\": 2, \"temperature\": 0.9, \"max_tokens\": 256}" | jq
+$ poetry run python main.py completion "{\"text\": \"Machine learning systems automatically learn programs from data. This is often  \", \"n_choices\": 2, \"temperature\": 0.9, \"max_tokens\": 256}" | jq
 
 # Response
 [
