@@ -5,8 +5,8 @@ import { VscCloseAll, VscSplitHorizontal } from 'react-icons/vsc';
 import { closeAllEditorsAtom, moveEditorToPaneAtom, selectEditorInPaneAtom } from '../../atoms/editorActions';
 import { openFilePathAtom } from '../../atoms/fileEntryActions';
 import { fileExplorerAtom, refreshFileTreeAtom } from '../../atoms/fileExplorerActions';
-import { usePaneActiveEditorId } from '../../atoms/hooks/usePaneActiveEditorId';
-import { usePaneOpenEditorsData } from '../../atoms/hooks/usePaneOpenEditorsData';
+import { useActiveEditorIdForPane } from '../../atoms/hooks/useActiveEditorIdForPane';
+import { useOpenEditorsDataForPane } from '../../atoms/hooks/useOpenEditorsDataForPane';
 import { EditorId, parseEditorId } from '../../atoms/types/EditorData';
 import { PaneId } from '../../atoms/types/PaneGroup';
 import { EditorsList } from '../../components/EditorsList';
@@ -17,10 +17,10 @@ import { isNonNullish } from '../../lib/isNonNullish';
 import { FileExplorer } from './FileExplorer';
 
 export function ExplorerPanel() {
-  const leftPaneOpenEditors = usePaneOpenEditorsData('LEFT');
-  const leftPaneActiveEditorId = usePaneActiveEditorId('LEFT');
-  const rightPaneOpenEditors = usePaneOpenEditorsData('RIGHT');
-  const rightPaneActiveEditorId = usePaneActiveEditorId('RIGHT');
+  const leftPaneOpenEditors = useOpenEditorsDataForPane('LEFT');
+  const leftPaneActiveEditorId = useActiveEditorIdForPane('LEFT');
+  const rightPaneOpenEditors = useOpenEditorsDataForPane('RIGHT');
+  const rightPaneActiveEditorId = useActiveEditorIdForPane('RIGHT');
   const rootFileExplorerEntry = useAtomValue(fileExplorerAtom);
 
   const selectFileInPane = useSetAtom(selectEditorInPaneAtom);
@@ -70,7 +70,7 @@ export function ExplorerPanel() {
             rightAction={(editorId) => ({
               onClick: handleMoveEditor({ editorId, fromPaneId: 'RIGHT', toPaneId: 'LEFT' }),
               VscIcon: VscSplitHorizontal,
-              title: `Move to RIGHT split pane`,
+              title: `Move to LEFT split pane`,
             })}
             selectedEditors={rightPaneActiveEditorId ? [rightPaneActiveEditorId] : []}
             onClick={(editorId) => selectFileInPane({ paneId: 'RIGHT', editorId })}

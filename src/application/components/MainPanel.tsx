@@ -2,8 +2,8 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback } from 'react';
 import { Panel, PanelGroup } from 'react-resizable-panels';
 
-import { usePaneActiveEditorContentAtoms } from '../../atoms/hooks/usePaneActiveEditorContentAtoms';
-import { usePaneOpenEditorsCount } from '../../atoms/hooks/usePaneOpenEditorsCount';
+import { useActiveEditorContentAtomsForPane } from '../../atoms/hooks/useActiveEditorContentAtomsForPane';
+import { useOpenEditorsCountForPane } from '../../atoms/hooks/useOpenEditorsCountForPane';
 import { focusPaneAtom } from '../../atoms/paneActions';
 import { EditorContentAtoms } from '../../atoms/types/EditorContentAtoms';
 import { PaneId } from '../../atoms/types/PaneGroup';
@@ -25,8 +25,8 @@ interface MainPanelProps {
 
 export function MainPanel(props: MainPanelProps) {
   const { pdfViewerRef } = props;
-  const leftOpenEditorsCount = usePaneOpenEditorsCount('LEFT');
-  const rightOpenEditorsCount = usePaneOpenEditorsCount('RIGHT');
+  const leftOpenEditorsCount = useOpenEditorsCountForPane('LEFT');
+  const rightOpenEditorsCount = useOpenEditorsCountForPane('RIGHT');
 
   const updatePDFViewerWidth = useCallback(() => {
     pdfViewerRef.current?.updateWidth();
@@ -57,7 +57,7 @@ interface MainPanelPaneProps {
 }
 
 const MainPanelPane = memo(({ paneId, pdfViewerRef }: MainPanelPaneProps & MainPanelProps) => {
-  const activeEditorAtoms = usePaneActiveEditorContentAtoms(paneId);
+  const activeEditorAtoms = useActiveEditorContentAtomsForPane(paneId);
 
   const focusPane = useSetAtom(focusPaneAtom);
 

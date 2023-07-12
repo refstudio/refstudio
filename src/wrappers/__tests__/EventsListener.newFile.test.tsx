@@ -1,7 +1,7 @@
 import { createStore } from 'jotai';
 
 import { runHookWithJotaiProvider } from '../../atoms/__tests__/test-utils';
-import { usePaneOpenEditorsCount } from '../../atoms/hooks/usePaneOpenEditorsCount';
+import { useOpenEditorsCountForPane } from '../../atoms/hooks/useOpenEditorsCountForPane';
 import { RefStudioEventName } from '../../events';
 import { act, mockListenEvent, setupWithJotaiProvider, waitFor } from '../../test/test-utils';
 import { EventsListener } from '../EventsListener';
@@ -32,7 +32,7 @@ describe('EventsListener.close', () => {
   it(`should create a new file in the LEFT pane when ${newFileEventName} event is triggered`, async () => {
     const mockData = mockListenEvent();
 
-    const activePaneContentOpenEditorsCount = runHookWithJotaiProvider(() => usePaneOpenEditorsCount('LEFT'), store);
+    const activePaneContentOpenEditorsCount = runHookWithJotaiProvider(() => useOpenEditorsCountForPane('LEFT'), store);
 
     expect(activePaneContentOpenEditorsCount.current).toBe(0);
 

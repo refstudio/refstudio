@@ -1,6 +1,7 @@
 import { createStore } from 'jotai';
 
-import { activeEditorIdAtom } from '../../../../atoms/paneActions';
+import { runHookWithJotaiProvider } from '../../../../atoms/__tests__/test-utils';
+import { useActiveEditorId } from '../../../../atoms/hooks/useActiveEditorId';
 import { setReferencesAtom } from '../../../../atoms/referencesState';
 import { buildEditorId } from '../../../../atoms/types/EditorData';
 import { emitEvent, RefStudioEventName, RefStudioEventPayload } from '../../../../events';
@@ -96,7 +97,7 @@ describe('ReferencesTableView component', () => {
     expect(buttons).toHaveLength(REFERENCES.length);
     await user.click(buttons[0]);
 
-    const activeEditorId = store.get(activeEditorIdAtom);
+    const activeEditorId = runHookWithJotaiProvider(useActiveEditorId, store).current;
     expect(activeEditorId).not.toBeNull();
     expect(activeEditorId).toBe(buildEditorId('reference', ref1.id));
   });
@@ -108,7 +109,7 @@ describe('ReferencesTableView component', () => {
     expect(buttons).toHaveLength(REFERENCES.length);
     await user.click(buttons[0]);
 
-    const activeEditorId = store.get(activeEditorIdAtom);
+    const activeEditorId = runHookWithJotaiProvider(useActiveEditorId, store).current;
     expect(activeEditorId).not.toBeNull();
     expect(activeEditorId).toBe(buildEditorId('pdf', ref1.filepath));
   });

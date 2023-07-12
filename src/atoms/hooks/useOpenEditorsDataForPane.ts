@@ -1,6 +1,6 @@
 import { useAtomValue } from 'jotai';
 import { selectAtom } from 'jotai/utils';
-import { useMemo } from 'react';
+import { useCallback } from 'react';
 
 import { areStringArraysEqual } from '../../lib/areStringArraysEqual';
 import { isNonNullish } from '../../lib/isNonNullish';
@@ -9,29 +9,30 @@ import { paneGroupAtom } from '../core/paneGroup';
 import { EditorData } from '../types/EditorData';
 import { PaneId } from '../types/PaneGroup';
 
-/** Returns the count of open editors for a given pane */
-export function usePaneOpenEditorsData(paneId: PaneId): EditorData[] {
+/** Returns the open editors data for a given pane */
+export function useOpenEditorsDataForPane(paneId: PaneId): EditorData[] {
   // Get array of editor ids
-  const openEditorIdsAtom = useMemo(
-    () => selectAtom(paneGroupAtom, (paneGroup) => paneGroup[paneId].openEditorIds, areStringArraysEqual),
-    [paneId],
+  const openEditorIds = useAtomValue(
+    selectAtom(
+      paneGroupAtom,
+      useCallback((paneGroup) => paneGroup[paneId].openEditorIds, [paneId]),
+      areStringArraysEqual,
+    ),
   );
-  const openEditorIds = useAtomValue(openEditorIdsAtom);
 
   // Get array of open editors that is only updated when the data of one of the open editors is updated
-  const openEditorsDataAtom = useMemo(
-    () =>
-      selectAtom(
-        editorsDataAtom,
+  return useAtomValue(
+    selectAtom(
+      editorsDataAtom,
+      useCallback(
         (editorsData) => openEditorIds.map((editorId) => editorsData.get(editorId)).filter(isNonNullish),
-        (editorsDataA, editorsDataB) =>
-          editorsDataA.length === editorsDataB.length &&
-          editorsDataA.every((editorData, index) => areEditorsDataEqual(editorData, editorsDataB[index])),
+        [openEditorIds],
       ),
-    [openEditorIds],
+      (editorsDataA, editorsDataB) =>
+        editorsDataA.length === editorsDataB.length &&
+        editorsDataA.every((editorData, index) => areEditorsDataEqual(editorData, editorsDataB[index])),
+    ),
   );
-
-  return useAtomValue(openEditorsDataAtom);
 }
 
 function areEditorsDataEqual(editorDataA: EditorData, editorDataB: EditorData) {

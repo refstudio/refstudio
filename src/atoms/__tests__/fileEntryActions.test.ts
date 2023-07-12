@@ -11,9 +11,9 @@ import { act } from '../../test/test-utils';
 import { activePaneAtom } from '../editorActions';
 import { createFileAtom, deleteFileAtom, openFileEntryAtom, renameFileAtom } from '../fileEntryActions';
 import { refreshFileTreeAtom } from '../fileExplorerActions';
-import { usePaneActiveEditorContentAtoms } from '../hooks/usePaneActiveEditorContentAtoms';
-import { usePaneActiveEditorId } from '../hooks/usePaneActiveEditorId';
-import { usePaneOpenEditorsData } from '../hooks/usePaneOpenEditorsData';
+import { useActiveEditorContentAtomsForPane } from '../hooks/useActiveEditorContentAtomsForPane';
+import { useActiveEditorIdForPane } from '../hooks/useActiveEditorIdForPane';
+import { useOpenEditorsDataForPane } from '../hooks/useOpenEditorsDataForPane';
 import { EditorContent } from '../types/EditorContent';
 import { buildEditorId } from '../types/EditorData';
 import { makeFile, makeFileAndEditor, makeFolder } from './test-fixtures';
@@ -37,7 +37,7 @@ describe('fileEntryActions', () => {
 
     act(() => createFile.current());
 
-    const leftPaneActiveEditorId = runHookWithJotaiProvider(() => usePaneActiveEditorId('LEFT'), store).current;
+    const leftPaneActiveEditorId = runHookWithJotaiProvider(() => useActiveEditorIdForPane('LEFT'), store).current;
     expect(leftPaneActiveEditorId).not.toBeNull();
     expect(leftPaneActiveEditorId).toMatchInlineSnapshot('"refstudio://text//Untitled-1"');
   });
@@ -52,7 +52,7 @@ describe('fileEntryActions', () => {
       createFile.current();
     });
 
-    const leftPaneActiveEditorId = runHookWithJotaiProvider(() => usePaneActiveEditorId('LEFT'), store).current;
+    const leftPaneActiveEditorId = runHookWithJotaiProvider(() => useActiveEditorIdForPane('LEFT'), store).current;
     expect(leftPaneActiveEditorId).not.toBeNull();
     expect(leftPaneActiveEditorId).toMatchInlineSnapshot('"refstudio://text//Untitled-3"');
   });
@@ -130,7 +130,7 @@ describe('fileEntryActions', () => {
 
     store.set(openFileEntryAtom, fileEntry);
 
-    const leftPaneOpenEditorsData = runHookWithJotaiProvider(() => usePaneOpenEditorsData('LEFT'), store);
+    const leftPaneOpenEditorsData = runHookWithJotaiProvider(() => useOpenEditorsDataForPane('LEFT'), store);
     expect(leftPaneOpenEditorsData.current).toHaveLength(1);
     expect(leftPaneOpenEditorsData.current[0].id).toBe(buildEditorId('text', fileEntry.path));
     expect(leftPaneOpenEditorsData.current[0].title).toBe(fileEntry.name);
@@ -161,12 +161,12 @@ describe('fileEntryActions', () => {
 
     store.set(openFileEntryAtom, fileEntry);
 
-    const leftPaneActiveEditorId = runHookWithJotaiProvider(() => usePaneActiveEditorId('LEFT'), store);
+    const leftPaneActiveEditorId = runHookWithJotaiProvider(() => useActiveEditorIdForPane('LEFT'), store);
     expect(leftPaneActiveEditorId.current).not.toBeNull();
     expect(leftPaneActiveEditorId.current).toBe(buildEditorId('text', fileEntry.path));
 
     const leftPaneActiveEditorContentAtoms = runHookWithJotaiProvider(
-      () => usePaneActiveEditorContentAtoms('LEFT'),
+      () => useActiveEditorContentAtomsForPane('LEFT'),
       store,
     ).current!;
     const editorId = store.get(leftPaneActiveEditorContentAtoms.editorIdAtom);
@@ -230,8 +230,8 @@ describe('fileEntryActions', () => {
 
     const newName = 'Updated File.txt';
 
-    const leftPaneOpenEditorsData = runHookWithJotaiProvider(() => usePaneOpenEditorsData('LEFT'), store);
-    const leftPaneActiveEditorId = runHookWithJotaiProvider(() => usePaneActiveEditorId('LEFT'), store);
+    const leftPaneOpenEditorsData = runHookWithJotaiProvider(() => useOpenEditorsDataForPane('LEFT'), store);
+    const leftPaneActiveEditorId = runHookWithJotaiProvider(() => useActiveEditorIdForPane('LEFT'), store);
 
     expect(leftPaneOpenEditorsData.current).toHaveLength(1);
     expect(leftPaneOpenEditorsData.current[0].id).toBe(buildEditorId('text', fileEntry.path));

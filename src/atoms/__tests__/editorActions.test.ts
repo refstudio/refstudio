@@ -13,10 +13,10 @@ import {
   selectEditorInPaneAtom,
 } from '../editorActions';
 import { openFileEntryAtom, openFilePathAtom } from '../fileEntryActions';
-import { usePaneActiveEditorContentAtoms } from '../hooks/usePaneActiveEditorContentAtoms';
-import { usePaneActiveEditorId } from '../hooks/usePaneActiveEditorId';
-import { usePaneOpenEditorsCount } from '../hooks/usePaneOpenEditorsCount';
-import { usePaneOpenEditorsData } from '../hooks/usePaneOpenEditorsData';
+import { useActiveEditorContentAtomsForPane } from '../hooks/useActiveEditorContentAtomsForPane';
+import { useActiveEditorIdForPane } from '../hooks/useActiveEditorIdForPane';
+import { useOpenEditorsCountForPane } from '../hooks/useOpenEditorsCountForPane';
+import { useOpenEditorsDataForPane } from '../hooks/useOpenEditorsDataForPane';
 import { setReferencesAtom } from '../referencesState';
 import { buildEditorId, EditorData, EditorId } from '../types/EditorData';
 import { PaneId } from '../types/PaneGroup';
@@ -38,13 +38,13 @@ describe('editorActions', () => {
 
   beforeEach(() => {
     store = createStore();
-    leftPaneOpenEditorsCount = runHookWithJotaiProvider(() => usePaneOpenEditorsCount('LEFT'), store);
-    leftPaneActiveEditorId = runHookWithJotaiProvider(() => usePaneActiveEditorId('LEFT'), store);
-    leftPaneOpenEditorsData = runHookWithJotaiProvider(() => usePaneOpenEditorsData('LEFT'), store);
+    leftPaneOpenEditorsCount = runHookWithJotaiProvider(() => useOpenEditorsCountForPane('LEFT'), store);
+    leftPaneActiveEditorId = runHookWithJotaiProvider(() => useActiveEditorIdForPane('LEFT'), store);
+    leftPaneOpenEditorsData = runHookWithJotaiProvider(() => useOpenEditorsDataForPane('LEFT'), store);
 
-    rightPaneOpenEditorsCount = runHookWithJotaiProvider(() => usePaneOpenEditorsCount('RIGHT'), store);
-    rightPaneActiveEditorId = runHookWithJotaiProvider(() => usePaneActiveEditorId('RIGHT'), store);
-    rightPaneOpenEditorsData = runHookWithJotaiProvider(() => usePaneOpenEditorsData('RIGHT'), store);
+    rightPaneOpenEditorsCount = runHookWithJotaiProvider(() => useOpenEditorsCountForPane('RIGHT'), store);
+    rightPaneActiveEditorId = runHookWithJotaiProvider(() => useActiveEditorIdForPane('RIGHT'), store);
+    rightPaneOpenEditorsData = runHookWithJotaiProvider(() => useOpenEditorsDataForPane('RIGHT'), store);
   });
 
   afterEach(() => {
@@ -452,7 +452,7 @@ describe('editorActions', () => {
       openFile.current(fileA);
     });
 
-    const leftPaneActiveContentAtoms = runHookWithJotaiProvider(() => usePaneActiveEditorContentAtoms('LEFT'), store)
+    const leftPaneActiveContentAtoms = runHookWithJotaiProvider(() => useActiveEditorContentAtomsForPane('LEFT'), store)
       .current!;
 
     expect(leftPaneActiveContentAtoms).not.toBeNull();

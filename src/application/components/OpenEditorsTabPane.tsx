@@ -1,8 +1,8 @@
 import { useSetAtom } from 'jotai';
 
 import { selectEditorInPaneAtom } from '../../atoms/editorActions';
-import { usePaneActiveEditorId } from '../../atoms/hooks/usePaneActiveEditorId';
-import { usePaneOpenEditorsData } from '../../atoms/hooks/usePaneOpenEditorsData';
+import { useActiveEditorIdForPane } from '../../atoms/hooks/useActiveEditorIdForPane';
+import { useOpenEditorsDataForPane } from '../../atoms/hooks/useOpenEditorsDataForPane';
 import { PaneId } from '../../atoms/types/PaneGroup';
 import { TabPane } from '../../components/TabPane';
 import { emitEvent } from '../../events';
@@ -12,8 +12,8 @@ interface OpenEditorsTabPaneProps {
 }
 
 export function OpenEditorsTabPane({ paneId }: OpenEditorsTabPaneProps) {
-  const openEditorsData = usePaneOpenEditorsData(paneId);
-  const activeEditorId = usePaneActiveEditorId(paneId);
+  const openEditorsData = useOpenEditorsDataForPane(paneId);
+  const activeEditorId = useActiveEditorIdForPane(paneId);
 
   const selectFileInPane = useSetAtom(selectEditorInPaneAtom);
 
