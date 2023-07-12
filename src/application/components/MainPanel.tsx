@@ -1,13 +1,13 @@
 import { useAtomValue, useSetAtom } from 'jotai';
-import { useCallback } from 'react';
+import { memo, useCallback } from 'react';
 import { Panel, PanelGroup } from 'react-resizable-panels';
 
-import { selectEditorInPaneAtom } from '../../atoms/editorActions';
-import { focusPaneAtom, leftPaneAtom, rightPaneAtom } from '../../atoms/paneActions';
+import { useActiveEditorContentAtomsForPane } from '../../atoms/hooks/useActiveEditorContentAtomsForPane';
+import { useOpenEditorsCountForPane } from '../../atoms/hooks/useOpenEditorsCountForPane';
+import { focusPaneAtom } from '../../atoms/paneActions';
 import { EditorContentAtoms } from '../../atoms/types/EditorContentAtoms';
-import { PaneContent } from '../../atoms/types/PaneGroup';
+import { PaneId } from '../../atoms/types/PaneGroup';
 import { Spinner } from '../../components/Spinner';
-import { TabPane } from '../../components/TabPane';
 import { VerticalResizeHandle } from '../../components/VerticalResizeHandle';
 import { emitEvent } from '../../events';
 import { ReferencesTableView } from '../../features/references/editor/ReferencesTableView';
@@ -18,13 +18,14 @@ import { assertNever } from '../../lib/assertNever';
 import { EmptyView } from '../views/EmptyView';
 import { PdfViewer } from '../views/PdfViewer';
 import { TextView } from '../views/TextView';
+import { OpenEditorsTabPane } from './OpenEditorsTabPane';
 
 export function MainPanel() {
-  const left = useAtomValue(leftPaneAtom);
-  const right = useAtomValue(rightPaneAtom);
+  const leftOpenEditorsCount = useOpenEditorsCountForPane('LEFT');
+  const rightOpenEditorsCount = useOpenEditorsCountForPane('RIGHT');
 
-  const showRight = right.openEditors.length > 0;
-  const showLeft = left.openEditors.length > 0 || !showRight;
+  const showRight = rightOpenEditorsCount > 0;
+  const showLeft = leftOpenEditorsCount > 0 || !showRight;
 
   const handleLayoutUpdate = useDebouncedCallback(
     useCallback(() => emitEvent('refstudio://layout/update'), []),
@@ -35,58 +36,47 @@ export function MainPanel() {
     <PanelGroup autoSaveId="mainPanel" direction="horizontal" onLayout={handleLayoutUpdate}>
       {showLeft && (
         <Panel order={1}>
-          <MainPanelPane pane={left} />
+          <MainPanelPane paneId="LEFT" />
         </Panel>
       )}
       {showLeft && showRight && <VerticalResizeHandle />}
       {showRight && (
         <Panel order={2}>
-          <MainPanelPane pane={right} />
-        </Panel>
-      )}
-    </PanelGroup>
+          <MainPanelPane paneId="RIGHT" />
+        </Panel >
+      )
+      }
+    </PanelGroup >
   );
 }
 
 interface MainPanelPaneProps {
-  pane: PaneContent;
+  paneId: PaneId;
 }
 
-export function MainPanelPane({ pane }: MainPanelPaneProps) {
-  const { openEditors, activeEditor: activeFile, activeEditor } = pane;
-  const activeEditorAtoms = activeEditor?.contentAtoms;
+const MainPanelPane = memo(({ paneId }: MainPanelPaneProps) => {
+  const activeEditorAtoms = useActiveEditorContentAtomsForPane(paneId);
 
-  const items = openEditors.map(({ id: editorId, title, isDirty }) => ({
-    text: title,
-    value: editorId,
-    isDirty,
-  }));
-
-  const selectFileInPane = useSetAtom(selectEditorInPaneAtom);
   const focusPane = useSetAtom(focusPaneAtom);
 
   return (
-    <div className="flex h-full flex-col" onClick={() => focusPane(pane.id)} onFocus={() => focusPane(pane.id)}>
+    <div className="flex h-full flex-col" onClick={() => focusPane(paneId)} onFocus={() => focusPane(paneId)}>
       <div className="grow-0">
-        <TabPane
-          items={items}
-          value={activeFile?.id}
-          onClick={(editorId) => selectFileInPane({ paneId: pane.id, editorId })}
-          onCloseClick={(editorId) => emitEvent('refstudio://editors/close', { paneId: pane.id, editorId })}
-        />
+        <OpenEditorsTabPane paneId={paneId} />
       </div>
       <div className="flex w-full grow overflow-hidden">
         {activeEditorAtoms ? <MainPaneViewContent activeEditorAtoms={activeEditorAtoms} /> : <EmptyView />}
       </div>
     </div>
   );
-}
+});
+MainPanelPane.displayName = 'MainPanelPane';
 
 interface MainPaneViewContentProps {
   activeEditorAtoms: EditorContentAtoms;
 }
 
-export function MainPaneViewContent({ activeEditorAtoms }: MainPaneViewContentProps) {
+function MainPaneViewContent({ activeEditorAtoms }: MainPaneViewContentProps) {
   const { loadableEditorContentAtom } = activeEditorAtoms;
   const loadableEditorContent = useAtomValue(loadableEditorContentAtom);
 

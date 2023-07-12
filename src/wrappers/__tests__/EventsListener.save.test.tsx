@@ -1,10 +1,10 @@
 import { createStore } from 'jotai';
 
 import { makeFileAndEditor } from '../../atoms/__tests__/test-fixtures';
-import { runSetAtomHook } from '../../atoms/__tests__/test-utils';
+import { runHookWithJotaiProvider, runSetAtomHook } from '../../atoms/__tests__/test-utils';
 import { activePaneAtom, closeEditorFromPaneAtom } from '../../atoms/editorActions';
 import { openFileEntryAtom } from '../../atoms/fileEntryActions';
-import { activePaneContentAtom } from '../../atoms/paneActions';
+import { useActiveEditorContentAtoms } from '../../atoms/hooks/useActiveEditorContentAtoms';
 import { EditorData } from '../../atoms/types/EditorData';
 import { FileEntry } from '../../atoms/types/FileEntry';
 import { RefStudioEventName } from '../../events';
@@ -55,8 +55,9 @@ describe('EventsListener.save', () => {
 
   it(`should call saveFile when ${saveEventName} event is triggered`, () => {
     const mockData = mockListenEvent();
-    const activePaneContent = store.get(activePaneContentAtom);
-    const { updateEditorContentBufferAtom } = activePaneContent.activeEditor!.contentAtoms;
+
+    const activeEditorContentAtoms = runHookWithJotaiProvider(useActiveEditorContentAtoms, store);
+    const { updateEditorContentBufferAtom } = activeEditorContentAtoms.current!;
 
     const updateFileBuffer = runSetAtomHook(updateEditorContentBufferAtom, store);
 

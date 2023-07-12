@@ -1,13 +1,10 @@
-import { atom, Getter } from 'jotai';
+import { atom } from 'jotai';
 
-import { isNonNullish } from '../../lib/isNonNullish';
 import { buildEditorIdFromPath, EditorId } from '../types/EditorData';
-import { PaneContent, PaneEditorId, PaneId, PaneState } from '../types/PaneGroup';
+import { PaneEditorId, PaneGroupState, PaneId, PaneState } from '../types/PaneGroup';
 import { activePaneIdAtom } from './activePane';
 import { editorsContentStateAtom, updateEditorContentIdAtom } from './editorContent';
 import { editorsDataAtom, renameEditorDataAtom } from './editorData';
-
-type PaneGroupState = Record<PaneId, PaneState>;
 
 /** This atom contains data about the panes: the list of open editors and the active editor */
 export const paneGroupAtom = atom<PaneGroupState>({
@@ -18,25 +15,6 @@ export const paneGroupAtom = atom<PaneGroupState>({
     openEditorIds: [],
   },
 });
-
-export function getPane(get: Getter, paneId: PaneId): PaneContent {
-  const panes = get(paneGroupAtom);
-  const editorsData = get(editorsDataAtom);
-  const openEditors = get(editorsContentStateAtom);
-  const pane = panes[paneId];
-
-  const editorContentAtoms = pane.activeEditorId && openEditors.get(pane.activeEditorId);
-
-  if (pane.activeEditorId && !editorContentAtoms) {
-    throw new Error('Editor content is not loaded in memory');
-  }
-
-  return {
-    id: paneId,
-    openEditors: pane.openEditorIds.map((id) => editorsData.get(id)).filter(isNonNullish),
-    activeEditor: pane.activeEditorId ? { id: pane.activeEditorId, contentAtoms: editorContentAtoms! } : undefined,
-  };
-}
 
 /** Updates a given pane with partial attributes */
 export const updatePaneGroup = atom(

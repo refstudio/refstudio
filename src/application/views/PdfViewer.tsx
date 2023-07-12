@@ -29,9 +29,9 @@ export function PdfViewer({ file }: PdfViewerProps) {
   // Update viewer's width on mount
   useLayoutEffect(updateWidth, [updateWidth]);
 
-  const onDocumentLoadSuccess = (pdf: { numPages: number }) => {
+  const onDocumentLoadSuccess = useCallback((pdf: { numPages: number }) => {
     setNumPages(pdf.numPages);
-  };
+  }, []);
 
   return (
     <div className="pdf-viewer flex h-full w-full flex-col" ref={containerRef}>
