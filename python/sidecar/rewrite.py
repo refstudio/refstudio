@@ -4,7 +4,7 @@ import sys
 
 import openai
 from dotenv import load_dotenv
-from sidecar import prompts
+from sidecar import prompts, shared
 from sidecar.typing import (RewriteChoice, RewriteRequest,
                             TextCompletionChoice, TextCompletionRequest,
                             TextSuggestionChoice)
@@ -36,8 +36,9 @@ def complete_text(request: TextCompletionRequest):
         temperature=request.temperature,
         max_tokens=request.max_tokens,
     )
-    response = chat.get_response(response_type=TextCompletionChoice)
-    sys.stdout.write(json.dumps([r.dict() for r in response]))
+    choices = chat.get_response(response_type=TextCompletionChoice)
+    choices = shared.trim_completion_prefix_from_choices(prefix=request.text, choices=choices)
+    sys.stdout.write(json.dumps([r.dict() for r in choices]))
 
 
 class Rewriter:
