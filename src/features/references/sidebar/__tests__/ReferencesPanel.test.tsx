@@ -1,7 +1,8 @@
 import { createStore } from 'jotai';
 
-import { runGetAtomHook } from '../../../../atoms/__tests__/test-utils';
-import { activePaneContentAtom } from '../../../../atoms/paneActions';
+import { runHookWithJotaiProvider } from '../../../../atoms/__tests__/test-utils';
+import { useActiveEditorContentAtoms } from '../../../../atoms/hooks/useActiveEditorContentAtoms';
+import { useActiveEditorId } from '../../../../atoms/hooks/useActiveEditorId';
 import { setReferencesAtom } from '../../../../atoms/referencesState';
 import { buildEditorId } from '../../../../atoms/types/EditorData';
 import { emitEvent, RefStudioEventName, RefStudioEventPayload } from '../../../../events';
@@ -63,9 +64,9 @@ describe('ReferencesPanel', () => {
 
     await user.click(screen.getByRole('listitem', { name: ref1.title }));
 
-    const active = runGetAtomHook(activePaneContentAtom, store);
-    expect(active.current.activeEditor?.id).toBeDefined();
-    expect(active.current.activeEditor?.id).toBe(buildEditorId('reference', ref1.id));
+    const activeEditorId = runHookWithJotaiProvider(useActiveEditorId, store).current;
+    expect(activeEditorId).not.toBeNull();
+    expect(activeEditorId).toBe(buildEditorId('reference', ref1.id));
   });
 
   it('should open reference PDF on PDF icon click', async () => {
@@ -76,9 +77,9 @@ describe('ReferencesPanel', () => {
     await user.hover(elem);
     await user.click(within(elem).getByTitle('Open PDF'));
 
-    const active = runGetAtomHook(activePaneContentAtom, store);
-    expect(active.current.activeEditor?.id).toBeDefined();
-    expect(active.current.activeEditor?.id).toBe(buildEditorId('pdf', ref1.filepath));
+    const activeEditorId = runHookWithJotaiProvider(useActiveEditorId, store).current;
+    expect(activeEditorId).not.toBeNull();
+    expect(activeEditorId).toBe(buildEditorId('pdf', ref1.filepath));
   });
 
   it('should open references table on author click', async () => {
@@ -87,10 +88,12 @@ describe('ReferencesPanel', () => {
     const elem = screen.getAllByText(ref1.authors[0].lastName);
     await user.click(elem[0]);
 
-    const active = runGetAtomHook(activePaneContentAtom, store);
-    expect(active.current.activeEditor?.id).toBeDefined();
-    expect(active.current.activeEditor?.id).toBe(buildEditorId('references'));
-    const editorContent = store.get(active.current.activeEditor!.contentAtoms.loadableEditorContentAtom);
+    const activeEditorId = runHookWithJotaiProvider(useActiveEditorId, store).current;
+    expect(activeEditorId).not.toBeNull();
+    expect(activeEditorId).toBe(buildEditorId('references'));
+
+    const activeEditorContentAtoms = runHookWithJotaiProvider(useActiveEditorContentAtoms, store).current;
+    const editorContent = store.get(activeEditorContentAtoms!.loadableEditorContentAtom);
     if (editorContent.state === 'hasData' && editorContent.data.type === 'references') {
       expect(editorContent.data.filter).toBe(ref1.authors[0].lastName);
     } else {
