@@ -3,7 +3,7 @@ import { cx } from '../../lib/cx';
 export function EmptyView() {
   return (
     <div className="pointer-events-none flex w-full select-none flex-col items-center justify-center gap-2 bg-slate-300">
-      <div className="relative border border-slate-500 text-[160px] font-extrabold">
+      <div className="relative border border-slate-500 text-[160px] font-extrabold leading-none">
         <EmptyViewLetter className="bg-slate-500/50 text-slate-200/50" letter="R" />
         <EmptyViewLetter className="bg-slate-200/50 text-slate-500/50" letter="S" />
       </div>
@@ -35,7 +35,7 @@ function EmptyViewShortcut({ text, keys }: { text: string; keys: string[] }) {
 
 function EmptyViewLetter({ letter, className = '' }: { letter: string; className?: string }) {
   return (
-    <div className={cx('xw-[80px] inline-flex items-center justify-center px-4 text-center', className)}>
+    <div className={cx('inline-flex items-center justify-center px-4 text-center', className)}>
       <span>{letter}</span>
     </div>
   );
