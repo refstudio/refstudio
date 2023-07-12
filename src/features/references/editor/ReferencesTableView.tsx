@@ -98,6 +98,7 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
         editable: true,
         initialWidth: 140,
         initialFlex: undefined,
+        cellEditor: 'agDateStringCellEditor',
         onCellValueChanged: handleCellValueChanged,
       },
       {
@@ -135,6 +136,8 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
     emitEvent('refstudio://references/remove', {
       referenceIds: selectedReferences.map((r) => r.id),
     });
+
+  const rowData = useMemo(() => references.map((r) => ({ ...r })), [references]);
 
   return (
     <div className="flex w-full flex-col overflow-y-auto p-6">
@@ -183,7 +186,7 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
         getRowId={(params: GetRowIdParams<ReferenceItem>) => params.data.id}
         quickFilterText={quickFilter}
         ref={gridRef}
-        rowData={references}
+        rowData={rowData}
         rowSelection="multiple"
         suppressRowClickSelection
         onColumnMoved={(params) => saveColumnsState(() => params.columnApi.getColumnState(), !params.finished)}
