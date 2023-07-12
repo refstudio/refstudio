@@ -16,17 +16,17 @@ describe('NotificationsPopup', () => {
   ];
 
   it('should display empty notifications popup', () => {
-    render(<NotificationsPopup notifications={[]} onClear={noop} />);
+    render(<NotificationsPopup notifications={[]} onClear={noop} onClose={noop} />);
     expect(screen.getByText('NO NEW NOTIFICATIONS')).toBeInTheDocument();
   });
 
   it('should display all notifications in notifications popup', () => {
-    setup(<NotificationsPopup notifications={NOTIFICATIONS} onClear={noop} />);
+    setup(<NotificationsPopup notifications={NOTIFICATIONS} onClear={noop} onClose={noop} />);
     expect(screen.getAllByRole('row')).toHaveLength(NOTIFICATIONS.length);
   });
 
   it('should only expand first notification item by default', () => {
-    render(<NotificationsPopup notifications={NOTIFICATIONS} onClear={noop} />);
+    render(<NotificationsPopup notifications={NOTIFICATIONS} onClear={noop} onClose={noop} />);
 
     expect(screen.getByRole('row', { expanded: true })).toBeInTheDocument();
     expect(screen.queryAllByRole('row', { expanded: false })).toHaveLength(NOTIFICATIONS.length - 1);
@@ -34,7 +34,7 @@ describe('NotificationsPopup', () => {
   });
 
   it('should expand/close notification item by default', async () => {
-    const { user } = setup(<NotificationsPopup notifications={NOTIFICATIONS} onClear={noop} />);
+    const { user } = setup(<NotificationsPopup notifications={NOTIFICATIONS} onClear={noop} onClose={noop} />);
 
     const getItems = (params: { isExpanded: boolean }) => screen.queryAllByRole('row', { expanded: params.isExpanded });
 
@@ -66,9 +66,33 @@ describe('NotificationsPopup', () => {
 
   it('should call clearNotifications and close on CLEAR ALL click', async () => {
     const fn = vi.fn();
-    const { user } = setup(<NotificationsPopup notifications={NOTIFICATIONS} onClear={fn} />);
+    const { user } = setup(<NotificationsPopup notifications={NOTIFICATIONS} onClear={fn} onClose={noop} />);
 
     await user.click(screen.getByTitle('Clear All'));
+
+    expect(fn).toHaveBeenCalled();
+  });
+
+  it('sould expand/collapse on Expand/Collapse click', async () => {
+    const { user } = setup(<NotificationsPopup notifications={NOTIFICATIONS} onClear={noop} onClose={noop} />);
+
+    expect(screen.getByTitle('Expand')).toBeInTheDocument();
+    expect(screen.queryByTitle('Collapse')).not.toBeInTheDocument();
+
+    await user.click(screen.getByTitle('Expand'));
+    expect(screen.queryByTitle('Expand')).not.toBeInTheDocument();
+    expect(screen.getByTitle('Collapse')).toBeInTheDocument();
+
+    await user.click(screen.getByTitle('Collapse'));
+    expect(screen.getByTitle('Expand')).toBeInTheDocument();
+    expect(screen.queryByTitle('Collapse')).not.toBeInTheDocument();
+  });
+
+  it('sould close on CLOSE click', async () => {
+    const fn = vi.fn();
+    const { user } = setup(<NotificationsPopup notifications={NOTIFICATIONS} onClear={noop} onClose={fn} />);
+
+    await user.click(screen.getByTitle('Close'));
 
     expect(fn).toHaveBeenCalled();
   });
