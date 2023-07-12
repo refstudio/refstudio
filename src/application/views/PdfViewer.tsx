@@ -27,9 +27,12 @@ export function PdfViewer({ file }: PdfViewerProps) {
   }, []);
 
   // Update viewer's width when receiving refstudio://layout/update event
-  useListenEvent('refstudio://layout/update', useCallback(() => {
-    setPdfViewerWidth(containerRef.current?.getBoundingClientRect().width);
-  }, []));
+  useListenEvent(
+    'refstudio://layout/update',
+    useCallback(() => {
+      setPdfViewerWidth(containerRef.current?.getBoundingClientRect().width);
+    }, []),
+  );
 
   const onDocumentLoadSuccess = useCallback((pdf: { numPages: number }) => {
     setNumPages(pdf.numPages);
