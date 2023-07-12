@@ -31,12 +31,12 @@ export function CommandPalette() {
       subCommands: [
         {
           icon: <VscBell />,
-          text: 'Toggle Notifications Popup',
+          text: 'Show Notifications',
           perform: () => emitEvent('refstudio://menu/view/notifications'),
         },
         {
           icon: <VscGear />,
-          text: 'Open Settings',
+          text: 'Show Settings',
           perform: () => emitEvent('refstudio://menu/settings'),
         },
       ],
@@ -46,12 +46,12 @@ export function CommandPalette() {
       commands: [
         {
           icon: <VscSearch />,
-          text: 'Find Reference...',
+          text: 'Find References...',
           perform: () => setOpen(2),
         },
         {
           icon: <VscLibrary />,
-          text: 'Open References',
+          text: 'Show References',
           perform: () => emitEvent('refstudio://menu/references/open'),
         },
         {
@@ -66,7 +66,7 @@ export function CommandPalette() {
   const [mainCommands] = useCommands(main);
 
   return (
-    <div className="command-palette">
+    <div className="command-palette" data-testid={CommandPalette.name}>
       <CommandWrapper>
         <CommandMenu commands={mainCommands} crumbs={[]} index={1} placeholder="Search commands" />
         <ReferencesCommandMenu index={2} />
