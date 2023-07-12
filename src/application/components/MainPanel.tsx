@@ -43,10 +43,9 @@ export function MainPanel() {
       {showRight && (
         <Panel order={2}>
           <MainPanelPane paneId="RIGHT" />
-        </Panel >
-      )
-      }
-    </PanelGroup >
+        </Panel>
+      )}
+    </PanelGroup>
   );
 }
 
