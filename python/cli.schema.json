@@ -57,6 +57,22 @@
         }
       ]
     },
+    "completion": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": [
+        {
+          "$ref": "#/definitions/TextCompletionRequest"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TextCompletionChoice"
+          }
+        }
+      ]
+    },
     "chat": {
       "type": "array",
       "minItems": 2,
@@ -105,6 +121,7 @@
     "ingest_status",
     "ingest_references",
     "rewrite",
+    "completion",
     "chat",
     "update",
     "delete"
@@ -312,6 +329,52 @@
     },
     "RewriteChoice": {
       "title": "RewriteChoice",
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "index",
+        "text"
+      ]
+    },
+    "TextCompletionRequest": {
+      "title": "TextCompletionRequest",
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "n_choices": {
+          "default": 1,
+          "type": "integer"
+        },
+        "temperature": {
+          "default": 0.7,
+          "type": "number"
+        },
+        "max_tokens": {
+          "default": 512,
+          "type": "integer"
+        },
+        "title": {
+          "type": "string"
+        },
+        "abstract": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ]
+    },
+    "TextCompletionChoice": {
+      "title": "TextCompletionChoice",
       "type": "object",
       "properties": {
         "index": {
