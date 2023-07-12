@@ -13,39 +13,35 @@ import { emitEvent } from '../../events';
 import { ReferencesTableView } from '../../features/references/editor/ReferencesTableView';
 import { ReferenceView } from '../../features/references/editor/ReferenceView';
 import { TipTapView } from '../../features/textEditor/editor/TipTapView';
+import { useDebouncedCallback } from '../../hooks/useDebouncedCallback';
 import { assertNever } from '../../lib/assertNever';
-import { PdfViewerAPI } from '../../types/PdfViewerAPI';
 import { EmptyView } from '../views/EmptyView';
 import { PdfViewer } from '../views/PdfViewer';
 import { TextView } from '../views/TextView';
 
-interface MainPanelProps {
-  pdfViewerRef: React.MutableRefObject<PdfViewerAPI | null>;
-}
-
-export function MainPanel(props: MainPanelProps) {
-  const { pdfViewerRef } = props;
+export function MainPanel() {
   const left = useAtomValue(leftPaneAtom);
   const right = useAtomValue(rightPaneAtom);
-
-  const updatePDFViewerWidth = useCallback(() => {
-    pdfViewerRef.current?.updateWidth();
-  }, [pdfViewerRef]);
 
   const showRight = right.openEditors.length > 0;
   const showLeft = left.openEditors.length > 0 || !showRight;
 
+  const handleLayoutUpdate = useDebouncedCallback(
+    useCallback(() => emitEvent('refstudio://layout/update'), []),
+    200,
+  );
+
   return (
-    <PanelGroup autoSaveId="mainPanel" direction="horizontal" onLayout={updatePDFViewerWidth}>
+    <PanelGroup autoSaveId="mainPanel" direction="horizontal" onLayout={handleLayoutUpdate}>
       {showLeft && (
         <Panel order={1}>
-          <MainPanelPane pane={left} {...props} />
+          <MainPanelPane pane={left} />
         </Panel>
       )}
       {showLeft && showRight && <VerticalResizeHandle />}
       {showRight && (
         <Panel order={2}>
-          <MainPanelPane pane={right} {...props} />
+          <MainPanelPane pane={right} />
         </Panel>
       )}
     </PanelGroup>
@@ -56,7 +52,7 @@ interface MainPanelPaneProps {
   pane: PaneContent;
 }
 
-export function MainPanelPane({ pane, pdfViewerRef }: MainPanelPaneProps & MainPanelProps) {
+export function MainPanelPane({ pane }: MainPanelPaneProps) {
   const { openEditors, activeEditor: activeFile, activeEditor } = pane;
   const activeEditorAtoms = activeEditor?.contentAtoms;
 
@@ -80,11 +76,7 @@ export function MainPanelPane({ pane, pdfViewerRef }: MainPanelPaneProps & MainP
         />
       </div>
       <div className="flex w-full grow overflow-hidden">
-        {activeEditorAtoms ? (
-          <MainPaneViewContent activeEditorAtoms={activeEditorAtoms} pdfViewerRef={pdfViewerRef} />
-        ) : (
-          <EmptyView />
-        )}
+        {activeEditorAtoms ? <MainPaneViewContent activeEditorAtoms={activeEditorAtoms} /> : <EmptyView />}
       </div>
     </div>
   );
@@ -92,10 +84,9 @@ export function MainPanelPane({ pane, pdfViewerRef }: MainPanelPaneProps & MainP
 
 interface MainPaneViewContentProps {
   activeEditorAtoms: EditorContentAtoms;
-  pdfViewerRef: React.MutableRefObject<PdfViewerAPI | null>;
 }
 
-export function MainPaneViewContent({ activeEditorAtoms, pdfViewerRef }: MainPaneViewContentProps) {
+export function MainPaneViewContent({ activeEditorAtoms }: MainPaneViewContentProps) {
   const { loadableEditorContentAtom } = activeEditorAtoms;
   const loadableEditorContent = useAtomValue(loadableEditorContentAtom);
 
@@ -115,7 +106,7 @@ export function MainPaneViewContent({ activeEditorAtoms, pdfViewerRef }: MainPan
     case 'json':
       return <TextView file={data} textFormatter={(input) => JSON.stringify(JSON.parse(input), null, 2)} />;
     case 'pdf':
-      return <PdfViewer file={data} pdfViewerRef={pdfViewerRef} />;
+      return <PdfViewer file={data} />;
     case 'text':
       return <TipTapView activeEditorContentAtoms={activeEditorAtoms} file={data} />;
     case 'reference':
