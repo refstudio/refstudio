@@ -1,7 +1,7 @@
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 
 import { PdfEditorContent } from '../../atoms/types/EditorContent';
@@ -48,9 +48,9 @@ export function PdfViewer({ file, pdfViewerRef }: PdfViewerProps) {
     };
   }, [pdfViewerRef, debouncedUpdateWidth]);
 
-  const onDocumentLoadSuccess = (pdf: { numPages: number }) => {
+  const onDocumentLoadSuccess = useCallback((pdf: { numPages: number }) => {
     setNumPages(pdf.numPages);
-  };
+  }, []);
 
   return (
     <div className="pdf-viewer flex h-full w-full flex-col" ref={containerRef}>
