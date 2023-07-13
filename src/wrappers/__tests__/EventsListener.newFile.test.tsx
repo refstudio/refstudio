@@ -1,7 +1,7 @@
 import { createStore } from 'jotai';
 
-import { runGetAtomHook } from '../../atoms/__tests__/test-utils';
-import { activePaneContentAtom } from '../../atoms/paneActions';
+import { runHookWithJotaiProvider } from '../../atoms/__tests__/test-utils';
+import { useOpenEditorsCountForPane } from '../../atoms/hooks/useOpenEditorsCountForPane';
 import { RefStudioEventName } from '../../events';
 import { act, mockListenEvent, setupWithJotaiProvider, waitFor } from '../../test/test-utils';
 import { EventsListener } from '../EventsListener';
@@ -29,18 +29,19 @@ describe('EventsListener.close', () => {
     expect(mockData.registeredEventNames).toContain<RefStudioEventName>(newFileEventName);
   });
 
-  it(`should create a new file when ${newFileEventName} event is triggered`, async () => {
+  it(`should create a new file in the LEFT pane when ${newFileEventName} event is triggered`, async () => {
     const mockData = mockListenEvent();
-    const activePaneContent = runGetAtomHook(activePaneContentAtom, store);
 
-    expect(activePaneContent.current.openEditors).toHaveLength(0);
+    const activePaneContentOpenEditorsCount = runHookWithJotaiProvider(() => useOpenEditorsCountForPane('LEFT'), store);
+
+    expect(activePaneContentOpenEditorsCount.current).toBe(0);
 
     setupWithJotaiProvider(<EventsListener />, store);
 
     act(() => mockData.trigger(newFileEventName));
 
     await waitFor(() => {
-      expect(activePaneContent.current.openEditors).toHaveLength(1);
+      expect(activePaneContentOpenEditorsCount.current).toBe(1);
     });
   });
 });

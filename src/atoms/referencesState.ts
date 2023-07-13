@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
 
-import { removeReferences } from '../api/ingestion';
+import { removeReferences, updateReference } from '../api/ingestion';
 import { deleteFile } from '../io/filesystem';
 import { isNonNullish } from '../lib/isNonNullish';
 import { ReferenceItem } from '../types/ReferenceItem';
@@ -35,6 +35,49 @@ const removeReferenceAtom = atom(null, (get, set, id: string) => {
   const newReferences = references.filter((ref) => ref.id !== id);
   set(setReferencesAtom, newReferences);
 });
+
+const UPDATABLE_FIELDS: (keyof ReferenceItem)[] = ['citationKey', 'title', 'publishedDate', 'authors'];
+export const updateReferenceAtom = atom(null, async (get, set, id: string, updatedReference: ReferenceItem) => {
+  const reference = get(getDerivedReferenceAtom(id));
+  if (!reference) {
+    console.warn('Cannot find reference with ID', id);
+    return;
+  }
+
+  const patch: Partial<ReferenceItem> = UPDATABLE_FIELDS.reduce(
+    (acc, field) => ({
+      ...acc,
+      ...patchEntry(field, reference, updatedReference),
+    }),
+    {},
+  );
+
+  if (Object.keys(patch).length === 0) {
+    console.log('No change detected.');
+    return;
+  }
+
+  // Call backend (patch of updatable fields)
+  await updateReference(reference.filename, patch);
+
+  // Update local atoms
+  const references = get(getReferencesAtom);
+  const updatedReferences: ReferencesState = {};
+  references.forEach((ref) => {
+    updatedReferences[ref.id] = ref.id === updatedReference.id ? updatedReference : ref;
+  });
+  set(referencesAtom, updatedReferences);
+});
+
+function patchEntry(key: keyof ReferenceItem, original: ReferenceItem, updated: ReferenceItem): Partial<ReferenceItem> {
+  const originalValue = original[key];
+  const updatedValue = updated[key];
+
+  if (JSON.stringify(originalValue) !== JSON.stringify(updatedValue)) {
+    return { [key]: updatedValue };
+  }
+  return {};
+}
 
 export const removeReferencesAtom = atom(null, async (get, set, ids: string[]) => {
   const referencesToRemove = ids.map((id) => get(getDerivedReferenceAtom(id))).filter(isNonNullish);

@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -7,7 +8,7 @@ from typing import List
 import pypdf
 from sidecar import settings
 
-from .typing import Author, Chunk, Reference
+from .typing import Author, Chunk, Reference, TextCompletionChoice
 
 
 def get_word_count(text: str) -> int:
@@ -22,6 +23,56 @@ def remove_file(filepath: str) -> None:
         os.remove(filepath)
     except OSError:
         pass
+
+
+def trim_completion_prefix_from_choices(
+        prefix: str,
+        choices: List[TextCompletionChoice]
+    ) -> List[TextCompletionChoice]:
+    """
+    Trim a text completion prefix from a list of text completion choices.
+
+    Parameters
+    ----------
+    prefix : str
+        The prefix to trim from the text completion choices.
+    choices : List[TextCompletionChoice]
+        The text completion choices to trim the prefix from.
+
+    Returns
+    -------
+    List[TextCompletionChoice]
+        The text completion choices with the prefix trimmed.
+
+    Examples
+    --------
+    >>> prefix = "This is a prefix and we have "
+    >>> choices = [
+    ...     TextCompletionChoice(index=0, text="This is a prefix and we have inserted some text."),
+    ...     TextCompletionChoice(index=1, text="This is a prefix and we have added some text."),
+    ...     TextCompletionChoice(index=2, text="updated some text."),
+    ... ]
+    >>> trimmed_choices = trim_completion_prefix_from_choices(prefix, choices)
+    >>> trimmed_choices[0].text
+    'inserted some text.'
+    >>> trimmed_choices[1].text
+    'added some text.'
+    >>> trimmed_choices[2].text
+    'updated some text.'
+    """
+    # split prefix into sentences
+    sentence_splitter_regex = r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s'
+    prefix_sentences = re.split(sentence_splitter_regex, prefix)
+
+    # and remove any sentences from the prompt that were included in the responses
+    for choice in choices:
+        for sentence in prefix_sentences:
+            if choice.text.strip().startswith(sentence.strip()):
+                choice.text = choice.text[len(sentence):].strip()
+
+            if '[MASK]' in choice.text:
+                choice.text = choice.text.replace('[MASK]', '')
+    return choices
 
 
 def parse_date(date_str: str) -> datetime:

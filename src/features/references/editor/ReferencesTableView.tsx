@@ -6,40 +6,34 @@ import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-mod
 import {
   ColDef,
   GetRowIdParams,
-  ICellRendererParams,
   ModuleRegistry,
   NewValueParams,
   SelectionChangedEvent,
+  SuppressKeyboardEventParams,
 } from '@ag-grid-community/core';
 import { AgGridReact } from '@ag-grid-community/react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  VscDesktopDownload,
-  VscFile,
-  VscFilePdf,
-  VscKebabVertical,
-  VscNewFile,
-  VscTable,
-  VscTrash,
-} from 'react-icons/vsc';
+import { VscDesktopDownload, VscKebabVertical, VscNewFile, VscTable, VscTrash } from 'react-icons/vsc';
 
-import { openReferenceAtom, openReferencePdfAtom } from '../../../atoms/editorActions';
-import { getReferencesAtom } from '../../../atoms/referencesState';
+import { getReferencesAtom, updateReferenceAtom } from '../../../atoms/referencesState';
 import { emitEvent } from '../../../events';
 import { autoFocusAndSelect } from '../../../lib/autoFocusAndSelect';
 import { isNonNullish } from '../../../lib/isNonNullish';
-import { ReferenceItem, ReferenceItemStatus } from '../../../types/ReferenceItem';
-import { ReferencesItemStatusLabel } from '../components/ReferencesItemStatusLabel';
+import { ReferenceItem } from '../../../types/ReferenceItem';
 import { TopActionIcon } from '../components/TopActionIcon';
 import { UploadTipInstructions } from '../components/UploadTipInstructions';
+import { ActionsCell } from './grid/ActionsCell';
+import { AuthorsEditor } from './grid/AuthorsEditor';
 import { loadColumnsState, resetColumnsState, saveColumnsState } from './grid/columnsState';
 import { authorsFormatter, firstAuthorFormatter } from './grid/formatters';
+import { StatusCell } from './grid/StatusCell';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: string }) {
   const references = useAtomValue(getReferencesAtom);
+  const updateReference = useSetAtom(updateReferenceAtom);
   const [quickFilter, setQuickFilter] = useState(defaultFilter);
 
   useEffect(() => setQuickFilter(defaultFilter), [defaultFilter]);
@@ -48,10 +42,10 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
 
   const gridRef = useRef<AgGridReact<ReferenceItem>>(null);
 
-  const handleTitleEdit = useCallback(({ oldValue, newValue }: NewValueParams<ReferenceItem, 'string'>) => {
-    console.log('EDIT');
-    console.log(`${oldValue} -> ${newValue}`);
-  }, []);
+  const handleCellValueChanged = useCallback(
+    (params: NewValueParams<ReferenceItem>) => void updateReference(params.data.id, params.data),
+    [updateReference],
+  );
 
   const onSelectionChanged = useCallback((event: SelectionChangedEvent<ReferenceItem>) => {
     const rows = event.api.getSelectedNodes();
@@ -75,8 +69,10 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
         initialWidth: 160,
         sortable: true,
         flex: undefined,
+        editable: true,
         checkboxSelection: true,
         headerCheckboxSelection: true,
+        onCellValueChanged: handleCellValueChanged,
       },
       {
         field: 'authors',
@@ -91,7 +87,7 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
         initialSort: 'asc',
         initialFlex: 1,
         editable: true,
-        onCellValueChanged: handleTitleEdit,
+        onCellValueChanged: handleCellValueChanged,
       },
       { field: 'abstract', flex: 2, filter: true, sortable: true },
       {
@@ -99,13 +95,22 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
         headerName: 'Published',
         filter: true,
         sortable: true,
+        editable: true,
         initialWidth: 140,
         initialFlex: undefined,
+        cellEditor: 'agDateStringCellEditor',
+        onCellValueChanged: handleCellValueChanged,
       },
       {
         field: 'authors',
         valueFormatter: authorsFormatter,
+        editable: true,
+        suppressKeyboardEvent: (params) => params.editing && suppressShiftEnter(params),
+        cellEditor: memo(AuthorsEditor),
+        cellEditorPopupPosition: 'under',
+        cellEditorPopup: true,
         filter: true,
+        onCellValueChanged: handleCellValueChanged,
       },
       {
         field: 'status',
@@ -124,13 +129,15 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
         cellRenderer: memo(ActionsCell),
       },
     ],
-    [handleTitleEdit],
+    [handleCellValueChanged],
   );
 
   const handleOnBulkRemove = () =>
     emitEvent('refstudio://references/remove', {
       referenceIds: selectedReferences.map((r) => r.id),
     });
+
+  const rowData = useMemo(() => references.map((r) => ({ ...r })), [references]);
 
   return (
     <div className="flex w-full flex-col overflow-y-auto p-6">
@@ -179,7 +186,7 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
         getRowId={(params: GetRowIdParams<ReferenceItem>) => params.data.id}
         quickFilterText={quickFilter}
         ref={gridRef}
-        rowData={references}
+        rowData={rowData}
         rowSelection="multiple"
         suppressRowClickSelection
         onColumnMoved={(params) => saveColumnsState(() => params.columnApi.getColumnState(), !params.finished)}
@@ -195,38 +202,9 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
   );
 }
 
-function StatusCell({ value }: ICellRendererParams<ReferenceItem, ReferenceItemStatus>) {
-  if (!value) {
-    return null;
-  }
-  return (
-    <span className="text-[10px]">
-      <ReferencesItemStatusLabel status={value} />
-    </span>
-  );
-}
-
-function ActionsCell({ data: reference }: ICellRendererParams<ReferenceItem, ReferenceItemStatus>) {
-  const openReference = useSetAtom(openReferenceAtom);
-  const openReferencePdf = useSetAtom(openReferencePdfAtom);
-
-  if (!reference) {
-    return null;
-  }
-  return (
-    <div className="flex h-full w-full items-center justify-center gap-2">
-      <VscFile
-        className="shrink-0 cursor-pointer"
-        size={20}
-        title="Open Reference Details"
-        onClick={() => openReference(reference.id)}
-      />
-      <VscFilePdf
-        className="shrink-0 cursor-pointer"
-        size={20}
-        title="Open Reference PDF"
-        onClick={() => openReferencePdf(reference.id)}
-      />
-    </div>
-  );
+function suppressShiftEnter(params: SuppressKeyboardEventParams) {
+  const KEY_ENTER = 'Enter';
+  const { event } = params;
+  const { key } = event;
+  return key === KEY_ENTER && event.shiftKey;
 }

@@ -24,9 +24,9 @@ describe('notifications.console', () => {
   });
 
   it('should intercept console.log with optional parameters as details in JSON', () => {
-    console.log('message', 'some extra');
+    console.log('message', 'some extra details');
     expect(vi.mocked(notifyInfo)).toHaveBeenCalledTimes(1);
-    expect(vi.mocked(notifyInfo)).toHaveBeenCalledWith(prefixTitle('message'), '"some extra"');
+    expect(vi.mocked(notifyInfo)).toHaveBeenCalledWith(prefixTitle('message'), 'some extra details');
   });
 
   it('should intercept console.log with optional parameters in multi-line JSON', () => {
@@ -34,7 +34,7 @@ describe('notifications.console', () => {
     expect(vi.mocked(notifyInfo)).toHaveBeenCalledTimes(1);
     expect(vi.mocked(notifyInfo)).toHaveBeenCalledWith(
       prefixTitle('message'),
-      ['"some extra"', 1, JSON.stringify({ a: 42 }, null, 2)].join('\n'),
+      ['some extra', 1, JSON.stringify({ a: 42 }, null, 2)].join('\n'),
     );
   });
 
@@ -52,9 +52,9 @@ describe('notifications.console', () => {
 
   it('should intercept console.error with err in first arg', () => {
     const err = new Error('message');
-    console.error(err);
+    console.error(err, 'some extra content for err');
     expect(vi.mocked(notifyErr)).toHaveBeenCalledTimes(1);
-    expect(vi.mocked(notifyErr)).toHaveBeenCalledWith(err);
+    expect(vi.mocked(notifyErr)).toHaveBeenCalledWith(err, undefined, 'some extra content for err');
   });
 
   it('should intercept console.error with err in second arg', () => {

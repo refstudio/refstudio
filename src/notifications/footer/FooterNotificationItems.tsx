@@ -75,6 +75,7 @@ export function FooterNotificationItems() {
             clearNotifications(type);
             hideNotifications();
           }}
+          onClose={hideNotifications}
         />
       )}
     </>

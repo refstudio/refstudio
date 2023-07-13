@@ -1,29 +1,44 @@
+const SYSTEM_PATH = '/usr/name/foo/tauri.foo';
+const PROJECT_NAME = 'project';
 const UPLOADS_DIR = 'uploads';
 
-export const makeUploadPath = (filename: string) => `/${UPLOADS_DIR}/${filename}`;
+function join(...segments: string[]) {
+  return segments.join('/').replaceAll('//', '/');
+}
 
-export const makeNewFilePath = (filename: string) => `/${filename}`;
+// #####################################################################################
+// Top Level PATH API
+// #####################################################################################
+export const getSystemPath = vi.fn((rsPath: string) => join(SYSTEM_PATH, PROJECT_NAME, rsPath));
+export const getRefStudioPath = vi.fn((path: string) => path.replace(SYSTEM_PATH, ''));
+export const getSystemConfigurationsDir = vi.fn(() => join(SYSTEM_PATH, 'config'));
+export const getSystemAppDataDir = vi.fn(() => join(SYSTEM_PATH, 'data'));
 
-export const splitFilePath = (filePath: string) => filePath.split('/');
-
-export const isInUploadsDir = (relativePath: string) => relativePath.startsWith(`/${UPLOADS_DIR}`);
-
-export const getUploadsDir = vi.fn();
-
-export const getConfigDir = vi.fn();
-
-export const getAppDataDir = vi.fn();
-
-export const ensureProjectFileStructure = vi.fn();
-
-export const readAllProjectFiles = vi.fn();
-
-export const writeFileContent = vi.fn();
-
+// #####################################################################################
+// UPLOADS
+// #####################################################################################
+export const getUploadsDir = vi.fn(() => join('/', UPLOADS_DIR));
+export const makeUploadPath = vi.fn((filename: string) => join(UPLOADS_DIR, filename));
+export const isInUploadsDir = vi.fn((path: string) => path.startsWith(join('/', UPLOADS_DIR)));
 export const uploadFiles = vi.fn();
 
+// #####################################################################################
+// Project Structure and read project files
+// #####################################################################################
+export const ensureProjectFileStructure = vi.fn();
+export const readAllProjectFiles = vi.fn(() => []);
+
+// #####################################################################################
+// file path utils
+// #####################################################################################
+export const makeRefStudioPath = vi.fn((file: string) => '/' + file);
+export const splitRefStudioPath = vi.fn((path: string) => path.split('/'));
+export const getParentFolder = vi.fn((path: string) => path.split('/').slice(0, -1).join('/'));
+
+// #####################################################################################
+// FILE Operations: read, write, delete, rename
+// #####################################################################################
+export const writeFileContent = vi.fn();
 export const readFileContent = vi.fn();
-
 export const deleteFile = vi.fn();
-
 export const renameFile = vi.fn();

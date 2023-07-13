@@ -24,7 +24,12 @@ export function useAsyncEffect<V, E>(
     const maybePromise = effect(() => mounted);
 
     Promise.resolve(maybePromise)
-      .then((_effectResult) => (effectResult = _effectResult))
+      .then((_effectResult) => {
+        effectResult = _effectResult;
+        if (!mounted && hasDestroy && effectResult !== undefined) {
+          destroy(_effectResult);
+        }
+      })
       .catch((err: E) => onError?.(err));
 
     return () => {

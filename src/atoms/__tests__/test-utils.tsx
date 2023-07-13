@@ -1,6 +1,6 @@
-import { renderHook } from '@testing-library/react';
-import { Atom, createStore, useAtomValue, useSetAtom, WritableAtom } from 'jotai';
+import { Atom, createStore, Provider, useAtomValue, useSetAtom, WritableAtom } from 'jotai';
 
+import { renderHook } from '../../test/test-utils';
 import { FileExplorerEntry } from '../types/FileExplorerEntry';
 
 export function runGetAtomHook<T>(atom: Atom<T>, store: ReturnType<typeof createStore>) {
@@ -12,6 +12,11 @@ export function runSetAtomHook<Value, Args extends unknown[], Result>(
   store: ReturnType<typeof createStore>,
 ) {
   return renderHook(() => useSetAtom(atom, { store })).result;
+}
+
+export function runHookWithJotaiProvider<T>(hook: () => T, store: ReturnType<typeof createStore>) {
+  const wrapper = ({ children }: { children: React.ReactNode }) => <Provider store={store}>{children}</Provider>;
+  return renderHook(hook, { wrapper }).result;
 }
 
 export function stringifyFileExplorerState(

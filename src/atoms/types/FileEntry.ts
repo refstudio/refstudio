@@ -1,4 +1,4 @@
-import { splitFilePath } from '../../io/filesystem';
+import { splitRefStudioPath } from '../../io/filesystem';
 
 interface FileEntryBase {
   name: string;
@@ -21,7 +21,7 @@ export interface FolderFileEntry extends FileEntryBase {
 export type FileEntry = FileFileEntry | FolderFileEntry;
 
 export function getFileFileEntryFromPath(filePath: string): FileFileEntry {
-  const name = splitFilePath(filePath).pop() ?? '';
+  const name = splitRefStudioPath(filePath).pop() ?? '';
   return {
     path: filePath,
     name,

@@ -1,11 +1,10 @@
 import { createStore } from 'jotai';
 
-import { runGetAtomHook } from '../../../../atoms/__tests__/test-utils';
-import { activePaneContentAtom } from '../../../../atoms/paneActions';
+import { runHookWithJotaiProvider } from '../../../../atoms/__tests__/test-utils';
+import { useActiveEditorId } from '../../../../atoms/hooks/useActiveEditorId';
 import { setReferencesAtom } from '../../../../atoms/referencesState';
 import { buildEditorId } from '../../../../atoms/types/EditorData';
 import { emitEvent, RefStudioEventName, RefStudioEventPayload } from '../../../../events';
-import { getAppDataDir } from '../../../../io/filesystem';
 import { screen, setupWithJotaiProvider, waitFor, within } from '../../../../test/test-utils';
 import { REFERENCES } from '../../__tests__/test-fixtures';
 import { UploadTipInstructions } from '../../components/UploadTipInstructions';
@@ -13,8 +12,6 @@ import { ReferencesTableView } from '../ReferencesTableView';
 
 vi.mock('../../../../events');
 vi.mock('../../../../io/filesystem');
-
-vi.mocked(getAppDataDir).mockResolvedValue('/');
 
 describe('ReferencesTableView component', () => {
   let store: ReturnType<typeof createStore>;
@@ -26,7 +23,7 @@ describe('ReferencesTableView component', () => {
   });
 
   afterEach(() => {
-    vi.resetAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render empty table with upload tips', () => {
@@ -100,10 +97,9 @@ describe('ReferencesTableView component', () => {
     expect(buttons).toHaveLength(REFERENCES.length);
     await user.click(buttons[0]);
 
-    const active = runGetAtomHook(activePaneContentAtom, store);
-
-    expect(active.current.activeEditor?.id).toBeDefined();
-    expect(active.current.activeEditor?.id).toBe(buildEditorId('reference', ref1.id));
+    const activeEditorId = runHookWithJotaiProvider(useActiveEditorId, store).current;
+    expect(activeEditorId).not.toBeNull();
+    expect(activeEditorId).toBe(buildEditorId('reference', ref1.id));
   });
 
   it('should open reference PDF details on click in icon Open Reference PDF', async () => {
@@ -113,10 +109,9 @@ describe('ReferencesTableView component', () => {
     expect(buttons).toHaveLength(REFERENCES.length);
     await user.click(buttons[0]);
 
-    const active = runGetAtomHook(activePaneContentAtom, store);
-
-    expect(active.current.activeEditor?.id).toBeDefined();
-    expect(active.current.activeEditor?.id).toBe(buildEditorId('pdf', ref1.filepath));
+    const activeEditorId = runHookWithJotaiProvider(useActiveEditorId, store).current;
+    expect(activeEditorId).not.toBeNull();
+    expect(activeEditorId).toBe(buildEditorId('pdf', ref1.filepath));
   });
 
   it(`should not emit ${'refstudio://references/remove' as RefStudioEventName} with NO selections`, async () => {

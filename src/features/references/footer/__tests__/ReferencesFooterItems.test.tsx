@@ -14,7 +14,7 @@ vi.mock('../../../../api/ingestion');
 
 describe('ReferencesFooterItems component', () => {
   afterEach(() => {
-    vi.resetAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render with 0 references, and no sync in progess indicator', () => {
@@ -55,7 +55,7 @@ describe('ReferencesFooterItems component', () => {
 
     const opened = runGetAtomHook(activePaneAtom, store);
     expect(opened.current.openEditorIds).toHaveLength(1);
-    expect(opened.current.activeEditorId).toBeDefined();
+    expect(opened.current.activeEditorId).not.toBeNull();
     expect(opened.current.activeEditorId).toBe(buildEditorId('references'));
   });
 });
