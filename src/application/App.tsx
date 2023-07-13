@@ -1,5 +1,6 @@
 import 'react-contexify/dist/ReactContexify.css';
 
+import { MenuProvider } from 'kmenu';
 import React, { useCallback, useEffect, useState } from 'react';
 import { VscChevronUp } from 'react-icons/vsc';
 import { ImperativePanelHandle, Panel, PanelGroup } from 'react-resizable-panels';
@@ -19,6 +20,7 @@ import { SettingsModalOpener } from '../settings/SettingsModalOpener';
 import { ApplicationFrame } from '../wrappers/ApplicationFrame';
 import { ContextMenus } from '../wrappers/ContextMenus';
 import { EventsListener } from '../wrappers/EventsListener';
+import { CommandPalette } from './CommandPalette';
 import { MainPanel } from './components/MainPanel';
 import { ExplorerPanel } from './sidebar/ExplorerPanel';
 
@@ -50,18 +52,21 @@ function App() {
       <ReferencesDropZone>
         <ApplicationFrame>
           <ContextMenus>
-            <PanelGroup
-              autoSaveId="refstudio"
-              className="relative h-full"
-              direction="horizontal"
-              onLayout={handleLayoutUpdate}
-            >
-              <LeftSidePanelWrapper />
-              <Panel defaultSize={60} order={2}>
-                <MainPanel />
-              </Panel>
-              <RightPanelWrapper />
-            </PanelGroup>
+            <MenuProvider config={{ animationDuration: 0 }}>
+              <CommandPalette />
+              <PanelGroup
+                autoSaveId="refstudio"
+                className="relative h-full"
+                direction="horizontal"
+                onLayout={handleLayoutUpdate}
+              >
+                <LeftSidePanelWrapper />
+                <Panel defaultSize={60} order={2}>
+                  <MainPanel />
+                </Panel>
+                <RightPanelWrapper />
+              </PanelGroup>
+            </MenuProvider>
           </ContextMenus>
         </ApplicationFrame>
         <SettingsModalOpener />

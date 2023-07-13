@@ -105,10 +105,10 @@ function NotificationItemWidget({ item, expanded }: { item: ReadonlyNotification
 function NotificationIcon({ type }: { type: NotificationItemType }) {
   switch (type) {
     case 'info':
-      return <VscInfo className="text-blue-400" size={20} />;
+      return <VscInfo className="shrink-0 text-blue-400" size={20} />;
     case 'warning':
-      return <VscWarning className="text-orange-400" size={20} />;
+      return <VscWarning className="shrink-0 text-orange-400" size={20} />;
     case 'error':
-      return <VscError className="text-red-400" size={20} />;
+      return <VscError className="shrink-0 text-red-400" size={20} />;
   }
 }
