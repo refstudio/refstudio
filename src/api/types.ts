@@ -78,7 +78,6 @@ export interface DeleteStatusResponse {
   status: ResponseStatus;
   message: string;
 }
-// TODO: Add search response
 export interface SearchResponse {
   search_results: {}[];
 }
