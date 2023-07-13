@@ -28,6 +28,9 @@
     },
     "delete": {
       "$ref": "#/definitions/DeleteStatusResponse"
+    },
+    "search": {
+      "$ref": "#/definitions/SearchResponse"
     }
   },
   "required": [
@@ -37,7 +40,8 @@
     "rewrite",
     "chat",
     "update",
-    "delete"
+    "delete",
+    "search"
   ],
   "definitions": {
     "IngestStatus": {
@@ -270,6 +274,21 @@
       "required": [
         "status",
         "message"
+      ]
+    },
+    "SearchResponse": {
+      "title": "SearchResponse",
+      "type": "object",
+      "properties": {
+        "search_results": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      },
+      "required": [
+        "search_results"
       ]
     }
   }
