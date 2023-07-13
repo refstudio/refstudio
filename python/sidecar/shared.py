@@ -69,6 +69,9 @@ def trim_completion_prefix_from_choices(
         for sentence in prefix_sentences:
             if choice.text.strip().startswith(sentence.strip()):
                 choice.text = choice.text[len(sentence):].strip()
+
+            if '[MASK]' in choice.text:
+                choice.text = choice.text.replace('[MASK]', '')
     return choices
 
 
