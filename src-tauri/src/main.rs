@@ -9,6 +9,9 @@ fn get_environment_variable(name: &str) -> String {
 
 use dotenv::dotenv;
 use std::env;
+
+// Prevent build warning for tauri::Manager
+#[allow(unused_imports)]
 use tauri::Manager;
 
 mod core;
@@ -19,12 +22,12 @@ fn main() {
     let context = tauri::generate_context!();
 
     tauri::Builder::default()
-        .setup(|app| {
+        .setup(|_app| {
             #[cfg(debug_assertions)] // only include this code on debug builds
             {
                 let dev_tools_visible = env::var("DEV_TOOLS").is_ok();
                 if dev_tools_visible {
-                    app.get_window("main").unwrap().open_devtools();
+                    _app.get_window("main").unwrap().open_devtools();
                 };
             }
             Ok(())
