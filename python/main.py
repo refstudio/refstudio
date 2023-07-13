@@ -31,7 +31,7 @@ if __name__ == '__main__':
         ingest.get_references(param_obj)
 
     elif args.command == "rewrite":
-        rewrite.summarize(param_obj)
+        rewrite.rewrite(param_obj)
 
     elif args.command == "completion":
         rewrite.complete_text(param_obj)

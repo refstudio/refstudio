@@ -13,16 +13,18 @@ load_dotenv()
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 
-def summarize(arg: RewriteRequest):
+def rewrite(arg: RewriteRequest):
     text = arg.text
+    manner = arg.manner
     n_choices = arg.n_choices
     temperature = arg.temperature
+
     # there are 1.33 tokens per word on average
     # seems reasonable to require a max_tokens roughly equivalent to our input text
     # https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them
     max_tokens = int(round(len(text.split(" ")) * 1.33))
 
-    prompt = prompts.create_prompt_for_summarize(text)
+    prompt = prompts.create_prompt_for_rewrite(text, manner)
     chat = Rewriter(prompt, n_choices, temperature, max_tokens)
     response = chat.get_response(response_type=RewriteChoice)
     sys.stdout.write(json.dumps([r.dict() for r in response]))

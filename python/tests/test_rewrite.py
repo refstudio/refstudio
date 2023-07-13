@@ -4,7 +4,7 @@ from sidecar import rewrite
 from sidecar.typing import RewriteRequest, TextCompletionRequest
 
 
-def test_summarize(monkeypatch, capsys):
+def test_rewrite(monkeypatch, capsys):
     def mock_call_model(*args, **kwargs):
         response = {
             "choices": [
@@ -31,7 +31,7 @@ def test_summarize(monkeypatch, capsys):
 
     monkeypatch.setattr(rewrite.Rewriter, "call_model", mock_call_model)
 
-    _ = rewrite.summarize(RewriteRequest(text="This is a test"))
+    _ = rewrite.rewrite(RewriteRequest(text="This is a test"))
     captured = capsys.readouterr()
     output = json.loads(captured.out)
 
