@@ -9,43 +9,40 @@ import { EditorContentAtoms } from '../../atoms/types/EditorContentAtoms';
 import { PaneId } from '../../atoms/types/PaneGroup';
 import { Spinner } from '../../components/Spinner';
 import { VerticalResizeHandle } from '../../components/VerticalResizeHandle';
+import { emitEvent } from '../../events';
 import { ReferencesTableView } from '../../features/references/editor/ReferencesTableView';
 import { ReferenceView } from '../../features/references/editor/ReferenceView';
 import { TipTapView } from '../../features/textEditor/editor/TipTapView';
+import { useDebouncedCallback } from '../../hooks/useDebouncedCallback';
 import { assertNever } from '../../lib/assertNever';
-import { PdfViewerAPI } from '../../types/PdfViewerAPI';
 import { EmptyView } from '../views/EmptyView';
 import { PdfViewer } from '../views/PdfViewer';
 import { TextView } from '../views/TextView';
 import { OpenEditorsTabPane } from './OpenEditorsTabPane';
 
-interface MainPanelProps {
-  pdfViewerRef: React.MutableRefObject<PdfViewerAPI | null>;
-}
-
-export function MainPanel(props: MainPanelProps) {
-  const { pdfViewerRef } = props;
+export function MainPanel() {
   const leftOpenEditorsCount = useOpenEditorsCountForPane('LEFT');
   const rightOpenEditorsCount = useOpenEditorsCountForPane('RIGHT');
-
-  const updatePDFViewerWidth = useCallback(() => {
-    pdfViewerRef.current?.updateWidth();
-  }, [pdfViewerRef]);
 
   const showRight = rightOpenEditorsCount > 0;
   const showLeft = leftOpenEditorsCount > 0 || !showRight;
 
+  const handleLayoutUpdate = useDebouncedCallback(
+    useCallback(() => emitEvent('refstudio://layout/update'), []),
+    200,
+  );
+
   return (
-    <PanelGroup autoSaveId="mainPanel" direction="horizontal" onLayout={updatePDFViewerWidth}>
+    <PanelGroup autoSaveId="mainPanel" direction="horizontal" onLayout={handleLayoutUpdate}>
       {showLeft && (
         <Panel order={1}>
-          <MainPanelPane paneId="LEFT" {...props} />
+          <MainPanelPane paneId="LEFT" />
         </Panel>
       )}
       {showLeft && showRight && <VerticalResizeHandle />}
       {showRight && (
         <Panel order={2}>
-          <MainPanelPane paneId="RIGHT" {...props} />
+          <MainPanelPane paneId="RIGHT" />
         </Panel>
       )}
     </PanelGroup>
@@ -56,7 +53,7 @@ interface MainPanelPaneProps {
   paneId: PaneId;
 }
 
-const MainPanelPane = memo(({ paneId, pdfViewerRef }: MainPanelPaneProps & MainPanelProps) => {
+const MainPanelPane = memo(({ paneId }: MainPanelPaneProps) => {
   const activeEditorAtoms = useActiveEditorContentAtomsForPane(paneId);
 
   const focusPane = useSetAtom(focusPaneAtom);
@@ -67,11 +64,7 @@ const MainPanelPane = memo(({ paneId, pdfViewerRef }: MainPanelPaneProps & MainP
         <OpenEditorsTabPane paneId={paneId} />
       </div>
       <div className="flex w-full grow overflow-hidden">
-        {activeEditorAtoms ? (
-          <MainPaneViewContent activeEditorAtoms={activeEditorAtoms} pdfViewerRef={pdfViewerRef} />
-        ) : (
-          <EmptyView />
-        )}
+        {activeEditorAtoms ? <MainPaneViewContent activeEditorAtoms={activeEditorAtoms} /> : <EmptyView />}
       </div>
     </div>
   );
@@ -80,10 +73,9 @@ MainPanelPane.displayName = 'MainPanelPane';
 
 interface MainPaneViewContentProps {
   activeEditorAtoms: EditorContentAtoms;
-  pdfViewerRef: React.MutableRefObject<PdfViewerAPI | null>;
 }
 
-function MainPaneViewContent({ activeEditorAtoms, pdfViewerRef }: MainPaneViewContentProps) {
+function MainPaneViewContent({ activeEditorAtoms }: MainPaneViewContentProps) {
   const { loadableEditorContentAtom } = activeEditorAtoms;
   const loadableEditorContent = useAtomValue(loadableEditorContentAtom);
 
@@ -103,7 +95,7 @@ function MainPaneViewContent({ activeEditorAtoms, pdfViewerRef }: MainPaneViewCo
     case 'json':
       return <TextView file={data} textFormatter={(input) => JSON.stringify(JSON.parse(input), null, 2)} />;
     case 'pdf':
-      return <PdfViewer file={data} pdfViewerRef={pdfViewerRef} />;
+      return <PdfViewer file={data} />;
     case 'text':
       return <TipTapView activeEditorContentAtoms={activeEditorAtoms} file={data} />;
     case 'reference':

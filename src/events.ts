@@ -23,6 +23,7 @@ interface RefStudioEvents {
   'refstudio://notifications/popup/close': undefined;
   'refstudio://explorer/rename': { path: string; newName?: string };
   'refstudio://ai/suggestion/insert': { text: string };
+  'refstudio://layout/update': undefined;
 }
 
 export type RefStudioEventName = keyof RefStudioEvents;

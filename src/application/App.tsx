@@ -12,11 +12,11 @@ import { emitEvent } from '../events';
 import { AIPanel } from '../features/ai/AIPanel';
 import { ReferencesDropZone } from '../features/references/components/ReferencesDropZone';
 import { ReferencesPanel } from '../features/references/sidebar/ReferencesPanel';
+import { useDebouncedCallback } from '../hooks/useDebouncedCallback';
 import { ensureProjectFileStructure } from '../io/filesystem';
 import { notifyInfo } from '../notifications/notifications';
 import { interceptConsoleMessages } from '../notifications/notifications.console';
 import { SettingsModalOpener } from '../settings/SettingsModalOpener';
-import { PdfViewerAPI } from '../types/PdfViewerAPI';
 import { ApplicationFrame } from '../wrappers/ApplicationFrame';
 import { ContextMenus } from '../wrappers/ContextMenus';
 import { EventsListener } from '../wrappers/EventsListener';
@@ -34,10 +34,18 @@ function App() {
     emitEvent('refstudio://references/load');
   });
 
-  const pdfViewerRef = React.useRef<PdfViewerAPI>(null);
-  const updatePDFViewerWidth = useCallback(() => {
-    pdfViewerRef.current?.updateWidth();
-  }, [pdfViewerRef]);
+  const handleLayoutUpdate = useDebouncedCallback(
+    useCallback(() => emitEvent('refstudio://layout/update'), []),
+    200,
+  );
+
+  useEffect(() => {
+    window.addEventListener('resize', handleLayoutUpdate);
+
+    return () => {
+      window.removeEventListener('resize', handleLayoutUpdate);
+    };
+  }, [handleLayoutUpdate]);
 
   return (
     <EventsListener>
@@ -50,11 +58,11 @@ function App() {
                 autoSaveId="refstudio"
                 className="relative h-full"
                 direction="horizontal"
-                onLayout={updatePDFViewerWidth}
+                onLayout={handleLayoutUpdate}
               >
                 <LeftSidePanelWrapper />
                 <Panel defaultSize={60} order={2}>
-                  <MainPanel pdfViewerRef={pdfViewerRef} />
+                  <MainPanel />
                 </Panel>
                 <RightPanelWrapper />
               </PanelGroup>
