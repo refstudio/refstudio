@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -7,7 +8,7 @@ from typing import List
 import pypdf
 from sidecar import settings
 
-from .typing import Author, Chunk, Reference
+from .typing import Author, Chunk, Reference, TextCompletionChoice
 
 
 def get_word_count(text: str) -> int:
@@ -22,6 +23,54 @@ def remove_file(filepath: str) -> None:
         os.remove(filepath)
     except OSError:
         pass
+
+
+def trim_completion_prefix_from_choices(
+        prefix: str,
+        choices: List[TextCompletionChoice]
+    ) -> List[TextCompletionChoice]:
+    """
+    Trim a text completion prefix from a list of text completion choices.
+
+    Parameters
+    ----------
+    prefix : str
+        The prefix to trim from the text completion choices.
+    choices : List[TextCompletionChoice]
+        The text completion choices to trim the prefix from.
+
+    Returns
+    -------
+    List[TextCompletionChoice]
+        The text completion choices with the prefix trimmed.
+
+    Examples
+    --------
+    >>> prefix = "This is a prefix and we have "
+    >>> choices = [
+    ...     TextCompletionChoice(index=0, text="This is a prefix and we have inserted some text."),
+    ...     TextCompletionChoice(index=1, text="This is a prefix and we have added some text."),
+    ...     TextCompletionChoice(index=2, text="updated some text."),
+    ... ]
+    >>> trimmed_choices = trim_completion_prefix_from_choices(prefix, choices)
+    >>> trimmed_choices[0].text
+    'inserted some text.'
+    >>> trimmed_choices[1].text
+    'added some text.'
+    >>> trimmed_choices[2].text
+    'updated some text.'
+    """
+    # split prefix into sentences
+    sentence_splitter_regex = r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s'
+    prefix_sentences = re.split(sentence_splitter_regex, prefix)
+
+    # OpenAI response may include the last sentence of the prefix
+    # if so, remove it from the choices for consistency
+    last_prefix_piece = prefix_sentences[-1]
+    for choice in choices:
+        if choice.text.startswith(last_prefix_piece):
+            choice.text = choice.text[len(last_prefix_piece):]
+    return choices
 
 
 def parse_date(date_str: str) -> datetime:

@@ -1,8 +1,23 @@
-from sidecar.typing import Chunk
+from sidecar.typing import Chunk, TextCompletionRequest
 
 
 def create_prompt_for_summarize(text: str) -> str:
     prompt = f"Please rewrite the following text in a more concise manner:\nTEXT: {text}"
+    return prompt
+
+
+def create_prompt_for_text_completion(request: TextCompletionRequest) -> str:
+    prompt = "I am a researcher at a university. You are my research assistant. "
+    prompt += "I am writing a document. \n"
+    if request.title:
+        prompt += f"TITLE: \"{request.title.strip()}\" \n"
+    if request.abstract:
+        prompt += f"ABSTRACT: \"{request.abstract.strip()}\" \n"
+    prompt += "Please help me complete the portion of text input below. "
+    # prompt += "Only append to the text input. "
+    # prompt += "Do not include the text input at the beginning of your response. "
+    prompt += "Use complete sentences and proper grammer. \n"
+    prompt += f"INPUT: {request.text.strip()} [MASK]"
     return prompt
 
 

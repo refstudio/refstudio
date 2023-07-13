@@ -1,11 +1,54 @@
 from sidecar import prompts
-from sidecar.typing import Chunk
+from sidecar.typing import Chunk, TextCompletionRequest
 
 
 def test_create_prompt_for_summarize():
     expected = "Please rewrite the following text in a more concise manner:\nTEXT: This is a test"
     prompt = prompts.create_prompt_for_summarize("This is a test")
     assert prompt == expected
+
+
+def test_create_prompt_for_text_completion():
+    # test 1: no metadata
+    test_request = TextCompletionRequest(text="This is a test")
+    expected = (
+        "I am a researcher at a university. "
+        "You are my research assistant. "
+        "I am writing a document. \n"
+        "Please help me complete the portion of text input below. "
+        "Use complete sentences and proper grammer. \n"
+        "INPUT: This is a test [MASK]"
+    )
+    result = prompts.create_prompt_for_text_completion(test_request)
+    assert result == expected
+
+    # test 2: with title
+    test_request = TextCompletionRequest(text="This is a test", title="test")
+    expected = (
+        "I am a researcher at a university. "
+        "You are my research assistant. "
+        "I am writing a document. \n"
+        "TITLE: \"test\" \n"
+        "Please help me complete the portion of text input below. "
+        "Use complete sentences and proper grammer. \n"
+        "INPUT: This is a test [MASK]"
+    )
+    result = prompts.create_prompt_for_text_completion(test_request)
+    assert result == expected
+
+    # test 3: with abstract
+    test_request = TextCompletionRequest(text="This is a test", abstract="A paper about tests")
+    expected = (
+        "I am a researcher at a university. "
+        "You are my research assistant. "
+        "I am writing a document. \n"
+        "ABSTRACT: \"A paper about tests\" \n"
+        "Please help me complete the portion of text input below. "
+        "Use complete sentences and proper grammer. \n"
+        "INPUT: This is a test [MASK]"
+    )
+    result = prompts.create_prompt_for_text_completion(test_request)
+    assert result == expected
 
 
 def test_prepare_chunks_for_prompt():
