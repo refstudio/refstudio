@@ -22,7 +22,7 @@ def ask_question(request: ChatRequest):
     storage = JsonStorage(filepath=settings.REFERENCES_JSON_PATH)
     logger.info(f"Loading documents from storage: {storage.filepath}")
     storage.load()
-    logger.info(f"Loaded {len(storage.documents)} documents from storage.")
+    logger.info(f"Loaded {len(storage.chunks)} documents from storage")
 
     ranker = BM25Ranker(storage=storage)
     chat = Chat(input_text=input_text, storage=storage, ranker=ranker)
@@ -71,7 +71,7 @@ class Chat:
         ]
 
     def ask_question(self, n_choices: int = 1) -> dict:
-        logger.info("Fetching five most relevant document chunks from storage")
+        logger.info("Fetching 5 most relevant document chunks from storage")
         docs = self.get_relevant_documents()
         logger.info("Creating input prompt for chat API")
         context_str = prompts.prepare_chunks_for_prompt(chunks=docs)
