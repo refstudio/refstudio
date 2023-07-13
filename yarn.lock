@@ -5014,15 +5014,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"kmenu@npm:^1.4.11-beta":
-  version: 1.4.11-beta
-  resolution: "kmenu@npm:1.4.11-beta"
+"kmenu@npm:^1.4.2":
+  version: 1.4.2
+  resolution: "kmenu@npm:1.4.2"
   dependencies:
     framer-motion: ^9.0.1
     react-scrollbar-size: ^5.0.0
   peerDependencies:
     react: ^18.2.0
-  checksum: 76e4c495bcbf146d1dee960ade55320bfd6205eb24d3bb45113d0308d6b557e7af9e4149e31475a10d6f0f4284421924524403fb2f92387b537fbe467429ed82
+  checksum: a34d819c2acfe899b64d3b03408226f3ec167e8bced3940f17627bcfe5f86fbd151afaae230d4b5c5cca9211db086a2b106c8c28bf4e8f363a6f82132980ce1e
   languageName: node
   linkType: hard
 
@@ -6679,7 +6679,7 @@ __metadata:
     jotai: ^2.1.0
     jsdom: ^22.1.0
     json-schema-to-typescript: ^13.0.1
-    kmenu: ^1.4.11-beta
+    kmenu: ^1.4.2
     knip: ^2.14.3
     lowlight: ^2.9.0
     postcss: ^8.4.23
