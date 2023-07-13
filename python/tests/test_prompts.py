@@ -1,10 +1,18 @@
 from sidecar import prompts
-from sidecar.typing import Chunk, TextCompletionRequest
+from sidecar.typing import Chunk, RewriteMannerType, TextCompletionRequest
 
 
-def test_create_prompt_for_summarize():
-    expected = "Please rewrite the following text in a more concise manner:\nTEXT: This is a test"
-    prompt = prompts.create_prompt_for_summarize("This is a test")
+def test_create_prompt_for_rewrite():
+    manner = RewriteMannerType.CONCISE
+    expected = ("Please rewrite the following text in a more concise manner. Do not make up facts.\n"
+                "TEXT: This is a test")
+    prompt = prompts.create_prompt_for_rewrite("This is a test", manner)
+    assert prompt == expected
+
+    manner = RewriteMannerType.ELABORATE
+    expected = ("Please rewrite the following text in a more elaborate manner. Do not make up facts.\n"
+                "TEXT: This is a test")
+    prompt = prompts.create_prompt_for_rewrite("This is a test", manner)
     assert prompt == expected
 
 

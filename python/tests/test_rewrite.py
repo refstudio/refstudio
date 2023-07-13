@@ -31,7 +31,7 @@ def test_rewrite(monkeypatch, capsys):
 
     monkeypatch.setattr(rewrite.Rewriter, "call_model", mock_call_model)
 
-    _ = rewrite.summarize(RewriteRequest(text="This is a test"))
+    _ = rewrite.rewrite(RewriteRequest(text="This is a test"))
     captured = capsys.readouterr()
     output = json.loads(captured.out)
 

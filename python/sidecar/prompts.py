@@ -8,7 +8,7 @@ def create_prompt_for_rewrite(
     ) -> str:
     prompt = (
         f"Please rewrite the following text in a more {manner} manner. "
-        "Do not make up facts.:\n"
+        "Do not make up facts.\n"
         f"TEXT: {text}"
     )
     return prompt
