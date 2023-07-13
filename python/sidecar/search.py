@@ -6,6 +6,9 @@ from semanticscholar import SemanticScholar
 from .stopwords import stopwords
 import sys
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Searcher:
@@ -61,20 +64,33 @@ class Searcher:
 
         # Preprocess the query (e.g., lowercase, remove stopwords)
         query = self.preprocess_query(query)
+
+        # Perform the search using Semantic Scholar's API
+        logger.info(f"Preprocessed query: {query}")
+
         # Perform the search using Semantic Scholar's API
         results = self.s2.search_paper(query, limit=limit, fields=returned_fields)
 
+        logger.info("Executed search using Semantic Scholar's API")
+
         results_list = []
+
         # Loop over the search results
         for item in results[:limit]:
             # For each result, create a dictionary with the fields specified in returned_fields
             result = {field: getattr(item, field, None) for field in returned_fields}
+
             # Replace author dictionaries with author names in each result
             if "authors" in result:
                 result["authors"] = [author["name"] for author in result["authors"]]
+
             results_list.append(result)  # add the result to the list of results
 
-        # sys.stdout.write(json.dumps(results_list))
+        logger.info(f"First two papers from search results: {results_list[:2]}")
+
+        # Adding a warning log statement
+        if not results_list:
+            logger.warning("The final results list is empty.")
         return results_list
 
 
