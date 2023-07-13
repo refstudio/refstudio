@@ -1,6 +1,8 @@
 from sidecar import search
+import json
 
-def test_search(monkeypatch):
+
+def test_search(monkeypatch, capsys):
     def mock_search_paper(*args, **kwargs):
         response = [
             {
@@ -14,7 +16,7 @@ def test_search(monkeypatch):
                 "authors": [
                     {"authorId": "auth-id-1", "name": "Sample Author Name 1"},
                     {"authorId": "auth-id-2", "name": "Sample Author Name 2"},
-                ]
+                ],
             },
             {
                 "title": "Sample Paper Title 2",
@@ -27,20 +29,21 @@ def test_search(monkeypatch):
                 "authors": [
                     {"authorId": "auth-id-3", "name": "Sample Author Name 3"},
                     {"authorId": "auth-id-4", "name": "Sample Author Name 4"},
-                ]
+                ],
             },
         ]
         return response
 
-    monkeypatch.setattr(search.Search, "search_paper", mock_search_paper)
+    monkeypatch.setattr(search.Searcher, "search", mock_search_paper)
 
-    searcher = search.Searcher()
-    result = searcher.s2.search_paper("any-query-string-you-like")
+    _ = search.search_s2("any-query-string-you-like")
+    captured = capsys.readouterr()
+    output = json.loads(captured.out)
 
-    assert len(result) == 2
-    assert result[0]["title"] == "Sample Paper Title"
-    assert result[0]["authors"][0]["name"] == "Sample Author Name 1"
-    assert result[0]["authors"][1]["name"] == "Sample Author Name 2"
-    assert result[1]["title"] == "Sample Paper Title 2"
-    assert result[1]["authors"][0]["name"] == "Sample Author Name 3"
-    assert result[1]["authors"][1]["name"] == "Sample Author Name 4"
+    assert len(output) == 2
+    assert output[0]["title"] == "Sample Paper Title"
+    assert output[0]["authors"][0]["name"] == "Sample Author Name 1"
+    assert output[0]["authors"][1]["name"] == "Sample Author Name 2"
+    assert output[1]["title"] == "Sample Paper Title 2"
+    assert output[1]["authors"][0]["name"] == "Sample Author Name 3"
+    assert output[1]["authors"][1]["name"] == "Sample Author Name 4"
