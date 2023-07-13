@@ -22,6 +22,7 @@ export interface CliCommands {
   chat: ChatResponseChoice[];
   update: UpdateStatusResponse;
   delete: DeleteStatusResponse;
+  search: SearchResponse;
 }
 export interface IngestResponse {
   project_name: string;
@@ -76,4 +77,8 @@ export interface UpdateStatusResponse {
 export interface DeleteStatusResponse {
   status: ResponseStatus;
   message: string;
+}
+// TODO: Add search response
+export interface SearchResponse {
+  search_results: {}[];
 }
