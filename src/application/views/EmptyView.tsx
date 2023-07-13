@@ -21,7 +21,7 @@ export function EmptyView() {
 function EmptyViewShortcut({ text, keys }: { text: string; keys: string[] }) {
   return (
     <div className="flex items-center gap-2">
-      <div className=" min-w-[150px] px-1 text-right text-slate-500">{text}</div>
+      <div className="min-w-[135px] px-1 text-right text-slate-500">{text}</div>
       <div className="flex gap-1">
         {keys.map((key) => (
           <kbd className="rounded-sm bg-slate-500 px-2 py-0.5 font-mono text-slate-200" key={key}>
