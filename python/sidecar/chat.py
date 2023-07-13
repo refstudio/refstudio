@@ -1,13 +1,14 @@
-import json
 import os
 import sys
 
 import openai
 from dotenv import load_dotenv
-from sidecar import prompts, settings
+from sidecar import prompts, settings, typing
 from sidecar.ranker import BM25Ranker
+from sidecar.settings import logger
 from sidecar.storage import JsonStorage
-from sidecar.typing import ChatRequest, ChatResponseChoice
+from sidecar.typing import ChatRequest, ChatResponse, ChatResponseChoice
+from tenacity import retry, stop_after_attempt, wait_fixed
 
 load_dotenv()
 openai.api_key = os.environ.get("OPENAI_API_KEY")
@@ -16,12 +17,31 @@ openai.api_key = os.environ.get("OPENAI_API_KEY")
 def ask_question(request: ChatRequest):
     input_text = request.text
     n_choices = request.n_choices
+
     storage = JsonStorage(filepath=settings.REFERENCES_JSON_PATH)
     storage.load()
+
     ranker = BM25Ranker(storage=storage)
     chat = Chat(input_text=input_text, storage=storage, ranker=ranker)
-    choices = chat.ask_question(n_choices=n_choices)
-    sys.stdout.write(json.dumps([c.dict() for c in choices]))
+
+    try:
+        choices = chat.ask_question(n_choices=n_choices)
+    except Exception as e:
+        logger.error(e)
+        response = ChatResponse(
+            status=typing.ResponseStatus.ERROR,
+            message=str(e),
+            choices=[],
+        )
+        sys.stdout.write(response.json())
+        return
+
+    response = ChatResponse(
+        status=typing.ResponseStatus.OK,
+        message="",
+        choices=[r.dict() for r in choices],
+    )
+    sys.stdout.write(response.json())
 
 
 class Chat:
@@ -39,6 +59,7 @@ class Chat:
         docs = self.ranker.get_top_n(query=self.input_text, limit=5)
         return docs
 
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(1))
     def call_model(self, messages: list, n_choices: int = 1):
         response = openai.ChatCompletion.create(
             model=os.environ["OPENAI_CHAT_MODEL"],
