@@ -18,6 +18,7 @@ def rewrite(arg: RewriteRequest):
     manner = arg.manner
     n_choices = arg.n_choices
     temperature = arg.temperature
+
     # there are 1.33 tokens per word on average
     # seems reasonable to require a max_tokens roughly equivalent to our input text
     # https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them

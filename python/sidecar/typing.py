@@ -158,7 +158,7 @@ class CliCommands(RefStudioModel):
     ingest_references: tuple[IngestRequest, IngestResponse]
     """Retrieve ingested PDF references"""
     rewrite: tuple[RewriteRequest, list[RewriteChoice]]
-    """"Rewrites a block of text in a more specified manner"""
+    """"Rewrites a block of text in a specified manner"""
     completion: tuple[TextCompletionRequest, list[TextCompletionChoice]]
     """Completes a body of text"""
     chat: tuple[ChatRequest, list[ChatResponseChoice]]
