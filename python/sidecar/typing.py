@@ -13,8 +13,8 @@ class RefStudioModel(BaseModel):
 
         @staticmethod
         def schema_extra(schema: dict[str, Any], _model) -> None:
-            for prop in schema.get('properties', {}).values():
-                prop.pop('title', None)
+            for prop in schema.get("properties", {}).values():
+                prop.pop("title", None)
 
 
 class ResponseStatus(str, Enum):
@@ -30,6 +30,7 @@ class IngestStatus(str, Enum):
 
 class Reference(RefStudioModel):
     """A reference for an academic paper / PDF"""
+
     source_filename: str
     status: IngestStatus
     citation_key: str | None = None
@@ -46,6 +47,7 @@ class ReferencePatch(RefStudioModel):
     """
     ReferencePatch is the input type for updating a Reference's metadata.
     """
+
     data: dict[str, Any]
 
 
@@ -106,6 +108,10 @@ class ChatResponseChoice(RefStudioModel):
     text: str
 
 
+class SearchResponse(RefStudioModel):
+    search_results: list[dict] # TODO: remove to SearchResults
+
+
 class CliCommands(RefStudioModel):
     ingest: IngestResponse
     ingest_status: IngestStatusResponse
@@ -114,6 +120,7 @@ class CliCommands(RefStudioModel):
     chat: list[ChatResponseChoice]
     update: UpdateStatusResponse
     delete: DeleteStatusResponse
+    search: SearchResponse
 
 
 Reference.update_forward_refs()
