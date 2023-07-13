@@ -4,7 +4,7 @@ from sidecar import rewrite
 from sidecar.typing import RewriteRequest, TextCompletionRequest
 
 
-def test_summarize(monkeypatch, capsys):
+def test_rewrite(monkeypatch, capsys):
     def mock_call_model(*args, **kwargs):
         response = {
             "choices": [

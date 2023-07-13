@@ -13,7 +13,7 @@ load_dotenv()
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 
-def summarize(arg: RewriteRequest):
+def rewrite(arg: RewriteRequest):
     text = arg.text
     manner = arg.manner
     n_choices = arg.n_choices
