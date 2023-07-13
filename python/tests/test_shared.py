@@ -156,3 +156,28 @@ def test_trim_completion_prefix_from_choices():
     assert trimmed_choices[0].text == "part of the prefix."
     assert trimmed_choices[1].text == "part of the test."
     assert trimmed_choices[2].text == "something else."
+
+    # test 3: prefix is many sentences and response includes the entire prefix
+    test_prefix = "This is a very long prefix. But we only append to the last piece. The last piece is "
+    choices = [
+        typing.TextCompletionChoice(
+            index=0,
+            text=("This is a very long prefix. But we only append to the last piece. "
+                  "The last piece is part of the prefix.")
+        ),
+        typing.TextCompletionChoice(
+            index=1,
+            text=("This is a very long prefix. But we only append to the last piece. "
+                  "The last piece is part of the test.")
+        ),
+        typing.TextCompletionChoice(
+            index=2,
+            text=("This is a very long prefix. But we only append to the last piece. "
+                  "The last piece is something else.")
+        ),
+    ]
+    trimmed_choices = shared.trim_completion_prefix_from_choices(test_prefix, choices)
+    assert len(trimmed_choices) == 3
+    assert trimmed_choices[0].text == "part of the prefix."
+    assert trimmed_choices[1].text == "part of the test."
+    assert trimmed_choices[2].text == "something else."

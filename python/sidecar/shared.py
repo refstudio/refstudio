@@ -64,12 +64,14 @@ def trim_completion_prefix_from_choices(
     sentence_splitter_regex = r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s'
     prefix_sentences = re.split(sentence_splitter_regex, prefix)
 
-    # OpenAI response may include the last sentence of the prefix
-    # if so, remove it from the choices for consistency
-    last_prefix_piece = prefix_sentences[-1]
+    # and remove any sentences from the prompt that were included in the responses
     for choice in choices:
-        if choice.text.startswith(last_prefix_piece):
-            choice.text = choice.text[len(last_prefix_piece):]
+        for sentence in prefix_sentences:
+            if choice.text.strip().startswith(sentence.strip()):
+                choice.text = choice.text[len(sentence):].strip()
+
+            if '[MASK]' in choice.text:
+                choice.text = choice.text.replace('[MASK]', '')
     return choices
 
 
