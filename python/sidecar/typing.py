@@ -1,8 +1,16 @@
 from datetime import date
-from enum import Enum
 from typing import Any
 
 from pydantic import BaseModel
+
+try:
+    # introduced in Python 3.11 ... 
+    from enum import StrEnum
+except ImportError:
+    # ... but had some breaking changes
+    # https://github.com/python/cpython/issues/100458
+    # Python 3.10 and below
+    from strenum import StrEnum
 
 
 class RefStudioModel(BaseModel):
@@ -17,12 +25,12 @@ class RefStudioModel(BaseModel):
                 prop.pop('title', None)
 
 
-class ResponseStatus(str, Enum):
+class ResponseStatus(StrEnum):
     OK = "ok"
     ERROR = "error"
 
 
-class IngestStatus(str, Enum):
+class IngestStatus(StrEnum):
     PROCESSING = "processing"
     FAILURE = "failure"
     COMPLETE = "complete"
@@ -110,7 +118,7 @@ class TextSuggestionChoice(RefStudioModel):
     text: str
 
 
-class RewriteMannerType(str, Enum):
+class RewriteMannerType(StrEnum):
     CONCISE = "concise"
     ELABORATE = "elaborate"
     SCHOLARLY = "scholarly"
