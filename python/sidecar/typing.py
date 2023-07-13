@@ -110,8 +110,15 @@ class TextSuggestionChoice(RefStudioModel):
     text: str
 
 
+class RewriteMannerType(str, Enum):
+    CONCISE = "concise"
+    ELABORATE = "elaborate"
+    SCHOLARLY = "scholarly"
+
+
 class RewriteRequest(RefStudioModel):
     text: str
+    manner: RewriteMannerType = RewriteMannerType.CONCISE
     n_choices: int = 1
     temperature: float = 0.7
 
@@ -151,7 +158,7 @@ class CliCommands(RefStudioModel):
     ingest_references: tuple[IngestRequest, IngestResponse]
     """Retrieve ingested PDF references"""
     rewrite: tuple[RewriteRequest, list[RewriteChoice]]
-    """"Rewrites a block of text in a more concise manner"""
+    """"Rewrites a block of text in a more specified manner"""
     completion: tuple[TextCompletionRequest, list[TextCompletionChoice]]
     """Completes a body of text"""
     chat: tuple[ChatRequest, list[ChatResponseChoice]]

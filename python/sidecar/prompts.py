@@ -1,8 +1,18 @@
+from enum import Enum
+
+from sidecar import typing
 from sidecar.typing import Chunk, TextCompletionRequest
 
 
-def create_prompt_for_summarize(text: str) -> str:
-    prompt = f"Please rewrite the following text in a more concise manner:\nTEXT: {text}"
+def create_prompt_for_rewrite(
+        text: str,
+        manner: typing.RewriteMannerType
+    ) -> str:
+    prompt = (
+        f"Please rewrite the following text in a more {manner} manner. "
+        "Do not make up facts.:\n"
+        f"TEXT: {text}"
+    )
     return prompt
 
 
