@@ -1,5 +1,3 @@
-from enum import Enum
-
 from sidecar import typing
 from sidecar.typing import Chunk, TextCompletionRequest
 
