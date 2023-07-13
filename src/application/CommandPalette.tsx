@@ -3,14 +3,21 @@ import './CommandPalette.css';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { Command, CommandMenu, CommandWrapper, useCommands, useKmenu } from 'kmenu';
 import { CategoryCommand } from 'kmenu/dist/types';
+import { useEffect } from 'react';
 import { VscBell, VscClose, VscGear, VscLibrary, VscNewFile, VscSearch } from 'react-icons/vsc';
 
 import { openReferenceAtom } from '../atoms/editorActions';
 import { getReferencesAtom } from '../atoms/referencesState';
 import { emitEvent } from '../events';
 
-export function CommandPalette() {
+export function CommandPalette({ index }: { index?: number }) {
   const { setOpen } = useKmenu();
+
+  useEffect(() => {
+    if (index !== undefined) {
+      setOpen(index);
+    }
+  }, [index, setOpen]);
 
   const main: Command[] = [
     {
@@ -75,7 +82,7 @@ export function CommandPalette() {
   );
 }
 
-function ReferencesCommandMenu({ index }: { index: number }) {
+export function ReferencesCommandMenu({ index }: { index: number }) {
   const references = useAtomValue(getReferencesAtom);
   const openReference = useSetAtom(openReferenceAtom);
 
