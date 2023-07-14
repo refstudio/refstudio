@@ -1,3 +1,4 @@
+import { notifyError } from '../notifications/notifications';
 import { callSidecar } from './sidecar';
 
 export async function chatWithAI(text: string): Promise<string[]> {
@@ -6,7 +7,12 @@ export async function chatWithAI(text: string): Promise<string[]> {
       return [];
     }
     const response = await callSidecar('chat', { text });
-    return response.map((choice) => choice.text);
+
+    if (response.status === 'error') {
+      notifyError('Chat error', response.message);
+    }
+
+    return response.choices.map((choice) => choice.text);
   } catch (err) {
     return [`Chat error: ${String(err)}`];
   }

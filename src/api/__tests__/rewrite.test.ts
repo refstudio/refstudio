@@ -1,6 +1,6 @@
 import { askForRewrite } from '../rewrite';
 import { callSidecar } from '../sidecar';
-import { RewriteChoice } from '../types';
+import { RewriteResponse } from '../types';
 
 vi.mock('../sidecar');
 
@@ -10,7 +10,8 @@ describe('askForRewrite', () => {
   });
 
   it('should call sidecar rewrite with text', async () => {
-    vi.mocked(callSidecar).mockResolvedValue([] as RewriteChoice[]);
+    const response: RewriteResponse = { status: 'ok', message: '', choices: [] };
+    vi.mocked(callSidecar).mockResolvedValue(response);
 
     const REWRITE_REQUEST_TEXT = 'Some text to rewrite';
     await askForRewrite(REWRITE_REQUEST_TEXT);
@@ -20,12 +21,17 @@ describe('askForRewrite', () => {
 
   it('Should return text from first RewriteChoice', async () => {
     const REWRITE_REPLY_TEXT = 'The rewrite reply!';
-    vi.mocked(callSidecar).mockResolvedValue([
-      {
-        index: 0,
-        text: REWRITE_REPLY_TEXT,
-      },
-    ] as RewriteChoice[]);
+    const mockResponse: RewriteResponse = {
+      status: 'ok',
+      message: '',
+      choices: [
+        {
+          index: 0,
+          text: REWRITE_REPLY_TEXT,
+        },
+      ],
+    };
+    vi.mocked(callSidecar).mockResolvedValue(mockResponse);
 
     const response = await askForRewrite('some input');
     expect(response).toBe(REWRITE_REPLY_TEXT);

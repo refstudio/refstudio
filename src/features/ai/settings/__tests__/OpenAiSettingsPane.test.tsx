@@ -23,7 +23,6 @@ const mockSettings: Pick<SettingsSchema, 'openAI'> = {
   openAI: {
     apiKey: 'API KEY',
     chatModel: 'CHAT MODEL',
-    completeModel: 'COMPLETE MODEL',
   },
 };
 
@@ -51,7 +50,6 @@ describe('OpenAiSettingsPane component', () => {
     expect(vi.mocked(getCachedSetting).mock.calls.length).toBeGreaterThan(0);
     expect(screen.getByLabelText('API Key')).toHaveValue(mockSettings.openAI.apiKey);
     expect(screen.getByLabelText('Chat Model')).toHaveValue(mockSettings.openAI.chatModel);
-    expect(screen.getByLabelText('Complete Model')).toHaveValue(mockSettings.openAI.completeModel);
   });
 
   it('should save (setCached, flush) with edited values on save', async () => {
@@ -64,10 +62,8 @@ describe('OpenAiSettingsPane component', () => {
     // Type
     await user.type(screen.getByLabelText('API Key'), '-Updated-1');
     await user.type(screen.getByLabelText('Chat Model'), '-Updated-2');
-    await user.type(screen.getByLabelText('Complete Model'), '-Updated-3');
     expect(screen.getByLabelText('API Key')).toHaveValue(`${mockSettings.openAI.apiKey}-Updated-1`);
     expect(screen.getByLabelText('Chat Model')).toHaveValue(`${mockSettings.openAI.chatModel}-Updated-2`);
-    expect(screen.getByLabelText('Complete Model')).toHaveValue(`${mockSettings.openAI.completeModel}-Updated-3`);
     expect(screen.getByRole('button', { name: /save/i })).toBeEnabled();
 
     // Submit
@@ -78,7 +74,6 @@ describe('OpenAiSettingsPane component', () => {
       {
         apiKey: `${mockSettings.openAI.apiKey}-Updated-1`,
         chatModel: `${mockSettings.openAI.chatModel}-Updated-2`,
-        completeModel: `${mockSettings.openAI.completeModel}-Updated-3`,
       },
     ]);
     expect(vi.mocked(saveCachedSettings).mock.calls.length).toBe(1);

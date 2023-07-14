@@ -50,15 +50,6 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
               onChange={(e) => setPaneSettings({ ...paneSettings, chatModel: e.currentTarget.value })}
             />
           </div>
-          <div>
-            <label htmlFor="completeModel">Complete Model</label>
-            <input
-              className="w-full border bg-slate-50 px-2 py-0.5"
-              id="completeModel"
-              value={paneSettings.completeModel}
-              onChange={(e) => setPaneSettings({ ...paneSettings, completeModel: e.currentTarget.value })}
-            />
-          </div>
         </fieldset>
         <fieldset className="mt-10 flex items-center justify-end">
           {saveMutation.isSuccess && <span className="px-2 text-primary">Saved!</span>}

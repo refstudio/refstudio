@@ -38,17 +38,17 @@ export interface CliCommands {
    * @minItems 2
    * @maxItems 2
    */
-  rewrite: [RewriteRequest, RewriteChoice[]];
+  rewrite: [RewriteRequest, RewriteResponse];
   /**
    * @minItems 2
    * @maxItems 2
    */
-  completion: [TextCompletionRequest, TextCompletionChoice[]];
+  completion: [TextCompletionRequest, TextCompletionResponse];
   /**
    * @minItems 2
    * @maxItems 2
    */
-  chat: [ChatRequest, ChatResponseChoice[]];
+  chat: [ChatRequest, ChatResponse];
   /**
    * @minItems 2
    * @maxItems 2
@@ -107,6 +107,11 @@ export interface RewriteRequest {
   n_choices?: number;
   temperature?: number;
 }
+export interface RewriteResponse {
+  status: ResponseStatus;
+  message: string;
+  choices: RewriteChoice[];
+}
 export interface RewriteChoice {
   index: number;
   text: string;
@@ -119,6 +124,11 @@ export interface TextCompletionRequest {
   title?: string;
   abstract?: string;
 }
+export interface TextCompletionResponse {
+  status: ResponseStatus;
+  message: string;
+  choices: TextCompletionChoice[];
+}
 export interface TextCompletionChoice {
   index: number;
   text: string;
@@ -126,6 +136,12 @@ export interface TextCompletionChoice {
 export interface ChatRequest {
   text: string;
   n_choices?: number;
+  temperature?: number;
+}
+export interface ChatResponse {
+  status: ResponseStatus;
+  message: string;
+  choices: ChatResponseChoice[];
 }
 export interface ChatResponseChoice {
   index: number;

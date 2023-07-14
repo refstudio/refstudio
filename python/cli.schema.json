@@ -50,10 +50,7 @@
           "$ref": "#/definitions/RewriteRequest"
         },
         {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/RewriteChoice"
-          }
+          "$ref": "#/definitions/RewriteResponse"
         }
       ]
     },
@@ -66,10 +63,7 @@
           "$ref": "#/definitions/TextCompletionRequest"
         },
         {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/TextCompletionChoice"
-          }
+          "$ref": "#/definitions/TextCompletionResponse"
         }
       ]
     },
@@ -82,10 +76,7 @@
           "$ref": "#/definitions/ChatRequest"
         },
         {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ChatResponseChoice"
-          }
+          "$ref": "#/definitions/ChatResponse"
         }
       ]
     },
@@ -361,6 +352,29 @@
         "text"
       ]
     },
+    "RewriteResponse": {
+      "title": "RewriteResponse",
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string"
+        },
+        "choices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RewriteChoice"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "message",
+        "choices"
+      ]
+    },
     "TextCompletionRequest": {
       "title": "TextCompletionRequest",
       "type": "object",
@@ -407,6 +421,29 @@
         "text"
       ]
     },
+    "TextCompletionResponse": {
+      "title": "TextCompletionResponse",
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string"
+        },
+        "choices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TextCompletionChoice"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "message",
+        "choices"
+      ]
+    },
     "ChatRequest": {
       "title": "ChatRequest",
       "type": "object",
@@ -417,6 +454,10 @@
         "n_choices": {
           "default": 1,
           "type": "integer"
+        },
+        "temperature": {
+          "default": 0.7,
+          "type": "number"
         }
       },
       "required": [
@@ -437,6 +478,29 @@
       "required": [
         "index",
         "text"
+      ]
+    },
+    "ChatResponse": {
+      "title": "ChatResponse",
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string"
+        },
+        "choices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ChatResponseChoice"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "message",
+        "choices"
       ]
     },
     "ReferencePatch": {

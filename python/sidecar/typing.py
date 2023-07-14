@@ -135,6 +135,12 @@ class RewriteChoice(TextSuggestionChoice):
     pass
 
 
+class RewriteResponse(RefStudioModel):
+    status: ResponseStatus
+    message: str
+    choices: list[RewriteChoice]
+
+
 class TextCompletionRequest(RefStudioModel):
     text: str
     n_choices: int = 1
@@ -148,14 +154,26 @@ class TextCompletionChoice(TextSuggestionChoice):
     pass
 
 
+class TextCompletionResponse(RefStudioModel):
+    status: ResponseStatus
+    message: str
+    choices: list[TextCompletionChoice]
+
+
 class ChatRequest(RefStudioModel):
     text: str
     n_choices: int = 1
+    temperature: float = 0.7
 
 
-class ChatResponseChoice(RefStudioModel):
-    index: int
-    text: str
+class ChatResponseChoice(TextSuggestionChoice):
+    pass
+
+
+class ChatResponse(RefStudioModel):
+    status: ResponseStatus
+    message: str
+    choices: list[ChatResponseChoice]
 
 
 class CliCommands(RefStudioModel):
@@ -165,11 +183,11 @@ class CliCommands(RefStudioModel):
     """Retrieve ingestion status of uploads"""
     ingest_references: tuple[IngestRequest, IngestResponse]
     """Retrieve ingested PDF references"""
-    rewrite: tuple[RewriteRequest, list[RewriteChoice]]
+    rewrite: tuple[RewriteRequest, RewriteResponse]
     """"Rewrites a block of text in a specified manner"""
-    completion: tuple[TextCompletionRequest, list[TextCompletionChoice]]
+    completion: tuple[TextCompletionRequest, TextCompletionResponse]
     """Completes a body of text"""
-    chat: tuple[ChatRequest, list[ChatResponseChoice]]
+    chat: tuple[ChatRequest, ChatResponse]
     """Chat with the AI"""
     update: tuple[ReferenceUpdate, UpdateStatusResponse]
     """Update metadata for a Reference"""

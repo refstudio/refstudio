@@ -1,14 +1,14 @@
-import json
 import os
 import sys
 
 import openai
 from dotenv import load_dotenv
-from sidecar import prompts, shared
+from sidecar import prompts, shared, typing
 from sidecar.settings import logger
 from sidecar.typing import (RewriteChoice, RewriteRequest,
                             TextCompletionChoice, TextCompletionRequest,
                             TextSuggestionChoice)
+from tenacity import retry, stop_after_attempt, wait_fixed
 
 load_dotenv()
 openai.api_key = os.environ.get("OPENAI_API_KEY")
@@ -29,9 +29,26 @@ def rewrite(arg: RewriteRequest):
 
     prompt = prompts.create_prompt_for_rewrite(text, manner)
     chat = Rewriter(prompt, n_choices, temperature, max_tokens)
-    choices = chat.get_response(response_type=RewriteChoice)
+
+    try:
+        choices = chat.get_response(response_type=RewriteChoice)
+    except Exception as e:
+        logger.error(e)
+        response = typing.RewriteResponse(
+            status=typing.ResponseStatus.ERROR,
+            message=str(e),
+            choices=[],
+        )
+        sys.stdout.write(response.json())
+        return
+
     logger.info(f"Returning {len(choices)} rewrite choices to client: {choices}")
-    sys.stdout.write(json.dumps([r.dict() for r in choices]))
+    response = typing.RewriteResponse(
+        status=typing.ResponseStatus.OK,
+        message="",
+        choices=[r.dict() for r in choices],
+    )
+    sys.stdout.write(response.json())
 
 
 def complete_text(request: TextCompletionRequest):
@@ -43,11 +60,29 @@ def complete_text(request: TextCompletionRequest):
         temperature=request.temperature,
         max_tokens=request.max_tokens,
     )
-    choices = chat.get_response(response_type=TextCompletionChoice)
-    logger.info(f"Trimming completion prefix text from completion choices: {choices}")
+
+    try:
+        choices = chat.get_response(response_type=TextCompletionChoice)
+    except Exception as e:
+        logger.error(e)
+        response = typing.TextCompletionResponse(
+            status=typing.ResponseStatus.ERROR,
+            message=str(e),
+            choices=[],
+        )
+        sys.stdout.write(response.json())
+        return
+
+    logger.info(f"Trimming completion prefix text from completion choices: {choices}") 
     choices = shared.trim_completion_prefix_from_choices(prefix=request.text, choices=choices)
     logger.info(f"Returning {len(choices)} completion choices to client: {choices}")
-    sys.stdout.write(json.dumps([r.dict() for r in choices]))
+
+    response = typing.TextCompletionResponse(
+        status=typing.ResponseStatus.OK,
+        message="",
+        choices=[r.dict() for r in choices],
+    )
+    sys.stdout.write(response.json())
 
 
 class Rewriter:
@@ -93,6 +128,7 @@ class Rewriter:
             for choice in response['choices']
         ]
 
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(1))
     def call_model(self, messages: list):
         logger.info(f"Calling OpenAI chat API with the following input message(s): {messages}")
         response = openai.ChatCompletion.create(
