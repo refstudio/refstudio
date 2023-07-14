@@ -163,6 +163,7 @@ class TextCompletionResponse(RefStudioModel):
 class ChatRequest(RefStudioModel):
     text: str
     n_choices: int = 1
+    temperature: float = 0.7
 
 
 class ChatResponseChoice(TextSuggestionChoice):
