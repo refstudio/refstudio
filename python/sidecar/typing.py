@@ -20,7 +20,7 @@ class RefStudioModel(BaseModel):
         use_enum_values = True
 
         @staticmethod
-        def schema_extra(schema: dict[str, Any], _model) -> None:
+        def schema_extra(schema: dict[str, Any]) -> None:
             for prop in schema.get('properties', {}).values():
                 prop.pop('title', None)
 
