@@ -11,6 +11,7 @@ export async function askForRewrite(selection: string): Promise<string> {
 
     if (response.status === 'error') {
       notifyError('Rewrite error', response.message);
+      return '';
     }
 
     return response.choices[0].text;

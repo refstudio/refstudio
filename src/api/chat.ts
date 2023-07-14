@@ -10,6 +10,7 @@ export async function chatWithAI(text: string): Promise<string[]> {
 
     if (response.status === 'error') {
       notifyError('Chat error', response.message);
+      return [];
     }
 
     return response.choices.map((choice) => choice.text);
