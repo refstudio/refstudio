@@ -1,3 +1,4 @@
+import { notifyError } from '../notifications/notifications';
 import { callSidecar } from './sidecar';
 
 export async function askForRewrite(selection: string): Promise<string> {
@@ -7,7 +8,13 @@ export async function askForRewrite(selection: string): Promise<string> {
     }
 
     const response = await callSidecar('rewrite', { text: selection });
-    return response[0].text;
+
+    if (response.status === 'error') {
+      notifyError('Rewrite error', response.message);
+      return '';
+    }
+
+    return response.choices[0].text;
   } catch (err) {
     return `Rewrite error: ${String(err)}`;
   }

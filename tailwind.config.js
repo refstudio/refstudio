@@ -9,36 +9,38 @@ export default {
         // Using modern `hsl`
         primary: {
           DEFAULT: 'hsl(var(--color-primary) / <alpha-value>)',
-          hover: 'hsl(var(--color-primary-hover) / <alpha-value>)'
+          hover: 'hsl(var(--color-primary-hover) / <alpha-value>)',
         },
         secondary: {
           DEFAULT: 'hsl(var(--color-secondary) / <alpha-value>)',
-          hover: 'hsl(var(--color-secondary-hover) / <alpha-value>)'
-        }
+          hover: 'hsl(var(--color-secondary-hover) / <alpha-value>)',
+        },
+        muted: 'hsl(var(--color-muted) / <alpha-value>)',
+        error: 'hsl(var(--color-error) / <alpha-value>)',
       },
-      zIndex: {
-        "modals":        99999,
-        'notifications': 88888,
-        'drop-zone':     55555,
-      }
+      zIndex: {
+        modals: 99999,
+        notifications: 88888,
+        'drop-zone': 55555,
+      },
     },
   },
-  plugins: [debugPlugin(), autocompleteCustomComponentsPlugin()], 
+  plugins: [debugPlugin(), autocompleteCustomComponentsPlugin()],
 };
 
 /**
  * Custom plugin that provide auto-complete support for the listed classes.
  *
  * The style definitions can be found in `index.css` under the `@layer components {` section
- * 
+ *
  */
 function autocompleteCustomComponentsPlugin() {
   return plugin(function ({ addComponents }) {
     addComponents({
       '.btn-primary': {},
-      '.debug-widget': {}
-    })
-  })
+      '.debug-widget': {},
+    });
+  });
 }
 
 /**

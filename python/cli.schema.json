@@ -50,10 +50,7 @@
           "$ref": "#/definitions/RewriteRequest"
         },
         {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/RewriteChoice"
-          }
+          "$ref": "#/definitions/RewriteResponse"
         }
       ]
     },
@@ -66,10 +63,7 @@
           "$ref": "#/definitions/TextCompletionRequest"
         },
         {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/TextCompletionChoice"
-          }
+          "$ref": "#/definitions/TextCompletionResponse"
         }
       ]
     },
@@ -82,10 +76,7 @@
           "$ref": "#/definitions/ChatRequest"
         },
         {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ChatResponseChoice"
-          }
+          "$ref": "#/definitions/ChatResponse"
         }
       ]
     },
@@ -307,12 +298,30 @@
         "reference_statuses"
       ]
     },
+    "RewriteMannerType": {
+      "title": "RewriteMannerType",
+      "description": "An enumeration.",
+      "enum": [
+        "concise",
+        "elaborate",
+        "scholarly"
+      ],
+      "type": "string"
+    },
     "RewriteRequest": {
       "title": "RewriteRequest",
       "type": "object",
       "properties": {
         "text": {
           "type": "string"
+        },
+        "manner": {
+          "default": "concise",
+          "allOf": [
+            {
+              "$ref": "#/definitions/RewriteMannerType"
+            }
+          ]
         },
         "n_choices": {
           "default": 1,
@@ -341,6 +350,29 @@
       "required": [
         "index",
         "text"
+      ]
+    },
+    "RewriteResponse": {
+      "title": "RewriteResponse",
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string"
+        },
+        "choices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RewriteChoice"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "message",
+        "choices"
       ]
     },
     "TextCompletionRequest": {
@@ -389,6 +421,29 @@
         "text"
       ]
     },
+    "TextCompletionResponse": {
+      "title": "TextCompletionResponse",
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string"
+        },
+        "choices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TextCompletionChoice"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "message",
+        "choices"
+      ]
+    },
     "ChatRequest": {
       "title": "ChatRequest",
       "type": "object",
@@ -399,6 +454,10 @@
         "n_choices": {
           "default": 1,
           "type": "integer"
+        },
+        "temperature": {
+          "default": 0.7,
+          "type": "number"
         }
       },
       "required": [
@@ -419,6 +478,29 @@
       "required": [
         "index",
         "text"
+      ]
+    },
+    "ChatResponse": {
+      "title": "ChatResponse",
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string"
+        },
+        "choices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ChatResponseChoice"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "message",
+        "choices"
       ]
     },
     "ReferencePatch": {

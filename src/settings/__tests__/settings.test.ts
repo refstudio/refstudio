@@ -61,7 +61,7 @@ describe('settings', () => {
   });
 
   it('should read default value from env', async () => {
-    vi.mocked(readEnv).mockResolvedValue('OPENAI_COMPLETE_MODEL-value');
+    vi.mocked(readEnv).mockResolvedValue('OPENAI_CHAT_MODEL-value');
     const fn = vi.fn();
     vi.mocked(SettingsManager<SettingsSchema>).mockImplementation(
       (defaultSettings) =>
@@ -71,7 +71,7 @@ describe('settings', () => {
         } as unknown as SettingsManager<SettingsSchema>),
     );
     await initSettings();
-    expect(getSettings().default.openAI.chatModel).toBe('OPENAI_COMPLETE_MODEL-value');
+    expect(getSettings().default.openAI.chatModel).toBe('OPENAI_CHAT_MODEL-value');
   });
 
   it('should call settingsManager via getCachedSetting and setCachedSetting', async () => {

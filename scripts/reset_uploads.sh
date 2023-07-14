@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PROJECT_DIR="$HOME/Library/Application Support/com.tauri.dev/project-x"
+PROJECT_DIR="$HOME/Library/Application Support/studio.ref.desktop/project-x"
 
 rm -f "$PROJECT_DIR/uploads/"*.pdf
 rm -rf "$PROJECT_DIR/.staging"
