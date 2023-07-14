@@ -21,6 +21,5 @@ export function ReferencesItemStatusLabel({ status }: { status: ReferenceItemSta
       );
     default:
       assertNever(status);
-      return null;
   }
 }
