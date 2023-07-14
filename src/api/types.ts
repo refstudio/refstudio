@@ -13,6 +13,10 @@ export type IngestStatus = 'processing' | 'failure' | 'complete';
  * An enumeration.
  */
 export type ResponseStatus = 'ok' | 'error';
+/**
+ * An enumeration.
+ */
+export type RewriteMannerType = 'concise' | 'elaborate' | 'scholarly';
 
 export interface CliCommands {
   /**
@@ -99,6 +103,7 @@ export interface ReferenceStatus {
 }
 export interface RewriteRequest {
   text: string;
+  manner?: RewriteMannerType & string;
   n_choices?: number;
   temperature?: number;
 }

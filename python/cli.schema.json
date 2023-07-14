@@ -298,12 +298,30 @@
         "reference_statuses"
       ]
     },
+    "RewriteMannerType": {
+      "title": "RewriteMannerType",
+      "description": "An enumeration.",
+      "enum": [
+        "concise",
+        "elaborate",
+        "scholarly"
+      ],
+      "type": "string"
+    },
     "RewriteRequest": {
       "title": "RewriteRequest",
       "type": "object",
       "properties": {
         "text": {
           "type": "string"
+        },
+        "manner": {
+          "default": "concise",
+          "allOf": [
+            {
+              "$ref": "#/definitions/RewriteMannerType"
+            }
+          ]
         },
         "n_choices": {
           "default": 1,
