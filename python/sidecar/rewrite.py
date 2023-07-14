@@ -80,7 +80,7 @@ class Rewriter:
             response_type: TextSuggestionChoice
         ) -> list[TextSuggestionChoice]:
         return [
-            response_type(index=choice['index'], text=choice["message"]["content"])
+            response_type(index=choice['index'], text=choice["message"]["content"].strip())
             for choice in response['choices']
         ]
 
