@@ -104,7 +104,6 @@ function MainPaneViewContent({ activeEditorAtoms }: MainPaneViewContentProps) {
       return <ReferencesTableView defaultFilter={data.filter} />;
     default: {
       assertNever(data);
-      return null;
     }
   }
 }
