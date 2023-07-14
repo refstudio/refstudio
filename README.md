@@ -36,11 +36,12 @@ When editing documents you can ask AI assistance to rewrite parts of the text, a
 
 ## Setup & Run
 
-### Prerequisites
+### Prerequisites (development)
 
-- [node.js](https://nodejs.org/en/download) (>= 18.12.0 LTS)
-- [Yarn](https://yarnpkg.com/getting-started/install) - Node package manager
-- [Poetry](https://python-poetry.org/docs/#installation) - Python package manager
+- JavaScript: [node.js](https://nodejs.org/en/download) (>= 18.12.0 LTS) and [Yarn](https://yarnpkg.com/getting-started/install) package manager
+- Python: (>= 3.11) and [Poetry](https://python-poetry.org/docs/#installation) package manager
+- Tauri: Check [prerequisites](https://tauri.app/v1/guides/getting-started/prerequisites/) to install Rust and [Cargo](https://doc.rust-lang.org/stable/cargo/) package manager
+
 
 ### Backend (Python sidecar)
 
