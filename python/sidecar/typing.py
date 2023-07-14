@@ -1,8 +1,16 @@
 from datetime import date
-from enum import Enum
 from typing import Any
 
 from pydantic import BaseModel
+
+try:
+    # introduced in Python 3.11 ... 
+    from enum import StrEnum
+except ImportError:
+    # ... but had some breaking changes
+    # https://github.com/python/cpython/issues/100458
+    # Python 3.10 and below
+    from strenum import StrEnum
 
 
 class RefStudioModel(BaseModel):
@@ -12,17 +20,17 @@ class RefStudioModel(BaseModel):
         use_enum_values = True
 
         @staticmethod
-        def schema_extra(schema: dict[str, Any], _model) -> None:
+        def schema_extra(schema: dict[str, Any]) -> None:
             for prop in schema.get('properties', {}).values():
                 prop.pop('title', None)
 
 
-class ResponseStatus(str, Enum):
+class ResponseStatus(StrEnum):
     OK = "ok"
     ERROR = "error"
 
 
-class IngestStatus(str, Enum):
+class IngestStatus(StrEnum):
     PROCESSING = "processing"
     FAILURE = "failure"
     COMPLETE = "complete"
@@ -110,8 +118,15 @@ class TextSuggestionChoice(RefStudioModel):
     text: str
 
 
+class RewriteMannerType(StrEnum):
+    CONCISE = "concise"
+    ELABORATE = "elaborate"
+    SCHOLARLY = "scholarly"
+
+
 class RewriteRequest(RefStudioModel):
     text: str
+    manner: RewriteMannerType = RewriteMannerType.CONCISE
     n_choices: int = 1
     temperature: float = 0.7
 
@@ -151,7 +166,7 @@ class CliCommands(RefStudioModel):
     ingest_references: tuple[IngestRequest, IngestResponse]
     """Retrieve ingested PDF references"""
     rewrite: tuple[RewriteRequest, list[RewriteChoice]]
-    """"Rewrites a block of text in a more concise manner"""
+    """"Rewrites a block of text in a specified manner"""
     completion: tuple[TextCompletionRequest, list[TextCompletionChoice]]
     """Completes a body of text"""
     chat: tuple[ChatRequest, list[ChatResponseChoice]]

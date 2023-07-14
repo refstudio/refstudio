@@ -5,6 +5,7 @@ import sys
 import openai
 from dotenv import load_dotenv
 from sidecar import prompts, shared
+from sidecar.settings import logger
 from sidecar.typing import (RewriteChoice, RewriteRequest,
                             TextCompletionChoice, TextCompletionRequest,
                             TextSuggestionChoice)
@@ -13,22 +14,28 @@ load_dotenv()
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 
-def summarize(arg: RewriteRequest):
+def rewrite(arg: RewriteRequest):
     text = arg.text
+    manner = arg.manner
     n_choices = arg.n_choices
     temperature = arg.temperature
+
     # there are 1.33 tokens per word on average
     # seems reasonable to require a max_tokens roughly equivalent to our input text
     # https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them
     max_tokens = int(round(len(text.split(" ")) * 1.33))
 
-    prompt = prompts.create_prompt_for_summarize(text)
+    logger.info(f"Calling rewrite with the following parameters: {arg.dict()}")
+
+    prompt = prompts.create_prompt_for_rewrite(text, manner)
     chat = Rewriter(prompt, n_choices, temperature, max_tokens)
-    response = chat.get_response(response_type=RewriteChoice)
-    sys.stdout.write(json.dumps([r.dict() for r in response]))
+    choices = chat.get_response(response_type=RewriteChoice)
+    logger.info(f"Returning {len(choices)} rewrite choices to client: {choices}")
+    sys.stdout.write(json.dumps([r.dict() for r in choices]))
 
 
 def complete_text(request: TextCompletionRequest):
+    logger.info(f"Calling text completion with the following parameters: {request.dict()}")
     prompt = prompts.create_prompt_for_text_completion(request)
     chat = Rewriter(
         prompt,
@@ -37,7 +44,9 @@ def complete_text(request: TextCompletionRequest):
         max_tokens=request.max_tokens,
     )
     choices = chat.get_response(response_type=TextCompletionChoice)
+    logger.info(f"Trimming completion prefix text from completion choices: {choices}")
     choices = shared.trim_completion_prefix_from_choices(prefix=request.text, choices=choices)
+    logger.info(f"Returning {len(choices)} completion choices to client: {choices}")
     sys.stdout.write(json.dumps([r.dict() for r in choices]))
 
 
@@ -85,6 +94,7 @@ class Rewriter:
         ]
 
     def call_model(self, messages: list):
+        logger.info(f"Calling OpenAI chat API with the following input message(s): {messages}")
         response = openai.ChatCompletion.create(
             model=os.environ["OPENAI_CHAT_MODEL"],
             messages=messages,
@@ -93,6 +103,7 @@ class Rewriter:
             # maximum number of tokens to generate (1 word ~= 1.33 tokens)
             max_tokens=self.max_tokens,
         )
+        logger.info(f"Received response from OpenAI chat API: {response}")
         return response
 
     def prepare_messages_for_chat(self, text: str) -> list:

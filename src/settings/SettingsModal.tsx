@@ -8,8 +8,8 @@ import { GeneralSettingsPane } from './panes/GeneralSettingsPane';
 import { initSettings } from './settingsManager';
 import { PaneConfig, SettingsPanesConfig } from './types';
 
-// Ensure settings are configured and loaded
-await initSettings();
+// Ensure settings are configured and loaded (fire and forget)
+void initSettings();
 
 const SETTINGS_PANES: SettingsPanesConfig[] = [
   // {
