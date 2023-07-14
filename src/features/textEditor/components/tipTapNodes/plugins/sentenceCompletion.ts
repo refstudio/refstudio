@@ -70,8 +70,6 @@ const sentenceCompletionPlugin = new Plugin<SentenceCompletionState>({
           view.dispatch(view.state.tr.setMeta(sentenceCompletionPluginKey, metadata));
         });
       }
-
-      return false;
     },
   }),
   props: {
