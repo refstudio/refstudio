@@ -11,7 +11,6 @@ export interface SettingsSchema {
   };
   openAI: {
     apiKey: string;
-    completeModel: string;
     chatModel: string;
   };
   sidecar: {
@@ -36,7 +35,6 @@ export async function initSettings() {
       },
       openAI: {
         apiKey: await readEnv('OPENAI_API_KEY', ''),
-        completeModel: await readEnv('OPENAI_COMPLETE_MODEL', DEFAULT_OPEN_AI_COMPLETE_MODEL),
         chatModel: await readEnv('OPENAI_CHAT_MODEL', DEFAULT_OPEN_AI_CHAT_MODEL),
       },
       sidecar: {

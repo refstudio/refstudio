@@ -19,7 +19,6 @@ export async function callSidecar<T extends keyof CliCommands>(
     // Open AI
     OPENAI_API_KEY: openAISettings.apiKey,
     OPENAI_CHAT_MODEL: openAISettings.chatModel,
-    OPENAI_COMPLETE_MODEL: openAISettings.completeModel,
     // Sidecar
     SIDECAR_ENABLE_LOGGING: String(sidecarSettings.logging.active),
     SIDECAR_LOG_DIR: sidecarSettings.logging.path,

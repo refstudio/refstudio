@@ -22,7 +22,6 @@ const mockSettings: SettingsSchema = {
   },
   openAI: {
     apiKey: '',
-    completeModel: 'davinci',
     chatModel: 'gpt-3.5-turbo',
   },
   sidecar: {
