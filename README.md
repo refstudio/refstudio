@@ -1,3 +1,11 @@
+<p align="center">
+  <a href="https://github.com/refstudio/refstudio/actions/workflows/on-push.yml">
+    <img src="https://github.com/refstudio/refstudio/actions/workflows/on-push.yml/badge.svg" />
+  <a href="https://codecov.io/gh/refstudio/refstudio" > 
+   <img src="https://codecov.io/gh/refstudio/refstudio/branch/main/graph/badge.svg?token=XZMTETRGXC"/> 
+   </a>
+</p>
+
 # Ref Studio
 
 > An open source text editor optimized for writing that relies on references.
