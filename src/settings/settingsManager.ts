@@ -23,7 +23,6 @@ export interface SettingsSchema {
 
 let settingsManager: SettingsManager<SettingsSchema> | undefined;
 
-export const DEFAULT_OPEN_AI_COMPLETE_MODEL = 'davinci';
 export const DEFAULT_OPEN_AI_CHAT_MODEL = 'gpt-3.5-turbo';
 
 export async function initSettings() {
