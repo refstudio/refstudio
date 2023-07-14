@@ -136,6 +136,7 @@ export interface TextCompletionChoice {
 export interface ChatRequest {
   text: string;
   n_choices?: number;
+  temperature?: number;
 }
 export interface ChatResponse {
   status: ResponseStatus;
