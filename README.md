@@ -113,7 +113,7 @@ Project state is persisted in the Tauri [`appDataDir`][appDataDir], typically `~
 To completely reset app state, quit the RefStudio app and remove this directory:
 
 ```bash
-$ mv ~/Library/Application\ Support/com.tauri.dev /tmp/
+mv ~/Library/Application\ Support/com.tauri.dev /tmp/
 ```
 
 [appDataDir]: https://tauri.app/v1/api/js/path#appdatadir
