@@ -22,7 +22,3 @@
 .tiptap-editor {
   @apply flex-1 overflow-y-scroll pl-1 pr-2 pt-2;
 }
-
-.tiptap-editor .sentence-suggestion {
-  @apply text-gray-400;
-}

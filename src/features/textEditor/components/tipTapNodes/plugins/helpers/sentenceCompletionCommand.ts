@@ -1,6 +1,6 @@
 import { Command } from '@tiptap/react';
 
-import { SentenceCompletionMetadata } from '../../types/SentenceCompletionMetadata';
+import { createOpenAction } from '../../types/SentenceCompletionMetadata';
 import { sentenceCompletionPluginKey } from '../sentenceCompletion';
 
 export const sentenceCompletionCommand: Command = ({ dispatch, state, tr }) => {
@@ -11,12 +11,7 @@ export const sentenceCompletionCommand: Command = ({ dispatch, state, tr }) => {
     const { parent, parentOffset } = state.selection.$from;
     const text = parent.textBetween(0, parentOffset);
 
-    const openMetadata: SentenceCompletionMetadata = {
-      type: 'open',
-      query: text,
-    };
-
-    tr.setMeta(sentenceCompletionPluginKey, openMetadata);
+    tr.setMeta(sentenceCompletionPluginKey, createOpenAction(text));
 
     dispatch(tr);
   }

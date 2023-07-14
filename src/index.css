@@ -9,6 +9,8 @@
     --color-primary-hover: 152deg 54% 48%;
     --color-secondary: 193deg 37% 69%;
     --color-secondary-hover: 193deg 37% 48%;
+    --color-muted: 218deg 11% 65%;
+    --color-error: 0deg 84% 60%;
   }
 }
 
