@@ -1,4 +1,3 @@
-![Ref Studio](public/readme/readme-refstudio.png)
 <p align="center">
   <a href="https://github.com/refstudio/refstudio/actions/workflows/on-push.yml">
     <img src="https://github.com/refstudio/refstudio/actions/workflows/on-push.yml/badge.svg" />
@@ -11,9 +10,7 @@
 
 > An open source text editor optimized for writing that relies on references.
 
-## Demo 
-
-public/readme/refstudio-short.mov
+![Ref Studio](public/readme/readme-refstudio.png)
 
 ## Motivation
 
@@ -34,6 +31,10 @@ References play a crucial role in scientific document writing. Ref Studio offers
 ### AI Interactions
 
 When editing documents you can ask AI assistance to rewrite parts of the text, and get answers using the chat. Additionally you can also ask for text completion in the editor.
+
+## Demo
+
+https://github.com/refstudio/refstudio/assets/174127/f8b847e1-d6b7-4e58-ae04-0d8e96c88382
 
 
 
