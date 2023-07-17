@@ -6,8 +6,8 @@ import { PasswordInput } from '../../../components/PasswordInput';
 import { SettingsPane, SettingsPaneProps } from '../../../settings/panes/SettingsPane';
 import {
   getCachedSetting,
+  getMannerOptions,
   getSettings,
-  MANNER_OPTIONS,
   OpenAiManner,
   saveCachedSettings,
   setCachedSetting,
@@ -37,7 +37,7 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
       description="You need to configure the API to use the rewrite and chat operations."
       header={config.title}
     >
-      <form className="mt-10" onSubmit={handleSaveSettings}>
+      <form className="mt-10" data-testid="openai-settings-form" onSubmit={handleSaveSettings}>
         <fieldset className="space-y-4">
           <div>
             <label htmlFor="apiKey">API Key</label>
@@ -45,6 +45,7 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
               className="w-full border bg-slate-50 px-2 py-0.5"
               data-testid="apiKey"
               id="apiKey"
+              name="apiKey"
               value={paneSettings.apiKey}
               onChange={(e) => setPaneSettings({ ...paneSettings, apiKey: e.currentTarget.value })}
             />
@@ -54,6 +55,7 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
             <input
               className="w-full border bg-slate-50 px-2 py-0.5"
               id="chatModel"
+              name="chatModel"
               value={paneSettings.chatModel}
               onChange={(e) => setPaneSettings({ ...paneSettings, chatModel: e.currentTarget.value })}
             />
@@ -63,10 +65,11 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
             <select
               className="w-full border bg-slate-50 px-2 py-0.5"
               id="manner"
+              name="manner"
               value={paneSettings.manner}
               onChange={(e) => setPaneSettings({ ...paneSettings, manner: e.currentTarget.value as OpenAiManner })}
             >
-              {MANNER_OPTIONS.map((m) => (
+              {getMannerOptions().map((m) => (
                 <option key={m} value={m}>
                   {m}
                 </option>
@@ -80,6 +83,7 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
               id="temperature"
               max={0.9}
               min={0.7}
+              name="temperature"
               step={0.01}
               type="range"
               value={paneSettings.temperature}

@@ -1,6 +1,12 @@
 import { noop } from '../../lib/noop';
 import { render, screen, userEvent } from '../../test/test-utils';
-import { getCachedSetting, initSettings, saveCachedSettings, setCachedSetting } from '../settingsManager';
+import {
+  getCachedSetting,
+  getMannerOptions,
+  initSettings,
+  saveCachedSettings,
+  setCachedSetting,
+} from '../settingsManager';
 import { SettingsModal } from '../SettingsModal';
 import { SettingsPaneId } from '../types';
 
@@ -14,6 +20,7 @@ describe('SettingsModal component', () => {
     vi.mocked(saveCachedSettings).mockResolvedValue();
     vi.mocked(getCachedSetting).mockReturnValue('');
     vi.mocked(setCachedSetting).mockImplementation(noop);
+    vi.mocked(getMannerOptions).mockReturnValue(['concise', 'elaborate', 'scholarly']);
   });
 
   afterEach(() => {

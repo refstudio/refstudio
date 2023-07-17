@@ -5,7 +5,9 @@ import { getSystemAppDataDir, getSystemConfigurationsDir } from '../io/filesyste
 import { readEnv } from '../io/readEnv';
 
 export type OpenAiManner = 'concise' | 'elaborate' | 'scholarly';
-export const MANNER_OPTIONS: OpenAiManner[] = ['concise', 'elaborate', 'scholarly'];
+export function getMannerOptions(): OpenAiManner[] {
+  return ['concise', 'elaborate', 'scholarly'];
+}
 
 export interface SettingsSchema {
   general: {
