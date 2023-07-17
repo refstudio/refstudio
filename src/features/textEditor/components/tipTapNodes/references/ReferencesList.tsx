@@ -12,7 +12,7 @@ import { cx } from '../../../../../lib/cx';
 import { ReferenceItem } from '../../../../../types/ReferenceItem';
 import { fuseOptions } from './config';
 
-export type ReferenceListProps = SuggestionProps<{ id: string; label: string }>;
+export type ReferenceListProps = SuggestionProps<{ id: string }>;
 
 export const ReferencesList = forwardRef((props: ReferenceListProps, ref) => {
   const { command, clientRect, query } = props;
@@ -45,7 +45,7 @@ export const ReferencesList = forwardRef((props: ReferenceListProps, ref) => {
   const handleSelect = (index: number) => {
     const referenceItem = queriedReferences[index];
 
-    command({ id: referenceItem.id, label: getReferenceLabel(referenceItem) });
+    command({ id: referenceItem.id });
   };
 
   const handleArrowUp = useCallback(() => {

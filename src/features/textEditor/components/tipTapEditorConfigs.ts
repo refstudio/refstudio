@@ -13,8 +13,9 @@ import { CollapsibleBlockContentNode } from './tipTapNodes/collapsibleBlock/node
 import { CollapsibleBlockNode } from './tipTapNodes/collapsibleBlock/nodes/CollapsibleBlockNode';
 import { CollapsibleBlockSummaryNode } from './tipTapNodes/collapsibleBlock/nodes/CollapsibleBlockSummary';
 import { DraggableBlockNode } from './tipTapNodes/draggableBlock/DraggableBlockNode';
-import { SentenceCompletionExtension } from './tipTapNodes/plugins/sentenceCompletion';
-import { ReferenceNode } from './tipTapNodes/referenceNode/ReferenceNode';
+import { sentenceCompletionExtension } from './tipTapNodes/plugins/sentenceCompletion';
+import { referencesMark } from './tipTapNodes/references/citationMark';
+import { referenceExtension } from './tipTapNodes/references/referenceExtension';
 import { RefStudioDocument } from './tipTapNodes/refStudioDocument/RefStudioDocument';
 lowlight.registerLanguage('markdown', markdown);
 
@@ -44,8 +45,9 @@ export const EDITOR_EXTENSIONS: Extensions = [
   CollapsibleBlockNode,
   CollapsibleBlockContentNode,
   CollapsibleBlockSummaryNode,
-  ReferenceNode,
-  SentenceCompletionExtension,
+  referenceExtension,
+  referencesMark,
+  sentenceCompletionExtension,
 ];
 
 export function transformPasted(slice: Slice) {

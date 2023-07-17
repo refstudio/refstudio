@@ -1,15 +1,32 @@
-import Mention from '@tiptap/extension-mention';
 import { ReactRenderer } from '@tiptap/react';
-import { SuggestionKeyDownProps } from '@tiptap/suggestion';
+import { SuggestionKeyDownProps, SuggestionOptions } from '@tiptap/suggestion';
 
+import { referencesMark } from './citationMark';
+import { referencePlugin } from './referencePlugin';
 import { ReferenceListProps, ReferencesList } from './ReferencesList';
 
-export const ReferenceNode = Mention.configure({
-  renderLabel: ({ node }) => (node.attrs.label as string | undefined) ?? '[INVALID_REF]',
+export const referenceExtension = referencePlugin.configure({
   suggestion: {
     allowSpaces: true,
-    char: '[',
+    char: '@',
     allowedPrefixes: null,
+    command: ({
+      editor,
+      range,
+      props,
+    }: Parameters<Exclude<SuggestionOptions<{ id: string }>['command'], undefined>>[0]) => {
+      editor
+        .chain()
+        .focus()
+        .insertContentAt(range, [
+          {
+            type: referenceExtension.name,
+            attrs: props,
+            marks: [{ type: referencesMark.name }],
+          },
+        ])
+        .run();
+    },
     render: () => {
       let reactRenderer: ReactRenderer<{ onKeyDown: (e: SuggestionKeyDownProps) => boolean }, ReferenceListProps>;
 
