@@ -4,7 +4,7 @@ import { MenuProvider } from 'kmenu';
 import React, { useCallback, useEffect, useState } from 'react';
 import { VscChevronUp } from 'react-icons/vsc';
 import { ImperativePanelHandle, Panel, PanelGroup } from 'react-resizable-panels';
-import { useEffectOnce, useEventListener } from 'usehooks-ts';
+import { useEffectOnce } from 'usehooks-ts';
 
 import { PrimarySideBar, PrimarySideBarPane } from '../components/PrimarySideBar';
 import { VerticalResizeHandle } from '../components/VerticalResizeHandle';
@@ -43,7 +43,13 @@ function App() {
     200,
   );
 
-  useEventListener('resize', handleLayoutUpdate);
+  useEffect(() => {
+    window.addEventListener('resize', handleLayoutUpdate);
+
+    return () => {
+      window.removeEventListener('resize', handleLayoutUpdate);
+    };
+  }, [handleLayoutUpdate]);
 
   return (
     <EventsListener>
