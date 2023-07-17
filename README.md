@@ -1,6 +1,7 @@
 <p align="center">
   <a href="https://github.com/refstudio/refstudio/actions/workflows/on-push.yml">
     <img src="https://github.com/refstudio/refstudio/actions/workflows/on-push.yml/badge.svg" />
+  </a>
   <a href="https://codecov.io/gh/refstudio/refstudio" > 
    <img src="https://codecov.io/gh/refstudio/refstudio/branch/main/graph/badge.svg?token=XZMTETRGXC"/> 
    </a>
