@@ -1,9 +1,17 @@
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 
+import { JSONDebug, JSONDebugContainer } from '../../../components/JSONDebug';
 import { PasswordInput } from '../../../components/PasswordInput';
 import { SettingsPane, SettingsPaneProps } from '../../../settings/panes/SettingsPane';
-import { getCachedSetting, getSettings, saveCachedSettings, setCachedSetting } from '../../../settings/settingsManager';
+import {
+  getCachedSetting,
+  getSettings,
+  MANNER_OPTIONS,
+  OpenAiManner,
+  saveCachedSettings,
+  setCachedSetting,
+} from '../../../settings/settingsManager';
 
 export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
   const [paneSettings, setPaneSettings] = useState(getCachedSetting('openAI'));
@@ -50,6 +58,34 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
               onChange={(e) => setPaneSettings({ ...paneSettings, chatModel: e.currentTarget.value })}
             />
           </div>
+          <div>
+            <label htmlFor="manner">Manner</label>
+            <select
+              className="w-full border bg-slate-50 px-2 py-0.5"
+              id="manner"
+              value={paneSettings.manner}
+              onChange={(e) => setPaneSettings({ ...paneSettings, manner: e.currentTarget.value as OpenAiManner })}
+            >
+              {MANNER_OPTIONS.map((m) => (
+                <option key={m} value={m}>
+                  {m}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="temperature">Creativity (temperature)</label>
+            <input
+              className="w-full border bg-slate-50 px-2 py-0.5"
+              id="temperature"
+              max={0.9}
+              min={0.7}
+              step={0.01}
+              type="range"
+              value={paneSettings.temperature}
+              onChange={(e) => setPaneSettings({ ...paneSettings, temperature: parseFloat(e.currentTarget.value) })}
+            />
+          </div>
         </fieldset>
         <fieldset className="mt-10 flex items-center justify-end">
           {saveMutation.isSuccess && <span className="px-2 text-primary">Saved!</span>}
@@ -58,10 +94,10 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
         </fieldset>
       </form>
 
-      {/* <JSONDebugContainer className="mt-28">
-        <JSONDebug header="paneSettings" value={paneSettings} />
-        <JSONDebug header="API call result" value={saveMutation.data} />
-      </JSONDebugContainer> */}
+      <JSONDebugContainer className="mt-28">
+        <JSONDebug header="paneSettings" maskedKeys={['apiKey']} value={paneSettings} />
+        <JSONDebug header="API call result" maskedKeys={['apiKey']} value={saveMutation.data} />
+      </JSONDebugContainer>
     </SettingsPane>
   );
 }
