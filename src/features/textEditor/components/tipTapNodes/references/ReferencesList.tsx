@@ -9,7 +9,6 @@ import { usePopper } from 'react-popper';
 
 import { getReferencesAtom } from '../../../../../atoms/referencesState';
 import { cx } from '../../../../../lib/cx';
-import { ReferenceItem } from '../../../../../types/ReferenceItem';
 import { fuseOptions } from './config';
 
 export type ReferenceListProps = SuggestionProps<{ id: string }>;
@@ -107,7 +106,3 @@ export const ReferencesList = forwardRef((props: ReferenceListProps, ref) => {
 });
 
 ReferencesList.displayName = 'ReferencesList';
-
-export function getReferenceLabel(referenceItem: ReferenceItem): string {
-  return `[${referenceItem.citationKey}]`;
-}
