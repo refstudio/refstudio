@@ -5,11 +5,7 @@ import { OpenAiSettingsPane } from '../features/ai/settings/OpenAiSettingsPane';
 import { cx } from '../lib/cx';
 import { DebugSettingsPane } from './panes/DebugSettingsPane';
 import { GeneralSettingsPane } from './panes/GeneralSettingsPane';
-import { initSettings } from './settingsManager';
 import { PaneConfig, SettingsPanesConfig } from './types';
-
-// Ensure settings are configured and loaded (fire and forget)
-void initSettings();
 
 const SETTINGS_PANES: SettingsPanesConfig[] = [
   // {

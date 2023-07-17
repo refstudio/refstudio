@@ -16,6 +16,7 @@ import { useDebouncedCallback } from '../hooks/useDebouncedCallback';
 import { ensureProjectFileStructure } from '../io/filesystem';
 import { notifyInfo } from '../notifications/notifications';
 import { interceptConsoleMessages } from '../notifications/notifications.console';
+import { initSettings } from '../settings/settingsManager';
 import { SettingsModalOpener } from '../settings/SettingsModalOpener';
 import { ApplicationFrame } from '../wrappers/ApplicationFrame';
 import { ContextMenus } from '../wrappers/ContextMenus';
@@ -30,8 +31,11 @@ interceptConsoleMessages(true, true, true);
 function App() {
   useEffectOnce(() => {
     notifyInfo('Application Startup');
-    void ensureProjectFileStructure();
-    emitEvent('refstudio://references/load');
+    void ensureProjectFileStructure()
+      .then(initSettings)
+      .then(() => {
+        emitEvent('refstudio://references/load');
+      });
   });
 
   const handleLayoutUpdate = useDebouncedCallback(
