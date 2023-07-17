@@ -8,13 +8,17 @@ import { askForRewrite, REWRITE_MANNER, RewriteOptions } from '../../../api/rewr
 import { selectionAtom } from '../../../atoms/selectionState';
 import { PanelSection } from '../../../components/PanelSection';
 import { emitEvent } from '../../../events';
+import { getCachedSetting } from '../../../settings/settingsManager';
 
 export function SelectionPanelSection() {
   const selection = useAtomValue(selectionAtom);
   const debouncedSelection = useDebounce(selection, 200);
+
+  const openAiSettings = getCachedSetting('openAI');
+
   const [rewriteOptions, setRewriteOptions] = useState<RewriteOptions>({
-    manner: REWRITE_MANNER[0],
-    temperature: 0.7,
+    manner: openAiSettings.manner,
+    temperature: openAiSettings.temperature,
     nChoices: 3,
   });
 

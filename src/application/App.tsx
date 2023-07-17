@@ -28,6 +28,8 @@ import { ExplorerPanel } from './sidebar/ExplorerPanel';
 // Note: Intercepting INFO, WARN and ERROR console.*
 interceptConsoleMessages(true, true, true);
 
+await initSettings();
+
 function App() {
   useEffectOnce(() => {
     notifyInfo('Application Startup');
