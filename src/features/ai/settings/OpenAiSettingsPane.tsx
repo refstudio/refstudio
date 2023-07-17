@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 
-import { JSONDebug, JSONDebugContainer } from '../../../components/JSONDebug';
+import { PasswordInput } from '../../../components/PasswordInput';
 import { SettingsPane, SettingsPaneProps } from '../../../settings/panes/SettingsPane';
 import { getCachedSetting, getSettings, saveCachedSettings, setCachedSetting } from '../../../settings/settingsManager';
 
@@ -33,7 +33,7 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
         <fieldset className="space-y-4">
           <div>
             <label htmlFor="apiKey">API Key</label>
-            <input
+            <PasswordInput
               className="w-full border bg-slate-50 px-2 py-0.5"
               data-testid="apiKey"
               id="apiKey"
@@ -57,10 +57,11 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
           <input className="btn-primary" disabled={!isDirty || saveMutation.isLoading} type="submit" value="SAVE" />
         </fieldset>
       </form>
-      <JSONDebugContainer className="mt-28">
+
+      {/* <JSONDebugContainer className="mt-28">
         <JSONDebug header="paneSettings" value={paneSettings} />
         <JSONDebug header="API call result" value={saveMutation.data} />
-      </JSONDebugContainer>
+      </JSONDebugContainer> */}
     </SettingsPane>
   );
 }
