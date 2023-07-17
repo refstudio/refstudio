@@ -8,7 +8,7 @@ export interface RewriteOptions {
   temperature?: number; // between 0.7 and 0.9
 }
 
-const DEFAULT_OPTIONS: RewriteOptions = {
+export const DEFAULT_OPTIONS: RewriteOptions = {
   nChoices: 3,
   manner: 'concise',
   temperature: 0.7,
