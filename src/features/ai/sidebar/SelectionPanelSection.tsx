@@ -24,10 +24,10 @@ export function SelectionPanelSection() {
 
   return (
     <PanelSection title="Selection">
-      <p className="my-4 italic">Select some text in the editor to see it here.</p>
+      <p className="my-4 px-4 italic">Select some text in the editor to see it here.</p>
 
       {selection && (
-        <div className="mb-6 flex flex-col gap-4">
+        <div className="mb-6 flex flex-col gap-4 px-4">
           <div className="border border-slate-100 bg-slate-50 p-4">{debouncedSelection}</div>
           <button className="btn-primary" disabled={isFetching} onClick={() => void refetch()}>
             REWRITE
