@@ -1,3 +1,4 @@
+![Ref Studio](public/readme/readme-refstudio.png)
 <p align="center">
   <a href="https://github.com/refstudio/refstudio/actions/workflows/on-push.yml">
     <img src="https://github.com/refstudio/refstudio/actions/workflows/on-push.yml/badge.svg" />
@@ -10,7 +11,9 @@
 
 > An open source text editor optimized for writing that relies on references.
 
-![Ref Studio](public/readme-refstudio.png)
+## Demo 
+
+public/readme/refstudio-short.mov
 
 ## Motivation
 
