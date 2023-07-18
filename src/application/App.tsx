@@ -13,10 +13,6 @@ import { AIPanel } from '../features/ai/AIPanel';
 import { ReferencesDropZone } from '../features/references/components/ReferencesDropZone';
 import { ReferencesPanel } from '../features/references/sidebar/ReferencesPanel';
 import { useDebouncedCallback } from '../hooks/useDebouncedCallback';
-import { ensureProjectFileStructure } from '../io/filesystem';
-import { notifyInfo } from '../notifications/notifications';
-import { interceptConsoleMessages } from '../notifications/notifications.console';
-import { initSettings } from '../settings/settingsManager';
 import { SettingsModalOpener } from '../settings/SettingsModalOpener';
 import { ApplicationFrame } from '../wrappers/ApplicationFrame';
 import { ContextMenus } from '../wrappers/ContextMenus';
@@ -25,18 +21,8 @@ import { CommandPalette } from './CommandPalette';
 import { MainPanel } from './components/MainPanel';
 import { ExplorerPanel } from './sidebar/ExplorerPanel';
 
-// Note: Intercepting INFO, WARN and ERROR console.*
-interceptConsoleMessages(true, true, true);
-
-function App() {
-  useEffectOnce(() => {
-    notifyInfo('Application Startup');
-    void ensureProjectFileStructure()
-      .then(initSettings)
-      .then(() => {
-        emitEvent('refstudio://references/load');
-      });
-  });
+export function App() {
+  useEffectOnce(() => emitEvent('refstudio://references/load'));
 
   const handleLayoutUpdate = useDebouncedCallback(
     useCallback(() => emitEvent('refstudio://layout/update'), []),
@@ -161,5 +147,3 @@ function RightPanelWrapper() {
     </>
   );
 }
-
-export default App;
