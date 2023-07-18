@@ -31,7 +31,7 @@ export const backspace: KeyboardShortcutCommand = ({ editor }) => {
   // Otherwise, remove the citation node
   const start = $from.before();
   const end = start + $from.parent.nodeSize;
-  tr.delete(start, end);
+  tr.insertText('[', start, end);
   editor.view.dispatch(tr);
   return true;
 };
