@@ -7,6 +7,6 @@ import { WelcomeView } from './application/views/WelcomeView';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <WelcomeView className="h-screen bg-white" hideShortcuts />
+    <WelcomeView className="h-screen bg-transparent" hideShortcuts />
   </React.StrictMode>,
 );
