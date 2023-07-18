@@ -17,10 +17,18 @@ export function SelectionPanelSection() {
   const openAiSettings = getCachedSetting('openAI');
 
   const [rewriteOptions, setRewriteOptions] = useState<RewriteOptions>({
+    nChoices: 3,
     manner: openAiSettings.manner,
     temperature: openAiSettings.temperature,
-    nChoices: 3,
   });
+
+  useEffect(() => {
+    setRewriteOptions((state) => ({
+      ...state,
+      manner: openAiSettings.manner,
+      temperature: openAiSettings.temperature,
+    }));
+  }, [openAiSettings.manner, openAiSettings.temperature]);
 
   const {
     error,
