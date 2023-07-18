@@ -45,8 +45,8 @@ export const EDITOR_EXTENSIONS: Extensions = [
   CollapsibleBlockNode,
   CollapsibleBlockContentNode,
   CollapsibleBlockSummaryNode,
-  referenceNode,
   citationNode,
+  referenceNode,
   sentenceCompletionExtension,
 ];
 

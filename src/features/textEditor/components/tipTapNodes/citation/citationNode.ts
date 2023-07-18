@@ -5,6 +5,11 @@ import { ReactNodeViewRenderer } from '@tiptap/react';
 
 import { referenceNode } from '../references/referenceNode';
 import { Citation } from './Citation';
+import { squareBracketHandler } from './inputRuleHandlers/squareBracketHandler';
+import { arrowLeft } from './keyboardShortcutCommands/arrowLeft';
+import { arrowRight } from './keyboardShortcutCommands/arrowRight';
+import { backspace } from './keyboardShortcutCommands/backspace';
+import { enter } from './keyboardShortcutCommands/enter';
 
 type CitationPluginState = number | null;
 
@@ -22,7 +27,7 @@ const citationPlugin = new Plugin<CitationPluginState>({
 
   state: {
     init: () => null,
-    apply: (_tr, _value, _oldState, newState) => {
+    apply: (tr, _value, _oldState, newState) => {
       if (!newState.selection.empty) {
         return null;
       }
@@ -65,8 +70,8 @@ const citationPlugin = new Plugin<CitationPluginState>({
     const { $from } = newState.selection;
     const { parent } = $from;
 
-    // If the selection after the update is not in the citation node, nothing to do
-    if (parent.type.name !== citationNode.name || $from.pos !== $from.after() - 1) {
+    // If the selection after the update is not at the end of the citation node, nothing to do
+    if (parent.type.name !== citationNode.name || $from.nodeAfter) {
       return;
     }
 
@@ -77,7 +82,7 @@ const citationPlugin = new Plugin<CitationPluginState>({
 
   props: {
     decorations(state) {
-      const decorationPos = this.getState(state);
+      const decorationPos = this.getState(state) as CitationPluginState;
       if (!decorationPos) {
         return null;
       }
@@ -101,6 +106,42 @@ const citationPlugin = new Plugin<CitationPluginState>({
   },
 });
 
+/**
+ * Plugin that prevents the cursor from being directly after the opening and closing brackets of citation nodes
+ */
+const moveCursorPluginKey = new PluginKey('moveCursor');
+const moveCursorPlugin = new Plugin({
+  key: moveCursorPluginKey,
+  appendTransaction: (_transactions, oldState, newState) => {
+    if (!newState.selection.empty) {
+      return;
+    }
+
+    const { selection, tr } = newState;
+    const { $from } = selection;
+
+    const isAfterOpeningBracket = $from.parent.type.name === citationNode.name && $from.nodeBefore === null;
+    const isAfterClosingBracket = $from.nodeBefore?.type.name === citationNode.name;
+
+    if (!isAfterOpeningBracket && !isAfterClosingBracket) {
+      return;
+    }
+
+    const wasAfterBeforeOpeningBracket =
+      oldState.selection.empty && oldState.selection.$from.nodeAfter?.type.name === citationNode.name;
+
+    // If the the cursor was before the opening bracket and is now after the bracket,
+    // it means the user is trying to enter the node so we move the cursor inside
+    if (wasAfterBeforeOpeningBracket && isAfterOpeningBracket) {
+      tr.setSelection(TextSelection.create(newState.doc, $from.pos + 1));
+    } else {
+      tr.setSelection(TextSelection.create(newState.doc, $from.pos - 1));
+    }
+
+    return tr;
+  },
+});
+
 export const citationNode = Node.create({
   name: 'citation',
 
@@ -120,81 +161,19 @@ export const citationNode = Node.create({
 
   addNodeView: () => ReactNodeViewRenderer(Citation),
 
-  addInputRules() {
-    return [
-      new InputRule({
-        find: inputRegex,
-        handler: ({ state, range }) => {
-          const { tr } = state;
-          const start = range.from;
+  addInputRules: () => [
+    new InputRule({
+      find: inputRegex,
+      handler: squareBracketHandler,
+    }),
+  ],
 
-          // When inserting a citation node, also inserts a '@' character to open the reference selector
-          tr.insert(start, this.type.create({}, state.schema.text('@'))).setSelection(
-            TextSelection.create(tr.doc, state.selection.from + 2),
-          );
-        },
-      }),
-    ];
-  },
+  addKeyboardShortcuts: () => ({
+    ArrowRight: arrowRight,
+    ArrowLeft: arrowLeft,
+    Backspace: backspace,
+    Enter: enter,
+  }),
 
-  addKeyboardShortcuts() {
-    return {
-      // Enable escaping the citation node when pressing ArrowRight while being at the end of the node
-      ArrowRight: ({ editor }) => {
-        if (!editor.state.selection.empty) {
-          return false;
-        }
-
-        const { $from } = editor.state.selection;
-        if ($from.parent.type.name !== this.type.name || $from.pos !== $from.after() - 1) {
-          return false;
-        }
-
-        const resolvedAfterPos = editor.state.doc.resolve($from.after());
-        const maybeNextNode = resolvedAfterPos.nodeAfter;
-        const { tr } = editor.state;
-        if (!maybeNextNode) {
-          tr.insert(resolvedAfterPos.pos, editor.schema.text(' '));
-        }
-        tr.setSelection(TextSelection.create(tr.doc, $from.after() + 1));
-
-        editor.view.dispatch(tr);
-        return true;
-      },
-      // Enable escaping the citation node when pressing ArrowLeft while being at the start of the node
-      ArrowLeft: ({ editor }) => {
-        if (!editor.state.selection.empty) {
-          return false;
-        }
-
-        const { $from } = editor.state.selection;
-        if ($from.parent.type.name !== this.type.name || $from.pos !== $from.before() + 1) {
-          return false;
-        }
-
-        const resolvedBeforePos = editor.state.doc.resolve($from.before());
-        const maybePreviousNode = resolvedBeforePos.nodeBefore;
-        const { tr } = editor.state;
-        if (!maybePreviousNode) {
-          tr.insert(resolvedBeforePos.pos, editor.schema.text(' '));
-        }
-        tr.setSelection(TextSelection.create(tr.doc, $from.before()));
-
-        editor.view.dispatch(tr);
-        return true;
-      },
-      // Block Enter key when selection overlaps with a citation node
-      Enter: ({ editor }) => {
-        if (
-          editor.state.selection.$from.parent.type.name === this.type.name ||
-          editor.state.selection.$to.parent.type.name === this.type.name
-        ) {
-          return true;
-        }
-        return false;
-      },
-    };
-  },
-
-  addProseMirrorPlugins: () => [citationPlugin],
+  addProseMirrorPlugins: () => [citationPlugin, moveCursorPlugin],
 });

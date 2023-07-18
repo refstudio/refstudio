@@ -9,6 +9,21 @@ import { ReferenceListProps, ReferencesList } from './ReferencesList';
 export const referenceNode = Mention.extend({
   name: 'reference',
   addNodeView: () => ReactNodeViewRenderer(Reference),
+  addAttributes: () => ({
+    id: {
+      default: null,
+      parseHTML: (element) => element.getAttribute('data-id'),
+      renderHTML: (attributes) => {
+        if (!attributes.id || typeof attributes.id !== 'string') {
+          return {};
+        }
+
+        return {
+          'data-id': attributes.id,
+        };
+      },
+    },
+  }),
 }).configure({
   suggestion: {
     allowSpaces: true,
