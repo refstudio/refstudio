@@ -1,7 +1,7 @@
 import { invoke } from '@tauri-apps/api';
 import { useState } from 'react';
 
-import App from './application/App';
+import { App } from './application/App';
 import { useAsyncEffect } from './hooks/useAsyncEffect';
 import { ensureProjectFileStructure } from './io/filesystem';
 import { noop } from './lib/noop';
@@ -9,18 +9,23 @@ import { notifyInfo } from './notifications/notifications';
 import { interceptConsoleMessages } from './notifications/notifications.console';
 import { initSettings } from './settings/settingsManager';
 
+// Note: Intercepting INFO, WARN and ERROR console.*
+interceptConsoleMessages(true, true, true);
+
 export function AppStartup() {
   const [initialized, setInitialized] = useState(false);
 
   useAsyncEffect(
     async (isMounted) => {
-      // Note: Intercepting INFO, WARN and ERROR console.*
-      interceptConsoleMessages(true, true, true);
+      if (initialized) {
+        return;
+      }
 
       notifyInfo('Application Startup');
       await initSettings();
       await ensureProjectFileStructure();
       await invoke('close_splashscreen');
+
       notifyInfo('Application Initialized');
 
       if (isMounted()) {
@@ -28,7 +33,7 @@ export function AppStartup() {
       }
     },
     noop,
-    [],
+    [initialized],
   );
 
   if (!initialized) {

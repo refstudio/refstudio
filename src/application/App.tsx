@@ -21,7 +21,7 @@ import { CommandPalette } from './CommandPalette';
 import { MainPanel } from './components/MainPanel';
 import { ExplorerPanel } from './sidebar/ExplorerPanel';
 
-function App() {
+export function App() {
   useEffectOnce(() => emitEvent('refstudio://references/load'));
 
   const handleLayoutUpdate = useDebouncedCallback(
@@ -147,5 +147,3 @@ function RightPanelWrapper() {
     </>
   );
 }
-
-export default App;
