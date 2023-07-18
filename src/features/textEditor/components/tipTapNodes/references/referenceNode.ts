@@ -2,6 +2,7 @@ import Mention from '@tiptap/extension-mention';
 import { ReactNodeViewRenderer, ReactRenderer } from '@tiptap/react';
 import { SuggestionKeyDownProps, SuggestionOptions } from '@tiptap/suggestion';
 
+import { citationNode } from '../citation/citationNode';
 import { Reference } from './Reference';
 import { ReferenceListProps, ReferencesList } from './ReferencesList';
 
@@ -13,6 +14,8 @@ export const referenceNode = Mention.extend({
     allowSpaces: true,
     char: '@',
     allowedPrefixes: null,
+    allow: ({ state, range }) =>
+      state.selection.empty && state.doc.resolve(range.from).parent.type.name === citationNode.name,
     command: ({
       editor,
       range,
