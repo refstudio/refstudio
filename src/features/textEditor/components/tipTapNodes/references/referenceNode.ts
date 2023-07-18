@@ -1,11 +1,14 @@
-import { ReactRenderer } from '@tiptap/react';
+import Mention from '@tiptap/extension-mention';
+import { ReactNodeViewRenderer, ReactRenderer } from '@tiptap/react';
 import { SuggestionKeyDownProps, SuggestionOptions } from '@tiptap/suggestion';
 
-import { referencesMark } from './citationMark';
-import { referencePlugin } from './referencePlugin';
+import { Reference } from './Reference';
 import { ReferenceListProps, ReferencesList } from './ReferencesList';
 
-export const referenceExtension = referencePlugin.configure({
+export const referenceNode = Mention.extend({
+  name: 'reference',
+  addNodeView: () => ReactNodeViewRenderer(Reference),
+}).configure({
   suggestion: {
     allowSpaces: true,
     char: '@',
@@ -20,9 +23,8 @@ export const referenceExtension = referencePlugin.configure({
         .focus()
         .insertContentAt(range, [
           {
-            type: referenceExtension.name,
+            type: referenceNode.name,
             attrs: props,
-            marks: [{ type: referencesMark.name }],
           },
         ])
         .run();
