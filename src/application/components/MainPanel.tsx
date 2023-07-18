@@ -15,9 +15,9 @@ import { ReferenceView } from '../../features/references/editor/ReferenceView';
 import { TipTapView } from '../../features/textEditor/editor/TipTapView';
 import { useDebouncedCallback } from '../../hooks/useDebouncedCallback';
 import { assertNever } from '../../lib/assertNever';
-import { EmptyView } from '../views/EmptyView';
 import { PdfViewer } from '../views/PdfViewer';
 import { TextView } from '../views/TextView';
+import { WelcomeView } from '../views/WelcomeView';
 import { OpenEditorsTabPane } from './OpenEditorsTabPane';
 
 export function MainPanel() {
@@ -64,7 +64,7 @@ const MainPanelPane = memo(({ paneId }: MainPanelPaneProps) => {
         <OpenEditorsTabPane paneId={paneId} />
       </div>
       <div className="flex w-full grow overflow-hidden">
-        {activeEditorAtoms ? <MainPaneViewContent activeEditorAtoms={activeEditorAtoms} /> : <EmptyView />}
+        {activeEditorAtoms ? <MainPaneViewContent activeEditorAtoms={activeEditorAtoms} /> : <WelcomeView />}
       </div>
     </div>
   );

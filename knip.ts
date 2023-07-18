@@ -1,7 +1,7 @@
 import type { KnipConfig } from 'knip';
 
 const config: KnipConfig = {
-  entry: ['src/main.tsx'],
+  entry: ['src/main.tsx', 'src/splash.tsx'],
   project: ['src/**/*.ts', 'src/**/*.tsx'],
   ignore: ['src/api/types.ts', 'src/vite-env.d.ts', 'src/**/__mocks__/*.ts'],
   ignoreBinaries: ['poetry'],
