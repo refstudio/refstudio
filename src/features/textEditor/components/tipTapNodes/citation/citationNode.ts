@@ -12,6 +12,11 @@ const inputRegex = /\[$/;
 
 const citationPluginKey = new PluginKey('citationPlugin');
 
+/**
+ * Plugin that adds a '; ' decoration after a reference in a citation node
+ * The state contains the position at which the decoration should be added
+ * Adding text in the citation node actually adds the '; ' text to the document
+ * */
 const citationPlugin = new Plugin<CitationPluginState>({
   key: citationPluginKey,
 
@@ -24,20 +29,25 @@ const citationPlugin = new Plugin<CitationPluginState>({
 
       const { $from } = newState.selection;
 
+      // If the transaction does not happen in a citation node or is not at the end of the citation node,
+      // there is nothing to do
       if ($from.parent.type.name !== citationNode.name || $from.pos !== $from.after() - 1) {
         return null;
       }
 
       const { parent } = $from;
 
+      // If the last child of the citation node is not a reference, nothing to do
       if (parent.child(parent.childCount - 1).type.name !== referenceNode.name) {
         return null;
       }
 
+      // Otherwise, add a decoration
       return newState.selection.from;
     },
   },
 
+  // Inserts '; ' in the document when writing something after a reference, at the end of a citation node
   appendTransaction: (_transactions, oldState, newState) => {
     if (!newState.selection.empty) {
       return;
@@ -47,6 +57,7 @@ const citationPlugin = new Plugin<CitationPluginState>({
     const oldPluginState = citationPluginKey.getState(oldState) as CitationPluginState;
     const newPluginState = citationPluginKey.getState(newState) as CitationPluginState;
 
+    // If there was no decoration before the update or if there is one after the update, nothing to do
     if (!oldPluginState || newPluginState) {
       return;
     }
@@ -54,10 +65,12 @@ const citationPlugin = new Plugin<CitationPluginState>({
     const { $from } = newState.selection;
     const { parent } = $from;
 
+    // If the selection after the update is not in the citation node, nothing to do
     if (parent.type.name !== citationNode.name || $from.pos !== $from.after() - 1) {
       return;
     }
 
+    // Otherwise, it means, there was a decoration, then some text was added: we insert '; ' in the document
     tr.insertText('; ', oldPluginState);
     return tr;
   },
@@ -115,6 +128,7 @@ export const citationNode = Node.create({
           const { tr } = state;
           const start = range.from;
 
+          // When inserting a citation node, also inserts a '@' character to open the reference selector
           tr.insert(start, this.type.create({}, state.schema.text('@'))).setSelection(
             TextSelection.create(tr.doc, state.selection.from + 2),
           );
@@ -125,6 +139,7 @@ export const citationNode = Node.create({
 
   addKeyboardShortcuts() {
     return {
+      // Enable escaping the citation node when pressing ArrowRight while being at the end of the node
       ArrowRight: ({ editor }) => {
         if (!editor.state.selection.empty) {
           return false;
@@ -146,6 +161,7 @@ export const citationNode = Node.create({
         editor.view.dispatch(tr);
         return true;
       },
+      // Enable escaping the citation node when pressing ArrowLeft while being at the start of the node
       ArrowLeft: ({ editor }) => {
         if (!editor.state.selection.empty) {
           return false;
@@ -167,8 +183,8 @@ export const citationNode = Node.create({
         editor.view.dispatch(tr);
         return true;
       },
+      // Block Enter key when selection overlaps with a citation node
       Enter: ({ editor }) => {
-        // Block Enter key when selection overlaps with a citation node
         if (
           editor.state.selection.$from.parent.type.name === this.type.name ||
           editor.state.selection.$to.parent.type.name === this.type.name
