@@ -1,5 +1,6 @@
 import { InputRule, Node } from '@tiptap/core';
 import { Plugin, PluginKey, TextSelection } from '@tiptap/pm/state';
+import { ReplaceStep } from '@tiptap/pm/transform';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
 import { ReactNodeViewRenderer } from '@tiptap/react';
 
@@ -52,18 +53,17 @@ const citationPlugin = new Plugin<CitationPluginState>({
   },
 
   // Inserts '; ' in the document when writing something after a reference, at the end of a citation node
-  appendTransaction: (_transactions, oldState, newState) => {
+  appendTransaction: (transactions, oldState, newState) => {
     if (!newState.selection.empty) {
-      return;
+      return null;
     }
 
     const { tr } = newState;
     const oldPluginState = citationPluginKey.getState(oldState) as CitationPluginState;
-    const newPluginState = citationPluginKey.getState(newState) as CitationPluginState;
 
-    // If there was no decoration before the update or if there is one after the update, nothing to do
-    if (!oldPluginState || newPluginState) {
-      return;
+    // If there was no decoration before the update, nothing to do
+    if (!oldPluginState) {
+      return null;
     }
 
     const { $from } = newState.selection;
@@ -71,12 +71,22 @@ const citationPlugin = new Plugin<CitationPluginState>({
 
     // If the selection after the update is not at the end of the citation node, nothing to do
     if (parent.type.name !== citationNode.name || $from.nodeAfter) {
-      return;
+      return null;
     }
 
-    // Otherwise, it means, there was a decoration, then some text was added: we insert '; ' in the document
-    tr.insertText('; ', oldPluginState);
-    return tr;
+    // Otherwise, if there was a replace step that added something in the citation node, we insert '; ' in the document
+    if (
+      transactions.find((transaction) =>
+        transaction.steps.find(
+          (step) => step instanceof ReplaceStep && step.from === step.to && step.from === oldPluginState,
+        ),
+      )
+    ) {
+      tr.insertText('; ', oldPluginState);
+      return tr;
+    }
+
+    return null;
   },
 
   props: {
