@@ -10,7 +10,7 @@ export function WelcomeView({ hideShortcuts, className }: { hideShortcuts?: bool
         className,
       )}
     >
-      <div className="relative border border-slate-500 bg-slate-300 text-[160px] font-extrabold leading-none">
+      <div className="relative border border-slate-500 text-[160px] font-extrabold leading-none">
         <WelcomeViewLetter className="bg-slate-500/50 text-slate-200/50" letter="R" />
         <WelcomeViewLetter className="bg-slate-200/50 text-slate-500/50" letter="S" />
       </div>

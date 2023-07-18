@@ -55,7 +55,6 @@
     "updater": {
       "active": false
     },
-    "macOSPrivateApi": true,
     "windows": [
       {
         "fullscreen": false,
@@ -71,7 +70,6 @@
         "width": 640,
         "height": 400,
         "decorations": false,
-        "transparent": true,
         "url": "splashscreen.html",
         "label": "splashscreen"
       }
