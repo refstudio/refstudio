@@ -6,7 +6,6 @@ import { ReactNodeViewRenderer } from '@tiptap/react';
 import { referenceNode } from '../references/referenceNode';
 import { Citation } from './Citation';
 import { squareBracketHandler } from './inputRuleHandlers/squareBracketHandler';
-import { arrowLeft } from './keyboardShortcutCommands/arrowLeft';
 import { arrowRight } from './keyboardShortcutCommands/arrowRight';
 import { backspace } from './keyboardShortcutCommands/backspace';
 import { enter } from './keyboardShortcutCommands/enter';
@@ -114,17 +113,17 @@ const moveCursorPlugin = new Plugin({
   key: moveCursorPluginKey,
   appendTransaction: (_transactions, oldState, newState) => {
     if (!newState.selection.empty) {
-      return;
+      return null;
     }
 
-    const { selection, tr } = newState;
+    const { doc, schema, selection, tr } = newState;
     const { $from } = selection;
 
     const isAfterOpeningBracket = $from.parent.type.name === citationNode.name && $from.nodeBefore === null;
     const isAfterClosingBracket = $from.nodeBefore?.type.name === citationNode.name;
 
     if (!isAfterOpeningBracket && !isAfterClosingBracket) {
-      return;
+      return null;
     }
 
     const wasAfterBeforeOpeningBracket =
@@ -135,7 +134,13 @@ const moveCursorPlugin = new Plugin({
     if (wasAfterBeforeOpeningBracket && isAfterOpeningBracket) {
       tr.setSelection(TextSelection.create(newState.doc, $from.pos + 1));
     } else {
-      tr.setSelection(TextSelection.create(newState.doc, $from.pos - 1));
+      // If there no text node in front of the citation node, create an "empty" one
+      // Note: prosemirror does not support empty text node, so we have to create a node with a space
+      if (isAfterOpeningBracket && !doc.resolve($from.before()).nodeBefore) {
+        tr.insert($from.before(), schema.text(' '));
+      }
+
+      tr.setSelection(TextSelection.create(tr.doc, $from.pos - 1));
     }
 
     return tr;
@@ -170,7 +175,6 @@ export const citationNode = Node.create({
 
   addKeyboardShortcuts: () => ({
     ArrowRight: arrowRight,
-    ArrowLeft: arrowLeft,
     Backspace: backspace,
     Enter: enter,
   }),
