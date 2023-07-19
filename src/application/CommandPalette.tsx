@@ -1,6 +1,6 @@
 import './CommandPalette.css';
 
-import { Command, CommandMenu, CommandWrapper, useCommands, useKmenu, useShortcut } from 'kmenu';
+import { Command, CommandMenu, CommandWrapper, useCommands, useKmenu } from 'kmenu';
 import { useEffect } from 'react';
 import {
   VscBell,
@@ -12,6 +12,7 @@ import {
   VscSearch,
   VscSymbolString,
 } from 'react-icons/vsc';
+import { useEventListener } from 'usehooks-ts';
 
 import { emitEvent } from '../events';
 import { FilesCommandMenu } from './FilesCommandMenu';
@@ -39,12 +40,11 @@ export function CommandPalette({ index }: { index?: number }) {
     }
   }, [index, setOpen]);
 
-  useShortcut({
-    modifier: 'meta',
-    targetKey: 'p',
-    handler: () => {
-      setOpen(INDEX_FILES);
-    },
+  // Open Files on META+p
+  useEventListener('keydown', (e) => {
+    if (e.metaKey && e.key.toLowerCase() === 'p') {
+      setOpen(INDEX_FILES, true);
+    }
   });
 
   return (
@@ -66,34 +66,6 @@ export function MainCommandMenu({ index }: { index: number }) {
   const { setOpen } = useKmenu();
 
   const main: Command[] = [
-    {
-      category: 'Actions',
-      commands: [
-        {
-          icon: <VscNewFile />,
-          text: 'New File',
-          perform: () => emitEvent('refstudio://menu/file/new'),
-        },
-        {
-          icon: <VscClose />,
-          text: 'Close Active Editor',
-          perform: () => emitEvent('refstudio://menu/file/close'),
-        },
-      ],
-      // Commands that aren't visible to the user (only after search)
-      subCommands: [
-        {
-          icon: <VscBell />,
-          text: 'Show Notifications',
-          perform: () => emitEvent('refstudio://menu/view/notifications'),
-        },
-        {
-          icon: <VscGear />,
-          text: 'Show Settings',
-          perform: () => emitEvent('refstudio://menu/settings'),
-        },
-      ],
-    },
     {
       category: 'AI',
       commands: [
@@ -135,12 +107,35 @@ export function MainCommandMenu({ index }: { index: number }) {
       ],
     },
     {
-      category: 'Files',
+      category: 'Actions',
       commands: [
+        {
+          icon: <VscNewFile />,
+          text: 'New File',
+          perform: () => emitEvent('refstudio://menu/file/new'),
+        },
+        {
+          icon: <VscClose />,
+          text: 'Close Active Editor',
+          perform: () => emitEvent('refstudio://menu/file/close'),
+        },
         {
           icon: <VscFiles />,
           text: 'Open File...',
           perform: () => setOpen(INDEX_FILES, true),
+        },
+      ],
+      // Commands that aren't visible to the user (only after search)
+      subCommands: [
+        {
+          icon: <VscBell />,
+          text: 'Show Notifications',
+          perform: () => emitEvent('refstudio://menu/view/notifications'),
+        },
+        {
+          icon: <VscGear />,
+          text: 'Show Settings',
+          perform: () => emitEvent('refstudio://menu/settings'),
         },
       ],
     },
