@@ -17,6 +17,15 @@ export type ResponseStatus = 'ok' | 'error';
  * An enumeration.
  */
 export type RewriteMannerType = 'concise' | 'elaborate' | 'scholarly';
+export type Status = string;
+export type Title = string;
+export type Abstract = string;
+export type Venue = string;
+export type Year = number;
+export type Paperid = string;
+export type Citationcount = number;
+export type Authors = string[];
+export type Results = S2SearchResult[];
 
 export interface CliCommands {
   /**
@@ -59,6 +68,11 @@ export interface CliCommands {
    * @maxItems 2
    */
   delete: [DeleteRequest, DeleteStatusResponse];
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  search: [SearchRequest, SearchResponse];
 }
 export interface IngestRequest {
   pdf_directory: string;
@@ -168,4 +182,25 @@ export interface DeleteRequest {
 export interface DeleteStatusResponse {
   status: ResponseStatus;
   message: string;
+}
+export interface SearchRequest {
+  query: string;
+  limit?: number;
+}
+export interface SearchResponse {
+  status?: Status;
+  results?: Results;
+}
+export interface S2SearchResult {
+  title?: Title;
+  abstract?: Abstract;
+  venue?: Venue;
+  year?: Year;
+  paperId?: Paperid;
+  citationCount?: Citationcount;
+  openAccessPdf?: Openaccesspdf;
+  authors?: Authors;
+}
+export interface Openaccesspdf {
+  [k: string]: string;
 }
