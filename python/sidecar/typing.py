@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Any
+from typing import Any, Dict
 
 from pydantic import BaseModel
 
@@ -176,6 +176,27 @@ class ChatResponse(RefStudioModel):
     choices: list[ChatResponseChoice]
 
 
+class SearchRequest(RefStudioModel):
+    query: str
+    limit: int = 10
+
+
+class S2SearchResult(BaseModel):
+    title: str | None = None
+    abstract: str | None = None
+    venue: str | None = None
+    year: int | None = None
+    paperId: str | None = None
+    citationCount: int | None = None
+    openAccessPdf: Dict[str, str] | None = None
+    authors: list[str] | None = None
+    
+
+class SearchResponse(BaseModel):
+    status: str = "ok"
+    results: list[S2SearchResult] | None = None
+
+
 class CliCommands(RefStudioModel):
     ingest: tuple[IngestRequest, IngestResponse]
     """Ingest PDFs"""
@@ -193,6 +214,8 @@ class CliCommands(RefStudioModel):
     """Update metadata for a Reference"""
     delete: tuple[DeleteRequest, DeleteStatusResponse]
     """Deletes a Reference"""
+    search: tuple[SearchRequest, SearchResponse]
+    """Searches for papers on Semantic Scholar"""
 
 
 Reference.update_forward_refs()
