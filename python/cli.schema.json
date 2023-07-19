@@ -105,6 +105,19 @@
           "$ref": "#/definitions/DeleteStatusResponse"
         }
       ]
+    },
+    "search": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": [
+        {
+          "$ref": "#/definitions/SearchRequest"
+        },
+        {
+          "$ref": "#/definitions/SearchResponse"
+        }
+      ]
     }
   },
   "required": [
@@ -115,7 +128,8 @@
     "completion",
     "chat",
     "update",
-    "delete"
+    "delete",
+    "search"
   ],
   "definitions": {
     "IngestRequest": {
@@ -582,6 +596,84 @@
         "status",
         "message"
       ]
+    },
+    "SearchRequest": {
+      "title": "SearchRequest",
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string"
+        },
+        "limit": {
+          "default": 10,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "query"
+      ]
+    },
+    "S2SearchResult": {
+      "title": "S2SearchResult",
+      "type": "object",
+      "properties": {
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "abstract": {
+          "title": "Abstract",
+          "type": "string"
+        },
+        "venue": {
+          "title": "Venue",
+          "type": "string"
+        },
+        "year": {
+          "title": "Year",
+          "type": "integer"
+        },
+        "paperId": {
+          "title": "Paperid",
+          "type": "string"
+        },
+        "citationCount": {
+          "title": "Citationcount",
+          "type": "integer"
+        },
+        "openAccessPdf": {
+          "title": "Openaccesspdf",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "authors": {
+          "title": "Authors",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "SearchResponse": {
+      "title": "SearchResponse",
+      "type": "object",
+      "properties": {
+        "status": {
+          "title": "Status",
+          "default": "ok",
+          "type": "string"
+        },
+        "results": {
+          "title": "Results",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/S2SearchResult"
+          }
+        }
+      }
     }
   }
 }
