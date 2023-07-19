@@ -7,7 +7,6 @@ import { ReferenceItem } from '../../../../../../types/ReferenceItem';
 import { EDITOR_EXTENSIONS } from '../../../tipTapEditorConfigs';
 import { getPrettyHTMLWithSelection, setUpEditorWithSelection } from '../../__tests__/test-utils';
 
-// global.document.elementFromPoint = vi.fn();
 vi.mock('../../../../../../atoms/referencesState');
 
 describe('citationNode', () => {
