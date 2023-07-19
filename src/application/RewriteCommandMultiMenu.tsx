@@ -7,6 +7,7 @@ import { askForRewrite } from '../api/rewrite';
 import { selectionAtom } from '../atoms/selectionState';
 import { emitEvent } from '../events';
 import { getMannerOptions, OpenAiManner } from '../settings/settingsManager';
+import { HIDE_PLACEHOLDER_TEXT } from './CommandPaletteConfigs';
 
 export function RewriteCommandMultiMenu({ index }: { index: number }) {
   const selection = useAtomValue(selectionAtom);
@@ -64,7 +65,7 @@ export function RewriteCommandMultiMenu({ index }: { index: number }) {
           </div>
         }
         loadingState
-        placeholder=" "
+        placeholder={HIDE_PLACEHOLDER_TEXT}
       />
       <CommandMenu
         commands={commands}
@@ -76,7 +77,7 @@ export function RewriteCommandMultiMenu({ index }: { index: number }) {
           </div>
         }
         loadingState
-        placeholder=" "
+        placeholder={HIDE_PLACEHOLDER_TEXT}
       />
       <CommandMenu
         commands={commands}

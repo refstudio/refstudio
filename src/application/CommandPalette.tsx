@@ -15,32 +15,29 @@ import {
 import { useEventListener } from 'usehooks-ts';
 
 import { emitEvent } from '../events';
+import {
+  INDEX_FILES,
+  INDEX_MAIN,
+  INDEX_REFERENCES,
+  INDEX_REWRITE_MENUS,
+  INDEX_REWRITE_WIDGET,
+} from './CommandPaletteConfigs';
 import { FilesCommandMenu } from './FilesCommandMenu';
 import { ReferencesCommandMenu } from './ReferencesCommandMenu';
-import { RewriteCommand2Menu } from './RewriteCommand2Menu';
-import { RewriteCommandMenu } from './RewriteCommandMenu';
 import { RewriteCommandMultiMenu } from './RewriteCommandMultiMenu';
 import { RewriteCommandWidgetMenu } from './RewriteCommandWidgetMenu';
-
-const INDEX_MAIN = 1;
-const INDEX_REFERENCES = 2;
-const INDEX_FILES = 3;
-const INDEX_REWRITE = 4;
-const INDEX_REWRITE2 = 5;
-const INDEX_REWRITE3 = 40;
-const INDEX_REWRITE4 = 50;
 
 export function CommandPalette({ index }: { index?: number }) {
   const { setOpen } = useKmenu();
 
-  // Allow to select open menu (index)
+  // Open a menu by default (usefull for tests)
   useEffect(() => {
     if (index !== undefined) {
       setOpen(index);
     }
   }, [index, setOpen]);
 
-  // Open Files on META+p
+  // Open Files on "META + p"
   useEventListener('keydown', (e) => {
     if (e.metaKey && e.key.toLowerCase() === 'p') {
       setOpen(INDEX_FILES, true);
@@ -53,10 +50,8 @@ export function CommandPalette({ index }: { index?: number }) {
         <MainCommandMenu index={INDEX_MAIN} />
         <ReferencesCommandMenu index={INDEX_REFERENCES} />
         <FilesCommandMenu index={INDEX_FILES} />
-        <RewriteCommandMenu index={INDEX_REWRITE} />
-        <RewriteCommand2Menu index={INDEX_REWRITE2} />
-        <RewriteCommandWidgetMenu index={INDEX_REWRITE3} />
-        <RewriteCommandMultiMenu index={INDEX_REWRITE4} />
+        <RewriteCommandWidgetMenu index={INDEX_REWRITE_WIDGET} />
+        <RewriteCommandMultiMenu index={INDEX_REWRITE_MENUS} />
       </CommandWrapper>
     </div>
   );
@@ -71,18 +66,13 @@ export function MainCommandMenu({ index }: { index: number }) {
       commands: [
         {
           icon: <VscSymbolString />,
-          text: 'Rewrite selection...',
-          perform: () => setOpen(INDEX_REWRITE, true),
-        },
-        {
-          icon: <VscSymbolString />,
           text: 'Rewrite selection (menus)...',
-          perform: () => setOpen(INDEX_REWRITE4, true),
+          perform: () => setOpen(INDEX_REWRITE_MENUS, true),
         },
         {
           icon: <VscSymbolString />,
           text: 'Rewrite selection (widget)...',
-          perform: () => setOpen(INDEX_REWRITE3, true),
+          perform: () => setOpen(INDEX_REWRITE_WIDGET, true),
         },
       ],
     },

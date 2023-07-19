@@ -4,6 +4,7 @@ import { VscWarning } from 'react-icons/vsc';
 
 import { selectionAtom } from '../atoms/selectionState';
 import { RewriteWidget } from '../features/ai/sidebar/SelectionPanelSection';
+import { HIDE_PLACEHOLDER_TEXT } from './CommandPaletteConfigs';
 
 export function RewriteCommandWidgetMenu({ index }: { index: number }) {
   const { toggle } = useKmenu();
@@ -27,6 +28,7 @@ export function RewriteCommandWidgetMenu({ index }: { index: number }) {
           </div>
         }
         loadingState
+        placeholder={HIDE_PLACEHOLDER_TEXT}
       />
     );
   }
@@ -36,9 +38,9 @@ export function RewriteCommandWidgetMenu({ index }: { index: number }) {
       commands={commands}
       crumbs={['Rewrite']}
       index={index}
-      loadingPlaceholder={<RewriteWidget selection={selection} onChoiceSelected={toggle} />}
+      loadingPlaceholder={<RewriteWidget className="!p-2" selection={selection} onChoiceSelected={toggle} />}
       loadingState
-      placeholder="Configure the rewrite options"
+      placeholder={HIDE_PLACEHOLDER_TEXT}
     />
   );
 }
