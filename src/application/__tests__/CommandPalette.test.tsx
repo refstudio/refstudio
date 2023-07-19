@@ -8,6 +8,7 @@ import { emitEvent, RefStudioEventName } from '../../events';
 import { REFERENCES } from '../../features/references/__tests__/test-fixtures';
 import { screen, setupWithJotaiProvider } from '../../test/test-utils';
 import { CommandPalette } from '../CommandPalette';
+import { INDEX_MAIN, INDEX_REFERENCES } from '../CommandPaletteConfigs';
 
 vi.mock('../../events');
 
@@ -51,7 +52,7 @@ describe('CommandPalette', () => {
   it('should display first menu', () => {
     setupWithJotaiProvider(
       <MenuProvider config={{ animationDuration: 0 }}>
-        <CommandPalette index={1} />
+        <CommandPalette index={INDEX_MAIN} />
       </MenuProvider>,
       store,
     );
@@ -81,7 +82,7 @@ describe('CommandPalette', () => {
   it('should display second menu', () => {
     setupWithJotaiProvider(
       <MenuProvider config={{ animationDuration: 0 }}>
-        <CommandPalette index={2} />
+        <CommandPalette index={INDEX_REFERENCES} />
       </MenuProvider>,
       store,
     );
@@ -93,7 +94,7 @@ describe('CommandPalette', () => {
   it('should open reference on click', async () => {
     const { user } = setupWithJotaiProvider(
       <MenuProvider config={{ animationDuration: 0 }}>
-        <CommandPalette index={2} />
+        <CommandPalette index={INDEX_REFERENCES} />
       </MenuProvider>,
       store,
     );
