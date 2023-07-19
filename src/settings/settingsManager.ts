@@ -1,7 +1,7 @@
 import { SettingsManager } from 'tauri-settings';
 import { Path, PathValue } from 'tauri-settings/dist/types/dot-notation';
 
-import { getAppDataDir, getConfigDir } from '../io/filesystem';
+import { getSystemAppDataDir, getSystemConfigurationsDir } from '../io/filesystem';
 import { readEnv } from '../io/readEnv';
 
 export interface SettingsSchema {
@@ -11,7 +11,6 @@ export interface SettingsSchema {
   };
   openAI: {
     apiKey: string;
-    completeModel: string;
     chatModel: string;
   };
   sidecar: {
@@ -24,19 +23,17 @@ export interface SettingsSchema {
 
 let settingsManager: SettingsManager<SettingsSchema> | undefined;
 
-export const DEFAULT_OPEN_AI_COMPLETE_MODEL = 'davinci';
 export const DEFAULT_OPEN_AI_CHAT_MODEL = 'gpt-3.5-turbo';
 
 export async function initSettings() {
   settingsManager = new SettingsManager<SettingsSchema>(
     {
       general: {
-        appDataDir: await getAppDataDir(),
+        appDataDir: await getSystemAppDataDir(),
         projectName: 'project-x',
       },
       openAI: {
         apiKey: await readEnv('OPENAI_API_KEY', ''),
-        completeModel: await readEnv('OPENAI_COMPLETE_MODEL', DEFAULT_OPEN_AI_COMPLETE_MODEL),
         chatModel: await readEnv('OPENAI_CHAT_MODEL', DEFAULT_OPEN_AI_CHAT_MODEL),
       },
       sidecar: {
@@ -47,7 +44,7 @@ export async function initSettings() {
       },
     },
     {
-      dir: await getConfigDir(),
+      dir: await getSystemConfigurationsDir(),
       fileName: 'refstudio-settings.json',
       prettify: true,
     },

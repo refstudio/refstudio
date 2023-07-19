@@ -1,10 +1,10 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { UnlistenFn } from '@tauri-apps/api/event';
 import { render } from '@testing-library/react';
 import { default as userEvent } from '@testing-library/user-event';
 import { createStore, Provider } from 'jotai';
 
 import { listenEvent, RefStudioEventCallback, RefStudioEventName, RefStudioEventPayload } from '../events';
-import { noop } from '../lib/noop';
 
 function customRender(ui: React.ReactElement, options = {}) {
   const queryClient = new QueryClient({
@@ -59,19 +59,37 @@ export function setupWithJotaiProvider(jsx: React.ReactNode, store?: ReturnType<
  *
  */
 export function mockListenEvent() {
-  const current: { [Event in RefStudioEventName]?: (payload?: RefStudioEventPayload<Event>) => void } = {};
+  const current: {
+    [Event in RefStudioEventName]?: {
+      id: number;
+      handler: (payload?: RefStudioEventPayload<Event>) => void;
+      deleted?: boolean;
+    }[];
+  } = {};
+  let currentId = 0;
 
   vi.mocked(listenEvent).mockImplementation(
-    <Event extends RefStudioEventName>(event: Event, handler: RefStudioEventCallback<Event>) => {
-      current[event] = ((payload) =>
-        handler({ event, windowLabel: '', id: 0, payload: payload! })) as (typeof current)[Event];
-      return Promise.resolve(noop);
+    <Event extends RefStudioEventName>(event: Event, handler: RefStudioEventCallback<Event>): Promise<UnlistenFn> => {
+      if (!(event in current)) {
+        current[event] = [];
+      }
+      const id = currentId++;
+      current[event]!.push({
+        id,
+        handler: (payload) => handler({ event, windowLabel: '', id: 0, payload } as Parameters<typeof handler>[0]),
+      });
+
+      return Promise.resolve(() => {
+        current[event]!.find((eventHandler) => eventHandler.id === id)!.deleted = true;
+      });
     },
   );
 
   const trigger = <Event extends RefStudioEventName>(eventName: Event, payload?: RefStudioEventPayload<Event>) => {
     if (eventName in current) {
-      return current[eventName]?.(payload);
+      current[eventName]!.filter((eventHandler) => !eventHandler.deleted).forEach((eventHandler) =>
+        eventHandler.handler(payload),
+      );
     } else {
       throw new Error(`Received unexpected event ${eventName}`);
     }
@@ -80,7 +98,9 @@ export function mockListenEvent() {
   return {
     trigger,
     get registeredEventNames() {
-      return Object.keys(current);
+      return (Object.keys(current) as RefStudioEventName[]).filter((event) =>
+        current[event]!.some((eventHandler) => !eventHandler.deleted),
+      );
     },
   };
 }

@@ -13,16 +13,55 @@ export type IngestStatus = 'processing' | 'failure' | 'complete';
  * An enumeration.
  */
 export type ResponseStatus = 'ok' | 'error';
+/**
+ * An enumeration.
+ */
+export type RewriteMannerType = 'concise' | 'elaborate' | 'scholarly';
 
 export interface CliCommands {
-  ingest: IngestResponse;
-  ingest_status: IngestStatusResponse;
-  ingest_references: IngestResponse;
-  rewrite: RewriteChoice[];
-  chat: ChatResponseChoice[];
-  update: UpdateStatusResponse;
-  delete: DeleteStatusResponse;
-  search: SearchResponse;
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  ingest: [IngestRequest, IngestResponse];
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  ingest_status: [null, IngestStatusResponse];
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  ingest_references: [IngestRequest, IngestResponse];
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  rewrite: [RewriteRequest, RewriteResponse];
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  completion: [TextCompletionRequest, TextCompletionResponse];
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  chat: [ChatRequest, ChatResponse];
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  update: [ReferenceUpdate, UpdateStatusResponse];
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  delete: [DeleteRequest, DeleteStatusResponse];
+}
+export interface IngestRequest {
+  pdf_directory: string;
 }
 export interface IngestResponse {
   project_name: string;
@@ -62,22 +101,71 @@ export interface ReferenceStatus {
   source_filename: string;
   status: IngestStatus;
 }
+export interface RewriteRequest {
+  text: string;
+  manner?: RewriteMannerType & string;
+  n_choices?: number;
+  temperature?: number;
+}
+export interface RewriteResponse {
+  status: ResponseStatus;
+  message: string;
+  choices: RewriteChoice[];
+}
 export interface RewriteChoice {
   index: number;
   text: string;
+}
+export interface TextCompletionRequest {
+  text: string;
+  n_choices?: number;
+  temperature?: number;
+  max_tokens?: number;
+  title?: string;
+  abstract?: string;
+}
+export interface TextCompletionResponse {
+  status: ResponseStatus;
+  message: string;
+  choices: TextCompletionChoice[];
+}
+export interface TextCompletionChoice {
+  index: number;
+  text: string;
+}
+export interface ChatRequest {
+  text: string;
+  n_choices?: number;
+  temperature?: number;
+}
+export interface ChatResponse {
+  status: ResponseStatus;
+  message: string;
+  choices: ChatResponseChoice[];
 }
 export interface ChatResponseChoice {
   index: number;
   text: string;
 }
+export interface ReferenceUpdate {
+  source_filename: string;
+  patch: ReferencePatch;
+}
+/**
+ * ReferencePatch is the input type for updating a Reference's metadata.
+ */
+export interface ReferencePatch {
+  data: {};
+}
 export interface UpdateStatusResponse {
   status: ResponseStatus;
   message: string;
 }
+export interface DeleteRequest {
+  source_filenames: string[];
+  all?: boolean;
+}
 export interface DeleteStatusResponse {
   status: ResponseStatus;
   message: string;
-}
-export interface SearchResponse {
-  search_results: {}[];
 }

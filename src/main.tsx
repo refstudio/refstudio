@@ -5,7 +5,7 @@ import { Provider } from 'jotai';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
-import App from './application/App';
+import { AppStartup } from './AppStartup';
 
 const queryClient = new QueryClient();
 
@@ -13,7 +13,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <Provider>
       <QueryClientProvider client={queryClient}>
-        <App />
+        <AppStartup />
       </QueryClientProvider>
     </Provider>
   </React.StrictMode>,

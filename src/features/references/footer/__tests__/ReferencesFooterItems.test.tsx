@@ -1,10 +1,11 @@
-import { getIngestedReferences } from '../../../../api/ingestion';
+import { createStore } from 'jotai';
+
 import { runGetAtomHook, runSetAtomHook } from '../../../../atoms/__tests__/test-utils';
 import { activePaneAtom } from '../../../../atoms/editorActions';
 import { referencesSyncInProgressAtom, setReferencesAtom } from '../../../../atoms/referencesState';
 import { buildEditorId } from '../../../../atoms/types/EditorData';
 import { emitEvent } from '../../../../events';
-import { act, mockListenEvent, screen, setupWithJotaiProvider, waitFor } from '../../../../test/test-utils';
+import { act, mockListenEvent, screen, setupWithJotaiProvider } from '../../../../test/test-utils';
 import { REFERENCES } from '../../__tests__/test-fixtures';
 import { ReferencesFooterItems } from '../ReferencesFooterItems';
 
@@ -12,37 +13,25 @@ vi.mock('../../../../events');
 vi.mock('../../../../api/ingestion');
 
 describe('ReferencesFooterItems component', () => {
-  beforeEach(() => {
-    vi.mocked(getIngestedReferences).mockResolvedValue([]);
-  });
   afterEach(() => {
-    vi.resetAllMocks();
+    vi.clearAllMocks();
   });
 
-  it('should render empty without loading', () => {
+  it('should render with 0 references, and no sync in progess indicator', () => {
     setupWithJotaiProvider(<ReferencesFooterItems />);
-    expect(screen.getByText('References: 0')).toBeInTheDocument();
-  });
 
-  it('should render ingested references', async () => {
-    const [oneReference] = REFERENCES;
-    vi.mocked(getIngestedReferences).mockResolvedValue([oneReference]);
-    setupWithJotaiProvider(<ReferencesFooterItems />);
     expect(screen.getByText('References: 0')).toBeInTheDocument();
-    await waitFor(() => {
-      expect(screen.getByText('References: 1')).toBeInTheDocument();
-    });
   });
 
   it('should render number of references ingested', () => {
-    const { store } = setupWithJotaiProvider(<ReferencesFooterItems />);
-    const setReferences = runSetAtomHook(setReferencesAtom, store);
+    const store = createStore();
+    store.set(setReferencesAtom, REFERENCES);
+    setupWithJotaiProvider(<ReferencesFooterItems />, store);
 
-    act(() => setReferences.current(REFERENCES));
     expect(screen.getByText(`References: ${REFERENCES.length}`)).toBeInTheDocument();
   });
 
-  it('should render loading spinner', () => {
+  it('should render sync in progress spinner', () => {
     const { store } = setupWithJotaiProvider(<ReferencesFooterItems />);
     const setSync = runSetAtomHook(referencesSyncInProgressAtom, store);
 
@@ -66,7 +55,7 @@ describe('ReferencesFooterItems component', () => {
 
     const opened = runGetAtomHook(activePaneAtom, store);
     expect(opened.current.openEditorIds).toHaveLength(1);
-    expect(opened.current.activeEditorId).toBeDefined();
+    expect(opened.current.activeEditorId).not.toBeNull();
     expect(opened.current.activeEditorId).toBe(buildEditorId('references'));
   });
 });

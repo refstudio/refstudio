@@ -1,38 +1,49 @@
+import inspect
 import json
 
-from sidecar import chat, cli, ingest, rewrite, storage, search
+from sidecar import chat, cli, ingest, rewrite, storage
+from sidecar.typing import CliCommands
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     parser = cli.get_arg_parser()
     args = parser.parse_args()
 
     if args.debug:
         print(args)
 
-    if args.command == "ingest":
-        ingest.run_ingest(args.pdf_directory)
+    param_json = json.loads(args.param_json)
+    args_type = inspect.signature(CliCommands).parameters[args.command].annotation.__args__[0]
 
-    if args.command == "ingest_status":
+    if args_type is None:
+        if param_json is not None:
+            raise ValueError(f'Command {args.command} does not take an argument')
+        param_obj = None
+    else:
+        param_obj = args_type.parse_obj(param_json)
+
+    if args.command == "ingest":
+        ingest.run_ingest(param_obj)
+
+    elif args.command == "ingest_status":
         ingest.get_statuses()
 
-    if args.command == "ingest_references":
-        ingest.get_references(args.pdf_directory)
+    elif args.command == "ingest_references":
+        ingest.get_references(param_obj)
 
-    if args.command == "rewrite":
-        rewrite.summarize(args.text)
+    elif args.command == "rewrite":
+        rewrite.rewrite(param_obj)
 
-    if args.command == "chat":
-        chat.ask_question(args.text)
+    elif args.command == "completion":
+        rewrite.complete_text(param_obj)
 
-    if args.command == "search":
-        search.search_s2(query=args.query, limit=args.limit)
+    elif args.command == "chat":
+        chat.ask_question(param_obj)
 
-    if args.command == "update":
-        data = json.loads(args.data)
-        storage.update_reference(data)
+    elif args.command == "update":
+        storage.update_reference(param_obj)
 
-    if args.command == "delete":
-        if args.all:
-            storage.delete_references(all_=args.all)
-        else:
-            storage.delete_references(source_filenames=args.source_filenames)
+    elif args.command == "delete":
+        storage.delete_references(param_obj)
+
+    else:
+        raise NotImplementedError(f'Command {args.command} is not implemented.')

@@ -5,11 +5,7 @@ import { OpenAiSettingsPane } from '../features/ai/settings/OpenAiSettingsPane';
 import { cx } from '../lib/cx';
 import { DebugSettingsPane } from './panes/DebugSettingsPane';
 import { GeneralSettingsPane } from './panes/GeneralSettingsPane';
-import { initSettings } from './settingsManager';
 import { PaneConfig, SettingsPanesConfig } from './types';
-
-// Ensure settings are configured and loaded
-await initSettings();
 
 const SETTINGS_PANES: SettingsPanesConfig[] = [
   // {
@@ -61,7 +57,7 @@ export function SettingsModal({ open, onCloseClick }: { open: boolean; onCloseCl
   }
 
   return (
-    <div className="fixed left-0 top-0 flex h-screen w-screen items-center justify-center">
+    <div className="fixed left-0 top-0 z-modals flex h-screen w-screen items-center justify-center">
       <div className="pointer-events-none absolute left-0 top-0 h-full w-full bg-slate-400/60" />
       <div
         className={cx(

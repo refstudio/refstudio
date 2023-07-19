@@ -7,8 +7,21 @@ fn get_environment_variable(name: &str) -> String {
     std::env::var(name).unwrap_or_else(|_| "".to_string())
 }
 
+#[tauri::command]
+async fn close_splashscreen(window: tauri::Window) {
+    // Close splashscreen
+    if let Some(splashscreen) = window.get_window("splashscreen") {
+        splashscreen.close().unwrap();
+    }
+    // Show main window
+    window.get_window("main").unwrap().show().unwrap();
+}
+
 use dotenv::dotenv;
 use std::env;
+
+// Prevent build warning for tauri::Manager
+#[allow(unused_imports)]
 use tauri::Manager;
 
 mod core;
@@ -19,17 +32,21 @@ fn main() {
     let context = tauri::generate_context!();
 
     tauri::Builder::default()
-        .setup(|app| {
+        .setup(|_app| {
             #[cfg(debug_assertions)] // only include this code on debug builds
             {
                 let dev_tools_visible = env::var("DEV_TOOLS").is_ok();
                 if dev_tools_visible {
-                    app.get_window("main").unwrap().open_devtools();
+                    _app.get_window("splashscreen").unwrap().open_devtools();
+                    _app.get_window("main").unwrap().open_devtools();
                 };
             }
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![get_environment_variable])
+        .invoke_handler(tauri::generate_handler![
+            close_splashscreen,
+            get_environment_variable
+        ])
         .menu(core::menu::AppMenu::get_menu(&context))
         .on_menu_event(core::menu::AppMenu::on_menu_event)
         .run(context)

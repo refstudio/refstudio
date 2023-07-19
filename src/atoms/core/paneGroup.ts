@@ -1,12 +1,10 @@
-import { atom, Getter } from 'jotai';
+import { atom } from 'jotai';
 
-import { isNonNullish } from '../../lib/isNonNullish';
-import { PaneContent, PaneEditorId, PaneId, PaneState } from '../types/PaneGroup';
+import { buildEditorIdFromPath, EditorId } from '../types/EditorData';
+import { PaneEditorId, PaneGroupState, PaneId, PaneState } from '../types/PaneGroup';
 import { activePaneIdAtom } from './activePane';
-import { editorsContentStateAtom } from './editorContent';
-import { editorsDataAtom } from './editorData';
-
-type PaneGroupState = Record<PaneId, PaneState>;
+import { editorsContentStateAtom, updateEditorContentIdAtom } from './editorContent';
+import { editorsDataAtom, renameEditorDataAtom } from './editorData';
 
 /** This atom contains data about the panes: the list of open editors and the active editor */
 export const paneGroupAtom = atom<PaneGroupState>({
@@ -17,25 +15,6 @@ export const paneGroupAtom = atom<PaneGroupState>({
     openEditorIds: [],
   },
 });
-
-export function getPane(get: Getter, paneId: PaneId): PaneContent {
-  const panes = get(paneGroupAtom);
-  const editorsData = get(editorsDataAtom);
-  const openEditors = get(editorsContentStateAtom);
-  const pane = panes[paneId];
-
-  const editorContentAtoms = pane.activeEditorId && openEditors.get(pane.activeEditorId);
-
-  if (pane.activeEditorId && !editorContentAtoms) {
-    throw new Error('Editor content is not loaded in memory');
-  }
-
-  return {
-    id: paneId,
-    openEditors: pane.openEditorIds.map((id) => editorsData.get(id)).filter(isNonNullish),
-    activeEditor: pane.activeEditorId ? { id: pane.activeEditorId, contentAtoms: editorContentAtoms! } : undefined,
-  };
-}
 
 /** Updates a given pane with partial attributes */
 export const updatePaneGroup = atom(
@@ -114,3 +93,56 @@ export const selectEditorInPaneAtom = atom(null, (get, set, { editorId, paneId }
     activeEditorId: editorId,
   });
 });
+
+interface RenameEditorInPanePayload extends PaneEditorId {
+  newName: string;
+  newPath: string;
+}
+export const renameEditorInPaneAtom = atom(
+  null,
+  (get, set, { editorId, paneId, newName, newPath }: RenameEditorInPanePayload) => {
+    const panes = get(paneGroupAtom);
+
+    /* c8 ignore next 4 */
+    if (!panes[paneId].openEditorIds.includes(editorId)) {
+      console.warn('Editor not open in the given pane ', editorId, paneId);
+      return;
+    }
+
+    const newEditorId = buildEditorIdFromPath(newPath);
+
+    // Update editor data
+    const editorData = get(editorsDataAtom).get(editorId);
+    if (editorData) {
+      set(renameEditorDataAtom, { editorId, newEditorId, newName });
+    }
+
+    // Update editor content
+    const editorsContentState = get(editorsContentStateAtom);
+    const editorContent = editorsContentState.get(editorId);
+    if (editorContent) {
+      set(updateEditorContentIdAtom, { editorId, newEditorId });
+    }
+
+    // Replace the old editor with the new one, but keep the order of open editors unchanged
+    const newOpenEditorIds = panes[paneId].openEditorIds.map((openEditorId) =>
+      openEditorId === editorId ? newEditorId : openEditorId,
+    );
+    // Update the active editor id if needed
+    const newActiveEditorId = panes[paneId].activeEditorId === editorId ? newEditorId : panes[paneId].activeEditorId;
+    set(updatePaneGroup, { paneId, activeEditorId: newActiveEditorId, openEditorIds: newOpenEditorIds });
+  },
+);
+
+export const renameEditorAtom = atom(
+  null,
+  (get, set, { editorId, newName, newPath }: { editorId: EditorId; newName: string; newPath: string }) => {
+    const panes = get(paneGroupAtom);
+
+    Object.keys(panes).forEach((paneId) => {
+      if (panes[paneId as PaneId].openEditorIds.includes(editorId)) {
+        set(renameEditorInPaneAtom, { editorId, paneId: paneId as PaneId, newName, newPath });
+      }
+    });
+  },
+);

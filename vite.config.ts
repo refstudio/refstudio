@@ -23,6 +23,13 @@ export default defineConfig(async () => ({
     minify: !process.env.TAURI_DEBUG ? 'esbuild' : false,
     // produce sourcemaps for debug builds
     sourcemap: !!process.env.TAURI_DEBUG,
+
+    rollupOptions: {
+      input: {
+        index: './index.html',
+        splashscreen: './splashscreen.html',
+      },
+    },
   },
   test: {
     coverage: {
@@ -30,7 +37,13 @@ export default defineConfig(async () => ({
       // Instrument all files: https://github.com/bcoe/c8#checking-for-full-source-coverage-using---all
       all: true,
       include: ['src/**'],
-      exclude: ['src/**/types.ts', 'src/**/types/**.ts', 'src/**/*.test.{ts,tsx}', 'src/**/*.d.ts'],
+      exclude: [
+        'src/**/types.ts',
+        'src/**/__tests__/**',
+        'src/**/types/**.ts',
+        'src/**/*.test.{ts,tsx}',
+        'src/**/*.d.ts',
+      ],
     },
     globals: true,
     environment: 'jsdom',

@@ -3,34 +3,108 @@
   "type": "object",
   "properties": {
     "ingest": {
-      "$ref": "#/definitions/IngestResponse"
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": [
+        {
+          "$ref": "#/definitions/IngestRequest"
+        },
+        {
+          "$ref": "#/definitions/IngestResponse"
+        }
+      ]
     },
     "ingest_status": {
-      "$ref": "#/definitions/IngestStatusResponse"
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/definitions/IngestStatusResponse"
+        }
+      ]
     },
     "ingest_references": {
-      "$ref": "#/definitions/IngestResponse"
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": [
+        {
+          "$ref": "#/definitions/IngestRequest"
+        },
+        {
+          "$ref": "#/definitions/IngestResponse"
+        }
+      ]
     },
     "rewrite": {
       "type": "array",
-      "items": {
-        "$ref": "#/definitions/RewriteChoice"
-      }
+      "minItems": 2,
+      "maxItems": 2,
+      "items": [
+        {
+          "$ref": "#/definitions/RewriteRequest"
+        },
+        {
+          "$ref": "#/definitions/RewriteResponse"
+        }
+      ]
+    },
+    "completion": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": [
+        {
+          "$ref": "#/definitions/TextCompletionRequest"
+        },
+        {
+          "$ref": "#/definitions/TextCompletionResponse"
+        }
+      ]
     },
     "chat": {
       "type": "array",
-      "items": {
-        "$ref": "#/definitions/ChatResponseChoice"
-      }
+      "minItems": 2,
+      "maxItems": 2,
+      "items": [
+        {
+          "$ref": "#/definitions/ChatRequest"
+        },
+        {
+          "$ref": "#/definitions/ChatResponse"
+        }
+      ]
     },
     "update": {
-      "$ref": "#/definitions/UpdateStatusResponse"
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": [
+        {
+          "$ref": "#/definitions/ReferenceUpdate"
+        },
+        {
+          "$ref": "#/definitions/UpdateStatusResponse"
+        }
+      ]
     },
     "delete": {
-      "$ref": "#/definitions/DeleteStatusResponse"
-    },
-    "search": {
-      "$ref": "#/definitions/SearchResponse"
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": [
+        {
+          "$ref": "#/definitions/DeleteRequest"
+        },
+        {
+          "$ref": "#/definitions/DeleteStatusResponse"
+        }
+      ]
     }
   },
   "required": [
@@ -38,12 +112,25 @@
     "ingest_status",
     "ingest_references",
     "rewrite",
+    "completion",
     "chat",
     "update",
     "delete",
     "search"
   ],
   "definitions": {
+    "IngestRequest": {
+      "title": "IngestRequest",
+      "type": "object",
+      "properties": {
+        "pdf_directory": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "pdf_directory"
+      ]
+    },
     "IngestStatus": {
       "title": "IngestStatus",
       "description": "An enumeration.",
@@ -212,6 +299,44 @@
         "reference_statuses"
       ]
     },
+    "RewriteMannerType": {
+      "title": "RewriteMannerType",
+      "description": "An enumeration.",
+      "enum": [
+        "concise",
+        "elaborate",
+        "scholarly"
+      ],
+      "type": "string"
+    },
+    "RewriteRequest": {
+      "title": "RewriteRequest",
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "manner": {
+          "default": "concise",
+          "allOf": [
+            {
+              "$ref": "#/definitions/RewriteMannerType"
+            }
+          ]
+        },
+        "n_choices": {
+          "default": 1,
+          "type": "integer"
+        },
+        "temperature": {
+          "default": 0.7,
+          "type": "number"
+        }
+      },
+      "required": [
+        "text"
+      ]
+    },
     "RewriteChoice": {
       "title": "RewriteChoice",
       "type": "object",
@@ -225,6 +350,118 @@
       },
       "required": [
         "index",
+        "text"
+      ]
+    },
+    "RewriteResponse": {
+      "title": "RewriteResponse",
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string"
+        },
+        "choices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RewriteChoice"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "message",
+        "choices"
+      ]
+    },
+    "TextCompletionRequest": {
+      "title": "TextCompletionRequest",
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "n_choices": {
+          "default": 1,
+          "type": "integer"
+        },
+        "temperature": {
+          "default": 0.7,
+          "type": "number"
+        },
+        "max_tokens": {
+          "default": 512,
+          "type": "integer"
+        },
+        "title": {
+          "type": "string"
+        },
+        "abstract": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ]
+    },
+    "TextCompletionChoice": {
+      "title": "TextCompletionChoice",
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "index",
+        "text"
+      ]
+    },
+    "TextCompletionResponse": {
+      "title": "TextCompletionResponse",
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string"
+        },
+        "choices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TextCompletionChoice"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "message",
+        "choices"
+      ]
+    },
+    "ChatRequest": {
+      "title": "ChatRequest",
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "n_choices": {
+          "default": 1,
+          "type": "integer"
+        },
+        "temperature": {
+          "default": 0.7,
+          "type": "number"
+        }
+      },
+      "required": [
         "text"
       ]
     },
@@ -244,6 +481,58 @@
         "text"
       ]
     },
+    "ChatResponse": {
+      "title": "ChatResponse",
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string"
+        },
+        "choices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ChatResponseChoice"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "message",
+        "choices"
+      ]
+    },
+    "ReferencePatch": {
+      "title": "ReferencePatch",
+      "description": "ReferencePatch is the input type for updating a Reference's metadata.",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "data"
+      ]
+    },
+    "ReferenceUpdate": {
+      "title": "ReferenceUpdate",
+      "type": "object",
+      "properties": {
+        "source_filename": {
+          "type": "string"
+        },
+        "patch": {
+          "$ref": "#/definitions/ReferencePatch"
+        }
+      },
+      "required": [
+        "source_filename",
+        "patch"
+      ]
+    },
     "UpdateStatusResponse": {
       "title": "UpdateStatusResponse",
       "type": "object",
@@ -258,6 +547,25 @@
       "required": [
         "status",
         "message"
+      ]
+    },
+    "DeleteRequest": {
+      "title": "DeleteRequest",
+      "type": "object",
+      "properties": {
+        "source_filenames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "all": {
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "source_filenames"
       ]
     },
     "DeleteStatusResponse": {

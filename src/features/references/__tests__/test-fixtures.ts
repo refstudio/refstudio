@@ -2,20 +2,20 @@ import { ReferenceItem } from '../../../types/ReferenceItem';
 
 export const REFERENCES: ReferenceItem[] = [
   {
-    id: 'A Few Useful Things to Know about Machine Learning.pdf',
-    filepath: '/path/to/A Few Useful Things to Know about Machine Learning.pdf',
+    id: 'a_few_useful_things_to_know_about_machine_learning',
+    filepath: '/any/path/A Few Useful Things to Know about Machine Learning.pdf',
     filename: 'A Few Useful Things to Know about Machine Learning.pdf',
-    title: 'A Few Useful Things to Know about Machine Learning.pdf',
-    citationKey: 'citationKey',
+    title: 'REF1 A Few Useful Things to Know about Machine Learning',
+    citationKey: 'doe2023',
     status: 'complete',
     authors: [{ fullName: 'Joe Doe', lastName: 'Doe' }],
   },
   {
-    id: 'Rules of Machine Learning - Best Practices for ML Engineering.pdf',
-    filepath: '/path/to/Rules of Machine Learning - Best Practices for ML Engineering.pdf',
+    id: 'rules_of_machine_learning_-_best_practices_for_ml_engineering',
+    filepath: '/any/path/Rules of Machine Learning - Best Practices for ML Engineering.pdf',
     filename: 'Rules of Machine Learning - Best Practices for ML Engineering.pdf',
-    title: 'Rules of Machine Learning - Best Practices for ML Engineering.pdf',
-    citationKey: 'citationKey 2',
+    title: 'REF2 Rules of Machine Learning - Best Practices for ML Engineering',
+    citationKey: 'maria',
     status: 'complete',
     authors: [
       { fullName: 'Joe Doe', lastName: 'Doe' },

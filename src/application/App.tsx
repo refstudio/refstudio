@@ -1,3 +1,6 @@
+import 'react-contexify/dist/ReactContexify.css';
+
+import { MenuProvider } from 'kmenu';
 import React, { useCallback, useEffect, useState } from 'react';
 import { VscChevronUp } from 'react-icons/vsc';
 import { ImperativePanelHandle, Panel, PanelGroup } from 'react-resizable-panels';
@@ -9,38 +12,52 @@ import { emitEvent } from '../events';
 import { AIPanel } from '../features/ai/AIPanel';
 import { ReferencesDropZone } from '../features/references/components/ReferencesDropZone';
 import { ReferencesPanel } from '../features/references/sidebar/ReferencesPanel';
-import { ensureProjectFileStructure } from '../io/filesystem';
+import { useDebouncedCallback } from '../hooks/useDebouncedCallback';
 import { SettingsModalOpener } from '../settings/SettingsModalOpener';
-import { PdfViewerAPI } from '../types/PdfViewerAPI';
 import { ApplicationFrame } from '../wrappers/ApplicationFrame';
+import { ContextMenus } from '../wrappers/ContextMenus';
 import { EventsListener } from '../wrappers/EventsListener';
+import { CommandPalette } from './CommandPalette';
 import { MainPanel } from './components/MainPanel';
 import { ExplorerPanel } from './sidebar/ExplorerPanel';
 
-function App() {
-  useEffectOnce(() => void ensureProjectFileStructure());
+export function App() {
+  useEffectOnce(() => emitEvent('refstudio://references/load'));
 
-  const pdfViewerRef = React.useRef<PdfViewerAPI>(null);
-  const updatePDFViewerWidth = useCallback(() => {
-    pdfViewerRef.current?.updateWidth();
-  }, [pdfViewerRef]);
+  const handleLayoutUpdate = useDebouncedCallback(
+    useCallback(() => emitEvent('refstudio://layout/update'), []),
+    200,
+  );
+
+  useEffect(() => {
+    window.addEventListener('resize', handleLayoutUpdate);
+
+    return () => {
+      window.removeEventListener('resize', handleLayoutUpdate);
+    };
+  }, [handleLayoutUpdate]);
 
   return (
     <EventsListener>
       <ReferencesDropZone>
         <ApplicationFrame>
-          <PanelGroup
-            autoSaveId="refstudio"
-            className="relative h-full"
-            direction="horizontal"
-            onLayout={updatePDFViewerWidth}
-          >
-            <LeftSidePanelWrapper />
-            <Panel defaultSize={60} order={2}>
-              <MainPanel pdfViewerRef={pdfViewerRef} />
-            </Panel>
-            <RightPanelWrapper />
-          </PanelGroup>
+          <ContextMenus>
+            <MenuProvider config={{ animationDuration: 0 }}>
+              <CommandPalette />
+              <PanelGroup
+                autoSaveId="refstudio"
+                className="relative h-full"
+                direction="horizontal"
+                onLayout={handleLayoutUpdate}
+              >
+                <LeftSidePanelWrapper />
+                <Panel defaultSize={60} order={2}>
+                  <MainPanel />
+                </Panel>
+                <RightPanelWrapper />
+              </PanelGroup>
+            </MenuProvider>
+          </ContextMenus>
         </ApplicationFrame>
         <SettingsModalOpener />
       </ReferencesDropZone>
@@ -114,7 +131,7 @@ function RightPanelWrapper() {
       <Panel collapsible order={3} ref={panelRef} onCollapse={setClosed}>
         <AIPanel onCloseClick={() => setClosed(true)} />
         {closed && (
-          <div className="absolute bottom-0 right-0 flex border border-slate-300 bg-slate-100 px-4 py-2">
+          <div className="absolute bottom-0 right-0 flex border border-b-0 border-slate-300 bg-slate-100 px-4 py-2">
             <div
               className="flex w-60 cursor-pointer select-none items-center justify-between"
               onClick={() => setClosed(false)}
@@ -130,5 +147,3 @@ function RightPanelWrapper() {
     </>
   );
 }
-
-export default App;

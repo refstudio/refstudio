@@ -13,6 +13,7 @@ import { CollapsibleBlockContentNode } from './tipTapNodes/collapsibleBlock/node
 import { CollapsibleBlockNode } from './tipTapNodes/collapsibleBlock/nodes/CollapsibleBlockNode';
 import { CollapsibleBlockSummaryNode } from './tipTapNodes/collapsibleBlock/nodes/CollapsibleBlockSummary';
 import { DraggableBlockNode } from './tipTapNodes/draggableBlock/DraggableBlockNode';
+import { SentenceCompletionExtension } from './tipTapNodes/plugins/sentenceCompletion';
 import { ReferenceNode } from './tipTapNodes/referenceNode/ReferenceNode';
 import { RefStudioDocument } from './tipTapNodes/refStudioDocument/RefStudioDocument';
 lowlight.registerLanguage('markdown', markdown);
@@ -44,52 +45,8 @@ export const EDITOR_EXTENSIONS: Extensions = [
   CollapsibleBlockContentNode,
   CollapsibleBlockSummaryNode,
   ReferenceNode,
+  SentenceCompletionExtension,
 ];
-export const INITIAL_CONTENT = `
-  <h2>Hi there,</h2>
-  <p>
-    this is a <em>basic</em> example of <strong>tiptap</strong>. Sure, there are
-    all kind of basic text styles you’d probably expect from a text editor. But
-    wait until you see the lists:
-  </p>
-  <collapsible-block folded="false">
-    <collapsible-summary>Open Collapsible</collapsible-summary>
-    <collapsible-content>
-      <p>Text</p>
-      <collapsible-block folded="true">
-        <collapsible-summary>collapsible 1.2</collapsible-summary
-        ></collapsible-block
-    ></collapsible-content>
-  </collapsible-block>
-  <ul>
-    <li>
-      That’s a bullet list with one …
-    </li>
-    <li>… or two list items.</li>
-  </ul>
-  <collapsible-block
-    >Closed Collapsible<collapsible-block
-      >collapsible 2.1</collapsible-block
-    ></collapsible-block
-  >
-  <p>
-    Isn’t that great? And all of that is editable. But wait, there’s more. Let’s
-    try a code block:
-  </p>
-  <pre><code class="language-css">body {
-  display: none;
-}</code></pre>
-  <p>
-    I know, I know, this is impressive. It’s only the tip of the iceberg though.
-    Give it a try and click a little bit around. Don’t forget to check the other
-    examples too.
-  </p>
-  <blockquote>
-    Wow, that’s amazing. Good work, boy! 👏
-    <br />
-    — Mom
-  </blockquote>
-`;
 
 export function transformPasted(slice: Slice) {
   return new Slice(stripTransparentMarksFromFragment(slice.content), slice.openStart, slice.openEnd);

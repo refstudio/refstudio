@@ -1,5 +1,4 @@
 import { Command, SpawnOptions } from '@tauri-apps/api/shell';
-import { describe, it } from 'vitest';
 
 import { noop } from '../../lib/noop';
 import {
@@ -22,7 +21,6 @@ const mockSettings: SettingsSchema = {
   openAI: {
     apiKey: 'API KEY',
     chatModel: 'CHAT MODEL',
-    completeModel: 'COMPLETE MODEL',
   },
   sidecar: {
     logging: {
@@ -58,6 +56,7 @@ describe('sidecar', () => {
     let env: undefined | Record<string, string>;
     vi.mocked(Command).mockImplementation((program: string, args?: string | string[], options?: SpawnOptions) => {
       env = options?.env;
+      expect(args).toEqual(['chat', `{"text":"Hello chatbot!"}`]);
       return {
         execute: () => ({
           stdout: JSON.stringify({}),
@@ -65,10 +64,10 @@ describe('sidecar', () => {
       } as unknown as Command;
     });
 
-    await callSidecar('chat', []);
+    await callSidecar('chat', { text: 'Hello chatbot!' });
 
     expect(vi.mocked(getCachedSetting).mock.calls.length).toBeGreaterThan(0);
-    expect(Object.keys(env ?? {}).length).toBe(7);
+    expect(Object.keys(env ?? {}).length).toBe(6);
 
     // General
     expect(env?.APP_DATA_DIR).toBe(mockSettings.general.appDataDir);
@@ -76,7 +75,6 @@ describe('sidecar', () => {
     // OpenAI
     expect(env?.OPENAI_API_KEY).toBe(mockSettings.openAI.apiKey);
     expect(env?.OPENAI_CHAT_MODEL).toBe(mockSettings.openAI.chatModel);
-    expect(env?.OPENAI_COMPLETE_MODEL).toBe(mockSettings.openAI.completeModel);
     // Logging
     expect(env?.SIDECAR_ENABLE_LOGGING).toBe(String(mockSettings.sidecar.logging.active));
     expect(env?.SIDECAR_LOG_DIR).toBe(mockSettings.sidecar.logging.path);
@@ -92,6 +90,6 @@ describe('sidecar', () => {
         } as unknown as Command),
     );
 
-    await expect(callSidecar('chat', [])).rejects.toThrow('error details');
+    await expect(callSidecar('chat', { text: 'Hello chatbot!' })).rejects.toThrow();
   });
 });

@@ -1,58 +1,35 @@
-import { useQuery } from '@tanstack/react-query';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { VscCloseAll, VscSplitHorizontal } from 'react-icons/vsc';
 
-import {
-  closeAllEditorsAtom,
-  moveEditorToPaneAtom,
-  openFileEntryAtom,
-  selectEditorInPaneAtom,
-} from '../../atoms/editorActions';
-import { leftPaneAtom, rightPaneAtom } from '../../atoms/paneActions';
+import { closeAllEditorsAtom, moveEditorToPaneAtom, selectEditorInPaneAtom } from '../../atoms/editorActions';
+import { openFilePathAtom } from '../../atoms/fileEntryActions';
+import { fileExplorerAtom, refreshFileTreeAtom } from '../../atoms/fileExplorerActions';
+import { useActiveEditorIdForPane } from '../../atoms/hooks/useActiveEditorIdForPane';
+import { useOpenEditorsDataForPane } from '../../atoms/hooks/useOpenEditorsDataForPane';
 import { EditorId, parseEditorId } from '../../atoms/types/EditorData';
-import { FileEntry, FileFileEntry } from '../../atoms/types/FileEntry';
 import { PaneId } from '../../atoms/types/PaneGroup';
 import { EditorsList } from '../../components/EditorsList';
-import { FileEntryTree } from '../../components/FileEntryTree';
 import { PanelSection } from '../../components/PanelSection';
 import { PanelWrapper } from '../../components/PanelWrapper';
-import { readAllProjectFiles } from '../../io/filesystem';
+import { useAsyncEffect } from '../../hooks/useAsyncEffect';
 import { isNonNullish } from '../../lib/isNonNullish';
+import { FileExplorer } from './FileExplorer';
 
 export function ExplorerPanel() {
-  const left = useAtomValue(leftPaneAtom);
-  const right = useAtomValue(rightPaneAtom);
+  const leftPaneOpenEditors = useOpenEditorsDataForPane('LEFT');
+  const leftPaneActiveEditorId = useActiveEditorIdForPane('LEFT');
+  const rightPaneOpenEditors = useOpenEditorsDataForPane('RIGHT');
+  const rightPaneActiveEditorId = useActiveEditorIdForPane('RIGHT');
+  const rootFileExplorerEntry = useAtomValue(fileExplorerAtom);
+
   const selectFileInPane = useSetAtom(selectEditorInPaneAtom);
-  const openFile = useSetAtom(openFileEntryAtom);
+  const openFile = useSetAtom(openFilePathAtom);
   const closeAllFiles = useSetAtom(closeAllEditorsAtom);
   const moveEditorToPane = useSetAtom(moveEditorToPaneAtom);
+  const refreshFileTree = useSetAtom(refreshFileTreeAtom);
 
-  const { data: allFiles } = useQuery({
-    queryKey: ['allFiles'],
-    queryFn: readAllProjectFiles,
-    initialData: [],
-  });
-
-  const flattenFiles: (files: FileEntry[]) => FileFileEntry[] = useCallback(
-    (files: FileEntry[]) => files.flatMap((file) => (file.isFolder ? flattenFiles(file.children) : file)),
-    [],
-  );
-
-  const flattenedFiles = useMemo(() => flattenFiles(allFiles), [allFiles, flattenFiles]);
-
-  const handleOpenFile = useCallback(
-    (filePath: string) => {
-      const file = flattenedFiles.find((f) => f.path === filePath);
-      if (!file) {
-        console.warn('This file does not exist');
-        return;
-      }
-      console.log('file', file);
-      openFile(file);
-    },
-    [flattenedFiles, openFile],
-  );
+  useAsyncEffect(refreshFileTree);
 
   const handleMoveEditor = useCallback(
     ({ editorId, fromPaneId, toPaneId }: { editorId: EditorId; fromPaneId: PaneId; toPaneId: PaneId }) =>
@@ -63,7 +40,7 @@ export function ExplorerPanel() {
     [moveEditorToPane],
   );
 
-  const hasLeftAndRightPanelsFiles = left.openEditors.length > 0 && right.openEditors.length > 0;
+  const hasLeftAndRightPanelsFiles = leftPaneOpenEditors.length > 0 && rightPaneOpenEditors.length > 0;
 
   return (
     <PanelWrapper title="Explorer">
@@ -72,43 +49,42 @@ export function ExplorerPanel() {
         title="Open Files"
       >
         {hasLeftAndRightPanelsFiles && <div className="ml-4 text-xs font-bold">LEFT</div>}
-        {left.openEditors.length > 0 && (
+        {leftPaneOpenEditors.length > 0 && (
           <EditorsList
-            editors={left.openEditors}
+            editors={leftPaneOpenEditors}
             paddingLeft="1.5rem"
             rightAction={(editorId) => ({
-              onClick: handleMoveEditor({ editorId, fromPaneId: left.id, toPaneId: right.id }),
+              onClick: handleMoveEditor({ editorId, fromPaneId: 'LEFT', toPaneId: 'RIGHT' }),
               VscIcon: VscSplitHorizontal,
-              title: `Move to ${right.id} split pane`,
+              title: 'Move to RIGHT split pane',
             })}
-            selectedEditors={left.activeEditor ? [left.activeEditor.id] : []}
-            onClick={(editorId) => selectFileInPane({ paneId: left.id, editorId })}
+            selectedEditors={leftPaneActiveEditorId ? [leftPaneActiveEditorId] : []}
+            onClick={(editorId) => selectFileInPane({ paneId: 'LEFT', editorId })}
           />
         )}
         {hasLeftAndRightPanelsFiles && <div className="ml-4 text-xs font-bold">RIGHT</div>}
-        {right.openEditors.length > 0 && (
+        {rightPaneOpenEditors.length > 0 && (
           <EditorsList
-            editors={right.openEditors}
+            editors={rightPaneOpenEditors}
             paddingLeft="1.5rem"
             rightAction={(editorId) => ({
-              onClick: handleMoveEditor({ editorId, fromPaneId: right.id, toPaneId: left.id }),
+              onClick: handleMoveEditor({ editorId, fromPaneId: 'RIGHT', toPaneId: 'LEFT' }),
               VscIcon: VscSplitHorizontal,
-              title: `Move to ${right.id} split pane`,
+              title: `Move to LEFT split pane`,
             })}
-            selectedEditors={right.activeEditor ? [right.activeEditor.id] : []}
-            onClick={(editorId) => selectFileInPane({ paneId: right.id, editorId })}
+            selectedEditors={rightPaneActiveEditorId ? [rightPaneActiveEditorId] : []}
+            onClick={(editorId) => selectFileInPane({ paneId: 'RIGHT', editorId })}
           />
         )}
       </PanelSection>
       <PanelSection grow title="Project X">
-        <FileEntryTree
-          files={allFiles}
+        <FileExplorer
+          fileExplorerEntry={rootFileExplorerEntry}
           paddingLeft="1.25rem"
-          root
-          selectedFiles={[left.activeEditor?.id, right.activeEditor?.id]
+          selectedFiles={[leftPaneActiveEditorId, rightPaneActiveEditorId]
             .filter(isNonNullish)
             .map((editorId) => parseEditorId(editorId).id)}
-          onFileClick={handleOpenFile}
+          onFileClick={openFile}
         />
       </PanelSection>
     </PanelWrapper>

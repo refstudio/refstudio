@@ -1,8 +1,16 @@
 from datetime import date
-from enum import Enum
 from typing import Any
 
 from pydantic import BaseModel
+
+try:
+    # introduced in Python 3.11 ... 
+    from enum import StrEnum
+except ImportError:
+    # ... but had some breaking changes
+    # https://github.com/python/cpython/issues/100458
+    # Python 3.10 and below
+    from strenum import StrEnum
 
 
 class RefStudioModel(BaseModel):
@@ -12,17 +20,17 @@ class RefStudioModel(BaseModel):
         use_enum_values = True
 
         @staticmethod
-        def schema_extra(schema: dict[str, Any], _model) -> None:
-            for prop in schema.get("properties", {}).values():
-                prop.pop("title", None)
+        def schema_extra(schema: dict[str, Any]) -> None:
+            for prop in schema.get('properties', {}).values():
+                prop.pop('title', None)
 
 
-class ResponseStatus(str, Enum):
+class ResponseStatus(StrEnum):
     OK = "ok"
     ERROR = "error"
 
 
-class IngestStatus(str, Enum):
+class IngestStatus(StrEnum):
     PROCESSING = "processing"
     FAILURE = "failure"
     COMPLETE = "complete"
@@ -30,7 +38,6 @@ class IngestStatus(str, Enum):
 
 class Reference(RefStudioModel):
     """A reference for an academic paper / PDF"""
-
     source_filename: str
     status: IngestStatus
     citation_key: str | None = None
@@ -47,7 +54,6 @@ class ReferencePatch(RefStudioModel):
     """
     ReferencePatch is the input type for updating a Reference's metadata.
     """
-
     data: dict[str, Any]
 
 
@@ -83,6 +89,10 @@ class ReferenceStatus(RefStudioModel):
     status: IngestStatus
 
 
+class IngestRequest(RefStudioModel):
+    pdf_directory: str
+
+
 class IngestStatusResponse(RefStudioModel):
     status: ResponseStatus
     reference_statuses: list[ReferenceStatus]
@@ -93,34 +103,96 @@ class UpdateStatusResponse(RefStudioModel):
     message: str
 
 
+class DeleteRequest(RefStudioModel):
+    source_filenames: list[str]
+    all: bool = False
+
+
 class DeleteStatusResponse(RefStudioModel):
     status: ResponseStatus
     message: str
 
 
-class RewriteChoice(RefStudioModel):
+class TextSuggestionChoice(RefStudioModel):
     index: int
     text: str
 
 
-class ChatResponseChoice(RefStudioModel):
-    index: int
+class RewriteMannerType(StrEnum):
+    CONCISE = "concise"
+    ELABORATE = "elaborate"
+    SCHOLARLY = "scholarly"
+
+
+class RewriteRequest(RefStudioModel):
     text: str
+    manner: RewriteMannerType = RewriteMannerType.CONCISE
+    n_choices: int = 1
+    temperature: float = 0.7
 
 
-class SearchResponse(RefStudioModel):
-    search_results: list[dict] # TODO: remove to SearchResults
+class RewriteChoice(TextSuggestionChoice):
+    pass
+
+
+class RewriteResponse(RefStudioModel):
+    status: ResponseStatus
+    message: str
+    choices: list[RewriteChoice]
+
+
+class TextCompletionRequest(RefStudioModel):
+    text: str
+    n_choices: int = 1
+    temperature: float = 0.7
+    max_tokens: int = 512
+    title: str = None
+    abstract: str = None
+
+
+class TextCompletionChoice(TextSuggestionChoice):
+    pass
+
+
+class TextCompletionResponse(RefStudioModel):
+    status: ResponseStatus
+    message: str
+    choices: list[TextCompletionChoice]
+
+
+class ChatRequest(RefStudioModel):
+    text: str
+    n_choices: int = 1
+    temperature: float = 0.7
+
+
+class ChatResponseChoice(TextSuggestionChoice):
+    pass
+
+
+class ChatResponse(RefStudioModel):
+    status: ResponseStatus
+    message: str
+    choices: list[ChatResponseChoice]
 
 
 class CliCommands(RefStudioModel):
-    ingest: IngestResponse
-    ingest_status: IngestStatusResponse
-    ingest_references: IngestResponse
-    rewrite: list[RewriteChoice]
-    chat: list[ChatResponseChoice]
-    update: UpdateStatusResponse
-    delete: DeleteStatusResponse
-    search: SearchResponse
+    ingest: tuple[IngestRequest, IngestResponse]
+    """Ingest PDFs"""
+    ingest_status: tuple[None, IngestStatusResponse]
+    """Retrieve ingestion status of uploads"""
+    ingest_references: tuple[IngestRequest, IngestResponse]
+    """Retrieve ingested PDF references"""
+    rewrite: tuple[RewriteRequest, RewriteResponse]
+    """"Rewrites a block of text in a specified manner"""
+    completion: tuple[TextCompletionRequest, TextCompletionResponse]
+    """Completes a body of text"""
+    chat: tuple[ChatRequest, ChatResponse]
+    """Chat with the AI"""
+    update: tuple[ReferenceUpdate, UpdateStatusResponse]
+    """Update metadata for a Reference"""
+    delete: tuple[DeleteRequest, DeleteStatusResponse]
+    """Deletes a Reference"""
 
 
 Reference.update_forward_refs()

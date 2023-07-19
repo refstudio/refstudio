@@ -1,29 +1,31 @@
 import { act, waitFor } from '@testing-library/react';
 import { createStore } from 'jotai';
 import { Loadable } from 'jotai/vanilla/utils/loadable';
-import { describe, expect, it } from 'vitest';
 
-import { readFileContent, writeFileContent } from '../../io/filesystem';
-import { activePaneAtom, closeEditorFromPaneAtom, moveEditorToPaneAtom, openFileEntryAtom } from '../editorActions';
-import { activePaneContentAtom, focusPaneAtom } from '../paneActions';
+import { readAllProjectFiles, readFileContent, writeFileContent } from '../../io/filesystem';
+import { activePaneAtom, closeEditorFromPaneAtom, moveEditorToPaneAtom } from '../editorActions';
+import { openFileEntryAtom } from '../fileEntryActions';
+import { useActiveEditorContentAtoms } from '../hooks/useActiveEditorContentAtoms';
+import { useActiveEditorId } from '../hooks/useActiveEditorId';
+import { focusPaneAtom } from '../paneActions';
 import { EditorContent } from '../types/EditorContent';
 import { EditorContentAtoms } from '../types/EditorContentAtoms';
-import { EditorData } from '../types/EditorData';
-import { FileEntry } from '../types/FileEntry';
+import { buildEditorId, EditorData } from '../types/EditorData';
+import { FileFileEntry } from '../types/FileEntry';
 import { PaneId } from '../types/PaneGroup';
-import { makeFile } from './test-fixtures';
-import { runGetAtomHook, runSetAtomHook } from './test-utils';
+import { makeFileAndEditor } from './test-fixtures';
+import { runGetAtomHook, runHookWithJotaiProvider, runSetAtomHook } from './test-utils';
 
 vi.mock('../../io/filesystem');
 
-describe('fileActions', () => {
+describe('paneActions', () => {
   let store: ReturnType<typeof createStore>;
-  let fileEntry: FileEntry;
+  let fileEntry: FileFileEntry;
   let editorData: EditorData;
   let fileContentAtoms: EditorContentAtoms;
 
   beforeEach(() => {
-    const file = makeFile('file.txt');
+    const file = makeFileAndEditor('file.txt');
     fileEntry = file.fileEntry;
     editorData = file.editorData;
 
@@ -32,10 +34,10 @@ describe('fileActions', () => {
     store = createStore();
     store.set(openFileEntryAtom, fileEntry);
 
-    const pane = store.get(activePaneContentAtom);
-    expect(pane.activeEditor).toBeDefined();
+    const activeEditorContentAtoms = runHookWithJotaiProvider(useActiveEditorContentAtoms, store).current;
+    expect(activeEditorContentAtoms).not.toBeNull();
 
-    fileContentAtoms = pane.activeEditor!.contentAtoms;
+    fileContentAtoms = activeEditorContentAtoms!;
   });
 
   afterEach(() => {
@@ -64,7 +66,7 @@ describe('fileActions', () => {
     const initialPaneId = activePane.current.id;
     const otherPaneId: PaneId = initialPaneId === 'LEFT' ? 'RIGHT' : 'LEFT';
 
-    const { fileEntry: fileEntry2, editorData: editorData2 } = makeFile('File2.txt');
+    const { fileEntry: fileEntry2, editorData: editorData2 } = makeFileAndEditor('File2.txt');
 
     act(() => {
       openFileEntry.current(fileEntry2);
@@ -94,7 +96,7 @@ describe('fileActions', () => {
   });
 
   it('should return the content of the active pane', () => {
-    const activePane = runGetAtomHook(activePaneContentAtom, store);
+    const activePane = runGetAtomHook(activePaneAtom, store);
     const focusPanel = runSetAtomHook(focusPaneAtom, store);
 
     const paneToFocus: PaneId = activePane.current.id === 'LEFT' ? 'RIGHT' : 'LEFT';
@@ -158,6 +160,7 @@ describe('fileActions', () => {
 
   it('should call writeFileContent when using saveFileAtom', async () => {
     vi.mocked(writeFileContent).mockResolvedValueOnce(true);
+    vi.mocked(readAllProjectFiles).mockResolvedValueOnce([]);
 
     const {
       loadableEditorContentAtom: loadableFileAtom,
@@ -179,6 +182,7 @@ describe('fileActions', () => {
     });
 
     expect(writeFileContent).toHaveBeenCalledOnce();
+    expect(readAllProjectFiles).toHaveBeenCalledOnce();
   });
 
   it('should not call writeFileContent if the file buffer is empty', async () => {
@@ -223,5 +227,22 @@ describe('fileActions', () => {
     });
 
     expect(writeFileContent).not.toHaveBeenCalledOnce();
+  });
+
+  it('should return the active editor', () => {
+    const activeEditorId = runHookWithJotaiProvider(useActiveEditorId, store).current;
+    const activeEditorContentAtoms = runHookWithJotaiProvider(useActiveEditorContentAtoms, store).current;
+
+    expect(activeEditorId).not.toBeNull();
+    expect(activeEditorId).toBe(buildEditorId('text', fileEntry.path));
+    expect(activeEditorContentAtoms).not.toBeNull();
+    expect(activeEditorContentAtoms).toBe(fileContentAtoms);
+  });
+
+  it('should return the active editor id', () => {
+    const activeEditorId = runHookWithJotaiProvider(useActiveEditorId, store).current;
+
+    expect(activeEditorId).not.toBeNull();
+    expect(activeEditorId).toBe(buildEditorId('text', fileEntry.path));
   });
 });

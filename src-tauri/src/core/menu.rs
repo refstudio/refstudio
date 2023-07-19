@@ -6,7 +6,9 @@ const MENU_SETTINGS: &str = "refstudio://menu/settings";
 const MENU_REFERENCES_OPEN: &str = "refstudio://menu/references/open";
 const MENU_REFERENCES_UPLOAD: &str = "refstudio://menu/references/upload";
 const MENU_FILE_SAVE: &str = "refstudio://menu/file/save";
+const MENU_FILE_NEW: &str = "refstudio://menu/file/new";
 const MENU_FILE_CLOSE: &str = "refstudio://menu/file/close";
+const MENU_VIEW_NOTIFICATIONS: &str = "refstudio://menu/view/notifications";
 
 impl AppMenu {
     pub fn get_menu(context: &Context<EmbeddedAssets>) -> Menu {
@@ -31,10 +33,12 @@ impl AppMenu {
             Menu::new()
                 .add_item(CustomMenuItem::new(MENU_FILE_SAVE, "Save").accelerator("cmdOrControl+S"))
                 .add_item(
+                    CustomMenuItem::new(MENU_FILE_NEW, "New File").accelerator("cmdOrControl+N"),
+                )
+                .add_item(
                     CustomMenuItem::new(MENU_FILE_CLOSE, "Close Editor")
                         .accelerator("cmdOrControl+W"),
-                ), // .add_item(CustomMenuItem::new("tauri://menu/file/new".to_string(), "New File..."))
-                   // .add_item(CustomMenuItem::new("tauri://menu/file/close".to_string(), "Close File"))
+                ),
         );
 
         let edit_menu = Submenu::new(
@@ -58,7 +62,12 @@ impl AppMenu {
 
         let view_menu = Submenu::new(
             "View",
-            Menu::new().add_native_item(MenuItem::EnterFullScreen),
+            Menu::new()
+                .add_native_item(MenuItem::EnterFullScreen)
+                .add_item(
+                    CustomMenuItem::new(MENU_VIEW_NOTIFICATIONS, "Notifications")
+                        .accelerator("F11"),
+                ),
         );
 
         let window_menu = Submenu::new(

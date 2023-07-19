@@ -2,7 +2,7 @@ import { runPDFIngestion } from '../../../../api/ingestion';
 import { runGetAtomHook } from '../../../../atoms/__tests__/test-utils';
 import { getReferencesAtom, referencesSyncInProgressAtom } from '../../../../atoms/referencesState';
 import { listenEvent } from '../../../../events';
-import { uploadFiles } from '../../../../io/filesystem';
+import { readAllProjectFiles, uploadFiles } from '../../../../io/filesystem';
 import { noop } from '../../../../lib/noop';
 import { act, fireEvent, mockListenEvent, screen, setupWithJotaiProvider, waitFor } from '../../../../test/test-utils';
 import { REFERENCES } from '../../__tests__/test-fixtures';
@@ -13,8 +13,12 @@ vi.mock('../../../../io/filesystem');
 vi.mock('../../../../api/ingestion');
 
 describe('ReferencesDropZone', () => {
+  beforeEach(() => {
+    vi.mocked(readAllProjectFiles).mockResolvedValue([]);
+  });
+
   afterEach(() => {
-    vi.resetAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render children with', () => {
