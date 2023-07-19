@@ -5,7 +5,6 @@ This script performs a search on Semantic Scholar and retrieves information abou
 from semanticscholar import SemanticScholar
 from .stopwords import stopwords
 import sys
-import json
 import logging
 from .typing import SearchResponse, S2SearchResult, SearchRequest
 
