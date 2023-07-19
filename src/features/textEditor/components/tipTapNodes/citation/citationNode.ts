@@ -142,7 +142,7 @@ const moveCursorPlugin = new Plugin({
     // If the the cursor was before the opening bracket and is now after the bracket,
     // it means the user is trying to enter the node so we move the cursor inside
     if (wasAfterBeforeOpeningBracket && isAfterOpeningBracket) {
-      tr.setSelection(TextSelection.create(newState.doc, $from.pos + 1));
+      tr.setSelection(TextSelection.create(tr.doc, $from.pos + 1));
     } else {
       // If there no text node in front of the citation node, create an "empty" one
       // Note: prosemirror does not support empty text node, so we have to create a node with a space
@@ -174,7 +174,7 @@ export const citationNode = Node.create({
 
   renderHTML: ({ HTMLAttributes }) => ['citation', HTMLAttributes, 0],
 
-  addNodeView: () => ReactNodeViewRenderer(Citation),
+  addNodeView: () => ReactNodeViewRenderer(Citation, { attrs: { 'data-testid': 'citation' } }),
 
   addInputRules: () => [
     new InputRule({
