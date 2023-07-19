@@ -1,7 +1,7 @@
 import inspect
 import json
 
-from sidecar import chat, cli, ingest, rewrite, storage
+from sidecar import chat, cli, ingest, rewrite, storage, search
 from sidecar.typing import CliCommands
 
 if __name__ == '__main__':
@@ -45,5 +45,8 @@ if __name__ == '__main__':
     elif args.command == "delete":
         storage.delete_references(param_obj)
 
+    elif args.command == "search":
+        search.search_s2(param_obj)
+
     else:
-        raise NotImplementedError(f'Command {args.command} is not implemented.')
+        raise NotImplementedError(f"Command {args.command} is not implemented.")
