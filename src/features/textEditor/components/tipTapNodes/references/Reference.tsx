@@ -22,7 +22,7 @@ export function Reference({ node }: ReferenceProps) {
   const reference = useAtomValue(referenceAtom);
 
   return (
-    <NodeViewWrapper as="span">
+    <NodeViewWrapper as="cite">
       {reference?.citationKey ? `@${reference.citationKey}` : 'INVALID REFERENCE'}
     </NodeViewWrapper>
   );

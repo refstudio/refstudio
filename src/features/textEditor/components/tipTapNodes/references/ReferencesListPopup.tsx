@@ -1,4 +1,4 @@
-import './ReferencesList.css';
+import './ReferencesListPopup.css';
 
 import { SuggestionKeyDownProps, SuggestionProps } from '@tiptap/suggestion';
 import Fuse from 'fuse.js';
@@ -11,9 +11,9 @@ import { getReferencesAtom } from '../../../../../atoms/referencesState';
 import { cx } from '../../../../../lib/cx';
 import { fuseOptions } from './config';
 
-export type ReferenceListProps = SuggestionProps<{ id: string }>;
+export type ReferenceListPopupProps = SuggestionProps<{ id: string }>;
 
-export const ReferencesList = forwardRef((props: ReferenceListProps, ref) => {
+export const ReferencesListPopup = forwardRef((props: ReferenceListPopupProps, ref) => {
   const { command, clientRect, query } = props;
   const [selectedIndex, setSelectedIndex] = useState(0);
   const references = useAtomValue(getReferencesAtom);
@@ -90,7 +90,7 @@ export const ReferencesList = forwardRef((props: ReferenceListProps, ref) => {
   return createPortal(
     <div
       className="references"
-      data-testid="referencesList"
+      data-testid={ReferencesListPopup.displayName}
       ref={setPopperElement}
       style={styles.popper}
       {...attributes.popper}
@@ -114,4 +114,4 @@ export const ReferencesList = forwardRef((props: ReferenceListProps, ref) => {
   );
 });
 
-ReferencesList.displayName = 'ReferencesList';
+ReferencesListPopup.displayName = 'ReferencesList';

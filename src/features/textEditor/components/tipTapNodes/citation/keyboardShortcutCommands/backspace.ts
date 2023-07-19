@@ -1,6 +1,6 @@
 import { KeyboardShortcutCommand } from '@tiptap/core';
 
-import { citationNode } from '../citationNode';
+import { CitationNode } from '../CitationNode';
 
 /**
  * Rules when pressing backspace:
@@ -12,7 +12,7 @@ export const backspace: KeyboardShortcutCommand = ({ editor }) => {
   const { $from, $to } = selection;
 
   // If the selection does not starts or ends in a citation node, let other handlers handle it
-  if ($from.parent.type.name !== citationNode.name && $to.parent.type.name !== citationNode.name) {
+  if ($from.parent.type.name !== CitationNode.name && $to.parent.type.name !== CitationNode.name) {
     return false;
   }
 

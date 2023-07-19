@@ -1,7 +1,7 @@
 import { KeyboardShortcutCommand } from '@tiptap/core';
 import { TextSelection } from '@tiptap/pm/state';
 
-import { citationNode } from '../citationNode';
+import { CitationNode } from '../CitationNode';
 
 /** Enable escaping the citation node when pressing ArrowRight while being at the end of the node */
 export const arrowRight: KeyboardShortcutCommand = ({ editor }) => {
@@ -10,7 +10,7 @@ export const arrowRight: KeyboardShortcutCommand = ({ editor }) => {
   }
 
   const { $from } = editor.state.selection;
-  if ($from.parent.type.name !== citationNode.name || $from.pos !== $from.after() - 1) {
+  if ($from.parent.type.name !== CitationNode.name || $from.pos !== $from.after() - 1) {
     return false;
   }
 

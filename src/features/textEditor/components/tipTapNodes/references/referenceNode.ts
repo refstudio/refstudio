@@ -2,11 +2,11 @@ import Mention from '@tiptap/extension-mention';
 import { ReactNodeViewRenderer, ReactRenderer } from '@tiptap/react';
 import { SuggestionKeyDownProps, SuggestionOptions } from '@tiptap/suggestion';
 
-import { citationNode } from '../citation/citationNode';
+import { CitationNode } from '../citation/CitationNode';
 import { Reference } from './Reference';
-import { ReferenceListProps, ReferencesList } from './ReferencesList';
+import { ReferenceListPopupProps, ReferencesListPopup } from './ReferencesListPopup';
 
-export const referenceNode = Mention.extend({
+export const ReferenceNode = Mention.extend({
   name: 'reference',
   addNodeView: () => ReactNodeViewRenderer(Reference),
   addAttributes: () => ({
@@ -30,7 +30,7 @@ export const referenceNode = Mention.extend({
     char: '@',
     allowedPrefixes: null,
     allow: ({ state, range }) =>
-      state.selection.empty && state.doc.resolve(range.from).parent.type.name === citationNode.name,
+      state.selection.empty && state.doc.resolve(range.from).parent.type.name === CitationNode.name,
     /* c8 ignore start */
     command: ({
       editor,
@@ -42,7 +42,7 @@ export const referenceNode = Mention.extend({
         .focus()
         .insertContentAt(range, [
           {
-            type: referenceNode.name,
+            type: ReferenceNode.name,
             attrs: props,
           },
         ])
@@ -51,17 +51,17 @@ export const referenceNode = Mention.extend({
     /* c8 ignore stop */
 
     render: () => {
-      let reactRenderer: ReactRenderer<{ onKeyDown: (e: SuggestionKeyDownProps) => boolean }, ReferenceListProps>;
+      let reactRenderer: ReactRenderer<{ onKeyDown: (e: SuggestionKeyDownProps) => boolean }, ReferenceListPopupProps>;
 
       return {
         onStart: (props) => {
-          reactRenderer = new ReactRenderer<{ onKeyDown: (e: SuggestionKeyDownProps) => boolean }, ReferenceListProps>(
-            ReferencesList,
-            {
-              props,
-              editor: props.editor,
-            },
-          );
+          reactRenderer = new ReactRenderer<
+            { onKeyDown: (e: SuggestionKeyDownProps) => boolean },
+            ReferenceListPopupProps
+          >(ReferencesListPopup, {
+            props,
+            editor: props.editor,
+          });
         },
 
         onUpdate: (props) => {

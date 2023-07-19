@@ -1,7 +1,7 @@
 import { TextSelection } from '@tiptap/pm/state';
 import { InputRule } from '@tiptap/react';
 
-import { citationNode } from '../citationNode';
+import { CitationNode } from '../CitationNode';
 
 export const squareBracketHandler = ({
   state,
@@ -12,6 +12,6 @@ export const squareBracketHandler = ({
 
   // When inserting a citation node, also inserts a '@' character to open the reference selector
   tr.delete(start, start + 1)
-    .insert(start, state.schema.nodes[citationNode.name].create({}, state.schema.text('@')))
+    .insert(start, state.schema.nodes[CitationNode.name].create({}, state.schema.text('@')))
     .setSelection(TextSelection.create(tr.doc, state.selection.from + 2));
 };

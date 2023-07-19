@@ -6,6 +6,7 @@ import { screen, setup, setupWithJotaiProvider } from '../../../../../../test/te
 import { REFERENCES } from '../../../../../references/__tests__/test-fixtures';
 import { EDITOR_EXTENSIONS } from '../../../tipTapEditorConfigs';
 import { setUpEditorWithSelection } from '../../__tests__/test-utils';
+import { ReferencesListPopup } from '../ReferencesListPopup';
 
 global.document.elementFromPoint = vi.fn();
 
@@ -41,7 +42,7 @@ describe('referenceNode', () => {
 
     await user.type(screen.getByText('Citation'), '@');
 
-    const referencePicker = screen.getByTestId('referencesList');
+    const referencePicker = screen.getByTestId(ReferencesListPopup.displayName!);
     expect(referencePicker).toBeInTheDocument();
     expect(referencePicker.getElementsByTagName('button')).toHaveLength(REFERENCES.length);
   });
@@ -52,12 +53,12 @@ describe('referenceNode', () => {
 
     await user.type(screen.getByText('Citation'), '@');
 
-    const referencePicker = screen.getByTestId('referencesList');
+    const referencePicker = screen.getByTestId(ReferencesListPopup.displayName!);
     expect(referencePicker).toBeInTheDocument();
     expect(referencePicker.getElementsByTagName('button')).toHaveLength(REFERENCES.length);
 
     await user.keyboard('{Escape}');
-    expect(screen.queryByTestId('referencesList')).not.toBeInTheDocument();
+    expect(screen.queryByTestId(ReferencesListPopup.displayName!)).not.toBeInTheDocument();
   });
 
   it('should not open the references list outside of a citation node', async () => {
@@ -69,6 +70,6 @@ describe('referenceNode', () => {
 
     await user.type(screen.getByText('Citation'), '@');
 
-    expect(screen.queryByTestId('referencesList')).not.toBeInTheDocument();
+    expect(screen.queryByTestId(ReferencesListPopup.displayName!)).not.toBeInTheDocument();
   });
 });

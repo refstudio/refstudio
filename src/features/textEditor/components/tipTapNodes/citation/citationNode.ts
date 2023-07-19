@@ -4,7 +4,7 @@ import { ReplaceStep } from '@tiptap/pm/transform';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
 import { ReactNodeViewRenderer } from '@tiptap/react';
 
-import { referenceNode } from '../references/referenceNode';
+import { ReferenceNode } from '../references/ReferenceNode';
 import { Citation } from './Citation';
 import { squareBracketHandler } from './inputRuleHandlers/squareBracketHandler';
 import { arrowRight } from './keyboardShortcutCommands/arrowRight';
@@ -36,14 +36,14 @@ const citationPlugin = new Plugin<CitationPluginState>({
 
       // If the transaction does not happen in a citation node or is not at the end of the citation node,
       // there is nothing to do
-      if ($from.parent.type.name !== citationNode.name || $from.pos !== $from.after() - 1) {
+      if ($from.parent.type.name !== CitationNode.name || $from.pos !== $from.after() - 1) {
         return null;
       }
 
       const { parent } = $from;
 
       // If the last child of the citation node is not a reference, nothing to do
-      if (parent.child(parent.childCount - 1).type.name !== referenceNode.name) {
+      if (parent.child(parent.childCount - 1).type.name !== ReferenceNode.name) {
         return null;
       }
 
@@ -70,7 +70,7 @@ const citationPlugin = new Plugin<CitationPluginState>({
     const { parent } = $from;
 
     // If the selection after the update is not at the end of the citation node, nothing to do
-    if (parent.type.name !== citationNode.name || $from.nodeAfter) {
+    if (parent.type.name !== CitationNode.name || $from.nodeAfter) {
       return null;
     }
 
@@ -129,15 +129,15 @@ const moveCursorPlugin = new Plugin({
     const { doc, schema, selection, tr } = newState;
     const { $from } = selection;
 
-    const isAfterOpeningBracket = $from.parent.type.name === citationNode.name && $from.nodeBefore === null;
-    const isAfterClosingBracket = $from.nodeBefore?.type.name === citationNode.name;
+    const isAfterOpeningBracket = $from.parent.type.name === CitationNode.name && $from.nodeBefore === null;
+    const isAfterClosingBracket = $from.nodeBefore?.type.name === CitationNode.name;
 
     if (!isAfterOpeningBracket && !isAfterClosingBracket) {
       return null;
     }
 
     const wasAfterBeforeOpeningBracket =
-      oldState.selection.empty && oldState.selection.$from.nodeAfter?.type.name === citationNode.name;
+      oldState.selection.empty && oldState.selection.$from.nodeAfter?.type.name === CitationNode.name;
 
     // If the the cursor was before the opening bracket and is now after the bracket,
     // it means the user is trying to enter the node so we move the cursor inside
@@ -157,7 +157,7 @@ const moveCursorPlugin = new Plugin({
   },
 });
 
-export const citationNode = Node.create({
+export const CitationNode = Node.create({
   name: 'citation',
 
   content: '(text | reference)*',

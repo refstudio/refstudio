@@ -128,7 +128,7 @@ const sentenceCompletionPlugin = new Plugin<SentenceCompletionState>({
   key: sentenceCompletionPluginKey,
 });
 
-export const sentenceCompletionExtension = Extension.create({
+export const SentenceCompletionExtension = Extension.create({
   name: 'sentenceCompletionExtension',
 
   addProseMirrorPlugins: () => [sentenceCompletionPlugin],
