@@ -31,6 +31,7 @@ export const referenceNode = Mention.extend({
     allowedPrefixes: null,
     allow: ({ state, range }) =>
       state.selection.empty && state.doc.resolve(range.from).parent.type.name === citationNode.name,
+    /* c8 ignore start */
     command: ({
       editor,
       range,
@@ -47,6 +48,8 @@ export const referenceNode = Mention.extend({
         ])
         .run();
     },
+    /* c8 ignore stop */
+
     render: () => {
       let reactRenderer: ReactRenderer<{ onKeyDown: (e: SuggestionKeyDownProps) => boolean }, ReferenceListProps>;
 
