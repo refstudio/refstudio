@@ -20,27 +20,60 @@ describe('ReferencesList component', () => {
   });
 
   it('should render the list of references', () => {
-    setupWithJotaiProvider(<ReferencesList command={noop} decorationNode={null} editor={editor} items={[]} query="" range={{
-      from: 0,
-      to: 0,
-    }} text="" />, store);
+    setupWithJotaiProvider(
+      <ReferencesList
+        command={noop}
+        decorationNode={null}
+        editor={editor}
+        items={[]}
+        query=""
+        range={{
+          from: 0,
+          to: 0,
+        }}
+        text=""
+      />,
+      store,
+    );
     expect(screen.getAllByRole('button')).toHaveLength(REFERENCES.length);
   });
 
   it('should use the query to suggest references', () => {
-    setupWithJotaiProvider(<ReferencesList command={noop} decorationNode={null} editor={editor} items={[]} query={REFERENCES[1].title} range={{
-      from: 0,
-      to: 0,
-    }} text="" />, store);
+    setupWithJotaiProvider(
+      <ReferencesList
+        command={noop}
+        decorationNode={null}
+        editor={editor}
+        items={[]}
+        query={REFERENCES[1].title}
+        range={{
+          from: 0,
+          to: 0,
+        }}
+        text=""
+      />,
+      store,
+    );
     expect(screen.getByRole('button')).toHaveTextContent(REFERENCES[1].title);
   });
 
   it('should display "No Result" when no references are available', () => {
     store.set(setReferencesAtom, []);
-    setupWithJotaiProvider(<ReferencesList command={noop} decorationNode={null} editor={editor} items={[]} query="" range={{
-      from: 0,
-      to: 0,
-    }} text="" />, store);
+    setupWithJotaiProvider(
+      <ReferencesList
+        command={noop}
+        decorationNode={null}
+        editor={editor}
+        items={[]}
+        query=""
+        range={{
+          from: 0,
+          to: 0,
+        }}
+        text=""
+      />,
+      store,
+    );
     expect(screen.getByText('No result')).toBeInTheDocument();
   });
 });
