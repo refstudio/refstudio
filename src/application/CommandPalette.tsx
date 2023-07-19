@@ -35,6 +35,14 @@ export function CommandPalette({ index }: { index?: number }) {
     }
   }, [index, setOpen]);
 
+  useShortcut({
+    modifier: 'meta',
+    targetKey: 'p',
+    handler: () => {
+      setOpen(INDEX_FILES);
+    },
+  });
+
   return (
     <div className="command-palette" data-testid={CommandPalette.name}>
       <CommandWrapper>
