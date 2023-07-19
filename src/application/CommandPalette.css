@@ -51,6 +51,14 @@
   font-family: inherit;
 }
 
+/** Hide the searchbar if the placeholder is empty **/
+.command-palette .searchbar[placeholder=' '] {
+  display: none;
+}
+.command-palette .searchbar[placeholder=' '] + div.command_wrapper {
+  margin-top: 5px !important;
+}
+
 .command-palette .command_wrapper {
   display: flex;
   overflow-y: auto;
