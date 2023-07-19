@@ -14,10 +14,10 @@ export const arrowRight: KeyboardShortcutCommand = ({ editor }) => {
     return false;
   }
 
-  const resolvedAfterPos = editor.state.doc.resolve($from.after());
-  const maybeNextNode = resolvedAfterPos.nodeAfter;
   const { tr } = editor.state;
-  if (!maybeNextNode) {
+
+  const resolvedAfterPos = editor.state.doc.resolve($from.after());
+  if (!resolvedAfterPos.nodeAfter) {
     tr.insert(resolvedAfterPos.pos, editor.schema.text(' '));
   }
   tr.setSelection(TextSelection.create(tr.doc, $from.after() + 1));

@@ -9,22 +9,22 @@ import { citationNode } from '../citationNode';
  */
 export const backspace: KeyboardShortcutCommand = ({ editor }) => {
   const { selection, tr } = editor.state;
-  // Blocks the event for non-empty selections overlapping with the citation node
-  if (
-    !selection.empty &&
-    (selection.$from.parent.type.name === citationNode.name || selection.$to.parent.type.name === citationNode.name)
-  ) {
-    return true;
-  }
+  const { $from, $to } = selection;
 
-  // Let other handlers handle the event when the selection is not empty or the node is not a citation node
-  const { $from } = selection;
-  if (!selection.empty || $from.parent.type.name !== citationNode.name) {
+  // If the selection does not starts or ends in a citation node, let other handlers handle it
+  if ($from.parent.type.name !== citationNode.name && $to.parent.type.name !== citationNode.name) {
     return false;
   }
 
-  // If the current element is not the last element of the citation node, let others handlers handle the event
-  if ($from.parent.childCount !== 1 || $from.parent.child(0).nodeSize !== 1) {
+  // If the selection starts or ends in a different node, block the event
+  if (!$from.sameParent($to)) {
+    return true;
+  }
+
+  const childrenToRemove = selection.empty ? 1 : selection.to - selection.from;
+  // If the current selection is not the entire citation node's content, let others handlers handle the event
+  // 2 is to account for the <citation> and </citation> tags
+  if ($from.parent.nodeSize !== childrenToRemove + 2) {
     return false;
   }
 
