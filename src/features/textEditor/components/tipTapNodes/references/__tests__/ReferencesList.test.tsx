@@ -54,7 +54,34 @@ describe('ReferencesList component', () => {
       />,
       store,
     );
-    expect(screen.getByRole('button')).toHaveTextContent(REFERENCES[1].title);
+    const [firstReference] = screen.getAllByRole('button');
+    expect(firstReference).toHaveTextContent(REFERENCES[1].title);
+  });
+
+  it('should call command', async () => {
+    const mockedCommand = vi.fn();
+    const { user } = setupWithJotaiProvider(
+      <ReferencesList
+        command={mockedCommand}
+        decorationNode={null}
+        editor={editor}
+        items={[]}
+        query=""
+        range={{
+          from: 0,
+          to: 0,
+        }}
+        text=""
+      />,
+      store,
+    );
+
+    const [firstReference] = screen.getAllByRole('button');
+    expect(firstReference).toBeInTheDocument();
+    await user.click(firstReference);
+
+    expect(mockedCommand).toHaveBeenCalledTimes(1);
+    expect(mockedCommand).toHaveBeenCalledWith({ id: REFERENCES[0].id });
   });
 
   it('should display "No Result" when no references are available', () => {

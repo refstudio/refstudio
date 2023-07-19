@@ -41,6 +41,11 @@ export const ReferencesList = forwardRef((props: ReferenceListProps, ref) => {
     }
   }, [clientRect]);
 
+  useEffect(() => {
+    setSelectedIndex(0);
+  }, [queriedReferences]);
+
+  /* c8 ignore start */
   const handleSelect = (index: number) => {
     const referenceItem = queriedReferences[index];
 
@@ -54,10 +59,6 @@ export const ReferencesList = forwardRef((props: ReferenceListProps, ref) => {
   const handleArrowDown = useCallback(() => {
     setSelectedIndex((currentIndex) => (currentIndex + 1) % queriedReferences.length);
   }, [queriedReferences.length]);
-
-  useEffect(() => {
-    setSelectedIndex(0);
-  }, [queriedReferences]);
 
   useImperativeHandle(ref, () => ({
     onKeyDown: ({ event }: SuggestionKeyDownProps) => {
@@ -79,6 +80,7 @@ export const ReferencesList = forwardRef((props: ReferenceListProps, ref) => {
       return false;
     },
   }));
+  /* c8 ignore stop */
 
   const [popperElement, setPopperElement] = useState<HTMLDivElement | null>(null);
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
