@@ -18,6 +18,7 @@ import { FilesCommandMenu } from './FilesCommandMenu';
 import { ReferencesCommandMenu } from './ReferencesCommandMenu';
 import { RewriteCommand2Menu } from './RewriteCommand2Menu';
 import { RewriteCommandMenu } from './RewriteCommandMenu';
+import { RewriteCommandMultiMenu } from './RewriteCommandMultiMenu';
 import { RewriteCommandWidgetMenu } from './RewriteCommandWidgetMenu';
 
 const INDEX_MAIN = 1;
@@ -25,8 +26,8 @@ const INDEX_REFERENCES = 2;
 const INDEX_FILES = 3;
 const INDEX_REWRITE = 4;
 const INDEX_REWRITE2 = 5;
-
 const INDEX_REWRITE3 = 40;
+const INDEX_REWRITE4 = 50;
 
 export function CommandPalette({ index }: { index?: number }) {
   const { setOpen } = useKmenu();
@@ -55,6 +56,7 @@ export function CommandPalette({ index }: { index?: number }) {
         <RewriteCommandMenu index={INDEX_REWRITE} />
         <RewriteCommand2Menu index={INDEX_REWRITE2} />
         <RewriteCommandWidgetMenu index={INDEX_REWRITE3} />
+        <RewriteCommandMultiMenu index={INDEX_REWRITE4} />
       </CommandWrapper>
     </div>
   );
@@ -103,7 +105,7 @@ export function MainCommandMenu({ index }: { index: number }) {
         {
           icon: <VscSymbolString />,
           text: 'Rewrite selection (menus)...',
-          perform: () => setOpen(INDEX_REWRITE2, true),
+          perform: () => setOpen(INDEX_REWRITE4, true),
         },
         {
           icon: <VscSymbolString />,
