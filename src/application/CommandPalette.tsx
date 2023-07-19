@@ -1,6 +1,6 @@
 import './CommandPalette.css';
 
-import { Command, CommandMenu, CommandWrapper, useCommands, useKmenu } from 'kmenu';
+import { Command, CommandMenu, CommandWrapper, useCommands, useKmenu, useShortcut } from 'kmenu';
 import { useEffect } from 'react';
 import {
   VscBell,
@@ -18,12 +18,15 @@ import { FilesCommandMenu } from './FilesCommandMenu';
 import { ReferencesCommandMenu } from './ReferencesCommandMenu';
 import { RewriteCommand2Menu } from './RewriteCommand2Menu';
 import { RewriteCommandMenu } from './RewriteCommandMenu';
+import { RewriteCommandWidgetMenu } from './RewriteCommandWidgetMenu';
 
 const INDEX_MAIN = 1;
 const INDEX_REFERENCES = 2;
 const INDEX_FILES = 3;
 const INDEX_REWRITE = 4;
 const INDEX_REWRITE2 = 5;
+
+const INDEX_REWRITE3 = 40;
 
 export function CommandPalette({ index }: { index?: number }) {
   const { setOpen } = useKmenu();
@@ -48,9 +51,10 @@ export function CommandPalette({ index }: { index?: number }) {
       <CommandWrapper>
         <MainCommandMenu index={INDEX_MAIN} />
         <ReferencesCommandMenu index={INDEX_REFERENCES} />
-        <RewriteCommandMenu index={INDEX_REWRITE} />
         <FilesCommandMenu index={INDEX_FILES} />
+        <RewriteCommandMenu index={INDEX_REWRITE} />
         <RewriteCommand2Menu index={INDEX_REWRITE2} />
+        <RewriteCommandWidgetMenu index={INDEX_REWRITE3} />
       </CommandWrapper>
     </div>
   );
@@ -98,8 +102,13 @@ export function MainCommandMenu({ index }: { index: number }) {
         },
         {
           icon: <VscSymbolString />,
-          text: 'Rewrite selection (2)...',
+          text: 'Rewrite selection (menus)...',
           perform: () => setOpen(INDEX_REWRITE2, true),
+        },
+        {
+          icon: <VscSymbolString />,
+          text: 'Rewrite selection (widget)...',
+          perform: () => setOpen(INDEX_REWRITE3, true),
         },
       ],
     },
