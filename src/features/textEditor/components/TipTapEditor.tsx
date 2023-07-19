@@ -48,17 +48,15 @@ export function TipTapEditor({ editorContent, isActive, saveFileInMemory, update
 
   useEffect(() => {
     if (isActive && editor) {
-      setTimeout(() => {
-        editor.commands.focus();
-      }, 100);
+      // Note: We need this setTimeout to ensure the focus works.
+      setTimeout(() => editor.commands.focus(), 100);
     }
   }, [isActive, editor]);
 
   const insertContent = useCallback(
     ({ text }: { text: string }) => {
       if (isActive) {
-        editor?.commands.insertContent(text);
-        editor?.commands.focus();
+        editor?.chain().insertContent(text).focus().run();
       }
     },
     [editor, isActive],
@@ -77,7 +75,7 @@ export function TipTapEditor({ editorContent, isActive, saveFileInMemory, update
   return (
     <div className="flex h-full w-full flex-col" onClick={focusEditorOnClick}>
       <MenuBar editor={editor} />
-      <EditorContent className="tiptap-editor" editor={editor} />
+      <EditorContent autoFocus className="tiptap-editor" editor={editor} />
     </div>
   );
 }

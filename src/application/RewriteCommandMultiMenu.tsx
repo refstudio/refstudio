@@ -1,9 +1,9 @@
 import { useAtomValue } from 'jotai';
 import { CommandMenu, useCommands, useKmenu } from 'kmenu';
 import { useCallback, useEffect, useState } from 'react';
-import { VscLoading, VscSettings, VscWarning } from 'react-icons/vsc';
+import { VscError, VscLoading, VscSettings, VscWarning } from 'react-icons/vsc';
 
-import { askForRewrite } from '../api/rewrite';
+import { askForRewrite, AskForRewriteReturn } from '../api/rewrite';
 import { selectionAtom } from '../atoms/selectionState';
 import { emitEvent } from '../events';
 import { getMannerOptions, OpenAiManner } from '../settings/settingsManager';
@@ -13,20 +13,21 @@ export function RewriteCommandMultiMenu({ index }: { index: number }) {
   const selection = useAtomValue(selectionAtom);
   const { open, setOpen } = useKmenu();
 
-  const [choices, setChoices] = useState<string[]>([]);
+  const [rewriteReturn, setRewriteReturn] = useState<AskForRewriteReturn | null>(null);
 
   const INDEX_NO_SELECTION = index;
   const INDEX_SELECT_MANNER = index + 1;
   const INDEX_LOADING_CHOICES = index + 2;
-  const INDEX_CHOICES = index + 3;
+  const INDEX_ERROR = index + 3;
+  const INDEX_CHOICES = index + 4;
 
   const askRewrite = useCallback(
     async (manner: OpenAiManner) => {
-      const rewriteChoices = await askForRewrite(selection, { manner });
-      setChoices(rewriteChoices);
-      setOpen(INDEX_CHOICES, true);
+      const res = await askForRewrite(selection, { manner });
+      setRewriteReturn(res);
+      setOpen(res.ok ? INDEX_CHOICES : INDEX_ERROR, true);
     },
-    [selection, setOpen, INDEX_CHOICES],
+    [selection, setOpen, INDEX_CHOICES, INDEX_ERROR],
   );
 
   const [commands] = useCommands([
@@ -36,7 +37,7 @@ export function RewriteCommandMultiMenu({ index }: { index: number }) {
         text: 'Rewrite ' + manner,
         perform: () => {
           setOpen(INDEX_LOADING_CHOICES, true);
-          setChoices([]);
+          setRewriteReturn(null);
           void askRewrite(manner);
         },
       })),
@@ -70,6 +71,18 @@ export function RewriteCommandMultiMenu({ index }: { index: number }) {
       <CommandMenu
         commands={commands}
         crumbs={['Rewrite']}
+        index={INDEX_ERROR}
+        loadingPlaceholder={
+          <div className="flex items-center gap-2 bg-red-50 p-6">
+            <VscError /> {rewriteReturn?.ok === false ? rewriteReturn.message : 'Unexpected Error'}
+          </div>
+        }
+        loadingState
+        placeholder={HIDE_PLACEHOLDER_TEXT}
+      />
+      <CommandMenu
+        commands={commands}
+        crumbs={['Rewrite']}
         index={INDEX_LOADING_CHOICES}
         loadingPlaceholder={
           <div className="flex items-center gap-2 bg-primary/50 p-6">
@@ -85,8 +98,8 @@ export function RewriteCommandMultiMenu({ index }: { index: number }) {
         index={INDEX_SELECT_MANNER}
         placeholder="Select rewrite manner"
       />
-      {choices.length > 0 && (
-        <ChoicesCommandMenu choices={choices} index={INDEX_CHOICES} onSelectChoice={handleSelectChoice} />
+      {rewriteReturn?.ok && (
+        <ChoicesCommandMenu choices={rewriteReturn.choices} index={INDEX_CHOICES} onSelectChoice={handleSelectChoice} />
       )}
     </>
   );

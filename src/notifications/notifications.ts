@@ -13,7 +13,7 @@ export function notifyError(title: string, details?: string) {
   emitEvent('refstudio://notifications/new', { type: 'error', title, details });
 }
 
-export function notifyErr(err: Error, title?: string, details?: string) {
+export function notifyErr(err: Error | unknown, title?: string, details?: string) {
   title = title ?? (err instanceof Error ? err.message : 'Error');
   details = details ?? (err instanceof Error ? err.stack : String(err));
   emitEvent('refstudio://notifications/new', { type: 'error', title, details });

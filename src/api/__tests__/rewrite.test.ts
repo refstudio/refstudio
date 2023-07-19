@@ -1,11 +1,13 @@
-import { askForRewrite, DEFAULT_OPTIONS } from '../rewrite';
+import { notifyErr } from '../../notifications/notifications';
+import { askForRewrite, AskForRewriteReturn, DEFAULT_OPTIONS } from '../rewrite';
 import { callSidecar } from '../sidecar';
 import { RewriteRequest, RewriteResponse } from '../types';
 
 vi.mock('../sidecar');
+vi.mock('../../notifications/notifications');
 
 describe('askForRewrite', () => {
-  beforeEach(() => {
+  afterEach(() => {
     vi.clearAllMocks();
   });
 
@@ -18,12 +20,6 @@ describe('askForRewrite', () => {
     expect(callSidecar).toHaveBeenCalledTimes(1);
     expect(vi.mocked(callSidecar).mock.lastCall![0]).toBe('rewrite');
     expect(vi.mocked(callSidecar).mock.lastCall![1]).toMatchObject({ text: REWRITE_REQUEST_TEXT });
-    expect(callSidecar).toHaveBeenCalledWith<[string, RewriteRequest]>('rewrite', {
-      text: REWRITE_REQUEST_TEXT,
-      n_choices: DEFAULT_OPTIONS.nChoices,
-      temperature: DEFAULT_OPTIONS.temperature,
-      manner: DEFAULT_OPTIONS.manner,
-    });
   });
 
   it('should call sidecar rewrite with default options', async () => {
@@ -90,21 +86,31 @@ describe('askForRewrite', () => {
     vi.mocked(callSidecar).mockResolvedValue(mockResponse);
 
     const response = await askForRewrite('some input');
-    expect(response).toEqual([REWRITE_REPLY_TEXT, REWRITE_REPLY_TEXT.toUpperCase()]);
+    expect(response).toEqual<AskForRewriteReturn>({
+      ok: true,
+      choices: [REWRITE_REPLY_TEXT, REWRITE_REPLY_TEXT.toUpperCase()],
+    });
   });
 
   it('Should return error text for internal sidecar exception', async () => {
     vi.mocked(callSidecar).mockRejectedValue('some failure');
 
     const response = await askForRewrite('some input');
-    expect(response.length).toBe(1);
-    expect(response[0]).toMatch(/^rewrite error/i);
+    expect(response).toEqual<AskForRewriteReturn>({
+      ok: false,
+      message: 'Cannot rewrite selection. Please check the notification tray for more details.',
+    });
+
+    expect(notifyErr).toHaveBeenCalledTimes(1);
   });
 
   it('Should return empty text and not call sidecar for empty selection', async () => {
     const response = await askForRewrite('  ');
-    expect(response.length).toBe(1);
-    expect(response[0]).toBe('');
-    expect(vi.mocked(callSidecar).mock.calls).toHaveLength(0);
+    expect(response).toEqual<AskForRewriteReturn>({
+      ok: false,
+      message: 'You should provide a selection with text.',
+    });
+
+    expect(callSidecar).not.toHaveBeenCalled();
   });
 });

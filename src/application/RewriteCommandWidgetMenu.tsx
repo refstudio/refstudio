@@ -3,7 +3,7 @@ import { CommandMenu, useCommands, useKmenu } from 'kmenu';
 import { VscWarning } from 'react-icons/vsc';
 
 import { selectionAtom } from '../atoms/selectionState';
-import { RewriteWidget } from '../features/ai/sidebar/SelectionPanelSection';
+import { RewriteWidget } from '../features/ai/sidebar/RewriteWidget';
 import { HIDE_PLACEHOLDER_TEXT } from './CommandPaletteConfigs';
 
 export function RewriteCommandWidgetMenu({ index }: { index: number }) {
