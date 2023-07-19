@@ -11,7 +11,7 @@ vi.mock('../../../../../../api/completion');
 
 global.document.elementFromPoint = vi.fn();
 
-describe('SentenceCompletionExtension', () => {
+describe('SentenceCompletion extension', () => {
   const editor = new Editor({
     extensions: EDITOR_EXTENSIONS,
   });

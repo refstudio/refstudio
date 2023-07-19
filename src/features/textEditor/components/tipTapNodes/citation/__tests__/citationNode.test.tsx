@@ -9,7 +9,7 @@ import { getPrettyHTMLWithSelection, setUpEditorWithSelection } from '../../__te
 
 vi.mock('../../../../../../atoms/referencesState');
 
-describe('citationNode', () => {
+describe('CitationNode', () => {
   const editor = new Editor({
     extensions: EDITOR_EXTENSIONS,
   });

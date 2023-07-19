@@ -10,7 +10,7 @@ import { ReferencesListPopup } from '../ReferencesListPopup';
 
 global.document.elementFromPoint = vi.fn();
 
-describe('referenceNode', () => {
+describe('ReferenceNode', () => {
   const editor = new Editor({
     extensions: EDITOR_EXTENSIONS,
   });
