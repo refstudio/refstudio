@@ -1,0 +1,46 @@
+import { Editor } from '@tiptap/react';
+import { createStore } from 'jotai';
+
+import { setReferencesAtom } from '../../../../../../atoms/referencesState';
+import { noop } from '../../../../../../lib/noop';
+import { screen, setupWithJotaiProvider } from '../../../../../../test/test-utils';
+import { REFERENCES } from '../../../../../references/__tests__/test-fixtures';
+import { EDITOR_EXTENSIONS } from '../../../tipTapEditorConfigs';
+import { ReferencesList } from '../ReferencesList';
+
+describe('ReferencesList component', () => {
+  const editor = new Editor({
+    extensions: EDITOR_EXTENSIONS,
+  });
+  let store: ReturnType<typeof createStore>;
+
+  beforeEach(() => {
+    store = createStore();
+    store.set(setReferencesAtom, REFERENCES);
+  });
+
+  it('should render the list of references', () => {
+    setupWithJotaiProvider(<ReferencesList command={noop} decorationNode={null} editor={editor} items={[]} query="" range={{
+      from: 0,
+      to: 0,
+    }} text="" />, store);
+    expect(screen.getAllByRole('button')).toHaveLength(REFERENCES.length);
+  });
+
+  it('should use the query to suggest references', () => {
+    setupWithJotaiProvider(<ReferencesList command={noop} decorationNode={null} editor={editor} items={[]} query={REFERENCES[1].title} range={{
+      from: 0,
+      to: 0,
+    }} text="" />, store);
+    expect(screen.getByRole('button')).toHaveTextContent(REFERENCES[1].title);
+  });
+
+  it('should display "No Result" when no references are available', () => {
+    store.set(setReferencesAtom, []);
+    setupWithJotaiProvider(<ReferencesList command={noop} decorationNode={null} editor={editor} items={[]} query="" range={{
+      from: 0,
+      to: 0,
+    }} text="" />, store);
+    expect(screen.getByText('No result')).toBeInTheDocument();
+  });
+});

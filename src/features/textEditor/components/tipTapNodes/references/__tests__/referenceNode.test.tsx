@@ -35,32 +35,32 @@ describe('referenceNode', () => {
     expect(screen.getByText(`INVALID REFERENCE`)).toBeInTheDocument();
   });
 
-  it('should open reference picker', async () => {
+  it('should open references list', async () => {
     setUpEditorWithSelection(editor, '<p><citation>Citation |</citation></p>');
     const { user } = setupWithJotaiProvider(<EditorContent editor={editor} />, store);
 
     await user.type(screen.getByText('Citation'), '@');
 
-    const referencePicker = screen.getByTestId('references');
+    const referencePicker = screen.getByTestId('referencesList');
     expect(referencePicker).toBeInTheDocument();
     expect(referencePicker.getElementsByTagName('button')).toHaveLength(REFERENCES.length);
   });
 
-  it('should close reference picker', async () => {
+  it('should close references list', async () => {
     setUpEditorWithSelection(editor, '<p><citation>Citation |</citation></p>');
     const { user } = setupWithJotaiProvider(<EditorContent editor={editor} />, store);
 
     await user.type(screen.getByText('Citation'), '@');
 
-    const referencePicker = screen.getByTestId('references');
+    const referencePicker = screen.getByTestId('referencesList');
     expect(referencePicker).toBeInTheDocument();
     expect(referencePicker.getElementsByTagName('button')).toHaveLength(REFERENCES.length);
 
     await user.keyboard('{Escape}');
-    expect(screen.queryByTestId('references')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('referencesList')).not.toBeInTheDocument();
   });
 
-  it('should not open the reference picker outside of a citation node', async () => {
+  it('should not open the references list outside of a citation node', async () => {
     window.Range.prototype.getClientRects = vi.fn().mockImplementation(() => []);
     window.Range.prototype.getBoundingClientRect = vi.fn().mockImplementation(() => ({ width: 0 }));
 
@@ -69,6 +69,6 @@ describe('referenceNode', () => {
 
     await user.type(screen.getByText('Citation'), '@');
 
-    expect(screen.queryByTestId('references')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('referencesList')).not.toBeInTheDocument();
   });
 });

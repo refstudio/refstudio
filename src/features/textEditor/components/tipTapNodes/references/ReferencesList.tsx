@@ -86,12 +86,13 @@ export const ReferencesList = forwardRef((props: ReferenceListProps, ref) => {
   });
 
   return createPortal(
-    <div className="references" ref={setPopperElement} style={styles.popper} {...attributes.popper} data-testid="references">
+    <div className="references" ref={setPopperElement} style={styles.popper} {...attributes.popper} data-testid="referencesList">
       {queriedReferences.length ? (
         queriedReferences.map(({ id, title }, index) => (
           <button
             className={cx('reference', { selected: index === selectedIndex })}
             key={id}
+            role='button'
             onClick={() => handleSelect(index)}
           >
             {title}
