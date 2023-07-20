@@ -12,6 +12,7 @@ const SELECTED_TEXT = 'This is the selected text.';
 const CHOICE_OPTION_1 = 'This is the first choice option.';
 const CHOICE_OPTION_2 = 'This is the second choice option.';
 const CHOICE_OPTION_3 = 'This is the third choice option.';
+const INSERT_TEXT_EVENT = 'refstudio://ai/suggestion/insert' as RefStudioEventName;
 
 vi.mock('../../../../api/rewrite');
 vi.mock('../../../../settings/settingsManager');
@@ -137,7 +138,7 @@ describe('RewriteWidget', () => {
     });
   });
 
-  it('should display first choice after successfull askForRewrite reply and button to REPLACE', async () => {
+  const awaitForChoicesOnScreen = async (onChoiceSelected?: (choice: string) => void) => {
     let resolveFn: () => void = vi.fn();
     vi.mocked(askForRewrite).mockImplementation(async () => {
       await new Promise<void>((resolve) => {
@@ -147,7 +148,7 @@ describe('RewriteWidget', () => {
       return { ok: true, choices: [CHOICE_OPTION_1, CHOICE_OPTION_2, CHOICE_OPTION_3] } as AskForRewriteReturn;
     });
 
-    const { user } = setup(<RewriteWidget selection={SELECTED_TEXT} onChoiceSelected={noop} />);
+    const { user } = setup(<RewriteWidget selection={SELECTED_TEXT} onChoiceSelected={onChoiceSelected} />);
 
     await user.click(screen.getByText('REWRITE'));
     resolveFn();
@@ -157,29 +158,17 @@ describe('RewriteWidget', () => {
       expect(screen.queryByText('Processing...')).not.toBeInTheDocument();
     });
 
+    return { user };
+  };
+
+  it('should display first choice after successfull askForRewrite reply and button to REPLACE', async () => {
+    await awaitForChoicesOnScreen();
     expect(screen.getByText(CHOICE_OPTION_1)).toBeInTheDocument();
     expect(screen.getByText('REPLACE')).toBeInTheDocument();
   });
 
   it('should toggle beetween choices', async () => {
-    let resolveFn: () => void = vi.fn();
-    vi.mocked(askForRewrite).mockImplementation(async () => {
-      await new Promise<void>((resolve) => {
-        // Capture resolve function to call after assertion
-        resolveFn = resolve;
-      });
-      return { ok: true, choices: [CHOICE_OPTION_1, CHOICE_OPTION_2, CHOICE_OPTION_3] } as AskForRewriteReturn;
-    });
-
-    const { user } = setup(<RewriteWidget selection={SELECTED_TEXT} onChoiceSelected={noop} />);
-
-    await user.click(screen.getByText('REWRITE'));
-    resolveFn();
-
-    // wait for the UI to be ready
-    await waitFor(() => {
-      expect(screen.queryByText('Processing...')).not.toBeInTheDocument();
-    });
+    const { user } = await awaitForChoicesOnScreen();
 
     expect(screen.getByText(CHOICE_OPTION_1)).toBeInTheDocument();
     await user.click(screen.getByTitle('next choice'));
@@ -190,29 +179,10 @@ describe('RewriteWidget', () => {
     expect(screen.getByText(CHOICE_OPTION_2)).toBeInTheDocument();
   });
 
-  const INSERT_TEXT_EVENT = 'refstudio://ai/suggestion/insert' as RefStudioEventName;
   it(`should emitEvent ${INSERT_TEXT_EVENT} and call onChoiceSelected on REPLACE click`, async () => {
     const fn = vi.fn();
-    let resolveFn: () => void = vi.fn();
-    vi.mocked(askForRewrite).mockImplementation(async () => {
-      await new Promise<void>((resolve) => {
-        // Capture resolve function to call after assertion
-        resolveFn = resolve;
-      });
-      return { ok: true, choices: [CHOICE_OPTION_1, CHOICE_OPTION_2, CHOICE_OPTION_3] } as AskForRewriteReturn;
-    });
+    const { user } = await awaitForChoicesOnScreen(fn);
 
-    const { user } = setup(<RewriteWidget selection={SELECTED_TEXT} onChoiceSelected={fn} />);
-
-    await user.click(screen.getByText('REWRITE'));
-    resolveFn();
-
-    // wait for the UI to be ready
-    await waitFor(() => {
-      expect(screen.queryByText('Processing...')).not.toBeInTheDocument();
-    });
-
-    expect(screen.getByText(CHOICE_OPTION_1)).toBeInTheDocument();
     await user.click(screen.getByText('REPLACE'));
 
     expect(emitEvent).toHaveBeenCalledTimes(1);
