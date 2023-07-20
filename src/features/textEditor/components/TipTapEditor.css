@@ -15,6 +15,10 @@
   @apply list-decimal;
 }
 
+.tiptap-editor cite {
+  @apply not-italic;
+}
+
 .tiptap-editor .ProseMirror-focused {
   outline: none;
 }
