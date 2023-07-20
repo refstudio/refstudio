@@ -6,6 +6,7 @@ from sidecar.typing import SearchRequest, SearchResponse, S2SearchResult
 def test_search(monkeypatch, capsys):
     def mock_search_paper(*args, **kwargs):
         response = SearchResponse(
+            status="ok",
             results=[
                 S2SearchResult(
                     title="Sample Paper Title",
@@ -14,7 +15,7 @@ def test_search(monkeypatch, capsys):
                     year=2021,
                     paperId="sample-id-1",
                     citationCount=10,
-                    openAccessPdf={"url": "https://sample1.pdf", "status": "sample1"},
+                    openAccessPdf="https://sample1.pdf",
                     authors=["author1", "author2", "author3"],
                 ),
                 S2SearchResult(
@@ -24,10 +25,10 @@ def test_search(monkeypatch, capsys):
                     year=2022,
                     paperId="sample-id-2",
                     citationCount=20,
-                    openAccessPdf={"url": "https://sample2.pdf", "status": "sample2"},
+                    openAccessPdf="https://sample2.pdf",
                     authors=["author1", "author2", "author3"],
                 ),
-            ]
+            ],
         )
         return response
 
