@@ -17,13 +17,13 @@ export type ResponseStatus = 'ok' | 'error';
  * An enumeration.
  */
 export type RewriteMannerType = 'concise' | 'elaborate' | 'scholarly';
-export type Status = string;
 export type Title = string;
 export type Abstract = string;
 export type Venue = string;
 export type Year = number;
 export type Paperid = string;
 export type Citationcount = number;
+export type Openaccesspdf = string;
 export type Authors = string[];
 export type Results = S2SearchResult[];
 
@@ -188,7 +188,7 @@ export interface SearchRequest {
   limit?: number;
 }
 export interface SearchResponse {
-  status?: Status;
+  status: ResponseStatus;
   results?: Results;
 }
 export interface S2SearchResult {
@@ -200,7 +200,4 @@ export interface S2SearchResult {
   citationCount?: Citationcount;
   openAccessPdf?: Openaccesspdf;
   authors?: Authors;
-}
-export interface Openaccesspdf {
-  [k: string]: string;
 }
