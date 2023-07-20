@@ -197,7 +197,7 @@ class S2SearchResult(RefStudioModel):
 class SearchResponse(RefStudioModel):
     status: ResponseStatus
     message: str
-    results: list[S2SearchResult] | None = None
+    results: list[S2SearchResult] = []
 
 
 class CliCommands(RefStudioModel):
