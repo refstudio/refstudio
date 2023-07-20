@@ -1,5 +1,6 @@
 import { notifyErr } from '../../notifications/notifications';
-import { askForRewrite, AskForRewriteReturn, DEFAULT_OPTIONS } from '../rewrite';
+import { askForRewrite, AskForRewriteReturn } from '../rewrite';
+import { DEFAULT_OPTIONS } from '../rewrite.config';
 import { callSidecar } from '../sidecar';
 import { RewriteRequest, RewriteResponse } from '../types';
 

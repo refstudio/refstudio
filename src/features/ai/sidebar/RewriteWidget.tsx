@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useState } from 'react';
 import { VscChevronLeft, VscChevronRight } from 'react-icons/vsc';
 
-import { askForRewrite, REWRITE_MANNER, RewriteOptions } from '../../../api/rewrite';
+import { askForRewrite } from '../../../api/rewrite';
+import { REWRITE_MANNER, RewriteOptions } from '../../../api/rewrite.config';
 import { emitEvent } from '../../../events';
 import { cx } from '../../../lib/cx';
 import { getCachedSetting } from '../../../settings/settingsManager';
@@ -60,6 +61,7 @@ export function RewriteWidget({
         <div className="flex w-full flex-wrap items-center justify-between gap-2 rounded-b-xl border border-t border-primary bg-primary/50 ">
           <div className="flex items-center gap-1 whitespace-nowrap">
             <select
+              aria-label="manner"
               className="m-1 rounded-none"
               value={rewriteOptions.manner}
               onChange={(e) =>
@@ -74,8 +76,14 @@ export function RewriteWidget({
             </select>
             <span>Creativity:</span>
             <input
+              aria-label="creativity"
+              aria-valuemax={0.9}
+              aria-valuemin={0.7}
+              aria-valuenow={rewriteOptions.temperature}
               max={0.9}
               min={0.7}
+              name="temperatureRange"
+              role="slider"
               step={0.05}
               type="range"
               value={rewriteOptions.temperature}
@@ -107,11 +115,13 @@ export function RewriteWidget({
               <VscChevronLeft
                 className="cursor-pointer border border-primary hover:bg-primary-hover hover:text-primary"
                 size={20}
+                title="previous choice"
                 onClick={() => setSelectedChoiceIndex(decRotate(selectedChoiceIndex, rewrite.choices))}
               />
               <VscChevronRight
                 className="cursor-pointer border border-primary hover:bg-primary-hover hover:text-primary"
                 size={20}
+                title="next choice"
                 onClick={() => setSelectedChoiceIndex(incRotate(selectedChoiceIndex, rewrite.choices))}
               />
             </div>

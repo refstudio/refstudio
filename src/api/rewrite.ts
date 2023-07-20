@@ -1,18 +1,6 @@
 import { notifyErr, notifyError } from '../notifications/notifications';
+import { DEFAULT_OPTIONS, RewriteOptions } from './rewrite.config';
 import { callSidecar } from './sidecar';
-
-export const REWRITE_MANNER: RewriteOptions['manner'][] = ['concise', 'elaborate', 'scholarly'];
-export interface RewriteOptions {
-  nChoices?: number;
-  manner?: 'concise' | 'elaborate' | 'scholarly';
-  temperature?: number; // between 0.7 and 0.9
-}
-
-export const DEFAULT_OPTIONS: RewriteOptions = {
-  nChoices: 3,
-  manner: 'concise',
-  temperature: 0.7,
-};
 
 export type AskForRewriteReturn = { ok: true; choices: string[] } | { ok: false; message: string };
 export async function askForRewrite(selection: string, options?: RewriteOptions): Promise<AskForRewriteReturn> {
