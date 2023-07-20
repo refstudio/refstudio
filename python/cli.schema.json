@@ -661,6 +661,10 @@
         "status": {
           "$ref": "#/definitions/ResponseStatus"
         },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
         "results": {
           "title": "Results",
           "type": "array",
@@ -670,7 +674,8 @@
         }
       },
       "required": [
-        "status"
+        "status",
+        "message"
       ]
     }
   }
