@@ -657,7 +657,6 @@
           "type": "string"
         },
         "results": {
-          "default": [],
           "type": "array",
           "items": {
             "$ref": "#/definitions/S2SearchResult"
@@ -666,7 +665,8 @@
       },
       "required": [
         "status",
-        "message"
+        "message",
+        "results"
       ]
     }
   }
