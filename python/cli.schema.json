@@ -618,35 +618,27 @@
       "type": "object",
       "properties": {
         "title": {
-          "title": "Title",
           "type": "string"
         },
         "abstract": {
-          "title": "Abstract",
           "type": "string"
         },
         "venue": {
-          "title": "Venue",
           "type": "string"
         },
         "year": {
-          "title": "Year",
           "type": "integer"
         },
         "paperId": {
-          "title": "Paperid",
           "type": "string"
         },
         "citationCount": {
-          "title": "Citationcount",
           "type": "integer"
         },
         "openAccessPdf": {
-          "title": "Openaccesspdf",
           "type": "string"
         },
         "authors": {
-          "title": "Authors",
           "type": "array",
           "items": {
             "type": "string"
@@ -662,11 +654,9 @@
           "$ref": "#/definitions/ResponseStatus"
         },
         "message": {
-          "title": "Message",
           "type": "string"
         },
         "results": {
-          "title": "Results",
           "type": "array",
           "items": {
             "$ref": "#/definitions/S2SearchResult"
