@@ -189,6 +189,7 @@ export interface SearchRequest {
 }
 export interface SearchResponse {
   status: ResponseStatus;
+  message: string;
   results?: Results;
 }
 export interface S2SearchResult {
