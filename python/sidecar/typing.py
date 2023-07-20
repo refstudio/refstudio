@@ -196,6 +196,7 @@ class S2SearchResult(BaseModel):
 
 class SearchResponse(BaseModel):
     status: ResponseStatus
+    message: str
     results: list[S2SearchResult] | None = None
 
 
