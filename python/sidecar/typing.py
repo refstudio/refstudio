@@ -4,7 +4,7 @@ from typing import Any
 from pydantic import BaseModel
 
 try:
-    # introduced in Python 3.11 ... 
+    # introduced in Python 3.11 ...
     from enum import StrEnum
 except ImportError:
     # ... but had some breaking changes
@@ -21,8 +21,8 @@ class RefStudioModel(BaseModel):
 
         @staticmethod
         def schema_extra(schema: dict[str, Any]) -> None:
-            for prop in schema.get('properties', {}).values():
-                prop.pop('title', None)
+            for prop in schema.get("properties", {}).values():
+                prop.pop("title", None)
 
 
 class ResponseStatus(StrEnum):
@@ -38,6 +38,7 @@ class IngestStatus(StrEnum):
 
 class Reference(RefStudioModel):
     """A reference for an academic paper / PDF"""
+
     source_filename: str
     status: IngestStatus
     citation_key: str | None = None
@@ -54,6 +55,7 @@ class ReferencePatch(RefStudioModel):
     """
     ReferencePatch is the input type for updating a Reference's metadata.
     """
+
     data: dict[str, Any]
 
 
@@ -176,6 +178,28 @@ class ChatResponse(RefStudioModel):
     choices: list[ChatResponseChoice]
 
 
+class SearchRequest(RefStudioModel):
+    query: str
+    limit: int = 10
+
+
+class S2SearchResult(RefStudioModel):
+    title: str | None = None
+    abstract: str | None = None
+    venue: str | None = None
+    year: int | None = None
+    paperId: str | None = None
+    citationCount: int | None = None
+    openAccessPdf: str | None = None
+    authors: list[str] | None = None
+
+
+class SearchResponse(RefStudioModel):
+    status: ResponseStatus
+    message: str
+    results: list[S2SearchResult] 
+
+
 class CliCommands(RefStudioModel):
     ingest: tuple[IngestRequest, IngestResponse]
     """Ingest PDFs"""
@@ -193,6 +217,8 @@ class CliCommands(RefStudioModel):
     """Update metadata for a Reference"""
     delete: tuple[DeleteRequest, DeleteStatusResponse]
     """Deletes a Reference"""
+    search: tuple[SearchRequest, SearchResponse]
+    """Searches for papers on Semantic Scholar"""
 
 
 Reference.update_forward_refs()

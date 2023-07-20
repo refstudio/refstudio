@@ -358,3 +358,29 @@ $ cat .storage/references.json | jq '.[] | select(.source_filename | contains("f
   "title": "a title that was missing"
 }
 ```
+
+### Search (Semantic Scholar)
+
+`search` queries the Semantic Scholar API for a given query string.
+
+```bash
+poetry run python main.py search '{ "query": "your search query", "limit": 1 }' | jq
+```
+
+```json
+{
+  "status": "ok",
+  "results": [
+    {
+      "title": "Search Query Extension Semantics",
+      "abstract": "The problems of extracting the most complete information from the semantic library by accounting for related documents are considered. Expert knowledge encrypted in the subject area can be made available when the user obtains additional information from linked documents. A feature of the approach is the use of a shallow neural network algorithm to expand the search query in mathematical subject areas, where expert knowledge is available with a significant scientific background of users. The solution to this problem can be achieved by means of semantic analysis in the knowledge space using machine learning algorithms. The paper investigates the construction of a vector representation of documents based on paragraphs in relation to the data array of the digital semantic library LibMeta. Each piece of text is labelled. Both the whole document and its separate parts can be marked. Since the problem of enriching user queries with synonyms was solved, when building a search model in conjunction with word2vec algorithms, an approach of “indexing first, then training” was used to cover more information and give more accurate results.",
+      "venue": "International Conference on Data Analytics and Management in Data Intensive Domains",
+      "year": 2021,
+      "paperId": "646b1c1574c5d72bd102278cedb47f7c2c9577a1",
+      "citationCount": 0,
+      "openAccessPdf": null,
+      "authors": ["O. Ataeva", "V. Serebriakov", "N. Tuchkova"]
+    }
+  ]
+}
+```

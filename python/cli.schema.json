@@ -105,6 +105,19 @@
           "$ref": "#/definitions/DeleteStatusResponse"
         }
       ]
+    },
+    "search": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": [
+        {
+          "$ref": "#/definitions/SearchRequest"
+        },
+        {
+          "$ref": "#/definitions/SearchResponse"
+        }
+      ]
     }
   },
   "required": [
@@ -115,7 +128,8 @@
     "completion",
     "chat",
     "update",
-    "delete"
+    "delete",
+    "search"
   ],
   "definitions": {
     "IngestRequest": {
@@ -581,6 +595,78 @@
       "required": [
         "status",
         "message"
+      ]
+    },
+    "SearchRequest": {
+      "title": "SearchRequest",
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string"
+        },
+        "limit": {
+          "default": 10,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "query"
+      ]
+    },
+    "S2SearchResult": {
+      "title": "S2SearchResult",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "abstract": {
+          "type": "string"
+        },
+        "venue": {
+          "type": "string"
+        },
+        "year": {
+          "type": "integer"
+        },
+        "paperId": {
+          "type": "string"
+        },
+        "citationCount": {
+          "type": "integer"
+        },
+        "openAccessPdf": {
+          "type": "string"
+        },
+        "authors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "SearchResponse": {
+      "title": "SearchResponse",
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string"
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/S2SearchResult"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "message",
+        "results"
       ]
     }
   }
