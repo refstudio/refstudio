@@ -1,7 +1,7 @@
 import { TextSelection } from '@tiptap/pm/state';
 import { InputRule } from '@tiptap/react';
 
-import { CitationNode } from '../CitationNode2';
+import { CitationNode } from '../CitationNode';
 
 export const squareBracketHandler = ({
   state,

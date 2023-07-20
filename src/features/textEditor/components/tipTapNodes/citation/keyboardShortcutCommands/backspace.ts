@@ -1,6 +1,6 @@
 import { KeyboardShortcutCommand } from '@tiptap/core';
 
-import { CitationNode } from '../CitationNode2';
+import { CitationNode } from '../CitationNode';
 
 /**
  * Rules when pressing backspace:

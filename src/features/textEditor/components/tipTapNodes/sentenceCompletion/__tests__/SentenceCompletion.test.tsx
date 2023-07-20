@@ -5,7 +5,7 @@ import { act, screen, setup, waitFor } from '../../../../../../test/test-utils';
 import { EDITOR_EXTENSIONS } from '../../../tipTapEditorConfigs';
 import { getPrettyHTMLWithSelection, setUpEditorWithSelection } from '../../__tests__/test-utils';
 import { sentenceCompletionCommand } from '../helpers/sentenceCompletionCommand';
-import { sentenceCompletionPluginKey } from '../SentenceCompletion2';
+import { sentenceCompletionPluginKey } from '../SentenceCompletion';
 
 vi.mock('../../../../../../api/completion');
 
