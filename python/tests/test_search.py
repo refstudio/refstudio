@@ -7,6 +7,7 @@ def test_search(monkeypatch, capsys):
     def mock_search_paper(*args, **kwargs):
         response = SearchResponse(
             status=ResponseStatus.OK,
+            message="",
             results=[
                 S2SearchResult(
                     title="Sample Paper Title",
@@ -38,7 +39,7 @@ def test_search(monkeypatch, capsys):
     captured = capsys.readouterr()
     output = json.loads(captured.out)
 
-    assert len(output) == 2
+    assert len(output["results"]) == 2
     assert output["results"][0]["title"] == "Sample Paper Title"
     assert output["results"][0]["authors"][0] == "author1"
     assert output["results"][0]["authors"][1] == "author2"
