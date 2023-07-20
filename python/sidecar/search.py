@@ -69,13 +69,17 @@ class Searcher:
         logger.info(f"Preprocessed query: {query}")
 
         # Perform the search using Semantic Scholar's API
-        results = self.s2.search_paper(query, limit=limit, fields=returned_fields)
+        try:
+            results = self.s2.search_paper(query, limit=limit, fields=returned_fields)
+        except Exception as e:
+            return {"ok": False, "message": str(e)}
 
         logger.info("Executed search using Semantic Scholar's API")
 
         results_list = []
 
         for item in results[:limit]:
+            openaccesspdf = getattr(item, "openAccessPdf", None)
             result = S2SearchResult(
                 title=getattr(item, "title", None),
                 abstract=getattr(item, "abstract", None),
@@ -83,7 +87,7 @@ class Searcher:
                 year=getattr(item, "year", None),
                 paperId=getattr(item, "paperId", None),
                 citationCount=getattr(item, "citationCount", None),
-                openAccessPdf=getattr(item, "openAccessPdf", None),
+                openAccessPdf=openaccesspdf.get("url") if openaccesspdf else None,
                 authors=[author["name"] for author in getattr(item, "authors", [])],
             )
             results_list.append(result)
