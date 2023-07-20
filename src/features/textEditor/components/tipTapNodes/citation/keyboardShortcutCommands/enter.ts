@@ -1,6 +1,6 @@
 import { KeyboardShortcutCommand } from '@tiptap/core';
 
-import { CitationNode } from '../CitationNode';
+import { CitationNode } from '../CitationNode2';
 
 /** Block Enter key when the selection overlaps with a citation node */
 export const enter: KeyboardShortcutCommand = ({ editor }) => {

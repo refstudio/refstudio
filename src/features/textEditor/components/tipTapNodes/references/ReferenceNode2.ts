@@ -2,7 +2,7 @@ import Mention from '@tiptap/extension-mention';
 import { ReactNodeViewRenderer, ReactRenderer } from '@tiptap/react';
 import { SuggestionKeyDownProps, SuggestionOptions } from '@tiptap/suggestion';
 
-import { CitationNode } from '../citation/CitationNode';
+import { CitationNode } from '../citation/CitationNode2';
 import { Reference } from './Reference';
 import { ReferenceListPopupProps, ReferencesListPopup } from './ReferencesListPopup';
 

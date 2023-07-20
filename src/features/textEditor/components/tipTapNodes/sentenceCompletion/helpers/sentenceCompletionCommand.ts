@@ -1,7 +1,7 @@
 import { Command } from '@tiptap/react';
 
 import { createOpenAction } from '../../types/SentenceCompletionMetadata';
-import { sentenceCompletionPluginKey } from '../SentenceCompletion';
+import { sentenceCompletionPluginKey } from '../SentenceCompletion2';
 
 export const sentenceCompletionCommand: Command = ({ dispatch, state, tr }) => {
   if (!state.selection.empty) {

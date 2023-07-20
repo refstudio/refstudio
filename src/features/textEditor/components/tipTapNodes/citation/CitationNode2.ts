@@ -4,7 +4,7 @@ import { ReplaceStep } from '@tiptap/pm/transform';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
 import { ReactNodeViewRenderer } from '@tiptap/react';
 
-import { ReferenceNode } from '../references/ReferenceNode';
+import { ReferenceNode } from '../references/ReferenceNode2';
 import { Citation } from './Citation';
 import { squareBracketHandler } from './inputRuleHandlers/squareBracketHandler';
 import { arrowRight } from './keyboardShortcutCommands/arrowRight';
