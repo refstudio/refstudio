@@ -1,12 +1,12 @@
 from sidecar import search
 import json
-from sidecar.typing import SearchRequest, SearchResponse, S2SearchResult
+from sidecar.typing import SearchRequest, SearchResponse, S2SearchResult, ResponseStatus
 
 
 def test_search(monkeypatch, capsys):
     def mock_search_paper(*args, **kwargs):
         response = SearchResponse(
-            status="ok",
+            status=ResponseStatus.OK,
             results=[
                 S2SearchResult(
                     title="Sample Paper Title",
