@@ -183,7 +183,7 @@ class SearchRequest(RefStudioModel):
     limit: int = 10
 
 
-class S2SearchResult(BaseModel):
+class S2SearchResult(RefStudioModel):
     title: str | None = None
     abstract: str | None = None
     venue: str | None = None
@@ -194,7 +194,7 @@ class S2SearchResult(BaseModel):
     authors: list[str] | None = None
 
 
-class SearchResponse(BaseModel):
+class SearchResponse(RefStudioModel):
     status: ResponseStatus
     message: str
     results: list[S2SearchResult] | None = None
