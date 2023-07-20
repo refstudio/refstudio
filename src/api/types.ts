@@ -17,6 +17,7 @@ export type ResponseStatus = 'ok' | 'error';
  * An enumeration.
  */
 export type RewriteMannerType = 'concise' | 'elaborate' | 'scholarly';
+export type Message = string;
 export type Title = string;
 export type Abstract = string;
 export type Venue = string;
@@ -189,7 +190,7 @@ export interface SearchRequest {
 }
 export interface SearchResponse {
   status: ResponseStatus;
-  message: string;
+  message: Message;
   results?: Results;
 }
 export interface S2SearchResult {
