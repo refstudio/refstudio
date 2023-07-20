@@ -17,16 +17,6 @@ export type ResponseStatus = 'ok' | 'error';
  * An enumeration.
  */
 export type RewriteMannerType = 'concise' | 'elaborate' | 'scholarly';
-export type Message = string;
-export type Title = string;
-export type Abstract = string;
-export type Venue = string;
-export type Year = number;
-export type Paperid = string;
-export type Citationcount = number;
-export type Openaccesspdf = string;
-export type Authors = string[];
-export type Results = S2SearchResult[];
 
 export interface CliCommands {
   /**
@@ -190,16 +180,16 @@ export interface SearchRequest {
 }
 export interface SearchResponse {
   status: ResponseStatus;
-  message: Message;
-  results?: Results;
+  message: string;
+  results?: S2SearchResult[];
 }
 export interface S2SearchResult {
-  title?: Title;
-  abstract?: Abstract;
-  venue?: Venue;
-  year?: Year;
-  paperId?: Paperid;
-  citationCount?: Citationcount;
-  openAccessPdf?: Openaccesspdf;
-  authors?: Authors;
+  title?: string;
+  abstract?: string;
+  venue?: string;
+  year?: number;
+  paperId?: string;
+  citationCount?: number;
+  openAccessPdf?: string;
+  authors?: string[];
 }
