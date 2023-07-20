@@ -6,7 +6,7 @@ from semanticscholar import SemanticScholar
 from .stopwords import stopwords
 import sys
 import logging
-from .typing import SearchResponse, S2SearchResult, SearchRequest
+from .typing import SearchResponse, S2SearchResult, SearchRequest, ResponseStatus
 
 logger = logging.getLogger(__name__)
 
@@ -72,8 +72,9 @@ class Searcher:
         try:
             results = self.s2.search_paper(query, limit=limit, fields=returned_fields)
         except Exception as e:
-            return {"ok": False, "message": str(e)}
-
+            logger.warning(f"Error while searching using Semantic Scholar's API: {e}")
+            return SearchResponse(status=ResponseStatus.ERROR, message=str(e), results=[])
+        
         logger.info("Executed search using Semantic Scholar's API")
 
         results_list = []
@@ -93,7 +94,7 @@ class Searcher:
             results_list.append(result)
 
         logger.info(f"First two papers from search results: {results_list[:2]}")
-        return SearchResponse(status="ok", results=results_list)
+        return SearchResponse(status=ResponseStatus.OK, message="Success", results=results_list)
 
 
 def search_s2(request: SearchRequest):
