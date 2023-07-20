@@ -186,6 +186,8 @@ describe('RewriteWidget', () => {
     expect(screen.getByText(CHOICE_OPTION_2)).toBeInTheDocument();
     await user.click(screen.getByTitle('next choice'));
     expect(screen.getByText(CHOICE_OPTION_3)).toBeInTheDocument();
+    await user.click(screen.getByTitle('previous choice'));
+    expect(screen.getByText(CHOICE_OPTION_2)).toBeInTheDocument();
   });
 
   const INSERT_TEXT_EVENT = 'refstudio://ai/suggestion/insert' as RefStudioEventName;
