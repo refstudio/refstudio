@@ -643,10 +643,7 @@
         },
         "openAccessPdf": {
           "title": "Openaccesspdf",
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
+          "type": "string"
         },
         "authors": {
           "title": "Authors",
@@ -662,9 +659,7 @@
       "type": "object",
       "properties": {
         "status": {
-          "title": "Status",
-          "default": "ok",
-          "type": "string"
+          "$ref": "#/definitions/ResponseStatus"
         },
         "results": {
           "title": "Results",
@@ -673,7 +668,10 @@
             "$ref": "#/definitions/S2SearchResult"
           }
         }
-      }
+      },
+      "required": [
+        "status"
+      ]
     }
   }
 }
