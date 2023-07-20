@@ -73,7 +73,7 @@ describe('RewriteWidget', () => {
   });
 
   it('should display Processing... while askForRewrite is processing', async () => {
-    let resolveFn: () => void = vi.fn();
+    let resolveFn: () => void = () => fail();
     vi.mocked(askForRewrite).mockImplementation(async () => {
       await new Promise<void>((resolve) => {
         // Capture resolve function to call after assertion
@@ -95,7 +95,7 @@ describe('RewriteWidget', () => {
   });
 
   it('should display error message if askForRewrite fails', async () => {
-    let rejectFn: (reason?: unknown) => void = vi.fn();
+    let rejectFn: (reason?: unknown) => void = () => fail();
     vi.mocked(askForRewrite).mockImplementation(async () => {
       await new Promise<void>((_, reject) => {
         // Capture reject function to call after assertion
@@ -117,7 +117,7 @@ describe('RewriteWidget', () => {
   });
 
   it('should display error message if askForRewrite returns ok:false', async () => {
-    let resolveFn: () => void = vi.fn();
+    let resolveFn: () => void = () => fail();
     vi.mocked(askForRewrite).mockImplementation(async () => {
       await new Promise<void>((resolve) => {
         // Capture resolve function to call after assertion
@@ -139,7 +139,7 @@ describe('RewriteWidget', () => {
   });
 
   const awaitForChoicesOnScreen = async (onChoiceSelected?: (choice: string) => void) => {
-    let resolveFn: () => void = vi.fn();
+    let resolveFn: () => void = () => fail();
     vi.mocked(askForRewrite).mockImplementation(async () => {
       await new Promise<void>((resolve) => {
         // Capture resolve function to call after assertion
