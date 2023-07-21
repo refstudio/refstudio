@@ -59,6 +59,11 @@ export interface CliCommands {
    * @maxItems 2
    */
   delete: [DeleteRequest, DeleteStatusResponse];
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  search: [SearchRequest, SearchResponse];
 }
 export interface IngestRequest {
   pdf_directory: string;
@@ -168,4 +173,23 @@ export interface DeleteRequest {
 export interface DeleteStatusResponse {
   status: ResponseStatus;
   message: string;
+}
+export interface SearchRequest {
+  query: string;
+  limit?: number;
+}
+export interface SearchResponse {
+  status: ResponseStatus;
+  message: string;
+  results: S2SearchResult[];
+}
+export interface S2SearchResult {
+  title?: string;
+  abstract?: string;
+  venue?: string;
+  year?: number;
+  paperId?: string;
+  citationCount?: number;
+  openAccessPdf?: string;
+  authors?: string[];
 }

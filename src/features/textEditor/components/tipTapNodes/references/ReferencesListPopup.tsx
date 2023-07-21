@@ -1,4 +1,4 @@
-import './ReferencesList.css';
+import './ReferencesListPopup.css';
 
 import { SuggestionKeyDownProps, SuggestionProps } from '@tiptap/suggestion';
 import Fuse from 'fuse.js';
@@ -9,12 +9,11 @@ import { usePopper } from 'react-popper';
 
 import { getReferencesAtom } from '../../../../../atoms/referencesState';
 import { cx } from '../../../../../lib/cx';
-import { ReferenceItem } from '../../../../../types/ReferenceItem';
 import { fuseOptions } from './config';
 
-export type ReferenceListProps = SuggestionProps<{ id: string; label: string }>;
+export type ReferenceListPopupProps = SuggestionProps<{ id: string }>;
 
-export const ReferencesList = forwardRef((props: ReferenceListProps, ref) => {
+export const ReferencesListPopup = forwardRef((props: ReferenceListPopupProps, ref) => {
   const { command, clientRect, query } = props;
   const [selectedIndex, setSelectedIndex] = useState(0);
   const references = useAtomValue(getReferencesAtom);
@@ -42,10 +41,15 @@ export const ReferencesList = forwardRef((props: ReferenceListProps, ref) => {
     }
   }, [clientRect]);
 
+  useEffect(() => {
+    setSelectedIndex(0);
+  }, [queriedReferences]);
+
+  /* c8 ignore start */
   const handleSelect = (index: number) => {
     const referenceItem = queriedReferences[index];
 
-    command({ id: referenceItem.id, label: getReferenceLabel(referenceItem) });
+    command({ id: referenceItem.id });
   };
 
   const handleArrowUp = useCallback(() => {
@@ -55,10 +59,6 @@ export const ReferencesList = forwardRef((props: ReferenceListProps, ref) => {
   const handleArrowDown = useCallback(() => {
     setSelectedIndex((currentIndex) => (currentIndex + 1) % queriedReferences.length);
   }, [queriedReferences.length]);
-
-  useEffect(() => {
-    setSelectedIndex(0);
-  }, [queriedReferences]);
 
   useImperativeHandle(ref, () => ({
     onKeyDown: ({ event }: SuggestionKeyDownProps) => {
@@ -80,6 +80,7 @@ export const ReferencesList = forwardRef((props: ReferenceListProps, ref) => {
       return false;
     },
   }));
+  /* c8 ignore stop */
 
   const [popperElement, setPopperElement] = useState<HTMLDivElement | null>(null);
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
@@ -87,12 +88,19 @@ export const ReferencesList = forwardRef((props: ReferenceListProps, ref) => {
   });
 
   return createPortal(
-    <div className="references" ref={setPopperElement} style={styles.popper} {...attributes.popper}>
+    <div
+      className="references"
+      data-testid={ReferencesListPopup.displayName}
+      ref={setPopperElement}
+      style={styles.popper}
+      {...attributes.popper}
+    >
       {queriedReferences.length ? (
         queriedReferences.map(({ id, title }, index) => (
           <button
             className={cx('reference', { selected: index === selectedIndex })}
             key={id}
+            role="button"
             onClick={() => handleSelect(index)}
           >
             {title}
@@ -106,8 +114,4 @@ export const ReferencesList = forwardRef((props: ReferenceListProps, ref) => {
   );
 });
 
-ReferencesList.displayName = 'ReferencesList';
-
-export function getReferenceLabel(referenceItem: ReferenceItem): string {
-  return `[${referenceItem.citationKey}]`;
-}
+ReferencesListPopup.displayName = 'ReferencesList';

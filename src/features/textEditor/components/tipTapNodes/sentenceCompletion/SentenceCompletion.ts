@@ -129,7 +129,7 @@ const sentenceCompletionPlugin = new Plugin<SentenceCompletionState>({
 });
 
 export const SentenceCompletionExtension = Extension.create({
-  name: 'SentenceCompletionExtension',
+  name: 'sentenceCompletionExtension',
 
   addProseMirrorPlugins: () => [sentenceCompletionPlugin],
 

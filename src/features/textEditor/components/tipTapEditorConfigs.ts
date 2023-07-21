@@ -9,13 +9,14 @@ import markdown from 'highlight.js/lib/languages/markdown';
 import { lowlight } from 'lowlight';
 import { Markdown } from 'tiptap-markdown';
 
+import { CitationNode } from './tipTapNodes/citation/CitationNode';
 import { CollapsibleBlockContentNode } from './tipTapNodes/collapsibleBlock/nodes/CollapsibleBlockContent';
 import { CollapsibleBlockNode } from './tipTapNodes/collapsibleBlock/nodes/CollapsibleBlockNode';
 import { CollapsibleBlockSummaryNode } from './tipTapNodes/collapsibleBlock/nodes/CollapsibleBlockSummary';
 import { DraggableBlockNode } from './tipTapNodes/draggableBlock/DraggableBlockNode';
-import { SentenceCompletionExtension } from './tipTapNodes/plugins/sentenceCompletion';
-import { ReferenceNode } from './tipTapNodes/referenceNode/ReferenceNode';
+import { ReferenceNode } from './tipTapNodes/references/ReferenceNode';
 import { RefStudioDocument } from './tipTapNodes/refStudioDocument/RefStudioDocument';
+import { SentenceCompletionExtension } from './tipTapNodes/sentenceCompletion/SentenceCompletion';
 lowlight.registerLanguage('markdown', markdown);
 
 export const EDITOR_EXTENSIONS: Extensions = [
@@ -44,6 +45,7 @@ export const EDITOR_EXTENSIONS: Extensions = [
   CollapsibleBlockNode,
   CollapsibleBlockContentNode,
   CollapsibleBlockSummaryNode,
+  CitationNode,
   ReferenceNode,
   SentenceCompletionExtension,
 ];
