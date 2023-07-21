@@ -23,6 +23,8 @@ const mockSettings: SettingsSchema = {
   openAI: {
     apiKey: '',
     chatModel: 'gpt-3.5-turbo',
+    manner: 'concise',
+    temperature: 0.7,
   },
   sidecar: {
     logging: {

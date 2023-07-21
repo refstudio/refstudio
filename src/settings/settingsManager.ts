@@ -4,6 +4,11 @@ import { Path, PathValue } from 'tauri-settings/dist/types/dot-notation';
 import { getSystemAppDataDir, getSystemConfigurationsDir } from '../io/filesystem';
 import { readEnv } from '../io/readEnv';
 
+export type OpenAiManner = 'concise' | 'elaborate' | 'scholarly';
+export function getMannerOptions(): OpenAiManner[] {
+  return ['concise', 'elaborate', 'scholarly'];
+}
+
 export interface SettingsSchema {
   general: {
     appDataDir: string;
@@ -12,6 +17,9 @@ export interface SettingsSchema {
   openAI: {
     apiKey: string;
     chatModel: string;
+    manner: OpenAiManner;
+    /** Control the "creativity" of OpenAI. Value should be between 0.7 and 0.9 */
+    temperature: number;
   };
   sidecar: {
     logging: {
@@ -35,6 +43,8 @@ export async function initSettings() {
       openAI: {
         apiKey: await readEnv('OPENAI_API_KEY', ''),
         chatModel: await readEnv('OPENAI_CHAT_MODEL', DEFAULT_OPEN_AI_CHAT_MODEL),
+        manner: (await readEnv('OPENAI_MANNER', 'scholarly')) as OpenAiManner,
+        temperature: parseFloat(await readEnv('OPENAI_TEMPERATURE', '0.7')),
       },
       sidecar: {
         logging: {

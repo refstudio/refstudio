@@ -21,6 +21,8 @@ const mockSettings: SettingsSchema = {
   openAI: {
     apiKey: 'API KEY',
     chatModel: 'CHAT MODEL',
+    manner: 'concise',
+    temperature: 0.7,
   },
   sidecar: {
     logging: {

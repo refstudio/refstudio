@@ -1,21 +1,39 @@
-import { notifyError } from '../notifications/notifications';
+import { notifyErr, notifyError } from '../notifications/notifications';
+import { DEFAULT_OPTIONS, RewriteOptions } from './rewrite.config';
 import { callSidecar } from './sidecar';
 
-export async function askForRewrite(selection: string): Promise<string> {
+export type AskForRewriteReturn = { ok: true; choices: string[] } | { ok: false; message: string };
+export async function askForRewrite(selection: string, options?: RewriteOptions): Promise<AskForRewriteReturn> {
   try {
     if (selection.trim() === '') {
-      return '';
+      return { ok: false, message: 'You should provide a selection with text.' };
     }
 
-    const response = await callSidecar('rewrite', { text: selection });
+    options = {
+      ...DEFAULT_OPTIONS,
+      ...options,
+    };
+    const response = await callSidecar('rewrite', {
+      text: selection,
+      n_choices: options.nChoices,
+      temperature: options.temperature,
+      manner: options.manner,
+    });
 
     if (response.status === 'error') {
       notifyError('Rewrite error', response.message);
-      return '';
+      return { ok: false, message: 'Cannot rewrite selection. Please check the notification tray for more details.' };
     }
 
-    return response.choices[0].text;
+    return {
+      ok: true,
+      choices: response.choices.map((ch) => ch.text),
+    };
   } catch (err) {
-    return `Rewrite error: ${String(err)}`;
+    notifyErr(err);
+    return {
+      ok: false,
+      message: 'Cannot rewrite selection. Please check the notification tray for more details.',
+    };
   }
 }

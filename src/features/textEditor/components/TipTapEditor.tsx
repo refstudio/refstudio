@@ -46,10 +46,19 @@ export function TipTapEditor({ editorContent, isActive, saveFileInMemory, update
     };
   }, [editorContent, setSelection, saveFileInMemory, updateFileBuffer]);
 
+  useEffect(() => {
+    if (isActive && editor) {
+      if (!editor.isFocused) {
+        // Note: We need this setTimeout to ensure the focus works.
+        setTimeout(() => editor.commands.focus(), 100);
+      }
+    }
+  }, [isActive, editor]);
+
   const insertContent = useCallback(
     ({ text }: { text: string }) => {
       if (isActive) {
-        editor?.commands.insertContent(text);
+        editor?.chain().insertContent(text).focus().run();
       }
     },
     [editor, isActive],
@@ -57,12 +66,16 @@ export function TipTapEditor({ editorContent, isActive, saveFileInMemory, update
 
   useListenEvent('refstudio://ai/suggestion/insert', insertContent);
 
+  const focusEditorOnClick = useCallback(() => {
+    editor?.commands.focus();
+  }, [editor]);
+
   if (!editor) {
     return <Spinner />;
   }
 
   return (
-    <div className="flex h-full w-full flex-col">
+    <div className="flex h-full w-full flex-col" onClick={focusEditorOnClick}>
       <MenuBar editor={editor} />
       <EditorContent className="tiptap-editor" editor={editor} />
     </div>

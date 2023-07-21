@@ -15,7 +15,7 @@ vi.mock('../application/App', () => {
 });
 
 describe('AppStartup', () => {
-  beforeEach(() => {
+  afterEach(() => {
     clearMocks();
     vi.clearAllMocks();
   });

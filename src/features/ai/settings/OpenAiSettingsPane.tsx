@@ -2,8 +2,16 @@ import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 
 import { JSONDebug, JSONDebugContainer } from '../../../components/JSONDebug';
+import { PasswordInput } from '../../../components/PasswordInput';
 import { SettingsPane, SettingsPaneProps } from '../../../settings/panes/SettingsPane';
-import { getCachedSetting, getSettings, saveCachedSettings, setCachedSetting } from '../../../settings/settingsManager';
+import {
+  getCachedSetting,
+  getMannerOptions,
+  getSettings,
+  OpenAiManner,
+  saveCachedSettings,
+  setCachedSetting,
+} from '../../../settings/settingsManager';
 
 export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
   const [paneSettings, setPaneSettings] = useState(getCachedSetting('openAI'));
@@ -29,14 +37,15 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
       description="You need to configure the API to use the rewrite and chat operations."
       header={config.title}
     >
-      <form className="mt-10" onSubmit={handleSaveSettings}>
+      <form className="mt-10" data-testid="openai-settings-form" onSubmit={handleSaveSettings}>
         <fieldset className="space-y-4">
           <div>
             <label htmlFor="apiKey">API Key</label>
-            <input
+            <PasswordInput
               className="w-full border bg-slate-50 px-2 py-0.5"
               data-testid="apiKey"
               id="apiKey"
+              name="apiKey"
               value={paneSettings.apiKey}
               onChange={(e) => setPaneSettings({ ...paneSettings, apiKey: e.currentTarget.value })}
             />
@@ -46,8 +55,39 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
             <input
               className="w-full border bg-slate-50 px-2 py-0.5"
               id="chatModel"
+              name="chatModel"
               value={paneSettings.chatModel}
               onChange={(e) => setPaneSettings({ ...paneSettings, chatModel: e.currentTarget.value })}
+            />
+          </div>
+          <div>
+            <label htmlFor="manner">Manner</label>
+            <select
+              className="w-full border bg-slate-50 px-2 py-0.5"
+              id="manner"
+              name="manner"
+              value={paneSettings.manner}
+              onChange={(e) => setPaneSettings({ ...paneSettings, manner: e.currentTarget.value as OpenAiManner })}
+            >
+              {getMannerOptions().map((m) => (
+                <option key={m} value={m}>
+                  {m}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="temperature">Creativity (temperature)</label>
+            <input
+              className="w-full border bg-slate-50 px-2 py-0.5"
+              id="temperature"
+              max={0.9}
+              min={0.7}
+              name="temperature"
+              step={0.01}
+              type="range"
+              value={paneSettings.temperature}
+              onChange={(e) => setPaneSettings({ ...paneSettings, temperature: parseFloat(e.currentTarget.value) })}
             />
           </div>
         </fieldset>
@@ -57,9 +97,10 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
           <input className="btn-primary" disabled={!isDirty || saveMutation.isLoading} type="submit" value="SAVE" />
         </fieldset>
       </form>
+
       <JSONDebugContainer className="mt-28">
-        <JSONDebug header="paneSettings" value={paneSettings} />
-        <JSONDebug header="API call result" value={saveMutation.data} />
+        <JSONDebug header="paneSettings" maskedKeys={['apiKey']} value={paneSettings} />
+        <JSONDebug header="API call result" maskedKeys={['apiKey']} value={saveMutation.data} />
       </JSONDebugContainer>
     </SettingsPane>
   );
