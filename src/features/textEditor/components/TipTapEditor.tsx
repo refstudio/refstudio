@@ -75,7 +75,7 @@ export function TipTapEditor({ editorContent, isActive, saveFileInMemory, update
   return (
     <div className="flex h-full w-full flex-col" onClick={focusEditorOnClick}>
       <MenuBar editor={editor} />
-      <EditorContent autoFocus className="tiptap-editor" editor={editor} />
+      <EditorContent className="tiptap-editor" editor={editor} />
     </div>
   );
 }

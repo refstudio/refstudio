@@ -46,6 +46,10 @@ export function RewriteWidget({
 
   const [selectedChoiceIndex, setSelectedChoiceIndex] = useState(0);
 
+  useEffect(() => {
+    setSelectedChoiceIndex(0);
+  }, [rewrite]);
+
   const handleSelectChoice = useCallback(
     (choice: string) => {
       emitEvent('refstudio://ai/suggestion/insert', { text: choice });
