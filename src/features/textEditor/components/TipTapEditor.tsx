@@ -48,15 +48,23 @@ export function TipTapEditor({ editorContent, isActive, saveFileInMemory, update
 
   useEffect(() => {
     if (isActive && editor) {
-      // Note: We need this setTimeout to ensure the focus works.
-      setTimeout(() => editor.commands.focus(), 100);
+      if (!editor.isFocused) {
+        // Note: We need this setTimeout to ensure the focus works.
+        setTimeout(() => editor.commands.focus(), 100);
+      }
     }
   }, [isActive, editor]);
 
   const insertContent = useCallback(
     ({ text }: { text: string }) => {
+      if (!editor) {
+        return;
+      }
       if (isActive) {
-        editor?.chain().insertContent(text).focus().run();
+        editor.commands.insertContent(text);
+        if (!editor.isFocused) {
+          editor.commands.focus();
+        }
       }
     },
     [editor, isActive],
