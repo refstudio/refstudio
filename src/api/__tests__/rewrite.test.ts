@@ -1,4 +1,4 @@
-import { notifyErr } from '../../notifications/notifications';
+import { notifyErr, notifyError } from '../../notifications/notifications';
 import { askForRewrite, AskForRewriteReturn } from '../rewrite';
 import { DEFAULT_OPTIONS } from '../rewrite.config';
 import { callSidecar } from '../sidecar';
@@ -91,6 +91,19 @@ describe('askForRewrite', () => {
       ok: true,
       choices: [REWRITE_REPLY_TEXT, REWRITE_REPLY_TEXT.toUpperCase()],
     });
+  });
+
+  it('Should return error text for error status sidecar', async () => {
+    const mockResponse: RewriteResponse = { status: 'error', message: 'Error message', choices: [] };
+    vi.mocked(callSidecar).mockResolvedValue(mockResponse);
+
+    const response = await askForRewrite('some input');
+    expect(response).toEqual<AskForRewriteReturn>({
+      ok: false,
+      message: 'Cannot rewrite selection. Please check the notification tray for more details.',
+    });
+
+    expect(notifyError).toHaveBeenCalledTimes(1);
   });
 
   it('Should return error text for internal sidecar exception', async () => {
