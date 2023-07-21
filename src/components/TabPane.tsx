@@ -1,5 +1,8 @@
+import { useContextMenu } from 'react-contexify';
+
 import { cx } from '../lib/cx';
 import { TabCloseButton } from './TabCloseButton';
+import { TABPANE_TAB_MENU_ID } from './TabPaneTabContextMenu';
 
 export function TabPane<K extends string>({
   items,
@@ -27,6 +30,7 @@ export function TabPane<K extends string>({
           content={item.text}
           isDirty={item.isDirty}
           key={item.value}
+          value={item.value}
           onClick={() => onClick(item.value)}
           onCloseClick={() => onCloseClick(item.value)}
         />
@@ -35,19 +39,23 @@ export function TabPane<K extends string>({
   );
 }
 
-export function TabItem({
+export function TabItem<K extends string>({
   active,
+  value,
   content,
   isDirty,
   onClick,
   onCloseClick,
 }: {
   active: boolean;
+  value: K;
   content: React.ReactNode;
   isDirty?: boolean;
   onClick: () => void;
   onCloseClick: () => void;
 }) {
+  const { show } = useContextMenu({ id: TABPANE_TAB_MENU_ID, props: { editorId: value } });
+
   return (
     <div
       aria-selected={active}
@@ -66,6 +74,7 @@ export function TabItem({
         e.preventDefault();
         onClick();
       }}
+      onContextMenu={(e) => show({ event: e })}
     >
       <span>{content}</span>
       <TabCloseButton isDirty={isDirty} onClick={onCloseClick} />

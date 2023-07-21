@@ -1,15 +1,9 @@
 import { useAtomValue, useSetAtom } from 'jotai';
-import { useCallback } from 'react';
-import { VscCloseAll, VscSplitHorizontal } from 'react-icons/vsc';
 
-import { closeAllEditorsAtom, moveEditorToPaneAtom, selectEditorInPaneAtom } from '../../atoms/editorActions';
 import { openFilePathAtom } from '../../atoms/fileEntryActions';
 import { fileExplorerAtom, refreshFileTreeAtom } from '../../atoms/fileExplorerActions';
 import { useActiveEditorIdForPane } from '../../atoms/hooks/useActiveEditorIdForPane';
-import { useOpenEditorsDataForPane } from '../../atoms/hooks/useOpenEditorsDataForPane';
-import { EditorId, parseEditorId } from '../../atoms/types/EditorData';
-import { PaneId } from '../../atoms/types/PaneGroup';
-import { EditorsList } from '../../components/EditorsList';
+import { parseEditorId } from '../../atoms/types/EditorData';
 import { PanelSection } from '../../components/PanelSection';
 import { PanelWrapper } from '../../components/PanelWrapper';
 import { useAsyncEffect } from '../../hooks/useAsyncEffect';
@@ -17,66 +11,16 @@ import { isNonNullish } from '../../lib/isNonNullish';
 import { FileExplorer } from './FileExplorer';
 
 export function ExplorerPanel() {
-  const leftPaneOpenEditors = useOpenEditorsDataForPane('LEFT');
   const leftPaneActiveEditorId = useActiveEditorIdForPane('LEFT');
-  const rightPaneOpenEditors = useOpenEditorsDataForPane('RIGHT');
   const rightPaneActiveEditorId = useActiveEditorIdForPane('RIGHT');
   const rootFileExplorerEntry = useAtomValue(fileExplorerAtom);
-
-  const selectFileInPane = useSetAtom(selectEditorInPaneAtom);
   const openFile = useSetAtom(openFilePathAtom);
-  const closeAllFiles = useSetAtom(closeAllEditorsAtom);
-  const moveEditorToPane = useSetAtom(moveEditorToPaneAtom);
   const refreshFileTree = useSetAtom(refreshFileTreeAtom);
 
   useAsyncEffect(refreshFileTree);
 
-  const handleMoveEditor = useCallback(
-    ({ editorId, fromPaneId, toPaneId }: { editorId: EditorId; fromPaneId: PaneId; toPaneId: PaneId }) =>
-      (evt: React.MouseEvent) => {
-        evt.stopPropagation();
-        moveEditorToPane({ editorId, fromPaneId, toPaneId });
-      },
-    [moveEditorToPane],
-  );
-
-  const hasLeftAndRightPanelsFiles = leftPaneOpenEditors.length > 0 && rightPaneOpenEditors.length > 0;
-
   return (
     <PanelWrapper title="Explorer">
-      <PanelSection
-        rightIcons={[{ key: 'closeAll', Icon: VscCloseAll, title: 'Close All Open Files', onClick: closeAllFiles }]}
-        title="Open Files"
-      >
-        {hasLeftAndRightPanelsFiles && <div className="ml-4 text-xs font-bold">LEFT</div>}
-        {leftPaneOpenEditors.length > 0 && (
-          <EditorsList
-            editors={leftPaneOpenEditors}
-            paddingLeft="1.5rem"
-            rightAction={(editorId) => ({
-              onClick: handleMoveEditor({ editorId, fromPaneId: 'LEFT', toPaneId: 'RIGHT' }),
-              VscIcon: VscSplitHorizontal,
-              title: 'Move to RIGHT split pane',
-            })}
-            selectedEditors={leftPaneActiveEditorId ? [leftPaneActiveEditorId] : []}
-            onClick={(editorId) => selectFileInPane({ paneId: 'LEFT', editorId })}
-          />
-        )}
-        {hasLeftAndRightPanelsFiles && <div className="ml-4 text-xs font-bold">RIGHT</div>}
-        {rightPaneOpenEditors.length > 0 && (
-          <EditorsList
-            editors={rightPaneOpenEditors}
-            paddingLeft="1.5rem"
-            rightAction={(editorId) => ({
-              onClick: handleMoveEditor({ editorId, fromPaneId: 'RIGHT', toPaneId: 'LEFT' }),
-              VscIcon: VscSplitHorizontal,
-              title: `Move to LEFT split pane`,
-            })}
-            selectedEditors={rightPaneActiveEditorId ? [rightPaneActiveEditorId] : []}
-            onClick={(editorId) => selectFileInPane({ paneId: 'RIGHT', editorId })}
-          />
-        )}
-      </PanelSection>
       <PanelSection grow title="Project X">
         <FileExplorer
           fileExplorerEntry={rootFileExplorerEntry}
