@@ -57,14 +57,8 @@ export function TipTapEditor({ editorContent, isActive, saveFileInMemory, update
 
   const insertContent = useCallback(
     ({ text }: { text: string }) => {
-      if (!editor) {
-        return;
-      }
       if (isActive) {
-        editor.commands.insertContent(text);
-        if (!editor.isFocused) {
-          editor.commands.focus();
-        }
+        editor?.chain().insertContent(text).focus().run();
       }
     },
     [editor, isActive],
