@@ -20,8 +20,8 @@ import { ReferencesCommandMenu } from '../../features/references/commands/Refere
 import { INDEX_FILES, INDEX_MAIN, INDEX_REFERENCES, INDEX_REWRITE_WIDGET } from './CommandPaletteConfigs';
 import { FilesCommandMenu } from './FilesCommandMenu';
 
-export function CommandPalette({ index }: { index?: number }) {
-  const { setOpen } = useKmenu();
+export function CommandPalette({ index, onOpen }: { index?: number; onOpen?: (index: number) => void }) {
+  const { setOpen, open } = useKmenu();
 
   // Open a menu by default (usefull for tests)
   useEffect(() => {
@@ -29,6 +29,11 @@ export function CommandPalette({ index }: { index?: number }) {
       setOpen(index);
     }
   }, [index, setOpen]);
+
+  // Notify externally that a menu was opened (usefull for tests)
+  useEffect(() => {
+    onOpen?.(open);
+  }, [onOpen, open]);
 
   // Open Files on "META + p"
   useEventListener('keydown', (e) => {
