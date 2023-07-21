@@ -2,8 +2,8 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { Command, CommandMenu, useCommands } from 'kmenu';
 import { VscFile } from 'react-icons/vsc';
 
-import { openFilePathAtom } from '../atoms/fileEntryActions';
-import { fileExplorerAtom } from '../atoms/fileExplorerActions';
+import { openFilePathAtom } from '../../atoms/fileEntryActions';
+import { fileExplorerAtom } from '../../atoms/fileExplorerActions';
 import { useOpenKmenuOnInput } from './useOpenKmenuOnInput';
 
 export function FilesCommandMenu({ index }: { index: number }) {

@@ -2,9 +2,9 @@ import { useAtomValue } from 'jotai';
 import { CommandMenu, useCommands, useKmenu } from 'kmenu';
 import { VscWarning } from 'react-icons/vsc';
 
-import { selectionAtom } from '../atoms/selectionState';
-import { RewriteWidget } from '../features/ai/sidebar/RewriteWidget';
-import { HIDE_PLACEHOLDER_TEXT } from './CommandPaletteConfigs';
+import { HIDE_PLACEHOLDER_TEXT } from '../../../application/commands/CommandPaletteConfigs';
+import { selectionAtom } from '../../../atoms/selectionState';
+import { RewriteWidget } from '../../components/RewriteWidget';
 
 export function RewriteCommandWidgetMenu({ index }: { index: number }) {
   const { toggle } = useKmenu();

@@ -1,16 +1,16 @@
 import { createStore } from 'jotai';
 import { MenuProvider } from 'kmenu';
 
-import { runHookWithJotaiProvider } from '../../atoms/__tests__/test-utils';
-import { useOpenEditorsCountForPane } from '../../atoms/hooks/useOpenEditorsCountForPane';
-import { setReferencesAtom } from '../../atoms/referencesState';
-import { emitEvent, RefStudioEventName } from '../../events';
-import { REFERENCES } from '../../features/references/__tests__/test-fixtures';
-import { screen, setupWithJotaiProvider } from '../../test/test-utils';
+import { runHookWithJotaiProvider } from '../../../atoms/__tests__/test-utils';
+import { useOpenEditorsCountForPane } from '../../../atoms/hooks/useOpenEditorsCountForPane';
+import { setReferencesAtom } from '../../../atoms/referencesState';
+import { emitEvent, RefStudioEventName } from '../../../events';
+import { REFERENCES } from '../../../features/references/__tests__/test-fixtures';
+import { screen, setupWithJotaiProvider } from '../../../test/test-utils';
 import { CommandPalette } from '../CommandPalette';
 import { INDEX_MAIN, INDEX_REFERENCES } from '../CommandPaletteConfigs';
 
-vi.mock('../../events');
+vi.mock('../../../events');
 
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),

@@ -14,18 +14,11 @@ import {
 } from 'react-icons/vsc';
 import { useEventListener } from 'usehooks-ts';
 
-import { emitEvent } from '../events';
-import {
-  INDEX_FILES,
-  INDEX_MAIN,
-  INDEX_REFERENCES,
-  INDEX_REWRITE_MENUS,
-  INDEX_REWRITE_WIDGET,
-} from './CommandPaletteConfigs';
+import { emitEvent } from '../../events';
+import { RewriteCommandWidgetMenu } from '../../features/ai/commands/RewriteCommandWidgetMenu';
+import { ReferencesCommandMenu } from '../../features/references/commands/ReferencesCommandMenu';
+import { INDEX_FILES, INDEX_MAIN, INDEX_REFERENCES, INDEX_REWRITE_WIDGET } from './CommandPaletteConfigs';
 import { FilesCommandMenu } from './FilesCommandMenu';
-import { ReferencesCommandMenu } from './ReferencesCommandMenu';
-import { RewriteCommandMultiMenu } from './RewriteCommandMultiMenu';
-import { RewriteCommandWidgetMenu } from './RewriteCommandWidgetMenu';
 
 export function CommandPalette({ index }: { index?: number }) {
   const { setOpen } = useKmenu();
@@ -51,7 +44,6 @@ export function CommandPalette({ index }: { index?: number }) {
         <ReferencesCommandMenu index={INDEX_REFERENCES} />
         <FilesCommandMenu index={INDEX_FILES} />
         <RewriteCommandWidgetMenu index={INDEX_REWRITE_WIDGET} />
-        <RewriteCommandMultiMenu index={INDEX_REWRITE_MENUS} />
       </CommandWrapper>
     </div>
   );
@@ -66,12 +58,7 @@ export function MainCommandMenu({ index }: { index: number }) {
       commands: [
         {
           icon: <VscSymbolString />,
-          text: 'Rewrite selection (menus)...',
-          perform: () => setOpen(INDEX_REWRITE_MENUS, true),
-        },
-        {
-          icon: <VscSymbolString />,
-          text: 'Rewrite selection (widget)...',
+          text: 'Rewrite selection...',
           perform: () => setOpen(INDEX_REWRITE_WIDGET, true),
         },
       ],

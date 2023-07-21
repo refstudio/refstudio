@@ -1,12 +1,12 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 
-import { askForRewrite, AskForRewriteReturn } from '../../../../api/rewrite';
-import { RewriteOptions } from '../../../../api/rewrite.config';
-import { emitEvent, RefStudioEventName } from '../../../../events';
-import { noop } from '../../../../lib/noop';
-import { getCachedSetting, OpenAiManner, SettingsSchema } from '../../../../settings/settingsManager';
-import { render, setup } from '../../../../test/test-utils';
-import { RewriteWidget } from '../RewriteWidget';
+import { askForRewrite, AskForRewriteReturn } from '../../../api/rewrite';
+import { RewriteOptions } from '../../../api/rewrite.config';
+import { emitEvent, RefStudioEventName } from '../../../events';
+import { noop } from '../../../lib/noop';
+import { getCachedSetting, OpenAiManner, SettingsSchema } from '../../../settings/settingsManager';
+import { render, setup } from '../../../test/test-utils';
+import { RewriteWidget } from '../../components/RewriteWidget';
 
 const SELECTED_TEXT = 'This is the selected text.';
 const CHOICE_OPTION_1 = 'This is the first choice option.';
@@ -14,9 +14,9 @@ const CHOICE_OPTION_2 = 'This is the second choice option.';
 const CHOICE_OPTION_3 = 'This is the third choice option.';
 const INSERT_TEXT_EVENT = 'refstudio://ai/suggestion/insert' as RefStudioEventName;
 
-vi.mock('../../../../api/rewrite');
-vi.mock('../../../../settings/settingsManager');
-vi.mock('../../../../events');
+vi.mock('../../../api/rewrite');
+vi.mock('../../../settings/settingsManager');
+vi.mock('../../../events');
 
 const mockSettings: Pick<SettingsSchema, 'openAI'> = {
   openAI: {

@@ -2,9 +2,9 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { CommandMenu, useCommands } from 'kmenu';
 import { CategoryCommand } from 'kmenu/dist/types';
 
-import { openReferenceAtom } from '../atoms/editorActions';
-import { getReferencesAtom } from '../atoms/referencesState';
-import { useOpenKmenuOnInput } from './useOpenKmenuOnInput';
+import { useOpenKmenuOnInput } from '../../../application/commands/useOpenKmenuOnInput';
+import { openReferenceAtom } from '../../../atoms/editorActions';
+import { getReferencesAtom } from '../../../atoms/referencesState';
 
 export function ReferencesCommandMenu({ index }: { index: number }) {
   useOpenKmenuOnInput('@', index);

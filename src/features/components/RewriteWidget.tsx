@@ -2,11 +2,11 @@ import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useState } from 'react';
 import { VscChevronLeft, VscChevronRight } from 'react-icons/vsc';
 
-import { askForRewrite } from '../../../api/rewrite';
-import { REWRITE_MANNER, RewriteOptions } from '../../../api/rewrite.config';
-import { emitEvent } from '../../../events';
-import { cx } from '../../../lib/cx';
-import { getCachedSetting } from '../../../settings/settingsManager';
+import { askForRewrite } from '../../api/rewrite';
+import { REWRITE_MANNER, RewriteOptions } from '../../api/rewrite.config';
+import { emitEvent } from '../../events';
+import { cx } from '../../lib/cx';
+import { getCachedSetting } from '../../settings/settingsManager';
 
 export function RewriteWidget({
   selection,

@@ -3,11 +3,11 @@ import { useDebounce } from 'usehooks-ts';
 
 import { selectionAtom } from '../../../atoms/selectionState';
 import { PanelSection } from '../../../components/PanelSection';
-import { RewriteWidget } from './RewriteWidget';
+import { RewriteWidget } from '../../components/RewriteWidget';
 
-export function SelectionPanelSection() {
+export function SelectionPanelSection({ debounceMs = 200 }: { debounceMs?: number }) {
   const selection = useAtomValue(selectionAtom);
-  const debouncedSelection = useDebounce(selection, 200);
+  const debouncedSelection = useDebounce(selection, debounceMs);
 
   return (
     <PanelSection title="Selection">
