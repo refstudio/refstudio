@@ -9,12 +9,6 @@ import { PaneId } from '../atoms/types/PaneGroup';
 
 export const TABPANE_TAB_MENU_ID = 'TabPaneContextMenu';
 
-export interface TabPaneTabContextMenuProps {
-  editorId: EditorId;
-  fromPaneId: PaneId;
-  toPaneId: PaneId;
-}
-
 export function TabPaneTabContextMenu() {
   const closeAllEditors = useSetAtom(closeAllEditorsAtom);
   const closeEditor = useSetAtom(closeEditorFromAllPanesAtom);
