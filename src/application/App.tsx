@@ -4,7 +4,7 @@ import { MenuProvider } from 'kmenu';
 import React, { useCallback, useEffect, useState } from 'react';
 import { VscChevronUp } from 'react-icons/vsc';
 import { ImperativePanelHandle, Panel, PanelGroup } from 'react-resizable-panels';
-import { useEffectOnce } from 'usehooks-ts';
+import { useEffectOnce, useEventListener } from 'usehooks-ts';
 
 import { PrimarySideBar, PrimarySideBarPane } from '../components/PrimarySideBar';
 import { VerticalResizeHandle } from '../components/VerticalResizeHandle';
@@ -80,6 +80,20 @@ function LeftSidePanelWrapper() {
     }
     setPrimaryPane(selectedPane);
   };
+
+  // Configure keyboard shortcuts to open/close side panel
+  useEventListener('keydown', (e) => {
+    if (e.metaKey) {
+      switch (e.key.toLowerCase()) {
+        case 'b':
+          return handleSideBarClick(primaryPane);
+        case '1':
+          return handleSideBarClick('Explorer');
+        case '2':
+          return handleSideBarClick('References');
+      }
+    }
+  });
 
   React.useEffect(() => {
     if (primaryPaneCollapsed) {
