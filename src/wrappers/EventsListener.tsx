@@ -19,33 +19,27 @@ import {
 } from '../notifications/eventListeners';
 
 export function EventsListener({ children }: { children?: React.ReactNode }) {
-  const saveActiveFileListener = useSaveActiveFileListener();
-  const closeActiveEditorListener = useCloseActiveEditorListener();
-  const closeEditorListener = useCloseEditorListener();
-  const createFileListener = useCreateFileListener();
-  const removeReferencesListener = useRemoveReferencesListener();
-  const renameFileListener = useRenameFileListener();
-  const deleteFileListener = useDeleteFileListener();
-
   // Menu > File
-  useListenEvent('refstudio://menu/file/save', saveActiveFileListener);
-  useListenEvent('refstudio://menu/file/close', closeActiveEditorListener);
-  useListenEvent('refstudio://menu/file/new', createFileListener);
+  useListenEvent('refstudio://menu/file/save', useSaveActiveFileListener());
+  useListenEvent('refstudio://menu/file/close', useCloseActiveEditorListener());
+  useListenEvent('refstudio://menu/file/new', useCreateFileListener());
   // Editors
-  useListenEvent('refstudio://editors/close', closeEditorListener);
+  useListenEvent('refstudio://editors/close', useCloseEditorListener());
+  useListenEvent('refstudio://editors/close', useCloseEditorListener());
   // Explorer
-  useListenEvent('refstudio://explorer/rename', renameFileListener);
-  useListenEvent('refstudio://explorer/delete', deleteFileListener);
+  useListenEvent('refstudio://explorer/rename', useRenameFileListener());
+  useListenEvent('refstudio://explorer/delete', useDeleteFileListener());
   // References
-  useListenEvent('refstudio://references/remove', removeReferencesListener);
+  useListenEvent('refstudio://references/remove', useRemoveReferencesListener());
   useListenEvent('refstudio://references/load', useLoadReferencesListener());
   // Notifications
   useListenEvent('refstudio://notifications/new', useCreateNotificationListener());
   useListenEvent('refstudio://notifications/clear', useClearNotificationsListener());
   // notifications popup
-  useListenEvent('refstudio://menu/view/notifications', useTauriViewNotificationMenuListener());
   useListenEvent('refstudio://notifications/popup/open', useShowNotificationsPopupListener());
   useListenEvent('refstudio://notifications/popup/close', useHideNotificationsPopupListener());
+  // View
+  useListenEvent('refstudio://menu/view/notifications', useTauriViewNotificationMenuListener());
 
   return <>{children}</>;
 }

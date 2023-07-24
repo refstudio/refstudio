@@ -19,7 +19,9 @@ impl AppMenu {
             Menu::new()
                 .add_native_item(MenuItem::About(name.into(), AboutMetadata::new()))
                 .add_native_item(MenuItem::Separator)
-                .add_item(CustomMenuItem::new(MENU_SETTINGS, "Settings").accelerator("Cmd+,"))
+                .add_item(
+                    CustomMenuItem::new(MENU_SETTINGS, "Settings").accelerator("cmdOrControl+,"),
+                )
                 .add_native_item(MenuItem::Separator)
                 .add_native_item(MenuItem::Services)
                 .add_native_item(MenuItem::Hide)
@@ -35,6 +37,7 @@ impl AppMenu {
                 .add_item(
                     CustomMenuItem::new(MENU_FILE_NEW, "New File").accelerator("cmdOrControl+N"),
                 )
+                .add_native_item(MenuItem::Separator)
                 .add_item(
                     CustomMenuItem::new(MENU_FILE_CLOSE, "Close Editor")
                         .accelerator("cmdOrControl+W"),
@@ -56,7 +59,9 @@ impl AppMenu {
         let references_menu = Submenu::new(
             "References",
             Menu::new()
-                .add_item(CustomMenuItem::new(MENU_REFERENCES_OPEN, "Open").accelerator("Cmd+R"))
+                .add_item(
+                    CustomMenuItem::new(MENU_REFERENCES_OPEN, "Open").accelerator("cmdOrControl+R"),
+                )
                 .add_item(CustomMenuItem::new(MENU_REFERENCES_UPLOAD, "Upload...")),
         );
 
