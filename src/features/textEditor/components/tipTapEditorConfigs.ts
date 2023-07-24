@@ -10,10 +10,7 @@ import { lowlight } from 'lowlight';
 import { Markdown } from 'tiptap-markdown';
 
 import { CitationNode } from './tipTapNodes/citation/CitationNode';
-import { CollapsibleBlockContentNode } from './tipTapNodes/collapsibleBlock/nodes/CollapsibleBlockContent';
-import { CollapsibleBlockNode } from './tipTapNodes/collapsibleBlock/nodes/CollapsibleBlockNode';
-import { CollapsibleBlockSummaryNode } from './tipTapNodes/collapsibleBlock/nodes/CollapsibleBlockSummary';
-import { DraggableBlockNode } from './tipTapNodes/draggableBlock/DraggableBlockNode';
+import { NotionBlockNode } from './tipTapNodes/notionBlock/NotionBlockNode';
 import { ReferenceNode } from './tipTapNodes/references/ReferenceNode';
 import { RefStudioDocument } from './tipTapNodes/refStudioDocument/RefStudioDocument';
 import { SentenceCompletionExtension } from './tipTapNodes/sentenceCompletion/SentenceCompletion';
@@ -41,13 +38,14 @@ export const EDITOR_EXTENSIONS: Extensions = [
   }),
   // Custom extensions
   RefStudioDocument,
-  DraggableBlockNode,
-  CollapsibleBlockNode,
-  CollapsibleBlockContentNode,
-  CollapsibleBlockSummaryNode,
+  // DraggableBlockNode,
+  // CollapsibleBlockNode,
+  // CollapsibleBlockContentNode,
+  // CollapsibleBlockSummaryNode,
   CitationNode,
   ReferenceNode,
   SentenceCompletionExtension,
+  NotionBlockNode,
 ];
 
 export function transformPasted(slice: Slice) {

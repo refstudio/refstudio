@@ -1,0 +1,55 @@
+.notion-block {
+  @apply flex flex-row items-start gap-1;
+}
+
+.notion-block > .drag-handle {
+  @apply invisible;
+  @apply flex flex-shrink-0 flex-grow-0;
+  @apply mt-2 h-4 w-4;
+  @apply cursor-grab;
+  @apply bg-contain bg-center bg-no-repeat;
+  background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 16"><path fill-opacity="0.2" d="M4 14c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zM2 6C.9 6 0 6.9 0 8s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6C.9 0 0 .9 0 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" /></svg>');
+}
+
+.notion-block:hover:not(:has(.notion-block:hover)) > .drag-handle {
+  @apply visible;
+}
+
+.notion-block:has(> .content > div > h1) > .drag-handle {
+  /* 1.75rem / 2 */
+  @apply mt-[0.875rem];
+}
+
+.notion-block:has(> .content > div > h2) > .drag-handle {
+  /* 1.5rem / 2 */
+  @apply mt-3;
+}
+
+.notion-block:has(> .content > div > h3, h4) > .drag-handle {
+  /* 1.25rem / 2 */
+  @apply mt-[0.625rem];
+}
+
+.notion-block.selected > .content {
+  background-color: #e2edfb;
+}
+
+.notion-block.selected > .drag-handle {
+  @apply visible;
+}
+
+.notion-block > .content {
+  @apply flex-1 rounded-sm;
+}
+
+.notion-block p,
+.notion-block h1,
+.notion-block h2,
+.notion-block h3,
+.notion-block h4 {
+  @apply px-0.5 py-1;
+}
+
+.hidden-drag-handle .drag-handle {
+  @apply !invisible;
+}

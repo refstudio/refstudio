@@ -12,9 +12,16 @@ declare module '@tiptap/core' {
 }
 
 export const RefStudioDocument = Document.extend({
-  content: 'draggableBlock* | codeBlock',
+  content: 'notionBlock* | codeBlock',
   addKeyboardShortcuts: () => ({
     Backspace: backspace,
+    Tab: () => true,
+    'Shift-Tab': () => true,
+    'Mod-l': ({ editor }) => {
+      console.log(editor.state.selection.from);
+      console.log(editor.getHTML());
+      return true;
+    },
   }),
   addCommands: () => ({
     deleteNonEmptySelection: () => (props) => {
