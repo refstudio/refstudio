@@ -1,5 +1,5 @@
-import { Node } from '@tiptap/core';
-import { Plugin, PluginKey } from '@tiptap/pm/state';
+import { InputRule, Node } from '@tiptap/core';
+import { EditorState, Plugin, PluginKey } from '@tiptap/pm/state';
 import { ReactNodeViewRenderer } from '@tiptap/react';
 import { Decoration, DecorationSet } from 'prosemirror-view';
 
@@ -8,6 +8,7 @@ import { joinBackward } from './commands/joinBackward';
 import { joinForward } from './commands/joinForward';
 import { splitBlock } from './commands/splitBlock';
 import { unindent } from './commands/unindent';
+import { chevronHandler } from './inputRuleHandlers/chevronHandler';
 import { NotionBlock } from './NotionBlock';
 
 const placeholderPluginKey = new PluginKey<DecorationSet>('placeholder');
@@ -86,6 +87,54 @@ const hideHandlePlugin = new Plugin({
   },
 });
 
+function createCollapsibleArrowButton() {
+  const button = document.createElement('button');
+  button.innerHTML = `
+  <svg className="triangle" viewBox="0 0 100 100">
+    <polygon points="5.9,88.2 50,11.8 94.1,88.2 " />
+  </svg>`;
+
+  return button;
+}
+
+function getCollapsibleDecorations(state: EditorState): Decoration[] {
+  const decorations: Decoration[] = [];
+  state.doc.descendants((node, pos) => {
+    if (node.type.name !== NotionBlockNode.name) {
+      return false;
+    }
+    if (node.attrs.type !== 'collapsible') {
+      return;
+    }
+
+    const button = createCollapsibleArrowButton();
+    if (node.childCount === 1) {
+      button.classList.add('empty');
+    }
+    decorations.push(Decoration.widget(pos + 2, button, { side: -1 }));
+  });
+  return decorations;
+}
+
+const collapsiblePluginKey = new PluginKey<DecorationSet>('collapsibleNodes');
+const collapsiblePlugin = new Plugin({
+  key: collapsiblePluginKey,
+  state: {
+    init: (_config, state) => DecorationSet.create(state.doc, getCollapsibleDecorations(state)),
+    apply: (tr, value, _oldState, newState) => {
+      if (!tr.docChanged) {
+        return value;
+      }
+      return DecorationSet.create(tr.doc, getCollapsibleDecorations(newState));
+    },
+  },
+  props: {
+    decorations(state) {
+      return this.getState(state);
+    },
+  },
+});
+
 export const NotionBlockNode = Node.create({
   name: 'notionBlock',
   content: 'block notionBlock*',
@@ -129,5 +178,14 @@ export const NotionBlockNode = Node.create({
     Delete: ({ editor }) => editor.commands.command(joinForward),
   }),
 
-  addProseMirrorPlugins: () => [placeholderPlugin, hideHandlePlugin],
+  addProseMirrorPlugins: () => [placeholderPlugin, hideHandlePlugin, collapsiblePlugin],
+
+  addInputRules() {
+    return [
+      new InputRule({
+        find: /^> $/,
+        handler: chevronHandler.bind(this),
+      }),
+    ];
+  },
 });
