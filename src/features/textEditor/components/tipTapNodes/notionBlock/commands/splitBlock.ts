@@ -20,12 +20,10 @@ export const splitBlock: Command = ({ dispatch, state, tr }) => {
       tr.deleteSelection();
     }
 
-    const notionBlockType = state.schema.nodes[NotionBlockNode.name];
-
     const { pos } = $from;
     const updatedResolvedPos = tr.doc.resolve(tr.mapping.map(pos));
-    const before = Fragment.from(notionBlockType.create(null, updatedResolvedPos.parent.copy()));
-    const after = Fragment.from(notionBlockType.create(null, updatedResolvedPos.parent.copy()));
+    const before = Fragment.from($from.node(-1).copy(Fragment.from(updatedResolvedPos.parent.copy())));
+    const after = Fragment.from($from.node(-1).copy(Fragment.from(state.schema.nodes.paragraph.create())));
 
     tr.step(new ReplaceStep(pos, pos, new Slice(before.append(after), 2, 2), true));
 

@@ -23,7 +23,6 @@ export const joinForward: Command = ({ state, tr, view, dispatch }) => {
   if (textNodePosition === docSize) {
     return false;
   }
-  console.log(textNodePosition, docSize);
 
   if (dispatch) {
     const resolvedTextNodePosition = tr.doc.resolve(textNodePosition);
