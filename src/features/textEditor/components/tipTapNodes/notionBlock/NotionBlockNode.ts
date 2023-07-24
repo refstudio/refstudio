@@ -48,27 +48,40 @@ const hideHandlePlugin = new Plugin({
   key: hideHandlePluginKey,
   state: {
     init: () => false,
-    apply: (tr) => {
-      if (tr.getMeta(hideHandlePluginKey)) {
-        return false;
+    apply: (tr, value) => {
+      const metadata = tr.getMeta(hideHandlePluginKey) as boolean | undefined;
+      if (metadata !== undefined) {
+        return metadata;
       }
-      return tr.docChanged;
+      return value;
     },
   },
   props: {
+    handleKeyPress(view) {
+      if (!this.getState(view.state)) {
+        const { tr } = view.state;
+        tr.setMeta(hideHandlePluginKey, true);
+        view.dispatch(tr);
+      }
+    },
     handleDOMEvents: {
-      mousemove(view) {
-        if (this.getState(view.state)) {
+      mousemove(view, event) {
+        if (this.getState(view.state) && (event.movementX || event.movementY)) {
           const { tr } = view.state;
-          tr.setMeta(hideHandlePluginKey, true);
+          tr.setMeta(hideHandlePluginKey, false);
           view.dispatch(tr);
         }
       },
     },
     decorations(state) {
-      return this.getState(state)
-        ? DecorationSet.create(state.doc, [Decoration.node(0, state.doc.content.size, { class: 'hidden-drag-handle' })])
-        : DecorationSet.empty;
+      if (!this.getState(state)) {
+        return DecorationSet.empty;
+      }
+      const decorations: Decoration[] = [];
+      state.doc.forEach((node, offset) => {
+        decorations.push(Decoration.node(offset, offset + node.nodeSize, { class: 'hidden-drag-handle' }));
+      });
+      return DecorationSet.create(state.doc, decorations);
     },
   },
 });
