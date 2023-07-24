@@ -2,13 +2,14 @@ use tauri::utils::assets::EmbeddedAssets;
 use tauri::{AboutMetadata, Context, CustomMenuItem, Menu, MenuItem, Submenu, WindowMenuEvent};
 pub struct AppMenu {}
 
-const MENU_SETTINGS: &str = "refstudio://menu/settings";
-const MENU_REFERENCES_OPEN: &str = "refstudio://menu/references/open";
-const MENU_REFERENCES_UPLOAD: &str = "refstudio://menu/references/upload";
-const MENU_FILE_SAVE: &str = "refstudio://menu/file/save";
-const MENU_FILE_NEW: &str = "refstudio://menu/file/new";
-const MENU_FILE_CLOSE: &str = "refstudio://menu/file/close";
-const MENU_VIEW_NOTIFICATIONS: &str = "refstudio://menu/view/notifications";
+const MENU_SETTINGS: &str = /*           */ "refstudio://menu/settings";
+const MENU_REFERENCES_OPEN: &str = /*    */ "refstudio://menu/references/open";
+const MENU_REFERENCES_UPLOAD: &str = /*  */ "refstudio://menu/references/upload";
+const MENU_FILE_SAVE: &str = /*          */ "refstudio://menu/file/save";
+const MENU_FILE_NEW: &str = /*           */ "refstudio://menu/file/new";
+const MENU_FILE_CLOSE: &str = /*         */ "refstudio://menu/file/close";
+const MENU_FILE_CLOSE_ALL: &str = /*     */ "refstudio://menu/file/close/all";
+const MENU_VIEW_NOTIFICATIONS: &str = /* */ "refstudio://menu/view/notifications";
 
 impl AppMenu {
     pub fn get_menu(context: &Context<EmbeddedAssets>) -> Menu {
@@ -41,7 +42,11 @@ impl AppMenu {
                 .add_item(
                     CustomMenuItem::new(MENU_FILE_CLOSE, "Close Editor")
                         .accelerator("cmdOrControl+W"),
-                ),
+                )
+                .add_item(CustomMenuItem::new(
+                    MENU_FILE_CLOSE_ALL,
+                    "Close All Editors",
+                )),
         );
 
         let edit_menu = Submenu::new(

@@ -1,6 +1,6 @@
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 
-import { activePaneAtom, closeEditorFromPaneAtom } from '../atoms/editorActions';
+import { activePaneAtom, closeAllEditorsAtom, closeEditorFromPaneAtom } from '../atoms/editorActions';
 import { createFileAtom, deleteFileAtom, renameFileAtom } from '../atoms/fileEntryActions';
 import { fileExplorerEntryPathBeingRenamed } from '../atoms/fileExplorerActions';
 import { useActiveEditorContentAtoms } from '../atoms/hooks/useActiveEditorContentAtoms';
@@ -20,11 +20,11 @@ import {
 
 export function EventsListener({ children }: { children?: React.ReactNode }) {
   // Menu > File
+  useListenEvent('refstudio://menu/file/new', useCreateFileListener());
   useListenEvent('refstudio://menu/file/save', useSaveActiveFileListener());
   useListenEvent('refstudio://menu/file/close', useCloseActiveEditorListener());
-  useListenEvent('refstudio://menu/file/new', useCreateFileListener());
+  useListenEvent('refstudio://menu/file/close/all', useCloseAllActiveEditorsListener());
   // Editors
-  useListenEvent('refstudio://editors/close', useCloseEditorListener());
   useListenEvent('refstudio://editors/close', useCloseEditorListener());
   // Explorer
   useListenEvent('refstudio://explorer/rename', useRenameFileListener());
@@ -68,6 +68,12 @@ function useCloseActiveEditorListener() {
   const paneId = activePane.id;
 
   return () => emitEvent('refstudio://editors/close', { editorId, paneId });
+}
+
+function useCloseAllActiveEditorsListener() {
+  const closeAllEditors = useSetAtom(closeAllEditorsAtom);
+
+  return () => closeAllEditors();
 }
 
 function useCloseEditorListener() {

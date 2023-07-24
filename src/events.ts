@@ -4,9 +4,10 @@ import { PaneEditorId } from './atoms/types/PaneGroup';
 import { NotificationItemType } from './notifications/types';
 
 interface RefStudioEvents {
-  'refstudio://menu/file/close': undefined;
-  'refstudio://menu/file/save': undefined;
   'refstudio://menu/file/new': undefined;
+  'refstudio://menu/file/save': undefined;
+  'refstudio://menu/file/close': undefined;
+  'refstudio://menu/file/close/all': undefined;
   'refstudio://menu/settings': undefined;
   'refstudio://menu/references/open': undefined;
   'refstudio://menu/references/upload': undefined;

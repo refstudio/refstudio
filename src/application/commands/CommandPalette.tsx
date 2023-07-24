@@ -102,6 +102,11 @@ export function MainCommandMenu({ index }: { index: number }) {
           perform: () => emitEvent('refstudio://menu/file/close'),
         },
         {
+          icon: <VscClose />,
+          text: 'Close All Editors',
+          perform: () => emitEvent('refstudio://menu/file/close/all'),
+        },
+        {
           icon: <VscFiles />,
           text: 'Open File...',
           perform: () => setOpen(INDEX_FILES, true),
