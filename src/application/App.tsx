@@ -17,7 +17,7 @@ import { SettingsModalOpener } from '../settings/SettingsModalOpener';
 import { ApplicationFrame } from '../wrappers/ApplicationFrame';
 import { ContextMenus } from '../wrappers/ContextMenus';
 import { EventsListener } from '../wrappers/EventsListener';
-import { CommandPalette } from './CommandPalette';
+import { CommandPalette } from './commands/CommandPalette';
 import { MainPanel } from './components/MainPanel';
 import { ExplorerPanel } from './sidebar/ExplorerPanel';
 

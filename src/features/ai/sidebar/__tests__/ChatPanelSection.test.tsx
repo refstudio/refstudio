@@ -89,7 +89,7 @@ describe('ChatPanelSection component', () => {
   });
 
   it('should render ... and then the ### reply text', async () => {
-    let resolveFn: () => void = vi.fn();
+    let resolveFn: () => void = () => fail();
     vi.mocked(chatWithAI).mockImplementation(async () => {
       await new Promise<void>((resolve) => {
         // Capture resolve function to call after assertion

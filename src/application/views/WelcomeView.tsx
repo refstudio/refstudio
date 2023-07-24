@@ -18,6 +18,7 @@ export function WelcomeView({ hideShortcuts, className }: { hideShortcuts?: bool
       {!hideShortcuts && (
         <div className="mt-10 space-y-4">
           <WelcomeViewShortcut keys={['⌘', 'K']} text="Show Commands" />
+          <WelcomeViewShortcut keys={['⌘', 'P']} text="Show Files" />
           <WelcomeViewShortcut keys={['⌘', 'R']} text="Show References" />
           <WelcomeViewShortcut keys={['⌘', 'N']} text="New File" />
           <WelcomeViewShortcut keys={['⌘', ',']} text="Show Settings" />

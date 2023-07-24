@@ -13,7 +13,14 @@ export function notifyError(title: string, details?: string) {
   emitEvent('refstudio://notifications/new', { type: 'error', title, details });
 }
 
-export function notifyErr(err: Error, title?: string, details?: string) {
+/**
+ * Specialized notifyError utility for Errors (eg. for try/catch)
+ *
+ * @param err we use unknown instead of Error to simplify the code: `try { .. } catch(err) { notifyErr(err) }`
+ * @param title optional title override
+ * @param details optional notification details payload
+ */
+export function notifyErr(err: unknown, title?: string, details?: string) {
   title = title ?? (err instanceof Error ? err.message : 'Error');
   details = details ?? (err instanceof Error ? err.stack : String(err));
   emitEvent('refstudio://notifications/new', { type: 'error', title, details });
