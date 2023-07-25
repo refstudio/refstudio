@@ -1,9 +1,10 @@
 import { emit, EventCallback, listen } from '@tauri-apps/api/event';
 
-import { PaneEditorId } from './atoms/types/PaneGroup';
+import { PaneEditorId, PaneId } from './atoms/types/PaneGroup';
 import { NotificationItemType } from './notifications/types';
 
 interface RefStudioEvents {
+  // Menu actions (Note that these should have undefined payload)
   'refstudio://menu/file/new': undefined;
   'refstudio://menu/file/save': undefined;
   'refstudio://menu/file/close': undefined;
@@ -13,17 +14,25 @@ interface RefStudioEvents {
   'refstudio://menu/references/upload': undefined;
   'refstudio://menu/references/export': undefined;
   'refstudio://menu/view/notifications': undefined;
+  'refstudio://menu/debug/console/clear': undefined;
+  // Editor actions
   'refstudio://editors/close': PaneEditorId;
+  'refstudio://editors/move': { editor: PaneEditorId; toPaneId: PaneId };
+  // References actions
   'refstudio://references/ingestion/run': undefined;
   'refstudio://references/remove': { referenceIds: string[] };
   'refstudio://references/load': undefined;
+  // Explorer actions
   'refstudio://explorer/delete': { path: string };
+  'refstudio://explorer/rename': { path: string; newName?: string };
+  // Notifications actions
   'refstudio://notifications/clear': { type?: NotificationItemType };
   'refstudio://notifications/new': { type: NotificationItemType; title: string; details?: string };
   'refstudio://notifications/popup/open': { type?: NotificationItemType };
   'refstudio://notifications/popup/close': undefined;
-  'refstudio://explorer/rename': { path: string; newName?: string };
+  // Ai actions
   'refstudio://ai/suggestion/insert': { text: string };
+  // Layout actions
   'refstudio://layout/update': undefined;
 }
 

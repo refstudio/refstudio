@@ -1,6 +1,11 @@
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 
-import { activePaneAtom, closeAllEditorsAtom, closeEditorFromPaneAtom } from '../atoms/editorActions';
+import {
+  activePaneAtom,
+  closeAllEditorsAtom,
+  closeEditorFromPaneAtom,
+  moveEditorToPaneAtom,
+} from '../atoms/editorActions';
 import { createFileAtom, deleteFileAtom, renameFileAtom } from '../atoms/fileEntryActions';
 import { fileExplorerEntryPathBeingRenamed } from '../atoms/fileExplorerActions';
 import { useActiveEditorContentAtoms } from '../atoms/hooks/useActiveEditorContentAtoms';
@@ -26,6 +31,7 @@ export function EventsListener({ children }: { children?: React.ReactNode }) {
   useListenEvent('refstudio://menu/file/close/all', useCloseAllActiveEditorsListener());
   // Editors
   useListenEvent('refstudio://editors/close', useCloseEditorListener());
+  useListenEvent('refstudio://editors/move', useMoveActiveEditorToPaneListener());
   // Explorer
   useListenEvent('refstudio://explorer/rename', useRenameFileListener());
   useListenEvent('refstudio://explorer/delete', useDeleteFileListener());
@@ -40,6 +46,8 @@ export function EventsListener({ children }: { children?: React.ReactNode }) {
   useListenEvent('refstudio://notifications/popup/close', useHideNotificationsPopupListener());
   // View
   useListenEvent('refstudio://menu/view/notifications', useTauriViewNotificationMenuListener());
+  // Debug
+  useListenEvent('refstudio://menu/debug/console/clear', useClearConsoleListener());
 
   return <>{children}</>;
 }
@@ -103,5 +111,20 @@ function useRenameFileListener() {
     } else {
       void renameFile({ filePath: path, newName });
     }
+  };
+}
+
+function useMoveActiveEditorToPaneListener() {
+  const moveEditorToPane = useSetAtom(moveEditorToPaneAtom);
+
+  // Note: Payload for .../left and .../right is the same
+  return ({ editor, toPaneId }: RefStudioEventPayload<'refstudio://editors/move'>) => {
+    moveEditorToPane({ editorId: editor.editorId, fromPaneId: editor.paneId, toPaneId });
+  };
+}
+
+function useClearConsoleListener() {
+  return () => {
+    console.clear();
   };
 }
