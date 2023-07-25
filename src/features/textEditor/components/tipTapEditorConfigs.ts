@@ -38,10 +38,6 @@ export const EDITOR_EXTENSIONS: Extensions = [
   }),
   // Custom extensions
   RefStudioDocument,
-  // DraggableBlockNode,
-  // CollapsibleBlockNode,
-  // CollapsibleBlockContentNode,
-  // CollapsibleBlockSummaryNode,
   CitationNode,
   ReferenceNode,
   SentenceCompletionExtension,
