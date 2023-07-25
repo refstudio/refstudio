@@ -15,10 +15,9 @@ export interface TabPaneTabContextMenuProps {
 export function TabPaneTabContextMenu() {
   const moveEditorToPane = (props: TabPaneTabContextMenuProps | undefined, toPaneId: PaneId) => {
     const { editorId, paneId } = props ?? {};
-    if (!editorId || !paneId || paneId === toPaneId) {
-      return;
+    if (editorId && paneId && paneId !== toPaneId) {
+      emitEvent('refstudio://editors/move', { fromPaneEditorId: { editorId, paneId }, toPaneId });
     }
-    emitEvent('refstudio://editors/move', { fromPaneEditorId: { editorId, paneId }, toPaneId });
   };
 
   return (
