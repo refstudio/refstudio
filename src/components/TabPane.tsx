@@ -10,7 +10,7 @@ export function TabPane<K extends string>({
   onClick,
   onCloseClick,
 }: {
-  items: { text: string; value: K; ctxProps: unknown; isDirty?: boolean }[];
+  items: { text: string; value: K; ctxProps?: unknown; isDirty?: boolean }[];
   value: K | null;
   onClick(value: K): void;
   onCloseClick(value: K): void;
