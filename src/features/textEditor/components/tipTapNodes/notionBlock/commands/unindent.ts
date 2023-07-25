@@ -20,7 +20,7 @@ export const unindent: Command = ({ tr, dispatch }) => {
     tr.step(
       new ReplaceStep(
         $from.before(-1),
-        $from.after(-1), // $from.node(-1).content
+        $from.after(-1),
         new Slice(Fragment.from($from.node(-2).copy()).addToEnd($from.node(-1)), 1, 1),
       ),
     );

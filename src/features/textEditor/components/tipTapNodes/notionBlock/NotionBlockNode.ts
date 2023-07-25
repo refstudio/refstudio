@@ -1,5 +1,5 @@
 import { InputRule, Node } from '@tiptap/core';
-import { EditorState, Plugin, PluginKey } from '@tiptap/pm/state';
+import { EditorState, Plugin, PluginKey, Transaction } from '@tiptap/pm/state';
 import { ReactNodeViewRenderer } from '@tiptap/react';
 import { Decoration, DecorationSet } from 'prosemirror-view';
 
@@ -7,6 +7,7 @@ import { indent } from './commands/indent';
 import { joinBackward } from './commands/joinBackward';
 import { joinForward } from './commands/joinForward';
 import { splitBlock } from './commands/splitBlock';
+import { toggleCollapsed } from './commands/toggleCollapsed';
 import { unindent } from './commands/unindent';
 import { chevronHandler } from './inputRuleHandlers/chevronHandler';
 import { NotionBlock } from './NotionBlock';
@@ -90,21 +91,28 @@ const hideHandlePlugin = new Plugin({
   },
 });
 
-function createCollapsibleArrowButton(isEmpty: boolean) {
-  const button = document.createElement('button');
-  button.innerHTML = `
-  <svg className="triangle" viewBox="0 0 100 100">
-    <polygon points="5.9,88.2 50,11.8 94.1,88.2 " />
-  </svg>`;
+function createCollapsibleArrowButtonWidget(pos: number, isEmpty: boolean) {
+  return Decoration.widget(
+    pos,
+    () => {
+      const button = document.createElement('button');
+      button.classList.add('collapsible-arrow');
+      button.innerHTML = `
+        <svg className="triangle" viewBox="0 0 100 100">
+          <polygon points="5.9,88.2 50,11.8 94.1,88.2 " />
+        </svg>`;
 
-  if (isEmpty) {
-    button.classList.add('empty');
-  }
+      if (isEmpty) {
+        button.classList.add('empty');
+      }
 
-  return button;
+      return button;
+    },
+    { side: -1 },
+  );
 }
 
-function getCollapsibleDecorations(state: EditorState): Decoration[] {
+function getCollapsibleArrowDecorations(state: EditorState): Decoration[] {
   const decorations: Decoration[] = [];
   state.doc.descendants((node, pos) => {
     if (node.type.name !== NotionBlockNode.name) {
@@ -114,23 +122,89 @@ function getCollapsibleDecorations(state: EditorState): Decoration[] {
       return;
     }
 
-    decorations.push(
-      Decoration.widget(pos + 2, () => createCollapsibleArrowButton(node.childCount === 1), { side: -1 }),
-    );
+    const isEmpty = node.childCount === 1;
+    // + 2 to add the decoration in the paragraph (...|<notionBlock><p>... --> ...<notionBlock><p>|...)
+    decorations.push(createCollapsibleArrowButtonWidget(pos + 2, isEmpty));
   });
   return decorations;
 }
 
-const collapsiblePluginKey = new PluginKey<DecorationSet>('collapsibleNodes');
+function createEmptyCollapsiblePlaceholderWidget(pos: number) {
+  return Decoration.widget(pos, () => {
+    const placeholder = document.createElement('p');
+    placeholder.innerHTML = 'Empty toggle. Click or drop blocks inside.';
+    placeholder.style.color = 'hsl(var(--color-muted))';
+    placeholder.classList.add('empty-collapsible-placeholder');
+
+    return placeholder;
+  });
+}
+
+function getCollapsiblePlaceholderDecorations(state: EditorState): Decoration[] {
+  const decorations: Decoration[] = [];
+  state.doc.descendants((node, pos) => {
+    if (node.type.name !== NotionBlockNode.name) {
+      return false;
+    }
+    if (node.attrs.type !== 'collapsible') {
+      return;
+    }
+
+    const isEmpty = node.childCount === 1;
+    const isCollapsed = !!node.attrs.collapsed;
+    if (isEmpty && !isCollapsed) {
+      // Add the decoration after the paragraph (...|<notionBlock><p>...</p>... --> ...<notionBlock><p>...</p>|...)
+      decorations.push(createEmptyCollapsiblePlaceholderWidget(pos + node.child(0).nodeSize + 1));
+    }
+  });
+  return decorations;
+}
+
+export const collapsiblePluginKey = new PluginKey<DecorationSet>('collapsibleNodes');
 const collapsiblePlugin = new Plugin({
   key: collapsiblePluginKey,
   state: {
-    init: (_config, state) => DecorationSet.create(state.doc, getCollapsibleDecorations(state)),
+    init: (_config, state) => DecorationSet.create(state.doc, getCollapsibleArrowDecorations(state)),
+    apply: (tr, value, _oldState, newState) => {
+      if (!tr.docChanged || tr.getMeta(collapsiblePluginKey)) {
+        return value;
+      }
+      return DecorationSet.create(tr.doc, getCollapsibleArrowDecorations(newState));
+    },
+  },
+  props: {
+    decorations(state) {
+      return this.getState(state);
+    },
+    handleClick: (view, pos, event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      const toggleNodeCollapsed = () =>
+        toggleCollapsed({ pos: pos - 2, view, tr: view.state.tr, dispatch: (tr: Transaction) => view.dispatch(tr) });
+      // We need this because user can click on the svg polygon element, that is not an instance of HTMLElement
+      if (target.parentElement?.parentElement?.className.includes('collapsible-arrow')) {
+        toggleNodeCollapsed();
+      } else if (target.parentElement?.className.includes('collapsible-arrow')) {
+        toggleNodeCollapsed();
+      } else if (target.className.includes('collapsible-arrow')) {
+        toggleNodeCollapsed();
+      } else if (target.className.includes('empty-collapsible-placeholder')) {
+        const { tr } = view.state;
+        const schemaNodes = view.state.schema.nodes;
+        view.dispatch(tr.insert(pos, schemaNodes[NotionBlockNode.name].create(null, schemaNodes.paragraph.create())));
+      }
+    },
+  },
+});
+export const collapsiblePlaceholderPluginKey = new PluginKey<DecorationSet>('collapsibleNodes');
+const collapsiblePlaceholderPlugin = new Plugin({
+  key: collapsiblePlaceholderPluginKey,
+  state: {
+    init: (_config, state) => DecorationSet.create(state.doc, getCollapsiblePlaceholderDecorations(state)),
     apply: (tr, value, _oldState, newState) => {
       if (!tr.docChanged) {
         return value;
       }
-      return DecorationSet.create(tr.doc, getCollapsibleDecorations(newState));
+      return DecorationSet.create(tr.doc, getCollapsiblePlaceholderDecorations(newState));
     },
   },
   props: {
@@ -157,6 +231,13 @@ export const NotionBlockNode = Node.create({
           'data-type': attributes.type as string,
         }),
       },
+      collapsed: {
+        default: null,
+        parseHTML: (element) => element.getAttribute('data-collapsed') === 'true',
+        renderHTML: (attributes) => ({
+          'data-collapsed': attributes.collapsed as boolean,
+        }),
+      },
     };
   },
 
@@ -180,6 +261,7 @@ export const NotionBlockNode = Node.create({
         return editor.commands.command(({ dispatch, tr }) => {
           if (dispatch) {
             tr.setNodeAttribute($from.before(-1), 'type', null);
+            tr.setNodeAttribute($from.before(-1), 'collapsed', null);
             dispatch(tr);
           }
           return true;
@@ -193,9 +275,17 @@ export const NotionBlockNode = Node.create({
     },
     'Shift-Tab': ({ editor }) => editor.commands.command(unindent),
     Delete: ({ editor }) => editor.commands.command(joinForward),
+    'Cmd-Enter': ({ editor }) => {
+      const { $from } = editor.state.selection;
+      if ($from.node(-1).type.name !== NotionBlockNode.name || $from.node(-1).attrs.type !== 'collapsible') {
+        return false;
+      }
+      const pos = $from.before(-1);
+      return editor.commands.command(({ dispatch, tr, view }) => toggleCollapsed({ pos, dispatch, tr, view }));
+    },
   }),
 
-  addProseMirrorPlugins: () => [placeholderPlugin, hideHandlePlugin, collapsiblePlugin],
+  addProseMirrorPlugins: () => [placeholderPlugin, hideHandlePlugin, collapsiblePlugin, collapsiblePlaceholderPlugin],
 
   addInputRules() {
     return [

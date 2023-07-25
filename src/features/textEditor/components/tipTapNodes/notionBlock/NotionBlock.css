@@ -54,21 +54,42 @@
   @apply !invisible;
 }
 
-.notion-block button {
+.notion-block .collapsible-arrow {
   @apply block cursor-pointer border-0 bg-transparent;
-  @apply h-6 w-6 items-center justify-center p-1.5;
-  @apply rotate-180;
+  @apply mr-0.5 h-6 w-6 items-center justify-center p-1.5;
   @apply opacity-100;
   @apply inline-block;
-  transition: transform 200ms ease-out 0s, background 20ms ease-in 0s;
-  border-radius: 3px;
-  margin-right: 2px;
+  @apply rounded;
 }
 
-.notion-block button:hover {
+.notion-block .collapsible-arrow > svg {
+  @apply rotate-180;
+  transition: transform 200ms ease-out 0s, background 20ms ease-in 0s;
+}
+
+.notion-block .collapsible-arrow:hover {
   background: rgba(55, 53, 47, 0.08);
 }
 
-.notion-block button.empty {
+.notion-block .collapsible-arrow.empty > svg {
   @apply opacity-50;
+}
+
+.notion-block.collapsed .collapsible-arrow > svg {
+  @apply rotate-90;
+}
+
+.notion-block.collapsed .notion-block {
+  @apply hidden;
+}
+
+.notion-block .empty-collapsible-placeholder {
+  @apply ml-7 py-[3px] pl-0.5;
+  @apply cursor-pointer;
+  @apply rounded;
+  transition: background 20ms ease-in 0s;
+}
+
+.notion-block .empty-collapsible-placeholder:hover {
+  background: rgba(55, 53, 47, 0.08);
 }

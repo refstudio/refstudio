@@ -5,7 +5,7 @@ import { TextSelection } from 'prosemirror-state';
 
 import { NotionBlockNode } from '../NotionBlockNode';
 
-export const indent: Command = ({ state, tr, dispatch }) => {
+export const indent: Command = ({ tr, dispatch }) => {
   const { $from } = tr.selection;
   if (!tr.selection.empty || $from.node(-1).type.name !== NotionBlockNode.name) {
     return false;
@@ -18,9 +18,7 @@ export const indent: Command = ({ state, tr, dispatch }) => {
   }
 
   if (dispatch) {
-    const notionBlockType = state.schema.nodes[NotionBlockNode.name];
-
-    const fragment = Fragment.from(notionBlockType.create(null, $from.parent));
+    const fragment = Fragment.from($from.node(-1).copy(Fragment.from($from.parent)));
 
     tr.step(new ReplaceStep($from.before(-1) - 1, $from.after(), new Slice(fragment, 0, 0)));
     tr.setSelection(TextSelection.create(tr.doc, $from.pos - 1));
