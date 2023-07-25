@@ -17,7 +17,7 @@ interface RefStudioEvents {
   'refstudio://menu/debug/console/clear': undefined;
   // Editor actions
   'refstudio://editors/close': PaneEditorId;
-  'refstudio://editors/move': { editor: PaneEditorId; toPaneId: PaneId };
+  'refstudio://editors/move': { fromPaneEditorId: PaneEditorId; toPaneId: PaneId };
   // References actions
   'refstudio://references/ingestion/run': undefined;
   'refstudio://references/remove': { referenceIds: string[] };

@@ -118,7 +118,7 @@ function useMoveActiveEditorToPaneListener() {
   const moveEditorToPane = useSetAtom(moveEditorToPaneAtom);
 
   // Note: Payload for .../left and .../right is the same
-  return ({ editor, toPaneId }: RefStudioEventPayload<'refstudio://editors/move'>) => {
+  return ({ fromPaneEditorId: editor, toPaneId }: RefStudioEventPayload<'refstudio://editors/move'>) => {
     moveEditorToPane({ editorId: editor.editorId, fromPaneId: editor.paneId, toPaneId });
   };
 }

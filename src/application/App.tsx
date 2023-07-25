@@ -85,8 +85,6 @@ function LeftSidePanelWrapper() {
   useEventListener('keydown', (e) => {
     if (e.metaKey) {
       switch (e.key.toLowerCase()) {
-        case 'b':
-          return handleSideBarClick(primaryPane);
         case '1':
           return handleSideBarClick('Explorer');
         case '2':
