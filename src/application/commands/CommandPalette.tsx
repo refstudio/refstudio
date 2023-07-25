@@ -7,6 +7,8 @@ import {
   VscClose,
   VscFiles,
   VscGear,
+  VscLayoutSidebarLeft,
+  VscLayoutSidebarRight,
   VscLibrary,
   VscNewFile,
   VscSearch,
@@ -14,6 +16,7 @@ import {
 } from 'react-icons/vsc';
 import { useEventListener } from 'usehooks-ts';
 
+import { useActiveEditorId } from '../../atoms/hooks/useActiveEditorId';
 import { emitEvent } from '../../events';
 import { RewriteCommandWidgetMenu } from '../../features/ai/commands/RewriteCommandWidgetMenu';
 import { ReferencesCommandMenu } from '../../features/references/commands/ReferencesCommandMenu';
@@ -56,6 +59,7 @@ export function CommandPalette({ index, onOpen }: { index?: number; onOpen?: (in
 
 export function MainCommandMenu({ index }: { index: number }) {
   const { setOpen } = useKmenu();
+  const activeEditorId = useActiveEditorId();
 
   const main: Command[] = [
     {
@@ -95,6 +99,30 @@ export function MainCommandMenu({ index }: { index: number }) {
           icon: <VscNewFile />,
           text: 'New File',
           perform: () => emitEvent('refstudio://menu/file/new'),
+        },
+        {
+          icon: <VscLayoutSidebarLeft />,
+          text: 'Move Left',
+          perform: () => {
+            if (activeEditorId) {
+              emitEvent('refstudio://editors/move', {
+                fromPaneEditorId: { editorId: activeEditorId, paneId: 'RIGHT' },
+                toPaneId: 'LEFT',
+              });
+            }
+          },
+        },
+        {
+          icon: <VscLayoutSidebarRight />,
+          text: 'Move Right',
+          perform: () => {
+            if (activeEditorId) {
+              emitEvent('refstudio://editors/move', {
+                fromPaneEditorId: { editorId: activeEditorId, paneId: 'LEFT' },
+                toPaneId: 'RIGHT',
+              });
+            }
+          },
         },
         {
           icon: <VscClose />,
