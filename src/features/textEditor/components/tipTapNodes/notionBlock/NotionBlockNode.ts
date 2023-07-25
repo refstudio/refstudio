@@ -54,6 +54,9 @@ const hideHandlePlugin = new Plugin({
       if (metadata !== undefined) {
         return metadata;
       }
+      if (!value) {
+        return tr.docChanged;
+      }
       return value;
     },
   },
@@ -87,12 +90,16 @@ const hideHandlePlugin = new Plugin({
   },
 });
 
-function createCollapsibleArrowButton() {
+function createCollapsibleArrowButton(isEmpty: boolean) {
   const button = document.createElement('button');
   button.innerHTML = `
   <svg className="triangle" viewBox="0 0 100 100">
     <polygon points="5.9,88.2 50,11.8 94.1,88.2 " />
   </svg>`;
+
+  if (isEmpty) {
+    button.classList.add('empty');
+  }
 
   return button;
 }
@@ -107,11 +114,9 @@ function getCollapsibleDecorations(state: EditorState): Decoration[] {
       return;
     }
 
-    const button = createCollapsibleArrowButton();
-    if (node.childCount === 1) {
-      button.classList.add('empty');
-    }
-    decorations.push(Decoration.widget(pos + 2, button, { side: -1 }));
+    decorations.push(
+      Decoration.widget(pos + 2, () => createCollapsibleArrowButton(node.childCount === 1), { side: -1 }),
+    );
   });
   return decorations;
 }
@@ -167,6 +172,18 @@ export const NotionBlockNode = Node.create({
     Backspace: ({ editor }) => {
       if (!editor.state.selection.empty || !editor.view.endOfTextblock('left')) {
         return false;
+      }
+
+      const { $from } = editor.state.selection;
+      const notionBlockNode = $from.node(-1);
+      if (notionBlockNode.attrs.type !== null) {
+        return editor.commands.command(({ dispatch, tr }) => {
+          if (dispatch) {
+            tr.setNodeAttribute($from.before(-1), 'type', null);
+            dispatch(tr);
+          }
+          return true;
+        });
       }
 
       if (editor.can().command(unindent)) {
