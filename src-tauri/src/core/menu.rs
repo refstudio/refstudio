@@ -2,14 +2,16 @@ use tauri::utils::assets::EmbeddedAssets;
 use tauri::{AboutMetadata, Context, CustomMenuItem, Menu, MenuItem, Submenu, WindowMenuEvent};
 pub struct AppMenu {}
 
-const MENU_SETTINGS: &str = /*           */ "refstudio://menu/settings";
-const MENU_REFERENCES_OPEN: &str = /*    */ "refstudio://menu/references/open";
-const MENU_REFERENCES_UPLOAD: &str = /*  */ "refstudio://menu/references/upload";
-const MENU_FILE_SAVE: &str = /*          */ "refstudio://menu/file/save";
-const MENU_FILE_NEW: &str = /*           */ "refstudio://menu/file/new";
-const MENU_FILE_CLOSE: &str = /*         */ "refstudio://menu/file/close";
-const MENU_FILE_CLOSE_ALL: &str = /*     */ "refstudio://menu/file/close/all";
-const MENU_VIEW_NOTIFICATIONS: &str = /* */ "refstudio://menu/view/notifications";
+const MENU_SETTINGS: &str = /*            */ "refstudio://menu/settings";
+const MENU_REFERENCES_OPEN: &str = /*     */ "refstudio://menu/references/open";
+const MENU_REFERENCES_UPLOAD: &str = /*   */ "refstudio://menu/references/upload";
+const MENU_FILE_SAVE: &str = /*           */ "refstudio://menu/file/save";
+const MENU_FILE_NEW: &str = /*            */ "refstudio://menu/file/new";
+const MENU_FILE_CLOSE: &str = /*          */ "refstudio://menu/file/close";
+const MENU_FILE_CLOSE_ALL: &str = /*      */ "refstudio://menu/file/close/all";
+const MENU_VIEW_NOTIFICATIONS: &str = /*  */ "refstudio://menu/view/notifications";
+const MENU_DEBUG_CONSOLE_TOGGLE: &str = /**/ "refstudio://menu/debug/console/toggle";
+const MENU_DEBUG_CONSOLE_CLEAR: &str = /* */ "refstudio://menu/debug/console/clear";
 
 impl AppMenu {
     pub fn get_menu(context: &Context<EmbeddedAssets>) -> Menu {
@@ -87,24 +89,46 @@ impl AppMenu {
                 .add_native_item(MenuItem::Zoom),
         );
 
-        Menu::new()
+        let menu = Menu::new()
             .add_submenu(app_menu)
             .add_submenu(file_menu)
             .add_submenu(edit_menu)
             .add_submenu(references_menu)
             .add_submenu(view_menu)
-            .add_submenu(window_menu)
+            .add_submenu(window_menu);
+
+        #[cfg(debug_assertions)]
+        {
+            let debug_menu = Submenu::new(
+                "Debug",
+                Menu::new()
+                    .add_item(
+                        CustomMenuItem::new(MENU_DEBUG_CONSOLE_TOGGLE, "Show Console")
+                            .accelerator("F12"),
+                    )
+                    .add_item(
+                        CustomMenuItem::new(MENU_DEBUG_CONSOLE_CLEAR, "Clear Console")
+                            .accelerator("Shift+F12"),
+                    ),
+            );
+            return menu.clone().add_submenu(debug_menu);
+        }
     }
 
     pub fn on_menu_event(event: WindowMenuEvent) {
         // Send all events to the app
         event.window().emit(event.menu_item_id(), {}).unwrap();
-        // match event.menu_item_id() {
-        //     "refstudio://menu/settings" => {
-        //         println!("Settings");
-        //         event.window().emit("settings", {}).unwrap();
-        //     }
-        //     _ => {}
-        // }
+
+        match event.menu_item_id() {
+            MENU_DEBUG_CONSOLE_TOGGLE => {
+                if event.window().is_devtools_open() {
+                    event.window().close_devtools();
+                } else {
+                    event.window().open_devtools();
+                    event.window().set_focus().unwrap();
+                }
+            }
+            _ => {}
+        }
     }
 }
