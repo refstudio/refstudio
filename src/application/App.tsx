@@ -137,6 +137,13 @@ function RightPanelWrapper() {
     }
   }, [panelRef, closed]);
 
+  // Configure keyboard shortcuts to open/close side panel
+  useEventListener('keydown', (e) => {
+    if (e.metaKey && e.key.toLowerCase() === '0') {
+      setClosed((current) => !current);
+    }
+  });
+
   return (
     <>
       <VerticalResizeHandle />
