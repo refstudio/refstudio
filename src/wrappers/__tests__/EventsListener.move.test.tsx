@@ -4,7 +4,6 @@ import { makeFileAndEditor } from '../../atoms/__tests__/test-fixtures';
 import { runHookWithJotaiProvider } from '../../atoms/__tests__/test-utils';
 import { openFileEntryAtom } from '../../atoms/fileEntryActions';
 import { useOpenEditorsCountForPane } from '../../atoms/hooks/useOpenEditorsCountForPane';
-import { EditorData } from '../../atoms/types/EditorData';
 import { FileEntry } from '../../atoms/types/FileEntry';
 import { RefStudioEventName } from '../../events';
 import { readFileContent } from '../../io/filesystem';
@@ -20,7 +19,6 @@ const editorsMoveEventName: RefStudioEventName = 'refstudio://editors/move';
 describe('EventsListener.move', () => {
   let store: ReturnType<typeof createStore>;
   let fileEntry: FileEntry;
-  let editorData: EditorData;
 
   beforeEach(() => {
     vi.mocked(readFileContent).mockResolvedValue({ type: 'text', textContent: 'Lorem Ipsum' });
@@ -28,7 +26,6 @@ describe('EventsListener.move', () => {
 
     const file = makeFileAndEditor('File.txt');
     fileEntry = file.fileEntry;
-    editorData = file.editorData;
 
     store.set(openFileEntryAtom, fileEntry);
   });
