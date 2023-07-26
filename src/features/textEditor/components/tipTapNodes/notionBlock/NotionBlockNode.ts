@@ -1,7 +1,7 @@
 import { InputRule, Node } from '@tiptap/core';
 import { EditorState, Plugin, PluginKey, Transaction } from '@tiptap/pm/state';
+import { Decoration, DecorationSet } from '@tiptap/pm/view';
 import { ReactNodeViewRenderer } from '@tiptap/react';
-import { Decoration, DecorationSet } from 'prosemirror-view';
 
 import { indent } from './commands/indent';
 import { joinBackward } from './commands/joinBackward';
