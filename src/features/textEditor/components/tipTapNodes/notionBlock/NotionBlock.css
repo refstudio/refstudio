@@ -84,7 +84,7 @@
 }
 
 .notion-block .empty-collapsible-placeholder {
-  @apply ml-7 py-[3px] pl-0.5;
+  @apply ml-[26px] py-[3px] pl-0.5;
   @apply cursor-pointer;
   @apply rounded;
   transition: background 20ms ease-in 0s;
