@@ -39,7 +39,7 @@ export function buildEditorIdFromPath(filePath: string) {
       break;
     }
     default: {
-      type = 'text';
+      type = 'refstudio';
       break;
     }
   }

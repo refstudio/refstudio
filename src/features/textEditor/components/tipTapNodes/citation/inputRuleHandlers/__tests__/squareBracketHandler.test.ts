@@ -19,6 +19,10 @@ describe('Square bracket input rule handler', () => {
     squareBracketHandler({ state, range: { from: 2, to: 3 } });
     editor.view.dispatch(state.tr);
 
-    expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot('"<p><citation>@|</citation></p>"');
+    expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
+      "<notionblock>
+        <p><citation>@|</citation></p>
+      </notionblock>"
+    `);
   });
 });

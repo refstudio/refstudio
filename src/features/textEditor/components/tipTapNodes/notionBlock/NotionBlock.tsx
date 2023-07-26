@@ -13,13 +13,9 @@ export function NotionBlock({ node }: NotionBlockProps) {
   return (
     <NodeViewWrapper>
       <div className={cx('notion-block', { collapsed: !!node.attrs.collapsed })}>
-        <div
-          className="drag-handle"
-          contentEditable="false"
-          data-drag-handle
-        />
+        <div className="drag-handle" contentEditable="false" data-drag-handle />
         <NodeViewContent className="content" />
       </div>
-    </NodeViewWrapper >
+    </NodeViewWrapper>
   );
 }

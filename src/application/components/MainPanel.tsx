@@ -96,7 +96,6 @@ function MainPaneViewContent({ activeEditorAtoms }: MainPaneViewContentProps) {
       return <TextView file={data} textFormatter={(input) => JSON.stringify(JSON.parse(input), null, 2)} />;
     case 'pdf':
       return <PdfViewer file={data} />;
-    case 'text':
     case 'refstudio':
       return <TipTapView activeEditorContentAtoms={activeEditorAtoms} file={data} />;
     case 'reference':

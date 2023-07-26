@@ -15,6 +15,7 @@ import { JSONContent } from '@tiptap/core';
 
 import { EditorContent } from '../atoms/types/EditorContent';
 import { FileEntry, FileFileEntry } from '../atoms/types/FileEntry';
+import { notifyError } from '../notifications/notifications';
 import { FILE2_CONTENT, FILE3_CONTENT, INITIAL_CONTENT } from './filesystem.sample-content';
 
 const PROJECT_NAME = 'project-x';
@@ -220,8 +221,9 @@ export async function readFileContent(file: FileFileEntry): Promise<EditorConten
       try {
         const jsonContent = JSON.parse(textContent) as JSONContent;
         return { type: 'refstudio', jsonContent };
-      } catch {
-        return { type: 'text', textContent };
+      } catch (err) {
+        notifyError('Invalid content. Cannot open file:', file.path);
+        return { type: 'refstudio', jsonContent: [] };
       }
     }
   }

@@ -25,7 +25,7 @@ describe('EventsListener.save', () => {
   const saveEventName: RefStudioEventName = 'refstudio://menu/file/save';
 
   beforeEach(() => {
-    vi.mocked(readFileContent).mockResolvedValue({ type: 'text', textContent: 'Lorem Ipsum' });
+    vi.mocked(readFileContent).mockResolvedValue({ type: 'refstudio', jsonContent: { doc: 'Lorem Ipsum' } });
     store = createStore();
 
     const file = makeFileAndEditor('File.txt');
@@ -63,15 +63,15 @@ describe('EventsListener.save', () => {
 
     setupWithJotaiProvider(<EventsListener />, store);
 
-    const updatedContent = 'Updated content';
+    const updatedContent = { doc: 'Updated content' };
 
     act(() => {
-      updateFileBuffer.current({ type: 'text', textContent: updatedContent });
+      updateFileBuffer.current({ type: 'refstudio', jsonContent: updatedContent });
       mockData.trigger(saveEventName);
     });
 
     expect(writeFileContent).toHaveBeenCalledTimes(1);
-    expect(writeFileContent).toHaveBeenCalledWith(fileEntry.path, updatedContent);
+    expect(writeFileContent).toHaveBeenCalledWith(fileEntry.path, JSON.stringify(updatedContent));
   });
 
   it(`should not call saveFile when ${saveEventName} event is triggered without content changes`, () => {

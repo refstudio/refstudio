@@ -16,10 +16,12 @@ describe('ArrowRight keyboard command', () => {
     expect(commandResult).toBe(true);
 
     expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
-      "<p>
-        <citation>Citation</citation>
-        |Text after citation
-      </p>"
+      "<notionblock>
+        <p>
+          <citation>Citation</citation>
+          |Text after citation
+        </p>
+      </notionblock>"
     `);
   });
 
@@ -30,10 +32,12 @@ describe('ArrowRight keyboard command', () => {
     expect(commandResult).toBe(true);
 
     expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
-      "<p>
-        <citation>Citation</citation>
-        |
-      </p>"
+      "<notionblock>
+        <p>
+          <citation>Citation</citation>
+          |
+        </p>
+      </notionblock>"
     `);
   });
 

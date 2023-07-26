@@ -38,10 +38,10 @@ export const EDITOR_EXTENSIONS: Extensions = [
   }),
   // Custom extensions
   RefStudioDocument,
+  NotionBlockNode,
   CitationNode,
   ReferenceNode,
   SentenceCompletionExtension,
-  NotionBlockNode,
 ];
 
 export function transformPasted(slice: Slice) {

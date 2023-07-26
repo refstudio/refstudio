@@ -21,7 +21,7 @@ describe('EventsListener.move', () => {
   let fileEntry: FileEntry;
 
   beforeEach(() => {
-    vi.mocked(readFileContent).mockResolvedValue({ type: 'text', textContent: 'Lorem Ipsum' });
+    vi.mocked(readFileContent).mockResolvedValue({ type: 'refstudio', jsonContent: { doc: 'Lorem Ipsum' } });
     store = createStore();
 
     const file = makeFileAndEditor('File.txt');

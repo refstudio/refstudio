@@ -15,7 +15,7 @@ describe('Backspace keyboard command', () => {
     const commandResult = backspace({ editor });
     expect(commandResult).toBe(true);
 
-    expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot('"<p>[|</p>"');
+    expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot('"<notionblock><p>[|</p></notionblock>"');
   });
 
   it('should block the event if the selection is not empty and starts in a citation node', () => {

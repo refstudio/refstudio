@@ -81,15 +81,9 @@ function addSelectionCursors(editor: Editor) {
   chain.run();
 }
 
-/**
- * Get the editor content as HTML and format it with prettier.
- *
- * Note that this removes <draggable-block> nodes since these tend to add noise to the HTML.
- */
+/** Get the editor content as HTML and format it with prettier. */
 export function getPrettyHTML(editor: Editor) {
-  let html = editor.getHTML();
-  html = html.replaceAll('<draggable-block>', '');
-  html = html.replaceAll('</draggable-block>', '');
+  const html = editor.getHTML();
 
   // Format with prettier. TipTap HTML has multiple root nodes, so we need to wrap with <html>...</html>
   const prettyHtml = format('<html>' + html + '</html>', {

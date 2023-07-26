@@ -1,5 +1,6 @@
 import { atom } from 'jotai';
 
+import { EMPTY_DOCUMENT_CONTENT } from '../features/textEditor/components/tipTapNodes/refStudioDocument/RefStudioDocument';
 import { deleteFile, makeRefStudioPath, renameFile } from '../io/filesystem';
 import { editorsContentStateAtom, loadEditorContent, loadFileEntry } from './core/editorContent';
 import { addEditorData, editorsDataAtom, setEditorDataIsDirtyAtom } from './core/editorData';
@@ -52,7 +53,7 @@ export const createFileAtom = atom(null, (get, set) => {
   const editorId = buildEditorIdFromPath(filePath);
 
   // Load editor in memory
-  set(loadEditorContent, { editorId, editorContent: { type: 'text', textContent: '<p></p>' } });
+  set(loadEditorContent, { editorId, editorContent: { type: 'refstudio', jsonContent: EMPTY_DOCUMENT_CONTENT } });
 
   // Add to editor entries atom
   set(addEditorData, { id: editorId, title: fileName });

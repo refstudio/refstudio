@@ -15,6 +15,7 @@ import {
   waitFor,
 } from '../../../../test/test-utils';
 import { TipTapEditor } from '../TipTapEditor';
+import { createTextContent, emptyParagraphContent } from './test-fixtures';
 
 const insertContentEvent: RefStudioEventName = 'refstudio://ai/suggestion/insert';
 
@@ -26,25 +27,26 @@ describe('TipTapEditor', () => {
   });
 
   it('should render editor with initial content', () => {
-    const initialContent = 'Initial content';
+    const initialText = 'Initial content';
+    const initialContent = createTextContent(initialText);
 
     setup(
       <TipTapEditor editorContent={initialContent} isActive={true} saveFileInMemory={noop} updateFileBuffer={noop} />,
     );
 
-    expect(screen.getByText(initialContent)).toBeInTheDocument();
+    expect(screen.getByText(initialText)).toBeInTheDocument();
   });
 
   it(`should listen to ${insertContentEvent} events`, () => {
     const mockData = mockListenEvent();
-    render(<TipTapEditor editorContent={null} isActive={true} saveFileInMemory={noop} updateFileBuffer={noop} />);
+    render(<TipTapEditor editorContent={emptyParagraphContent} isActive={true} saveFileInMemory={noop} updateFileBuffer={noop} />);
 
     expect(mockData.registeredEventNames).toContain(insertContentEvent);
   });
 
   it(`should update editor when ${insertContentEvent} event is triggered`, () => {
     const { trigger } = mockListenEvent();
-    render(<TipTapEditor editorContent="<p></p>" isActive={true} saveFileInMemory={noop} updateFileBuffer={noop} />);
+    render(<TipTapEditor editorContent={emptyParagraphContent} isActive={true} saveFileInMemory={noop} updateFileBuffer={noop} />);
 
     const insertedContent = 'inserted content';
     act(() => {
@@ -56,7 +58,7 @@ describe('TipTapEditor', () => {
 
   it(`should not update editor when ${insertContentEvent} event is triggered but the editor is not active`, () => {
     const { trigger } = mockListenEvent();
-    render(<TipTapEditor editorContent="<p></p>" isActive={false} saveFileInMemory={noop} updateFileBuffer={noop} />);
+    render(<TipTapEditor editorContent={emptyParagraphContent} isActive={false} saveFileInMemory={noop} updateFileBuffer={noop} />);
 
     const insertedContent = 'inserted content';
     act(() => {
@@ -69,21 +71,23 @@ describe('TipTapEditor', () => {
   // Skipping because updating selection does not work.
   // My feeling is it cannot be handled because there is no actual window, with actual dimensions in the test
   it.skip('should update selection atom when selection changes', async () => {
-    const initialContent = 'Initial content';
+    const initialText = 'Initial content';
+    const initialContent = createTextContent(initialText);
 
     const { store, user } = setupWithJotaiProvider(
       <TipTapEditor editorContent={initialContent} isActive={false} saveFileInMemory={noop} updateFileBuffer={noop} />,
     );
     const selection = runGetAtomHook(selectionAtom, store);
 
-    const textElement = screen.getByText(initialContent);
+    const textElement = screen.getByText(initialText);
     await user.pointer([{ target: textElement, offset: 0 }, { offset: 7 }]);
 
-    await waitFor(() => expect(selection.current).toBe(initialContent.slice(0, 7)));
+    await waitFor(() => expect(selection.current).toBe(initialText.slice(0, 7)));
   });
 
   it.skip('should save content in buffer on update', async () => {
-    const initialContent = 'Initial content';
+    const initialText = 'Initial Content';
+    const initialContent = createTextContent(initialText);
     const updateFileBuffer = vi.fn<[EditorContent], undefined>();
 
     const { user } = setupWithJotaiProvider(
@@ -96,14 +100,15 @@ describe('TipTapEditor', () => {
     );
 
     const update = 'update';
-    const textElement = screen.getByText(initialContent);
+    const textElement = screen.getByText(initialText);
     await user.click(textElement);
     await user.keyboard(update);
 
     await waitFor(() => expect(updateFileBuffer).toHaveBeenCalledTimes(1));
-    expect(updateFileBuffer).toHaveBeenCalledWith<[EditorContent]>({
-      type: 'text',
-      textContent: initialContent + update,
+    const callParameters = updateFileBuffer.mock.lastCall;
+    expect(callParameters).toStrictEqual<EditorContent>({
+      type: 'refstudio',
+      jsonContent: { type: 'doc', content: [{ type: 'text', text: initialText + update }] },
     });
   });
 });

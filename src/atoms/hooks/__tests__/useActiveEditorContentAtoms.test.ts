@@ -13,8 +13,8 @@ import { runHookWithRendersCount } from './test-utils';
 
 describe('useActiveEditorContentAtoms', () => {
   let store: ReturnType<typeof createStore>;
-  const editorId1 = buildEditorId('text', 'editor1');
-  const editorId2 = buildEditorId('text', 'editor2');
+  const editorId1 = buildEditorId('refstudio', 'editor1');
+  const editorId2 = buildEditorId('refstudio', 'editor2');
   const initialPaneState: PaneGroupState = {
     LEFT: {
       openEditorIds: [],
@@ -26,8 +26,8 @@ describe('useActiveEditorContentAtoms', () => {
     },
   };
   const initialEditorsContent = new Map<EditorId, EditorContentAtoms>([
-    [editorId1, createEditorContentAtoms(editorId1, { type: 'text', textContent: '' })],
-    [editorId2, createEditorContentAtoms(editorId2, { type: 'text', textContent: '' })],
+    [editorId1, createEditorContentAtoms(editorId1, { type: 'refstudio', jsonContent: { doc: '' } })],
+    [editorId2, createEditorContentAtoms(editorId2, { type: 'refstudio', jsonContent: { doc: '' } })],
   ]);
 
   beforeEach(() => {
@@ -97,7 +97,10 @@ describe('useActiveEditorContentAtoms', () => {
     expect(utils.current.hookResult).toBe(initialEditorsContent.get(editorId1));
 
     const updatedState = new Map(store.get(editorsContentStateAtom));
-    updatedState.set(editorId1, createEditorContentAtoms(editorId1, { type: 'text', textContent: 'Updated content' }));
+    updatedState.set(
+      editorId1,
+      createEditorContentAtoms(editorId1, { type: 'refstudio', jsonContent: { doc: 'Updated content' } }),
+    );
     act(() => {
       store.set(editorsContentStateAtom, updatedState);
     });
@@ -112,7 +115,10 @@ describe('useActiveEditorContentAtoms', () => {
     expect(utils.current.rendersCount).toBe(1);
 
     const updatedState = new Map(store.get(editorsContentStateAtom));
-    updatedState.set(editorId2, createEditorContentAtoms(editorId2, { type: 'text', textContent: 'Updated content' }));
+    updatedState.set(
+      editorId2,
+      createEditorContentAtoms(editorId2, { type: 'refstudio', jsonContent: { doc: 'Updated content' } }),
+    );
     act(() => {
       store.set(editorsContentStateAtom, updatedState);
     });

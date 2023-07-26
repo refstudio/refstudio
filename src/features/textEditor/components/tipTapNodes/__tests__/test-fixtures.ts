@@ -1,36 +1,42 @@
 export const defaultCollapsibleBlock = `
-<collapsible-block>
-    <collapsible-summary>Header</collapsible-summary>
-    <collapsible-content>
+<notionblock type='collapsible'>
+    <p>Header</p>
+    <notionblock>
         <p>Content Line 1</p>
+    </notionblock>
+    <notionblock>
         <p>Content Line 2</p>
-    </collapsible-content>
-</collapsible-block>`;
+    </notionblock>
+</notionblock>`;
 
 export const defaultUncollapsedCollapsibleBlock = `
-<collapsible-block folded='false'>
-    <collapsible-summary>Header</collapsible-summary>
-    <collapsible-content>
+<notionblock type='collapsible' collapsed='false'>
+    <p>Header</p>
+    <notionblock>
         <p>Content Line 1</p>
+    </notionblock>
+    <notionblock>
         <p>Content Line 2</p>
-    </collapsible-content>
-</collapsible-block>`;
+    </notionblock>
+</notionblock>`;
 
 export const defaultCollapsibleBlockWithCursor = `
-<collapsible-block>
-    <collapsible-summary>|Header</collapsible-summary>
-    <collapsible-content>
+<notionblock type='collapsible'>
+    <p>|Header</p>
+    <notionblock>
         <p>Content Line 1</p>
+    </notionblock>
+    <notionblock>
         <p>Content Line 2</p>
-    </collapsible-content>
-</collapsible-block>`;
+    </notionblock>
+</notionblock>`;
 
 export const defaultParagraph = `<p>Some content</p>`;
 
 export const oneLineCollapsibleBlock = `
-<collapsible-block>
-    <collapsible-summary>|Header</collapsible-summary>
-    <collapsible-content>
-        <p>Content Line</p>
-    </collapsible-content>
-</collapsible-block>`;
+<notionblock type='collapsible'>
+    <p>|Header</p>
+    <notionblock>
+        <p>Content Line 1</p>
+    </notionblock>
+</notionblock>`;

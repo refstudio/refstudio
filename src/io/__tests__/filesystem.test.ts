@@ -12,6 +12,7 @@ import {
 } from '@tauri-apps/api/fs';
 import { appConfigDir, appDataDir, join } from '@tauri-apps/api/path';
 
+import { EditorContent } from '../../atoms/types/EditorContent';
 import { FileFileEntry } from '../../atoms/types/FileEntry';
 import {
   deleteFile,
@@ -232,7 +233,6 @@ describe('filesystem', () => {
     });
 
     it.each([
-      { extension: 'txt', type: 'text' },
       { extension: 'xml', type: 'xml' },
       { extension: 'json', type: 'json' },
     ])('should read $extension file content via tauri APIs', async ({ extension, type }) => {
@@ -250,6 +250,24 @@ describe('filesystem', () => {
       expect(content).toStrictEqual({
         type,
         textContent: 'Some content',
+      });
+    });
+
+    it('should read refstudio file content via tauri APIs', async () => {
+      vi.mocked(tauriReadTextFile).mockResolvedValue('{ "doc": "Some content" }');
+      const content = await readFileContent({
+        path: '/file1.refstudio',
+        name: 'file1.refstudio',
+        fileExtension: 'refstudio',
+        isDotfile: false,
+        isFile: true,
+        isFolder: false,
+      });
+
+      expect(vi.mocked(tauriReadTextFile)).toHaveBeenCalledTimes(1);
+      expect(content).toStrictEqual<EditorContent>({
+        type: 'refstudio',
+        jsonContent: { doc: 'Some content' },
       });
     });
 
