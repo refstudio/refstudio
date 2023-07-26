@@ -14,7 +14,13 @@ import {
   AiOutlineUndo as IconUndo,
   AiOutlineUnorderedList as IconUnorderedList,
 } from 'react-icons/ai';
-import { LuCode2 as IconDebug, LuHeading1 as IconH1, LuHeading2 as IconH2, LuHeading3 as IconH3 } from 'react-icons/lu';
+import {
+  LuCode2 as IconDebug,
+  LuHeading1 as IconH1,
+  LuHeading2 as IconH2,
+  LuHeading3 as IconH3,
+  LuRemoveFormatting as IconClearMarks,
+} from 'react-icons/lu';
 
 import { cx } from '../../../lib/cx';
 
@@ -96,6 +102,13 @@ export function MenuBar({ editor }: { editor: Editor }) {
         onClick={() => editor.chain().focus().toggleStrike().run()}
       >
         <IconStrikethrough />
+      </button>
+      <button
+        className="toolbar-item"
+        title="Clear Formatting"
+        onClick={() => editor.chain().focus().unsetAllMarks().clearNodes().run()}
+      >
+        <IconClearMarks />
       </button>
       <button
         className={cx('toolbar-item', {
