@@ -42,7 +42,7 @@ export const joinBackward: Command = ({ dispatch, state, tr, view }) => {
     // Make the second node the type of the first one
     const updatedStart = tr.mapping.map($to.before());
     const updatedEnd = updatedStart + $to.parent.nodeSize;
-    console.log(updatedStart, updatedEnd);
+
     tr.step(
       new ReplaceAroundStep(
         updatedStart,

@@ -248,48 +248,50 @@ export const NotionBlockNode = Node.create({
 
   addNodeView: () => ReactNodeViewRenderer(NotionBlock),
 
-  addKeyboardShortcuts: () => ({
-    Tab: ({ editor }) => editor.commands.command(indent),
-    Enter: ({ editor }) => {
-      if (!editor.state.selection.empty) {
-        return editor.chain().command(joinBackward).command(splitBlock).run();
-      }
-      return editor.commands.command(splitBlock);
-    },
-    Backspace: ({ editor }) => {
-      if (!editor.state.selection.empty) {
+  addKeyboardShortcuts() {
+    return {
+      Tab: ({ editor }) => editor.commands.command(indent),
+      Enter: ({ editor }) => {
+        if (!editor.state.selection.empty) {
+          return editor.chain().command(joinBackward).command(splitBlock).run();
+        }
+        return editor.commands.command(splitBlock.bind(this));
+      },
+      Backspace: ({ editor }) => {
+        if (!editor.state.selection.empty) {
+          return editor.commands.command(joinBackward);
+        }
+
+        const { $from } = editor.state.selection;
+        const notionBlockNode = $from.node(-1);
+        if (notionBlockNode.attrs.type !== null) {
+          return editor.commands.command(({ dispatch, tr }) => {
+            if (dispatch) {
+              tr.setNodeAttribute($from.before(-1), 'type', null);
+              tr.setNodeAttribute($from.before(-1), 'collapsed', null);
+              dispatch(tr);
+            }
+            return true;
+          });
+        }
+
+        if (editor.can().command(unindent)) {
+          return editor.commands.command(unindent);
+        }
         return editor.commands.command(joinBackward);
-      }
-
-      const { $from } = editor.state.selection;
-      const notionBlockNode = $from.node(-1);
-      if (notionBlockNode.attrs.type !== null) {
-        return editor.commands.command(({ dispatch, tr }) => {
-          if (dispatch) {
-            tr.setNodeAttribute($from.before(-1), 'type', null);
-            tr.setNodeAttribute($from.before(-1), 'collapsed', null);
-            dispatch(tr);
-          }
-          return true;
-        });
-      }
-
-      if (editor.can().command(unindent)) {
-        return editor.commands.command(unindent);
-      }
-      return editor.commands.command(joinBackward);
-    },
-    'Shift-Tab': ({ editor }) => editor.commands.command(unindent),
-    Delete: ({ editor }) => editor.commands.command(joinForward),
-    'Cmd-Enter': ({ editor }) => {
-      const { $from } = editor.state.selection;
-      if ($from.node(-1).type.name !== NotionBlockNode.name || $from.node(-1).attrs.type !== 'collapsible') {
-        return false;
-      }
-      const pos = $from.before(-1);
-      return editor.commands.command(({ dispatch, tr, view }) => toggleCollapsed({ pos, dispatch, tr, view }));
-    },
-  }),
+      },
+      'Shift-Tab': ({ editor }) => editor.commands.command(unindent),
+      Delete: ({ editor }) => editor.commands.command(joinForward),
+      'Cmd-Enter': ({ editor }) => {
+        const { $from } = editor.state.selection;
+        if ($from.node(-1).type.name !== NotionBlockNode.name || $from.node(-1).attrs.type !== 'collapsible') {
+          return false;
+        }
+        const pos = $from.before(-1);
+        return editor.commands.command(({ dispatch, tr, view }) => toggleCollapsed({ pos, dispatch, tr, view }));
+      },
+    };
+  },
 
   addProseMirrorPlugins: () => [placeholderPlugin, hideHandlePlugin, collapsiblePlugin, collapsiblePlaceholderPlugin],
 
