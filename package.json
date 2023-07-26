@@ -26,6 +26,10 @@
     "test:watch:ui": "vitest --watch --ui",
     "coverage": "vitest run --coverage",
     "tauri": "tauri",
+    "tauri:build:mac:apple": "tauri build --target aarch64-apple-darwin",
+    "tauri:build:mac:intel": "yarn tauri build --target x86_64-apple-darwin",
+    "tauri:build:mac:universal": "yarn tauri build --target universal-apple-darwin",
+    "tauri:build": "yarn tauri:build:mac:apple && yarn tauri:build:mac:intel && yarn tauri:build:mac:universal",
     "tauri:dev": "tauri dev",
     "tauri:dev:debug": "DEV_TOOLS=1 tauri dev"
   },

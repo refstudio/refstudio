@@ -1,6 +1,6 @@
 [package]
 name = "refstudio"
-version = "0.1.0"
+version = "0.0.0"
 description = "An open source text editor optimized for writing that relies on references."
 authors = ["you"]
 license = "MIT"
