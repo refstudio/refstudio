@@ -1,10 +1,10 @@
 import 'react-contexify/dist/ReactContexify.css';
 
 import { MenuProvider } from 'kmenu';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { VscChevronUp } from 'react-icons/vsc';
-import { ImperativePanelHandle, Panel, PanelGroup } from 'react-resizable-panels';
-import { useEffectOnce } from 'usehooks-ts';
+import { ImperativePanelGroupHandle, ImperativePanelHandle, Panel, PanelGroup } from 'react-resizable-panels';
+import { useEffectOnce, useLocalStorage, useWindowSize } from 'usehooks-ts';
 
 import { PrimarySideBar, PrimarySideBarPane } from '../components/PrimarySideBar';
 import { VerticalResizeHandle } from '../components/VerticalResizeHandle';
@@ -22,20 +22,44 @@ import { MainPanel } from './components/MainPanel';
 import { ExplorerPanel } from './sidebar/ExplorerPanel';
 
 export function App() {
+  const panelRef = React.createRef<ImperativePanelGroupHandle>();
+  const size = useWindowSize();
+  const [panelDimensions, setPanelDimensions] = useLocalStorage('refstudio.panels', { left: 400, right: 400 });
+
   useEffectOnce(() => emitEvent('refstudio://references/load'));
 
   const handleLayoutUpdate = useDebouncedCallback(
-    useCallback(() => emitEvent('refstudio://layout/update'), []),
+    useCallback(
+      ([leftPerc, , rightPerc]: number[]) => {
+        if (size.width === 0) {
+          return;
+        }
+        const left = Math.round(size.width * (leftPerc / 100));
+        const right = Math.round(size.width * (rightPerc / 100));
+        setPanelDimensions({ left, right });
+
+        // Notify external components that the screen/layout was resized
+        emitEvent('refstudio://layout/update');
+      },
+      [size, setPanelDimensions],
+    ),
     200,
   );
 
-  useEffect(() => {
-    window.addEventListener('resize', handleLayoutUpdate);
-
-    return () => {
-      window.removeEventListener('resize', handleLayoutUpdate);
-    };
-  }, [handleLayoutUpdate]);
+  // React to width resize or panelDimensions resize (via setLayout/resize panels)
+  useLayoutEffect(() => {
+    if (!panelRef.current || size.width === 0) {
+      return;
+    }
+    const layout = panelRef.current.getLayout();
+    const leftPerc = Math.round((panelDimensions.left / size.width) * 100);
+    const rightPerc = Math.round((panelDimensions.right / size.width) * 100);
+    const centerPerc = 100 - leftPerc - rightPerc;
+    const newLayout = [leftPerc, centerPerc, rightPerc];
+    if (layout.join(',') !== newLayout.join(',')) {
+      panelRef.current.setLayout(newLayout);
+    }
+  }, [panelRef, size, panelDimensions]);
 
   return (
     <EventsListener>
@@ -45,13 +69,13 @@ export function App() {
             <MenuProvider config={{ animationDuration: 0 }}>
               <CommandPalette />
               <PanelGroup
-                autoSaveId="refstudio"
                 className="relative h-full"
                 direction="horizontal"
+                ref={panelRef}
                 onLayout={handleLayoutUpdate}
               >
                 <LeftSidePanelWrapper />
-                <Panel defaultSize={60} order={2}>
+                <Panel order={2}>
                   <MainPanel />
                 </Panel>
                 <RightPanelWrapper />
@@ -98,13 +122,7 @@ function LeftSidePanelWrapper() {
         onClick={handleSideBarClick}
         onSettingsClick={openSettings}
       />
-      <Panel
-        collapsible
-        defaultSize={20}
-        order={1}
-        ref={leftPanelRef}
-        onCollapse={(collapsed) => setPrimaryPaneCollapsed(collapsed)}
-      >
+      <Panel collapsible order={1} ref={leftPanelRef} onCollapse={(collapsed) => setPrimaryPaneCollapsed(collapsed)}>
         {primaryPane === 'Explorer' && <ExplorerPanel />}
         {primaryPane === 'References' && <ReferencesPanel />}
       </Panel>
