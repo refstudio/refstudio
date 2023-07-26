@@ -1,8 +1,14 @@
+import { JSONContent } from '@tiptap/core';
+
 import { EditorIdFor } from './EditorData';
 
 export interface TextEditorContent {
   type: 'text';
   textContent: string;
+}
+export interface RefStudioEditorContent {
+  type: 'refstudio';
+  jsonContent: JSONContent;
 }
 
 export interface PdfEditorContent {
@@ -32,6 +38,7 @@ export interface ReferenceEditorContent {
 
 export type EditorContent =
   | TextEditorContent
+  | RefStudioEditorContent
   | PdfEditorContent
   | XmlEditorContent
   | JsonEditorContent

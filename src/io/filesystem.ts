@@ -11,6 +11,7 @@ import {
   writeTextFile,
 } from '@tauri-apps/api/fs';
 import { appConfigDir, appDataDir, join, sep } from '@tauri-apps/api/path';
+import { JSONContent } from '@tiptap/core';
 
 import { EditorContent } from '../atoms/types/EditorContent';
 import { FileEntry, FileFileEntry } from '../atoms/types/FileEntry';
@@ -216,7 +217,12 @@ export async function readFileContent(file: FileFileEntry): Promise<EditorConten
     }
     default: {
       const textContent = await readTextFile(systemPath);
-      return { type: 'text', textContent };
+      try {
+        const jsonContent = JSON.parse(textContent) as JSONContent;
+        return { type: 'refstudio', jsonContent };
+      } catch {
+        return { type: 'text', textContent };
+      }
     }
   }
 }

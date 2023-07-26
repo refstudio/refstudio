@@ -97,6 +97,7 @@ function MainPaneViewContent({ activeEditorAtoms }: MainPaneViewContentProps) {
     case 'pdf':
       return <PdfViewer file={data} />;
     case 'text':
+    case 'refstudio':
       return <TipTapView activeEditorContentAtoms={activeEditorAtoms} file={data} />;
     case 'reference':
       return <ReferenceView referenceId={data.referenceId} />;

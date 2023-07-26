@@ -36,7 +36,7 @@ export function TipTapEditor({ editorContent, isActive, saveFileInMemory, update
         transformPasted,
       },
       onUpdate: ({ editor: updatedEditor }) => {
-        updateFileBuffer({ type: 'text', textContent: updatedEditor.storage.markdown.getMarkdown() as string });
+        updateFileBuffer({ type: 'refstudio', jsonContent: updatedEditor.getJSON() });
       },
     });
     setEditor(newEditor);

@@ -227,24 +227,24 @@ export const NotionBlockNode = Node.create({
       ...this.parent?.(),
       type: {
         default: null,
-        parseHTML: (element) => element.getAttribute('data-type'),
+        parseHTML: (element) => element.getAttribute('type'),
         renderHTML: (attributes) => ({
-          'data-type': attributes.type as string,
+          type: attributes.type as string,
         }),
       },
       collapsed: {
         default: null,
-        parseHTML: (element) => element.getAttribute('data-collapsed') === 'true',
+        parseHTML: (element) => element.getAttribute('collapsed') === 'true',
         renderHTML: (attributes) => ({
-          'data-collapsed': attributes.collapsed as boolean,
+          collapsed: attributes.collapsed as boolean,
         }),
       },
     };
   },
 
-  parseHTML: () => [{ tag: 'notionBlock' }],
+  parseHTML: () => [{ tag: 'notionblock' }],
 
-  renderHTML: ({ HTMLAttributes }) => ['notionBlock', HTMLAttributes, 0],
+  renderHTML: ({ HTMLAttributes }) => ['notionblock', HTMLAttributes, 0],
 
   addNodeView: () => ReactNodeViewRenderer(NotionBlock),
 
