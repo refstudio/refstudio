@@ -20,7 +20,7 @@ export function toggleCollapsed({
     const { from, to } = tr.selection;
     const contentStart = pos + notionBlock.child(0).nodeSize + 1; // Position after the paragraph
     const contentEnd = pos + notionBlock.nodeSize; // End of the notion block
-    console.log(contentStart, contentEnd);
+
     if (from <= contentEnd && contentStart <= to) {
       tr.setSelection(TextSelection.near(tr.doc.resolve(contentStart), -1));
     }

@@ -1,7 +1,6 @@
-import { Command } from '@tiptap/core';
 import { Fragment, Slice } from '@tiptap/pm/model';
-import { ReplaceStep } from '@tiptap/pm/transform';
-import { TextSelection } from 'prosemirror-state';
+import { ReplaceAroundStep, ReplaceStep } from '@tiptap/pm/transform';
+import { Command } from '@tiptap/react';
 
 import { NotionBlockNode } from '../NotionBlockNode';
 
@@ -12,16 +11,25 @@ export const indent: Command = ({ tr, dispatch }) => {
   }
 
   // If the current node does not have a NotionBlockNode sibling, the node cannot be indented
-  const beforePosition = $from.before(-1);
-  if (beforePosition === 0 || tr.doc.resolve(beforePosition - 1).parent.type.name !== NotionBlockNode.name) {
+  const indexInParent = $from.indexAfter(-2);
+  if (
+    ($from.node(-2).type.name === 'doc' && indexInParent < 2) ||
+    ($from.node(-2).type.name === NotionBlockNode.name && indexInParent < 3)
+  ) {
     return false;
   }
 
   if (dispatch) {
-    const fragment = Fragment.from($from.node(-1).copy(Fragment.from($from.parent)));
+    const start = $from.before();
+    const end = $from.after();
+    tr.step(
+      new ReplaceAroundStep(start, end, start, end, new Slice(Fragment.from($from.node(-1).copy()), 0, 0), 1, true),
+    );
 
-    tr.step(new ReplaceStep($from.before(-1) - 1, $from.after(), new Slice(fragment, 0, 0)));
-    tr.setSelection(TextSelection.create(tr.doc, $from.pos - 1));
+    // Remove the </notionBlock><notionBlock> created during the intermediate step
+    const updatedStart = tr.mapping.map($from.before(-1));
+    tr.step(new ReplaceStep(updatedStart - 1, updatedStart + 1, Slice.empty, true));
+
     dispatch(tr);
   }
   return true;

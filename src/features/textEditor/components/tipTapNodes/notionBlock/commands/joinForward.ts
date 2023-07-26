@@ -1,45 +1,61 @@
 import { Command } from '@tiptap/core';
-import { Fragment } from '@tiptap/pm/model';
+import { Fragment, Slice } from '@tiptap/pm/model';
 import { TextSelection } from '@tiptap/pm/state';
-import { ReplaceStep } from 'prosemirror-transform';
+import { ReplaceAroundStep, ReplaceStep } from '@tiptap/pm/transform';
 
-export const joinForward: Command = ({ state, tr, view, dispatch }) => {
-  if (!tr.selection.empty || !view.endOfTextblock('forward', state)) {
+import { addUnindentSteps } from './unindent';
+
+export const joinForward: Command = ({ dispatch, state, tr, view }) => {
+  if (tr.selection.empty && !view.endOfTextblock('forward', state)) {
     return false;
   }
 
-  const { $from } = tr.selection;
+  let { to } = tr.selection;
 
-  // Find the next text node
-  const docSize = tr.doc.content.size;
-  const afterPosition = $from.after();
-
-  let i = 1;
-  while (afterPosition + i < docSize && !tr.doc.resolve(afterPosition + i).parent.isTextblock) {
-    i++;
+  if (tr.selection.empty) {
+    // Find the next text node
+    do {
+      to++;
+    } while (to < tr.doc.content.size && !tr.doc.resolve(to).parent.isTextblock);
   }
-  const textNodePosition = afterPosition + i;
+  if (to === tr.doc.content.size) {
+    return true;
+  }
 
-  if (textNodePosition === docSize) {
+  const $to = tr.doc.resolve(to);
+  const { $from } = tr.selection;
+  if ($from.sameParent($to) || !$from.parent.isTextblock || !$to.parent.isTextblock) {
     return false;
   }
 
   if (dispatch) {
-    const resolvedTextNodePosition = tr.doc.resolve(textNodePosition);
-    tr.insert($from.pos, resolvedTextNodePosition.nodeAfter ?? Fragment.empty);
+    // Bring both blocks to the same depth level
+    for (let i = 0; i < $from.depth - $to.depth; i++) {
+      addUnindentSteps(tr, tr.mapping.map($from.pos));
+    }
+    for (let i = 0; i < $to.depth - $from.depth; i++) {
+      addUnindentSteps(tr, tr.mapping.map($to.pos));
+    }
 
-    const updatedBeforePosition = tr.mapping.map(resolvedTextNodePosition.before(-1));
-    const updatedAfterPosition = tr.mapping.map(resolvedTextNodePosition.after(-1));
-
+    // Make the second node the type of the first one
+    const updatedStart = tr.mapping.map($to.before());
+    const updatedEnd = tr.mapping.map($to.after());
     tr.step(
-      new ReplaceStep(
-        updatedBeforePosition,
-        updatedAfterPosition,
-        tr.doc.slice(updatedBeforePosition + resolvedTextNodePosition.parent.nodeSize + 1, updatedAfterPosition - 1),
+      new ReplaceAroundStep(
+        updatedStart,
+        updatedEnd,
+        updatedStart + 1,
+        updatedEnd - 1,
+        new Slice(Fragment.from($from.parent.copy()), 0, 0),
+        1,
+        true,
       ),
     );
 
-    tr.setSelection(TextSelection.near(tr.doc.resolve($from.pos)));
+    // Remove selection
+    tr.step(new ReplaceStep(tr.mapping.map($from.pos), tr.mapping.map(to), Slice.empty));
+    tr.setSelection(TextSelection.near(tr.doc.resolve(tr.mapping.map(to))));
+
     dispatch(tr);
   }
   return true;

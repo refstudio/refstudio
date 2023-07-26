@@ -1,9 +1,22 @@
-import { Command } from '@tiptap/core';
 import { Fragment, Slice } from '@tiptap/pm/model';
-import { TextSelection } from '@tiptap/pm/state';
-import { ReplaceStep } from 'prosemirror-transform';
+import { Transaction } from '@tiptap/pm/state';
+import { ReplaceAroundStep, ReplaceStep } from '@tiptap/pm/transform';
+import { Command } from '@tiptap/react';
 
 import { NotionBlockNode } from '../NotionBlockNode';
+
+export function addUnindentSteps(tr: Transaction, pos: number): void {
+  const resolvedPos = tr.doc.resolve(pos);
+  const grandParent = resolvedPos.node(-2);
+  const start = resolvedPos.before(-1);
+  const end = resolvedPos.after(-1);
+  tr.step(
+    new ReplaceStep(start, start, new Slice(Fragment.from([grandParent.copy(), grandParent.copy()]), 1, 1), true),
+  );
+  const updatedStart = start + 2;
+  const updatedEnd = end + 2;
+  tr.step(new ReplaceAroundStep(updatedStart, updatedEnd, updatedStart + 1, updatedEnd - 1, Slice.empty, 0, true));
+}
 
 export const unindent: Command = ({ tr, dispatch }) => {
   const { $from } = tr.selection;
@@ -17,14 +30,8 @@ export const unindent: Command = ({ tr, dispatch }) => {
   }
 
   if (dispatch) {
-    tr.step(
-      new ReplaceStep(
-        $from.before(-1),
-        $from.after(-1),
-        new Slice(Fragment.from($from.node(-2).copy()).addToEnd($from.node(-1)), 1, 1),
-      ),
-    );
-    tr.setSelection(TextSelection.create(tr.doc, $from.pos + 1));
+    addUnindentSteps(tr, $from.pos);
+
     dispatch(tr);
   }
   return true;

@@ -1,7 +1,6 @@
 import Document from '@tiptap/extension-document';
 
 import { unsetPartiallySelectedCollapsibleBlocks } from '../collapsibleBlock/helpers/unsetPartiallySelectedCollapsibleBlocks';
-import { backspace } from './keyboardShortcutCommands/backspace';
 
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
@@ -14,7 +13,7 @@ declare module '@tiptap/core' {
 export const RefStudioDocument = Document.extend({
   content: 'notionBlock* | codeBlock',
   addKeyboardShortcuts: () => ({
-    Backspace: backspace,
+    // Backspace: backspace,
     Tab: () => true,
     'Shift-Tab': () => true,
     'Mod-l': ({ editor }) => {

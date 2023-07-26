@@ -131,7 +131,7 @@ function getCollapsibleArrowDecorations(state: EditorState): Decoration[] {
 
 function createEmptyCollapsiblePlaceholderWidget(pos: number) {
   return Decoration.widget(pos, () => {
-    const placeholder = document.createElement('p');
+    const placeholder = document.createElement('div');
     placeholder.innerHTML = 'Empty toggle. Click or drop blocks inside.';
     placeholder.style.color = 'hsl(var(--color-muted))';
     placeholder.classList.add('empty-collapsible-placeholder');
@@ -217,6 +217,7 @@ const collapsiblePlaceholderPlugin = new Plugin({
 export const NotionBlockNode = Node.create({
   name: 'notionBlock',
   content: 'block notionBlock*',
+  group: 'block',
   defining: true,
   whitespace: 'pre',
   draggable: true,
@@ -249,10 +250,15 @@ export const NotionBlockNode = Node.create({
 
   addKeyboardShortcuts: () => ({
     Tab: ({ editor }) => editor.commands.command(indent),
-    Enter: ({ editor }) => editor.commands.command(splitBlock),
+    Enter: ({ editor }) => {
+      if (!editor.state.selection.empty) {
+        return editor.chain().command(joinBackward).command(splitBlock).run();
+      }
+      return editor.commands.command(splitBlock);
+    },
     Backspace: ({ editor }) => {
-      if (!editor.state.selection.empty || !editor.view.endOfTextblock('left')) {
-        return false;
+      if (!editor.state.selection.empty) {
+        return editor.commands.command(joinBackward);
       }
 
       const { $from } = editor.state.selection;
