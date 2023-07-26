@@ -1,4 +1,4 @@
-import { Item, Menu } from 'react-contexify';
+import { Item, ItemParams, Menu } from 'react-contexify';
 
 import { emitEvent } from '../../../events';
 
@@ -8,17 +8,21 @@ export function FileExplorerFileContextMenu() {
   return (
     <Menu animation={false} id={FILE_EXPLORER_FILE_MENU_ID}>
       <Item
-        onClick={({ props: { id: untypedId } }) => {
-          const id = untypedId as string;
-          emitEvent('refstudio://explorer/rename', { path: id });
+        onClick={(params: ItemParams<{ id: string }>) => {
+          const id = params.props?.id;
+          if (id) {
+            emitEvent('refstudio://explorer/rename', { path: id });
+          }
         }}
       >
         Rename...
       </Item>
       <Item
-        onClick={({ props: { id: untypedId } }) => {
-          const id = untypedId as string;
-          emitEvent('refstudio://explorer/delete', { path: id });
+        onClick={(params: ItemParams<{ id: string }>) => {
+          const id = params.props?.id;
+          if (id) {
+            emitEvent('refstudio://explorer/delete', { path: id });
+          }
         }}
       >
         Delete File

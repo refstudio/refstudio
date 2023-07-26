@@ -1,9 +1,10 @@
 import { createStore } from 'jotai';
 
 import { makeFileAndEditor } from '../../atoms/__tests__/test-fixtures';
-import { runGetAtomHook } from '../../atoms/__tests__/test-utils';
+import { runGetAtomHook, runHookWithJotaiProvider } from '../../atoms/__tests__/test-utils';
 import { activePaneAtom } from '../../atoms/editorActions';
 import { openFileEntryAtom } from '../../atoms/fileEntryActions';
+import { useOpenEditorsCountForPane } from '../../atoms/hooks/useOpenEditorsCountForPane';
 import { EditorData } from '../../atoms/types/EditorData';
 import { FileEntry } from '../../atoms/types/FileEntry';
 import { PaneEditorId } from '../../atoms/types/PaneGroup';
@@ -17,6 +18,7 @@ vi.mock('../../io/filesystem');
 vi.mock('../../lib/noop');
 
 const menuCloseEventName: RefStudioEventName = 'refstudio://menu/file/close';
+const menuCloseAllEventName: RefStudioEventName = 'refstudio://menu/file/close/all';
 const editorCloseEventName: RefStudioEventName = 'refstudio://editors/close';
 
 describe('EventsListener.close', () => {
@@ -87,5 +89,29 @@ describe('EventsListener.close', () => {
 
     expect(activePane.current.openEditorIds).toHaveLength(1);
     expect(activePane.current.openEditorIds).toContain(editorData2.id);
+  });
+
+  it(`should close all open editors when ${menuCloseAllEventName} event is triggered`, () => {
+    const mockData = mockListenEvent();
+    const leftPaneOpenEditorsCount = runHookWithJotaiProvider(() => useOpenEditorsCountForPane('LEFT'), store);
+    const rightPaneOpenEditorsCount = runHookWithJotaiProvider(() => useOpenEditorsCountForPane('RIGHT'), store);
+
+    const { fileEntry: fileEntry2 } = makeFileAndEditor('File2.txt');
+    const { fileEntry: fileEntry3 } = makeFileAndEditor('File3.pdf');
+
+    act(() => store.set(openFileEntryAtom, fileEntry2));
+    act(() => store.set(openFileEntryAtom, fileEntry3));
+
+    expect(leftPaneOpenEditorsCount.current).toBe(2);
+    expect(rightPaneOpenEditorsCount.current).toBe(1);
+
+    setupWithJotaiProvider(<EventsListener />, store);
+
+    act(() => {
+      mockData.trigger(menuCloseAllEventName);
+    });
+
+    expect(leftPaneOpenEditorsCount.current).toBe(0);
+    expect(rightPaneOpenEditorsCount.current).toBe(0);
   });
 });
