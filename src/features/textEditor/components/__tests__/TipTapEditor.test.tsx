@@ -39,14 +39,28 @@ describe('TipTapEditor', () => {
 
   it(`should listen to ${insertContentEvent} events`, () => {
     const mockData = mockListenEvent();
-    render(<TipTapEditor editorContent={emptyParagraphContent} isActive={true} saveFileInMemory={noop} updateFileBuffer={noop} />);
+    render(
+      <TipTapEditor
+        editorContent={emptyParagraphContent}
+        isActive={true}
+        saveFileInMemory={noop}
+        updateFileBuffer={noop}
+      />,
+    );
 
     expect(mockData.registeredEventNames).toContain(insertContentEvent);
   });
 
   it(`should update editor when ${insertContentEvent} event is triggered`, () => {
     const { trigger } = mockListenEvent();
-    render(<TipTapEditor editorContent={emptyParagraphContent} isActive={true} saveFileInMemory={noop} updateFileBuffer={noop} />);
+    render(
+      <TipTapEditor
+        editorContent={emptyParagraphContent}
+        isActive={true}
+        saveFileInMemory={noop}
+        updateFileBuffer={noop}
+      />,
+    );
 
     const insertedContent = 'inserted content';
     act(() => {
@@ -58,7 +72,14 @@ describe('TipTapEditor', () => {
 
   it(`should not update editor when ${insertContentEvent} event is triggered but the editor is not active`, () => {
     const { trigger } = mockListenEvent();
-    render(<TipTapEditor editorContent={emptyParagraphContent} isActive={false} saveFileInMemory={noop} updateFileBuffer={noop} />);
+    render(
+      <TipTapEditor
+        editorContent={emptyParagraphContent}
+        isActive={false}
+        saveFileInMemory={noop}
+        updateFileBuffer={noop}
+      />,
+    );
 
     const insertedContent = 'inserted content';
     act(() => {
