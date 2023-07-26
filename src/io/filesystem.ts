@@ -222,6 +222,7 @@ export async function readFileContent(file: FileFileEntry): Promise<EditorConten
         const jsonContent = JSON.parse(textContent) as JSONContent;
         return { type: 'refstudio', jsonContent };
       } catch (err) {
+        console.error(err);
         notifyError('Invalid content. Cannot open file:', file.path);
         return { type: 'refstudio', jsonContent: [] };
       }
