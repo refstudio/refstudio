@@ -1,8 +1,7 @@
 import { Command } from '@tiptap/core';
 import { Fragment, NodeType, Slice } from '@tiptap/pm/model';
 import { TextSelection } from '@tiptap/pm/state';
-import { ReplaceAroundStep } from '@tiptap/pm/transform';
-import { ReplaceStep } from 'prosemirror-transform';
+import { ReplaceAroundStep, ReplaceStep } from '@tiptap/pm/transform';
 
 export const splitBlock: Command = function (
   this: {

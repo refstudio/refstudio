@@ -1,5 +1,5 @@
 import { Range, SingleCommands } from '@tiptap/core';
-import { NodeType } from 'prosemirror-model';
+import { NodeType } from '@tiptap/pm/model';
 
 export function chevronHandler(
   this: { type: NodeType },
