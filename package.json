@@ -1,7 +1,8 @@
 {
   "name": "refstudio",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
+  "description": "An open source text editor optimized for writing that relies on references.",
   "type": "module",
   "scripts": {
     "postinstall": "husky install",
