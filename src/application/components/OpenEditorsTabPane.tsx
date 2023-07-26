@@ -5,6 +5,7 @@ import { useActiveEditorIdForPane } from '../../atoms/hooks/useActiveEditorIdFor
 import { useOpenEditorsDataForPane } from '../../atoms/hooks/useOpenEditorsDataForPane';
 import { PaneId } from '../../atoms/types/PaneGroup';
 import { TabPane } from '../../components/TabPane';
+import { TabPaneTabContextMenuProps } from '../../components/TabPaneTabContextMenu';
 import { emitEvent } from '../../events';
 
 interface OpenEditorsTabPaneProps {
@@ -21,6 +22,10 @@ export function OpenEditorsTabPane({ paneId }: OpenEditorsTabPaneProps) {
     text: editorData.title,
     value: editorData.id,
     isDirty: editorData.isDirty,
+    ctxProps: {
+      editorId: editorData.id,
+      paneId,
+    } as TabPaneTabContextMenuProps,
   }));
 
   return (
