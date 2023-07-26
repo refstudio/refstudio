@@ -252,32 +252,53 @@ export const NotionBlockNode = Node.create({
     return {
       Tab: ({ editor }) => editor.commands.command(indent),
       Enter: ({ editor }) => {
-        if (!editor.state.selection.empty) {
-          return editor.chain().command(joinBackward).command(splitBlock).run();
-        }
-        return editor.commands.command(splitBlock.bind(this));
-      },
-      Backspace: ({ editor }) => {
-        if (!editor.state.selection.empty) {
-          return editor.commands.command(joinBackward);
-        }
-
-        const { $from } = editor.state.selection;
-        const notionBlockNode = $from.node(-1);
-        if (notionBlockNode.attrs.type !== null) {
+        const { selection } = editor.state;
+        if (
+          selection.empty &&
+          selection.$from.parent.content.size === 0 &&
+          selection.$from.node(-1).attrs.type !== null
+        ) {
           return editor.commands.command(({ dispatch, tr }) => {
             if (dispatch) {
-              tr.setNodeAttribute($from.before(-1), 'type', null);
-              tr.setNodeAttribute($from.before(-1), 'collapsed', null);
+              tr.setNodeAttribute(selection.$from.before(-1), 'type', null);
+              tr.setNodeAttribute(selection.$from.before(-1), 'collapsed', null);
               dispatch(tr);
             }
             return true;
           });
         }
-
-        if (editor.can().command(unindent)) {
-          return editor.commands.command(unindent);
+        if (!selection.empty) {
+          return editor.chain().command(joinBackward).command(splitBlock).run();
         }
+        return editor.commands.command(splitBlock.bind(this));
+      },
+      Backspace: ({ editor }) => {
+        const { selection } = editor.state;
+        if (selection.empty && !editor.view.endOfTextblock('left')) {
+          return false;
+        }
+
+        if (selection.empty) {
+          const { $from } = selection;
+          const notionBlockNode = $from.node(-1);
+          if (notionBlockNode.attrs.type !== null) {
+            return editor.commands.command(({ dispatch, tr }) => {
+              if (dispatch) {
+                tr.setNodeAttribute($from.before(-1), 'type', null);
+                tr.setNodeAttribute($from.before(-1), 'collapsed', null);
+                dispatch(tr);
+              }
+              return true;
+            });
+          }
+
+          const isCollapsibleFirstChild =
+            $from.depth > 2 && $from.node(-2).attrs.type === 'collapsible' && $from.indexAfter(-2) === 2;
+          if (!isCollapsibleFirstChild && editor.can().command(unindent)) {
+            return editor.commands.command(unindent);
+          }
+        }
+
         return editor.commands.command(joinBackward);
       },
       'Shift-Tab': ({ editor }) => editor.commands.command(unindent),

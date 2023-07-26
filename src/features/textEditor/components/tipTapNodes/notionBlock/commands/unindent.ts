@@ -8,11 +8,10 @@ import { NotionBlockNode } from '../NotionBlockNode';
 export function addUnindentSteps(tr: Transaction, pos: number): void {
   const resolvedPos = tr.doc.resolve(pos);
   const grandParent = resolvedPos.node(-2);
+  const parent = resolvedPos.node(-1);
   const start = resolvedPos.before(-1);
   const end = resolvedPos.after(-1);
-  tr.step(
-    new ReplaceStep(start, start, new Slice(Fragment.from([grandParent.copy(), grandParent.copy()]), 1, 1), true),
-  );
+  tr.step(new ReplaceStep(start, start, new Slice(Fragment.from([grandParent.copy(), parent.copy()]), 1, 1), true));
   const updatedStart = start + 2;
   const updatedEnd = end + 2;
   tr.step(new ReplaceAroundStep(updatedStart, updatedEnd, updatedStart + 1, updatedEnd - 1, Slice.empty, 0, true));
