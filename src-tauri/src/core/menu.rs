@@ -103,7 +103,7 @@ impl AppMenu {
                 "Debug",
                 Menu::new()
                     .add_item(
-                        CustomMenuItem::new(MENU_DEBUG_CONSOLE_TOGGLE, "Show Console")
+                        CustomMenuItem::new(MENU_DEBUG_CONSOLE_TOGGLE, "Toggle Console")
                             .accelerator("F12"),
                     )
                     .add_item(
