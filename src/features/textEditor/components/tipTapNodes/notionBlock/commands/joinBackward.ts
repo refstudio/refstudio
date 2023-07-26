@@ -1,9 +1,9 @@
 import { Command } from '@tiptap/core';
 import { Fragment, Slice } from '@tiptap/pm/model';
 import { TextSelection } from '@tiptap/pm/state';
-import { ReplaceAroundStep } from '@tiptap/pm/transform';
-import { ReplaceStep } from 'prosemirror-transform';
+import { ReplaceAroundStep, ReplaceStep } from '@tiptap/pm/transform';
 
+import { addIndentSteps } from './indent';
 import { addUnindentSteps } from './unindent';
 
 export const joinBackward: Command = ({ dispatch, state, tr, view }) => {
@@ -33,7 +33,7 @@ export const joinBackward: Command = ({ dispatch, state, tr, view }) => {
   if (dispatch) {
     // Bring both blocks to the same depth level
     for (let i = 0; i < $from.depth - $to.depth; i++) {
-      addUnindentSteps(tr, tr.mapping.map($from.pos));
+      addIndentSteps(tr, tr.mapping.map($to.pos));
     }
     for (let i = 0; i < $to.depth - $from.depth; i++) {
       addUnindentSteps(tr, tr.mapping.map($to.pos));
@@ -41,7 +41,8 @@ export const joinBackward: Command = ({ dispatch, state, tr, view }) => {
 
     // Make the second node the type of the first one
     const updatedStart = tr.mapping.map($to.before());
-    const updatedEnd = tr.mapping.map($to.after());
+    const updatedEnd = updatedStart + $to.parent.nodeSize;
+    console.log(updatedStart, updatedEnd);
     tr.step(
       new ReplaceAroundStep(
         updatedStart,
