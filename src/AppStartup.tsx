@@ -1,7 +1,9 @@
 import { invoke } from '@tauri-apps/api';
+import { useSetAtom } from 'jotai';
 import { useState } from 'react';
 
 import { App } from './application/App';
+import { loadReferencesAtom } from './atoms/referencesState';
 import { useAsyncEffect } from './hooks/useAsyncEffect';
 import { ensureProjectFileStructure } from './io/filesystem';
 import { noop } from './lib/noop';
@@ -14,6 +16,7 @@ interceptConsoleMessages(true, true, true);
 
 export function AppStartup() {
   const [initialized, setInitialized] = useState(false);
+  const loadReferences = useSetAtom(loadReferencesAtom);
 
   useAsyncEffect(
     async (isMounted) => {
@@ -30,6 +33,7 @@ export function AppStartup() {
 
       if (isMounted()) {
         setInitialized(true);
+        await loadReferences();
       }
     },
     noop,
