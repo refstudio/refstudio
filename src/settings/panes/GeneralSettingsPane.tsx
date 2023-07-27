@@ -8,7 +8,7 @@ import { getCachedSetting, getSettings, saveCachedSettings, setCachedSetting } f
 import { SettingsPane, SettingsPaneProps } from './SettingsPane';
 
 export function GeneralSettingsPane({ config }: SettingsPaneProps) {
-  const [generalSettings] = useState(getCachedSetting('general'));
+  const [generalSettings, setGeneralSettings] = useState(getCachedSetting('general'));
   const [sidecarLoggingSettings, setSidecarLoggingSettings] = useState(getCachedSetting('sidecar.logging'));
 
   const saveMutation = useMutation({
@@ -58,8 +58,8 @@ export function GeneralSettingsPane({ config }: SettingsPaneProps) {
             <input
               className="w-full border bg-slate-50 px-2 py-0.5 text-gray-500"
               id="app-dir"
-              readOnly
               value={generalSettings.projectDir}
+              onChange={(e) => setGeneralSettings({ ...generalSettings, ...{ projectDir: String(e.target.value) } })}
             />
             <p className="text-xs text-gray-500">NOTE: This setting is readonly (for now!)</p>
           </div>
