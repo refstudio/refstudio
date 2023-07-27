@@ -7,7 +7,7 @@ import { loadReferencesAtom } from './atoms/referencesState';
 import { useAsyncEffect } from './hooks/useAsyncEffect';
 import { openProject } from './io/filesystem';
 import { noop } from './lib/noop';
-import { notifyInfo } from './notifications/notifications';
+import { notifyErr, notifyInfo } from './notifications/notifications';
 import { interceptConsoleMessages } from './notifications/notifications.console';
 import { getCachedSetting, initSettings } from './settings/settingsManager';
 
@@ -20,20 +20,25 @@ export function AppStartup() {
 
   useAsyncEffect(
     async (isMounted) => {
-      if (initialized) {
-        return;
-      }
+      try {
+        if (initialized) {
+          return;
+        }
 
-      notifyInfo('Application Startup');
-      await initSettings();
-      await openProject(getCachedSetting('general.projectDir'));
-      await invoke('close_splashscreen');
+        notifyInfo('Application Startup');
+        await initSettings();
+        const projectDir = getCachedSetting('general.projectDir');
+        await openProject(projectDir);
+        await invoke('close_splashscreen');
 
-      notifyInfo('Application Initialized');
+        notifyInfo('Application Initialized');
 
-      if (isMounted()) {
-        setInitialized(true);
-        await loadReferences();
+        if (isMounted()) {
+          setInitialized(true);
+          await loadReferences();
+        }
+      } catch (err) {
+        notifyErr(err);
       }
     },
     noop,
