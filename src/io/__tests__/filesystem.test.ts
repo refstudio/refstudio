@@ -16,7 +16,6 @@ import { EditorContent } from '../../atoms/types/EditorContent';
 import { FileFileEntry } from '../../atoms/types/FileEntry';
 import {
   deleteFile,
-  ensureProjectFileStructure,
   getParentFolder,
   getRefStudioPath,
   getSystemAppDataDir,
@@ -26,6 +25,7 @@ import {
   isInUploadsDir,
   makeRefStudioPath,
   makeUploadPath,
+  openProject,
   readAllProjectFiles,
   readFileContent,
   renameFile,
@@ -38,10 +38,10 @@ vi.mock('@tauri-apps/api/fs');
 vi.mock('@tauri-apps/api/path');
 
 const APP_CONFIG_DIR = '/usr/path/configdir/bundleid';
-const APP_DATA_DIR = '/usr/path/datadir/bundleid';
+const PROJECT_DIR = '/usr/path/datadir/bundleid/project-x';
 
 vi.mocked(appConfigDir).mockResolvedValue(APP_CONFIG_DIR);
-vi.mocked(appDataDir).mockResolvedValue(APP_DATA_DIR);
+vi.mocked(appDataDir).mockResolvedValue(PROJECT_DIR);
 vi.mocked(join).mockImplementation(async (...args: string[]) => Promise.resolve(args.join('/').replaceAll('//', '/')));
 vi.mocked(tauriReadDir).mockResolvedValue([]);
 
@@ -72,7 +72,7 @@ describe('filesystem', () => {
     it('should extract ref studio path from system path (reflective)', async () => {
       const rsPath = '/some/file.txt';
       const systemPath = await getSystemPath(rsPath);
-      expect(await getRefStudioPath(systemPath)).toBe(rsPath);
+      expect(getRefStudioPath(systemPath)).toBe(rsPath);
     });
   });
 
@@ -132,7 +132,7 @@ describe('filesystem', () => {
   // #####################################################################################
   describe('project structure and read files', () => {
     it('should create project structure if folder and files dont exist', async () => {
-      await ensureProjectFileStructure();
+      await openProject('/usr/documents/project-x');
       // Create 2 folders
       expect(tauriCreateDir).toHaveBeenCalledTimes(2);
       // Check and create 3 files
@@ -142,7 +142,7 @@ describe('filesystem', () => {
 
     it('should throw error if any tauri fs throws', async () => {
       vi.mocked(tauriCreateDir).mockRejectedValue('any');
-      await expect(ensureProjectFileStructure()).rejects.toThrow();
+      await expect(openProject('/usr/documents/project-x')).rejects.toThrow();
     });
 
     it('should read all project files empty if none exists', async () => {

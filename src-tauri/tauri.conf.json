@@ -22,7 +22,8 @@
           "$APPCONFIG",
           "$APPCONFIG/*",
           "$APPDATA/**",
-          "$RESOURCE/**"
+          "$RESOURCE/**",
+          "$HOME/**"
         ]
       },
       "shell": {

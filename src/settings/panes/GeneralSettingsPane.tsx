@@ -38,7 +38,7 @@ export function GeneralSettingsPane({ config }: SettingsPaneProps) {
               className="w-full border bg-slate-50 px-2 py-0.5 text-gray-500"
               id="app-data-dir"
               readOnly
-              value={generalSettings.appDataDir}
+              value={generalSettings.projectDir}
             />
             <p className="text-xs text-gray-500">NOTE: This setting is readonly (for now!)</p>
           </div>

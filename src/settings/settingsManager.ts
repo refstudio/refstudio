@@ -1,7 +1,7 @@
 import { SettingsManager } from 'tauri-settings';
 import { Path, PathValue } from 'tauri-settings/dist/types/dot-notation';
 
-import { getSystemAppDataDir, getSystemConfigurationsDir } from '../io/filesystem';
+import { getSystemConfigurationsDir } from '../io/filesystem';
 import { readEnv } from '../io/readEnv';
 
 export type OpenAiManner = 'concise' | 'elaborate' | 'scholarly';
@@ -11,7 +11,7 @@ export function getMannerOptions(): OpenAiManner[] {
 
 export interface SettingsSchema {
   general: {
-    appDataDir: string;
+    projectDir: string;
     projectName: string;
   };
   openAI: {
@@ -37,7 +37,7 @@ export async function initSettings() {
   settingsManager = new SettingsManager<SettingsSchema>(
     {
       general: {
-        appDataDir: await getSystemAppDataDir(),
+        projectDir: '', // TODO: Handle initial value
         projectName: 'project-x',
       },
       openAI: {

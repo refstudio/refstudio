@@ -14,8 +14,7 @@ export async function callSidecar<T extends keyof CliCommands>(
   const sidecarSettings = getCachedSetting('sidecar');
   const env: Record<string, string> = {
     // Paths
-    APP_DATA_DIR: generalSettings.appDataDir,
-    PROJECT_NAME: generalSettings.projectName,
+    PROJECT_DIR: generalSettings.projectDir,
     // Open AI
     OPENAI_API_KEY: openAISettings.apiKey,
     OPENAI_CHAT_MODEL: openAISettings.chatModel,

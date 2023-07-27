@@ -3,11 +3,11 @@ import { useState } from 'react';
 
 import { App } from './application/App';
 import { useAsyncEffect } from './hooks/useAsyncEffect';
-import { ensureProjectFileStructure } from './io/filesystem';
+import { openProject } from './io/filesystem';
 import { noop } from './lib/noop';
 import { notifyInfo } from './notifications/notifications';
 import { interceptConsoleMessages } from './notifications/notifications.console';
-import { initSettings } from './settings/settingsManager';
+import { getCachedSetting, initSettings } from './settings/settingsManager';
 
 // Note: Intercepting INFO, WARN and ERROR console.*
 interceptConsoleMessages(true, true, true);
@@ -23,7 +23,7 @@ export function AppStartup() {
 
       notifyInfo('Application Startup');
       await initSettings();
-      await ensureProjectFileStructure();
+      await openProject(getCachedSetting('general.appDataDir'));
       await invoke('close_splashscreen');
 
       notifyInfo('Application Initialized');
