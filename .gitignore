@@ -180,3 +180,6 @@ $RECYCLE.BIN/
 src-tauri/bin
 main.spec
 __pycache__
+
+# Build image binaries
+/binaries/*.dmg

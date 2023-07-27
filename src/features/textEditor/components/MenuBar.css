@@ -8,11 +8,11 @@
 .toolbar button.toolbar-item {
   @apply !bg-transparent;
   @apply flex items-center;
-  @apply cursor-pointer rounded-lg border-0 p-2;
+  @apply mx-0.5 cursor-pointer rounded-lg border-0 p-2;
 }
 
 .toolbar button.toolbar-item:disabled {
-  cursor: not-allowed;
+  @apply cursor-not-allowed;
 }
 
 .toolbar button.toolbar-item.spaced {
@@ -22,8 +22,7 @@
 .toolbar button.toolbar-item i.format {
   @apply flex;
   @apply bg-contain opacity-60;
-  height: 18px;
-  width: 18px;
+  @apply h-[18px] w-[18px];
 }
 
 .toolbar button.toolbar-item:disabled i.format {
@@ -43,98 +42,6 @@
 }
 
 .toolbar .divider {
-  width: 1px;
-  background-color: #eee;
-  margin: 0 4px;
-}
-
-.toolbar i.undo {
-  background-image: url(images/icons/arrow-counterclockwise.svg);
-}
-
-.toolbar i.redo {
-  background-image: url(images/icons/arrow-clockwise.svg);
-}
-
-.toolbar i.paragraph {
-  background-image: url(images/icons/text-paragraph.svg);
-}
-
-.toolbar i.large-heading,
-.toolbar i.h1 {
-  background-image: url(images/icons/type-h1.svg);
-}
-
-.toolbar i.small-heading,
-.toolbar i.h2 {
-  background-image: url(images/icons/type-h2.svg);
-}
-
-.toolbar i.h3 {
-  background-image: url(images/icons/type-h3.svg);
-}
-
-.toolbar i.bullet-list,
-.toolbar i.ul {
-  background-image: url(images/icons/list-ul.svg);
-}
-
-.toolbar i.numbered-list,
-.toolbar i.ol {
-  background-image: url(images/icons/list-ol.svg);
-}
-
-.toolbar i.quote {
-  background-image: url(images/icons/chat-square-quote.svg);
-}
-
-.toolbar i.code {
-  background-image: url(images/icons/code.svg);
-}
-
-.toolbar i.bold {
-  background-image: url(images/icons/type-bold.svg);
-}
-
-.toolbar i.italic {
-  background-image: url(images/icons/type-italic.svg);
-}
-
-.toolbar i.underline {
-  background-image: url(images/icons/type-underline.svg);
-}
-
-.toolbar i.strikethrough {
-  background-image: url(images/icons/type-strikethrough.svg);
-}
-
-.toolbar i.code {
-  background-image: url(images/icons/code.svg);
-}
-
-.toolbar i.journal-code {
-  background-image: url(images/icons/journal-code.svg);
-}
-.toolbar i.journal-text {
-  background-image: url(images/icons/journal-text.svg);
-}
-
-.toolbar i.link {
-  background-image: url(images/icons/link.svg);
-}
-
-.toolbar i.left-align {
-  background-image: url(images/icons/text-left.svg);
-}
-
-.toolbar i.center-align {
-  background-image: url(images/icons/text-center.svg);
-}
-
-.toolbar i.right-align {
-  background-image: url(images/icons/text-right.svg);
-}
-
-.toolbar i.justify-align {
-  background-image: url(images/icons/justify.svg);
+  @apply mx-1 my-1;
+  @apply w-[1px] bg-slate-300;
 }

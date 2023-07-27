@@ -1,10 +1,10 @@
 [package]
 name = "refstudio"
 version = "0.0.0"
-description = "A Tauri App"
+description = "An open source text editor optimized for writing that relies on references."
 authors = ["you"]
-license = ""
-repository = ""
+license = "MIT"
+repository = "https://github.com/refstudio/refstudio"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
