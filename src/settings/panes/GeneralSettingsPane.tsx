@@ -31,12 +31,12 @@ export function GeneralSettingsPane({ config }: SettingsPaneProps) {
       <form className="mt-10" onSubmit={handleSaveSettings}>
         <fieldset className="space-y-4">
           <div className="space-y-2">
-            <label className="font-semibold" htmlFor="app-data-dir">
-              Project App Data Dir
+            <label className="font-semibold" htmlFor="app-dir">
+              Project Dir
             </label>
             <input
               className="w-full border bg-slate-50 px-2 py-0.5 text-gray-500"
-              id="app-data-dir"
+              id="app-dir"
               readOnly
               value={generalSettings.projectDir}
             />

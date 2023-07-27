@@ -1,7 +1,7 @@
 import { SettingsManager } from 'tauri-settings';
 
 import { render, screen } from '../../../test/test-utils';
-import { SettingsSchema, getSettings, initSettings, saveCachedSettings } from '../../settingsManager';
+import { getSettings, initSettings, saveCachedSettings, SettingsSchema } from '../../settingsManager';
 import { PaneConfig } from '../../types';
 import { DebugSettingsPane } from '../DebugSettingsPane';
 import { GeneralSettingsPane } from '../GeneralSettingsPane';
@@ -17,7 +17,7 @@ const panelConfig: PaneConfig = {
 
 const mockSettings: SettingsSchema = {
   general: {
-    projectDir: 'app-data-dir',
+    projectDir: 'app-dir',
     projectName: 'project-x',
   },
   openAI: {

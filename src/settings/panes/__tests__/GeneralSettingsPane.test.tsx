@@ -1,11 +1,11 @@
 import { noop } from '../../../lib/noop';
 import { render, screen, userEvent } from '../../../test/test-utils';
 import {
-  SettingsSchema,
   getCachedSetting,
   initSettings,
   saveCachedSettings,
   setCachedSetting,
+  SettingsSchema,
 } from '../../settingsManager';
 import { PaneConfig } from '../../types';
 import { GeneralSettingsPane } from '../GeneralSettingsPane';
