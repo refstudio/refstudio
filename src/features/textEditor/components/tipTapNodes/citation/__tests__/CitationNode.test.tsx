@@ -57,12 +57,14 @@ describe('CitationNode', () => {
     editor.view.dispatch(editor.state.tr.insertText('a', position));
     expect(citation).toHaveTextContent(new RegExp(`^\\[@${mockedCitationKey}; a\\]$`));
     expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
-      "<p>
-        <citation>
-          <span data-type='reference' data-id='TESTID'>@TESTID</span>
-          ; a|
-        </citation>
-      </p>"
+      "<notionblock>
+        <p>
+          <citation>
+            <span data-type='reference' data-id='TESTID'>@TESTID</span>
+            ; a|
+          </citation>
+        </p>
+      </notionblock>"
     `);
   });
 
@@ -82,12 +84,14 @@ describe('CitationNode', () => {
 
     expect(citation).toHaveTextContent(new RegExp(`^\\[@${mockedCitationKey} and a\\]$`));
     expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
-      "<p>
-        <citation>
-          <span data-type='reference' data-id='TESTID'>@TESTID</span>
-          and a|
-        </citation>
-      </p>"
+      "<notionblock>
+        <p>
+          <citation>
+            <span data-type='reference' data-id='TESTID'>@TESTID</span>
+            and a|
+          </citation>
+        </p>
+      </notionblock>"
     `);
   });
 
@@ -117,17 +121,23 @@ describe('CitationNode', () => {
   it('should move a cursor that is after the closing bracket to the position before the bracket', () => {
     const [position] = setUpEditorWithSelection(editor, '<p><citation>Citation|</citation></p>');
     editor.commands.setTextSelection(position + 1);
-    expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot('"<p><citation>Citation|</citation></p>"');
+    expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
+      "<notionblock>
+        <p><citation>Citation|</citation></p>
+      </notionblock>"
+    `);
   });
 
   it('should move a cursor that is after the opening bracket to the position before the bracket', () => {
     const [position] = setUpEditorWithSelection(editor, '<p>Paragraph<citation>C|itation</citation></p>');
     editor.commands.setTextSelection(position - 1);
     expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
-      "<p>
-        Paragraph|
-        <citation>Citation</citation>
-      </p>"
+      "<notionblock>
+        <p>
+          Paragraph|
+          <citation>Citation</citation>
+        </p>
+      </notionblock>"
     `);
   });
 
@@ -135,10 +145,12 @@ describe('CitationNode', () => {
     const [position] = setUpEditorWithSelection(editor, '<p><citation>C|itation</citation></p>');
     editor.commands.setTextSelection(position - 1);
     expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
-      "<p>
-        |
-        <citation>Citation</citation>
-      </p>"
+      "<notionblock>
+        <p>
+          |
+          <citation>Citation</citation>
+        </p>
+      </notionblock>"
     `);
   });
 
@@ -146,10 +158,12 @@ describe('CitationNode', () => {
     const [position] = setUpEditorWithSelection(editor, '<p>Paragraph|<citation>Citation</citation></p>');
     editor.commands.setTextSelection(position + 1);
     expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
-      "<p>
-        Paragraph
-        <citation>C|itation</citation>
-      </p>"
+      "<notionblock>
+        <p>
+          Paragraph
+          <citation>C|itation</citation>
+        </p>
+      </notionblock>"
     `);
   });
 });

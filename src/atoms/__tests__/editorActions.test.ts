@@ -18,6 +18,7 @@ import { useActiveEditorIdForPane } from '../hooks/useActiveEditorIdForPane';
 import { useOpenEditorsCountForPane } from '../hooks/useOpenEditorsCountForPane';
 import { useOpenEditorsDataForPane } from '../hooks/useOpenEditorsDataForPane';
 import { setReferencesAtom } from '../referencesState';
+import { EditorContent } from '../types/EditorContent';
 import { buildEditorId, EditorData, EditorId } from '../types/EditorData';
 import { PaneId } from '../types/PaneGroup';
 import { makeFileAndEditor, makeFolder } from './test-fixtures';
@@ -82,7 +83,7 @@ describe('editorActions', () => {
     expect(store.get(activePaneIdAtom)).toBe<PaneId>('LEFT');
     expect(leftPaneOpenEditorsCount.current).toBe(1);
 
-    const editorId = buildEditorId('text', filePath);
+    const editorId = buildEditorId('refstudio', filePath);
     expect(leftPaneActiveEditorId.current).toBe(editorId);
   });
 
@@ -442,8 +443,8 @@ describe('editorActions', () => {
     const openFile = runSetAtomHook(openFileEntryAtom, store);
 
     const mockedReadFileContent = vi.mocked(readFileContent).mockResolvedValue({
-      type: 'text',
-      textContent: 'some content',
+      type: 'refstudio',
+      jsonContent: { doc: 'some content' },
     });
 
     const { fileEntry: fileA } = makeFileAndEditor('fileA.txt');
@@ -469,6 +470,6 @@ describe('editorActions', () => {
     if (activeFile.current.state !== 'hasData') {
       fail('Data should be available');
     }
-    expect(activeFile.current.data).toEqual({ type: 'text', textContent: 'some content' });
+    expect(activeFile.current.data).toEqual<EditorContent>({ type: 'refstudio', jsonContent: { doc: 'some content' } });
   });
 });

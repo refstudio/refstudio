@@ -35,15 +35,11 @@ export function createEditorContentAtoms(
 
     if (editorContent) {
       switch (editorContent.type) {
-        case 'text': {
+        case 'refstudio': {
           const currentEditorId = get(editorIdAtom);
-          const { type, id: path } = parseEditorId(currentEditorId);
-          /* c8 ignore next 3 */
-          if (type !== editorContent.type) {
-            throw new Error(`Editor content type (${editorContent.type}) does not match expected type (${type})`);
-          }
+          const { id: path } = parseEditorId(currentEditorId);
 
-          const success = await writeFileContent(path, editorContent.textContent);
+          const success = await writeFileContent(path, JSON.stringify(editorContent.jsonContent));
           if (success) {
             set(setEditorDataIsDirtyAtom, { editorId: currentEditorId, isDirty: false });
             // Refresh file tree after saving file

@@ -1,29 +1,18 @@
+import { JSONContent } from '@tiptap/core';
 import Document from '@tiptap/extension-document';
 
-import { unsetPartiallySelectedCollapsibleBlocks } from '../collapsibleBlock/helpers/unsetPartiallySelectedCollapsibleBlocks';
-import { backspace } from './keyboardShortcutCommands/backspace';
-
-declare module '@tiptap/core' {
-  interface Commands<ReturnType> {
-    refStudioDocument: {
-      deleteNonEmptySelection: () => ReturnType;
-    };
-  }
-}
+import { NotionBlockNode } from '../notionBlock/NotionBlockNode';
 
 export const RefStudioDocument = Document.extend({
-  content: 'draggableBlock* | codeBlock',
-  addKeyboardShortcuts: () => ({
-    Backspace: backspace,
-  }),
-  addCommands: () => ({
-    deleteNonEmptySelection: () => (props) => {
-      const { dispatch, tr } = props;
-      if (dispatch) {
-        unsetPartiallySelectedCollapsibleBlocks(props);
-        tr.deleteSelection();
-      }
-      return true;
-    },
-  }),
+  content: 'notionBlock* | codeBlock',
 });
+
+export const EMPTY_DOCUMENT_CONTENT: JSONContent = {
+  type: RefStudioDocument.name,
+  content: [
+    {
+      type: NotionBlockNode.name,
+      content: [{ type: 'paragraph' }],
+    },
+  ],
+};

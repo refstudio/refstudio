@@ -84,7 +84,9 @@ describe('SentenceCompletion extension', () => {
     act(() => resolveCompletionChoices(['Choice 1', 'Choice 2']));
     expect(await screen.findByText('Choice 1')).toBeInTheDocument();
 
-    expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot('"<p>Sentence to complete|</p>"');
+    expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(
+      '"<notionblock><p>Sentence to complete|</p></notionblock>"',
+    );
   });
 
   it('should cycle through choices', async () => {
@@ -162,7 +164,9 @@ describe('SentenceCompletion extension', () => {
     expect(await screen.findByText('completed!')).toBeInTheDocument();
     await user.keyboard(`{${key}}`);
 
-    expect(getPrettyHTMLWithSelection(editor)).toBe('<p>Sentence to completecompleted!|</p>');
+    expect(getPrettyHTMLWithSelection(editor)).toBe(
+      '<notionblock><p>Sentence to completecompleted!|</p></notionblock>',
+    );
   });
 
   it('should not catch key events if the widget is closed', async () => {
@@ -176,8 +180,8 @@ describe('SentenceCompletion extension', () => {
 
     expect(screen.queryByText('...')).not.toBeInTheDocument();
     expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
-      "<p>Sentence to complete</p>
-      <p>|</p>"
+      "<notionblock><p>Sentence to complete</p></notionblock>
+      <notionblock><p>|</p></notionblock>"
     `);
   });
 
@@ -194,7 +198,9 @@ describe('SentenceCompletion extension', () => {
     await user.keyboard('a');
 
     await waitFor(() => expect(screen.queryByText('...')).not.toBeInTheDocument());
-    expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot('"<p>Sentence to completea|</p>"');
+    expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(
+      '"<notionblock><p>Sentence to completea|</p></notionblock>"',
+    );
   });
 
   it('should not do anything if the api response is received after the widget has been closed', async () => {

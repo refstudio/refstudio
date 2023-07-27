@@ -29,7 +29,7 @@ describe('paneActions', () => {
     fileEntry = file.fileEntry;
     editorData = file.editorData;
 
-    vi.mocked(readFileContent).mockResolvedValue({ type: 'text', textContent: 'File content' });
+    vi.mocked(readFileContent).mockResolvedValue({ type: 'refstudio', jsonContent: { doc: 'File content' } });
 
     store = createStore();
     store.set(openFileEntryAtom, fileEntry);
@@ -122,7 +122,7 @@ describe('paneActions', () => {
     const initialFileContent = { ...loadableFile.current };
 
     act(() => {
-      updateFileBuffer.current({ type: 'text', textContent: 'Updated content' });
+      updateFileBuffer.current({ type: 'refstudio', jsonContent: { doc: 'Updated content}' } });
     });
 
     expect(loadableFile.current).toStrictEqual(initialFileContent);
@@ -143,16 +143,16 @@ describe('paneActions', () => {
       expect(loadableFile.current.state).toBe('hasData');
     });
 
-    const updatedContent = 'Updated content';
+    const updatedContent = { doc: 'Updated content' };
 
     act(() => {
-      updateFileBuffer.current({ type: 'text', textContent: updatedContent });
+      updateFileBuffer.current({ type: 'refstudio', jsonContent: updatedContent });
       saveFileInMemory.current();
     });
 
     const expectedData: Loadable<EditorContent> = {
       state: 'hasData',
-      data: { type: 'text', textContent: updatedContent },
+      data: { type: 'refstudio', jsonContent: updatedContent },
     };
 
     expect(loadableFile.current).toStrictEqual(expectedData);
@@ -177,7 +177,7 @@ describe('paneActions', () => {
     });
 
     await act(async () => {
-      updateFileBuffer.current({ type: 'text', textContent: 'Updated content' });
+      updateFileBuffer.current({ type: 'refstudio', jsonContent: { doc: 'Updated content' } });
       await saveFile.current();
     });
 
@@ -234,7 +234,7 @@ describe('paneActions', () => {
     const activeEditorContentAtoms = runHookWithJotaiProvider(useActiveEditorContentAtoms, store).current;
 
     expect(activeEditorId).not.toBeNull();
-    expect(activeEditorId).toBe(buildEditorId('text', fileEntry.path));
+    expect(activeEditorId).toBe(buildEditorId('refstudio', fileEntry.path));
     expect(activeEditorContentAtoms).not.toBeNull();
     expect(activeEditorContentAtoms).toBe(fileContentAtoms);
   });
@@ -243,6 +243,6 @@ describe('paneActions', () => {
     const activeEditorId = runHookWithJotaiProvider(useActiveEditorId, store).current;
 
     expect(activeEditorId).not.toBeNull();
-    expect(activeEditorId).toBe(buildEditorId('text', fileEntry.path));
+    expect(activeEditorId).toBe(buildEditorId('refstudio', fileEntry.path));
   });
 });

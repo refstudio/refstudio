@@ -12,7 +12,7 @@ import { MenuBar } from './MenuBar';
 import { EDITOR_EXTENSIONS, transformPasted } from './tipTapEditorConfigs';
 
 interface EditorProps {
-  editorContent: string | JSONContent | null;
+  editorContent: JSONContent;
   isActive: boolean;
   saveFileInMemory: () => void;
   updateFileBuffer: (editorContent: EditorContentType) => void;
@@ -25,7 +25,7 @@ export function TipTapEditor({ editorContent, isActive, saveFileInMemory, update
   useEffect(() => {
     const newEditor = new Editor({
       extensions: EDITOR_EXTENSIONS,
-      content: editorContent ?? '',
+      content: editorContent,
       onSelectionUpdate: (update) => {
         const updatedEditor = update.editor;
         const { from, to } = updatedEditor.view.state.selection;
@@ -36,7 +36,7 @@ export function TipTapEditor({ editorContent, isActive, saveFileInMemory, update
         transformPasted,
       },
       onUpdate: ({ editor: updatedEditor }) => {
-        updateFileBuffer({ type: 'text', textContent: updatedEditor.storage.markdown.getMarkdown() as string });
+        updateFileBuffer({ type: 'refstudio', jsonContent: updatedEditor.getJSON() });
       },
     });
     setEditor(newEditor);

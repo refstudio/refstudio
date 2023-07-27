@@ -19,13 +19,15 @@ describe('TipTap test utils', () => {
     it('should select text based on markers', () => {
       const [from, to] = setUpEditorWithSelection(
         editor,
-        `<collapsible-block>
-          <collapsible-summary>He|ader|</collapsible-summary>
-          <collapsible-content>
-              <p>Content Line 1</p>
-              <p>Content Line 2</p>
-          </collapsible-content>
-        </collapsible-block>`,
+        `<notionblock type='collapsible'>
+          <p>He|ader|</p>
+          <notionblock>
+            <p>Content Line 1</p>
+          </notionblock>
+          <notionblock>
+            <p>Content Line 2</p>
+          </notionblock>
+        </notionblock>`,
       );
       const sel = editor.view.state.selection;
       const text = editor.view.state.doc.textBetween(sel.from, sel.to);
@@ -38,7 +40,7 @@ describe('TipTap test utils', () => {
   });
 
   describe('getPrettyHTML', () => {
-    it('should nicely format document HTML, removing draggable blocks', () => {
+    it('should nicely format document HTML', () => {
       editor.commands.setContent(
         `<p
       >some <b
@@ -46,12 +48,13 @@ describe('TipTap test utils', () => {
       ></p
       >`,
       );
-      expect(editor.getHTML()).toMatch(/<draggable-block/);
       expect(getPrettyHTML(editor)).toMatchInlineSnapshot(`
-        "<p>
-          some
-          <strong>text</strong>
-        </p>"
+        "<notionblock>
+          <p>
+            some
+            <strong>text</strong>
+          </p>
+        </notionblock>"
       `);
     });
   });
@@ -60,44 +63,44 @@ describe('TipTap test utils', () => {
     it('should correctly place cursor corresponding to selection', () => {
       setUpEditorWithSelection(
         editor,
-        `<collapsible-block>
-          <collapsible-summary>He|ader</collapsible-summary>
-          <collapsible-content>
-              <p>Content Line 1</p>
-              <p>Content Line 2</p>
-          </collapsible-content>
-        </collapsible-block>`,
+        `<notionblock type='collapsible'>
+          <p>He|ader</p>
+          <notionblock>
+            <p>Content Line 1</p>
+          </notionblock>
+          <notionblock>
+            <p>Content Line 2</p>
+          </notionblock>
+        </notionblock>`,
       );
       expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
-        "<collapsible-block folded='true'>
-          <collapsible-summary>He|ader</collapsible-summary>
-          <collapsible-content>
-            <p>Content Line 1</p>
-            <p>Content Line 2</p>
-          </collapsible-content>
-        </collapsible-block>"
+        "<notionblock type='collapsible' collapsed='false'>
+          <p>He|ader</p>
+          <notionblock collapsed='false'><p>Content Line 1</p></notionblock>
+          <notionblock collapsed='false'><p>Content Line 2</p></notionblock>
+        </notionblock>"
       `);
     });
 
     it('should correctly place markers corresponding to selected text', () => {
       setUpEditorWithSelection(
         editor,
-        `<collapsible-block>
-        <collapsible-summary>He|ader</collapsible-summary>
-        <collapsible-content>
-            <p>Content| Line 1</p>
-            <p>Content Line 2</p>
-        </collapsible-content>
-      </collapsible-block>`,
+        `<notionblock>
+        <p>He|ader</p>
+        <notionblock>
+          <p>Content| Line 1</p>
+        </notionblock>
+        <notionblock>
+          <p>Content Line 2</p>
+        </notionblock>
+      </notionblock>`,
       );
       expect(getPrettyHTMLWithSelection(editor)).toMatchInlineSnapshot(`
-        "<collapsible-block folded='true'>
-          <collapsible-summary>He|ader</collapsible-summary>
-          <collapsible-content>
-            <p>Content| Line 1</p>
-            <p>Content Line 2</p>
-          </collapsible-content>
-        </collapsible-block>"
+        "<notionblock collapsed='false'>
+          <p>He|ader</p>
+          <notionblock collapsed='false'><p>Content| Line 1</p></notionblock>
+          <notionblock collapsed='false'><p>Content Line 2</p></notionblock>
+        </notionblock>"
       `);
     });
   });

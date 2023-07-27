@@ -9,8 +9,8 @@ import { runHookWithRendersCount } from './test-utils';
 
 describe('useActiveEditorId', () => {
   let store: ReturnType<typeof createStore>;
-  const editorId1 = buildEditorId('text', 'editor1');
-  const editorId2 = buildEditorId('text', 'editor2');
+  const editorId1 = buildEditorId('refstudio', 'editor1');
+  const editorId2 = buildEditorId('refstudio', 'editor2');
 
   beforeEach(() => {
     store = createStore();
