@@ -21,7 +21,6 @@ interface RefStudioEvents {
   // References actions
   'refstudio://references/ingestion/run': undefined;
   'refstudio://references/remove': { referenceIds: string[] };
-  'refstudio://references/load': undefined;
   // Explorer actions
   'refstudio://explorer/delete': { path: string };
   'refstudio://explorer/rename': { path: string; newName?: string };
