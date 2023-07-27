@@ -4,7 +4,7 @@ import { MenuProvider } from 'kmenu';
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { VscChevronUp } from 'react-icons/vsc';
 import { ImperativePanelGroupHandle, ImperativePanelHandle, Panel, PanelGroup } from 'react-resizable-panels';
-import { useEffectOnce, useEventListener, useLocalStorage, useWindowSize } from 'usehooks-ts';
+import { useEventListener, useLocalStorage, useWindowSize } from 'usehooks-ts';
 
 import { PrimarySideBar, PrimarySideBarPane } from '../components/PrimarySideBar';
 import { VerticalResizeHandle } from '../components/VerticalResizeHandle';
@@ -25,8 +25,6 @@ export function App() {
   const panelRef = React.createRef<ImperativePanelGroupHandle>();
   const size = useWindowSize();
   const [panelDimensions, setPanelDimensions] = useLocalStorage('refstudio.panels', { left: 400, right: 400 });
-
-  useEffectOnce(() => emitEvent('refstudio://references/load'));
 
   const handleLayoutUpdate = useDebouncedCallback(
     useCallback(

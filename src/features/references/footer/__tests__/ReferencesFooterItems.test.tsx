@@ -42,7 +42,7 @@ describe('ReferencesFooterItems component', () => {
 
   it(`should emit ${'refstudio://menu/references/open'} on click`, async () => {
     const { user } = setupWithJotaiProvider(<ReferencesFooterItems />);
-    await user.click(screen.getByRole('listitem'));
+    await user.click(screen.getAllByRole('listitem').pop()!);
     expect(vi.mocked(emitEvent)).toHaveBeenCalledWith('refstudio://menu/references/open');
   });
 

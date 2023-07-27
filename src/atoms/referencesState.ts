@@ -1,6 +1,6 @@
-import { atom } from 'jotai';
+import { Atom, atom } from 'jotai';
 
-import { removeReferences, updateReference } from '../api/ingestion';
+import { getIngestedReferences, removeReferences, updateReference } from '../api/ingestion';
 import { deleteFile } from '../io/filesystem';
 import { isNonNullish } from '../lib/isNonNullish';
 import { ReferenceItem } from '../types/ReferenceItem';
@@ -10,11 +10,15 @@ import { buildEditorId } from './types/EditorData';
 
 type ReferencesState = Record<string, ReferenceItem>;
 
-/** INTERNAL ATOMS */
+// #####################################################################################
+// Internal Atoms
+// #####################################################################################
 // This is the internal representation of the references and is not exposed so that all business logic lives in this file to enable us to easily change the structure and/or switch to another state management library
 const referencesAtom = atom<ReferencesState>({});
 
-/** EXTERNAL ATOMS */
+// #####################################################################################
+// References API
+// #####################################################################################
 export const getReferencesAtom = atom((get) => Object.values(get(referencesAtom)));
 
 export const getDerivedReferenceAtom = (referenceId: string) =>
@@ -28,8 +32,27 @@ export const setReferencesAtom = atom(null, (_get, set, references: ReferenceIte
   set(referencesAtom, updatedReferences);
 });
 
+// #####################################################################################
+// References sync status (upload flow)
+// #####################################################################################
 export const referencesSyncInProgressAtom = atom<boolean>(false);
 
+// #####################################################################################
+// References initialization
+// #####################################################################################
+const referencesLoadedAtom = atom<boolean>(false);
+
+export const loadReferencesAtom = atom(null, async (_get, set) => {
+  const initialReferences = await getIngestedReferences();
+  set(setReferencesAtom, initialReferences);
+  set(referencesLoadedAtom, true);
+});
+
+export const areReferencesLoadedAtom: Atom<boolean> = referencesLoadedAtom;
+
+// #####################################################################################
+// Edit operations
+// #####################################################################################
 const removeReferenceAtom = atom(null, (get, set, id: string) => {
   const references = get(getReferencesAtom);
   const newReferences = references.filter((ref) => ref.id !== id);
