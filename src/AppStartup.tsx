@@ -23,7 +23,7 @@ export function AppStartup() {
 
       notifyInfo('Application Startup');
       await initSettings();
-      await openProject(getCachedSetting('general.appDataDir'));
+      await openProject(getCachedSetting('general.projectDir'));
       await invoke('close_splashscreen');
 
       notifyInfo('Application Initialized');

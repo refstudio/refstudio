@@ -17,8 +17,8 @@ import { FileFileEntry } from '../../atoms/types/FileEntry';
 import {
   deleteFile,
   getParentFolder,
+  getProjectBaseDir,
   getRefStudioPath,
-  getSystemAppDataDir,
   getSystemConfigurationsDir,
   getSystemPath,
   getUploadsDir,
@@ -58,8 +58,8 @@ describe('filesystem', () => {
       expect(await getSystemConfigurationsDir()).toBeDefined();
     });
 
-    it('should export the (system) app data directory', async () => {
-      expect(await getSystemAppDataDir()).toBeDefined();
+    it('should export the (system) app data directory', () => {
+      expect(getProjectBaseDir()).toBeDefined();
     });
 
     it('should make system path from ref studio path', async () => {

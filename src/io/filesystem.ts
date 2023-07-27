@@ -43,7 +43,7 @@ let projectBaseDir: string;
  *
  * When opening
  */
-function getProjectBaseDir() {
+export function getProjectBaseDir() {
   return projectBaseDir || '/Users/cguedes/Desktop/refstudio/project-x'; // TODO: Remove this hardcoded
 }
 /**
