@@ -37,8 +37,8 @@ export async function initSettings() {
   settingsManager = new SettingsManager<SettingsSchema>(
     {
       general: {
-        projectDir: '', // TODO: Handle initial value
-        projectName: 'project-x',
+        projectDir: '',
+        projectName: '',
       },
       openAI: {
         apiKey: await readEnv('OPENAI_API_KEY', ''),

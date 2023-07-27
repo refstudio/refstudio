@@ -36,7 +36,7 @@ export async function getSystemConfigurationsDir() {
   return appConfigDir();
 }
 
-let projectBaseDir: string;
+let projectBaseDir = '';
 
 /**
  * The project base directory configures the root folder for the project files.
@@ -44,7 +44,7 @@ let projectBaseDir: string;
  * When opening
  */
 export function getProjectBaseDir() {
-  return projectBaseDir || '/Users/cguedes/Desktop/refstudio/project-x'; // TODO: Remove this hardcoded
+  return projectBaseDir;
 }
 /**
  * Set the project base directory
