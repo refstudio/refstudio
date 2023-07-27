@@ -2,6 +2,25 @@ import './MenuBar.css';
 
 import { Editor } from '@tiptap/react';
 import * as React from 'react';
+import {
+  AiOutlineAlignLeft as IconParagraph,
+  AiOutlineBold as IconBold,
+  AiOutlineCode as IconCode,
+  AiOutlineItalic as IconItalic,
+  AiOutlineLine as IconHorizontalRule,
+  AiOutlineOrderedList as IconOrderedList,
+  AiOutlineRedo as IconRedo,
+  AiOutlineStrikethrough as IconStrikethrough,
+  AiOutlineUndo as IconUndo,
+  AiOutlineUnorderedList as IconUnorderedList,
+} from 'react-icons/ai';
+import {
+  LuCode2 as IconDebug,
+  LuHeading1 as IconH1,
+  LuHeading2 as IconH2,
+  LuHeading3 as IconH3,
+  LuRemoveFormatting as IconClearMarks,
+} from 'react-icons/lu';
 
 import { cx } from '../../../lib/cx';
 
@@ -42,7 +61,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
         title="Undo"
         onClick={() => editor.chain().focus().undo().run()}
       >
-        <i className="format undo" />
+        <IconUndo />
       </button>
 
       <button
@@ -51,7 +70,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
         title="Redo"
         onClick={() => editor.chain().focus().redo().run()}
       >
-        <i className="format redo" />
+        <IconRedo />
       </button>
       <Divider />
       <button
@@ -62,7 +81,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
         title="Bold"
         onClick={() => editor.chain().focus().toggleBold().run()}
       >
-        <i className="format bold" />
+        <IconBold />
       </button>
       <button
         className={cx('toolbar-item', {
@@ -72,7 +91,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
         title="Italic"
         onClick={() => editor.chain().focus().toggleItalic().run()}
       >
-        <i className="format italic" />
+        <IconItalic />
       </button>
       <button
         className={cx('toolbar-item', {
@@ -82,7 +101,14 @@ export function MenuBar({ editor }: { editor: Editor }) {
         title="Strikethrough"
         onClick={() => editor.chain().focus().toggleStrike().run()}
       >
-        <i className="format strikethrough" />
+        <IconStrikethrough />
+      </button>
+      <button
+        className="toolbar-item"
+        title="Clear Formatting"
+        onClick={() => editor.chain().focus().unsetAllMarks().clearNodes().run()}
+      >
+        <IconClearMarks />
       </button>
       <button
         className={cx('toolbar-item', {
@@ -92,7 +118,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
         title="Code Formatting"
         onClick={() => editor.chain().focus().toggleCode().run()}
       >
-        <i className="format code" />
+        <IconCode />
       </button>
 
       <Divider />
@@ -104,7 +130,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
         title="Heading Level 1"
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
       >
-        <i className="format h1" />
+        <IconH1 />
       </button>
       <button
         className={cx('toolbar-item', {
@@ -113,7 +139,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
         title="Heading Level 2"
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
       >
-        <i className="format h2" />
+        <IconH2 />
       </button>
       <button
         className={cx('toolbar-item', {
@@ -122,7 +148,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
         title="Heading Level 3"
         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
       >
-        <i className="format h3" />
+        <IconH3 />
       </button>
       <button
         className={cx('toolbar-item', {
@@ -131,7 +157,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
         title="Paragraph Text"
         onClick={() => editor.chain().focus().setParagraph().run()}
       >
-        <i className="format paragraph" />
+        <IconParagraph />
       </button>
       <Divider />
 
@@ -142,7 +168,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
         title="Bulleted List"
         onClick={() => editor.chain().focus().toggleBulletList().run()}
       >
-        <i className="format ul" />
+        <IconUnorderedList />
       </button>
       <button
         className={cx('toolbar-item', {
@@ -151,54 +177,26 @@ export function MenuBar({ editor }: { editor: Editor }) {
         title="Ordered List"
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
       >
-        <i className="format ol" />
+        <IconOrderedList />
       </button>
-      {/* <button
-        onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-        className={cx('toolbar-item', {
-          active: editor.isActive('codeBlock'),
-        })}
+      <button
+        className={cx('toolbar-item')}
+        title="Horizontal Rule"
+        onClick={() => editor.chain().focus().setHorizontalRule().run()}
       >
-        <i className="format code-block" />
-      </button> */}
-      {/* <button
-        onClick={() => editor.chain().focus().toggleBlockquote().run()}
-        className={cx('toolbar-item', {
-          active: editor.isActive('blockquote'),
-        })}
-      >
-        <i className="format blockquote" />
-      </button> */}
-      {/* <button onClick={() => editor.chain().focus().setHorizontalRule().run()}>horizontal rule</button>
-      <button onClick={() => editor.chain().focus().setHardBreak().run()}>hard break</button> */}
-
-      <Divider />
-      <button className="toolbar-item" title="Markdown View" onClick={handleToggleMarkdown}>
-        <i
-          className={cx('format', {
-            'journal-text': markdownMode,
-            'journal-code': !markdownMode,
-          })}
-        />
+        <IconHorizontalRule />
       </button>
 
-      {/* <button onClick={() => editor.chain().focus().unsetAllMarks().run()} title="clear marks">
-        cm
-      </button>
-      <button onClick={() => editor.chain().focus().clearNodes().run()} title="clear nodes">
-        cn
-      </button> */}
-
-      {/* <button
-        onClick={() => editor.chain().focus().setColor('#958DF1').run()}
-        className={cx('toolbar-item', { active: editor.isActive('textStyle', { color: '#958DF1' }) })}
-      >
-        purple
-      </button> */}
+      <div className="ml-auto flex">
+        <Divider />
+        <button className="toolbar-item" title="Debug View" onClick={handleToggleMarkdown}>
+          <IconDebug className="opacity-50" />
+        </button>
+      </div>
     </menu>
   );
 }
 
-function Divider() {
-  return <div className="divider" />;
+function Divider({ className = '' }: { className?: string }) {
+  return <div className={cx('divider', className)} />;
 }

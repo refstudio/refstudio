@@ -21,7 +21,7 @@ export function addIndentSteps(tr: Transaction, pos: number): void {
 export const indent: Command = ({ tr, dispatch }) => {
   const { $from } = tr.selection;
   if (!tr.selection.empty || $from.node(-1).type.name !== NotionBlockNode.name) {
-    return false;
+    return true;
   }
 
   // If the current node does not have a NotionBlockNode sibling, the node cannot be indented
@@ -30,7 +30,7 @@ export const indent: Command = ({ tr, dispatch }) => {
     ($from.node(-2).type.name === 'doc' && indexInParent < 2) ||
     ($from.node(-2).type.name === NotionBlockNode.name && indexInParent < 3)
   ) {
-    return false;
+    return true;
   }
 
   if (dispatch) {

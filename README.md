@@ -131,3 +131,34 @@ mv ~/Library/Application\ Support/com.tauri.dev /tmp/
 ```
 
 [appDataDir]: https://tauri.app/v1/api/js/path#appdatadir
+
+## Versioning
+
+This project version convention is based in a [Calendar Versioning](https://www.cockroachlabs.com/blog/calendar-versioning/) [scheme](https://calver.org/).
+
+You should follow the general pattern:
+
+* `YY.N.PATCH`
+
+So the first version is `23.1.0` and a new release, in the same year, would be `23.2.0`, while a patch for the first version your be `23.1.1`. The first release of 2024 would be `24.1.0`.
+
+## Release
+
+You can create a new Ref Studio release (ex: mac `.dmg` image files) using the following:
+
+- `yarn tauri:build` to build all the supported binary files.
+
+If you are interested only on a specific target, you should run:
+- `yarn tauri:build:mac:apple` to get Apple silicon binary.
+- `yarn tauri:build:mac:intel` to get Intel-based mac binary.
+- `yarn tauri:build:mac:universal` to get a Universal macOS Binary (runs on both Apple silicon and Intel-based Macs).
+
+After the build you can find the `.dmg` binaries in the `/binaries` folder.
+
+
+### Release process (manual)
+
+To release a new version you should update (bump) the version in the `package.json` file and run `yarn tauri:build`.
+Then you should commit, and push, the version change and create a git tag with the new version released.
+
+After that you should use the version files located in `/binaries/refstudio_{$VERSION}_{$TARGET}.dmg` (ex: `refstudio_23.1.0_universal.dmg`) and upload them to a [new GitHub release](https://github.com/refstudio/refstudio/releases/new) using the tag created.

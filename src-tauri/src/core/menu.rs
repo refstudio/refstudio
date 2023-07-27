@@ -10,7 +10,10 @@ const MENU_FILE_NEW: &str = /*            */ "refstudio://menu/file/new";
 const MENU_FILE_CLOSE: &str = /*          */ "refstudio://menu/file/close";
 const MENU_FILE_CLOSE_ALL: &str = /*      */ "refstudio://menu/file/close/all";
 const MENU_VIEW_NOTIFICATIONS: &str = /*  */ "refstudio://menu/view/notifications";
+
+#[cfg(any(debug_assertions, feature = "devtools"))]
 const MENU_DEBUG_CONSOLE_TOGGLE: &str = /**/ "refstudio://menu/debug/console/toggle";
+#[cfg(any(debug_assertions, feature = "devtools"))]
 const MENU_DEBUG_CONSOLE_CLEAR: &str = /* */ "refstudio://menu/debug/console/clear";
 
 impl AppMenu {
@@ -89,7 +92,8 @@ impl AppMenu {
                 .add_native_item(MenuItem::Zoom),
         );
 
-        let menu = Menu::new()
+        #[allow(unused_mut)]
+        let mut menu = Menu::new()
             .add_submenu(app_menu)
             .add_submenu(file_menu)
             .add_submenu(edit_menu)
@@ -97,7 +101,7 @@ impl AppMenu {
             .add_submenu(view_menu)
             .add_submenu(window_menu);
 
-        #[cfg(debug_assertions)]
+        #[cfg(any(debug_assertions, feature = "devtools"))]
         {
             let debug_menu = Submenu::new(
                 "Debug",
@@ -111,8 +115,11 @@ impl AppMenu {
                             .accelerator("Shift+F12"),
                     ),
             );
-            return menu.clone().add_submenu(debug_menu);
+
+            menu = menu.clone().add_submenu(debug_menu);
         }
+
+        return menu;
     }
 
     pub fn on_menu_event(event: WindowMenuEvent) {
@@ -120,6 +127,7 @@ impl AppMenu {
         event.window().emit(event.menu_item_id(), {}).unwrap();
 
         match event.menu_item_id() {
+            #[cfg(any(debug_assertions, feature = "devtools"))]
             MENU_DEBUG_CONSOLE_TOGGLE => {
                 if event.window().is_devtools_open() {
                     event.window().close_devtools();

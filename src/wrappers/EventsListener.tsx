@@ -12,7 +12,6 @@ import { useActiveEditorContentAtoms } from '../atoms/hooks/useActiveEditorConte
 import { removeReferencesAtom } from '../atoms/referencesState';
 import { PaneEditorId } from '../atoms/types/PaneGroup';
 import { emitEvent, RefStudioEventPayload } from '../events';
-import { useLoadReferencesListener } from '../features/references/eventListeners';
 import { useListenEvent } from '../hooks/useListenEvent';
 import { asyncNoop, noop } from '../lib/noop';
 import {
@@ -37,7 +36,6 @@ export function EventsListener({ children }: { children?: React.ReactNode }) {
   useListenEvent('refstudio://explorer/delete', useDeleteFileListener());
   // References
   useListenEvent('refstudio://references/remove', useRemoveReferencesListener());
-  useListenEvent('refstudio://references/load', useLoadReferencesListener());
   // Notifications
   useListenEvent('refstudio://notifications/new', useCreateNotificationListener());
   useListenEvent('refstudio://notifications/clear', useClearNotificationsListener());
