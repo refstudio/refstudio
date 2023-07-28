@@ -14,7 +14,7 @@ export const getNewProjectsBaseDir = vi.fn(() => '/desktop');
 export const getRefStudioPath = vi.fn((path: string) => path.replace(SYSTEM_PATH, ''));
 export const getProjectBaseDir = vi.fn(() => PROJECT_PATH);
 export const setProjectBaseDir = vi.fn();
-export const getSystemPath = vi.fn((rsPath: string) => join(SYSTEM_PATH, 'project-x', rsPath));
+export const getSystemPath = vi.fn((rsPath: string) => join(SYSTEM_PATH, 'xx', rsPath));
 export const getSeparator = vi.fn(() => '/');
 
 // #####################################################################################

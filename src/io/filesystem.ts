@@ -61,7 +61,7 @@ export function getProjectBaseDir() {
  * @param dir new project directory
  * @returns
  */
-function setProjectBaseDir(dir: string) {
+export function setProjectBaseDir(dir: string) {
   return (projectBaseDir = dir);
 }
 

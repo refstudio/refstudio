@@ -74,7 +74,6 @@ describe('GeneralSettingsPane component', () => {
     expect(screen.getByRole('button', { name: /save/i })).toBeDisabled();
 
     // Type
-    await user.type(screen.getByLabelText('Project Name'), 'dont-care-bc-input-is-disabled');
     await user.click(screen.getByLabelText('Active'));
     await user.type(screen.getByLabelText('Path'), '-Updated-2');
     expect(screen.getByLabelText('Active')).not.toBeChecked();

@@ -29,6 +29,7 @@ import {
   readAllProjectFiles,
   readFileContent,
   renameFile,
+  setProjectBaseDir,
   splitRefStudioPath,
   uploadFiles,
   writeFileContent,
@@ -64,6 +65,7 @@ describe('filesystem', () => {
 
     it('should make system path from ref studio path', async () => {
       const rsPath = '/some/file.txt';
+      setProjectBaseDir('/user/desktop/refstudio/');
       const systemPath = await getSystemPath(rsPath);
       expect(systemPath).not.toBe(rsPath);
       expect(systemPath.endsWith(rsPath)).toBeTruthy();
