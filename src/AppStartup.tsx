@@ -3,22 +3,21 @@ import { useSetAtom } from 'jotai';
 import { useState } from 'react';
 
 import { App } from './application/App';
-import { loadReferencesAtom } from './atoms/referencesState';
+import { openProjectAtom } from './atoms/projectState';
 import { useAsyncEffect } from './hooks/useAsyncEffect';
-import { openProject } from './io/filesystem';
 import { noop } from './lib/noop';
 import { notifyErr, notifyInfo } from './notifications/notifications';
 import { interceptConsoleMessages } from './notifications/notifications.console';
 import { getCachedSetting, initSettings } from './settings/settingsManager';
 
-// Note: Intercepting INFO, WARN and ERROR console.* in DEV mode
+// Note: Intercepting INFO, WAR N and ERROR console.* in DEV mode
 if (import.meta.env.DEV) {
   interceptConsoleMessages(true, true, true);
 }
 
 export function AppStartup() {
   const [initialized, setInitialized] = useState(false);
-  const loadReferences = useSetAtom(loadReferencesAtom);
+  const openProject = useSetAtom(openProjectAtom);
 
   useAsyncEffect(
     async (isMounted) => {
@@ -29,19 +28,13 @@ export function AppStartup() {
 
         notifyInfo('Application Startup');
         await initSettings();
-        const projectDir = getCachedSetting('general.projectDir');
-        if (projectDir) {
-          await openProject(projectDir);
-        }
         await invoke('close_splashscreen');
-
-        notifyInfo('Application Initialized');
 
         if (isMounted()) {
           setInitialized(true);
-          if (projectDir) {
-            await loadReferences();
-          }
+          const projectDir = getCachedSetting('general.projectDir');
+          await openProject(projectDir);
+          notifyInfo('Application Initialized');
         }
       } catch (err) {
         notifyErr(err);

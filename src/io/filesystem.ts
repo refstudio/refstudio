@@ -10,7 +10,7 @@ import {
   writeBinaryFile,
   writeTextFile,
 } from '@tauri-apps/api/fs';
-import { appConfigDir, join, sep } from '@tauri-apps/api/path';
+import { appConfigDir, desktopDir, join, sep } from '@tauri-apps/api/path';
 import { JSONContent } from '@tiptap/core';
 
 import { EditorContent } from '../atoms/types/EditorContent';
@@ -34,6 +34,15 @@ const UPLOADS_DIR = 'uploads';
  */
 export async function getSystemConfigurationsDir() {
   return appConfigDir();
+}
+
+/**
+ * Default dir for new projects.
+ *
+ * @returns An operating-system absolute path
+ */
+export async function getNewProjectsBaseDir() {
+  return desktopDir();
 }
 
 let projectBaseDir = '';

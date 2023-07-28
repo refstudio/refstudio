@@ -1,9 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
-import { open } from '@tauri-apps/api/dialog';
-import { desktopDir } from '@tauri-apps/api/path';
 import { useState } from 'react';
 
-import { notifyInfo } from '../../notifications/notifications';
 import { getCachedSetting, getSettings, saveCachedSettings, setCachedSetting } from '../settingsManager';
 import { SettingsPane, SettingsPaneProps } from './SettingsPane';
 
@@ -28,24 +25,6 @@ export function GeneralSettingsPane({ config }: SettingsPaneProps) {
   const isDirty =
     JSON.stringify(generalSettings) !== JSON.stringify(getCachedSetting('general')) ||
     JSON.stringify(sidecarLoggingSettings) !== JSON.stringify(getCachedSetting('sidecar.logging'));
-
-  const handleOpen = async () => {
-    const selected = await open({
-      directory: true,
-      multiple: false,
-      defaultPath: await desktopDir(),
-      title: 'Open RefStudio project',
-    });
-    notifyInfo('Selected', JSON.stringify(selected));
-    if (Array.isArray(selected)) {
-      // foo
-    } else if (selected === null) {
-      // user cancelled the selection
-    } else {
-      // user selected a single directory
-      console.log('SELECTED single dir');
-    }
-  };
 
   return (
     <SettingsPane config={config} description="General settings for the refstudio application." header={config.title}>
@@ -109,7 +88,6 @@ export function GeneralSettingsPane({ config }: SettingsPaneProps) {
           {saveMutation.isSuccess && <span className="px-2 text-primary">Saved!</span>}
           {saveMutation.isError && <span className="px-2 text-red-300">{String(saveMutation.error)}</span>}
           <input className="btn-primary" disabled={!isDirty || saveMutation.isLoading} type="submit" value="SAVE" />
-          <input type="button" value="Open" onClick={() => void handleOpen()} />
         </fieldset>
       </form>
 

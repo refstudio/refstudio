@@ -10,6 +10,7 @@ function join(...segments: string[]) {
 // Top Level PATH API
 // #####################################################################################
 export const getSystemConfigurationsDir = vi.fn(() => join(SYSTEM_PATH, 'config'));
+export const getNewProjectsBaseDir = vi.fn(() => '/desktop');
 export const getRefStudioPath = vi.fn((path: string) => path.replace(SYSTEM_PATH, ''));
 export const getProjectBaseDir = vi.fn(() => PROJECT_PATH);
 export const setProjectBaseDir = vi.fn();
