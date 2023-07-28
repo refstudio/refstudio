@@ -1,7 +1,8 @@
+import { useAtomValue } from 'jotai';
 import { VscHome } from 'react-icons/vsc';
 
+import { projectPathAtom } from '../../atoms/projectState';
 import { ReferencesFooterItems } from '../../features/references/footer/ReferencesFooterItems';
-import { getProjectBaseDir } from '../../io/filesystem';
 import { FooterNotificationItems } from '../../notifications/footer/FooterNotificationItems';
 import { FooterItem } from './FooterItem';
 
@@ -16,6 +17,6 @@ export function Footer() {
 }
 
 function ProjectFooterItems() {
-  const projectDir = getProjectBaseDir();
+  const projectDir = useAtomValue(projectPathAtom);
   return <>{projectDir && <FooterItem className="mr-auto" icon={<VscHome />} text={projectDir} />}</>;
 }

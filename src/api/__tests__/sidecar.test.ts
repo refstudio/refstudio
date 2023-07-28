@@ -16,7 +16,6 @@ vi.mock('@tauri-apps/api/shell');
 const mockSettings: SettingsSchema = {
   general: {
     projectDir: 'PROJECT-DIR',
-    projectName: 'PROJECT-NAME',
   },
   openAI: {
     apiKey: 'API KEY',

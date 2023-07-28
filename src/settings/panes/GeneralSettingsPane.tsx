@@ -42,18 +42,6 @@ export function GeneralSettingsPane({ config }: SettingsPaneProps) {
             />
             <p className="text-xs text-gray-500">NOTE: This setting is readonly (for now!)</p>
           </div>
-          <div className="space-y-2">
-            <label className="font-semibold" htmlFor="project-name">
-              Project Name
-            </label>
-            <input
-              className="w-full border bg-slate-50 px-2 py-0.5 text-gray-500"
-              id="project-name"
-              readOnly
-              value={generalSettings.projectName}
-            />
-            <p className="text-xs text-gray-500">NOTE: This setting is readonly (for now!)</p>
-          </div>
           <h3>Sidecar Logging</h3>
           <div className="space-y-2">
             <label className="font-semibold" htmlFor="active">

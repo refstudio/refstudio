@@ -1,6 +1,11 @@
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 
 import {
+  useFileProjectCloseListener,
+  useFileProjectNewListener,
+  useFileProjectOpenListener,
+} from '../application/listeners/projectEventListeners';
+import {
   activePaneAtom,
   closeAllEditorsAtom,
   closeEditorFromPaneAtom,
@@ -28,6 +33,9 @@ export function EventsListener({ children }: { children?: React.ReactNode }) {
   useListenEvent('refstudio://menu/file/save', useSaveActiveFileListener());
   useListenEvent('refstudio://menu/file/close', useCloseActiveEditorListener());
   useListenEvent('refstudio://menu/file/close/all', useCloseAllActiveEditorsListener());
+  useListenEvent('refstudio://menu/file/project/new', useFileProjectNewListener());
+  useListenEvent('refstudio://menu/file/project/open', useFileProjectOpenListener());
+  useListenEvent('refstudio://menu/file/project/close', useFileProjectCloseListener());
   // Editors
   useListenEvent('refstudio://editors/close', useCloseEditorListener());
   useListenEvent('refstudio://editors/move', useMoveActiveEditorToPaneListener());

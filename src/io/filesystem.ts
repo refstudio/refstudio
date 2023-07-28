@@ -89,6 +89,15 @@ export function getRefStudioPath(absolutePath: string) {
   return absolutePath.replace(new RegExp(`^${baseDir}`), '');
 }
 
+/**
+ * Returns the the OS-specific separator
+ *
+ * @returns the separator (/ or \)
+ */
+export function getSeparator() {
+  return sep;
+}
+
 // #####################################################################################
 // UPLOADS
 // #####################################################################################

@@ -1,11 +1,23 @@
-import { atom } from 'jotai';
+import { Atom, atom } from 'jotai';
 
-import { openProject } from '../io/filesystem';
-import { loadReferencesAtom } from './referencesState';
+import { getSeparator, openProject } from '../io/filesystem';
+import { closeAllEditorsAtom } from './editorActions';
+import { refreshFileTreeAtom } from './fileExplorerActions';
+import { clearAllReferencesAtom, loadReferencesAtom } from './referencesState';
 
 const currentProjectPathAtom = atom('');
 
 export const isProjectOpenAtom = atom((get) => get(currentProjectPathAtom) !== '');
+export const projectPathAtom: Atom<string> = currentProjectPathAtom;
+
+export const projectNameAtom = atom((get) => {
+  const projectPath = get(currentProjectPathAtom);
+  const segments = projectPath.split(getSeparator());
+  if (segments.length > 1) {
+    return segments.pop()!.toUpperCase().replace(/-\./g, ' ');
+  }
+  return '';
+});
 
 export const openProjectAtom = atom(null, async (_, set, path: string) => {
   if (!path) {
@@ -18,5 +30,8 @@ export const openProjectAtom = atom(null, async (_, set, path: string) => {
 });
 
 export const closeProjectAtom = atom(null, async (_, set) => {
-  // TODO
+  set(closeAllEditorsAtom);
+  set(clearAllReferencesAtom);
+  set(currentProjectPathAtom, '');
+  await set(refreshFileTreeAtom);
 });

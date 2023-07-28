@@ -12,7 +12,6 @@ export function getMannerOptions(): OpenAiManner[] {
 export interface SettingsSchema {
   general: {
     projectDir: string;
-    projectName: string;
   };
   openAI: {
     apiKey: string;
@@ -36,9 +35,9 @@ export const DEFAULT_OPEN_AI_CHAT_MODEL = 'gpt-3.5-turbo';
 export async function initSettings() {
   settingsManager = new SettingsManager<SettingsSchema>(
     {
+      // TODO: Keep older settings (prevent major breaking change), and add new setting with a migration
       general: {
         projectDir: '',
-        projectName: '',
       },
       openAI: {
         apiKey: await readEnv('OPENAI_API_KEY', ''),

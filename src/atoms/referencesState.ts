@@ -32,6 +32,10 @@ export const setReferencesAtom = atom(null, (_get, set, references: ReferenceIte
   set(referencesAtom, updatedReferences);
 });
 
+export const clearAllReferencesAtom = atom(null, (_get, set) => {
+  set(referencesAtom, {});
+});
+
 // #####################################################################################
 // References sync status (upload flow)
 // #####################################################################################
