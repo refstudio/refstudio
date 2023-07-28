@@ -55,7 +55,7 @@ export async function initSettings() {
     },
     {
       dir: await getSystemConfigurationsDir(),
-      fileName: 'refstudio-settings.json',
+      fileName: 'refstudio-settings-288.json',
       prettify: true,
     },
   );

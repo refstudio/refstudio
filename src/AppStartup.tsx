@@ -30,14 +30,18 @@ export function AppStartup() {
         notifyInfo('Application Startup');
         await initSettings();
         const projectDir = getCachedSetting('general.projectDir');
-        await openProject(projectDir);
+        if (projectDir) {
+          await openProject(projectDir);
+        }
         await invoke('close_splashscreen');
 
         notifyInfo('Application Initialized');
 
         if (isMounted()) {
           setInitialized(true);
-          await loadReferences();
+          if (projectDir) {
+            await loadReferences();
+          }
         }
       } catch (err) {
         notifyErr(err);

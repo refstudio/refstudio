@@ -17,10 +17,5 @@ export function Footer() {
 
 function ProjectFooterItems() {
   const projectDir = getProjectBaseDir();
-
-  return (
-    <>
-      <FooterItem className="mr-auto" icon={<VscHome />} text={projectDir} />
-    </>
-  );
+  return <>{projectDir && <FooterItem className="mr-auto" icon={<VscHome />} text={projectDir} />}</>;
 }

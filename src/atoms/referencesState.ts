@@ -1,4 +1,4 @@
-import { Atom, atom } from 'jotai';
+import { atom } from 'jotai';
 
 import { getIngestedReferences, removeReferences, updateReference } from '../api/ingestion';
 import { deleteFile } from '../io/filesystem';
@@ -40,15 +40,16 @@ export const referencesSyncInProgressAtom = atom<boolean>(false);
 // #####################################################################################
 // References initialization
 // #####################################################################################
-const referencesLoadedAtom = atom<boolean>(false);
+const referencesLoadedAtom = atom<boolean | null>(null); // Starts true to account for
 
 export const loadReferencesAtom = atom(null, async (_get, set) => {
+  set(referencesLoadedAtom, false);
   const initialReferences = await getIngestedReferences();
   set(setReferencesAtom, initialReferences);
   set(referencesLoadedAtom, true);
 });
 
-export const areReferencesLoadedAtom: Atom<boolean> = referencesLoadedAtom;
+export const areReferencesLoadedAtom = atom((get) => get(referencesLoadedAtom) !== false);
 
 // #####################################################################################
 // Edit operations
