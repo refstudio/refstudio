@@ -214,7 +214,7 @@ def chunk_reference(
     try:
         reader = pypdf.PdfReader(filepath)
     except FileNotFoundError:
-        logger.info(f"File not found: {filepath}")
+        logger.error(f"File not found: {filepath}")
         return []
 
     chunks = []
