@@ -10,19 +10,29 @@ For RefStudio, we bundle our Python application as a [resource](https://tauri.ap
 
 We use [poetry](https://python-poetry.org/) for Python dependency management. We also recommend using [pyenv](https://github.com/pyenv/pyenv) for Python version management.
 
+## Setting up Open AI environment variables
+
+```bash
+export OPENAI_API_KEY=your_key_here
+export OPENAI_CHAT_MODEL='gpt-3.5-turbo'
+```
+
+You can add these to your `.bashrc` or `.zshrc` to persist them.
+
 ## Development
 
 The following assumes you have already installed [poetry](https://python-poetry.org/docs/).
 
 Install dependencies
+
 ```bash
-$ poetry install
+poetry install
 ```
 
 Building the Python application binary:
 
 ```bash
-$ yarn python
+yarn python
 ```
 
 The above should result in the Python application being placed in `../src-tauri/python/bin`
@@ -30,12 +40,13 @@ The above should result in the Python application being placed in `../src-tauri/
 Running the tests from this directory:
 
 ```bash
-$ poetry run pytest --cov=. tests
+poetry run pytest --cov=. tests
 ```
 
 ## Commands
 
 The application has the following main functions:
+
 1. Ingest
 1. Ingest Status
 1. Ingest References
@@ -57,8 +68,10 @@ The resulting output of `ingest` is a set of References which are both stored on
 To run `ingest`:
 
 ```bash
-$ poetry run python main.py ingest '{ "pdf_directory": "path/to/docs/" }'
+poetry run python main.py ingest '{ "pdf_directory": "path/to/docs/" }'
+```
 
+```bash
 # Example:
 $ poetry run python main.py ingest '{ "pdf_directory": "tests/fixtures/pdf/" }' | jq
 
@@ -115,8 +128,10 @@ It does not take any input and returns a dictionary of various statuses.
 To run `ingest_status`:
 
 ```bash
-$ poetry run python main.py ingest_status | jq
+poetry run python main.py ingest_status | jq
+```
 
+```bash
 # Example:
 $ poetry run python main.py ingest_status | jq
 
@@ -149,8 +164,10 @@ It takes an input directory containing PDFs and returns the ingested references.
 To run `ingest_references`:
 
 ```bash
-$ poetry run python main.py ingest_references '{ "pdf_directory": "path/to/docs/" }'
+poetry run python main.py ingest_references '{ "pdf_directory": "path/to/docs/" }'
+```
 
+```bash
 # Example:
 $ poetry run python main.py ingest_references '{ "pdf_directory": "tests/fixtures/pdf/" }' | jq
 
@@ -208,7 +225,9 @@ To run `rewrite`:
 
 ```bash
 $ poetry run python main.py rewrite '{"text": "Some text that the user would like to rewrite in a more concise fashion."}'
+```
 
+```bash
 # Example:
 $ poetry run python main.py rewrite '{"text": "In the cycling world, power meters are the typical way to objectively measure performance. Your speed is dependent on a lot of factors, like wind, road surface, and elevation. One'\''s heart rate is largely a function of genetics, but also things like temperature. The amount of power you are outputting to the pedals though, is a direct measure of how much work you'\''re doing, regardless of wind, elevation, your body weight, etc." }' | jq
 
@@ -231,8 +250,10 @@ To run `completion`:
 
 ```bash
 
-$ poetry run python main.py completion "{\"text\": \"Machine learning systems automatically learn programs from data. This is often  \", \"n_choices\": 2, \"temperature\": 0.9, \"max_tokens\": 256}" | jq
+poetry run python main.py completion "{\"text\": \"Machine learning systems automatically learn programs from data. This is often  \", \"n_choices\": 2, \"temperature\": 0.9, \"max_tokens\": 256}" | jq
+```
 
+```bash
 # Response
 [
   {
@@ -257,8 +278,10 @@ It takes an input question and returns a response of answer `choices`.
 To run `chat`:
 
 ```bash
-$ poetry run python main.py chat '{"text": "Some question about information contained with the uploaded reference documents"}'
+poetry run python main.py chat '{"text": "Some question about information contained with the uploaded reference documents"}'
+```
 
+```bash
 # Note that we've uploaded a Reference document titled Hidden Technical Debt in Machine Learning Systems (https://proceedings.neurips.cc/paper_files/paper/2015/file/86df7dcfd896fcaf2674f757a2463eba-Paper.pdf)
 
 # Example:
@@ -282,9 +305,10 @@ It takes a list of `source_filenames` as input and returns a response status. Al
 To run `delete`:
 
 ```bash
-$ poetry run python main.py delete '{ "source_filenames": ["grobid-fails.pdf", "Machine Learning at Scale.pdf"] }'
+poetry run python main.py delete '{ "source_filenames": ["grobid-fails.pdf", "Machine Learning at Scale.pdf"] }'
+```
 
-
+```bash
 # Example:
 $ poetry run python main.py delete '{ "source_filenames": ["grobid-fails.pdf", "Machine Learning at Scale.pdf"] }' | jq
 
@@ -313,8 +337,10 @@ Its input argument has a key for `source_filename` and `patch`. `source_filename
 To run `update`:
 
 ```bash
-$ poetry run python main.py update '{"source_filename": "grobid-fails.pdf", "patch": {"title": "a title that was missing"}}'
+poetry run python main.py update '{"source_filename": "grobid-fails.pdf", "patch": {"title": "a title that was missing"}}'
+```
 
+```bash
 # Example:
 $ poetry run python main.py update '{"source_filename": "grobid-fails.pdf", "patch": {"title": "a title that was missing"}}'
 | jq
