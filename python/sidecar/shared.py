@@ -9,7 +9,9 @@ import pypdf
 from sidecar import settings
 
 from .typing import Author, Chunk, Reference, TextCompletionChoice
+from .settings import logger
 
+logger = logger.getChild(__name__)
 
 def get_word_count(text: str) -> int:
     return len(text.strip().split(" "))
@@ -212,6 +214,7 @@ def chunk_reference(
     try:
         reader = pypdf.PdfReader(filepath)
     except FileNotFoundError:
+        logger.info(f"File not found: {filepath}")
         return []
 
     chunks = []
