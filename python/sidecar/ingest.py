@@ -300,6 +300,7 @@ class PDFIngestion:
             "title": header.get("title"),
             "authors": authors,
             "published_date": header.get("date"),
+            "doi": header.get("doi"),  # Added DOI extraction
         }
 
     def _create_author(self, author_dict: dict) -> Author:
@@ -456,6 +457,7 @@ class PDFIngestion:
                 status=typing.IngestStatus.COMPLETE,
                 title=header.get("title"),
                 authors=header.get("authors"),
+                doi=header.get("doi"),
                 published_date=pub_date,
                 abstract=doc.get("abstract"),
                 contents=doc.get("body"),
