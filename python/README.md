@@ -86,6 +86,7 @@ $ poetry run python main.py ingest '{ "pdf_directory": "tests/fixtures/pdf/" }' 
       "title": "A Few Useful Things to Know about Machine Learning",
       "abstract": "... PDF abstract here ...",
       "contents": "... PDF body here ...",
+      "doi": None,
       "authors": [
         {
           "full_name": "Pedro Domingos",

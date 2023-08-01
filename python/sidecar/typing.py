@@ -42,6 +42,7 @@ class Reference(RefStudioModel):
     source_filename: str
     status: IngestStatus
     citation_key: str | None = None
+    doi: str | None = None
     title: str | None = None
     abstract: str | None = None
     contents: str | None = None
