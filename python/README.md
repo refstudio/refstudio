@@ -19,6 +19,8 @@ export OPENAI_CHAT_MODEL='gpt-3.5-turbo'
 
 You can add these to your `.bashrc` or `.zshrc` to persist them.
 
+For development, you can also add a `.env` file inside the main refstudio directory (see `.env.example`).
+
 ## Development
 
 The following assumes you have already installed [poetry](https://python-poetry.org/docs/).
