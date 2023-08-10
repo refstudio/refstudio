@@ -45,6 +45,9 @@ if __name__ == '__main__':
     elif args.command == "delete":
         storage.delete_references(param_obj)
 
+    elif args.command == "link_references":
+        storage.link_references(param_obj)
+
     elif args.command == "search":
         search.search_s2(param_obj)
 
