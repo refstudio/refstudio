@@ -3,7 +3,8 @@ import sys
 
 from sidecar import settings, typing
 from sidecar.settings import logger
-from sidecar.typing import DeleteRequest, ReferenceUpdate
+from sidecar.typing import DeleteRequest, ReferenceUpdate, LinkRequest
+import semanticscholar
 
 logger = logger.getChild(__name__)
 
@@ -18,6 +19,12 @@ def delete_references(delete_request: DeleteRequest):
     storage = JsonStorage(settings.REFERENCES_JSON_PATH)
     storage.load()
     storage.delete(source_filenames=delete_request.source_filenames, all_=delete_request.all)
+
+def link_references(reference_update: LinkRequest):
+    storage = JsonStorage(settings.REFERENCES_JSON_PATH)
+    storage.load()
+    if reference_update.doi:
+        storage.link_s2_doi()
 
 
 class JsonStorage:
@@ -51,6 +58,34 @@ class JsonStorage:
         contents = [ref.dict() for ref in self.references]
         with open(self.filepath, 'w') as f:
             json.dump(contents, f, indent=2, default=str)
+
+    def link_s2_doi(self):
+        """
+        Link the references to S2 paperId using DOI.
+        """
+        s2_object = semanticscholar.SemanticScholar()
+        for reference in self.references:
+            if reference.doi:
+                try:
+                    paper = s2_object.get_paper(reference.doi, fields=["title", "paperId"])
+                    logger.info(
+                        f" Linking DOI: {reference.doi} --> {paper.title} and {paper.paperId}"
+                    )
+                    reference.s2_paperId = paper.paperId
+
+                except (
+                    semanticscholar.SemanticScholarException.ObjectNotFoundExeception
+                ) as e:
+                    logger.info(f"Paper with doi {reference.doi} not found.")
+
+                except Exception as e:
+                    logger.info(f"Linking: An unexpected error occurred: {e}")
+        self.save()
+        response = typing.LinkResponse(
+            status=typing.ResponseStatus.OK,
+            message="Linking with s2 complete"
+        )
+        sys.stdout.write(response.json())
 
     def delete(self, source_filenames: list[str] = [], all_: bool = False):
         """
