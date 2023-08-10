@@ -388,6 +388,34 @@ $ cat .storage/references.json | jq '.[] | select(.source_filename | contains("f
 }
 ```
 
+### Link References (Semantic Scholar)
+
+`link_references` links the `doi` of each reference in `references.json` to the corresponding Semantic Scholar paper and fetches the `s2_paper_id` which can be used as primary key to fetch additional information about the paper later.
+
+```bash
+poetry run python main.py link_references '{ "doi": true }'
+```
+
+```json
+{
+  "status": "ok",
+  "message": "Linking with s2 complete for 21 out of 25 references"
+}
+```
+
+Each reference will have a `s2_paper_id` field added to it.
+
+```json
+{
+    "source_filename": "91190.2-20201218131630-covered-e0fd13ba177f913fd3156f593ead4cfd.pdf",
+    "status": "complete",
+    "citation_key": "ayers2017",
+    "doi": "10.1172/jci91190",
+    "s2_paperId": "43120eca376614a844320d50ba42e8259797a48a",
+    "title": "IFN related mRNA profile predicts clinical response to PD-1 blockade",
+    . . }
+```
+
 ### Search (Semantic Scholar)
 
 `search` queries the Semantic Scholar API for a given query string.
