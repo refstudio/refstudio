@@ -78,7 +78,7 @@ class JsonStorage:
                 except (
                     semanticscholar.SemanticScholarException.ObjectNotFoundExeception
                 ) as e:
-                    logger.info(f"Paper with doi {reference.doi} not found.")
+                    logger.info(f"Paper with doi {reference.doi} not found. Exception: {e}")
 
                 except Exception as e:
                     logger.info(f"Linking: An unexpected error occurred: {e}")
