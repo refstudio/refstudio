@@ -63,6 +63,8 @@ class JsonStorage:
         """
         Link the references to S2 paperId using DOI.
         """
+        success_count = 0
+        total_count = len(self.references)
         s2_object = semanticscholar.SemanticScholar()
         for reference in self.references:
             if reference.doi:
@@ -72,7 +74,7 @@ class JsonStorage:
                         f" Linking DOI: {reference.doi} --> {paper.title} and {paper.paperId}"
                     )
                     reference.s2_paperId = paper.paperId
-
+                    success_count+=1
                 except (
                     semanticscholar.SemanticScholarException.ObjectNotFoundExeception
                 ) as e:
@@ -83,7 +85,7 @@ class JsonStorage:
         self.save()
         response = typing.LinkResponse(
             status=typing.ResponseStatus.OK,
-            message="Linking with s2 complete"
+            message="Linking with s2 complete for {} out of {} references".format(success_count, total_count),
         )
         sys.stdout.write(response.json())
 
