@@ -118,6 +118,19 @@
           "$ref": "#/definitions/SearchResponse"
         }
       ]
+    },
+    "link_references": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": [
+        {
+          "$ref": "#/definitions/LinkRequest"
+        },
+        {
+          "$ref": "#/definitions/LinkResponse"
+        }
+      ]
     }
   },
   "required": [
@@ -129,7 +142,8 @@
     "chat",
     "update",
     "delete",
-    "search"
+    "search",
+    "link_references"
   ],
   "definitions": {
     "IngestRequest": {
@@ -213,6 +227,9 @@
           "type": "string"
         },
         "doi": {
+          "type": "string"
+        },
+        "s2_paperId": {
           "type": "string"
         },
         "title": {
@@ -670,6 +687,32 @@
         "status",
         "message",
         "results"
+      ]
+    },
+    "LinkRequest": {
+      "title": "LinkRequest",
+      "type": "object",
+      "properties": {
+        "doi": {
+          "default": false,
+          "type": "boolean"
+        }
+      }
+    },
+    "LinkResponse": {
+      "title": "LinkResponse",
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "message"
       ]
     }
   }

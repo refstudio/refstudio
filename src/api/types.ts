@@ -64,6 +64,11 @@ export interface CliCommands {
    * @maxItems 2
    */
   search: [SearchRequest, SearchResponse];
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  link_references: [LinkRequest, LinkResponse];
 }
 export interface IngestRequest {
   pdf_directory: string;
@@ -80,6 +85,7 @@ export interface Reference {
   status: IngestStatus;
   citation_key?: string;
   doi?: string;
+  s2_paperId?: string;
   title?: string;
   abstract?: string;
   contents?: string;
@@ -193,4 +199,11 @@ export interface S2SearchResult {
   citationCount?: number;
   openAccessPdf?: string;
   authors?: string[];
+}
+export interface LinkRequest {
+  doi?: boolean;
+}
+export interface LinkResponse {
+  status: ResponseStatus;
+  message: string;
 }
