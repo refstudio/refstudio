@@ -43,6 +43,7 @@ class Reference(RefStudioModel):
     status: IngestStatus
     citation_key: str | None = None
     doi: str | None = None
+    s2_paperId: str | None = None
     title: str | None = None
     abstract: str | None = None
     contents: str | None = None
@@ -201,6 +202,15 @@ class SearchResponse(RefStudioModel):
     results: list[S2SearchResult] 
 
 
+class LinkRequest(RefStudioModel):
+    doi: bool = False
+
+
+class LinkResponse(RefStudioModel):
+    status: ResponseStatus
+    message: str
+
+
 class CliCommands(RefStudioModel):
     ingest: tuple[IngestRequest, IngestResponse]
     """Ingest PDFs"""
@@ -220,6 +230,8 @@ class CliCommands(RefStudioModel):
     """Deletes a Reference"""
     search: tuple[SearchRequest, SearchResponse]
     """Searches for papers on Semantic Scholar"""
+    link_references: tuple[LinkRequest, LinkResponse]
+    """Links references to Semantic Scholar papers"""
 
 
 Reference.update_forward_refs()
