@@ -98,8 +98,8 @@ describe('CitationNode', () => {
   it('should not add "; " when switching between nodes', async () => {
     const [pos1, pos2] = setUpEditorWithSelection(
       editor,
-      `<p><citation><span data-type='reference' data-id='TESTID'>@TESTID</span>|</citation></p>
-       <p><citation><span data-type='reference' data-id='TESTID'>@TESTID</span>|</citation></p>`,
+      `<p><citation><span data-type='reference' data-id='TESTID'>@TESTID</span>|</citation>.</p>
+       <p><citation><span data-type='reference' data-id='TESTID'>@TESTID</span>|</citation>.</p>`,
     );
 
     setup(<EditorContent editor={editor} />);
