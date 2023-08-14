@@ -16,14 +16,12 @@
       "path": {
         "all": true
       },
+      "dialog": {
+        "save": true
+      },
       "fs": {
         "all": true,
-        "scope": [
-          "$APPCONFIG",
-          "$APPCONFIG/*",
-          "$APPDATA/**",
-          "$RESOURCE/**"
-        ]
+        "scope": ["$APPCONFIG", "$APPCONFIG/*", "$APPDATA/**", "$RESOURCE/**", "$HOME/**"]
       },
       "shell": {
         "all": true,
@@ -44,9 +42,7 @@
       "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
       "externalBin": [],
       "identifier": "studio.ref.desktop",
-      "resources": [
-        "bin/*"
-      ],
+      "resources": ["bin/*"],
       "targets": "all"
     },
     "security": {

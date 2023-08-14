@@ -22,6 +22,11 @@ export interface JsonEditorContent {
   textContent: string;
 }
 
+export interface MarkdownEditorContent {
+  type: 'md';
+  textContent: string;
+}
+
 export interface ReferencesEditorContent {
   type: 'references';
   filter?: string;
@@ -37,6 +42,7 @@ export type EditorContent =
   | PdfEditorContent
   | XmlEditorContent
   | JsonEditorContent
+  | MarkdownEditorContent
   | ReferencesEditorContent
   | ReferenceEditorContent;
 

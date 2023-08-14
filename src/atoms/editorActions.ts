@@ -119,6 +119,7 @@ export function targetPaneIdFor(file: FileFileEntry): PaneId {
     case 'pdf':
     case 'xml':
     case 'json':
+    case 'md':
       return 'RIGHT';
     default:
       return 'LEFT';

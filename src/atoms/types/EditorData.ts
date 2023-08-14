@@ -34,7 +34,8 @@ export function buildEditorIdFromPath(filePath: string) {
   switch (fileFileEntry.fileExtension) {
     case 'pdf':
     case 'json':
-    case 'xml': {
+    case 'xml':
+    case 'md': {
       type = fileFileEntry.fileExtension;
       break;
     }

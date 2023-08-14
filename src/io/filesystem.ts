@@ -1,3 +1,4 @@
+import { save } from '@tauri-apps/api/dialog';
 import {
   createDir,
   exists,
@@ -20,6 +21,7 @@ import { FILE2_CONTENT, FILE3_CONTENT, INITIAL_CONTENT } from './filesystem.samp
 
 const PROJECT_NAME = 'project-x';
 const UPLOADS_DIR = 'uploads';
+const EXPORTS_DIR = 'exports';
 
 // #####################################################################################
 // Top Level PATH API
@@ -89,6 +91,10 @@ export function getUploadsDir() {
   return makeRefStudioPath(UPLOADS_DIR);
 }
 
+export function getExportsDir() {
+  return makeRefStudioPath(EXPORTS_DIR);
+}
+
 export function makeUploadPath(filename: string) {
   return `${getUploadsDir()}${sep}${filename}`;
 }
@@ -116,6 +122,9 @@ export async function ensureProjectFileStructure() {
 
     const systemUploadsDir = await getSystemPath(getUploadsDir());
     await createDir(systemUploadsDir, { recursive: true });
+
+    const systemExportsDir = await getSystemPath(getExportsDir());
+    await createDir(systemExportsDir, { recursive: true });
 
     await ensureFile('file 1.refstudio', INITIAL_CONTENT);
     await ensureFile('file 2.refstudio', FILE2_CONTENT);
@@ -212,6 +221,10 @@ export async function readFileContent(file: FileFileEntry): Promise<EditorConten
       const textContent = await readTextFile(systemPath);
       return { type: 'json', textContent };
     }
+    case 'md': {
+      const textContent = await readTextFile(systemPath);
+      return { type: 'md', textContent };
+    }
     case 'pdf': {
       const binaryContent = await readBinaryFile(systemPath);
       return { type: 'pdf', binaryContent };
@@ -257,3 +270,34 @@ export async function renameFile(relativePath: string, newName: string): RenameF
   }
 }
 type RenameFileResult = Promise<{ success: false } | { success: true; newPath: string }>;
+
+export async function saveAsMarkdown(markdownContent: string, exportedFilePath: string) {
+  try {
+    const splittedPath = exportedFilePath.split(sep);
+    const fileName = splittedPath.pop();
+    if (!fileName) {
+      return;
+    }
+    let markdownFileName: string;
+    if (fileName.includes('.')) {
+      const splittedFileName = fileName.split('.');
+      splittedFileName.pop();
+      markdownFileName = `${splittedFileName.join('.')}.md`;
+    } else {
+      markdownFileName = `${fileName}.md`;
+    }
+
+    const markdownFilePath = [...splittedPath, 'exports', markdownFileName].join(sep);
+
+    const filePath = await save({
+      title: 'Export file as Markdown',
+      defaultPath: await getSystemPath(markdownFilePath),
+      filters: [{ name: 'Markdown', extensions: ['md'] }],
+    });
+    if (filePath) {
+      await writeTextFile(filePath, markdownContent);
+    }
+  } catch (err) {
+    console.error('Error', err);
+  }
+}
