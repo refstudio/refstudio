@@ -8,7 +8,7 @@ import {
   AiOutlineCode as IconCode,
   AiOutlineItalic as IconItalic,
   AiOutlineLine as IconHorizontalRule,
-  AiOutlineOrderedList as IconOrderedList,
+  // AiOutlineOrderedList as IconOrderedList,
   AiOutlineRedo as IconRedo,
   AiOutlineStrikethrough as IconStrikethrough,
   AiOutlineUndo as IconUndo,
@@ -170,7 +170,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
       >
         <IconUnorderedList />
       </button>
-      <button
+      {/* <button
         className={cx('toolbar-item', {
           active: editor.isActive('orderedList'),
         })}
@@ -178,7 +178,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
       >
         <IconOrderedList />
-      </button>
+      </button> */}
       <button
         className={cx('toolbar-item')}
         title="Horizontal Rule"
