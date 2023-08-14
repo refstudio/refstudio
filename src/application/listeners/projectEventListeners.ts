@@ -27,6 +27,7 @@ export function useFileProjectOpenListener() {
 
       if (typeof selectedPath === 'string') {
         notifyInfo('Selected folder', selectedPath);
+
         await closeProject();
         setCachedSetting('general.projectDir', selectedPath);
         await saveCachedSettings();
