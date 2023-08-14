@@ -123,7 +123,7 @@ export async function uploadFiles(systemFiles: File[]) {
 }
 
 // #####################################################################################
-// Open projectProject Structure and read project files
+// Open Project Structure and read project files
 // #####################################################################################
 export async function openProject(projectPath: string, overrideFiles = false) {
   try {
@@ -131,9 +131,15 @@ export async function openProject(projectPath: string, overrideFiles = false) {
 
     const systemBaseDir = await getSystemPath('');
     await createDir(systemBaseDir, { recursive: true });
+    console.log('Ensure project directory', systemBaseDir);
+
+    console.log('before promise');
+    // await new Promise((resolve) => setTimeout(resolve, 500));
+    console.log('after promise');
 
     const systemUploadsDir = await getSystemPath(getUploadsDir());
     await createDir(systemUploadsDir, { recursive: true });
+    console.log('Ensure uploads directory', systemUploadsDir);
 
     await ensureFile('file 1.refstudio', INITIAL_CONTENT, overrideFiles);
     await ensureFile('file 2.refstudio', FILE2_CONTENT, overrideFiles);
@@ -148,13 +154,19 @@ export async function openProject(projectPath: string, overrideFiles = false) {
 
 async function ensureFile(fileName: string, content: string, overrideFiles = false) {
   const absoluteFilePath = await getSystemPath(fileName);
+  console.log('Ensure file', absoluteFilePath);
   if (overrideFiles || !(await exists(absoluteFilePath))) {
     await writeTextFile(absoluteFilePath, content);
   }
 }
 
 export async function readAllProjectFiles() {
+  console.log('before promise readAllProjectFiles');
+  // await new Promise((resolve) => setTimeout(resolve, 1000));
+  console.log('after promise readAllProjectFiles');
+
   const systemBaseDir = await getSystemPath('');
+  console.log('reading file structure from ', systemBaseDir);
   const entries = await readDir(systemBaseDir, { recursive: true });
   return Promise.all(entries.map(convertTauriFileEntryToFileEntry));
 }

@@ -60,13 +60,14 @@ export function ProjectSection() {
 }
 
 function CreateNewProjectAction() {
-  return <ProjectAction onClick={noop}>create new project</ProjectAction>;
+  const handleClick = () => emitEvent('refstudio://menu/file/project/new');
+  return <ProjectAction onClick={handleClick}>create new project</ProjectAction>;
 }
 
 function OpenExistingProjectAction() {
-  const handleOpen = () => emitEvent('refstudio://menu/file/project/open');
+  const handleClick = () => emitEvent('refstudio://menu/file/project/open');
 
-  return <ProjectAction onClick={() => handleOpen()}>open an existing project</ProjectAction>;
+  return <ProjectAction onClick={handleClick}>open an existing project</ProjectAction>;
 }
 
 function TrySampleProjectAction() {

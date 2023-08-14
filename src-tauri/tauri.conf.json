@@ -14,7 +14,9 @@
     "allowlist": {
       "all": false,
       "dialog": {
-        "open": true
+        "open": true,
+        "ask": true,
+        "save": true
       },
       "path": {
         "all": true

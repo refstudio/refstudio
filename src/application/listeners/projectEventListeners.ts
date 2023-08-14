@@ -1,15 +1,43 @@
-import { open } from '@tauri-apps/api/dialog';
-import { useSetAtom } from 'jotai';
+import { ask, open, save } from '@tauri-apps/api/dialog';
+import { useAtomValue, useSetAtom } from 'jotai';
 
-import { closeProjectAtom, openProjectAtom } from '../../atoms/projectState';
+import { refreshFileTreeAtom } from '../../atoms/fileExplorerActions';
+import { closeProjectAtom, isProjectOpenAtom, openProjectAtom, projectNameAtom } from '../../atoms/projectState';
 import { getNewProjectsBaseDir } from '../../io/filesystem';
 import { notifyInfo } from '../../notifications/notifications';
 import { saveCachedSettings, setCachedSetting } from '../../settings/settingsManager';
 
 export function useFileProjectNewListener() {
   const closeProject = useSetAtom(closeProjectAtom);
+  const openProject = useSetAtom(openProjectAtom);
+  const refreshFileTree = useSetAtom(refreshFileTreeAtom);
 
-  return () => void closeProject();
+  return () => {
+    const run = async () => {
+      const newProjectPath = await save({
+        defaultPath: await getNewProjectsBaseDir(),
+      });
+
+      if (typeof newProjectPath === 'string') {
+        console.log('close');
+        await closeProject();
+        setCachedSetting('general.projectDir', newProjectPath);
+        console.log('save settings');
+        await saveCachedSettings();
+        console.log('open project at ', newProjectPath);
+        await openProject(newProjectPath);
+        notifyInfo('New project created at ' + newProjectPath);
+      }
+    };
+
+    console.log('START');
+    run()
+      .then(() => {
+        console.log('Done');
+        void refreshFileTree();
+      })
+      .catch((err) => console.error(err));
+  };
 }
 
 export function useFileProjectOpenListener() {
@@ -40,11 +68,22 @@ export function useFileProjectOpenListener() {
 }
 
 export function useFileProjectCloseListener() {
+  const isOpen = useAtomValue(isProjectOpenAtom);
+  const projectName = useAtomValue(projectNameAtom);
   const closeProject = useSetAtom(closeProjectAtom);
 
   return () => {
-    void closeProject();
-    setCachedSetting('general.projectDir', '');
-    void saveCachedSettings();
+    const run = async () => {
+      if (isOpen) {
+        const ok = await ask('Sure you want to close the project?', { title: projectName });
+        if (ok) {
+          void closeProject();
+          setCachedSetting('general.projectDir', '');
+          void saveCachedSettings();
+        }
+      }
+    };
+
+    void run();
   };
 }
