@@ -133,8 +133,8 @@ describe('filesystem', () => {
   describe('project structure and read files', () => {
     it('should create project structure if folder and files dont exist', async () => {
       await ensureProjectFileStructure();
-      // Create 2 folders
-      expect(tauriCreateDir).toHaveBeenCalledTimes(2);
+      // Create 3 folders
+      expect(tauriCreateDir).toHaveBeenCalledTimes(3);
       // Check and create 3 files
       expect(tauriExists).toHaveBeenCalledTimes(3);
       expect(tauriWriteTextFile).toHaveBeenCalledTimes(3);
