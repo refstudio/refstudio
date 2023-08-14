@@ -212,6 +212,9 @@
         "citation_key": {
           "type": "string"
         },
+        "doi": {
+          "type": "string"
+        },
         "title": {
           "type": "string"
         },

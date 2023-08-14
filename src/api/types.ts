@@ -79,6 +79,7 @@ export interface Reference {
   source_filename: string;
   status: IngestStatus;
   citation_key?: string;
+  doi?: string;
   title?: string;
   abstract?: string;
   contents?: string;
