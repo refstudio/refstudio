@@ -72,20 +72,17 @@ export function TipTapEditor({ editorContent, editorId, isActive, saveFileInMemo
     [editor, isActive],
   );
 
-  const saveContentAsMarkdown = useCallback(
-    () => {
-      if (!isActive || !editor) {
-        return;
-      }
-      emitEvent('refstudio://menu/file/save');
+  const saveContentAsMarkdown = useCallback(() => {
+    if (!isActive || !editor) {
+      return;
+    }
+    emitEvent('refstudio://menu/file/save');
 
-      const mdSerializer = new MarkdownSerializer(references);
-      const { id: filePath } = parseEditorId(editorId);
+    const mdSerializer = new MarkdownSerializer(references);
+    const { id: filePath } = parseEditorId(editorId);
 
-      void saveAsMarkdown(mdSerializer.serialize(editor.state.doc), filePath);
-    },
-    [editor, editorId, isActive, references],
-  );
+    void saveAsMarkdown(mdSerializer.serialize(editor.state.doc), filePath);
+  }, [editor, editorId, isActive, references]);
 
   useListenEvent('refstudio://ai/suggestion/insert', insertContent);
   useListenEvent('refstudio://menu/file/markdown', saveContentAsMarkdown);
