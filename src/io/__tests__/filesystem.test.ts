@@ -151,7 +151,20 @@ describe('filesystem', () => {
       expect(tauriWriteTextFile).toHaveBeenCalledTimes(0);
     });
 
-    it.only('should create sample project structure with 3 files', async () => {
+    it('should create new project and delete directory if exists', async () => {
+      vi.mocked(tauriExists).mockResolvedValue(true);
+
+      const path = '/usr/documents/project-x-new';
+      await newProject(path);
+      expect(getProjectBaseDir()).toBe(path);
+      // Create 1 folder for the project and no files
+      expect(tauriExists).toHaveBeenCalledTimes(1);
+      expect(tauriRemoveDir).toHaveBeenCalledTimes(1);
+      expect(tauriCreateDir).toHaveBeenCalledTimes(1);
+      expect(tauriWriteTextFile).toHaveBeenCalledTimes(0);
+    });
+
+    it('should create sample project structure with 3 files', async () => {
       await sampleProject('/usr/documents/sample-x');
       // Create 1 folder for the project
       expect(tauriCreateDir).toHaveBeenCalledTimes(1);
@@ -159,7 +172,7 @@ describe('filesystem', () => {
       expect(tauriWriteTextFile).toHaveBeenCalledTimes(3);
     });
 
-    it.only('should override sample project directort if exists', async () => {
+    it('should override sample project directort if exists', async () => {
       vi.mocked(tauriExists).mockResolvedValue(true);
       await sampleProject('/usr/documents/sample-x-2');
 
@@ -170,7 +183,7 @@ describe('filesystem', () => {
 
     it('should throw error if any tauri fs throws', async () => {
       vi.mocked(tauriCreateDir).mockRejectedValue('any');
-      await expect(openProject('/usr/documents/project-x')).rejects.toThrow();
+      await expect(newProject('/usr/documents/project-x')).rejects.toThrow();
     });
 
     it('should read all project files empty if none exists', async () => {
@@ -332,6 +345,7 @@ describe('filesystem', () => {
     });
 
     it('should rename file content via tauri APIs', async () => {
+      vi.mocked(tauriExists).mockResolvedValue(false);
       const result = await renameFile('/some/relative.txt', 'updated.txt');
       expect(result).toStrictEqual({ success: true, newPath: '/some/updated.txt' });
       expect(tauriExists).toHaveBeenCalledTimes(1);

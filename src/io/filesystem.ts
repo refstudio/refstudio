@@ -136,6 +136,11 @@ export async function newProject(projectPath: string) {
   try {
     setProjectBaseDir(projectPath);
     const systemBaseDir = await getSystemPath('');
+
+    if (await exists(systemBaseDir)) {
+      await tauriRemoveDir(systemBaseDir, { recursive: true });
+    }
+
     await createDir(systemBaseDir, { recursive: true });
 
     console.log('New project created in folder ', systemBaseDir);
