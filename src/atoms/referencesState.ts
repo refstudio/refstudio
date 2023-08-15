@@ -44,7 +44,7 @@ export const referencesSyncInProgressAtom = atom<boolean>(false);
 // #####################################################################################
 // References initialization
 // #####################################################################################
-const referencesLoadedAtom = atom<boolean | null>(null); // Starts true to account for
+const referencesLoadedAtom = atom<boolean | null>(null);
 
 export const loadReferencesAtom = atom(null, async (_get, set) => {
   set(referencesLoadedAtom, false);

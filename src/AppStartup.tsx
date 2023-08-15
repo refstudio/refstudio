@@ -10,7 +10,7 @@ import { notifyErr, notifyInfo } from './notifications/notifications';
 import { interceptConsoleMessages } from './notifications/notifications.console';
 import { getCachedSetting, initSettings } from './settings/settingsManager';
 
-// Note: Intercepting INFO, WAR N and ERROR console.* in DEV mode
+// Note: Intercepting INFO, WARN and ERROR console.* in DEV mode
 if (import.meta.env.DEV) {
   interceptConsoleMessages(true, true, true);
 }

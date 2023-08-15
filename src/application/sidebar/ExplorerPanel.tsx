@@ -92,9 +92,4 @@ function ProjectAction({ children, onClick }: { children: React.ReactNode; onCli
       <div className="text-base font-semibold leading-normal text-white">{children}</div>
     </div>
   );
-  // return (
-  //   <li className="cursor-pointer underline hover:no-underline" onClick={onClick}>
-  //     {children}
-  //   </li>
-  // );
 }

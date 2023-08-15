@@ -93,7 +93,7 @@ export function getRefStudioPath(absolutePath: string) {
 /**
  * Returns the the OS-specific separator
  *
- * @returns the separator (/ or \)
+ * @returns the separator (/ or \\)
  */
 export function getSeparator() {
   return sep;
