@@ -19,9 +19,9 @@ const panelConfig: PaneConfig = {
   title: 'OPEN AI',
 };
 
-const mockSettings: Pick<SettingsSchema, 'general' | 'sidecar'> = {
-  general: {
-    projectDir: 'APP-DATA-DIR',
+const mockSettings: Pick<SettingsSchema, 'project' | 'sidecar'> = {
+  project: {
+    currentDir: 'APP-DATA-DIR',
   },
   sidecar: {
     logging: {
@@ -38,8 +38,8 @@ describe('GeneralSettingsPane component', () => {
     vi.mocked(saveCachedSettings).mockResolvedValue();
     vi.mocked(getCachedSetting).mockImplementation((key) => {
       switch (key) {
-        case 'general':
-          return mockSettings.general;
+        case 'project':
+          return mockSettings.project;
         case 'sidecar.logging':
           return mockSettings.sidecar.logging;
         default:
