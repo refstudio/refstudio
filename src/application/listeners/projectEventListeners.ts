@@ -22,8 +22,7 @@ export function useFileProjectNewListener() {
     if (typeof newProjectPath === 'string') {
       await newProject(newProjectPath);
       createFile();
-      setCachedSetting('general.projectDir', newProjectPath);
-      await saveCachedSettings();
+      persistProjectDirInSettings(newProjectPath);
       notifyInfo('New project created at ' + newProjectPath);
     }
   };
@@ -72,6 +71,6 @@ export function useFileProjectCloseListener() {
 }
 
 function persistProjectDirInSettings(path: string) {
-  setCachedSetting('general.projectDir', path);
+  setCachedSetting('project.currentDir', path);
   void saveCachedSettings();
 }
