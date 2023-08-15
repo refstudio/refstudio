@@ -1,11 +1,11 @@
 import { useAtomValue, useSetAtom } from 'jotai';
+import { VscClose, VscEmptyWindow } from 'react-icons/vsc';
 
 import { openFilePathAtom } from '../../atoms/fileEntryActions';
 import { fileExplorerAtom, refreshFileTreeAtom } from '../../atoms/fileExplorerActions';
 import { useActiveEditorIdForPane } from '../../atoms/hooks/useActiveEditorIdForPane';
 import { isProjectOpenAtom, projectNameAtom } from '../../atoms/projectState';
 import { parseEditorId } from '../../atoms/types/EditorData';
-import { InfoMessage } from '../../components/InfoMessage';
 import { PanelSection } from '../../components/PanelSection';
 import { PanelWrapper } from '../../components/PanelWrapper';
 import { emitEvent } from '../../events';
@@ -22,8 +22,7 @@ export function ExplorerPanel() {
 
       {!isProjectOpen && (
         <div className="p-4">
-          <InfoMessage className="mb-4 text-base leading-loose">Your project is empty!</InfoMessage>
-          <ul className="list-inside list-disc">
+          <ul className="flex list-inside list-disc flex-col gap-2">
             <CreateNewProjectAction />
             <OpenExistingProjectAction />
             <TrySampleProjectAction />
@@ -44,8 +43,18 @@ export function ProjectSection() {
 
   useAsyncEffect(refreshFileTree);
 
+  const openProject = () => emitEvent('refstudio://menu/file/project/open');
+  const closeProject = () => emitEvent('refstudio://menu/file/project/close');
+
   return (
-    <PanelSection grow title={projectName}>
+    <PanelSection
+      grow
+      rightIcons={[
+        { key: 'open', Icon: VscEmptyWindow, title: 'Open Project', onClick: openProject },
+        { key: 'close', Icon: VscClose, title: 'Close Project', onClick: closeProject },
+      ]}
+      title={projectName}
+    >
       <FileExplorer
         fileExplorerEntry={rootFileExplorerEntry}
         paddingLeft="1.25rem"
@@ -60,24 +69,32 @@ export function ProjectSection() {
 
 function CreateNewProjectAction() {
   const handleClick = () => emitEvent('refstudio://menu/file/project/new');
-  return <ProjectAction onClick={handleClick}>create new project</ProjectAction>;
+  return <ProjectAction onClick={handleClick}>Create New Project</ProjectAction>;
 }
 
 function OpenExistingProjectAction() {
   const handleClick = () => emitEvent('refstudio://menu/file/project/open');
 
-  return <ProjectAction onClick={handleClick}>open an existing project</ProjectAction>;
+  return <ProjectAction onClick={handleClick}>Open Existing Project</ProjectAction>;
 }
 
 function TrySampleProjectAction() {
   const handleClick = () => emitEvent('refstudio://menu/file/project/new/sample');
-  return <ProjectAction onClick={handleClick}>try a sample project</ProjectAction>;
+  return <ProjectAction onClick={handleClick}>Try Sample Project</ProjectAction>;
 }
 
 function ProjectAction({ children, onClick }: { children: React.ReactNode; onClick: () => void }) {
   return (
-    <li className="cursor-pointer underline hover:no-underline" onClick={onClick}>
-      {children}
-    </li>
+    <div
+      className="inline-flex cursor-pointer items-center justify-center gap-2 rounded bg-emerald-500 px-5 py-3 hover:bg-emerald-600"
+      onClick={onClick}
+    >
+      <div className="text-base font-semibold leading-normal text-white">{children}</div>
+    </div>
   );
+  // return (
+  //   <li className="cursor-pointer underline hover:no-underline" onClick={onClick}>
+  //     {children}
+  //   </li>
+  // );
 }
