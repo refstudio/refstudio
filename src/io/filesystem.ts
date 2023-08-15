@@ -136,7 +136,7 @@ export async function newProject(projectPath: string) {
     const systemUploadsDir = await getSystemPath(getUploadsDir());
     await createDir(systemUploadsDir, { recursive: true });
 
-    console.log('New project create in folder ', systemBaseDir);
+    console.log('New project created in folder ', systemBaseDir);
   } catch (err) {
     console.error('ERROR', err);
     throw new Error('Error creating new project in ' + projectPath);
