@@ -14,7 +14,7 @@ import { useListenEvent } from '../../../hooks/useListenEvent';
 import { saveAsMarkdown } from '../../../io/filesystem';
 import { MenuBar } from './MenuBar';
 import { EDITOR_EXTENSIONS, transformPasted } from './tipTapEditorConfigs';
-import { MarkdownSerializer } from './tipTapNodes/refStudioDocument/MarkdownSerializer';
+import { MarkdownSerializer } from './tipTapNodes/refStudioDocument/serialization/MarkdownSerializer';
 
 interface EditorProps {
   editorContent: JSONContent;
@@ -78,10 +78,10 @@ export function TipTapEditor({ editorContent, editorId, isActive, saveFileInMemo
     }
     emitEvent('refstudio://menu/file/save');
 
-    const mdSerializer = new MarkdownSerializer(references);
+    const mdSerializer = new MarkdownSerializer(editor, references);
     const { id: filePath } = parseEditorId(editorId);
 
-    void saveAsMarkdown(mdSerializer.serialize(editor.state.doc), filePath);
+    void saveAsMarkdown(mdSerializer, filePath);
   }, [editor, editorId, isActive, references]);
 
   useListenEvent('refstudio://ai/suggestion/insert', insertContent);

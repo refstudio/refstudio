@@ -1,0 +1,132 @@
+import { getHTMLFromFragment } from '@tiptap/core';
+import { Fragment, Node, Schema } from '@tiptap/pm/model';
+import { Editor } from '@tiptap/react';
+import TurndownService from 'turndown';
+
+import { ReferenceItem } from '../../../../../../types/ReferenceItem';
+import { NotionBlockNode } from '../../notionBlock/NotionBlockNode';
+import { SerializedReferences, serializeReferences } from './serializeReferences';
+
+interface SerializedDocument {
+  markdownContent: string;
+  bibliography?: SerializedReferences;
+}
+
+export class MarkdownSerializer {
+  private doc: Node;
+  private referencesById: Record<string, ReferenceItem>;
+  private schema: Schema;
+  private turndownService: TurndownService;
+
+  private usedReferenceIds = new Set<string>();
+
+  constructor(editor: Editor, references: ReferenceItem[]) {
+    this.doc = editor.state.doc;
+    this.referencesById = Object.fromEntries(references.map((reference) => [reference.id, reference]));
+    this.schema = editor.schema;
+    this.turndownService = new TurndownService({ headingStyle: 'atx', bulletListMarker: '-', emDelimiter: '*' });
+
+    this.turndownService.addRule('strikethrough', {
+      filter: ['s'],
+      replacement: (content) => '~~' + content + '~~',
+    });
+    this.turndownService.addRule('citation', {
+      filter: (node) => node.nodeName === 'CITATION',
+      replacement: (content) => '[' + content + ']',
+    });
+    this.turndownService.addRule('reference', {
+      filter: (node) => node.nodeName === 'SPAN' && node.getAttribute('data-type') === 'reference',
+      replacement: (content) => {
+        const referenceId = content.slice(1);
+        const reference = this.referencesById[referenceId] as ReferenceItem | undefined;
+        if (reference) {
+          this.usedReferenceIds.add(referenceId);
+        }
+
+        return `@${reference?.citationKey ?? 'INVALID_REFERENCE'}`;
+      },
+    });
+  }
+
+  private inlineBlockToMarkdown(node: Node): string {
+    const nodeType = node.type.name;
+    if (nodeType !== 'paragraph' && nodeType !== 'heading') {
+      throw new Error('Unexpected node type. Expected an inline block, got ' + nodeType);
+    }
+
+    const htmlContent = getHTMLFromFragment(Fragment.from(node), this.schema);
+    return this.turndownService.turndown(htmlContent);
+  }
+
+  private notionBlocksToMarkdown(nodes: Node[], indentLevel = 0, isList = false): string {
+    nodes.forEach((node) => {
+      const nodeType = node.type.name;
+      if (nodeType !== NotionBlockNode.name) {
+        throw new Error('Unexpected node type. Expected notionBlock, got ' + nodeType);
+      }
+    });
+
+    const lines: string[] = [];
+    let addEmptyLine = !isList;
+
+    nodes.forEach((node, nodeIndex) => {
+      const isCollapsible = node.attrs.type === 'collapsible' || node.attrs.type === 'bulletList';
+
+      if ((nodeIndex > 0 || indentLevel > 0) && (addEmptyLine || !isCollapsible)) {
+        lines.push('');
+      }
+
+      lines.push(' '.repeat(indentLevel * 4) + (isCollapsible ? '- ' : '') + this.inlineBlockToMarkdown(node.child(0)));
+
+      if (node.childCount > 1) {
+        const content: Node[] = [];
+        node.forEach((child, _offset, index) => {
+          if (index > 0) {
+            content.push(child);
+          }
+        });
+        lines.push(this.notionBlocksToMarkdown(content, isCollapsible ? indentLevel + 1 : indentLevel, isCollapsible));
+      }
+      addEmptyLine = !isCollapsible;
+    });
+    return lines.join('\n');
+  }
+
+  serialize(fileName: string): SerializedDocument {
+    this.usedReferenceIds = new Set<string>();
+
+    if (this.doc.childCount === 0) {
+      return { markdownContent: '' };
+    }
+    const notionBlocks: Node[] = [];
+    this.doc.forEach((child, _offset, index) => {
+      if (index > 0) {
+        notionBlocks.push(child);
+      }
+    });
+
+    const documentTitle = this.doc.child(0).textContent;
+
+    const markdownContent = [this.notionBlocksToMarkdown(notionBlocks)];
+
+    const metadata = ['---', `title: ${documentTitle}`, '---'];
+
+    if (this.usedReferenceIds.size === 0) {
+      return { markdownContent: [...metadata, '', ...markdownContent].join('\n') };
+    }
+
+    // Export references as .bib
+    const bibliography = serializeReferences(
+      [...this.usedReferenceIds.values()].map((referenceId) => this.referencesById[referenceId]).filter(Boolean),
+    );
+
+    metadata.splice(2, 0, `bibliography: ${fileName}.bib`);
+    // This is for Quarto (cf. https://quarto.org/docs/get-started/authoring/text-editor.html#citations)
+    markdownContent.push('', '## References');
+
+    return {
+      markdownContent: [...metadata, '', ...markdownContent].join('\n'),
+      bibliography,
+    };
+  }
+}

@@ -90,12 +90,10 @@ function MainPaneViewContent({ activeEditorAtoms }: MainPaneViewContentProps) {
   const { data } = loadableEditorContent;
 
   switch (data.type) {
-    case 'xml':
+    case 'text':
       return <TextView file={data} />;
     case 'json':
       return <TextView file={data} textFormatter={(input) => JSON.stringify(JSON.parse(input), null, 2)} />;
-    case 'md':
-      return <TextView file={data} />;
     case 'pdf':
       return <PdfViewer file={data} />;
     case 'refstudio':

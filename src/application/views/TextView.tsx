@@ -1,10 +1,10 @@
-import { JsonEditorContent, MarkdownEditorContent, XmlEditorContent } from '../../atoms/types/EditorContent';
+import { JsonEditorContent, RawTextEditorContent } from '../../atoms/types/EditorContent';
 
 export function TextView({
   file,
   textFormatter = (text) => text,
 }: {
-  file: XmlEditorContent | JsonEditorContent | MarkdownEditorContent;
+  file: RawTextEditorContent | JsonEditorContent;
   textFormatter?: (input: string) => string;
 }) {
   return (

@@ -33,14 +33,17 @@ export function buildEditorIdFromPath(filePath: string) {
   let type: EditorContentType;
   switch (fileFileEntry.fileExtension) {
     case 'pdf':
-    case 'json':
-    case 'xml':
-    case 'md': {
+    case 'json': {
       type = fileFileEntry.fileExtension;
       break;
     }
-    default: {
+    case 'refstudio':
+    case '': {
       type = 'refstudio';
+      break;
+    }
+    default: {
+      type = 'text';
       break;
     }
   }

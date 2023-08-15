@@ -12,18 +12,13 @@ export interface PdfEditorContent {
   binaryContent: Uint8Array;
 }
 
-export interface XmlEditorContent {
-  type: 'xml';
+export interface RawTextEditorContent {
+  type: 'text';
   textContent: string;
 }
 
 export interface JsonEditorContent {
   type: 'json';
-  textContent: string;
-}
-
-export interface MarkdownEditorContent {
-  type: 'md';
   textContent: string;
 }
 
@@ -40,9 +35,8 @@ export interface ReferenceEditorContent {
 export type EditorContent =
   | RefStudioEditorContent
   | PdfEditorContent
-  | XmlEditorContent
+  | RawTextEditorContent
   | JsonEditorContent
-  | MarkdownEditorContent
   | ReferencesEditorContent
   | ReferenceEditorContent;
 

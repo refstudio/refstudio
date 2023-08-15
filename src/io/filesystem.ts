@@ -16,6 +16,7 @@ import { JSONContent } from '@tiptap/core';
 
 import { EditorContent } from '../atoms/types/EditorContent';
 import { FileEntry, FileFileEntry } from '../atoms/types/FileEntry';
+import { MarkdownSerializer } from '../features/textEditor/components/tipTapNodes/refStudioDocument/serialization/MarkdownSerializer';
 import { notifyError } from '../notifications/notifications';
 import { FILE2_CONTENT, FILE3_CONTENT, INITIAL_CONTENT } from './filesystem.sample-content';
 
@@ -166,11 +167,11 @@ async function convertTauriFileEntryToFileEntry(entry: TauriFileEntry): Promise<
       children: await Promise.all(entry.children!.map(convertTauriFileEntryToFileEntry)),
     };
   } else {
-    const fileExtension = name.split('.').pop()?.toLowerCase() ?? '';
+    const nameParts = name.split('.');
     return {
       name,
       path: refStudioPath,
-      fileExtension,
+      fileExtension: nameParts.length > 1 ? nameParts[nameParts.length - 1].toLowerCase() : '',
       isFolder,
       isDotfile,
       isFile: !isFolder,
@@ -213,23 +214,16 @@ export async function writeFileContent(relativePath: string, textContent: string
 export async function readFileContent(file: FileFileEntry): Promise<EditorContent> {
   const systemPath = await getSystemPath(file.path);
   switch (file.fileExtension) {
-    case 'xml': {
-      const textContent = await readTextFile(systemPath);
-      return { type: 'xml', textContent };
-    }
     case 'json': {
       const textContent = await readTextFile(systemPath);
       return { type: 'json', textContent };
-    }
-    case 'md': {
-      const textContent = await readTextFile(systemPath);
-      return { type: 'md', textContent };
     }
     case 'pdf': {
       const binaryContent = await readBinaryFile(systemPath);
       return { type: 'pdf', binaryContent };
     }
-    default: {
+    case 'refstudio':
+    case '': {
       const textContent = await readTextFile(systemPath);
       try {
         const jsonContent = JSON.parse(textContent) as JSONContent;
@@ -238,6 +232,10 @@ export async function readFileContent(file: FileFileEntry): Promise<EditorConten
         notifyError('Invalid content. Cannot open file:', file.path);
         return { type: 'refstudio', jsonContent: [] };
       }
+    }
+    default: {
+      const textContent = await readTextFile(systemPath);
+      return { type: 'text', textContent };
     }
   }
 }
@@ -271,7 +269,7 @@ export async function renameFile(relativePath: string, newName: string): RenameF
 }
 type RenameFileResult = Promise<{ success: false } | { success: true; newPath: string }>;
 
-export async function saveAsMarkdown(markdownContent: string, exportedFilePath: string) {
+export async function saveAsMarkdown(markdownSerializer: MarkdownSerializer, exportedFilePath: string) {
   try {
     const splittedPath = exportedFilePath.split(sep);
     const fileName = splittedPath.pop();
@@ -294,8 +292,31 @@ export async function saveAsMarkdown(markdownContent: string, exportedFilePath: 
       defaultPath: await getSystemPath(markdownFilePath),
       filters: [{ name: 'Markdown', extensions: ['md'] }],
     });
+
     if (filePath) {
-      await writeTextFile(filePath, markdownContent);
+      const filePathParts = filePath.split(sep);
+      const newFileName = filePathParts.pop();
+      if (newFileName) {
+        const newFileNameParts = newFileName.split('.');
+        const newFileNameWithoutExtension =
+          newFileNameParts.length > 1 ? newFileNameParts.slice(0, -1).join('.') : newFileName;
+
+        const serializedContent = markdownSerializer.serialize(newFileNameWithoutExtension);
+
+        if (!serializedContent.bibliography) {
+          return writeTextFile(filePath, serializedContent.markdownContent);
+        }
+
+        const bibliographyFilePath = [
+          ...filePathParts,
+          `${newFileNameWithoutExtension}.${serializedContent.bibliography.extension}`,
+        ].join(sep);
+
+        return Promise.all([
+          writeTextFile(filePath, serializedContent.markdownContent),
+          writeTextFile(bibliographyFilePath, serializedContent.bibliography.textContent),
+        ]);
+      }
     }
   } catch (err) {
     console.error('Error', err);
