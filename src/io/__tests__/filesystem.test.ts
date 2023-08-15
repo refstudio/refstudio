@@ -5,6 +5,7 @@ import {
   readBinaryFile as tauriReadBinaryFile,
   readDir as tauriReadDir,
   readTextFile as tauriReadTextFile,
+  removeDir as tauriRemoveDir,
   removeFile as tauriRemoveFile,
   renameFile as tauriRenameFile,
   writeBinaryFile as tauriWriteBinaryFile,
@@ -25,10 +26,12 @@ import {
   isInUploadsDir,
   makeRefStudioPath,
   makeUploadPath,
+  newProject,
   openProject,
   readAllProjectFiles,
   readFileContent,
   renameFile,
+  sampleProject,
   setProjectBaseDir,
   splitRefStudioPath,
   uploadFiles,
@@ -133,13 +136,36 @@ describe('filesystem', () => {
   // Project Structure and read project files
   // #####################################################################################
   describe('project structure and read files', () => {
-    it('should create project structure if folder and files dont exist', async () => {
-      await openProject('/usr/documents/project-x');
-      // Create 2 folders
-      expect(tauriCreateDir).toHaveBeenCalledTimes(2);
+    it('should open project structure', async () => {
+      const path = '/usr/documents/project-x';
+      await openProject(path);
+      expect(getProjectBaseDir()).toBe(path);
+    });
+
+    it('should create new project in new directory', async () => {
+      const path = '/usr/documents/project-x-new';
+      await newProject(path);
+      expect(getProjectBaseDir()).toBe(path);
+      // Create 1 folder for the project and no files
+      expect(tauriCreateDir).toHaveBeenCalledTimes(1);
+      expect(tauriWriteTextFile).toHaveBeenCalledTimes(0);
+    });
+
+    it.only('should create sample project structure with 3 files', async () => {
+      await sampleProject('/usr/documents/sample-x');
+      // Create 1 folder for the project
+      expect(tauriCreateDir).toHaveBeenCalledTimes(1);
       // Check and create 3 files
-      expect(tauriExists).toHaveBeenCalledTimes(3);
       expect(tauriWriteTextFile).toHaveBeenCalledTimes(3);
+    });
+
+    it.only('should override sample project directort if exists', async () => {
+      vi.mocked(tauriExists).mockResolvedValue(true);
+      await sampleProject('/usr/documents/sample-x-2');
+
+      expect(tauriExists).toHaveBeenCalledTimes(1);
+      expect(tauriRemoveDir).toHaveBeenCalledTimes(1);
+      expect(tauriCreateDir).toHaveBeenCalledTimes(1);
     });
 
     it('should throw error if any tauri fs throws', async () => {

@@ -28,7 +28,9 @@ export const uploadFiles = vi.fn();
 // #####################################################################################
 // Project Structure and read project files
 // #####################################################################################
+export const newProject = vi.fn();
 export const openProject = vi.fn();
+export const sampleProject = vi.fn();
 export const readAllProjectFiles = vi.fn(() => []);
 
 // #####################################################################################

@@ -136,11 +136,7 @@ export async function newProject(projectPath: string) {
   try {
     setProjectBaseDir(projectPath);
     const systemBaseDir = await getSystemPath('');
-
     await createDir(systemBaseDir, { recursive: true });
-
-    // const systemUploadsDir = await getSystemPath(getUploadsDir());
-    // await createDir(systemUploadsDir, { recursive: true });
 
     console.log('New project created in folder ', systemBaseDir);
   } catch (err) {
@@ -153,10 +149,6 @@ export async function openProject(projectPath: string) {
   try {
     setProjectBaseDir(projectPath);
     const systemBaseDir = await getSystemPath('');
-
-    // // Ensure uploads dir
-    // const systemUploadsDir = await getSystemPath(getUploadsDir());
-    // await createDir(systemUploadsDir, { recursive: true });
 
     console.log('Project opened for folder ', systemBaseDir);
   } catch (err) {
@@ -176,12 +168,9 @@ export async function sampleProject(projectPath: string) {
 
     await createDir(systemBaseDir, { recursive: true });
 
-    const systemUploadsDir = await getSystemPath(getUploadsDir());
-    await createDir(systemUploadsDir, { recursive: true });
-
     await createSampleFiles(true);
 
-    console.log('Project opened for folder ', systemBaseDir);
+    console.log('Sample project open for folder ', systemBaseDir);
   } catch (err) {
     console.error('ERROR', err);
     throw new Error('Error open project in ' + projectPath);
