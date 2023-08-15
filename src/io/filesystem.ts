@@ -124,9 +124,6 @@ export async function ensureProjectFileStructure() {
     const systemUploadsDir = await getSystemPath(getUploadsDir());
     await createDir(systemUploadsDir, { recursive: true });
 
-    const systemExportsDir = await getSystemPath(getExportsDir());
-    await createDir(systemExportsDir, { recursive: true });
-
     await ensureFile('file 1.refstudio', INITIAL_CONTENT);
     await ensureFile('file 2.refstudio', FILE2_CONTENT);
     await ensureFile('file 3.refstudio', FILE3_CONTENT);
@@ -271,6 +268,12 @@ type RenameFileResult = Promise<{ success: false } | { success: true; newPath: s
 
 export async function saveAsMarkdown(markdownSerializer: MarkdownSerializer, exportedFilePath: string) {
   try {
+    const exportsDir = getExportsDir();
+    const systemExportsDir = await getSystemPath(exportsDir);
+    if (!(await exists(systemExportsDir))) {
+      await createDir(systemExportsDir);
+    }
+
     const splittedPath = exportedFilePath.split(sep);
     const fileName = splittedPath.pop();
     if (!fileName) {
@@ -285,7 +288,7 @@ export async function saveAsMarkdown(markdownSerializer: MarkdownSerializer, exp
       markdownFileName = `${fileName}.md`;
     }
 
-    const markdownFilePath = [...splittedPath, 'exports', markdownFileName].join(sep);
+    const markdownFilePath = [systemExportsDir, markdownFileName].join(sep);
 
     const filePath = await save({
       title: 'Export file as Markdown',
