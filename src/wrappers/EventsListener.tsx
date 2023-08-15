@@ -64,13 +64,13 @@ function useSaveActiveFileListener() {
   const activeEditor = useActiveEditorContentAtoms();
   const saveFile = useSetAtom(activeEditor?.saveEditorContentAtom ?? atom(null, asyncNoop));
 
-  return () => void saveFile();
+  return saveFile;
 }
 
 function useCreateFileListener() {
   const createFile = useSetAtom(createFileAtom);
 
-  return () => createFile();
+  return createFile;
 }
 
 function useCloseActiveEditorListener() {

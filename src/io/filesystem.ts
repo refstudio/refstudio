@@ -115,6 +115,12 @@ export function isInUploadsDir(relativePath: string) {
 }
 
 export async function uploadFiles(systemFiles: File[]) {
+  // Ensure uploads dir
+  const systemUploadsDir = await getSystemPath(getUploadsDir());
+  if (!(await exists(systemUploadsDir))) {
+    await createDir(systemUploadsDir);
+  }
+
   for (const file of systemFiles) {
     const bytes = await file.arrayBuffer();
     const systemUploadFilePath = await getSystemPath(makeUploadPath(file.name));
@@ -133,8 +139,8 @@ export async function newProject(projectPath: string) {
 
     await createDir(systemBaseDir, { recursive: true });
 
-    const systemUploadsDir = await getSystemPath(getUploadsDir());
-    await createDir(systemUploadsDir, { recursive: true });
+    // const systemUploadsDir = await getSystemPath(getUploadsDir());
+    // await createDir(systemUploadsDir, { recursive: true });
 
     console.log('New project created in folder ', systemBaseDir);
   } catch (err) {
@@ -148,9 +154,9 @@ export async function openProject(projectPath: string) {
     setProjectBaseDir(projectPath);
     const systemBaseDir = await getSystemPath('');
 
-    // Ensure uploads dir
-    const systemUploadsDir = await getSystemPath(getUploadsDir());
-    await createDir(systemUploadsDir, { recursive: true });
+    // // Ensure uploads dir
+    // const systemUploadsDir = await getSystemPath(getUploadsDir());
+    // await createDir(systemUploadsDir, { recursive: true });
 
     console.log('Project opened for folder ', systemBaseDir);
   } catch (err) {
