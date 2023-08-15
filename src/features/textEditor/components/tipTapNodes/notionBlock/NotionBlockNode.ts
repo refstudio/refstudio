@@ -258,7 +258,14 @@ export const NotionBlockNode = Node.create({
 
   addKeyboardShortcuts() {
     return {
-      Tab: ({ editor }) => editor.commands.command(indent),
+      Tab: ({ editor }) => {
+        editor.commands.command(indent);
+        return true;
+      },
+      'Shift-Tab': ({ editor }) => {
+        editor.commands.command(unindent);
+        return true;
+      },
       Enter: ({ editor }) => {
         const { selection } = editor.state;
         if (
@@ -309,7 +316,6 @@ export const NotionBlockNode = Node.create({
 
         return editor.commands.command(joinBackward);
       },
-      'Shift-Tab': ({ editor }) => editor.commands.command(unindent),
       Delete: ({ editor }) => editor.commands.command(joinForward),
       'Cmd-Enter': ({ editor }) => {
         const { $from } = editor.state.selection;
