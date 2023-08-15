@@ -1,6 +1,7 @@
 import { open, save } from '@tauri-apps/api/dialog';
 import { useAtomValue, useSetAtom } from 'jotai';
 
+import { createFileAtom } from '../../atoms/fileEntryActions';
 import {
   closeProjectAtom,
   isProjectOpenAtom,
@@ -14,11 +15,13 @@ import { saveCachedSettings, setCachedSetting } from '../../settings/settingsMan
 
 export function useFileProjectNewListener() {
   const newProject = useSetAtom(newProjectAtom);
+  const createFile = useSetAtom(createFileAtom);
 
   return async () => {
     const newProjectPath = await save({ defaultPath: await getNewProjectsBaseDir() });
     if (typeof newProjectPath === 'string') {
       await newProject(newProjectPath);
+      createFile();
       setCachedSetting('general.projectDir', newProjectPath);
       await saveCachedSettings();
       notifyInfo('New project created at ' + newProjectPath);
