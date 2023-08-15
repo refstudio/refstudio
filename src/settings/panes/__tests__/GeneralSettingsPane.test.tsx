@@ -82,7 +82,7 @@ describe('GeneralSettingsPane component', () => {
 
     // Submit
     await user.click(screen.getByRole('button', { name: /save/i }));
-    expect(vi.mocked(setCachedSetting).mock.calls.length).toBe(2);
-    expect(vi.mocked(saveCachedSettings).mock.calls.length).toBe(1);
+    expect(setCachedSetting).toBeCalledTimes(1);
+    expect(saveCachedSettings).toBeCalledTimes(1);
   });
 });
