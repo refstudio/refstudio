@@ -3,6 +3,7 @@ import { atom, useAtomValue, useSetAtom } from 'jotai';
 import {
   useFileProjectCloseListener,
   useFileProjectNewListener,
+  useFileProjectNewSampleListener,
   useFileProjectOpenListener,
 } from '../application/listeners/projectEventListeners';
 import {
@@ -34,6 +35,7 @@ export function EventsListener({ children }: { children?: React.ReactNode }) {
   useListenEvent('refstudio://menu/file/close', useCloseActiveEditorListener());
   useListenEvent('refstudio://menu/file/close/all', useCloseAllActiveEditorsListener());
   useListenEvent('refstudio://menu/file/project/new', useFileProjectNewListener());
+  useListenEvent('refstudio://menu/file/project/new/sample', useFileProjectNewSampleListener());
   useListenEvent('refstudio://menu/file/project/open', useFileProjectOpenListener());
   useListenEvent('refstudio://menu/file/project/close', useFileProjectCloseListener());
   // Editors

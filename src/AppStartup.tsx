@@ -33,7 +33,9 @@ export function AppStartup() {
         if (isMounted()) {
           setInitialized(true);
           const projectDir = getCachedSetting('general.projectDir');
-          await openProject(projectDir);
+          if (projectDir) {
+            await openProject(projectDir);
+          }
           notifyInfo('Application Initialized');
         }
       } catch (err) {

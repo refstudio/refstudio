@@ -1,6 +1,7 @@
 import { Atom, atom } from 'jotai';
+import { selectAtom } from 'jotai/utils';
 
-import { getSeparator, openProject } from '../io/filesystem';
+import { getSeparator, newProject, openProject, sampleProject } from '../io/filesystem';
 import { closeAllEditorsAtom } from './editorActions';
 import { refreshFileTreeAtom } from './fileExplorerActions';
 import { clearAllReferencesAtom, loadReferencesAtom } from './referencesState';
@@ -9,33 +10,52 @@ import { clearAllReferencesAtom, loadReferencesAtom } from './referencesState';
 // Internal Atoms
 // #####################################################################################
 const currentProjectPathAtom = atom('');
-const currentProjectNameAtom = atom('');
 
 // #####################################################################################
 // Public API
 // #####################################################################################
 export const isProjectOpenAtom = atom((get) => get(currentProjectPathAtom) !== '');
 export const projectPathAtom: Atom<string> = currentProjectPathAtom;
-export const projectNameAtom: Atom<string> = currentProjectNameAtom;
+export const projectNameAtom = selectAtom(currentProjectPathAtom, extractProjectName);
 
 export const openProjectAtom = atom(null, async (_, set, path: string) => {
   if (!path) {
     return;
   }
 
-  set(currentProjectNameAtom, extractProjectName(path));
+  // Close current project before create new
+  await set(closeProjectAtom);
+
   set(currentProjectPathAtom, path);
   await openProject(path);
   await set(loadReferencesAtom);
+  await set(refreshFileTreeAtom);
 });
 
 export const newProjectAtom = atom(null, async (_, set, path: string) => {
   if (!path) {
     return;
   }
-  set(currentProjectNameAtom, extractProjectName(path));
+  // Close current project before create new
+  await set(closeProjectAtom);
+
+  // Create empty project
   set(currentProjectPathAtom, path);
-  await openProject(path, true);
+  await newProject(path);
+  await set(loadReferencesAtom);
+  await set(refreshFileTreeAtom);
+});
+
+export const newSampleProjectAtom = atom(null, async (_, set, path: string) => {
+  if (!path) {
+    return;
+  }
+  // Close current project before create new
+  await set(closeProjectAtom);
+
+  // Create empty project
+  set(currentProjectPathAtom, path);
+  await sampleProject(path);
   await set(loadReferencesAtom);
   await set(refreshFileTreeAtom);
 });

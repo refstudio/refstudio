@@ -11,7 +11,6 @@ import { PanelWrapper } from '../../components/PanelWrapper';
 import { emitEvent } from '../../events';
 import { useAsyncEffect } from '../../hooks/useAsyncEffect';
 import { isNonNullish } from '../../lib/isNonNullish';
-import { noop } from '../../lib/noop';
 import { FileExplorer } from './FileExplorer';
 
 export function ExplorerPanel() {
@@ -71,7 +70,8 @@ function OpenExistingProjectAction() {
 }
 
 function TrySampleProjectAction() {
-  return <ProjectAction onClick={noop}>try a sample project</ProjectAction>;
+  const handleClick = () => emitEvent('refstudio://menu/file/project/new/sample');
+  return <ProjectAction onClick={handleClick}>try a sample project</ProjectAction>;
 }
 
 function ProjectAction({ children, onClick }: { children: React.ReactNode; onClick: () => void }) {

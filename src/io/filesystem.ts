@@ -5,6 +5,7 @@ import {
   readBinaryFile,
   readDir,
   readTextFile,
+  removeDir as tauriRemoveDir,
   removeFile,
   renameFile as tauriRenameFile,
   writeBinaryFile,
@@ -125,46 +126,81 @@ export async function uploadFiles(systemFiles: File[]) {
 // #####################################################################################
 // Open Project Structure and read project files
 // #####################################################################################
-export async function openProject(projectPath: string, overrideFiles = false) {
+export async function newProject(projectPath: string) {
   try {
     setProjectBaseDir(projectPath);
-
     const systemBaseDir = await getSystemPath('');
-    await createDir(systemBaseDir, { recursive: true });
-    console.log('Ensure project directory', systemBaseDir);
 
-    console.log('before promise');
-    // await new Promise((resolve) => setTimeout(resolve, 500));
-    console.log('after promise');
+    await createDir(systemBaseDir, { recursive: true });
 
     const systemUploadsDir = await getSystemPath(getUploadsDir());
     await createDir(systemUploadsDir, { recursive: true });
-    console.log('Ensure uploads directory', systemUploadsDir);
 
+    console.log('New project create in folder ', systemBaseDir);
+  } catch (err) {
+    console.error('ERROR', err);
+    throw new Error('Error creating new project in ' + projectPath);
+  }
+}
+
+export async function openProject(projectPath: string) {
+  try {
+    setProjectBaseDir(projectPath);
+    const systemBaseDir = await getSystemPath('');
+
+    // Ensure uploads dir
+    const systemUploadsDir = await getSystemPath(getUploadsDir());
+    await createDir(systemUploadsDir, { recursive: true });
+
+    console.log('Project opened for folder ', systemBaseDir);
+  } catch (err) {
+    console.error('ERROR', err);
+    throw new Error('Error open project in ' + projectPath);
+  }
+}
+
+export async function sampleProject(projectPath: string) {
+  try {
+    setProjectBaseDir(projectPath);
+    const systemBaseDir = await getSystemPath('');
+
+    if (await exists(systemBaseDir)) {
+      await tauriRemoveDir(systemBaseDir, { recursive: true });
+    }
+
+    await createDir(systemBaseDir, { recursive: true });
+
+    const systemUploadsDir = await getSystemPath(getUploadsDir());
+    await createDir(systemUploadsDir, { recursive: true });
+
+    await createSampleFiles(true);
+
+    console.log('Project opened for folder ', systemBaseDir);
+  } catch (err) {
+    console.error('ERROR', err);
+    throw new Error('Error open project in ' + projectPath);
+  }
+}
+
+export async function createSampleFiles(overrideFiles = false) {
+  try {
     await ensureFile('file 1.refstudio', INITIAL_CONTENT, overrideFiles);
     await ensureFile('file 2.refstudio', FILE2_CONTENT, overrideFiles);
     await ensureFile('file 3.refstudio', FILE3_CONTENT, overrideFiles);
-
-    console.log('Project structure created with success. Folder: ', systemBaseDir);
   } catch (err) {
     console.error('ERROR', err);
-    throw new Error('Error ensuring file struture');
+    throw new Error('Error creating sample files');
   }
 }
 
 async function ensureFile(fileName: string, content: string, overrideFiles = false) {
   const absoluteFilePath = await getSystemPath(fileName);
-  console.log('Ensure file', absoluteFilePath);
   if (overrideFiles || !(await exists(absoluteFilePath))) {
     await writeTextFile(absoluteFilePath, content);
   }
 }
 
 export async function readAllProjectFiles() {
-  console.log('before promise readAllProjectFiles');
-  // await new Promise((resolve) => setTimeout(resolve, 1000));
-  console.log('after promise readAllProjectFiles');
-
   const systemBaseDir = await getSystemPath('');
   console.log('reading file structure from ', systemBaseDir);
   const entries = await readDir(systemBaseDir, { recursive: true });
