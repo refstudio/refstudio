@@ -233,7 +233,8 @@ describe('filesystem', () => {
     });
 
     it.each([
-      { extension: 'xml', type: 'xml' },
+      { extension: 'xml', type: 'text' },
+      { extension: 'md', type: 'text' },
       { extension: 'json', type: 'json' },
     ])('should read $extension file content via tauri APIs', async ({ extension, type }) => {
       vi.mocked(tauriReadTextFile).mockResolvedValue('Some content');

@@ -25,7 +25,7 @@ describe('paneActions', () => {
   let fileContentAtoms: EditorContentAtoms;
 
   beforeEach(() => {
-    const file = makeFileAndEditor('file.txt');
+    const file = makeFileAndEditor('file.refstudio');
     fileEntry = file.fileEntry;
     editorData = file.editorData;
 
@@ -66,7 +66,7 @@ describe('paneActions', () => {
     const initialPaneId = activePane.current.id;
     const otherPaneId: PaneId = initialPaneId === 'LEFT' ? 'RIGHT' : 'LEFT';
 
-    const { fileEntry: fileEntry2, editorData: editorData2 } = makeFileAndEditor('File2.txt');
+    const { fileEntry: fileEntry2, editorData: editorData2 } = makeFileAndEditor('File2.refstudio');
 
     act(() => {
       openFileEntry.current(fileEntry2);
