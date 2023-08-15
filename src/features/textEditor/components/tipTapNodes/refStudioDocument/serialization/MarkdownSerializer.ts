@@ -1,5 +1,5 @@
 import { getHTMLFromFragment } from '@tiptap/core';
-import { Fragment, Node, Schema } from '@tiptap/pm/model';
+import { Fragment, Node } from '@tiptap/pm/model';
 import { Editor } from '@tiptap/react';
 import TurndownService from 'turndown';
 
@@ -13,17 +13,15 @@ interface SerializedDocument {
 }
 
 export class MarkdownSerializer {
-  private doc: Node;
+  private editor: Editor;
   private referencesById: Record<string, ReferenceItem>;
-  private schema: Schema;
   private turndownService: TurndownService;
 
   private usedReferenceIds = new Set<string>();
 
   constructor(editor: Editor, references: ReferenceItem[]) {
-    this.doc = editor.state.doc;
+    this.editor = editor;
     this.referencesById = Object.fromEntries(references.map((reference) => [reference.id, reference]));
-    this.schema = editor.schema;
     this.turndownService = new TurndownService({ headingStyle: 'atx', bulletListMarker: '-', emDelimiter: '*' });
 
     this.turndownService.addRule('strikethrough', {
@@ -36,8 +34,12 @@ export class MarkdownSerializer {
     });
     this.turndownService.addRule('reference', {
       filter: (node) => node.nodeName === 'SPAN' && node.getAttribute('data-type') === 'reference',
-      replacement: (content) => {
-        const referenceId = content.slice(1);
+      replacement: (_content, node) => {
+        const referenceId = node instanceof HTMLElement ? node.getAttribute('data-id') : null;
+
+        if (!referenceId) {
+          return '@INVALID_REFERENCE';
+        }
         const reference = this.referencesById[referenceId] as ReferenceItem | undefined;
         if (reference) {
           this.usedReferenceIds.add(referenceId);
@@ -54,7 +56,7 @@ export class MarkdownSerializer {
       throw new Error('Unexpected node type. Expected an inline block, got ' + nodeType);
     }
 
-    const htmlContent = getHTMLFromFragment(Fragment.from(node), this.schema);
+    const htmlContent = getHTMLFromFragment(Fragment.from(node), this.editor.schema);
     return this.turndownService.turndown(htmlContent);
   }
 
@@ -95,17 +97,19 @@ export class MarkdownSerializer {
   serialize(fileName: string): SerializedDocument {
     this.usedReferenceIds = new Set<string>();
 
-    if (this.doc.childCount === 0) {
+    const { doc } = this.editor.state;
+
+    if (doc.childCount === 0) {
       return { markdownContent: '' };
     }
     const notionBlocks: Node[] = [];
-    this.doc.forEach((child, _offset, index) => {
+    doc.forEach((child, _offset, index) => {
       if (index > 0) {
         notionBlocks.push(child);
       }
     });
 
-    const documentTitle = this.doc.child(0).textContent;
+    const documentTitle = doc.child(0).textContent;
 
     const markdownContent = [this.notionBlocksToMarkdown(notionBlocks)];
 
