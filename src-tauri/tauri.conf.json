@@ -23,7 +23,13 @@
       },
       "fs": {
         "all": true,
-        "scope": ["$APPCONFIG", "$APPCONFIG/*", "$APPDATA/**", "$RESOURCE/**", "$HOME/**"]
+        "scope": [
+          "$APPCONFIG",
+          "$APPCONFIG/*",
+          "$APPDATA/**",
+          "$RESOURCE/**",
+          "$HOME/**"
+        ]
       },
       "shell": {
         "all": true,
