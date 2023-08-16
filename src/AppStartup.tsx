@@ -3,37 +3,43 @@ import { useSetAtom } from 'jotai';
 import { useState } from 'react';
 
 import { App } from './application/App';
-import { loadReferencesAtom } from './atoms/referencesState';
+import { openProjectAtom } from './atoms/projectState';
 import { useAsyncEffect } from './hooks/useAsyncEffect';
-import { ensureProjectFileStructure } from './io/filesystem';
 import { noop } from './lib/noop';
-import { notifyInfo } from './notifications/notifications';
+import { notifyErr, notifyInfo } from './notifications/notifications';
 import { interceptConsoleMessages } from './notifications/notifications.console';
-import { initSettings } from './settings/settingsManager';
+import { getCachedSetting, initSettings } from './settings/settingsManager';
 
-// Note: Intercepting INFO, WARN and ERROR console.*
-interceptConsoleMessages(true, true, true);
+// Note: Intercepting INFO, WARN and ERROR console.* in DEV mode
+if (import.meta.env.DEV) {
+  interceptConsoleMessages(true, true, true);
+}
 
 export function AppStartup() {
   const [initialized, setInitialized] = useState(false);
-  const loadReferences = useSetAtom(loadReferencesAtom);
+  const openProject = useSetAtom(openProjectAtom);
 
   useAsyncEffect(
     async (isMounted) => {
-      if (initialized) {
-        return;
-      }
+      try {
+        if (initialized) {
+          return;
+        }
 
-      notifyInfo('Application Startup');
-      await initSettings();
-      await ensureProjectFileStructure();
-      await invoke('close_splashscreen');
+        notifyInfo('Application Startup');
+        await initSettings();
+        await invoke('close_splashscreen');
 
-      notifyInfo('Application Initialized');
-
-      if (isMounted()) {
-        setInitialized(true);
-        await loadReferences();
+        if (isMounted()) {
+          setInitialized(true);
+          const projectDir = getCachedSetting('project.currentDir');
+          if (projectDir) {
+            await openProject(projectDir);
+          }
+          notifyInfo('Application Initialized');
+        }
+      } catch (err) {
+        notifyErr(err);
       }
     },
     noop,

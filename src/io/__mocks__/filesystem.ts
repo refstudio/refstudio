@@ -1,5 +1,5 @@
+const PROJECT_PATH = '/usr/documents/refstudio/project-x';
 const SYSTEM_PATH = '/usr/name/foo/tauri.foo';
-const PROJECT_NAME = 'project';
 const UPLOADS_DIR = 'uploads';
 
 function join(...segments: string[]) {
@@ -9,10 +9,13 @@ function join(...segments: string[]) {
 // #####################################################################################
 // Top Level PATH API
 // #####################################################################################
-export const getSystemPath = vi.fn((rsPath: string) => join(SYSTEM_PATH, PROJECT_NAME, rsPath));
-export const getRefStudioPath = vi.fn((path: string) => path.replace(SYSTEM_PATH, ''));
 export const getSystemConfigurationsDir = vi.fn(() => join(SYSTEM_PATH, 'config'));
-export const getSystemAppDataDir = vi.fn(() => join(SYSTEM_PATH, 'data'));
+export const getNewProjectsBaseDir = vi.fn(() => '/desktop');
+export const getRefStudioPath = vi.fn((path: string) => path.replace(SYSTEM_PATH, ''));
+export const getProjectBaseDir = vi.fn(() => PROJECT_PATH);
+export const setProjectBaseDir = vi.fn();
+export const getSystemPath = vi.fn((rsPath: string) => join(SYSTEM_PATH, 'xx', rsPath));
+export const getSeparator = vi.fn(() => '/');
 
 // #####################################################################################
 // UPLOADS
@@ -25,7 +28,9 @@ export const uploadFiles = vi.fn();
 // #####################################################################################
 // Project Structure and read project files
 // #####################################################################################
-export const ensureProjectFileStructure = vi.fn();
+export const newProject = vi.fn();
+export const openProject = vi.fn();
+export const sampleProject = vi.fn();
 export const readAllProjectFiles = vi.fn(() => []);
 
 // #####################################################################################

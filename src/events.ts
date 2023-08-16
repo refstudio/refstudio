@@ -15,6 +15,10 @@ interface RefStudioEvents {
   'refstudio://menu/references/export': undefined;
   'refstudio://menu/view/notifications': undefined;
   'refstudio://menu/debug/console/clear': undefined;
+  'refstudio://menu/file/project/new': undefined;
+  'refstudio://menu/file/project/new/sample': undefined;
+  'refstudio://menu/file/project/open': undefined;
+  'refstudio://menu/file/project/close': undefined;
   // Editor actions
   'refstudio://editors/close': PaneEditorId;
   'refstudio://editors/move': { fromPaneEditorId: PaneEditorId; toPaneId: PaneId };

@@ -16,9 +16,8 @@ const panelConfig: PaneConfig = {
 };
 
 const mockSettings: SettingsSchema = {
-  general: {
-    appDataDir: 'app-data-dir',
-    projectName: 'project-x',
+  project: {
+    currentDir: 'app-dir',
   },
   openAI: {
     apiKey: '',

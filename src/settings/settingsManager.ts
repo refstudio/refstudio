@@ -1,7 +1,7 @@
 import { SettingsManager } from 'tauri-settings';
 import { Path, PathValue } from 'tauri-settings/dist/types/dot-notation';
 
-import { getSystemAppDataDir, getSystemConfigurationsDir } from '../io/filesystem';
+import { getSystemConfigurationsDir } from '../io/filesystem';
 import { readEnv } from '../io/readEnv';
 
 export type OpenAiManner = 'concise' | 'elaborate' | 'scholarly';
@@ -10,9 +10,15 @@ export function getMannerOptions(): OpenAiManner[] {
 }
 
 export interface SettingsSchema {
-  general: {
+  /**
+   * @deprecated this exists for retro-compatibility with v23.1.0 and should be removed.
+   */
+  general?: {
     appDataDir: string;
     projectName: string;
+  };
+  project: {
+    currentDir: string;
   };
   openAI: {
     apiKey: string;
@@ -34,35 +40,50 @@ let settingsManager: SettingsManager<SettingsSchema> | undefined;
 export const DEFAULT_OPEN_AI_CHAT_MODEL = 'gpt-3.5-turbo';
 
 export async function initSettings() {
-  settingsManager = new SettingsManager<SettingsSchema>(
-    {
-      general: {
-        appDataDir: await getSystemAppDataDir(),
-        projectName: 'project-x',
-      },
-      openAI: {
-        apiKey: await readEnv('OPENAI_API_KEY', ''),
-        chatModel: await readEnv('OPENAI_CHAT_MODEL', DEFAULT_OPEN_AI_CHAT_MODEL),
-        manner: (await readEnv('OPENAI_MANNER', 'scholarly')) as OpenAiManner,
-        temperature: parseFloat(await readEnv('OPENAI_TEMPERATURE', '0.7')),
-      },
-      sidecar: {
-        logging: {
-          active: (await readEnv('SIDECAR_ENABLE_LOGGING', 'false')).toLowerCase() === 'true',
-          path: await readEnv('SIDECAR_LOG_DIR', '/tmp'),
+  try {
+    settingsManager = new SettingsManager<SettingsSchema>(
+      {
+        project: {
+          currentDir: 'MIGRATE_FROM_GENERAL',
+        },
+        openAI: {
+          apiKey: await readEnv('OPENAI_API_KEY', ''),
+          chatModel: await readEnv('OPENAI_CHAT_MODEL', DEFAULT_OPEN_AI_CHAT_MODEL),
+          manner: (await readEnv('OPENAI_MANNER', 'scholarly')) as OpenAiManner,
+          temperature: parseFloat(await readEnv('OPENAI_TEMPERATURE', '0.7')),
+        },
+        sidecar: {
+          logging: {
+            active: (await readEnv('SIDECAR_ENABLE_LOGGING', 'false')).toLowerCase() === 'true',
+            path: await readEnv('SIDECAR_LOG_DIR', '/tmp'),
+          },
         },
       },
-    },
-    {
-      dir: await getSystemConfigurationsDir(),
-      fileName: 'refstudio-settings.json',
-      prettify: true,
-    },
-  );
+      {
+        dir: await getSystemConfigurationsDir(),
+        fileName: 'refstudio-settings.json',
+        prettify: true,
+      },
+    );
 
-  const configs = await settingsManager.initialize();
-  console.log('Settings initialized with success with', configs);
-  console.log('openAI', configs.openAI);
+    const configs = await settingsManager.initialize();
+
+    // Run retro-compatibility migration if required key is missing
+    if (configs.project.currentDir === 'MIGRATE_FROM_GENERAL') {
+      if (configs.general?.appDataDir && configs.general.projectName) {
+        setCachedSetting('project.currentDir', configs.general.appDataDir + configs.general.projectName);
+      } else {
+        setCachedSetting('project.currentDir', '');
+      }
+      await saveCachedSettings();
+    }
+
+    console.log('Settings initialized with success with', configs);
+    console.log('openAI', configs.openAI);
+  } catch (err) {
+    console.error('Cannot init settings', err);
+    throw new Error('Cannot init settings');
+  }
 }
 
 export function getSettings() {
