@@ -21,9 +21,6 @@
       "path": {
         "all": true
       },
-      "dialog": {
-        "save": true
-      },
       "fs": {
         "all": true,
         "scope": ["$APPCONFIG", "$APPCONFIG/*", "$APPDATA/**", "$RESOURCE/**", "$HOME/**"]
