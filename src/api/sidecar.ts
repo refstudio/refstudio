@@ -5,7 +5,11 @@ import { Command as TauriCommand } from '@tauri-apps/api/shell';
 import { getCachedSetting } from '../settings/settingsManager';
 import { CliCommands } from './types';
 
-class Command {
+interface SharedCommand {
+  execute: typeof TauriCommand.prototype.execute;
+}
+
+class StubCommand implements SharedCommand {
   command: string;
   args: string[];
   options: unknown;
@@ -23,6 +27,8 @@ class Command {
       stdout: '{"references": []}',
     });
 }
+
+const Command = import.meta.env.VITE_IS_WEB ? StubCommand : TauriCommand;
 
 export async function callSidecar<T extends keyof CliCommands>(
   subcommand: T,

@@ -1,3 +1,9 @@
+/**
+ * This module muxes between the Tauri API and our hand-rolled stubs.
+ *
+ * Import symbols from here, not directly from @tauri-apps.
+ */
+
 import { invoke as tauriInvoke } from '@tauri-apps/api';
 import * as tauriEvent from '@tauri-apps/api/event';
 import * as tauriFs from '@tauri-apps/api/fs';

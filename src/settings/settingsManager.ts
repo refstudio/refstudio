@@ -2,6 +2,7 @@ import { SettingsManager } from 'tauri-settings';
 import { Path, PathValue } from 'tauri-settings/dist/types/dot-notation';
 import { getDotNotation, setDotNotation } from 'tauri-settings/dist/utils/dot-notation';
 
+import { getSystemConfigurationsDir } from '../io/filesystem';
 import { readEnv } from '../io/readEnv';
 
 export type OpenAiManner = 'concise' | 'elaborate' | 'scholarly';
@@ -64,33 +65,37 @@ export async function initSettings() {
       },
     };
 
-    // settingsManager = new SettingsManager<SettingsSchema>(settings, {
-    //   dir: await getSystemConfigurationsDir(),
-    //   fileName: 'refstudio-settings.json',
-    //   prettify: true,
-    // });
+    let configs;
+    if (import.meta.env.VITE_IS_WEB) {
+      configs = settings;
 
-    const configs = settings; // await settingsManager.initialize();
-
-    settingsManager = {
-      default: settings,
-      getCache: (key) => getDotNotation(settings, key)!,
-      setCache: (key, value) => {
-        setDotNotation(settings, key, value);
-        return value;
-      },
-      syncCache: () => Promise.resolve(settings),
-    };
-
-    // Run retro-compatibility migration if required key is missing
-    // if (configs.project.currentDir === 'MIGRATE_FROM_GENERAL') {
-    //   if (configs.general?.appDataDir && configs.general.projectName) {
-    //     setCachedSetting('project.currentDir', configs.general.appDataDir + configs.general.projectName);
-    //   } else {
-    //     setCachedSetting('project.currentDir', '');
-    //   }
-    //   await saveCachedSettings();
-    // }
+      settingsManager = {
+        default: settings,
+        getCache: (key) => getDotNotation(settings, key)!,
+        setCache: (key, value) => {
+          setDotNotation(settings, key, value);
+          return value;
+        },
+        syncCache: () => Promise.resolve(settings),
+      };
+    } else {
+      const tauriSettingsManager = new SettingsManager<SettingsSchema>(settings, {
+        dir: await getSystemConfigurationsDir(),
+        fileName: 'refstudio-settings.json',
+        prettify: true,
+      });
+      configs = await tauriSettingsManager.initialize();
+      // Run retro-compatibility migration if required key is missing
+      if (configs.project.currentDir === 'MIGRATE_FROM_GENERAL') {
+        if (configs.general?.appDataDir && configs.general.projectName) {
+          setCachedSetting('project.currentDir', configs.general.appDataDir + configs.general.projectName);
+        } else {
+          setCachedSetting('project.currentDir', '');
+        }
+        await saveCachedSettings();
+      }
+      settingsManager = tauriSettingsManager;
+    }
 
     console.log('Settings initialized with success with', configs);
     console.log('openAI', configs.openAI);

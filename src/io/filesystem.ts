@@ -17,7 +17,7 @@ import {
   renameFile as tauriRenameFile,
   writeBinaryFile,
   writeTextFile,
-} from '../wrappers/FakeFile';
+} from '../wrappers/tauri-api-stubs/fs';
 import { appConfigDir, desktopDir, join, sep } from '../wrappers/tauri-api-stubs/path';
 import { FILE2_CONTENT, FILE3_CONTENT, INITIAL_CONTENT } from './filesystem.sample-content';
 

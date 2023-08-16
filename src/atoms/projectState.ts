@@ -26,7 +26,6 @@ export const openProjectAtom = atom(null, async (_, set, path: string) => {
   // Close current project before create new
   await set(closeProjectAtom);
 
-  console.log('open project', path);
   set(currentProjectPathAtom, path);
   await openProject(path);
   await set(loadReferencesAtom);
