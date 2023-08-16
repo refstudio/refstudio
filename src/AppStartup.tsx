@@ -1,4 +1,4 @@
-import { invoke } from '@tauri-apps/api';
+// import { invoke } from '@tauri-apps/api';
 import { useSetAtom } from 'jotai';
 import { useState } from 'react';
 
@@ -9,6 +9,7 @@ import { noop } from './lib/noop';
 import { notifyErr, notifyInfo } from './notifications/notifications';
 import { interceptConsoleMessages } from './notifications/notifications.console';
 import { getCachedSetting, initSettings } from './settings/settingsManager';
+import { invoke } from './wrappers/tauri-wrapper';
 
 // Note: Intercepting INFO, WARN and ERROR console.* in DEV mode
 if (import.meta.env.DEV) {

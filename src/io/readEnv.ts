@@ -1,4 +1,6 @@
-import { invoke } from '@tauri-apps/api';
+// import { invoke } from '@tauri-apps/api';
+
+import { invoke } from '../wrappers/tauri-wrapper';
 
 export async function readEnv(key: string, fallback: string) {
   try {
