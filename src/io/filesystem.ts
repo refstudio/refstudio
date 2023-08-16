@@ -1,24 +1,27 @@
 import { save } from '@tauri-apps/api/dialog';
-import {
-  createDir,
-  exists,
-  FileEntry as TauriFileEntry,
-  readBinaryFile,
-  readDir,
-  readTextFile,
-  removeDir as tauriRemoveDir,
-  removeFile,
-  renameFile as tauriRenameFile,
-  writeBinaryFile,
-  writeTextFile,
-} from '@tauri-apps/api/fs';
-import { appConfigDir, desktopDir, join, sep } from '@tauri-apps/api/path';
+import type { FileEntry as TauriFileEntry } from '@tauri-apps/api/fs';
 import { JSONContent } from '@tiptap/core';
 
 import { EditorContent } from '../atoms/types/EditorContent';
 import { FileEntry, FileFileEntry } from '../atoms/types/FileEntry';
 import { MarkdownSerializer } from '../features/textEditor/components/tipTapNodes/refStudioDocument/serialization/MarkdownSerializer';
 import { notifyError } from '../notifications/notifications';
+import {
+  appConfigDir,
+  createDir,
+  desktopDir,
+  exists,
+  join,
+  readBinaryFile,
+  readDir,
+  readTextFile,
+  removeDir,
+  removeFile,
+  renameFile as tauriRenameFile,
+  sep,
+  writeBinaryFile,
+  writeTextFile,
+} from '../wrappers/tauri-wrapper';
 import { FILE2_CONTENT, FILE3_CONTENT, INITIAL_CONTENT } from './filesystem.sample-content';
 
 const UPLOADS_DIR = 'uploads';
@@ -145,7 +148,7 @@ export async function newProject(projectPath: string) {
     const systemBaseDir = await getSystemPath('');
 
     if (await exists(systemBaseDir)) {
-      await tauriRemoveDir(systemBaseDir, { recursive: true });
+      await removeDir(systemBaseDir, { recursive: true });
     }
 
     await createDir(systemBaseDir, { recursive: true });
@@ -175,7 +178,7 @@ export async function sampleProject(projectPath: string) {
     const systemBaseDir = await getSystemPath('');
 
     if (await exists(systemBaseDir)) {
-      await tauriRemoveDir(systemBaseDir, { recursive: true });
+      await removeDir(systemBaseDir, { recursive: true });
     }
 
     await createDir(systemBaseDir, { recursive: true });
