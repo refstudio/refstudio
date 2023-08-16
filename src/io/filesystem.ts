@@ -7,21 +7,18 @@ import { FileEntry, FileFileEntry } from '../atoms/types/FileEntry';
 import { MarkdownSerializer } from '../features/textEditor/components/tipTapNodes/refStudioDocument/serialization/MarkdownSerializer';
 import { notifyError } from '../notifications/notifications';
 import {
-  appConfigDir,
   createDir,
-  desktopDir,
   exists,
-  join,
   readBinaryFile,
   readDir,
   readTextFile,
   removeDir,
   removeFile,
   renameFile as tauriRenameFile,
-  sep,
   writeBinaryFile,
   writeTextFile,
-} from '../wrappers/tauri-wrapper';
+} from '../wrappers/FakeFile';
+import { appConfigDir, desktopDir, join, sep } from '../wrappers/tauri-api-stubs/path';
 import { FILE2_CONTENT, FILE3_CONTENT, INITIAL_CONTENT } from './filesystem.sample-content';
 
 const UPLOADS_DIR = 'uploads';
