@@ -30,7 +30,7 @@ export const indent: Command = ({ tr, dispatch }) => {
     ($from.node(-2).type.name === 'doc' && indexInParent < 2) ||
     ($from.node(-2).type.name === NotionBlockNode.name && indexInParent < 3)
   ) {
-    return true;
+    return false;
   }
 
   if (dispatch) {

@@ -20,12 +20,12 @@ export function addUnindentSteps(tr: Transaction, pos: number): void {
 export const unindent: Command = ({ tr, dispatch }) => {
   const { $from } = tr.selection;
   if (!tr.selection.empty || $from.node(-1).type.name !== NotionBlockNode.name) {
-    return true;
+    return false;
   }
 
   // If the current node's grandparent is not a NotionBlockNode, then the node cannot be unindented
   if ($from.depth <= 2 || $from.node(-2).type.name !== NotionBlockNode.name) {
-    return true;
+    return false;
   }
 
   if (dispatch) {

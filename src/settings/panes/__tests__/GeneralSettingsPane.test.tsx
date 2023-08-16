@@ -19,10 +19,9 @@ const panelConfig: PaneConfig = {
   title: 'OPEN AI',
 };
 
-const mockSettings: Pick<SettingsSchema, 'general' | 'sidecar'> = {
-  general: {
-    appDataDir: 'APP-DATA-DIR',
-    projectName: 'PROJECT-NAME',
+const mockSettings: Pick<SettingsSchema, 'project' | 'sidecar'> = {
+  project: {
+    currentDir: 'APP-DATA-DIR',
   },
   sidecar: {
     logging: {
@@ -39,8 +38,8 @@ describe('GeneralSettingsPane component', () => {
     vi.mocked(saveCachedSettings).mockResolvedValue();
     vi.mocked(getCachedSetting).mockImplementation((key) => {
       switch (key) {
-        case 'general':
-          return mockSettings.general;
+        case 'project':
+          return mockSettings.project;
         case 'sidecar.logging':
           return mockSettings.sidecar.logging;
         default:
@@ -64,7 +63,6 @@ describe('GeneralSettingsPane component', () => {
     render(<GeneralSettingsPane config={panelConfig} />);
 
     expect(getCachedSettingMock.mock.calls.length).toBeGreaterThan(0);
-    expect(screen.getByLabelText('Project Name')).toHaveValue(mockSettings.general.projectName);
     expect(screen.getByLabelText('Active')).toBeChecked();
     expect(screen.getByLabelText('Path')).toHaveValue(mockSettings.sidecar.logging.path);
   });
@@ -73,21 +71,18 @@ describe('GeneralSettingsPane component', () => {
     const user = userEvent.setup();
     render(<GeneralSettingsPane config={panelConfig} />);
 
-    expect(screen.getByLabelText('Project Name')).toHaveValue(mockSettings.general.projectName);
     expect(screen.getByRole('button', { name: /save/i })).toBeDisabled();
 
     // Type
-    await user.type(screen.getByLabelText('Project Name'), 'dont-care-bc-input-is-disabled');
     await user.click(screen.getByLabelText('Active'));
     await user.type(screen.getByLabelText('Path'), '-Updated-2');
-    expect(screen.getByLabelText('Project Name')).toHaveValue(mockSettings.general.projectName);
     expect(screen.getByLabelText('Active')).not.toBeChecked();
     expect(screen.getByLabelText('Path')).toHaveValue(`${mockSettings.sidecar.logging.path}-Updated-2`);
     expect(screen.getByRole('button', { name: /save/i })).toBeEnabled();
 
     // Submit
     await user.click(screen.getByRole('button', { name: /save/i }));
-    expect(vi.mocked(setCachedSetting).mock.calls.length).toBe(2);
-    expect(vi.mocked(saveCachedSettings).mock.calls.length).toBe(1);
+    expect(setCachedSetting).toBeCalledTimes(1);
+    expect(saveCachedSettings).toBeCalledTimes(1);
   });
 });

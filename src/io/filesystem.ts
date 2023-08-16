@@ -5,12 +5,13 @@ import {
   readBinaryFile,
   readDir,
   readTextFile,
+  removeDir as tauriRemoveDir,
   removeFile,
   renameFile as tauriRenameFile,
   writeBinaryFile,
   writeTextFile,
 } from '@tauri-apps/api/fs';
-import { appConfigDir, appDataDir, join, sep } from '@tauri-apps/api/path';
+import { appConfigDir, desktopDir, join, sep } from '@tauri-apps/api/path';
 import { JSONContent } from '@tiptap/core';
 
 import { EditorContent } from '../atoms/types/EditorContent';
@@ -18,7 +19,6 @@ import { FileEntry, FileFileEntry } from '../atoms/types/FileEntry';
 import { notifyError } from '../notifications/notifications';
 import { FILE2_CONTENT, FILE3_CONTENT, INITIAL_CONTENT } from './filesystem.sample-content';
 
-const PROJECT_NAME = 'project-x';
 const UPLOADS_DIR = 'uploads';
 
 // #####################################################################################
@@ -38,24 +38,32 @@ export async function getSystemConfigurationsDir() {
 }
 
 /**
- * System application data directory for the Tauri app.
- *
- * Note that this path is were the PROJECT_NAME directory should exist.
- * Should only be used by the configuration and sidecar.
+ * Default dir for new projects.
  *
  * @returns An operating-system absolute path
  */
-export async function getSystemAppDataDir() {
-  return appDataDir();
+export async function getNewProjectsBaseDir() {
+  return desktopDir();
 }
 
+let projectBaseDir = '';
+
 /**
- * This is the refstudio project base dir.
+ * The project base directory configures the root folder for the project files.
  *
- * NOTE: For now the PROJECT_NAME is hard-coded
- **/
-async function getProjectBaseDir() {
-  return join(await appDataDir(), PROJECT_NAME);
+ * When opening
+ */
+export function getProjectBaseDir() {
+  return projectBaseDir;
+}
+/**
+ * Set the project base directory
+ *
+ * @param dir new project directory
+ * @returns
+ */
+export function setProjectBaseDir(dir: string) {
+  return (projectBaseDir = dir);
 }
 
 /**
@@ -66,7 +74,7 @@ async function getProjectBaseDir() {
  * @param rsPath a ref-studio absolute path
  **/
 export async function getSystemPath(rsPath: string) {
-  return join(await getProjectBaseDir(), rsPath);
+  return join(getProjectBaseDir(), rsPath);
 }
 
 /**
@@ -77,9 +85,18 @@ export async function getSystemPath(rsPath: string) {
  * @param absolutePath an operating-system absolute path
  * @returns
  */
-export async function getRefStudioPath(absolutePath: string) {
-  const baseDir = await getProjectBaseDir();
+export function getRefStudioPath(absolutePath: string) {
+  const baseDir = getProjectBaseDir();
   return absolutePath.replace(new RegExp(`^${baseDir}`), '');
+}
+
+/**
+ * Returns the the OS-specific separator
+ *
+ * @returns the separator (/ or \\)
+ */
+export function getSeparator() {
+  return sep;
 }
 
 // #####################################################################################
@@ -98,6 +115,12 @@ export function isInUploadsDir(relativePath: string) {
 }
 
 export async function uploadFiles(systemFiles: File[]) {
+  // Ensure uploads dir
+  const systemUploadsDir = await getSystemPath(getUploadsDir());
+  if (!(await exists(systemUploadsDir))) {
+    await createDir(systemUploadsDir);
+  }
+
   for (const file of systemFiles) {
     const bytes = await file.arrayBuffer();
     const systemUploadFilePath = await getSystemPath(makeUploadPath(file.name));
@@ -107,36 +130,79 @@ export async function uploadFiles(systemFiles: File[]) {
 }
 
 // #####################################################################################
-// Project Structure and read project files
+// Open Project Structure and read project files
 // #####################################################################################
-export async function ensureProjectFileStructure() {
+export async function newProject(projectPath: string) {
   try {
+    setProjectBaseDir(projectPath);
     const systemBaseDir = await getSystemPath('');
+
+    if (await exists(systemBaseDir)) {
+      await tauriRemoveDir(systemBaseDir, { recursive: true });
+    }
+
     await createDir(systemBaseDir, { recursive: true });
 
-    const systemUploadsDir = await getSystemPath(getUploadsDir());
-    await createDir(systemUploadsDir, { recursive: true });
-
-    await ensureFile('file 1.refstudio', INITIAL_CONTENT);
-    await ensureFile('file 2.refstudio', FILE2_CONTENT);
-    await ensureFile('file 3.refstudio', FILE3_CONTENT);
-
-    console.log('Project structure created with success. Folder: ', systemBaseDir);
+    console.log('New project created in folder ', systemBaseDir);
   } catch (err) {
     console.error('ERROR', err);
-    throw new Error('Error ensuring file struture');
+    throw new Error('Error creating new project in ' + projectPath);
   }
 }
 
-async function ensureFile(fileName: string, content: string) {
+export async function openProject(projectPath: string) {
+  try {
+    setProjectBaseDir(projectPath);
+    const systemBaseDir = await getSystemPath('');
+
+    console.log('Project opened for folder ', systemBaseDir);
+  } catch (err) {
+    console.error('ERROR', err);
+    throw new Error('Error open project in ' + projectPath);
+  }
+}
+
+export async function sampleProject(projectPath: string) {
+  try {
+    setProjectBaseDir(projectPath);
+    const systemBaseDir = await getSystemPath('');
+
+    if (await exists(systemBaseDir)) {
+      await tauriRemoveDir(systemBaseDir, { recursive: true });
+    }
+
+    await createDir(systemBaseDir, { recursive: true });
+
+    await createSampleFiles(true);
+
+    console.log('Sample project open for folder ', systemBaseDir);
+  } catch (err) {
+    console.error('ERROR', err);
+    throw new Error('Error open project in ' + projectPath);
+  }
+}
+
+export async function createSampleFiles(overrideFiles = false) {
+  try {
+    await ensureFile('file 1.refstudio', INITIAL_CONTENT, overrideFiles);
+    await ensureFile('file 2.refstudio', FILE2_CONTENT, overrideFiles);
+    await ensureFile('file 3.refstudio', FILE3_CONTENT, overrideFiles);
+  } catch (err) {
+    console.error('ERROR', err);
+    throw new Error('Error creating sample files');
+  }
+}
+
+async function ensureFile(fileName: string, content: string, overrideFiles = false) {
   const absoluteFilePath = await getSystemPath(fileName);
-  if (!(await exists(absoluteFilePath))) {
+  if (overrideFiles || !(await exists(absoluteFilePath))) {
     await writeTextFile(absoluteFilePath, content);
   }
 }
 
 export async function readAllProjectFiles() {
   const systemBaseDir = await getSystemPath('');
+  console.log('reading file structure from ', systemBaseDir);
   const entries = await readDir(systemBaseDir, { recursive: true });
   return Promise.all(entries.map(convertTauriFileEntryToFileEntry));
 }
@@ -145,7 +211,7 @@ async function convertTauriFileEntryToFileEntry(entry: TauriFileEntry): Promise<
   const isFolder = !!entry.children;
   const name = entry.name ?? '';
   const isDotfile = name.startsWith('.');
-  const refStudioPath = await getRefStudioPath(entry.path);
+  const refStudioPath = getRefStudioPath(entry.path);
 
   if (isFolder) {
     return {
@@ -249,7 +315,7 @@ export async function renameFile(relativePath: string, newName: string): RenameF
       return { success: false };
     }
     await tauriRenameFile(systemPath, newSystemPath);
-    const newRelativePath = await getRefStudioPath(newSystemPath);
+    const newRelativePath = getRefStudioPath(newSystemPath);
     return { success: true, newPath: newRelativePath };
   } catch (err) {
     console.error('Error', err);

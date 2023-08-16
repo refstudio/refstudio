@@ -5,6 +5,7 @@ import {
   readBinaryFile as tauriReadBinaryFile,
   readDir as tauriReadDir,
   readTextFile as tauriReadTextFile,
+  removeDir as tauriRemoveDir,
   removeFile as tauriRemoveFile,
   renameFile as tauriRenameFile,
   writeBinaryFile as tauriWriteBinaryFile,
@@ -16,19 +17,22 @@ import { EditorContent } from '../../atoms/types/EditorContent';
 import { FileFileEntry } from '../../atoms/types/FileEntry';
 import {
   deleteFile,
-  ensureProjectFileStructure,
   getParentFolder,
+  getProjectBaseDir,
   getRefStudioPath,
-  getSystemAppDataDir,
   getSystemConfigurationsDir,
   getSystemPath,
   getUploadsDir,
   isInUploadsDir,
   makeRefStudioPath,
   makeUploadPath,
+  newProject,
+  openProject,
   readAllProjectFiles,
   readFileContent,
   renameFile,
+  sampleProject,
+  setProjectBaseDir,
   splitRefStudioPath,
   uploadFiles,
   writeFileContent,
@@ -38,10 +42,10 @@ vi.mock('@tauri-apps/api/fs');
 vi.mock('@tauri-apps/api/path');
 
 const APP_CONFIG_DIR = '/usr/path/configdir/bundleid';
-const APP_DATA_DIR = '/usr/path/datadir/bundleid';
+const PROJECT_DIR = '/usr/path/datadir/bundleid/project-x';
 
 vi.mocked(appConfigDir).mockResolvedValue(APP_CONFIG_DIR);
-vi.mocked(appDataDir).mockResolvedValue(APP_DATA_DIR);
+vi.mocked(appDataDir).mockResolvedValue(PROJECT_DIR);
 vi.mocked(join).mockImplementation(async (...args: string[]) => Promise.resolve(args.join('/').replaceAll('//', '/')));
 vi.mocked(tauriReadDir).mockResolvedValue([]);
 
@@ -58,12 +62,13 @@ describe('filesystem', () => {
       expect(await getSystemConfigurationsDir()).toBeDefined();
     });
 
-    it('should export the (system) app data directory', async () => {
-      expect(await getSystemAppDataDir()).toBeDefined();
+    it('should export the (system) app data directory', () => {
+      expect(getProjectBaseDir()).toBeDefined();
     });
 
     it('should make system path from ref studio path', async () => {
       const rsPath = '/some/file.txt';
+      setProjectBaseDir('/user/desktop/refstudio/');
       const systemPath = await getSystemPath(rsPath);
       expect(systemPath).not.toBe(rsPath);
       expect(systemPath.endsWith(rsPath)).toBeTruthy();
@@ -72,7 +77,7 @@ describe('filesystem', () => {
     it('should extract ref studio path from system path (reflective)', async () => {
       const rsPath = '/some/file.txt';
       const systemPath = await getSystemPath(rsPath);
-      expect(await getRefStudioPath(systemPath)).toBe(rsPath);
+      expect(getRefStudioPath(systemPath)).toBe(rsPath);
     });
   });
 
@@ -131,18 +136,54 @@ describe('filesystem', () => {
   // Project Structure and read project files
   // #####################################################################################
   describe('project structure and read files', () => {
-    it('should create project structure if folder and files dont exist', async () => {
-      await ensureProjectFileStructure();
-      // Create 2 folders
-      expect(tauriCreateDir).toHaveBeenCalledTimes(2);
+    it('should open project structure', async () => {
+      const path = '/usr/documents/project-x';
+      await openProject(path);
+      expect(getProjectBaseDir()).toBe(path);
+    });
+
+    it('should create new project in new directory', async () => {
+      const path = '/usr/documents/project-x-new';
+      await newProject(path);
+      expect(getProjectBaseDir()).toBe(path);
+      // Create 1 folder for the project and no files
+      expect(tauriCreateDir).toHaveBeenCalledTimes(1);
+      expect(tauriWriteTextFile).toHaveBeenCalledTimes(0);
+    });
+
+    it('should create new project and delete directory if exists', async () => {
+      vi.mocked(tauriExists).mockResolvedValue(true);
+
+      const path = '/usr/documents/project-x-new';
+      await newProject(path);
+      expect(getProjectBaseDir()).toBe(path);
+      // Create 1 folder for the project and no files
+      expect(tauriExists).toHaveBeenCalledTimes(1);
+      expect(tauriRemoveDir).toHaveBeenCalledTimes(1);
+      expect(tauriCreateDir).toHaveBeenCalledTimes(1);
+      expect(tauriWriteTextFile).toHaveBeenCalledTimes(0);
+    });
+
+    it('should create sample project structure with 3 files', async () => {
+      await sampleProject('/usr/documents/sample-x');
+      // Create 1 folder for the project
+      expect(tauriCreateDir).toHaveBeenCalledTimes(1);
       // Check and create 3 files
-      expect(tauriExists).toHaveBeenCalledTimes(3);
       expect(tauriWriteTextFile).toHaveBeenCalledTimes(3);
+    });
+
+    it('should override sample project directort if exists', async () => {
+      vi.mocked(tauriExists).mockResolvedValue(true);
+      await sampleProject('/usr/documents/sample-x-2');
+
+      expect(tauriExists).toHaveBeenCalledTimes(1);
+      expect(tauriRemoveDir).toHaveBeenCalledTimes(1);
+      expect(tauriCreateDir).toHaveBeenCalledTimes(1);
     });
 
     it('should throw error if any tauri fs throws', async () => {
       vi.mocked(tauriCreateDir).mockRejectedValue('any');
-      await expect(ensureProjectFileStructure()).rejects.toThrow();
+      await expect(newProject('/usr/documents/project-x')).rejects.toThrow();
     });
 
     it('should read all project files empty if none exists', async () => {
@@ -304,6 +345,7 @@ describe('filesystem', () => {
     });
 
     it('should rename file content via tauri APIs', async () => {
+      vi.mocked(tauriExists).mockResolvedValue(false);
       const result = await renameFile('/some/relative.txt', 'updated.txt');
       expect(result).toStrictEqual({ success: true, newPath: '/some/updated.txt' });
       expect(tauriExists).toHaveBeenCalledTimes(1);

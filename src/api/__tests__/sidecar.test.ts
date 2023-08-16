@@ -14,9 +14,8 @@ vi.mock('../../settings/settingsManager');
 vi.mock('@tauri-apps/api/shell');
 
 const mockSettings: SettingsSchema = {
-  general: {
-    appDataDir: 'APP_DATA_DIR',
-    projectName: 'PROJECT-NAME',
+  project: {
+    currentDir: 'PROJECT-DIR',
   },
   openAI: {
     apiKey: 'API KEY',
@@ -40,7 +39,7 @@ describe('sidecar', () => {
     vi.mocked(getCachedSetting).mockImplementation((key) => {
       switch (key) {
         case 'openAI':
-        case 'general':
+        case 'project':
         case 'sidecar':
           return mockSettings[key];
         default:
@@ -69,11 +68,10 @@ describe('sidecar', () => {
     await callSidecar('chat', { text: 'Hello chatbot!' });
 
     expect(vi.mocked(getCachedSetting).mock.calls.length).toBeGreaterThan(0);
-    expect(Object.keys(env ?? {}).length).toBe(6);
+    expect(Object.keys(env ?? {}).length).toBe(5);
 
     // General
-    expect(env?.APP_DATA_DIR).toBe(mockSettings.general.appDataDir);
-    expect(env?.PROJECT_NAME).toBe(mockSettings.general.projectName);
+    expect(env?.PROJECT_DIR).toBe(mockSettings.project.currentDir);
     // OpenAI
     expect(env?.OPENAI_API_KEY).toBe(mockSettings.openAI.apiKey);
     expect(env?.OPENAI_CHAT_MODEL).toBe(mockSettings.openAI.chatModel);
