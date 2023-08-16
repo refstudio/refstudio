@@ -219,7 +219,7 @@ class PDFIngestion:
                 logger.error(e)
 
             client.process(
-                "processFulltextDocument",
+                "processHeaderDocument",
                 input_path=self.staging_dir,
                 output=self.grobid_output_dir,
                 force=True

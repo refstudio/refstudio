@@ -1,6 +1,7 @@
 import { useAtomValue } from 'jotai';
 
 import { referencesSyncInProgressAtom } from '../../../atoms/referencesState';
+import { InfoMessage } from '../../../components/InfoMessage';
 import { emitEvent } from '../../../events';
 
 export function UploadTipInstructions() {
@@ -11,15 +12,12 @@ export function UploadTipInstructions() {
   }
 
   return (
-    <div
-      className="m-4 rounded-md border border-solid border-blue-400 bg-blue-50 p-1 text-sm italic text-slate-500"
-      data-testid={UploadTipInstructions.name}
-    >
+    <InfoMessage className="m-4 " data-testid={UploadTipInstructions.name}>
       <strong>TIP:</strong> Click{' '}
       <span className="cursor-pointer underline" onClick={() => emitEvent('refstudio://menu/references/upload')}>
         here
       </span>{' '}
       or drag/drop PDF files for upload.
-    </div>
+    </InfoMessage>
   );
 }

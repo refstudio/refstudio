@@ -9,13 +9,12 @@ export async function callSidecar<T extends keyof CliCommands>(
   subcommand: T,
   arg: CliCommands[T][0],
 ): Promise<CliCommands[T][1]> {
-  const generalSettings = getCachedSetting('general');
+  const projectSettings = getCachedSetting('project');
   const openAISettings = getCachedSetting('openAI');
   const sidecarSettings = getCachedSetting('sidecar');
   const env: Record<string, string> = {
     // Paths
-    APP_DATA_DIR: generalSettings.appDataDir,
-    PROJECT_NAME: generalSettings.projectName,
+    PROJECT_DIR: projectSettings.currentDir,
     // Open AI
     OPENAI_API_KEY: openAISettings.apiKey,
     OPENAI_CHAT_MODEL: openAISettings.chatModel,

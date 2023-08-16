@@ -10,7 +10,7 @@ import { useAsyncEffect } from './useAsyncEffect';
 
 export function useListenEvent<Event extends RefStudioEventName>(
   eventName: Event,
-  callback: (p: RefStudioEventPayload<Event>) => void,
+  callback: (p: RefStudioEventPayload<Event>) => void | Promise<void>,
 ) {
   useAsyncEffect(
     (isMounted) =>
@@ -20,7 +20,7 @@ export function useListenEvent<Event extends RefStudioEventName>(
           //       This will break our implementation (typing),
           //       so we need to make the fallback and cast
           const payload = (evt.payload ?? undefined) as RefStudioEventPayload<Event>;
-          callback(payload);
+          void callback(payload);
         }
       }),
     (releaseHandle) => releaseHandle(),

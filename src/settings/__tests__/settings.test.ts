@@ -35,23 +35,31 @@ describe('settings', () => {
   it('should getSettings manager after call to initSettings', async () => {
     const fn = vi.fn();
     vi.mocked(SettingsManager<SettingsSchema>).mockImplementation(
-      (defaultSettings) =>
+      (defaultSettings, options) =>
         ({
           initialize: fn.mockReturnValue(defaultSettings),
+          options,
+          getCache: vi.fn(),
+          setCache: vi.fn(),
+          syncCache: vi.fn(),
         } as unknown as SettingsManager<SettingsSchema>),
     );
     await initSettings();
     expect(getSettings()).toBeDefined();
-    expect(fn).toBeCalled();
+    expect(fn).toBeCalledTimes(1);
   });
 
   it('should read settings from env', async () => {
     vi.mocked(readEnv).mockResolvedValue('some value');
     const fn = vi.fn();
     vi.mocked(SettingsManager<SettingsSchema>).mockImplementation(
-      (defaultSettings) =>
+      (defaultSettings, options) =>
         ({
           initialize: fn.mockReturnValue(defaultSettings),
+          options,
+          getCache: vi.fn(),
+          setCache: vi.fn(),
+          syncCache: vi.fn(),
         } as unknown as SettingsManager<SettingsSchema>),
     );
     await initSettings();
@@ -64,10 +72,14 @@ describe('settings', () => {
     vi.mocked(readEnv).mockResolvedValue('OPENAI_CHAT_MODEL-value');
     const fn = vi.fn();
     vi.mocked(SettingsManager<SettingsSchema>).mockImplementation(
-      (defaultSettings) =>
+      (defaultSettings, options) =>
         ({
           default: defaultSettings,
           initialize: fn.mockReturnValue(defaultSettings),
+          options,
+          getCache: vi.fn(),
+          setCache: vi.fn(),
+          syncCache: vi.fn(),
         } as unknown as SettingsManager<SettingsSchema>),
     );
     await initSettings();
@@ -85,6 +97,7 @@ describe('settings', () => {
           initialize: () => defaultSettings,
           getCache: getCachedFn,
           setCache: setCachedFn,
+          syncCache: vi.fn(),
         } as unknown as SettingsManager<SettingsSchema>),
     );
     await initSettings();
@@ -105,6 +118,8 @@ describe('settings', () => {
           default: defaultSettings,
           options,
           initialize: () => defaultSettings,
+          getCache: vi.fn(),
+          setCache: vi.fn(),
           syncCache: syncCacheFn,
         } as unknown as SettingsManager<SettingsSchema>),
     );

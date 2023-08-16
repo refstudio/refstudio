@@ -9,6 +9,9 @@ const MENU_FILE_SAVE: &str = /*           */ "refstudio://menu/file/save";
 const MENU_FILE_NEW: &str = /*            */ "refstudio://menu/file/new";
 const MENU_FILE_SAVE_AS_MD: &str = /*     */ "refstudio://menu/file/markdown";
 const MENU_FILE_CLOSE: &str = /*          */ "refstudio://menu/file/close";
+const MENU_FILE_PROJECT_NEW: &str = /*    */ "refstudio://menu/file/project/new";
+const MENU_FILE_PROJECT_OPEN: &str = /*   */ "refstudio://menu/file/project/open";
+const MENU_FILE_PROJECT_CLOSE: &str = /*  */ "refstudio://menu/file/project/close";
 const MENU_FILE_CLOSE_ALL: &str = /*      */ "refstudio://menu/file/close/all";
 const MENU_VIEW_NOTIFICATIONS: &str = /*  */ "refstudio://menu/view/notifications";
 
@@ -40,13 +43,20 @@ impl AppMenu {
         let file_menu = Submenu::new(
             "File",
             Menu::new()
-                .add_item(CustomMenuItem::new(MENU_FILE_SAVE, "Save").accelerator("cmdOrControl+S"))
                 .add_item(
                     CustomMenuItem::new(MENU_FILE_NEW, "New File").accelerator("cmdOrControl+N"),
                 )
+                .add_item(CustomMenuItem::new(MENU_FILE_SAVE, "Save").accelerator("cmdOrControl+S"))
                 .add_item(CustomMenuItem::new(
                     MENU_FILE_SAVE_AS_MD,
                     "Save File as Markdown...",
+                ))
+                .add_native_item(MenuItem::Separator)
+                .add_item(CustomMenuItem::new(MENU_FILE_PROJECT_NEW, "New Project"))
+                .add_item(CustomMenuItem::new(MENU_FILE_PROJECT_OPEN, "Open Project"))
+                .add_item(CustomMenuItem::new(
+                    MENU_FILE_PROJECT_CLOSE,
+                    "Close Project",
                 ))
                 .add_native_item(MenuItem::Separator)
                 .add_item(
