@@ -15,7 +15,7 @@ export const invoke: typeof tauriInvoke = (cmd, args) => {
 // # @tauri-apps/api/path
 export const appConfigDir: typeof tauriPath.appConfigDir = () =>
   Promise.resolve('/Users/refstudio/config/studio.ref.desktop');
-export const desktopDir: typeof tauriPath.desktopDir = () => Promise.resolve('/Users/refstudio/Desktop/');
+export const desktopDir: typeof tauriPath.desktopDir = () => Promise.resolve('/Users/refstudio/Desktop');
 
 // XXX might need to resolve ".." and leading "/"
 export const join: typeof tauriPath.join = (...args) => Promise.resolve(args.join('/'));
@@ -50,7 +50,7 @@ const fs = new Map<NormalizedPath, FakeNode>();
 
 export const createDir: typeof tauriFs.createDir = (dir, options) => {
   if (!options?.recursive) {
-    throw new Error('Only recursive creatDir is implemented');
+    throw new Error('Only recursive createDir is implemented');
   }
   fs.set(normalizePath(dir), { type: 'dir' });
   return Promise.resolve();
@@ -147,6 +147,8 @@ export const renameFile: typeof tauriFs.renameFile = (oldPath, newPath, options)
   fs.set(normalizePath(newPath), oldFile);
   return Promise.resolve();
 };
+
+(window as any).getFileSystem = () => fs;
 
 // # @tauri-apps/api/event
 const listeners = new Map<string, tauriEvent.EventCallback<unknown>>();
