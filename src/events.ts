@@ -1,7 +1,8 @@
-import { emit, EventCallback, listen } from '@tauri-apps/api/event';
+import type { EventCallback } from '@tauri-apps/api/event';
 
 import { PaneEditorId, PaneId } from './atoms/types/PaneGroup';
 import { NotificationItemType } from './notifications/types';
+import { emit, listen } from './wrappers/tauri-wrapper';
 
 interface RefStudioEvents {
   // Menu actions (Note that these should have undefined payload)

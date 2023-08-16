@@ -1,4 +1,5 @@
 import { invoke as tauriInvoke } from '@tauri-apps/api';
+import * as tauriEvent from '@tauri-apps/api/event';
 import * as tauriFs from '@tauri-apps/api/fs';
 import * as tauriPath from '@tauri-apps/api/path';
 
@@ -126,4 +127,17 @@ export const renameFile: typeof tauriFs.renameFile = (oldPath, newPath, options)
   fs.delete(oldPath);
   fs.set(newPath, oldFile);
   return Promise.resolve();
+};
+
+// # @tauri-apps/api/event
+export const emit: typeof tauriEvent.emit = (event, payload) => {
+  console.log('emit', event, payload);
+  return Promise.resolve();
+};
+
+export const listen: typeof tauriEvent.listen = (event, callback) => {
+  console.log('listen', event);
+  return Promise.resolve(() => {
+    /* no op */
+  });
 };
