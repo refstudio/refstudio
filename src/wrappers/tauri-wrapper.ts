@@ -15,10 +15,10 @@ export const invoke: typeof tauriInvoke = (cmd, args) => {
 // # @tauri-apps/api/path
 export const appConfigDir: typeof tauriPath.appConfigDir = () =>
   Promise.resolve('/Users/refstudio/config/studio.ref.desktop');
-export const desktopDir: typeof tauriPath.desktopDir = () => Promise.resolve('/Users/refstudio/Desktop');
+export const desktopDir: typeof tauriPath.desktopDir = () => Promise.resolve('/Users/refstudio/Desktop/');
 
 // XXX might need to resolve ".." and leading "/"
-export const join: typeof tauriPath.join = (...args) => Promise.resolve(args.join(','));
+export const join: typeof tauriPath.join = (...args) => Promise.resolve(args.join('/'));
 
 export const sep: typeof tauriPath.sep = '/';
 
@@ -61,7 +61,7 @@ export const readTextFile: typeof tauriFs.readTextFile = (filePath) => {
 export const readDir: typeof tauriFs.readDir = async (dir, options) => {
   const entries: tauriFs.FileEntry[] = [];
   for (const [path, node] of fs.entries()) {
-    if (path.startsWith(dir)) {
+    if (path.startsWith(dir) && path !== dir) {
       entries.push({
         path,
         name: path.split('/').slice(-1)[0],
@@ -130,13 +130,23 @@ export const renameFile: typeof tauriFs.renameFile = (oldPath, newPath, options)
 };
 
 // # @tauri-apps/api/event
+const listeners = new Map<string, tauriEvent.EventCallback<any>>();
+
 export const emit: typeof tauriEvent.emit = (event, payload) => {
   console.log('emit', event, payload);
+  const handler = listeners.get(event);
+  if (handler) {
+    handler({ event, payload, id: 0, windowLabel: 'refstudio' });
+  }
   return Promise.resolve();
 };
 
 export const listen: typeof tauriEvent.listen = (event, callback) => {
-  console.log('listen', event);
+  // console.log('listen', event);
+  // if (listeners.has(event)) {
+  //   console.log('multiple listeners for', event);
+  // }
+  listeners.set(event, callback);
   return Promise.resolve(() => {
     /* no op */
   });

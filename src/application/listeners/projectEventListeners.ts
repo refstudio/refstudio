@@ -1,4 +1,4 @@
-import { open, save } from '@tauri-apps/api/dialog';
+import { open } from '@tauri-apps/api/dialog';
 import { useAtomValue, useSetAtom } from 'jotai';
 
 import { createFileAtom } from '../../atoms/fileEntryActions';
@@ -18,7 +18,7 @@ export function useFileProjectNewListener() {
   const createFile = useSetAtom(createFileAtom);
 
   return async () => {
-    const newProjectPath = await save({ defaultPath: await getNewProjectsBaseDir() });
+    const newProjectPath = await getNewProjectsBaseDir(); // await save({ defaultPath: await getNewProjectsBaseDir() });
     if (typeof newProjectPath === 'string') {
       await newProject(newProjectPath);
       createFile();

@@ -1,9 +1,21 @@
 /** Utility for calling into the Python sidecar with types. */
 
-import { Command } from '@tauri-apps/api/shell';
+import { Command as TauriCommand } from '@tauri-apps/api/shell';
 
 import { getCachedSetting } from '../settings/settingsManager';
 import { CliCommands } from './types';
+
+class Command {
+  constructor(command: string, args: string[], options?: any) {}
+
+  execute: typeof TauriCommand.prototype.execute = () =>
+    Promise.resolve({
+      signal: null,
+      code: 0,
+      stderr: '',
+      stdout: '{"references": []}',
+    });
+}
 
 export async function callSidecar<T extends keyof CliCommands>(
   subcommand: T,
