@@ -24,17 +24,11 @@ export const EDITOR_EXTENSIONS: Extensions = [
   Color.configure({ types: [TextStyle.name, ListItem.name] }),
   TextStyle,
   StarterKit.configure({
-    bulletList: {
-      keepMarks: true,
-      keepAttributes: false,
-    },
+    bulletList: false,
     blockquote: false,
     codeBlock: false,
     document: false,
-    orderedList: {
-      keepMarks: true,
-      keepAttributes: false,
-    },
+    orderedList: false,
   }),
   // Custom extensions
   RefStudioDocument,

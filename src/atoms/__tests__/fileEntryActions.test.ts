@@ -58,7 +58,7 @@ describe('fileEntryActions', () => {
   });
 
   it('should delete the file', async () => {
-    const fileEntry = makeFile('File 1.txt');
+    const fileEntry = makeFile('File 1.refstudio');
     vi.mocked(readAllProjectFiles).mockResolvedValueOnce([fileEntry]);
     await store.set(refreshFileTreeAtom);
 
@@ -72,7 +72,7 @@ describe('fileEntryActions', () => {
   });
 
   it('should close any open editor corresponding to the deleted file', async () => {
-    const { fileEntry, editorData } = makeFileAndEditor('File 1.txt');
+    const { fileEntry, editorData } = makeFileAndEditor('File 1.refstudio');
     vi.mocked(readAllProjectFiles).mockResolvedValue([fileEntry]);
     await store.set(refreshFileTreeAtom);
     store.set(openFileEntryAtom, fileEntry);
@@ -106,13 +106,13 @@ describe('fileEntryActions', () => {
   });
 
   it('should rename the file', async () => {
-    const fileEntry = makeFile('File.txt');
+    const fileEntry = makeFile('File.refstudio');
     vi.mocked(readAllProjectFiles).mockResolvedValue([fileEntry]);
     await store.set(refreshFileTreeAtom);
 
     vi.mocked(renameFileFromDisk).mockResolvedValueOnce({ success: true, newPath: '' });
 
-    const newName = 'Updated File.txt';
+    const newName = 'Updated File.refstudio';
 
     const renameFile = runSetAtomHook(renameFileAtom, store);
     await act(async () => {
@@ -124,7 +124,7 @@ describe('fileEntryActions', () => {
   });
 
   it('should update editor data when renaming file', async () => {
-    const fileEntry = makeFile('File.txt');
+    const fileEntry = makeFile('File.refstudio');
     vi.mocked(readAllProjectFiles).mockResolvedValue([fileEntry]);
     await store.set(refreshFileTreeAtom);
 
@@ -136,8 +136,8 @@ describe('fileEntryActions', () => {
     expect(leftPaneOpenEditorsData.current[0].title).toBe(fileEntry.name);
     expect(leftPaneOpenEditorsData.current[0].isDirty).toBeFalsy();
 
-    const newName = 'Updated File.txt';
-    const newPath = '/new/path/to/file.txt';
+    const newName = 'Updated File.refstudio';
+    const newPath = '/new/path/to/file.refstudio';
     vi.mocked(renameFileFromDisk).mockResolvedValueOnce({ success: true, newPath });
 
     const renameFile = runSetAtomHook(renameFileAtom, store);
@@ -151,7 +151,7 @@ describe('fileEntryActions', () => {
   });
 
   it('should update editor content when renaming file', async () => {
-    const fileEntry = makeFile('File.txt');
+    const fileEntry = makeFile('File.refstudio');
     vi.mocked(readAllProjectFiles).mockResolvedValue([fileEntry]);
     await store.set(refreshFileTreeAtom);
 
@@ -180,8 +180,8 @@ describe('fileEntryActions', () => {
 
     vi.mocked(writeFileContent).mockClear();
 
-    const newName = 'Updated File.txt';
-    const newPath = '/new/path/to/file.txt';
+    const newName = 'Updated File.refstudio';
+    const newPath = '/new/path/to/file.refstudio';
     vi.mocked(renameFileFromDisk).mockResolvedValueOnce({ success: true, newPath });
 
     const renameFile = runSetAtomHook(renameFileAtom, store);
@@ -220,7 +220,7 @@ describe('fileEntryActions', () => {
   });
 
   it('should do nothing if renaming fails', async () => {
-    const fileEntry = makeFile('File.txt');
+    const fileEntry = makeFile('File.refstudio');
     vi.mocked(readAllProjectFiles).mockResolvedValue([fileEntry]);
     await store.set(refreshFileTreeAtom);
 
@@ -228,7 +228,7 @@ describe('fileEntryActions', () => {
 
     vi.mocked(renameFileFromDisk).mockResolvedValueOnce({ success: false });
 
-    const newName = 'Updated File.txt';
+    const newName = 'Updated File.refstudio';
 
     const leftPaneOpenEditorsData = runHookWithJotaiProvider(() => useOpenEditorsDataForPane('LEFT'), store);
     const leftPaneActiveEditorId = runHookWithJotaiProvider(() => useActiveEditorIdForPane('LEFT'), store);

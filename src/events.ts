@@ -7,6 +7,7 @@ interface RefStudioEvents {
   // Menu actions (Note that these should have undefined payload)
   'refstudio://menu/file/new': undefined;
   'refstudio://menu/file/save': undefined;
+  'refstudio://menu/file/markdown': undefined;
   'refstudio://menu/file/close': undefined;
   'refstudio://menu/file/close/all': undefined;
   'refstudio://menu/settings': undefined;

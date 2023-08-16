@@ -3,6 +3,7 @@ import { clearMocks } from '@tauri-apps/api/mocks';
 import { runGetAtomHook } from '../../../../atoms/__tests__/test-utils';
 import { selectionAtom } from '../../../../atoms/selectionState';
 import { EditorContent } from '../../../../atoms/types/EditorContent';
+import { buildEditorId } from '../../../../atoms/types/EditorData';
 import { RefStudioEventName } from '../../../../events';
 import { noop } from '../../../../lib/noop';
 import {
@@ -22,6 +23,7 @@ const insertContentEvent: RefStudioEventName = 'refstudio://ai/suggestion/insert
 vi.mock('../../../../events');
 
 describe('TipTapEditor', () => {
+  const editorId = buildEditorId('refstudio', 'test');
   afterEach(() => {
     clearMocks();
   });
@@ -31,7 +33,13 @@ describe('TipTapEditor', () => {
     const initialContent = createTextContent(initialText);
 
     setup(
-      <TipTapEditor editorContent={initialContent} isActive={true} saveFileInMemory={noop} updateFileBuffer={noop} />,
+      <TipTapEditor
+        editorContent={initialContent}
+        editorId={editorId}
+        isActive={true}
+        saveFileInMemory={noop}
+        updateFileBuffer={noop}
+      />,
     );
 
     expect(screen.getByText(initialText)).toBeInTheDocument();
@@ -42,6 +50,7 @@ describe('TipTapEditor', () => {
     render(
       <TipTapEditor
         editorContent={emptyParagraphContent}
+        editorId={editorId}
         isActive={true}
         saveFileInMemory={noop}
         updateFileBuffer={noop}
@@ -56,6 +65,7 @@ describe('TipTapEditor', () => {
     render(
       <TipTapEditor
         editorContent={emptyParagraphContent}
+        editorId={editorId}
         isActive={true}
         saveFileInMemory={noop}
         updateFileBuffer={noop}
@@ -75,6 +85,7 @@ describe('TipTapEditor', () => {
     render(
       <TipTapEditor
         editorContent={emptyParagraphContent}
+        editorId={editorId}
         isActive={false}
         saveFileInMemory={noop}
         updateFileBuffer={noop}
@@ -96,7 +107,13 @@ describe('TipTapEditor', () => {
     const initialContent = createTextContent(initialText);
 
     const { store, user } = setupWithJotaiProvider(
-      <TipTapEditor editorContent={initialContent} isActive={false} saveFileInMemory={noop} updateFileBuffer={noop} />,
+      <TipTapEditor
+        editorContent={initialContent}
+        editorId={editorId}
+        isActive={false}
+        saveFileInMemory={noop}
+        updateFileBuffer={noop}
+      />,
     );
     const selection = runGetAtomHook(selectionAtom, store);
 
@@ -114,6 +131,7 @@ describe('TipTapEditor', () => {
     const { user } = setupWithJotaiProvider(
       <TipTapEditor
         editorContent={initialContent}
+        editorId={editorId}
         isActive={false}
         saveFileInMemory={noop}
         updateFileBuffer={updateFileBuffer}

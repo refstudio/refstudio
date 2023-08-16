@@ -59,10 +59,10 @@ describe('editorActions', () => {
     expect(rightPaneActiveEditorId.current).toBeNull();
   });
 
-  it('should open TXT file in the left pane, and be active', () => {
+  it('should open REFSTUDIO file in the left pane, and be active', () => {
     const openFile = runSetAtomHook(openFileEntryAtom, store);
 
-    const { fileEntry: fileToOpen, editorData } = makeFileAndEditor('file.txt');
+    const { fileEntry: fileToOpen, editorData } = makeFileAndEditor('file.refstudio');
     expect(leftPaneOpenEditorsCount.current).toBe(0);
     expect(leftPaneActiveEditorId.current).toBeNull();
 
@@ -74,10 +74,38 @@ describe('editorActions', () => {
     expect(leftPaneActiveEditorId.current).toBe(editorData.id);
   });
 
-  it('should open TXT filePath in the left pane, and be active', () => {
+  it('should open REFSTUDIO filePath in the left pane, and be active', () => {
     const openFile = runSetAtomHook(openFilePathAtom, store);
 
-    const filePath = '/some/absolute/path/file.txt';
+    const filePath = '/some/absolute/path/file.refstudio';
+    act(() => openFile.current(filePath));
+
+    expect(store.get(activePaneIdAtom)).toBe<PaneId>('LEFT');
+    expect(leftPaneOpenEditorsCount.current).toBe(1);
+
+    const editorId = buildEditorId('refstudio', filePath);
+    expect(leftPaneActiveEditorId.current).toBe(editorId);
+  });
+
+  it('should open file with no extension in the left pane, and be active', () => {
+    const openFile = runSetAtomHook(openFileEntryAtom, store);
+
+    const { fileEntry: fileToOpen, editorData } = makeFileAndEditor('file');
+    expect(leftPaneOpenEditorsCount.current).toBe(0);
+    expect(leftPaneActiveEditorId.current).toBeNull();
+
+    act(() => openFile.current(fileToOpen));
+
+    expect(store.get(activePaneIdAtom)).toBe<PaneId>('LEFT');
+    expect(leftPaneOpenEditorsCount.current).toBe(1);
+    expect(leftPaneOpenEditorsData.current[0]).toStrictEqual(editorData);
+    expect(leftPaneActiveEditorId.current).toBe(editorData.id);
+  });
+
+  it('should open filePath with no extension in the left pane, and be active', () => {
+    const openFile = runSetAtomHook(openFilePathAtom, store);
+
+    const filePath = '/some/absolute/path/file';
     act(() => openFile.current(filePath));
 
     expect(store.get(activePaneIdAtom)).toBe<PaneId>('LEFT');
@@ -105,7 +133,7 @@ describe('editorActions', () => {
   it('should open file once in same panel', () => {
     const openFile = runSetAtomHook(openFileEntryAtom, store);
 
-    const { fileEntry: fileToOpen } = makeFileAndEditor('file.txt');
+    const { fileEntry: fileToOpen } = makeFileAndEditor('file.refstudio');
     expect(leftPaneOpenEditorsCount.current).toBe(0);
 
     act(() => {
@@ -149,8 +177,8 @@ describe('editorActions', () => {
     const openFile = runSetAtomHook(openFileEntryAtom, store);
     const closeFileFromPane = runSetAtomHook(closeEditorFromPaneAtom, store);
 
-    const { fileEntry: fileA, editorData: editorDataA } = makeFileAndEditor('fileA.txt');
-    const { fileEntry: fileB } = makeFileAndEditor('fileB.txt');
+    const { fileEntry: fileA, editorData: editorDataA } = makeFileAndEditor('fileA.refstudio');
+    const { fileEntry: fileB } = makeFileAndEditor('fileB.refstudio');
 
     act(() => {
       openFile.current(fileA);
@@ -169,7 +197,7 @@ describe('editorActions', () => {
     const openFile = runSetAtomHook(openFileEntryAtom, store);
     const closeEditorFromAllPanes = runSetAtomHook(closeEditorFromAllPanesAtom, store);
 
-    const { fileEntry: fileA, editorData: editorDataA } = makeFileAndEditor('fileA.txt');
+    const { fileEntry: fileA, editorData: editorDataA } = makeFileAndEditor('fileA.refstudio');
     const { fileEntry: fileB, editorData: editorDataB } = makeFileAndEditor('fileB.pdf');
 
     act(() => {
@@ -192,8 +220,8 @@ describe('editorActions', () => {
     const openFile = runSetAtomHook(openFileEntryAtom, store);
     const closeFileFromPane = runSetAtomHook(closeEditorFromPaneAtom, store);
 
-    const { fileEntry: fileOpened, editorData: openedEditorData } = makeFileAndEditor('fileA.txt');
-    const { editorData: notOpenedEditorData } = makeFileAndEditor('fileB.txt');
+    const { fileEntry: fileOpened, editorData: openedEditorData } = makeFileAndEditor('fileA.refstudio');
+    const { editorData: notOpenedEditorData } = makeFileAndEditor('fileB.refstudio');
 
     act(() => {
       openFile.current(fileOpened);
@@ -213,7 +241,7 @@ describe('editorActions', () => {
   it('should not fail trying to select file that is not opened in pane', () => {
     const selectFileInPane = runSetAtomHook(selectEditorInPaneAtom, store);
 
-    const { editorData } = makeFileAndEditor('fileA.txt');
+    const { editorData } = makeFileAndEditor('fileA.refstudio');
 
     act(() => {
       selectFileInPane.current({ paneId: 'LEFT', editorId: editorData.id });
@@ -251,7 +279,7 @@ describe('editorActions', () => {
     const openFile = runSetAtomHook(openFileEntryAtom, store);
     const closeAllFiles = runSetAtomHook(closeAllEditorsAtom, store);
 
-    const { fileEntry: fileA, editorData: fileAData } = makeFileAndEditor('file.txt');
+    const { fileEntry: fileA, editorData: fileAData } = makeFileAndEditor('file.refstudio');
     const { fileEntry: fileB, editorData: fileBData } = makeFileAndEditor('file.pdf');
 
     act(() => {
@@ -273,7 +301,7 @@ describe('editorActions', () => {
     const openFile = runSetAtomHook(openFileEntryAtom, store);
     const moveEditorToPane = runSetAtomHook(moveEditorToPaneAtom, store);
 
-    const { fileEntry, editorData } = makeFileAndEditor('file.txt');
+    const { fileEntry, editorData } = makeFileAndEditor('file.refstudio');
 
     act(() => {
       openFile.current(fileEntry);
@@ -294,7 +322,7 @@ describe('editorActions', () => {
     const openFile = runSetAtomHook(openFileEntryAtom, store);
     const moveEditorToPane = runSetAtomHook(moveEditorToPaneAtom, store);
 
-    const { fileEntry: fileA, editorData } = makeFileAndEditor('file.txt');
+    const { fileEntry: fileA, editorData } = makeFileAndEditor('file.refstudio');
 
     act(() => {
       openFile.current(fileA);
@@ -315,8 +343,8 @@ describe('editorActions', () => {
     const openFile = runSetAtomHook(openFileEntryAtom, store);
     const moveEditorToPane = runSetAtomHook(moveEditorToPaneAtom, store);
 
-    const { fileEntry: fileA, editorData: fileAData } = makeFileAndEditor('file1.txt');
-    const { fileEntry: fileB, editorData: fileBData } = makeFileAndEditor('file2.txt');
+    const { fileEntry: fileA, editorData: fileAData } = makeFileAndEditor('file1.refstudio');
+    const { fileEntry: fileB, editorData: fileBData } = makeFileAndEditor('file2.refstudio');
 
     act(() => {
       openFile.current(fileA);
@@ -342,7 +370,7 @@ describe('editorActions', () => {
     const openFile = runSetAtomHook(openFileEntryAtom, store);
     const moveEditorToPane = runSetAtomHook(moveEditorToPaneAtom, store);
 
-    const { fileEntry: fileA, editorData } = makeFileAndEditor('file.txt');
+    const { fileEntry: fileA, editorData } = makeFileAndEditor('file.refstudio');
 
     act(() => {
       openFile.current(fileA);
@@ -363,9 +391,9 @@ describe('editorActions', () => {
     const openFile = runSetAtomHook(openFileEntryAtom, store);
     const closeFileFromPane = runSetAtomHook(closeEditorFromPaneAtom, store);
 
-    const { fileEntry: fileA } = makeFileAndEditor('fileA.txt');
-    const { fileEntry: fileB, editorData: editorDataB } = makeFileAndEditor('fileB.txt');
-    const { fileEntry: fileC, editorData: editorDataC } = makeFileAndEditor('fileC.txt');
+    const { fileEntry: fileA } = makeFileAndEditor('fileA.refstudio');
+    const { fileEntry: fileB, editorData: editorDataB } = makeFileAndEditor('fileB.refstudio');
+    const { fileEntry: fileC, editorData: editorDataC } = makeFileAndEditor('fileC.refstudio');
 
     act(() => {
       openFile.current(fileA);
@@ -386,9 +414,9 @@ describe('editorActions', () => {
     const openFile = runSetAtomHook(openFileEntryAtom, store);
     const closeFileFromPane = runSetAtomHook(closeEditorFromPaneAtom, store);
 
-    const { fileEntry: fileA } = makeFileAndEditor('fileA.txt');
-    const { fileEntry: fileB, editorData: editorDataB } = makeFileAndEditor('fileB.txt');
-    const { fileEntry: fileC, editorData: editorDataC } = makeFileAndEditor('fileC.txt');
+    const { fileEntry: fileA } = makeFileAndEditor('fileA.refstudio');
+    const { fileEntry: fileB, editorData: editorDataB } = makeFileAndEditor('fileB.refstudio');
+    const { fileEntry: fileC, editorData: editorDataC } = makeFileAndEditor('fileC.refstudio');
 
     act(() => {
       openFile.current(fileA);
@@ -409,8 +437,8 @@ describe('editorActions', () => {
     const openFile = runSetAtomHook(openFileEntryAtom, store);
     const closeFileFromPane = runSetAtomHook(closeEditorFromPaneAtom, store);
 
-    const { fileEntry: fileA, editorData: editorDataA } = makeFileAndEditor('fileA.txt');
-    const { fileEntry: fileB, editorData: editorDataB } = makeFileAndEditor('fileB.txt');
+    const { fileEntry: fileA, editorData: editorDataA } = makeFileAndEditor('fileA.refstudio');
+    const { fileEntry: fileB, editorData: editorDataB } = makeFileAndEditor('fileB.refstudio');
 
     act(() => {
       openFile.current(fileA);
@@ -447,7 +475,7 @@ describe('editorActions', () => {
       jsonContent: { doc: 'some content' },
     });
 
-    const { fileEntry: fileA } = makeFileAndEditor('fileA.txt');
+    const { fileEntry: fileA } = makeFileAndEditor('fileA.refstudio');
 
     act(() => {
       openFile.current(fileA);

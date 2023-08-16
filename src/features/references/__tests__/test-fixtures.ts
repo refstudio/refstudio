@@ -9,6 +9,7 @@ export const REFERENCES: ReferenceItem[] = [
     citationKey: 'doe2023',
     status: 'complete',
     authors: [{ fullName: 'Joe Doe', lastName: 'Doe' }],
+    publishedDate: '2023-08-15',
   },
   {
     id: 'rules_of_machine_learning_-_best_practices_for_ml_engineering',

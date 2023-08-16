@@ -7,9 +7,11 @@ import { indent } from './commands/indent';
 import { joinBackward } from './commands/joinBackward';
 import { joinForward } from './commands/joinForward';
 import { splitBlock } from './commands/splitBlock';
+import { toggleBulletList } from './commands/toggleBulletList';
 import { toggleCollapsed } from './commands/toggleCollapsed';
 import { unindent } from './commands/unindent';
 import { chevronHandler } from './inputRuleHandlers/chevronHandler';
+import { dashHandler } from './inputRuleHandlers/dashHandler';
 import { NotionBlock } from './NotionBlock';
 
 const placeholderPluginKey = new PluginKey<DecorationSet>('placeholder');
@@ -160,6 +162,17 @@ function getCollapsiblePlaceholderDecorations(state: EditorState): Decoration[] 
   return decorations;
 }
 
+function hasAncestor(el: Element, selector: string): boolean {
+  if (el.matches(selector)) {
+    return true;
+  }
+  const { parentElement } = el;
+  if (!parentElement) {
+    return false;
+  }
+  return hasAncestor(parentElement, selector);
+}
+
 export const collapsiblePluginKey = new PluginKey<DecorationSet>('collapsibleNodes');
 const collapsiblePlugin = new Plugin({
   key: collapsiblePluginKey,
@@ -180,12 +193,7 @@ const collapsiblePlugin = new Plugin({
       const target = event.target as HTMLElement;
       const toggleNodeCollapsed = () =>
         toggleCollapsed({ pos: pos - 2, view, tr: view.state.tr, dispatch: (tr: Transaction) => view.dispatch(tr) });
-      // We need this because user can click on the svg polygon element, that is not an instance of HTMLElement
-      if (target.parentElement?.parentElement?.className.includes('collapsible-arrow')) {
-        toggleNodeCollapsed();
-      } else if (target.parentElement?.className.includes('collapsible-arrow')) {
-        toggleNodeCollapsed();
-      } else if (target.className.includes('collapsible-arrow')) {
+      if (hasAncestor(target, '.collapsible-arrow')) {
         toggleNodeCollapsed();
       } else if (target.className.includes('empty-collapsible-placeholder')) {
         const { tr } = view.state;
@@ -328,6 +336,16 @@ export const NotionBlockNode = Node.create({
         find: /^> $/,
         handler: chevronHandler.bind(this),
       }),
+      new InputRule({
+        find: /^- $/,
+        handler: dashHandler.bind(this),
+      }),
     ];
+  },
+
+  addCommands() {
+    return {
+      toggleBulletList: () => toggleBulletList.bind(this),
+    };
   },
 });

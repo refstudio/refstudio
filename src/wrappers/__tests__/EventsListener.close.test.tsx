@@ -30,7 +30,7 @@ describe('EventsListener.close', () => {
     vi.mocked(readFileContent).mockResolvedValue({ type: 'refstudio', jsonContent: { doc: 'Lorem Ipsum' } });
     store = createStore();
 
-    const file = makeFileAndEditor('File.txt');
+    const file = makeFileAndEditor('File.refstudio');
     fileEntry = file.fileEntry;
     editorData = file.editorData;
 
@@ -75,7 +75,7 @@ describe('EventsListener.close', () => {
     const mockData = mockListenEvent();
     const activePane = runGetAtomHook(activePaneAtom, store);
 
-    const { fileEntry: fileEntry2, editorData: editorData2 } = makeFileAndEditor('File2.txt');
+    const { fileEntry: fileEntry2, editorData: editorData2 } = makeFileAndEditor('File2.refstudio');
 
     act(() => store.set(openFileEntryAtom, fileEntry2));
 
@@ -96,7 +96,7 @@ describe('EventsListener.close', () => {
     const leftPaneOpenEditorsCount = runHookWithJotaiProvider(() => useOpenEditorsCountForPane('LEFT'), store);
     const rightPaneOpenEditorsCount = runHookWithJotaiProvider(() => useOpenEditorsCountForPane('RIGHT'), store);
 
-    const { fileEntry: fileEntry2 } = makeFileAndEditor('File2.txt');
+    const { fileEntry: fileEntry2 } = makeFileAndEditor('File2.refstudio');
     const { fileEntry: fileEntry3 } = makeFileAndEditor('File3.pdf');
 
     act(() => store.set(openFileEntryAtom, fileEntry2));
