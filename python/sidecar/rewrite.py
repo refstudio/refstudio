@@ -3,11 +3,11 @@ import sys
 
 import openai
 from dotenv import load_dotenv
-from sidecar import prompts, shared, typing
+from sidecar import _typing, prompts, shared
+from sidecar._typing import (RewriteChoice, RewriteRequest,
+                             TextCompletionChoice, TextCompletionRequest,
+                             TextSuggestionChoice)
 from sidecar.settings import logger
-from sidecar.typing import (RewriteChoice, RewriteRequest,
-                            TextCompletionChoice, TextCompletionRequest,
-                            TextSuggestionChoice)
 from tenacity import retry, stop_after_attempt, wait_fixed
 
 load_dotenv()
@@ -34,21 +34,22 @@ def rewrite(arg: RewriteRequest):
         choices = chat.get_response(response_type=RewriteChoice)
     except Exception as e:
         logger.error(e)
-        response = typing.RewriteResponse(
-            status=typing.ResponseStatus.ERROR,
+        response = _typing.RewriteResponse(
+            status=_typing.ResponseStatus.ERROR,
             message=str(e),
             choices=[],
         )
         sys.stdout.write(response.json())
-        return
+        return response
 
     logger.info(f"Returning {len(choices)} rewrite choices to client: {choices}")
-    response = typing.RewriteResponse(
-        status=typing.ResponseStatus.OK,
+    response = _typing.RewriteResponse(
+        status=_typing.ResponseStatus.OK,
         message="",
         choices=[r.dict() for r in choices],
     )
     sys.stdout.write(response.json())
+    return response
 
 
 def complete_text(request: TextCompletionRequest):
@@ -65,24 +66,25 @@ def complete_text(request: TextCompletionRequest):
         choices = chat.get_response(response_type=TextCompletionChoice)
     except Exception as e:
         logger.error(e)
-        response = typing.TextCompletionResponse(
-            status=typing.ResponseStatus.ERROR,
+        response = _typing.TextCompletionResponse(
+            status=_typing.ResponseStatus.ERROR,
             message=str(e),
             choices=[],
         )
         sys.stdout.write(response.json())
-        return
+        return response
 
     logger.info(f"Trimming completion prefix text from completion choices: {choices}") 
     choices = shared.trim_completion_prefix_from_choices(prefix=request.text, choices=choices)
     logger.info(f"Returning {len(choices)} completion choices to client: {choices}")
 
-    response = typing.TextCompletionResponse(
-        status=typing.ResponseStatus.OK,
+    response = _typing.TextCompletionResponse(
+        status=_typing.ResponseStatus.OK,
         message="",
         choices=[r.dict() for r in choices],
     )
     sys.stdout.write(response.json())
+    return response
 
 
 class Rewriter:

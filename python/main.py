@@ -1,8 +1,11 @@
 import inspect
 import json
 
-from sidecar import chat, cli, ingest, rewrite, storage, search
-from sidecar.typing import CliCommands
+from sidecar import chat, cli, http, ingest, rewrite, search, storage
+from sidecar._typing import CliCommands
+from sidecar.http import app
+
+app
 
 if __name__ == '__main__':
     parser = cli.get_arg_parser()

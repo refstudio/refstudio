@@ -3,12 +3,13 @@ import sys
 
 import openai
 from dotenv import load_dotenv
-from sidecar import prompts, settings, typing
+from tenacity import retry, stop_after_attempt, wait_fixed
+
+from sidecar import _typing, prompts, settings
+from sidecar._typing import ChatRequest, ChatResponse, ChatResponseChoice
 from sidecar.ranker import BM25Ranker
 from sidecar.settings import logger
 from sidecar.storage import JsonStorage
-from sidecar.typing import ChatRequest, ChatResponse, ChatResponseChoice
-from tenacity import retry, stop_after_attempt, wait_fixed
 
 load_dotenv()
 openai.api_key = os.environ.get("OPENAI_API_KEY")
@@ -34,7 +35,7 @@ def ask_question(request: ChatRequest):
     except Exception as e:
         logger.error(e)
         response = ChatResponse(
-            status=typing.ResponseStatus.ERROR,
+            status=_typing.ResponseStatus.ERROR,
             message=str(e),
             choices=[],
         )
@@ -43,7 +44,7 @@ def ask_question(request: ChatRequest):
 
     logger.info(f"Returning {len(choices)} chat response choices to client: {choices}")
     response = ChatResponse(
-        status=typing.ResponseStatus.OK,
+        status=_typing.ResponseStatus.OK,
         message="",
         choices=[r.dict() for r in choices],
     )
@@ -99,4 +100,5 @@ class Chat:
         messages = self.prepare_messages_for_chat(text=prompt)
         response = self.call_model(messages=messages, n_choices=n_choices, temperature=temperature)
         choices = self.prepare_choices_for_client(response=response)
+        return choices
         return choices

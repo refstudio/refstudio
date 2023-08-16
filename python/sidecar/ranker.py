@@ -1,6 +1,6 @@
 from rank_bm25 import BM25Plus
+from sidecar._typing import Chunk
 from sidecar.storage import JsonStorage
-from sidecar.typing import Chunk
 
 
 class BM25Ranker:
@@ -26,4 +26,4 @@ class BM25Ranker:
         tokenized_query = query.lower().split()
         docs = self.ranker.get_top_n(tokenized_query, self.storage.chunks, n=limit)
         return docs
-    
+        
