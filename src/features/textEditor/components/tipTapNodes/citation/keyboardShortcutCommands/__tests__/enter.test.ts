@@ -23,7 +23,7 @@ describe('Enter keyboard command', () => {
   it('should block the event if the first position of selection is within a citation node', () => {
     setUpEditorWithSelection(
       editor,
-      `<p>Paragraph 1 <citation>Citation|</citation></p>
+      `<p>Paragraph 1 <citation>Citation|</citation>.</p>
        <p>Paragraph 2|</p>`,
     );
 

@@ -21,7 +21,7 @@ describe('Backspace keyboard command', () => {
   it('should block the event if the selection is not empty and starts in a citation node', () => {
     setUpEditorWithSelection(
       editor,
-      `<p>Paragraph 1 <citation>Citation|</citation></p>
+      `<p>Paragraph 1 <citation>Citation|</citation>.</p>
        <p>Paragraph 2|</p>`,
     );
 
