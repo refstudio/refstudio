@@ -17,6 +17,7 @@ pypdf = "^3.11.1"
 tenacity = "^8.2.2"
 strenum = "^0.4.15"
 semanticscholar = "^0.4.1"
+litestar = {extras = ["standard"], version = "^2.0.0rc1"}
 
 [tool.poetry.group.dev.dependencies]
 ipython = "^8.13.2"

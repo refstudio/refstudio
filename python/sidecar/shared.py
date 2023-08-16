@@ -8,7 +8,7 @@ from typing import List
 import pypdf
 from sidecar import settings
 
-from .typing import Author, Chunk, Reference, TextCompletionChoice
+from ._typing import Author, Chunk, Reference, TextCompletionChoice
 from .settings import logger
 
 logger = logger.getChild(__name__)

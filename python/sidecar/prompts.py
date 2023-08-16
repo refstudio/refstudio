@@ -1,10 +1,10 @@
-from sidecar import typing
-from sidecar.typing import Chunk, TextCompletionRequest
+from sidecar import _typing
+from sidecar._typing import Chunk, TextCompletionRequest
 
 
 def create_prompt_for_rewrite(
         text: str,
-        manner: typing.RewriteMannerType
+        manner: _typing.RewriteMannerType
     ) -> str:
     prompt = (
         f"Please rewrite the following text in a more {manner} manner. "

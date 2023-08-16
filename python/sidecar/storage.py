@@ -1,9 +1,9 @@
 import json
 import sys
 
-from sidecar import settings, typing
+from sidecar import _typing, settings
+from sidecar._typing import DeleteRequest, ReferenceUpdate
 from sidecar.settings import logger
-from sidecar.typing import DeleteRequest, ReferenceUpdate
 
 logger = logger.getChild(__name__)
 
@@ -35,10 +35,10 @@ class JsonStorage:
         for item in data:
             for k, v in item.items():
                 if k == "authors":
-                    authors = [typing.Author(**a) for a in v]
+                    authors = [_typing.Author(**a) for a in v]
                 elif k == "chunks":
-                    chunks = [typing.Chunk(**c) for c in v]
-            ref = typing.Reference(**item)
+                    chunks = [_typing.Chunk(**c) for c in v]
+            ref = _typing.Reference(**item)
             ref.authors = authors
             ref.chunks = chunks
             self.references.append(ref)
@@ -83,8 +83,8 @@ class JsonStorage:
             except KeyError:
                 msg = f"Unable to delete {filename}: not found in storage"
                 logger.warning(msg)
-                response = typing.DeleteStatusResponse(
-                    status=typing.ResponseStatus.ERROR,
+                response = _typing.DeleteStatusResponse(
+                    status=_typing.ResponseStatus.ERROR,
                     message=msg
                 )
                 sys.stdout.write(response.json())
@@ -93,13 +93,13 @@ class JsonStorage:
         self.references = list(refs.values())
         self.save()
 
-        response = typing.DeleteStatusResponse(
-            status=typing.ResponseStatus.OK,
+        response = _typing.DeleteStatusResponse(
+            status=_typing.ResponseStatus.OK,
             message=""
         )
         sys.stdout.write(response.json())
 
-    def update(self, reference_update: typing.ReferenceUpdate):
+    def update(self, reference_update: _typing.ReferenceUpdate):
         """
         Update a Reference in storage with the target reference.
         This is used when the client has updated the reference in the UI.
@@ -120,8 +120,8 @@ class JsonStorage:
         except KeyError:
             msg = f"Unable to update {source_filename}: not found in storage"
             logger.error(msg)
-            response = typing.UpdateStatusResponse(
-                status=typing.ResponseStatus.ERROR,
+            response = _typing.UpdateStatusResponse(
+                status=_typing.ResponseStatus.ERROR,
                 message=msg
             )
             sys.stdout.write(response.json())
@@ -133,8 +133,8 @@ class JsonStorage:
         self.references = list(refs.values())
         self.save()
 
-        response = typing.UpdateStatusResponse(
-            status=typing.ResponseStatus.OK,
+        response = _typing.UpdateStatusResponse(
+            status=_typing.ResponseStatus.OK,
             message=""
         )
         sys.stdout.write(response.json())

@@ -1,8 +1,15 @@
 import inspect
 import json
 
-from sidecar import chat, cli, ingest, rewrite, storage, search
-from sidecar.typing import CliCommands
+from litestar import Litestar
+from sidecar import chat, cli, http, ingest, rewrite, search, storage
+from sidecar._typing import CliCommands
+
+app = Litestar([
+    http.index,
+    http.rewrite,
+    http.completion
+])
 
 if __name__ == '__main__':
     parser = cli.get_arg_parser()
