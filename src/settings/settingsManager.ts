@@ -1,7 +1,6 @@
 import { SettingsManager } from 'tauri-settings';
 import { Path, PathValue } from 'tauri-settings/dist/types/dot-notation';
 
-import { getSystemConfigurationsDir } from '../io/filesystem';
 import { readEnv } from '../io/readEnv';
 
 export type OpenAiManner = 'concise' | 'elaborate' | 'scholarly';
@@ -35,48 +34,52 @@ export interface SettingsSchema {
   };
 }
 
-let settingsManager: SettingsManager<SettingsSchema> | undefined;
+export type SettingsManagerView = Pick<
+  SettingsManager<SettingsSchema>,
+  'getCache' | 'setCache' | 'syncCache' | 'default'
+>;
+
+let settingsManager: SettingsManagerView | undefined;
 
 export const DEFAULT_OPEN_AI_CHAT_MODEL = 'gpt-3.5-turbo';
 
 export async function initSettings() {
   try {
-    settingsManager = new SettingsManager<SettingsSchema>(
-      {
-        project: {
-          currentDir: 'MIGRATE_FROM_GENERAL',
-        },
-        openAI: {
-          apiKey: await readEnv('OPENAI_API_KEY', ''),
-          chatModel: await readEnv('OPENAI_CHAT_MODEL', DEFAULT_OPEN_AI_CHAT_MODEL),
-          manner: (await readEnv('OPENAI_MANNER', 'scholarly')) as OpenAiManner,
-          temperature: parseFloat(await readEnv('OPENAI_TEMPERATURE', '0.7')),
-        },
-        sidecar: {
-          logging: {
-            active: (await readEnv('SIDECAR_ENABLE_LOGGING', 'false')).toLowerCase() === 'true',
-            path: await readEnv('SIDECAR_LOG_DIR', '/tmp'),
-          },
+    const settings: SettingsSchema = {
+      project: {
+        currentDir: 'MIGRATE_FROM_GENERAL',
+      },
+      openAI: {
+        apiKey: await readEnv('OPENAI_API_KEY', ''),
+        chatModel: await readEnv('OPENAI_CHAT_MODEL', DEFAULT_OPEN_AI_CHAT_MODEL),
+        manner: (await readEnv('OPENAI_MANNER', 'scholarly')) as OpenAiManner,
+        temperature: parseFloat(await readEnv('OPENAI_TEMPERATURE', '0.7')),
+      },
+      sidecar: {
+        logging: {
+          active: (await readEnv('SIDECAR_ENABLE_LOGGING', 'false')).toLowerCase() === 'true',
+          path: await readEnv('SIDECAR_LOG_DIR', '/tmp'),
         },
       },
-      {
-        dir: await getSystemConfigurationsDir(),
-        fileName: 'refstudio-settings.json',
-        prettify: true,
-      },
-    );
+    };
 
-    const configs = await settingsManager.initialize();
+    // settingsManager = new SettingsManager<SettingsSchema>(settings, {
+    //   dir: await getSystemConfigurationsDir(),
+    //   fileName: 'refstudio-settings.json',
+    //   prettify: true,
+    // });
+
+    const configs = settings; // await settingsManager.initialize();
 
     // Run retro-compatibility migration if required key is missing
-    if (configs.project.currentDir === 'MIGRATE_FROM_GENERAL') {
-      if (configs.general?.appDataDir && configs.general.projectName) {
-        setCachedSetting('project.currentDir', configs.general.appDataDir + configs.general.projectName);
-      } else {
-        setCachedSetting('project.currentDir', '');
-      }
-      await saveCachedSettings();
-    }
+    // if (configs.project.currentDir === 'MIGRATE_FROM_GENERAL') {
+    //   if (configs.general?.appDataDir && configs.general.projectName) {
+    //     setCachedSetting('project.currentDir', configs.general.appDataDir + configs.general.projectName);
+    //   } else {
+    //     setCachedSetting('project.currentDir', '');
+    //   }
+    //   await saveCachedSettings();
+    // }
 
     console.log('Settings initialized with success with', configs);
     console.log('openAI', configs.openAI);
