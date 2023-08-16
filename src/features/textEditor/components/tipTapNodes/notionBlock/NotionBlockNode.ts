@@ -1,4 +1,4 @@
-import { InputRule, Node } from '@tiptap/core';
+import { Node } from '@tiptap/core';
 import { EditorState, Plugin, PluginKey, Transaction } from '@tiptap/pm/state';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
 import { ReactNodeViewRenderer } from '@tiptap/react';
@@ -7,12 +7,22 @@ import { indent } from './commands/indent';
 import { joinBackward } from './commands/joinBackward';
 import { joinForward } from './commands/joinForward';
 import { splitBlock } from './commands/splitBlock';
-import { toggleBulletList } from './commands/toggleBulletList';
 import { toggleCollapsed } from './commands/toggleCollapsed';
+import { toggleOrderedList } from './commands/toggleOrderedList';
+import { toggleUnorderedList } from './commands/toggleUnorderedList';
 import { unindent } from './commands/unindent';
-import { chevronHandler } from './inputRuleHandlers/chevronHandler';
-import { dashHandler } from './inputRuleHandlers/dashHandler';
+import { createNotionBlockInputRule } from './inputRuleHandlers/createNotionBlockInputRule';
 import { NotionBlock } from './NotionBlock';
+import { orderedListPlugin } from './plugins/orderedListPlugin';
+import { unorderedListPlugin } from './plugins/unorderedListPlugin';
+
+declare module '@tiptap/core' {
+  interface Commands<ReturnType> {
+    notionBlock: {
+      toggleUnorderedList: () => ReturnType;
+    };
+  }
+}
 
 const placeholderPluginKey = new PluginKey<DecorationSet>('placeholder');
 const placeholderPlugin = new Plugin({
@@ -328,24 +338,25 @@ export const NotionBlockNode = Node.create({
     };
   },
 
-  addProseMirrorPlugins: () => [placeholderPlugin, hideHandlePlugin, collapsiblePlugin, collapsiblePlaceholderPlugin],
+  addProseMirrorPlugins: () => [
+    placeholderPlugin,
+    hideHandlePlugin,
+    collapsiblePlugin,
+    collapsiblePlaceholderPlugin,
+    orderedListPlugin,
+    unorderedListPlugin,
+  ],
 
-  addInputRules() {
-    return [
-      new InputRule({
-        find: /^> $/,
-        handler: chevronHandler.bind(this),
-      }),
-      new InputRule({
-        find: /^- $/,
-        handler: dashHandler.bind(this),
-      }),
-    ];
-  },
+  addInputRules: () => [
+    createNotionBlockInputRule(/^> $/, 'collapsible'),
+    createNotionBlockInputRule(/^- $/, 'unorderedList'),
+    createNotionBlockInputRule(/^(\d+|\w+)\. $/, 'orderedList'),
+  ],
 
   addCommands() {
     return {
-      toggleBulletList: () => toggleBulletList.bind(this),
+      toggleUnorderedList: () => toggleUnorderedList,
+      toggleOrderedList: () => toggleOrderedList.bind(this),
     };
   },
 });

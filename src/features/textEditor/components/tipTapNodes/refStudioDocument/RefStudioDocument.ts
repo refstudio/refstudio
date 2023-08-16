@@ -32,6 +32,15 @@ const selectionPlugin = new Plugin({
 
 export const RefStudioDocument = Document.extend({
   content: 'notionBlock* | codeBlock',
+  addKeyboardShortcuts: () => ({
+    'Mod-l': ({ editor }) => {
+      const { from } = editor.state.selection;
+      console.log(from);
+      console.log(editor.getHTML());
+      // console.log(getPreviousSiblingOrParent(editor.state.doc.resolve(from - 2)));
+      return true;
+    },
+  }),
   addProseMirrorPlugins: () => [selectionPlugin],
 });
 
