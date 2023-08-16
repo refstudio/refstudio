@@ -76,3 +76,4 @@ _env*ac
 *.patch
 *.rs
 *.icns
+*.py
