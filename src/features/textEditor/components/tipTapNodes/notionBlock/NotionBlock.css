@@ -94,7 +94,7 @@
   background: rgba(55, 53, 47, 0.08);
 }
 
-.notion-block .content.bullet-list > div > *:first-child {
+.notion-block .content.bullet-list-content > div > *:first-child {
   @apply list-item;
   @apply ml-7;
 }

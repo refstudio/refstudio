@@ -12,6 +12,12 @@ interface SerializedDocument {
   bibliography?: SerializedReferences;
 }
 
+function stringifyMetadata(metadata: Record<string, string>): string {
+  const metadataStrings = Object.entries(metadata).map(([key, value]) => `${key}: ${value}`);
+
+  return ['---', ...metadataStrings, '---'].join('\n') + '\n';
+}
+
 export class MarkdownSerializer {
   private editor: Editor;
   private referencesById: Record<string, ReferenceItem>;
@@ -111,12 +117,12 @@ export class MarkdownSerializer {
 
     const documentTitle = doc.child(0).textContent;
 
-    const markdownContent = [this.notionBlocksToMarkdown(notionBlocks)];
+    let markdownContent = this.notionBlocksToMarkdown(notionBlocks);
 
-    const metadata = ['---', `title: ${documentTitle}`, '---'];
+    const metadata: Record<string, string> = { title: documentTitle };
 
     if (this.usedReferenceIds.size === 0) {
-      return { markdownContent: [...metadata, '', ...markdownContent].join('\n') };
+      return { markdownContent: `${stringifyMetadata(metadata)}\n${markdownContent}` };
     }
 
     // Export references as .bib
@@ -124,12 +130,12 @@ export class MarkdownSerializer {
       [...this.usedReferenceIds.values()].map((referenceId) => this.referencesById[referenceId]).filter(Boolean),
     );
 
-    metadata.splice(2, 0, `bibliography: ${fileName}.bib`);
+    metadata.bibliography = `${fileName}.bib`;
     // This is for Quarto (cf. https://quarto.org/docs/get-started/authoring/text-editor.html#citations)
-    markdownContent.push('', '## References');
+    markdownContent += '\n\n## References';
 
     return {
-      markdownContent: [...metadata, '', ...markdownContent].join('\n'),
+      markdownContent: `${stringifyMetadata(metadata)}\n${markdownContent}`,
       bibliography,
     };
   }

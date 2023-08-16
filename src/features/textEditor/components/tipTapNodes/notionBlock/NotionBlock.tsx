@@ -16,7 +16,7 @@ export function NotionBlock({ node }: NotionBlockProps) {
         <div className="drag-handle" contentEditable="false" data-drag-handle />
         <NodeViewContent
           className={cx('content', {
-            'bullet-list': node.attrs.type === 'bulletList',
+            'bullet-list-content': node.attrs.type === 'bulletList',
           })}
         />
       </div>
