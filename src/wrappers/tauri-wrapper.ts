@@ -31,16 +31,32 @@ interface FakeDir {
   type: 'dir';
 }
 type FakeNode = FakeFile | FakeDir;
-const fs = new Map<string, FakeNode>();
+
+type NormalizedPath = string & { _brand: 'normalized' };
+// Remove some "warts" from paths, e.g. "//"
+function normalizePath(path: string): NormalizedPath {
+  let prefix = '';
+  if (path.startsWith('/')) {
+    prefix = '/';
+    path = path.slice(1);
+  }
+  return (prefix +
+    path
+      .split('/')
+      .filter((x) => !!x)
+      .join('/')) as NormalizedPath;
+}
+const fs = new Map<NormalizedPath, FakeNode>();
+
 export const createDir: typeof tauriFs.createDir = (dir, options) => {
   if (!options?.recursive) {
     throw new Error('Only recursive creatDir is implemented');
   }
-  fs.set(dir, { type: 'dir' });
+  fs.set(normalizePath(dir), { type: 'dir' });
   return Promise.resolve();
 };
 
-export const exists: typeof tauriFs.exists = (file) => Promise.resolve(fs.has(file));
+export const exists: typeof tauriFs.exists = (file) => Promise.resolve(fs.has(normalizePath(file)));
 
 export const readBinaryFile: typeof tauriFs.readBinaryFile = async (filePath) => {
   const f = await readTextFile(filePath);
@@ -48,7 +64,7 @@ export const readBinaryFile: typeof tauriFs.readBinaryFile = async (filePath) =>
 };
 
 export const readTextFile: typeof tauriFs.readTextFile = (filePath) => {
-  const f = fs.get(filePath);
+  const f = fs.get(normalizePath(filePath));
   if (!f) {
     throw new Error(`File does not exist: ${filePath}`);
   }
@@ -59,6 +75,7 @@ export const readTextFile: typeof tauriFs.readTextFile = (filePath) => {
 };
 
 export const readDir: typeof tauriFs.readDir = async (dir, options) => {
+  dir = normalizePath(dir);
   const entries: tauriFs.FileEntry[] = [];
   for (const [path, node] of fs.entries()) {
     if (path.startsWith(dir) && path !== dir) {
@@ -76,6 +93,7 @@ export const removeDir: typeof tauriFs.removeDir = (dir, options) => {
   if (!options?.recursive) {
     throw new Error('Only recursive removeDir is available');
   }
+  dir = normalizePath(dir);
   for (const path of fs.keys()) {
     if (path.startsWith(dir)) {
       fs.delete(path);
@@ -88,7 +106,7 @@ export const removeFile: typeof tauriFs.removeFile = (filePath, options) => {
   if (options) {
     throw new Error('Not implemented.');
   }
-  fs.delete(filePath);
+  fs.delete(normalizePath(filePath));
   return Promise.resolve();
 };
 
@@ -98,7 +116,7 @@ export const writeTextFile: typeof tauriFs.writeTextFile = (filePathOrObj, conte
   }
   const filePath = typeof filePathOrObj === 'object' ? filePathOrObj.path : filePathOrObj;
   const contents = typeof filePathOrObj === 'object' ? filePathOrObj.contents : (contentsOrNone as string);
-  fs.set(filePath, { type: 'file', contents });
+  fs.set(normalizePath(filePath), { type: 'file', contents });
   return Promise.resolve();
 };
 
@@ -109,7 +127,7 @@ export const writeBinaryFile: typeof tauriFs.writeBinaryFile = (filePathOrObj, c
   const filePath = typeof filePathOrObj === 'object' ? filePathOrObj.path : filePathOrObj;
   const contents =
     typeof filePathOrObj === 'object' ? filePathOrObj.contents : (contentsOrNone as tauriFs.BinaryFileContents);
-  fs.set(filePath, { type: 'file', contents: contents as string /* this is a lie */ });
+  fs.set(normalizePath(filePath), { type: 'file', contents: contents as string /* this is a lie */ });
   return Promise.resolve();
 };
 
@@ -117,15 +135,16 @@ export const renameFile: typeof tauriFs.renameFile = (oldPath, newPath, options)
   if (options) {
     throw new Error('Not implemented');
   }
-  const oldFile = fs.get(oldPath);
+  const normOldPath = normalizePath(oldPath);
+  const oldFile = fs.get(normOldPath);
   if (!oldFile) {
     throw new Error(`Tried to rename ${oldPath} which does not exist.`);
   }
   if (oldFile.type === 'dir') {
     throw new Error('Renaming directores is not implemented');
   }
-  fs.delete(oldPath);
-  fs.set(newPath, oldFile);
+  fs.delete(normOldPath);
+  fs.set(normalizePath(newPath), oldFile);
   return Promise.resolve();
 };
 
