@@ -149,7 +149,7 @@ export const renameFile: typeof tauriFs.renameFile = (oldPath, newPath, options)
 };
 
 // # @tauri-apps/api/event
-const listeners = new Map<string, tauriEvent.EventCallback<any>>();
+const listeners = new Map<string, tauriEvent.EventCallback<unknown>>();
 
 export const emit: typeof tauriEvent.emit = (event, payload) => {
   console.log('emit', event, payload);
@@ -161,11 +161,7 @@ export const emit: typeof tauriEvent.emit = (event, payload) => {
 };
 
 export const listen: typeof tauriEvent.listen = (event, callback) => {
-  // console.log('listen', event);
-  // if (listeners.has(event)) {
-  //   console.log('multiple listeners for', event);
-  // }
-  listeners.set(event, callback);
+  listeners.set(event, callback as tauriEvent.EventCallback<unknown>);
   return Promise.resolve(() => {
     /* no op */
   });

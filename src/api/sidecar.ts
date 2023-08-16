@@ -6,7 +6,14 @@ import { getCachedSetting } from '../settings/settingsManager';
 import { CliCommands } from './types';
 
 class Command {
-  constructor(command: string, args: string[], options?: any) {}
+  command: string;
+  args: string[];
+  options: unknown;
+  constructor(command: string, args: string[], options?: unknown) {
+    this.command = command;
+    this.args = args;
+    this.options = options;
+  }
 
   execute: typeof TauriCommand.prototype.execute = () =>
     Promise.resolve({
