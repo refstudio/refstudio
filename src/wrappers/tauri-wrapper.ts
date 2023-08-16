@@ -161,6 +161,7 @@ export const emit: typeof tauriEvent.emit = (event, payload) => {
   }
   return Promise.resolve();
 };
+(window as any).emitEvent = emit;
 
 export const listen: typeof tauriEvent.listen = (event, callback) => {
   listeners.set(event, callback as tauriEvent.EventCallback<unknown>);
