@@ -22,10 +22,11 @@ export type FileEntry = FileFileEntry | FolderFileEntry;
 
 export function getFileFileEntryFromPath(filePath: string): FileFileEntry {
   const name = splitRefStudioPath(filePath).pop() ?? '';
+  const nameParts = name.split('.');
   return {
     path: filePath,
     name,
-    fileExtension: name.split('.').pop() ?? '',
+    fileExtension: nameParts.length > 1 ? nameParts[nameParts.length - 1].toLowerCase() : '',
     isDotfile: name.startsWith('.'),
     isFile: true,
     isFolder: false,

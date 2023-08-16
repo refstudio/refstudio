@@ -25,6 +25,7 @@ export function TipTapView({ file, activeEditorContentAtoms }: TipTapViewProps) 
   return (
     <TipTapEditor
       editorContent={editorContent}
+      editorId={editorId}
       isActive={editorId === activeEditorId}
       saveFileInMemory={saveFileInMemory}
       updateFileBuffer={updateFileBuffer}

@@ -7,11 +7,12 @@ import { FileExplorerEntry, FileExplorerFileEntry, FileExplorerFolderEntry } fro
 
 export function makeFileAndEditor(name: string, parentPath = ''): { fileEntry: FileFileEntry; editorData: EditorData } {
   const filePath = `${parentPath}/${name}`;
+  const nameParts = name.split('.');
   return {
     fileEntry: {
       name,
       path: filePath,
-      fileExtension: name.split('.').pop() ?? '',
+      fileExtension: nameParts.length > 1 ? nameParts[nameParts.length - 1].toLowerCase() : '',
       isFolder: false,
       isDotfile: name.startsWith('.'),
       isFile: true,

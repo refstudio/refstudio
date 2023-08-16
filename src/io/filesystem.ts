@@ -1,3 +1,4 @@
+import { save } from '@tauri-apps/api/dialog';
 import {
   createDir,
   exists,
@@ -16,10 +17,12 @@ import { JSONContent } from '@tiptap/core';
 
 import { EditorContent } from '../atoms/types/EditorContent';
 import { FileEntry, FileFileEntry } from '../atoms/types/FileEntry';
+import { MarkdownSerializer } from '../features/textEditor/components/tipTapNodes/refStudioDocument/serialization/MarkdownSerializer';
 import { notifyError } from '../notifications/notifications';
 import { FILE2_CONTENT, FILE3_CONTENT, INITIAL_CONTENT } from './filesystem.sample-content';
 
 const UPLOADS_DIR = 'uploads';
+const EXPORTS_DIR = 'exports';
 
 // #####################################################################################
 // Top Level PATH API
@@ -104,6 +107,10 @@ export function getSeparator() {
 // #####################################################################################
 export function getUploadsDir() {
   return makeRefStudioPath(UPLOADS_DIR);
+}
+
+export function getExportsDir() {
+  return makeRefStudioPath(EXPORTS_DIR);
 }
 
 export function makeUploadPath(filename: string) {
@@ -223,11 +230,11 @@ async function convertTauriFileEntryToFileEntry(entry: TauriFileEntry): Promise<
       children: await Promise.all(entry.children!.map(convertTauriFileEntryToFileEntry)),
     };
   } else {
-    const fileExtension = name.split('.').pop()?.toLowerCase() ?? '';
+    const nameParts = name.split('.');
     return {
       name,
       path: refStudioPath,
-      fileExtension,
+      fileExtension: nameParts.length > 1 ? nameParts[nameParts.length - 1].toLowerCase() : '',
       isFolder,
       isDotfile,
       isFile: !isFolder,
@@ -270,10 +277,6 @@ export async function writeFileContent(relativePath: string, textContent: string
 export async function readFileContent(file: FileFileEntry): Promise<EditorContent> {
   const systemPath = await getSystemPath(file.path);
   switch (file.fileExtension) {
-    case 'xml': {
-      const textContent = await readTextFile(systemPath);
-      return { type: 'xml', textContent };
-    }
     case 'json': {
       const textContent = await readTextFile(systemPath);
       return { type: 'json', textContent };
@@ -282,7 +285,8 @@ export async function readFileContent(file: FileFileEntry): Promise<EditorConten
       const binaryContent = await readBinaryFile(systemPath);
       return { type: 'pdf', binaryContent };
     }
-    default: {
+    case 'refstudio':
+    case '': {
       const textContent = await readTextFile(systemPath);
       try {
         const jsonContent = JSON.parse(textContent) as JSONContent;
@@ -291,6 +295,10 @@ export async function readFileContent(file: FileFileEntry): Promise<EditorConten
         notifyError('Invalid content. Cannot open file:', file.path);
         return { type: 'refstudio', jsonContent: [] };
       }
+    }
+    default: {
+      const textContent = await readTextFile(systemPath);
+      return { type: 'text', textContent };
     }
   }
 }
@@ -323,3 +331,63 @@ export async function renameFile(relativePath: string, newName: string): RenameF
   }
 }
 type RenameFileResult = Promise<{ success: false } | { success: true; newPath: string }>;
+
+export async function saveAsMarkdown(markdownSerializer: MarkdownSerializer, exportedFilePath: string) {
+  try {
+    const exportsDir = getExportsDir();
+    const systemExportsDir = await getSystemPath(exportsDir);
+    if (!(await exists(systemExportsDir))) {
+      await createDir(systemExportsDir);
+    }
+
+    const splittedPath = exportedFilePath.split(sep);
+    const fileName = splittedPath.pop();
+    if (!fileName) {
+      return;
+    }
+    let markdownFileName: string;
+    if (fileName.includes('.')) {
+      const splittedFileName = fileName.split('.');
+      splittedFileName.pop();
+      markdownFileName = `${splittedFileName.join('.')}.md`;
+    } else {
+      markdownFileName = `${fileName}.md`;
+    }
+
+    const markdownFilePath = [systemExportsDir, markdownFileName].join(sep);
+
+    const filePath = await save({
+      title: 'Export file as Markdown',
+      defaultPath: await getSystemPath(markdownFilePath),
+      filters: [{ name: 'Markdown', extensions: ['md'] }],
+    });
+
+    if (filePath) {
+      const filePathParts = filePath.split(sep);
+      const newFileName = filePathParts.pop();
+      if (newFileName) {
+        const newFileNameParts = newFileName.split('.');
+        const newFileNameWithoutExtension =
+          newFileNameParts.length > 1 ? newFileNameParts.slice(0, -1).join('.') : newFileName;
+
+        const serializedContent = markdownSerializer.serialize(newFileNameWithoutExtension);
+
+        if (!serializedContent.bibliography) {
+          return writeTextFile(filePath, serializedContent.markdownContent);
+        }
+
+        const bibliographyFilePath = [
+          ...filePathParts,
+          `${newFileNameWithoutExtension}.${serializedContent.bibliography.extension}`,
+        ].join(sep);
+
+        return Promise.all([
+          writeTextFile(filePath, serializedContent.markdownContent),
+          writeTextFile(bibliographyFilePath, serializedContent.bibliography.textContent),
+        ]);
+      }
+    }
+  } catch (err) {
+    console.error('Error', err);
+  }
+}
