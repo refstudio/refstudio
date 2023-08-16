@@ -1,5 +1,6 @@
 import { SettingsManager } from 'tauri-settings';
 import { Path, PathValue } from 'tauri-settings/dist/types/dot-notation';
+import { getDotNotation, setDotNotation } from 'tauri-settings/dist/utils/dot-notation';
 
 import { readEnv } from '../io/readEnv';
 
@@ -70,6 +71,16 @@ export async function initSettings() {
     // });
 
     const configs = settings; // await settingsManager.initialize();
+
+    settingsManager = {
+      default: settings,
+      getCache: (key) => getDotNotation(settings, key)!,
+      setCache: (key, value) => {
+        setDotNotation(settings, key, value);
+        return value;
+      },
+      syncCache: () => Promise.resolve(settings),
+    };
 
     // Run retro-compatibility migration if required key is missing
     // if (configs.project.currentDir === 'MIGRATE_FROM_GENERAL') {
