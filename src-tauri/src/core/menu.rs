@@ -2,24 +2,6 @@ use tauri::utils::assets::EmbeddedAssets;
 use tauri::{AboutMetadata, Context, CustomMenuItem, Menu, MenuItem, Submenu, WindowMenuEvent};
 pub struct AppMenu {}
 
-const MENU_SETTINGS: &str = /*            */ "refstudio://menu/settings";
-const MENU_REFERENCES_OPEN: &str = /*     */ "refstudio://menu/references/open";
-const MENU_REFERENCES_UPLOAD: &str = /*   */ "refstudio://menu/references/upload";
-const MENU_FILE_SAVE: &str = /*           */ "refstudio://menu/file/save";
-const MENU_FILE_NEW: &str = /*            */ "refstudio://menu/file/new";
-const MENU_FILE_SAVE_AS_MD: &str = /*     */ "refstudio://menu/file/markdown";
-const MENU_FILE_CLOSE: &str = /*          */ "refstudio://menu/file/close";
-const MENU_FILE_PROJECT_NEW: &str = /*    */ "refstudio://menu/file/project/new";
-const MENU_FILE_PROJECT_OPEN: &str = /*   */ "refstudio://menu/file/project/open";
-const MENU_FILE_PROJECT_CLOSE: &str = /*  */ "refstudio://menu/file/project/close";
-const MENU_FILE_CLOSE_ALL: &str = /*      */ "refstudio://menu/file/close/all";
-const MENU_VIEW_NOTIFICATIONS: &str = /*  */ "refstudio://menu/view/notifications";
-
-#[cfg(any(debug_assertions, feature = "devtools"))]
-const MENU_DEBUG_CONSOLE_TOGGLE: &str = /**/ "refstudio://menu/debug/console/toggle";
-#[cfg(any(debug_assertions, feature = "devtools"))]
-const MENU_DEBUG_CONSOLE_CLEAR: &str = /* */ "refstudio://menu/debug/console/clear";
-
 impl AppMenu {
     pub fn get_menu(context: &Context<EmbeddedAssets>) -> Menu {
         let name = &context.package_info().name;
@@ -30,7 +12,8 @@ impl AppMenu {
                 .add_native_item(MenuItem::About(name.into(), AboutMetadata::new()))
                 .add_native_item(MenuItem::Separator)
                 .add_item(
-                    CustomMenuItem::new(MENU_SETTINGS, "Settings").accelerator("cmdOrControl+,"),
+                    CustomMenuItem::new("refstudio://menu/settings", "Settings")
+                        .accelerator("cmdOrControl+,"),
                 )
                 .add_native_item(MenuItem::Separator)
                 .add_native_item(MenuItem::Services)
@@ -44,27 +27,37 @@ impl AppMenu {
             "File",
             Menu::new()
                 .add_item(
-                    CustomMenuItem::new(MENU_FILE_NEW, "New File").accelerator("cmdOrControl+N"),
+                    CustomMenuItem::new("refstudio://menu/file/new", "New File")
+                        .accelerator("cmdOrControl+N"),
                 )
-                .add_item(CustomMenuItem::new(MENU_FILE_SAVE, "Save").accelerator("cmdOrControl+S"))
+                .add_item(
+                    CustomMenuItem::new("refstudio://menu/file/save", "Save")
+                        .accelerator("cmdOrControl+S"),
+                )
                 .add_item(CustomMenuItem::new(
-                    MENU_FILE_SAVE_AS_MD,
+                    "refstudio://menu/file/markdown",
                     "Save File as Markdown...",
                 ))
                 .add_native_item(MenuItem::Separator)
-                .add_item(CustomMenuItem::new(MENU_FILE_PROJECT_NEW, "New Project"))
-                .add_item(CustomMenuItem::new(MENU_FILE_PROJECT_OPEN, "Open Project"))
                 .add_item(CustomMenuItem::new(
-                    MENU_FILE_PROJECT_CLOSE,
+                    "refstudio://menu/file/project/new",
+                    "New Project",
+                ))
+                .add_item(CustomMenuItem::new(
+                    "refstudio://menu/file/project/open",
+                    "Open Project",
+                ))
+                .add_item(CustomMenuItem::new(
+                    "refstudio://menu/file/project/close",
                     "Close Project",
                 ))
                 .add_native_item(MenuItem::Separator)
                 .add_item(
-                    CustomMenuItem::new(MENU_FILE_CLOSE, "Close Editor")
+                    CustomMenuItem::new("refstudio://menu/file/close", "Close Editor")
                         .accelerator("cmdOrControl+W"),
                 )
                 .add_item(CustomMenuItem::new(
-                    MENU_FILE_CLOSE_ALL,
+                    "refstudio://menu/file/close/all",
                     "Close All Editors",
                 )),
         );
@@ -85,9 +78,13 @@ impl AppMenu {
             "References",
             Menu::new()
                 .add_item(
-                    CustomMenuItem::new(MENU_REFERENCES_OPEN, "Open").accelerator("cmdOrControl+R"),
+                    CustomMenuItem::new("refstudio://menu/references/open", "Open")
+                        .accelerator("cmdOrControl+R"),
                 )
-                .add_item(CustomMenuItem::new(MENU_REFERENCES_UPLOAD, "Upload...")),
+                .add_item(CustomMenuItem::new(
+                    "refstudio://menu/references/upload",
+                    "Upload...",
+                )),
         );
 
         let view_menu = Submenu::new(
@@ -95,7 +92,7 @@ impl AppMenu {
             Menu::new()
                 .add_native_item(MenuItem::EnterFullScreen)
                 .add_item(
-                    CustomMenuItem::new(MENU_VIEW_NOTIFICATIONS, "Notifications")
+                    CustomMenuItem::new("refstudio://menu/view/notifications", "Notifications")
                         .accelerator("F11"),
                 ),
         );
@@ -122,12 +119,18 @@ impl AppMenu {
                 "Debug",
                 Menu::new()
                     .add_item(
-                        CustomMenuItem::new(MENU_DEBUG_CONSOLE_TOGGLE, "Toggle Console")
-                            .accelerator("F12"),
+                        CustomMenuItem::new(
+                            "refstudio://menu/debug/console/toggle",
+                            "Toggle Console",
+                        )
+                        .accelerator("F12"),
                     )
                     .add_item(
-                        CustomMenuItem::new(MENU_DEBUG_CONSOLE_CLEAR, "Clear Console")
-                            .accelerator("Shift+F12"),
+                        CustomMenuItem::new(
+                            "refstudio://menu/debug/console/clear",
+                            "Clear Console",
+                        )
+                        .accelerator("Shift+F12"),
                     ),
             );
 
@@ -143,7 +146,7 @@ impl AppMenu {
 
         match event.menu_item_id() {
             #[cfg(any(debug_assertions, feature = "devtools"))]
-            MENU_DEBUG_CONSOLE_TOGGLE => {
+            "refstudio://menu/debug/console/toggle" => {
                 if event.window().is_devtools_open() {
                     event.window().close_devtools();
                 } else {
