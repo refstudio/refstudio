@@ -1,11 +1,11 @@
 import { Command } from '@tiptap/react';
 
-import { getTopNodes } from '../utils/getTopNodes';
+import { getTopLevelNodes } from '../utils/getTopLevelNodes';
 import { isNotionBlockTypeActive } from '../utils/isNotionBlockTypeActive';
 
 export const toggleOrderedList: Command = ({ tr, dispatch }) => {
   if (dispatch) {
-    const topNodes = getTopNodes(tr.selection);
+    const topNodes = getTopLevelNodes(tr.selection);
     const orderedListActive = isNotionBlockTypeActive(tr.selection, 'orderedList');
 
     topNodes.forEach((nodeData) => {

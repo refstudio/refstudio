@@ -1,6 +1,6 @@
 import { Selection } from '@tiptap/pm/state';
 
-import { getTopNodes } from './getTopNodes';
+import { getTopLevelNodes } from './getTopLevelNodes';
 
 /**
  * Returns whether a given notion block type is active in selection.
@@ -10,5 +10,5 @@ import { getTopNodes } from './getTopNodes';
  * @returns
  */
 export function isNotionBlockTypeActive(selection: Selection, type: string): boolean {
-  return getTopNodes(selection).every((nodeData) => nodeData.node.attrs.type === type);
+  return getTopLevelNodes(selection).every((nodeData) => nodeData.node.attrs.type === type);
 }

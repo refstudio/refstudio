@@ -18,7 +18,7 @@ export function getParent(resolvedPos: ResolvedPos): NodeData | null {
     return null;
   }
 
-  const parentIndex = resolvedPos.indexAfter(-1);
+  const parentIndex = resolvedPos.indexAfter(-1) - 1;
   const parentPos = resolvedPos.posAtIndex(parentIndex, -1);
 
   return { node: parent, resolvedPos: resolvedPos.node(0).resolve(parentPos) };
