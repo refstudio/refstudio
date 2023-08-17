@@ -7,8 +7,8 @@ from pathlib import Path
 
 import grobid_tei_xml
 from dotenv import load_dotenv
-from grobid_client.grobid_client import (GrobidClient,
-                                         ServerUnavailableException)
+from grobid_client.grobid_client import GrobidClient, ServerUnavailableException
+
 from sidecar import shared, typing
 
 from .settings import REFERENCES_JSON_PATH, UPLOADS_DIR, logger
@@ -30,13 +30,17 @@ def run_ingest(args: IngestRequest):
 def get_statuses():
     storage = JsonStorage(REFERENCES_JSON_PATH)
     status_fetcher = IngestStatusFetcher(storage=storage)
-    status_fetcher.emit_statuses()
+    response = status_fetcher.emit_statuses()
+    return response
+
 
 def get_references(args: IngestRequest):
     pdf_directory = Path(args.pdf_directory)
     ingest = PDFIngestion(input_dir=pdf_directory)
     response = ingest.create_ingest_response()
     sys.stdout.write(response.json())
+    return response
+
 
 class PDFIngestion:
 
@@ -527,7 +531,7 @@ class IngestStatusFetcher:
             reference_statuses=reference_statuses
         )
         sys.stdout.write(response.json())
-        return
+        return response
 
     def _handle_missing_references_json(self) -> list[typing.ReferenceStatus]:
         """
@@ -580,23 +584,23 @@ class IngestStatusFetcher:
         except FileNotFoundError as e:
             logger.warning(e)
             statuses = self._handle_missing_references_json()
-            self._emit_ingest_status_response(
+            response = self._emit_ingest_status_response(
                 response_status=typing.ResponseStatus.OK,
                 reference_statuses=statuses
             )
-            return
+            return response
         except Exception as e:
             logger.error(f"Error loading references.json: {e}")
-            self._emit_ingest_status_response(
+            response = self._emit_ingest_status_response(
                 response_status=typing.ResponseStatus.ERROR,
                 reference_statuses=[]
             )
-            return
+            return response
 
         statuses = self._compare_uploads_against_references_json()
-        self._emit_ingest_status_response(
+        response = self._emit_ingest_status_response(
             response_status=typing.ResponseStatus.OK,
             reference_statuses=statuses
         )
-        return
+        return response
 

@@ -1,7 +1,7 @@
 import inspect
 import json
 
-from sidecar import chat, cli, ingest, rewrite, storage, search
+from sidecar import chat, cli, ingest, rewrite, search, storage
 from sidecar.typing import CliCommands
 
 if __name__ == '__main__':
