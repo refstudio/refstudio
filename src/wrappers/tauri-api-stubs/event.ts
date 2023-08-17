@@ -12,6 +12,7 @@ export const emit: typeof tauriEvent.emit = (event, payload) => {
   }
   return Promise.resolve();
 };
+// Included to allow simulation of events from the dev tools console.
 (window as any).emitEvent = emit;
 
 export const listen: typeof tauriEvent.listen = (event, callback) => {
