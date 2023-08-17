@@ -44,12 +44,12 @@ export const INITIAL_CONTENT = JSON.stringify({
     },
     {
       type: 'notionBlock',
-      attrs: { type: 'bulletList', collapsed: false },
+      attrs: { type: 'unorderedList', collapsed: false },
       content: [{ type: 'paragraph', content: [{ type: 'text', text: 'That’s a bullet list with one …' }] }],
     },
     {
       type: 'notionBlock',
-      attrs: { type: 'bulletList', collapsed: false },
+      attrs: { type: 'unorderedList', collapsed: false },
       content: [{ type: 'paragraph', content: [{ type: 'text', text: '… or two list items.' }] }],
     },
     {

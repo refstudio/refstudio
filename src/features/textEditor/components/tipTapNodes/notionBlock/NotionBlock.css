@@ -94,7 +94,29 @@
   background: rgba(55, 53, 47, 0.08);
 }
 
-.notion-block .content.bullet-list-content > div > *:first-child {
+.notion-block .unordered-list-item {
   @apply list-item;
-  @apply ml-7;
+  @apply list-inside;
+  @apply ml-[11px];
+}
+.notion-block .unordered-list-item.circle {
+  list-style-type: circle;
+}
+.notion-block .unordered-list-item.square {
+  list-style-type: square;
+}
+
+.notion-block .ordered-list-item::before {
+  transform: translateX(-100%);
+  position: absolute;
+  content: counter(counter) '. ';
+}
+.notion-block .ordered-list-item {
+  @apply ml-[26px];
+}
+.notion-block .ordered-list-item.alpha::before {
+  content: counter(counter, lower-alpha) '. ';
+}
+.notion-block .ordered-list-item.roman::before {
+  content: counter(counter, lower-roman) '. ';
 }

@@ -78,13 +78,20 @@ export class MarkdownSerializer {
     let addEmptyLine = !isList;
 
     nodes.forEach((node, nodeIndex) => {
-      const isCollapsible = node.attrs.type === 'collapsible' || node.attrs.type === 'bulletList';
+      const isOrderedList = node.attrs.type === 'orderedList';
+      const isCollapsible = node.attrs.type === 'collapsible' || node.attrs.type === 'unorderedList' || isOrderedList;
 
       if ((nodeIndex > 0 || indentLevel > 0) && (addEmptyLine || !isCollapsible)) {
         lines.push('');
       }
 
-      lines.push(' '.repeat(indentLevel * 4) + (isCollapsible ? '- ' : '') + this.inlineBlockToMarkdown(node.child(0)));
+      if (isOrderedList) {
+        lines.push(`${' '.repeat(indentLevel * 4)}1. ${this.inlineBlockToMarkdown(node.child(0))}`);
+      } else {
+        lines.push(
+          ' '.repeat(indentLevel * 4) + (isCollapsible ? '- ' : '') + this.inlineBlockToMarkdown(node.child(0)),
+        );
+      }
 
       if (node.childCount > 1) {
         const content: Node[] = [];

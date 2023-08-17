@@ -300,7 +300,7 @@ ${'#'.repeat(headingLevel)} Hello world!`,
       Title
     </h1>
   </notionblock>
-  <notionblock type='bulletList'>
+  <notionblock type='unorderedList'>
       <paragraph>
         Collapsible header
       </paragraph>
