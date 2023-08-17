@@ -56,11 +56,11 @@ export const readDir: typeof tauriFs.readDir = async (dir, options) => {
   dir = normalizePath(dir);
   const entries: tauriFs.FileEntry[] = [];
   for (const [path, node] of fs.entries()) {
-    if (path.startsWith(dir) && path !== dir) {
+    if (path.startsWith(dir) && path !== dir && !path.slice(dir.length + 1).includes('/')) {
       entries.push({
         path,
         name: path.split('/').slice(-1)[0],
-        children: node.type === 'dir' ? await readDir(path, options) : undefined,
+        children: node.type === 'dir' && options?.recursive ? await readDir(path, options) : undefined,
       });
     }
   }
@@ -125,4 +125,8 @@ export const renameFile: typeof tauriFs.renameFile = (oldPath, newPath, options)
   fs.set(normalizePath(newPath), oldFile);
   return Promise.resolve();
 };
-(window as any).getFileSystem = () => fs;
+// (window as any).getFileSystem = () => fs;
+
+export function resetInMemoryFsForTesting() {
+  fs.clear();
+}
