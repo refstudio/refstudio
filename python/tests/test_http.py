@@ -51,7 +51,7 @@ def test_references_update(monkeypatch, tmp_path):
         "source_filename": "some_file.pdf",
         "patch": {"data": {"citation_key": "reda2023"}}
     }
-    response = client.post("/api/sidecar/references/update", json=patch)
+    response = client.post("/api/sidecar/update", json=patch)
 
     assert response.status_code == 200
     assert response.json() == {
@@ -84,7 +84,7 @@ def test_references_delete(monkeypatch, tmp_path):
 
     client = TestClient(api)
     request = {"source_filenames": ["some_file.pdf"]}
-    response = client.post("/api/sidecar/references/delete", json=request)
+    response = client.post("/api/sidecar/delete", json=request)
 
     assert response.status_code == 200
     assert response.json() == {
@@ -105,7 +105,7 @@ def test_ai_rewrite_is_ok(monkeypatch, mock_call_model_is_ok):
     monkeypatch.setattr(Rewriter, "call_model", mock_call_model_is_ok)
 
     request = {"text": "This is a test"}
-    response = client.post("/api/sidecar/ai/rewrite", json=request)
+    response = client.post("/api/sidecar/rewrite", json=request)
 
     assert response.status_code == 200
     assert response.json() == {
@@ -124,7 +124,7 @@ def test_ai_rewrite_missing_required_request_params(monkeypatch, mock_call_model
     monkeypatch.setattr(Rewriter, "call_model", mock_call_model_is_ok)
 
     request = {"missing": "This is an invalid request"}
-    response = client.post("/api/sidecar/ai/rewrite", json=request)
+    response = client.post("/api/sidecar/rewrite", json=request)
 
     assert response.status_code == 422
     assert response.json() == {
@@ -141,7 +141,7 @@ def test_ai_completion_is_ok(monkeypatch, mock_call_model_is_ok):
     monkeypatch.setattr(Rewriter, "call_model", mock_call_model_is_ok)
 
     request = {"text": "This is a test"}
-    response = client.post("/api/sidecar/ai/completion", json=request)
+    response = client.post("/api/sidecar/completion", json=request)
 
     assert response.status_code == 200
     assert response.json() == {
@@ -159,7 +159,7 @@ def test_ai_completion_missing_required_request_params(monkeypatch, mock_call_mo
     monkeypatch.setattr(Rewriter, "call_model", mock_call_model_is_ok)
 
     request = {"missing": "This is an invalid request"}
-    response = client.post("/api/sidecar/ai/completion", json=request)
+    response = client.post("/api/sidecar/completion", json=request)
 
     assert response.status_code == 422
     assert response.json() == {
@@ -184,7 +184,7 @@ def test_ai_chat_is_ok(monkeypatch, mock_call_model_is_ok, tmp_path):
     monkeypatch.setattr(settings, "REFERENCES_JSON_PATH", mocked_path)
 
     request = {"text": "This is a test"}
-    response = client.post("/api/sidecar/ai/chat", json=request)
+    response = client.post("/api/sidecar/chat", json=request)
 
     assert response.status_code == 200
     assert response.json() == {
@@ -210,7 +210,7 @@ def test_ai_chat_missing_required_request_params(monkeypatch, mock_call_model_is
     monkeypatch.setattr(settings, "REFERENCES_JSON_PATH", mocked_path)
 
     request = {"missing": "This is an invalid request"}
-    response = client.post("/api/sidecar/ai/chat", json=request)
+    response = client.post("/api/sidecar/chat", json=request)
 
     assert response.status_code == 422
     assert response.json() == {
@@ -227,7 +227,7 @@ def test_search_s2_is_ok(monkeypatch, mock_search_paper):
     monkeypatch.setattr(search.Searcher, "search_func", mock_search_paper)
 
     request = {"query": "any-query-string-you-like"}
-    response = client.post("/api/sidecar/search/s2", json=request)
+    response = client.post("/api/sidecar/search", json=request)
 
     assert response.status_code == 200
     assert response.json() == {

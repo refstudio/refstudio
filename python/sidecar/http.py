@@ -30,55 +30,55 @@ async def sidecar_index():
     return {"message": "Hello World from the Sidecar API"}
 
 
-@sidecar_api.post("/references")
-async def get_references(req: IngestRequest) -> IngestResponse:
-    response = sidecar.ingest.get_references(req)
-    return response
-
-
-@sidecar_api.post("/references/upload")
+@sidecar_api.post("/ingest")
 async def upload() -> IngestResponse:
     # response = sidecar.ingest.run_ingest()
-    raise NotImplementedError("Upload is not yet implemented")
+    raise NotImplementedError("Ingest is not yet implemented")
 
 
-@sidecar_api.get("/references/status")
+@sidecar_api.get("/ingest_status")
 async def get_statuses() -> IngestStatusResponse:
     response = sidecar.ingest.get_statuses()
     return response
 
 
-@sidecar_api.post("/references/update")
+@sidecar_api.post("/ingest_references")
+async def get_references(req: IngestRequest) -> IngestResponse:
+    response = sidecar.ingest.get_references(req)
+    return response
+
+
+@sidecar_api.post("/update")
 async def update(req: ReferenceUpdate) -> UpdateStatusResponse:
     response = sidecar.storage.update_reference(req)
     return response
 
 
-@sidecar_api.post("/references/delete")
+@sidecar_api.post("/delete")
 async def delete(req: DeleteRequest) -> DeleteStatusResponse:
     response = sidecar.storage.delete_references(req)
     return response
 
 
-@sidecar_api.post("/ai/rewrite")
+@sidecar_api.post("/rewrite")
 async def rewrite(req: RewriteRequest) -> RewriteResponse:
     response = sidecar.rewrite.rewrite(req)
     return response
 
 
-@sidecar_api.post("/ai/completion")
+@sidecar_api.post("/completion")
 async def completion(req: TextCompletionRequest) -> TextCompletionResponse:
     response = sidecar.rewrite.complete_text(req)
     return response
 
 
-@sidecar_api.post("/ai/chat")
+@sidecar_api.post("/chat")
 async def chat(req: ChatRequest) -> ChatResponse:
     response = sidecar.chat.ask_question(req)
     return response
 
 
-@sidecar_api.post("/search/s2")
+@sidecar_api.post("/search")
 async def search(req: SearchRequest) -> SearchResponse:
     response = sidecar.search.search_s2(req)
     return response
