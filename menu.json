@@ -1,0 +1,91 @@
+{
+  "menus": [
+    {
+      "title": "",
+      "items": [
+        { "type": "native", "nativeMenuItem": "About" },
+        { "type": "separator" },
+        {
+          "type": "custom",
+          "id": "refstudio://menu/settings",
+          "title": "Settings",
+          "accelerator": "cmdOrControl+,"
+        },
+        { "type": "separator" },
+        { "type": "native", "nativeMenuItem": "Services" },
+        { "type": "native", "nativeMenuItem": "Hide" },
+        { "type": "native", "nativeMenuItem": "HideOthers" },
+        { "type": "separator" },
+        { "type": "native", "nativeMenuItem": "Quit" }
+      ]
+    },
+    {
+      "title": "File",
+      "items": [
+        {
+          "type": "custom",
+          "id": "refstudio://menu/file/new",
+          "title": "New File",
+          "accelerator": "cmdOrControl+N"
+        },
+        { "type": "custom", "id": "refstudio://menu/file/save", "title": "Save", "accelerator": "cmdOrControl+S" },
+        { "type": "custom", "id": "refstudio://menu/file/markdown", "title": "Save File as Markdown..." },
+        { "type": "separator" },
+        { "type": "custom", "id": "refstudio://menu/file/project/new", "title": "New Project" },
+        { "type": "custom", "id": "refstudio://menu/file/project/open", "title": "Open Project" },
+        { "type": "custom", "id": "refstudio://menu/file/project/close", "title": "Close Project" },
+        { "type": "separator" },
+        {
+          "type": "custom",
+          "id": "refstudio://menu/file/close",
+          "title": "Close Editor",
+          "accelerator": "cmdOrControl+W"
+        },
+        { "type": "custom", "id": "refstudio://menu/file/close/all", "title": "Close All Editors" }
+      ]
+    },
+    {
+      "title": "Edit",
+      "items": [
+        { "type": "native", "nativeMenuItem": "Undo" },
+        { "type": "native", "nativeMenuItem": "Redo" },
+        { "type": "separator" },
+        { "type": "native", "nativeMenuItem": "Cut" },
+        { "type": "native", "nativeMenuItem": "Copy" },
+        { "type": "native", "nativeMenuItem": "Paste" },
+        { "type": "native", "nativeMenuItem": "SelectAll" }
+      ]
+    },
+    {
+      "title": "References",
+      "items": [
+        {
+          "type": "custom",
+          "id": "refstudio://menu/references/open",
+          "title": "Open",
+          "accelerator": "cmdOrControl+R"
+        },
+        { "type": "custom", "id": "refstudio://menu/references/upload", "title": "Upload..." }
+      ]
+    },
+    {
+      "title": "View",
+      "items": [
+        { "type": "native", "nativeMenuItem": "EnterFullScreen" },
+        {
+          "type": "custom",
+          "id": "refstudio://menu/view/notifications",
+          "title": "Notifications",
+          "accelerator": "F11"
+        }
+      ]
+    },
+    {
+      "title": "Window",
+      "items": [
+        { "type": "native", "nativeMenuItem": "Minimize" },
+        { "type": "native", "nativeMenuItem": "Zoom" }
+      ]
+    }
+  ]
+}
