@@ -66,11 +66,7 @@ function formatOptionalParams(optionalParams: unknown[]) {
       if (typeof param === 'string') {
         return param;
       }
-      try {
-        return JSON.stringify(param, null, 2);
-      } catch (e) {
-        return '[complex object]';
-      }
+      return JSON.stringify(param, null, 2);
     })
     .join('\n');
   return output;

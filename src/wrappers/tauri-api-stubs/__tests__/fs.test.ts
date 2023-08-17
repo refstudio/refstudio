@@ -18,6 +18,19 @@ describe('in-memory fs', () => {
     `);
   });
 
+  it('should allow double-slashes', async () => {
+    await createDir('/path/to//dir', { recursive: true });
+    expect(await readDir('/path//to', { recursive: true })).toMatchInlineSnapshot(`
+      [
+        {
+          "children": [],
+          "name": "dir",
+          "path": "/path/to/dir",
+        },
+      ]
+    `);
+  });
+
   it('should create a file in a directory', async () => {
     await createDir('/path/to/dir', { recursive: true });
     await writeTextFile('/path/to/dir/file.txt', 'Hello World');

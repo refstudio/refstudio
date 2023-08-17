@@ -38,5 +38,3 @@ export const renameFile = import.meta.env.VITE_IS_WEB ? stubFs.renameFile : taur
 // @tauri-apps/api/event
 export const emit = import.meta.env.VITE_IS_WEB ? stubEvent.emit : tauriEvent.emit;
 export const listen = import.meta.env.VITE_IS_WEB ? stubEvent.listen : tauriEvent.listen;
-
-(window as any).fs = tauriFs;

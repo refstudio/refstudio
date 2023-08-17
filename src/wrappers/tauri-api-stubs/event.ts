@@ -5,7 +5,6 @@ import * as tauriEvent from '@tauri-apps/api/event';
 const listeners = new Map<string, tauriEvent.EventCallback<unknown>>();
 
 export const emit: typeof tauriEvent.emit = (event, payload) => {
-  console.log('emit', event, payload);
   const handler = listeners.get(event);
   if (handler) {
     handler({ event, payload, id: 0, windowLabel: 'refstudio' });
