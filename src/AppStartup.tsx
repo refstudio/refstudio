@@ -6,13 +6,13 @@ import { openProjectAtom } from './atoms/projectState';
 import { useAsyncEffect } from './hooks/useAsyncEffect';
 import { noop } from './lib/noop';
 import { notifyErr, notifyInfo } from './notifications/notifications';
-// import { interceptConsoleMessages } from './notifications/notifications.console';
+import { interceptConsoleMessages } from './notifications/notifications.console';
 import { getCachedSetting, initSettings } from './settings/settingsManager';
 import { invoke } from './wrappers/tauri-wrapper';
 
 // Note: Intercepting INFO, WARN and ERROR console.* in DEV mode
 if (import.meta.env.DEV) {
-  // interceptConsoleMessages(true, true, true);
+  interceptConsoleMessages(true, true, true);
 }
 
 export function AppStartup() {
