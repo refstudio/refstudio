@@ -1,3 +1,4 @@
+// THIS FILE IS GENERATED. Edit menu.json instead.
 use tauri::utils::assets::EmbeddedAssets;
 use tauri::{AboutMetadata, Context, CustomMenuItem, Menu, MenuItem, Submenu, WindowMenuEvent};
 pub struct AppMenu {}
@@ -5,7 +6,6 @@ pub struct AppMenu {}
 impl AppMenu {
     pub fn get_menu(context: &Context<EmbeddedAssets>) -> Menu {
         let name = &context.package_info().name;
-
         let app_menu = Submenu::new(
             "",
             Menu::new()
@@ -136,7 +136,6 @@ impl AppMenu {
 
             menu = menu.clone().add_submenu(debug_menu);
         }
-
         return menu;
     }
 

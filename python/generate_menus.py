@@ -1,6 +1,7 @@
 """Generate menu.rs and menu.tsx from menu.json"""
 
 import json
+import subprocess
 
 
 def rust_for_item(item):
@@ -116,5 +117,6 @@ if __name__ == '__main__':
     menus = menu_json['menus']
 
     menu_rs = generate_rust(menus)
-    with open('src-tauri/src/core/menu-gen.rs', 'w') as out:
+    with open('src-tauri/src/core/menu.rs', 'w') as out:
         out.write(menu_rs)
+    subprocess.check_output(['rustfmt', 'src-tauri/src/core/menu.rs'])
