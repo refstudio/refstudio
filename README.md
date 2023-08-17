@@ -80,7 +80,7 @@ yarn tauri:dev
 To develop the web version of RefStudio, run:
 
 ```bash
-yarn dev
+yarn dev:web
 ```
 
 and open http://localhost:1420/ in your browser.
