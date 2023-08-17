@@ -84,6 +84,8 @@ export async function initSettings() {
         fileName: 'refstudio-settings.json',
         prettify: true,
       });
+      settingsManager = tauriSettingsManager;
+
       configs = await tauriSettingsManager.initialize();
       // Run retro-compatibility migration if required key is missing
       if (configs.project.currentDir === 'MIGRATE_FROM_GENERAL') {
@@ -94,7 +96,6 @@ export async function initSettings() {
         }
         await saveCachedSettings();
       }
-      settingsManager = tauriSettingsManager;
     }
 
     console.log('Settings initialized with success with', configs);
