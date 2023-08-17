@@ -33,3 +33,39 @@ def mock_call_model_is_error(*args, **kwargs):
     def mock_call_model_response(*args, **kwargs):
         raise Exception("This is a mocked error")
     return mock_call_model_response
+
+
+@pytest.fixture
+def mock_search_paper(*args, **kwargs):
+    from sidecar.typing import ResponseStatus, S2SearchResult, SearchResponse
+
+    def mock_search_paper_response(*args, **kwargs):
+        response = SearchResponse(
+            status=ResponseStatus.OK,
+            message="",
+            results=[
+                S2SearchResult(
+                    title="Sample Paper Title",
+                    abstract="Sample Abstract",
+                    venue="Sample Venue",
+                    year=2021,
+                    paperId="sample-id-1",
+                    citationCount=10,
+                    openAccessPdf="https://sample1.pdf",
+                    authors=["author1", "author2", "author3"],
+                ),
+                S2SearchResult(
+                    title="Sample Paper Title 2",
+                    abstract="Sample Abstract 2",
+                    venue="Sample Venue 2",
+                    year=2022,
+                    paperId="sample-id-2",
+                    citationCount=20,
+                    openAccessPdf="https://sample2.pdf",
+                    authors=["author1", "author2", "author3"],
+                ),
+            ],
+        )
+        return response
+    
+    return mock_search_paper_response
