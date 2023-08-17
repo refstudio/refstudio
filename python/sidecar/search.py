@@ -2,11 +2,13 @@
 Author: Shaurya
 This script performs a search on Semantic Scholar and retrieves information about a set of papers.
 """
-from semanticscholar import SemanticScholar
-from .stopwords import stopwords
-import sys
 import logging
-from .typing import SearchResponse, S2SearchResult, SearchRequest, ResponseStatus
+import sys
+
+from semanticscholar import SemanticScholar
+
+from .stopwords import stopwords
+from .typing import ResponseStatus, S2SearchResult, SearchRequest, SearchResponse
 
 logger = logging.getLogger(__name__)
 
@@ -105,4 +107,6 @@ def search_s2(request: SearchRequest):
     query = request.query
     limit = request.limit
     searcher = Searcher()
-    sys.stdout.write(searcher.search_func(query, limit=limit).json())
+    response = searcher.search_func(query, limit=limit)
+    sys.stdout.write(response.json())
+    return response

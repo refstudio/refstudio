@@ -40,7 +40,7 @@ def rewrite(arg: RewriteRequest):
             choices=[],
         )
         sys.stdout.write(response.json())
-        return
+        return response
 
     logger.info(f"Returning {len(choices)} rewrite choices to client: {choices}")
     response = typing.RewriteResponse(
@@ -49,6 +49,7 @@ def rewrite(arg: RewriteRequest):
         choices=[r.dict() for r in choices],
     )
     sys.stdout.write(response.json())
+    return response
 
 
 def complete_text(request: TextCompletionRequest):
@@ -71,7 +72,7 @@ def complete_text(request: TextCompletionRequest):
             choices=[],
         )
         sys.stdout.write(response.json())
-        return
+        return response
 
     logger.info(f"Trimming completion prefix text from completion choices: {choices}") 
     choices = shared.trim_completion_prefix_from_choices(prefix=request.text, choices=choices)
@@ -83,6 +84,7 @@ def complete_text(request: TextCompletionRequest):
         choices=[r.dict() for r in choices],
     )
     sys.stdout.write(response.json())
+    return response
 
 
 class Rewriter:

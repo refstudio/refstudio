@@ -11,13 +11,18 @@ logger = logger.getChild(__name__)
 def update_reference(reference_update: ReferenceUpdate):
     storage = JsonStorage(settings.REFERENCES_JSON_PATH)
     storage.load()
-    storage.update(reference_update=reference_update)
+    response = storage.update(reference_update=reference_update)
+    return response
 
 
 def delete_references(delete_request: DeleteRequest):
     storage = JsonStorage(settings.REFERENCES_JSON_PATH)
     storage.load()
-    storage.delete(source_filenames=delete_request.source_filenames, all_=delete_request.all)
+    response = storage.delete(
+        source_filenames=delete_request.source_filenames,
+        all_=delete_request.all
+    )
+    return response
 
 
 class JsonStorage:
@@ -98,6 +103,7 @@ class JsonStorage:
             message=""
         )
         sys.stdout.write(response.json())
+        return response
 
     def update(self, reference_update: typing.ReferenceUpdate):
         """
@@ -125,7 +131,7 @@ class JsonStorage:
                 message=msg
             )
             sys.stdout.write(response.json())
-            return
+            return response
 
         logger.info(f"Updating {source_filename} with new values: {patch.data}")
         refs[source_filename] = target.copy(update=patch.data)
@@ -138,6 +144,7 @@ class JsonStorage:
             message=""
         )
         sys.stdout.write(response.json())
+        return response
 
     def create_corpus(self):
         for ref in self.references:
