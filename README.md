@@ -2,8 +2,8 @@
   <a href="https://github.com/refstudio/refstudio/actions/workflows/on-push.yml">
     <img src="https://github.com/refstudio/refstudio/actions/workflows/on-push.yml/badge.svg" />
   </a>
-  <a href="https://codecov.io/gh/refstudio/refstudio" > 
-   <img src="https://codecov.io/gh/refstudio/refstudio/branch/main/graph/badge.svg?token=XZMTETRGXC"/> 
+  <a href="https://codecov.io/gh/refstudio/refstudio" >
+   <img src="https://codecov.io/gh/refstudio/refstudio/branch/main/graph/badge.svg?token=XZMTETRGXC"/>
    </a>
 </p>
 
@@ -123,11 +123,11 @@ To reset your local environment you should following these steps:
 * run `yarn tauri:dev` to run the app
 * upload new reference PDFs
 
-Project state is persisted in the Tauri [`appDataDir`][appDataDir], typically `~/Library/Application\ Support/com.tauri.dev`.
+Project state is persisted in the Tauri [`appDataDir`][appDataDir], typically `~/Library/Application\ Support/studio.ref.desktop`.
 To completely reset app state, quit the RefStudio app and remove this directory:
 
 ```bash
-mv ~/Library/Application\ Support/com.tauri.dev /tmp/
+mv ~/Library/Application\ Support/studio.ref.desktop /tmp/
 ```
 
 [appDataDir]: https://tauri.app/v1/api/js/path#appdatadir
