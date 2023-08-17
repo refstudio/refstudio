@@ -23,6 +23,7 @@ export function createNotionBlockInputRule(inputRegex: RegExp, type: string): In
         if (dispatch) {
           tr.replace(from, to);
           tr.setNodeAttribute(resolvedFrom.before(-1), 'type', type);
+          tr.setNodeAttribute(resolvedFrom.before(-1), 'collapsed', null);
         }
         return true;
       });
