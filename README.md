@@ -37,8 +37,6 @@ When editing documents you can ask AI assistance to rewrite parts of the text, a
 
 https://github.com/refstudio/refstudio/assets/174127/f8b847e1-d6b7-4e58-ae04-0d8e96c88382
 
-
-
 ## Setup & Run
 
 ### Prerequisites (development)
@@ -46,7 +44,6 @@ https://github.com/refstudio/refstudio/assets/174127/f8b847e1-d6b7-4e58-ae04-0d8
 - JavaScript: [node.js](https://nodejs.org/en/download) (>= 18.12.0 LTS) and [Yarn](https://yarnpkg.com/getting-started/install) package manager
 - Python: (>= 3.11) and [Poetry](https://python-poetry.org/docs/#installation) package manager
 - Tauri: Check [prerequisites](https://tauri.app/v1/guides/getting-started/prerequisites/) to install Rust and [Cargo](https://doc.rust-lang.org/stable/cargo/) package manager
-
 
 ### Backend (Python sidecar)
 
@@ -57,6 +54,7 @@ poetry install
 ```
 
 To compile the Python sidecar as a binary:
+
 ```bash
 yarn python
 ```
@@ -79,6 +77,14 @@ You should then be able to launch the app via:
 yarn tauri:dev
 ```
 
+To develop the web version of RefStudio, run:
+
+```bash
+yarn dev
+```
+
+and open http://localhost:1420/ in your browser.
+
 #### Debug
 
 To automatically open the browser devtools you can launch the app via:
@@ -99,6 +105,7 @@ Assuming you are in the root project directory, you can run the Python tests and
 ```bash
 poetry run pytest --cov=python python/tests
 ```
+
 ### Frontend (TypeScript)
 
 ```bash
@@ -112,7 +119,6 @@ yarn test
 yarn test:watch
 yarn test:watch:ui
 ```
-
 
 ## Reset
 
