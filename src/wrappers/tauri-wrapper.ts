@@ -21,7 +21,7 @@ export const invoke = import.meta.env.VITE_IS_WEB ? invokeStub : tauriInvoke;
 export const appConfigDir = import.meta.env.VITE_IS_WEB ? stubPath.appConfigDir : tauriPath.appConfigDir;
 export const desktopDir = import.meta.env.VITE_IS_WEB ? stubPath.desktopDir : tauriPath.desktopDir;
 export const join = import.meta.env.VITE_IS_WEB ? stubPath.join : tauriPath.join;
-export const step = import.meta.env.VITE_IS_WEB ? stubPath.sep : tauriPath.sep;
+export const sep = import.meta.env.VITE_IS_WEB ? stubPath.sep : tauriPath.sep;
 
 // @tauri-apps/api/fs
 export const createDir = import.meta.env.VITE_IS_WEB ? stubFs.createDir : tauriFs.createDir;

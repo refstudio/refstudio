@@ -6,8 +6,12 @@ import { openProjectAtom } from './atoms/projectState';
 import { useAsyncEffect } from './hooks/useAsyncEffect';
 import { noop } from './lib/noop';
 import { notifyErr, notifyInfo } from './notifications/notifications';
+// import { interceptConsoleMessages } from './notifications/notifications.console';
 import { getCachedSetting, initSettings } from './settings/settingsManager';
 import { invoke } from './wrappers/tauri-wrapper';
+
+console.log('AppStartup');
+(window as any).AppStartup = true;
 
 // Note: Intercepting INFO, WARN and ERROR console.* in DEV mode
 if (import.meta.env.DEV) {
@@ -26,9 +30,13 @@ export function AppStartup() {
           return;
         }
 
+        console.log('calling notifyInfo');
         notifyInfo('Application Startup');
+        console.log('calling initSettings');
         await initSettings();
+        console.log('calling close_splashscreen');
         await invoke('close_splashscreen');
+        console.log('and we are back');
 
         if (isMounted()) {
           setInitialized(true);
