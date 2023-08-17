@@ -7,6 +7,27 @@ import { getPreviousSibling } from '../utils/getPreviousSibling';
 
 const LIST_STYLES = ['decimal', 'alpha', 'roman'];
 
+const orderedListPluginKey = new PluginKey<DecorationSet>('orderedList');
+
+/** Plugin to add decorations to ordered list items */
+export const orderedListPlugin = new Plugin({
+  key: orderedListPluginKey,
+  state: {
+    init: (_config, state) => DecorationSet.create(state.doc, getOrderedListDecorations(state)),
+    apply: (tr, value, _oldState, newState) => {
+      if (!tr.docChanged) {
+        return value;
+      }
+      return DecorationSet.create(tr.doc, getOrderedListDecorations(newState));
+    },
+  },
+  props: {
+    decorations(state) {
+      return this.getState(state);
+    },
+  },
+});
+
 function getOrderedListDecorations(state: EditorState): Decoration[] {
   const decorations: Decoration[] = [];
 
@@ -44,23 +65,3 @@ function getOrderedListDecorations(state: EditorState): Decoration[] {
 
   return decorations;
 }
-
-const orderedListPluginKey = new PluginKey<DecorationSet>('orderedList');
-
-export const orderedListPlugin = new Plugin({
-  key: orderedListPluginKey,
-  state: {
-    init: (_config, state) => DecorationSet.create(state.doc, getOrderedListDecorations(state)),
-    apply: (tr, value, _oldState, newState) => {
-      if (!tr.docChanged) {
-        return value;
-      }
-      return DecorationSet.create(tr.doc, getOrderedListDecorations(newState));
-    },
-  },
-  props: {
-    decorations(state) {
-      return this.getState(state);
-    },
-  },
-});

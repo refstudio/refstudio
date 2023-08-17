@@ -6,6 +6,7 @@ import { getParent } from '../utils/getParent';
 
 const LIST_STYLES = ['disc', 'circle', 'square'];
 
+/** Plugin to add decorations to unordered list items */
 function getUnorderedListDecorations(state: EditorState): Decoration[] {
   const decorations: Decoration[] = [];
 
