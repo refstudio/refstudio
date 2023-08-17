@@ -112,6 +112,58 @@ impl AppMenu {
     '''.replace('{menu_code}', menu_code)
 
 
+
+def typescript_for_item(item):
+    typ = item['type']
+    if typ == 'native':
+        nativeItem = item['nativeMenuItem']
+        return f'<NativeMenuItem item="{nativeItem}" />'
+    elif typ == 'separator':
+        return '<MenuSeparator />'
+    elif typ == 'custom':
+        item_id = item['id']
+        title = item['title']
+        code = f'<MenuItem id="{item_id}" title="{title}" '
+        accel = item.get('accelerator')
+        if accel:
+            code += f'accelerator="{accel}" '
+        code += ' />'
+        return code
+    assert ValueError(typ)
+
+
+def generate_typescript(menus):
+    lines = [
+        '<MenuBar>'
+    ]
+    for i, menu in enumerate(menus):
+        title = menu['title']
+        lines += [
+            f'<Menu title="{title}">',
+            *[
+                typescript_for_item(item)
+                for item in menu['items']
+            ],
+            '</Menu>',
+        ]
+
+    lines.append('</MenuBar>')
+    menu_code = '\n'.join(lines)
+
+    return '''// THIS FILE IS GENERATED. Edit menu.json instead.
+import React from 'react';
+
+declare const MenuBar: React.ComponentType<any>;
+declare const Menu: React.ComponentType<any>;
+declare const NativeMenuItem: React.ComponentType<any>;
+declare const MenuSeparator: React.ComponentType<any>;
+declare const MenuItem: React.ComponentType<any>;
+
+export function AppMenu() {
+    {menu_code}
+}
+    '''.replace('{menu_code}', menu_code)
+
 if __name__ == '__main__':
     menu_json = json.load(open('menu.json'))
     menus = menu_json['menus']
@@ -120,3 +172,9 @@ if __name__ == '__main__':
     with open('src-tauri/src/core/menu.rs', 'w') as out:
         out.write(menu_rs)
     subprocess.check_output(['rustfmt', 'src-tauri/src/core/menu.rs'])
+
+    menu_ts = generate_typescript(menus)
+    with open('src/components/menu.tsx', 'w') as out:
+        out.write(menu_ts)
+    subprocess.check_output(['yarn', 'prettier', '--config', 'package.json', '--write', 'src/components/menu.tsx'])
+    subprocess.check_output(['yarn', 'eslint', '--fix', '--ext', '.js,.ts,.tsx', 'src/components/menu.tsx'])
