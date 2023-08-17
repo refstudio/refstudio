@@ -49,7 +49,6 @@ export function emitEvent<Event extends RefStudioEventName>(
   event: Event,
   ...args: RefStudioEventPayload<Event> extends undefined ? [] : [payload: RefStudioEventPayload<Event>]
 ) {
-  // rawConsoleLog('emit', event, args);
   void emit(event, ...args);
 }
 

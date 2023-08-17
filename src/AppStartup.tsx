@@ -18,7 +18,6 @@ if (import.meta.env.DEV) {
 export function AppStartup() {
   const [initialized, setInitialized] = useState(false);
   const openProject = useSetAtom(openProjectAtom);
-  console.log('AppStartup');
 
   useAsyncEffect(
     async (isMounted) => {
@@ -27,13 +26,9 @@ export function AppStartup() {
           return;
         }
 
-        console.log('calling notifyInfo');
         notifyInfo('Application Startup');
-        console.log('calling initSettings');
         await initSettings();
-        console.log('calling close_splashscreen');
         await invoke('close_splashscreen');
-        console.log('and we are back');
 
         if (isMounted()) {
           setInitialized(true);
