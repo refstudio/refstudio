@@ -30,7 +30,9 @@ def run_ingest(args: IngestRequest):
 def get_statuses():
     storage = JsonStorage(REFERENCES_JSON_PATH)
     status_fetcher = IngestStatusFetcher(storage=storage)
-    status_fetcher.emit_statuses()
+    response = status_fetcher.emit_statuses()
+    return response
+
 
 def get_references(args: IngestRequest):
     pdf_directory = Path(args.pdf_directory)
@@ -38,6 +40,7 @@ def get_references(args: IngestRequest):
     response = ingest.create_ingest_response()
     sys.stdout.write(response.json())
     return response
+
 
 class PDFIngestion:
 
