@@ -9,6 +9,10 @@ interface SharedCommand {
   execute: typeof TauriCommand.prototype.execute;
 }
 
+const METHODS: Record<string, 'get' | 'post'> = {
+  '/ingest/references': 'get',
+};
+
 class StubCommand implements SharedCommand {
   command: string;
   args: string[];
@@ -19,13 +23,42 @@ class StubCommand implements SharedCommand {
     this.options = options;
   }
 
-  execute: typeof TauriCommand.prototype.execute = () =>
-    Promise.resolve({
+  execute: typeof TauriCommand.prototype.execute = async () => {
+    const [command, body] = this.args;
+    const path = command.replaceAll('_', '/');
+    const response = await fetch(
+      `/api/v0/${path}`,
+      METHODS['/' + path] === 'get'
+        ? {
+            headers: {
+              Accept: 'application/json',
+            },
+          }
+        : {
+            method: 'POST',
+            body,
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+          },
+    );
+    const responsePayload = await response.text();
+    if (response.ok) {
+      return {
+        signal: null,
+        code: 0,
+        stderr: '',
+        stdout: responsePayload,
+      };
+    }
+    return {
       signal: null,
-      code: 0,
-      stderr: '',
-      stdout: '{"references": []}',
-    });
+      code: 1,
+      stderr: response.statusText,
+      stdout: responsePayload,
+    };
+  };
 }
 
 const Command = import.meta.env.VITE_IS_WEB ? StubCommand : TauriCommand;
