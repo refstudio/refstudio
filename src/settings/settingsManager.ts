@@ -36,6 +36,11 @@ export interface SettingsSchema {
   };
 }
 
+/**
+ * This pulls out just the parts of SettingsManager that are used in the app.
+ * This makes it easier to stub in an in-memory equivalent of SettingsManager.
+ * This can all go away when we have a settings API.
+ */
 export type SettingsManagerView = Pick<
   SettingsManager<SettingsSchema>,
   'getCache' | 'setCache' | 'syncCache' | 'default'
@@ -49,7 +54,7 @@ export async function initSettings() {
   try {
     const settings: SettingsSchema = {
       project: {
-        currentDir: 'MIGRATE_FROM_GENERAL',
+        currentDir: import.meta.env.VITE_IS_WEB ? '' : 'MIGRATE_FROM_GENERAL',
       },
       openAI: {
         apiKey: await readEnv('OPENAI_API_KEY', ''),

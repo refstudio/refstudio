@@ -125,7 +125,6 @@ export const renameFile: typeof tauriFs.renameFile = (oldPath, newPath, options)
   fs.set(normalizePath(newPath), oldFile);
   return Promise.resolve();
 };
-// (window as any).getFileSystem = () => fs;
 
 export function resetInMemoryFsForTesting() {
   fs.clear();

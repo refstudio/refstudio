@@ -7,7 +7,7 @@
   "scripts": {
     "postinstall": "husky install",
     "dev": "vite",
-    "dev:web": "VITE_IS_WEB=true vite",
+    "web:dev": "VITE_PORT=1421 VITE_IS_WEB=true vite",
     "build": "tsc && vite build",
     "codegen": "bash scripts/codegen.sh",
     "check": "yarn prettier:check && yarn pylint:check && yarn lint:check && yarn ts:check && yarn knip:check",

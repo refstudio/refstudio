@@ -2,12 +2,14 @@
 
 import * as tauriEvent from '@tauri-apps/api/event';
 
-const listeners = new Map<string, tauriEvent.EventCallback<unknown>>();
+import { noop } from '../../lib/noop';
+
+const listeners = new Map<string, tauriEvent.EventCallback<unknown>[]>();
 
 export const emit: typeof tauriEvent.emit = (event, payload) => {
-  const handler = listeners.get(event);
-  if (handler) {
-    handler({ event, payload, id: 0, windowLabel: 'refstudio' });
+  const handlers = listeners.get(event);
+  if (handlers) {
+    handlers.forEach((handler) => handler({ event, payload, id: 0, windowLabel: 'refstudio' }));
   }
   return Promise.resolve();
 };
@@ -17,8 +19,7 @@ export const emit: typeof tauriEvent.emit = (event, payload) => {
 (window as any).emitEvent = emit;
 
 export const listen: typeof tauriEvent.listen = (event, callback) => {
-  listeners.set(event, callback as tauriEvent.EventCallback<unknown>);
-  return Promise.resolve(() => {
-    /* no op */
-  });
+  const handlers = listeners.get(event) ?? [];
+  listeners.set(event, [...handlers, callback as tauriEvent.EventCallback<unknown>]);
+  return Promise.resolve(noop);
 };
