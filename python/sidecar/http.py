@@ -1,5 +1,3 @@
-import sys
-
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from sidecar import chat, ingest, rewrite, search, storage
