@@ -1,7 +1,7 @@
 import { render, screen, setup } from '../../../test/test-utils';
 import { AIPanel } from '../AIPanel';
-import { ChatPanelSection } from '../sidebar/ChatPanelSection';
-import { SelectionPanelSection } from '../sidebar/SelectionPanelSection';
+import { ChatbotPanel } from '../sidebar/ChatPanel';
+import { RewriterPanel } from '../sidebar/RewriterPanel';
 
 vi.mock('../sidebar/SelectionPanelSection');
 vi.mock('../sidebar/ChatPanelSection');
@@ -25,8 +25,8 @@ describe('SelectionPanelSection', () => {
   it('should render selection and chat panels', () => {
     render(<AIPanel />);
     expect(screen.getByText('AI')).toBeInTheDocument();
-    expect(SelectionPanelSection).toHaveBeenCalled();
-    expect(ChatPanelSection).toHaveBeenCalled();
+    expect(RewriterPanel).toHaveBeenCalled();
+    expect(ChatbotPanel).toHaveBeenCalled();
   });
 
   it('should close selection and chat panels', async () => {

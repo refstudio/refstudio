@@ -7,6 +7,8 @@ import { useEventListener, useLocalStorage, useWindowSize } from 'usehooks-ts';
 
 import { VerticalResizeHandle } from '../components/VerticalResizeHandle';
 import { emitEvent } from '../events';
+import { ChatbotPanel } from '../features/ai/sidebar/ChatPanel';
+import { RewriterPanel } from '../features/ai/sidebar/RewriterPanel';
 import { ReferencesDropZone } from '../features/references/components/ReferencesDropZone';
 import { ReferencesPanel } from '../features/references/sidebar/ReferencesPanel';
 import { useDebouncedCallback } from '../hooks/useDebouncedCallback';
@@ -17,13 +19,13 @@ import { EventsListener } from '../wrappers/EventsListener';
 import { CommandPalette } from './commands/CommandPalette';
 import { MainPanel } from './components/MainPanel';
 import { SideBar } from './components/SideBar';
-import { BotIcon } from './icons/sidebar/BotIcon';
-import { FilesIcon } from './icons/sidebar/FilesIcon';
-import { KeybindsIcon } from './icons/sidebar/KeybindsIcon';
-import { PenIcon } from './icons/sidebar/PenIcon';
-import { ReferencesIcon } from './icons/sidebar/ReferencesIcon';
-import { SettingsIcon } from './icons/sidebar/SettingsIcon';
 import { ExplorerPanel } from './sidebar/ExplorerPanel';
+import { BotIcon } from './sidebar/icons/BotIcon';
+import { FilesIcon } from './sidebar/icons/FilesIcon';
+import { KeybindsIcon } from './sidebar/icons/KeybindsIcon';
+import { PenIcon } from './sidebar/icons/PenIcon';
+import { ReferencesIcon } from './sidebar/icons/ReferencesIcon';
+import { SettingsIcon } from './sidebar/icons/SettingsIcon';
 
 export function App() {
   const panelRef = React.createRef<ImperativePanelGroupHandle>();
@@ -183,8 +185,8 @@ function RightSidePanelWrapper() {
     <>
       <VerticalResizeHandle />
       <Panel collapsible order={3} ref={rightPanelRef} onCollapse={(collapsed) => setSecondaryPaneCollapsed(collapsed)}>
-        {secondaryPane === 'Rewriter' && <ExplorerPanel />}
-        {secondaryPane === 'Chatbot' && <ReferencesPanel />}
+        {secondaryPane === 'Rewriter' && <RewriterPanel />}
+        {secondaryPane === 'Chatbot' && <ChatbotPanel />}
       </Panel>
       {!secondaryPaneCollapsed && <div className='h-full w-[1px]' style={{ backgroundColor: '#eff1f4' }} />}
       <SideBar

@@ -2,7 +2,7 @@ import { screen, waitFor } from '@testing-library/react';
 
 import { chatWithAI } from '../../../../api/chat';
 import { render, userEvent } from '../../../../test/test-utils';
-import { ChatPanelSection } from '../ChatPanelSection';
+import { ChatbotPanel } from '../ChatPanel';
 
 vi.mock('../../../../api/chat');
 
@@ -12,7 +12,7 @@ describe('ChatPanelSection component', () => {
   });
 
   it('should render the panel without history content and a textbox', () => {
-    render(<ChatPanelSection />);
+    render(<ChatbotPanel />);
     expect(screen.getByText(/your chat history will be shown here\./i)).toBeInTheDocument();
     expect(screen.getByRole('textbox')).toBeInTheDocument();
   });
@@ -20,7 +20,7 @@ describe('ChatPanelSection component', () => {
   it('should call api if textbox has text', async () => {
     const chatWithAiMock = vi.mocked(chatWithAI).mockResolvedValue([]);
     const user = userEvent.setup();
-    render(<ChatPanelSection />);
+    render(<ChatbotPanel />);
     await user.type(screen.getByRole('textbox'), 'This is a question.');
     await user.click(screen.getByTitle('Send'));
     expect(chatWithAiMock.mock.calls.length).toBe(1);
@@ -29,7 +29,7 @@ describe('ChatPanelSection component', () => {
   it('should NOT call api if textbox has empty text', async () => {
     const chatWithAiMock = vi.mocked(chatWithAI).mockResolvedValue([]);
     const user = userEvent.setup();
-    render(<ChatPanelSection />);
+    render(<ChatbotPanel />);
     await user.click(screen.getByTitle('Send'));
     expect(chatWithAiMock.mock.calls.length).toBe(0);
   });
@@ -38,7 +38,7 @@ describe('ChatPanelSection component', () => {
   it('should call api on ENTER in the textbox', async () => {
     const chatWithAiMock = vi.mocked(chatWithAI).mockResolvedValue([]);
     const user = userEvent.setup();
-    render(<ChatPanelSection />);
+    render(<ChatbotPanel />);
     await user.type(screen.getByRole('textbox'), 'This is a question.');
     await user.type(screen.getByRole('textbox'), '{enter}');
     expect(chatWithAiMock.mock.calls.length).toBe(1);
@@ -48,7 +48,7 @@ describe('ChatPanelSection component', () => {
   it('should display ERROR if chatWithAI throw exception', async () => {
     const chatWithAiMock = vi.mocked(chatWithAI).mockRejectedValue('Error message.');
     const user = userEvent.setup();
-    render(<ChatPanelSection />);
+    render(<ChatbotPanel />);
     await user.type(screen.getByRole('textbox'), 'This is a question.');
     await user.type(screen.getByRole('textbox'), '{enter}');
     expect(chatWithAiMock.mock.calls.length).toBe(1);
@@ -58,7 +58,7 @@ describe('ChatPanelSection component', () => {
   it('should NOT call api on SHIFT+ENTER in the textbox', async () => {
     const chatWithAiMock = vi.mocked(chatWithAI).mockResolvedValue([]);
     const user = userEvent.setup();
-    render(<ChatPanelSection />);
+    render(<ChatbotPanel />);
     await user.type(screen.getByRole('textbox'), 'This is a question.');
     await user.type(screen.getByRole('textbox'), '{Shift>}{enter}');
     expect(chatWithAiMock.mock.calls.length).toBe(0);
@@ -67,7 +67,7 @@ describe('ChatPanelSection component', () => {
   it('should render question and reply in the screen', async () => {
     const chatWithAiMock = vi.mocked(chatWithAI).mockResolvedValue(['Sure!']);
     const user = userEvent.setup();
-    render(<ChatPanelSection />);
+    render(<ChatbotPanel />);
     await user.type(screen.getByRole('textbox'), 'Will this test pass?');
     await user.click(screen.getByTitle('Send'));
     expect(chatWithAiMock.mock.calls.length).toBe(1);
@@ -79,7 +79,7 @@ describe('ChatPanelSection component', () => {
     // Note: this is a promise that _don't resolve_ so that we can test the "..." below.
     vi.mocked(chatWithAI).mockImplementation(async () => new Promise<string[]>(() => ['---']));
     const user = userEvent.setup();
-    render(<ChatPanelSection />);
+    render(<ChatbotPanel />);
 
     await user.type(screen.getByRole('textbox'), 'Will this test pass?');
     await user.click(screen.getByTitle('Send'));
@@ -98,7 +98,7 @@ describe('ChatPanelSection component', () => {
       return ['###'];
     });
     const user = userEvent.setup();
-    render(<ChatPanelSection />);
+    render(<ChatbotPanel />);
 
     await user.type(screen.getByRole('textbox'), 'Will this test pass?');
     await user.click(screen.getByTitle('Send'));

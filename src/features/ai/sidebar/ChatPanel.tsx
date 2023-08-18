@@ -3,6 +3,7 @@ import { VscMegaphone, VscRunAll, VscWand } from 'react-icons/vsc';
 
 import { chatWithAI } from '../../../api/chat';
 import { PanelSection } from '../../../components/PanelSection';
+import { PanelWrapper } from '../../../components/PanelWrapper';
 import { cx } from '../../../lib/cx';
 
 interface ChatThreadItem {
@@ -12,7 +13,7 @@ interface ChatThreadItem {
 }
 type ChatThread = ChatThreadItem[];
 
-export function ChatPanelSection() {
+export function ChatbotPanel() {
   const [text, setText] = useState('');
 
   const [chatThread, setChatThread] = useState<ChatThread>([
@@ -61,33 +62,35 @@ export function ChatPanelSection() {
   };
 
   return (
-    <PanelSection grow title="Chat">
-      <div className="ml-4 mr-6 grid min-h-[400px] grid-rows-[1fr_auto] gap-4">
-        <ChatThreadBlock
-          className="border border-slate-100 bg-slate-50"
-          thread={currentChatThreadItem ? [...chatThread, currentChatThreadItem] : chatThread}
-        />
-        <div className="flex grow gap-2 rounded-xl border border-slate-200 p-2 shadow-lg shadow-slate-200">
-          <textarea
-            className="grow resize-none p-2 outline-none"
-            disabled={!!currentChatThreadItem}
-            placeholder="Send a message."
-            rows={3}
-            value={text}
-            onChange={(evt) => setText(evt.currentTarget.value)}
-            onKeyDown={handleKeyDown}
+    <PanelWrapper title="Chatbot">
+      <PanelSection grow title="Chat">
+        <div className="ml-4 mr-6 grid min-h-[400px] grid-rows-[1fr_auto] gap-4">
+          <ChatThreadBlock
+            className="border border-slate-100 bg-slate-50"
+            thread={currentChatThreadItem ? [...chatThread, currentChatThreadItem] : chatThread}
           />
-          <div className="flex grow-0 items-end">
-            <VscRunAll
-              className="cursor-pointer hover:text-primary-hover"
-              size={20}
-              title="Send"
-              onClick={() => handleChat(text)}
+          <div className="flex grow gap-2 rounded-xl border border-slate-200 p-2 shadow-lg shadow-slate-200">
+            <textarea
+              className="grow resize-none p-2 outline-none"
+              disabled={!!currentChatThreadItem}
+              placeholder="Send a message."
+              rows={3}
+              value={text}
+              onChange={(evt) => setText(evt.currentTarget.value)}
+              onKeyDown={handleKeyDown}
             />
+            <div className="flex grow-0 items-end">
+              <VscRunAll
+                className="cursor-pointer hover:text-primary-hover"
+                size={20}
+                title="Send"
+                onClick={() => handleChat(text)}
+              />
+            </div>
           </div>
         </div>
-      </div>
-    </PanelSection>
+      </PanelSection>
+    </PanelWrapper>
   );
 }
 

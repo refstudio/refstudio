@@ -4,7 +4,7 @@ import { createStore } from 'jotai';
 import { selectionAtom } from '../../../../atoms/selectionState';
 import { setupWithJotaiProvider } from '../../../../test/test-utils';
 import { RewriteWidget } from '../../../components/RewriteWidget';
-import { SelectionPanelSection } from '../SelectionPanelSection';
+import { RewriterPanel } from '../RewriterPanel';
 
 vi.mock('../../../components/RewriteWidget');
 
@@ -24,7 +24,7 @@ describe('SelectionPanelSection', () => {
   });
 
   it('should display message on blank selection', () => {
-    setupWithJotaiProvider(<SelectionPanelSection />, store);
+    setupWithJotaiProvider(<RewriterPanel />, store);
     expect(screen.getByText('Select some text in the editor to see it here.')).toBeInTheDocument();
     expect(RewriteWidget).not.toHaveBeenCalled();
   });
@@ -32,7 +32,7 @@ describe('SelectionPanelSection', () => {
   it('should render RewriteWidget with selection debounded', async () => {
     store.set(selectionAtom, 'Some selected text');
 
-    setupWithJotaiProvider(<SelectionPanelSection debounceMs={1} />, store);
+    setupWithJotaiProvider(<RewriterPanel debounceMs={1} />, store);
     await waitFor(() => {
       expect(RewriteWidget).toHaveBeenCalled();
     });
