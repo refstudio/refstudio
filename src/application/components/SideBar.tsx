@@ -48,20 +48,17 @@ function IconButton({
 }: {
   active?: boolean;
   children: React.ReactNode;
-  onClick?: () => void;
+  onClick: () => void;
 }) {
   return (
     <div
-      className={cx('icon', { 'cursor-pointer': !!onClick, active })}
+      className={cx('icon cursor-pointer', { active })}
       role="menuitem"
-      onClick={
-        onClick &&
-        ((evt) => {
-          evt.preventDefault();
-          evt.stopPropagation();
-          onClick();
-        })
-      }
+      onClick={(evt) => {
+        evt.preventDefault();
+        evt.stopPropagation();
+        onClick();
+      }}
     >
       <div className="self-center">{children}</div>
     </div>
