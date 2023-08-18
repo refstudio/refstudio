@@ -1,7 +1,11 @@
+import shutil
+from typing import Annotated
+
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile
 
 import sidecar
+from sidecar import filesystem
 from sidecar.typing import (
     ChatRequest,
     ChatResponse,
@@ -23,8 +27,11 @@ from sidecar.typing import (
 load_dotenv()
 
 sidecar_api = FastAPI()  # Legacy API for existing sidecar cli functionality
+filesystem_api = FastAPI()  # API for interacting with the filesystem
 
 
+# Sidecar API
+# -----------
 @sidecar_api.get("/")
 async def sidecar_index():
     return {"message": "Hello World from the Sidecar API"}
@@ -81,4 +88,88 @@ async def chat(req: ChatRequest) -> ChatResponse:
 @sidecar_api.post("/search")
 async def search(req: SearchRequest) -> SearchResponse:
     response = sidecar.search.search_s2(req)
+    return response
+
+
+# Filesystem API
+# --------------
+@filesystem_api.get("/")
+async def filesystem_index():
+    return {"message": "Hello World from the Filesystem API"}
+
+
+@filesystem_api.get("/project")
+async def get_project(project_id: str):
+    user_id = "user1"
+    project_path = filesystem.get_project_path(user_id, project_id)
+    return project_path
+
+
+@filesystem_api.post("/project")
+async def create_project(project_id: str):
+    user_id = "user1"
+    project_path = filesystem.create_project(user_id, project_id)
+    return {project_id: project_path}
+
+
+@filesystem_api.get("/project/files")
+async def get_project_files(project_id: str):
+    user_id = "user1"
+    filepaths = filesystem.get_project_files(user_id, project_id)
+    return filepaths
+
+
+@filesystem_api.post("/create_file")
+async def create_file(project_id: str, file: UploadFile = File(...)):
+    user_id = "user1"
+    project_path = filesystem.get_project_path(user_id, project_id)
+    filepath = project_path / file.filename
+    try:
+        with open(filepath, "wb") as f:
+            shutil.copyfileobj(file.file, f)
+    except Exception as e:
+        print(e)
+    finally:
+        file.file.close()
+    return {
+        "status": "success",
+        "message": "File uploaded",
+        "filepath": filepath,
+    }
+
+
+@filesystem_api.get("/read_file")
+async def read_file(project_id, filename):
+    # TODO
+    # response = filesystem.read_file(project_id, filename)
+    return 
+
+
+@filesystem_api.delete("/delete_file")
+async def delete_file(project_id: str, filename: str):
+    user_id = "user1"
+    project_path = filesystem.get_project_path(user_id, project_id)
+    filepath = project_path / filename
+    try:
+        _ = filesystem.delete_file(filepath)
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Error deleting file: {e}",
+            "filepath": filepath,
+        }
+    return {
+        "status": "success",
+        "message": "File deleted",
+        "filepath": filepath,
+    }
+
+
+@filesystem_api.post("/file/rename")
+async def rename_file(project_id: str, old_filename: str, new_filename):
+    user_id = "user1"
+    project_path = filesystem.get_project_path(user_id, project_id)
+    response = filesystem.rename_file(
+        project_id, old_filename, new_filename
+    )
     return response

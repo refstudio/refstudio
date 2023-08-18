@@ -7,6 +7,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+WEB_STORAGE_URL = Path(
+    os.environ.get(
+        'WEB_STORAGE_URL', '/tmp/web-storage-url'
+    )
+)
 PROJECT_DIR = Path(
     os.environ.get('PROJECT_DIR', '/tmp/project-x')
 )
