@@ -1,3 +1,5 @@
-export type IconProps = React.HTMLAttributes<HTMLElement>;
+export interface IconProps extends React.HTMLAttributes<HTMLElement> {
+  active?: boolean;
+}
 
 export type IconType = (props: IconProps) => React.ReactElement;

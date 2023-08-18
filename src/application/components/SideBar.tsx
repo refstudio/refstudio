@@ -1,4 +1,3 @@
-import { cx } from '../../lib/cx';
 import { IconType } from '../icons/type';
 
 export function SideBar<SideBarPane extends string>({
@@ -19,8 +18,8 @@ export function SideBar<SideBarPane extends string>({
         {
           panes.map(({ pane, Icon }) => (
             <Icon
+              active={pane === activePane}
               aria-label={pane}
-              className={cx('cursor-pointer hover:opacity-100')}
               key={pane}
               role="menuitem"
               onClick={(evt) => {
@@ -37,7 +36,6 @@ export function SideBar<SideBarPane extends string>({
         <div className='flex flex-col p-2 gap-2'>
           {footerItems.map(({ label, Icon, onClick }) => (<Icon
             aria-label={label}
-            className={cx('mt-auto cursor-pointer hover:opacity-100')}
             key={label}
             role="menuitem"
             onClick={(evt) => {
