@@ -153,6 +153,7 @@ function LeftSidePanelWrapper() {
           { pane: 'Explorer', Icon: <FilesIcon /> },
           { pane: 'References', Icon: <ReferencesIcon /> },
         ]}
+        position="left"
         onItemClick={handleSideBarClick}
       />
       {!primaryPaneCollapsed && <div className="h-full w-[1px]" style={{ backgroundColor: '#eff1f4' }} />}
@@ -204,6 +205,7 @@ function RightSidePanelWrapper() {
           { pane: 'Rewriter', Icon: <PenIcon /> },
           { pane: 'Chatbot', Icon: <BotIcon /> },
         ]}
+        position="right"
         onItemClick={handleSideBarClick}
       />
     </>
