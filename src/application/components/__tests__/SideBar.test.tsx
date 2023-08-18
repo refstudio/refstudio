@@ -1,6 +1,6 @@
 import { noop } from '../../../lib/noop';
 import { render, screen, userEvent } from '../../../test/test-utils';
-import { IconProps } from '../../icons/type';
+import { IconProps } from '../icons/type';
 import { SideBar } from '../SideBar';
 
 describe('SideBar', () => {

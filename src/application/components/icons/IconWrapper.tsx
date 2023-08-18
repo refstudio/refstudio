@@ -1,6 +1,6 @@
 import './Icons.css';
 
-import { cx } from '../../lib/cx';
+import { cx } from '../../../lib/cx';
 import { IconProps } from './type';
 
 

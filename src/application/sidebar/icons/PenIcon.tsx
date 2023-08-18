@@ -1,5 +1,5 @@
-import { IconWrapper } from '../../icons/IconWrapper';
-import { IconProps, IconType } from '../../icons/type';
+import { IconWrapper } from '../../components/icons/IconWrapper';
+import { IconProps, IconType } from '../../components/icons/type';
 
 export const PenIcon: IconType = (props: IconProps) =>
   <IconWrapper {...props}>

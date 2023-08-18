@@ -8,7 +8,7 @@ import { RewriterPanel } from '../RewriterPanel';
 
 vi.mock('../../../components/RewriteWidget');
 
-describe('SelectionPanelSection', () => {
+describe('RewriterPanel component', () => {
   let store: ReturnType<typeof createStore>;
 
   beforeEach(() => {

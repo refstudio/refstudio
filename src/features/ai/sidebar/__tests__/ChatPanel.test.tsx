@@ -6,7 +6,7 @@ import { ChatbotPanel } from '../ChatPanel';
 
 vi.mock('../../../../api/chat');
 
-describe('ChatPanelSection component', () => {
+describe('ChatPanel component', () => {
   afterEach(() => {
     vi.clearAllMocks();
   });

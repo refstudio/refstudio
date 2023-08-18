@@ -1,4 +1,4 @@
-import { IconType } from '../icons/type';
+import { IconType } from './icons/type';
 
 interface SideBarProps<SideBarPane> {
   activePane: SideBarPane | null;
