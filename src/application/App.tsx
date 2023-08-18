@@ -22,10 +22,7 @@ import { CommandPalette } from './commands/CommandPalette';
 import { MainPanel } from './components/MainPanel';
 import { SideBar } from './components/SideBar';
 import { ExplorerPanel } from './sidebar/ExplorerPanel';
-import { BotIcon } from './sidebar/icons/BotIcon';
-import { FilesIcon } from './sidebar/icons/FilesIcon';
-import { PenIcon } from './sidebar/icons/PenIcon';
-import { ReferencesIcon } from './sidebar/icons/ReferencesIcon';
+import { BotIcon, FilesIcon, PenIcon, ReferencesIcon } from './sidebar/icons';
 
 export function App() {
   const panelRef = React.createRef<ImperativePanelGroupHandle>();
