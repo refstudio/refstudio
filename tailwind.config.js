@@ -17,6 +17,7 @@ export default {
         },
         muted: 'hsl(var(--color-muted) / <alpha-value>)',
         error: 'hsl(var(--color-error) / <alpha-value>)',
+        icon: 'hsl(var(--color-icon) / <alpha-value>)',
       },
       zIndex: {
         modals: 99999,

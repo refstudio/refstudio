@@ -1,15 +1,12 @@
 import 'react-contexify/dist/ReactContexify.css';
 
 import { MenuProvider } from 'kmenu';
-import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import { VscChevronUp } from 'react-icons/vsc';
+import React, { useCallback, useLayoutEffect, useState } from 'react';
 import { ImperativePanelGroupHandle, ImperativePanelHandle, Panel, PanelGroup } from 'react-resizable-panels';
 import { useEventListener, useLocalStorage, useWindowSize } from 'usehooks-ts';
 
-import { PrimarySideBar, PrimarySideBarPane } from '../components/PrimarySideBar';
 import { VerticalResizeHandle } from '../components/VerticalResizeHandle';
 import { emitEvent } from '../events';
-import { AIPanel } from '../features/ai/AIPanel';
 import { ReferencesDropZone } from '../features/references/components/ReferencesDropZone';
 import { ReferencesPanel } from '../features/references/sidebar/ReferencesPanel';
 import { useDebouncedCallback } from '../hooks/useDebouncedCallback';
@@ -19,6 +16,13 @@ import { ContextMenus } from '../wrappers/ContextMenus';
 import { EventsListener } from '../wrappers/EventsListener';
 import { CommandPalette } from './commands/CommandPalette';
 import { MainPanel } from './components/MainPanel';
+import { SideBar } from './components/SideBar';
+import { BotIcon } from './icons/sidebar/BotIcon';
+import { FilesIcon } from './icons/sidebar/FilesIcon';
+import { KeybindsIcon } from './icons/sidebar/KeybindsIcon';
+import { PenIcon } from './icons/sidebar/PenIcon';
+import { ReferencesIcon } from './icons/sidebar/ReferencesIcon';
+import { SettingsIcon } from './icons/sidebar/SettingsIcon';
 import { ExplorerPanel } from './sidebar/ExplorerPanel';
 
 export function App() {
@@ -76,7 +80,7 @@ export function App() {
                 <Panel order={2}>
                   <MainPanel />
                 </Panel>
-                <RightPanelWrapper />
+                <RightSidePanelWrapper />
               </PanelGroup>
             </MenuProvider>
           </ContextMenus>
@@ -87,6 +91,7 @@ export function App() {
   );
 }
 
+type PrimarySideBarPane = 'Explorer' | 'References';
 function LeftSidePanelWrapper() {
   const leftPanelRef = React.useRef<ImperativePanelHandle>(null);
   const [primaryPaneCollapsed, setPrimaryPaneCollapsed] = useState(false);
@@ -127,11 +132,19 @@ function LeftSidePanelWrapper() {
 
   return (
     <>
-      <PrimarySideBar
+      <SideBar
         activePane={primaryPaneCollapsed ? null : primaryPane}
-        onClick={handleSideBarClick}
-        onSettingsClick={openSettings}
+        footerItems={[
+          { label: 'Keybinds', Icon: KeybindsIcon, onClick: () => console.log('keybinds') },
+          { label: 'Settings', Icon: SettingsIcon, onClick: openSettings },
+        ]}
+        panes={[
+          { pane: 'Explorer', Icon: FilesIcon },
+          { pane: 'References', Icon: ReferencesIcon },
+        ]}
+        onItemClick={handleSideBarClick}
       />
+      {!primaryPaneCollapsed && <div className='h-full w-[1px]' style={{ backgroundColor: '#eff1f4' }} />}
       <Panel collapsible order={1} ref={leftPanelRef} onCollapse={(collapsed) => setPrimaryPaneCollapsed(collapsed)}>
         {primaryPane === 'Explorer' && <ExplorerPanel />}
         {primaryPane === 'References' && <ReferencesPanel />}
@@ -141,44 +154,47 @@ function LeftSidePanelWrapper() {
   );
 }
 
-function RightPanelWrapper() {
-  const [closed, setClosed] = React.useState(false);
-  const panelRef = React.useRef<ImperativePanelHandle>(null);
+type SecondarySideBarPane = 'Rewriter' | 'Chatbot';
+function RightSidePanelWrapper() {
+  const rightPanelRef = React.useRef<ImperativePanelHandle>(null);
+  const [secondaryPaneCollapsed, setSecondaryPaneCollapsed] = useState(true);
+  const [secondaryPane, setSecondaryPane] = useState<SecondarySideBarPane>('Rewriter');
 
-  useEffect(() => {
-    if (closed) {
-      panelRef.current?.collapse();
+  const handleSideBarClick = (selectedPane: SecondarySideBarPane) => {
+    if (selectedPane === secondaryPane) {
+      // Toggle collapsing
+      setSecondaryPaneCollapsed(!secondaryPaneCollapsed);
     } else {
-      panelRef.current?.expand();
+      // Always open the sidebar
+      setSecondaryPaneCollapsed(false);
     }
-  }, [panelRef, closed]);
+    setSecondaryPane(selectedPane);
+  };
 
-  // Configure keyboard shortcuts to open/close side panel
-  useEventListener('keydown', (e) => {
-    if (e.metaKey && e.key.toLowerCase() === '0') {
-      setClosed((current) => !current);
+  React.useEffect(() => {
+    if (secondaryPaneCollapsed) {
+      rightPanelRef.current?.collapse();
+    } else {
+      rightPanelRef.current?.expand();
     }
-  });
+  }, [rightPanelRef, secondaryPaneCollapsed]);
 
   return (
     <>
       <VerticalResizeHandle />
-      <Panel collapsible order={3} ref={panelRef} onCollapse={setClosed}>
-        <AIPanel onCloseClick={() => setClosed(true)} />
-        {closed && (
-          <div className="absolute bottom-0 right-0 flex border border-b-0 border-slate-300 bg-slate-100 px-4 py-2">
-            <div
-              className="flex w-60 cursor-pointer select-none items-center justify-between"
-              onClick={() => setClosed(false)}
-            >
-              <div>AI</div>
-              <div>
-                <VscChevronUp />
-              </div>
-            </div>
-          </div>
-        )}
+      <Panel collapsible order={3} ref={rightPanelRef} onCollapse={(collapsed) => setSecondaryPaneCollapsed(collapsed)}>
+        {secondaryPane === 'Rewriter' && <ExplorerPanel />}
+        {secondaryPane === 'Chatbot' && <ReferencesPanel />}
       </Panel>
+      {!secondaryPaneCollapsed && <div className='h-full w-[1px]' style={{ backgroundColor: '#eff1f4' }} />}
+      <SideBar
+        activePane={secondaryPaneCollapsed ? null : secondaryPane}
+        panes={[
+          { pane: 'Rewriter', Icon: PenIcon },
+          { pane: 'Chatbot', Icon: BotIcon },
+        ]}
+        onItemClick={handleSideBarClick}
+      />
     </>
   );
 }
