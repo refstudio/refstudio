@@ -140,7 +140,7 @@ function LeftSidePanelWrapper() {
           { label: 'Keybinds', Icon: KeybindsIcon, onClick: () => console.log('keybinds') },
           { label: 'Settings', Icon: SettingsIcon, onClick: openSettings },
         ]}
-        panes={[
+        items={[
           { pane: 'Explorer', Icon: FilesIcon },
           { pane: 'References', Icon: ReferencesIcon },
         ]}
@@ -191,7 +191,7 @@ function RightSidePanelWrapper() {
       {!secondaryPaneCollapsed && <div className='h-full w-[1px]' style={{ backgroundColor: '#eff1f4' }} />}
       <SideBar
         activePane={secondaryPaneCollapsed ? null : secondaryPane}
-        panes={[
+        items={[
           { pane: 'Rewriter', Icon: PenIcon },
           { pane: 'Chatbot', Icon: BotIcon },
         ]}

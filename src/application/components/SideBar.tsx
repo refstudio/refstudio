@@ -1,22 +1,23 @@
 import { IconType } from '../icons/type';
 
-export function SideBar<SideBarPane extends string>({
-  activePane,
-  panes,
-  footerItems,
-  onItemClick,
-}: {
+interface SideBarProps<SideBarPane> {
   activePane: SideBarPane | null;
-  panes: { pane: SideBarPane; Icon: IconType }[];
+  items: { pane: SideBarPane; Icon: IconType }[];
   footerItems?: { label: string; Icon: IconType; onClick: () => void }[];
   onItemClick: (pane: SideBarPane) => void;
-}) {
+}
+export function SideBar<SideBarPane extends string>({
+  activePane,
+  items,
+  footerItems,
+  onItemClick,
+}: SideBarProps<SideBarPane>) {
 
   return (
     <div className="flex select-none flex-col" role="menubar">
       <div className='flex-grow flex flex-col p-2 gap-2'>
         {
-          panes.map(({ pane, Icon }) => (
+          items.map(({ pane, Icon }) => (
             <Icon
               active={pane === activePane}
               aria-label={pane}
