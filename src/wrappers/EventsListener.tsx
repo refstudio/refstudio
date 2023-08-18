@@ -36,10 +36,6 @@ export function EventsListener({ children }: { children?: React.ReactNode }) {
   useListenEvent('refstudio://menu/file/close/all', useCloseAllActiveEditorsListener());
   useListenEvent('refstudio://menu/file/project/new', useFileProjectNewListener());
   useListenEvent('refstudio://menu/file/project/new/sample', useFileProjectNewSampleListener());
-  useListenEvent('refstudio://menu/file/project/new/sample', () => {
-    console.log('event handled in TrySampleProjectAction');
-  });
-
   useListenEvent('refstudio://menu/file/project/open', useFileProjectOpenListener());
   useListenEvent('refstudio://menu/file/project/close', useFileProjectCloseListener());
   // Editors
