@@ -12,6 +12,7 @@ import { RewriterPanel } from '../features/ai/sidebar/RewriterPanel';
 import { ReferencesDropZone } from '../features/references/components/ReferencesDropZone';
 import { ReferencesPanel } from '../features/references/sidebar/ReferencesPanel';
 import { useDebouncedCallback } from '../hooks/useDebouncedCallback';
+import { noop } from '../lib/noop';
 import { SettingsModalOpener } from '../settings/SettingsModalOpener';
 import { ApplicationFrame } from '../wrappers/ApplicationFrame';
 import { ContextMenus } from '../wrappers/ContextMenus';
@@ -137,7 +138,8 @@ function LeftSidePanelWrapper() {
       <SideBar
         activePane={primaryPaneCollapsed ? null : primaryPane}
         footerItems={[
-          { label: 'Keybinds', Icon: KeybindsIcon, onClick: () => console.log('keybinds') },
+          // TODO: Implement Keybinds screen
+          { label: 'Keybinds', Icon: KeybindsIcon, onClick: noop },
           { label: 'Settings', Icon: SettingsIcon, onClick: openSettings },
         ]}
         items={[
