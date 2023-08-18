@@ -1,7 +1,8 @@
-import { emit, EventCallback, listen } from '@tauri-apps/api/event';
+import type { EventCallback } from '@tauri-apps/api/event';
 
 import { PaneEditorId, PaneId } from './atoms/types/PaneGroup';
 import { NotificationItemType } from './notifications/types';
+import { emit, listen } from './wrappers/tauri-wrapper';
 
 interface RefStudioEvents {
   // Menu actions (Note that these should have undefined payload)
@@ -44,23 +45,11 @@ export type RefStudioEventName = keyof RefStudioEvents;
 
 export type RefStudioEventPayload<Event extends RefStudioEventName> = RefStudioEvents[Event];
 
-type RefStudioEventsWithNonEmptyPayload<Event = RefStudioEventName> = Event extends RefStudioEventName
-  ? RefStudioEventPayload<Event> extends undefined
-    ? never
-    : Event
-  : never;
-
-type RefStudioEventsWithEmptyPayload = Exclude<RefStudioEventName, RefStudioEventsWithNonEmptyPayload>;
-
-// payload must be passed for event with a non empty payload
-export function emitEvent<Event extends RefStudioEventsWithNonEmptyPayload>(
+export function emitEvent<Event extends RefStudioEventName>(
   event: Event,
-  payload: RefStudioEventPayload<Event>,
-): void;
-// no need to pass the payload for events that don't expect a payload
-export function emitEvent<Event extends RefStudioEventsWithEmptyPayload>(event: Event, payload?: undefined): void;
-export function emitEvent<Event extends RefStudioEventName>(event: Event, payload?: RefStudioEventPayload<Event>) {
-  void emit(event, payload);
+  ...args: RefStudioEventPayload<Event> extends undefined ? [] : [payload: RefStudioEventPayload<Event>]
+) {
+  void emit(event, ...args);
 }
 
 export type RefStudioEventCallback<Event extends RefStudioEventName> = EventCallback<RefStudioEventPayload<Event>>;

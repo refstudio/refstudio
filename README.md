@@ -2,8 +2,8 @@
   <a href="https://github.com/refstudio/refstudio/actions/workflows/on-push.yml">
     <img src="https://github.com/refstudio/refstudio/actions/workflows/on-push.yml/badge.svg" />
   </a>
-  <a href="https://codecov.io/gh/refstudio/refstudio" > 
-   <img src="https://codecov.io/gh/refstudio/refstudio/branch/main/graph/badge.svg?token=XZMTETRGXC"/> 
+  <a href="https://codecov.io/gh/refstudio/refstudio" >
+   <img src="https://codecov.io/gh/refstudio/refstudio/branch/main/graph/badge.svg?token=XZMTETRGXC"/>
    </a>
 </p>
 
@@ -37,8 +37,6 @@ When editing documents you can ask AI assistance to rewrite parts of the text, a
 
 https://github.com/refstudio/refstudio/assets/174127/f8b847e1-d6b7-4e58-ae04-0d8e96c88382
 
-
-
 ## Setup & Run
 
 ### Prerequisites (development)
@@ -46,7 +44,6 @@ https://github.com/refstudio/refstudio/assets/174127/f8b847e1-d6b7-4e58-ae04-0d8
 - JavaScript: [node.js](https://nodejs.org/en/download) (>= 18.12.0 LTS) and [Yarn](https://yarnpkg.com/getting-started/install) package manager
 - Python: (>= 3.11) and [Poetry](https://python-poetry.org/docs/#installation) package manager
 - Tauri: Check [prerequisites](https://tauri.app/v1/guides/getting-started/prerequisites/) to install Rust and [Cargo](https://doc.rust-lang.org/stable/cargo/) package manager
-
 
 ### Backend (Python sidecar)
 
@@ -57,6 +54,7 @@ poetry install
 ```
 
 To compile the Python sidecar as a binary:
+
 ```bash
 yarn python
 ```
@@ -79,6 +77,14 @@ You should then be able to launch the app via:
 yarn tauri:dev
 ```
 
+To develop the web version of RefStudio, run:
+
+```bash
+yarn web:dev
+```
+
+and open http://localhost:1421/ in your browser.
+
 #### Debug
 
 To automatically open the browser devtools you can launch the app via:
@@ -99,6 +105,7 @@ Assuming you are in the root project directory, you can run the Python tests and
 ```bash
 poetry run pytest --cov=python python/tests
 ```
+
 ### Frontend (TypeScript)
 
 ```bash
@@ -113,7 +120,6 @@ yarn test:watch
 yarn test:watch:ui
 ```
 
-
 ## Reset
 
 To reset your local environment you should following these steps:
@@ -123,11 +129,11 @@ To reset your local environment you should following these steps:
 * run `yarn tauri:dev` to run the app
 * upload new reference PDFs
 
-Project state is persisted in the Tauri [`appDataDir`][appDataDir], typically `~/Library/Application\ Support/com.tauri.dev`.
+Project state is persisted in the Tauri [`appDataDir`][appDataDir], typically `~/Library/Application\ Support/studio.ref.desktop`.
 To completely reset app state, quit the RefStudio app and remove this directory:
 
 ```bash
-mv ~/Library/Application\ Support/com.tauri.dev /tmp/
+mv ~/Library/Application\ Support/studio.ref.desktop /tmp/
 ```
 
 [appDataDir]: https://tauri.app/v1/api/js/path#appdatadir

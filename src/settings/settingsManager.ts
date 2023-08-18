@@ -1,5 +1,6 @@
 import { SettingsManager } from 'tauri-settings';
 import { Path, PathValue } from 'tauri-settings/dist/types/dot-notation';
+import { getDotNotation, setDotNotation } from 'tauri-settings/dist/utils/dot-notation';
 
 import { getSystemConfigurationsDir } from '../io/filesystem';
 import { readEnv } from '../io/readEnv';
@@ -35,47 +36,71 @@ export interface SettingsSchema {
   };
 }
 
-let settingsManager: SettingsManager<SettingsSchema> | undefined;
+/**
+ * This pulls out just the parts of SettingsManager that are used in the app.
+ * This makes it easier to stub in an in-memory equivalent of SettingsManager.
+ * This can all go away when we have a settings API.
+ */
+export type SettingsManagerView = Pick<
+  SettingsManager<SettingsSchema>,
+  'getCache' | 'setCache' | 'syncCache' | 'default'
+>;
+
+let settingsManager: SettingsManagerView | undefined;
 
 export const DEFAULT_OPEN_AI_CHAT_MODEL = 'gpt-3.5-turbo';
 
 export async function initSettings() {
   try {
-    settingsManager = new SettingsManager<SettingsSchema>(
-      {
-        project: {
-          currentDir: 'MIGRATE_FROM_GENERAL',
-        },
-        openAI: {
-          apiKey: await readEnv('OPENAI_API_KEY', ''),
-          chatModel: await readEnv('OPENAI_CHAT_MODEL', DEFAULT_OPEN_AI_CHAT_MODEL),
-          manner: (await readEnv('OPENAI_MANNER', 'scholarly')) as OpenAiManner,
-          temperature: parseFloat(await readEnv('OPENAI_TEMPERATURE', '0.7')),
-        },
-        sidecar: {
-          logging: {
-            active: (await readEnv('SIDECAR_ENABLE_LOGGING', 'false')).toLowerCase() === 'true',
-            path: await readEnv('SIDECAR_LOG_DIR', '/tmp'),
-          },
+    const settings: SettingsSchema = {
+      project: {
+        currentDir: import.meta.env.VITE_IS_WEB ? '' : 'MIGRATE_FROM_GENERAL',
+      },
+      openAI: {
+        apiKey: await readEnv('OPENAI_API_KEY', ''),
+        chatModel: await readEnv('OPENAI_CHAT_MODEL', DEFAULT_OPEN_AI_CHAT_MODEL),
+        manner: (await readEnv('OPENAI_MANNER', 'scholarly')) as OpenAiManner,
+        temperature: parseFloat(await readEnv('OPENAI_TEMPERATURE', '0.7')),
+      },
+      sidecar: {
+        logging: {
+          active: (await readEnv('SIDECAR_ENABLE_LOGGING', 'false')).toLowerCase() === 'true',
+          path: await readEnv('SIDECAR_LOG_DIR', '/tmp'),
         },
       },
-      {
+    };
+
+    let configs;
+    if (import.meta.env.VITE_IS_WEB) {
+      configs = settings;
+
+      settingsManager = {
+        default: settings,
+        getCache: (key) => getDotNotation(settings, key)!,
+        setCache: (key, value) => {
+          setDotNotation(settings, key, value);
+          return value;
+        },
+        syncCache: () => Promise.resolve(settings),
+      };
+    } else {
+      const tauriSettingsManager = new SettingsManager<SettingsSchema>(settings, {
         dir: await getSystemConfigurationsDir(),
         fileName: 'refstudio-settings.json',
         prettify: true,
-      },
-    );
+      });
+      settingsManager = tauriSettingsManager;
 
-    const configs = await settingsManager.initialize();
-
-    // Run retro-compatibility migration if required key is missing
-    if (configs.project.currentDir === 'MIGRATE_FROM_GENERAL') {
-      if (configs.general?.appDataDir && configs.general.projectName) {
-        setCachedSetting('project.currentDir', configs.general.appDataDir + configs.general.projectName);
-      } else {
-        setCachedSetting('project.currentDir', '');
+      configs = await tauriSettingsManager.initialize();
+      // Run retro-compatibility migration if required key is missing
+      if (configs.project.currentDir === 'MIGRATE_FROM_GENERAL') {
+        if (configs.general?.appDataDir && configs.general.projectName) {
+          setCachedSetting('project.currentDir', configs.general.appDataDir + configs.general.projectName);
+        } else {
+          setCachedSetting('project.currentDir', '');
+        }
+        await saveCachedSettings();
       }
-      await saveCachedSettings();
     }
 
     console.log('Settings initialized with success with', configs);
