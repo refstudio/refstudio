@@ -1,9 +1,11 @@
-import { IconType } from './icons/type';
+import './SideBar.css';
+
+import { cx } from '../../lib/cx';
 
 interface SideBarProps<SideBarPane> {
   activePane: SideBarPane | null;
-  items: { pane: SideBarPane; Icon: IconType }[];
-  footerItems?: { label: string; Icon: IconType; onClick: () => void }[];
+  items: { pane: SideBarPane; Icon: React.ReactElement }[];
+  footerItems?: { label: string; Icon: React.ReactElement; onClick: () => void }[];
   onItemClick: (pane: SideBarPane) => void;
 }
 export function SideBar<SideBarPane extends string>({
@@ -12,41 +14,54 @@ export function SideBar<SideBarPane extends string>({
   footerItems,
   onItemClick,
 }: SideBarProps<SideBarPane>) {
-
   return (
-    <div className="flex select-none flex-col" role="menubar">
-      <div className='flex-grow flex flex-col p-2 gap-2'>
-        {
-          items.map(({ pane, Icon }) => (
-            <Icon
-              active={pane === activePane}
-              aria-label={pane}
-              key={pane}
-              role="menuitem"
-              onClick={(evt) => {
-                evt.preventDefault();
-                evt.stopPropagation();
-                onItemClick(pane);
-              }}
-            />
-          ))
-        }
+    <div className="side-bar" role="menubar">
+      <div className="flex flex-grow flex-col gap-2 p-2">
+        {items.map(({ pane, Icon }) => (
+          <IconButton active={pane === activePane} key={pane} onClick={() => onItemClick(pane)}>
+            {Icon}
+          </IconButton>
+        ))}
       </div>
-      {footerItems?.length && <>
-        <div className='w-full h-[1px]' style={{ backgroundColor: '#eff1f4' }} />
-        <div className='flex flex-col p-2 gap-2'>
-          {footerItems.map(({ label, Icon, onClick }) => (<Icon
-            aria-label={label}
-            key={label}
-            role="menuitem"
-            onClick={(evt) => {
-              evt.preventDefault();
-              evt.stopPropagation();
-              onClick();
-            }}
-          />))}
-        </div>
-      </>}
+      {footerItems?.length && (
+        <>
+          <div className="h-[1px] w-full" style={{ backgroundColor: '#eff1f4' }} />
+          <div className="flex flex-col gap-2 p-2">
+            {footerItems.map(({ label, Icon, onClick }) => (
+              <IconButton key={label} onClick={onClick}>
+                {Icon}
+              </IconButton>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function IconButton({
+  active,
+  children,
+  onClick,
+}: {
+  active?: boolean;
+  children: React.ReactNode;
+  onClick?: () => void;
+}) {
+  return (
+    <div
+      className={cx('icon', { 'cursor-pointer': !!onClick, active })}
+      role="menuitem"
+      onClick={
+        onClick &&
+        ((evt) => {
+          evt.preventDefault();
+          evt.stopPropagation();
+          onClick();
+        })
+      }
+    >
+      <div className="self-center">{children}</div>
     </div>
   );
 }

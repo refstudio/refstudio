@@ -2,6 +2,7 @@ import 'react-contexify/dist/ReactContexify.css';
 
 import { MenuProvider } from 'kmenu';
 import React, { useCallback, useLayoutEffect, useState } from 'react';
+import { MdKeyboard, MdSettings } from 'react-icons/md';
 import { ImperativePanelGroupHandle, ImperativePanelHandle, Panel, PanelGroup } from 'react-resizable-panels';
 import { useEventListener, useLocalStorage, useWindowSize } from 'usehooks-ts';
 
@@ -23,10 +24,8 @@ import { SideBar } from './components/SideBar';
 import { ExplorerPanel } from './sidebar/ExplorerPanel';
 import { BotIcon } from './sidebar/icons/BotIcon';
 import { FilesIcon } from './sidebar/icons/FilesIcon';
-import { KeybindsIcon } from './sidebar/icons/KeybindsIcon';
 import { PenIcon } from './sidebar/icons/PenIcon';
 import { ReferencesIcon } from './sidebar/icons/ReferencesIcon';
-import { SettingsIcon } from './sidebar/icons/SettingsIcon';
 
 export function App() {
   const panelRef = React.createRef<ImperativePanelGroupHandle>();
@@ -139,16 +138,24 @@ function LeftSidePanelWrapper() {
         activePane={primaryPaneCollapsed ? null : primaryPane}
         footerItems={[
           // TODO: Implement Keybinds screen
-          { label: 'Keybinds', Icon: KeybindsIcon, onClick: noop },
-          { label: 'Settings', Icon: SettingsIcon, onClick: openSettings },
+          {
+            label: 'Keybinds',
+            Icon: <MdKeyboard aria-label="Keybindings" size="24" />,
+            onClick: noop,
+          },
+          {
+            label: 'Settings',
+            Icon: <MdSettings aria-label="Settings" size="24" />,
+            onClick: openSettings,
+          },
         ]}
         items={[
-          { pane: 'Explorer', Icon: FilesIcon },
-          { pane: 'References', Icon: ReferencesIcon },
+          { pane: 'Explorer', Icon: <FilesIcon /> },
+          { pane: 'References', Icon: <ReferencesIcon /> },
         ]}
         onItemClick={handleSideBarClick}
       />
-      {!primaryPaneCollapsed && <div className='h-full w-[1px]' style={{ backgroundColor: '#eff1f4' }} />}
+      {!primaryPaneCollapsed && <div className="h-full w-[1px]" style={{ backgroundColor: '#eff1f4' }} />}
       <Panel collapsible order={1} ref={leftPanelRef} onCollapse={(collapsed) => setPrimaryPaneCollapsed(collapsed)}>
         {primaryPane === 'Explorer' && <ExplorerPanel />}
         {primaryPane === 'References' && <ReferencesPanel />}
@@ -190,12 +197,12 @@ function RightSidePanelWrapper() {
         {secondaryPane === 'Rewriter' && <RewriterPanel />}
         {secondaryPane === 'Chatbot' && <ChatbotPanel />}
       </Panel>
-      {!secondaryPaneCollapsed && <div className='h-full w-[1px]' style={{ backgroundColor: '#eff1f4' }} />}
+      {!secondaryPaneCollapsed && <div className="h-full w-[1px]" style={{ backgroundColor: '#eff1f4' }} />}
       <SideBar
         activePane={secondaryPaneCollapsed ? null : secondaryPane}
         items={[
-          { pane: 'Rewriter', Icon: PenIcon },
-          { pane: 'Chatbot', Icon: BotIcon },
+          { pane: 'Rewriter', Icon: <PenIcon /> },
+          { pane: 'Chatbot', Icon: <BotIcon /> },
         ]}
         onItemClick={handleSideBarClick}
       />
