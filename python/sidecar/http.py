@@ -1,13 +1,29 @@
 from dotenv import load_dotenv
 from fastapi import FastAPI
-from sidecar import chat, ingest, rewrite, search, storage
-from sidecar.typing import (ChatRequest, ChatResponse, DeleteRequest,
-                            DeleteStatusResponse, IngestRequest,
-                            IngestResponse, IngestStatusResponse,
-                            ReferenceUpdate, RewriteRequest, RewriteResponse,
-                            SearchRequest, SearchResponse,
-                            TextCompletionRequest, TextCompletionResponse,
-                            UpdateStatusResponse)
+from sidecar import (
+    chat as chat_module,
+    ingest as ingest_module,
+    rewrite as rewrite_module,
+    search as search_module,
+    storage
+)
+from sidecar.typing import (
+    ChatRequest,
+    ChatResponse,
+    DeleteRequest,
+    DeleteStatusResponse,
+    IngestRequest,
+    IngestResponse,
+    IngestStatusResponse,
+    ReferenceUpdate,
+    RewriteRequest,
+    RewriteResponse,
+    SearchRequest,
+    SearchResponse,
+    TextCompletionRequest,
+    TextCompletionResponse,
+    UpdateStatusResponse,
+)
 
 load_dotenv()
 
@@ -20,54 +36,54 @@ async def sidecar_index():
 
 
 @sidecar_api.post("/ingest")
-async def http_ingest() -> IngestResponse:
+async def ingest() -> IngestResponse:
     # response = ingest.run_ingest()
-    raise NotImplementedError("Ingest is not yet implemented")
+    raise NotImplementedError("Ingest is not supported for the HTTP sidecar API.")
 
 
 @sidecar_api.get("/ingest_status")
-async def http_get_statuses() -> IngestStatusResponse:
-    response = ingest.get_statuses()
+async def get_statuses() -> IngestStatusResponse:
+    response = ingest_module.get_statuses()
     return response
 
 
 @sidecar_api.post("/ingest_references")
-async def http_get_references(req: IngestRequest) -> IngestResponse:
-    response = ingest.get_references(req)
+async def get_references(req: IngestRequest) -> IngestResponse:
+    response = ingest_module.get_references(req)
     return response
 
 
 @sidecar_api.post("/update")
-async def http_update(req: ReferenceUpdate) -> UpdateStatusResponse:
+async def update(req: ReferenceUpdate) -> UpdateStatusResponse:
     response = storage.update_reference(req)
     return response
 
 
 @sidecar_api.post("/delete")
-async def http_delete(req: DeleteRequest) -> DeleteStatusResponse:
+async def delete(req: DeleteRequest) -> DeleteStatusResponse:
     response = storage.delete_references(req)
     return response
 
 
 @sidecar_api.post("/rewrite")
-async def http_rewrite(req: RewriteRequest) -> RewriteResponse:
-    response = rewrite.rewrite(req)
+async def rewrite(req: RewriteRequest) -> RewriteResponse:
+    response = rewrite_module.rewrite(req)
     return response
 
 
 @sidecar_api.post("/completion")
-async def http_completion(req: TextCompletionRequest) -> TextCompletionResponse:
-    response = rewrite.complete_text(req)
+async def completion(req: TextCompletionRequest) -> TextCompletionResponse:
+    response = rewrite_module.complete_text(req)
     return response
 
 
 @sidecar_api.post("/chat")
-async def http_chat(req: ChatRequest) -> ChatResponse:
-    response = chat.ask_question(req)
+async def chat(req: ChatRequest) -> ChatResponse:
+    response = chat_module.ask_question(req)
     return response
 
 
 @sidecar_api.post("/search")
-async def http_search(req: SearchRequest) -> SearchResponse:
-    response = search.search_s2(req)
+async def search(req: SearchRequest) -> SearchResponse:
+    response = search_module.search_s2(req)
     return response
