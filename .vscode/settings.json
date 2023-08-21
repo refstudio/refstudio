@@ -13,6 +13,11 @@
   "[typescript]": {
     "editor.formatOnSave": true
   },
+  "[python]": {
+    "editor.formatOnSave": false,
+    "editor.defaultFormatter": "ms-python.python",
+    "editor.codeActionsOnSave": []
+  },
   "editor.codeActionsOnSave": [
     // Run ESLint fixers _before_ prettier to ensure the user doesn't need to do multiple saves
     "source.organizeImports",
