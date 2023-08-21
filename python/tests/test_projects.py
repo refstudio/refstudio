@@ -56,9 +56,9 @@ def test_update_project_path_storage_should_be_appended_to(monkeypatch, tmp_path
     }
 
 
-def test_get_project_path_for_project_that_does_not_exist(tmp_path):
+def test_get_project_path_for_project_that_does_not_exist(tmp_path, setup_project_path_storage):
     user_id = "user1"
-    project_id = "project1"
+    project_id = "project999"
     try:
         _ = projects.get_project_path(user_id, project_id)
     except KeyError:
