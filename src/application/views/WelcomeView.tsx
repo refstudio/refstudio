@@ -7,7 +7,7 @@ export function WelcomeView() {
       className={cx(
         'h-full w-full',
         'flex flex-col items-center justify-center gap-28',
-        'py-6 pb-16 pt-0',
+        'px-6 pb-16 pt-0',
         'bg-grayscale-10',
         'cursor-default select-none',
       )}
