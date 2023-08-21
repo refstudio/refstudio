@@ -25,7 +25,7 @@ export function SideBar<SideBarPane extends string>({
       </div>
       {footerItems?.length && (
         <>
-          <div className="h-[1px] w-full" style={{ backgroundColor: '#eff1f4' }} />
+          <div className="h-[1px] w-full bg-grayscale-20" />
           <div className="flex flex-col gap-2 p-2">
             {footerItems.map(({ label, Icon, onClick }) => (
               <IconButton key={label} onClick={onClick}>

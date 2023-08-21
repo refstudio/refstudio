@@ -6,7 +6,6 @@
   @apply flex h-10 w-10 content-center justify-center gap-2 rounded;
   @apply text-red-300;
   @apply bg-grayscale-0 text-grayscale-60;
-  @apply shadow-default;
 }
 
 .side-bar .icon:hover,
