@@ -20,6 +20,7 @@ import { EventsListener } from '../wrappers/EventsListener';
 import { CommandPalette } from './commands/CommandPalette';
 import { MainPanel } from './components/MainPanel';
 import { ExplorerPanel } from './sidebar/ExplorerPanel';
+import { WebMenuShortcuts } from './WebMenuShortcuts';
 
 export function App() {
   const panelRef = React.createRef<ImperativePanelGroupHandle>();
@@ -66,6 +67,7 @@ export function App() {
           <ContextMenus>
             <MenuProvider config={{ animationDuration: 0 }}>
               <CommandPalette />
+              {import.meta.env.VITE_IS_WEB && <WebMenuShortcuts />}
               <PanelGroup
                 className="relative h-full"
                 direction="horizontal"
@@ -108,9 +110,15 @@ function LeftSidePanelWrapper() {
     if (e.metaKey) {
       switch (e.key.toLowerCase()) {
         case '1':
-          return handleSideBarClick('Explorer');
+          handleSideBarClick('Explorer');
+          e.preventDefault();
+          e.stopPropagation();
+          break;
         case '2':
-          return handleSideBarClick('References');
+          handleSideBarClick('References');
+          e.preventDefault();
+          e.stopPropagation();
+          break;
       }
     }
   });
@@ -157,6 +165,8 @@ function RightPanelWrapper() {
   useEventListener('keydown', (e) => {
     if (e.metaKey && e.key.toLowerCase() === '0') {
       setClosed((current) => !current);
+      e.preventDefault();
+      e.stopPropagation();
     }
   });
 

@@ -5,12 +5,17 @@ import { useEffect } from 'react';
 import {
   VscBell,
   VscClose,
+  VscEmptyWindow,
+  VscExtensions,
   VscFiles,
   VscGear,
   VscLayoutSidebarLeft,
   VscLayoutSidebarRight,
   VscLibrary,
+  VscMarkdown,
   VscNewFile,
+  VscNewFolder,
+  VscSave,
   VscSearch,
   VscSymbolString,
 } from 'react-icons/vsc';
@@ -41,6 +46,8 @@ export function CommandPalette({ index, onOpen }: { index?: number; onOpen?: (in
   // Open Files on "META + p"
   useEventListener('keydown', (e) => {
     if (e.metaKey && e.key.toLowerCase() === 'p') {
+      e.preventDefault();
+      e.stopPropagation();
       setOpen(INDEX_FILES, true);
     }
   });
@@ -93,13 +100,48 @@ export function MainCommandMenu({ index }: { index: number }) {
       ],
     },
     {
-      category: 'Actions',
+      category: 'File',
       commands: [
         {
           icon: <VscNewFile />,
           text: 'New File',
           perform: () => emitEvent('refstudio://menu/file/new'),
         },
+        {
+          icon: <VscSave />,
+          text: 'Save',
+          perform: () => emitEvent('refstudio://menu/file/save'),
+        },
+        {
+          icon: <VscMarkdown />,
+          text: 'Save File as Markdown',
+          perform: () => emitEvent('refstudio://menu/file/markdown'),
+        },
+        {
+          icon: <VscNewFolder />,
+          text: 'New Project',
+          perform: () => emitEvent('refstudio://menu/file/project/new'),
+        },
+        {
+          icon: <VscEmptyWindow />,
+          text: 'Open Project',
+          perform: () => emitEvent('refstudio://menu/file/project/new'),
+        },
+        {
+          icon: <VscClose />,
+          text: 'Close Project',
+          perform: () => emitEvent('refstudio://menu/file/project/close'),
+        },
+        {
+          icon: <VscExtensions />,
+          text: 'Open Sample Project',
+          perform: () => emitEvent('refstudio://menu/file/project/new/sample'),
+        },
+      ],
+    },
+    {
+      category: 'Actions',
+      commands: [
         {
           icon: <VscLayoutSidebarLeft />,
           text: 'Move Left',
@@ -126,7 +168,7 @@ export function MainCommandMenu({ index }: { index: number }) {
         },
         {
           icon: <VscClose />,
-          text: 'Close Active Editor',
+          text: 'Close Editor',
           perform: () => emitEvent('refstudio://menu/file/close'),
         },
         {
