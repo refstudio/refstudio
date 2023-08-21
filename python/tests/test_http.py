@@ -1,13 +1,14 @@
 from pathlib import Path
+from uuid import UUID
 
 from fastapi.testclient import TestClient
-from sidecar import search, settings
+from sidecar import http, projects, search, settings
 from sidecar.chat import Chat
 from sidecar.rewrite import Rewriter
 from sidecar.storage import JsonStorage
 from web import api
 
-from .test_ingest import _copy_fixture_to_temp_dir
+from .test_ingest import _copy_fixture_to_temp_dir, FIXTURES_DIR
 
 client = TestClient(api)
 
@@ -250,3 +251,194 @@ def test_search_s2_is_ok(monkeypatch, mock_search_paper):
             },
         ],
     }
+
+
+def test_http_list_projects(monkeypatch, tmp_path):
+    monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
+
+    user_id = "user1"
+    project_id = "project1"
+
+    client = TestClient(http.project_api)
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert response.json() == {}
+
+    projects.create_project(user_id, project_id)
+
+    response = client.get("/")
+    assert response.status_code == 200
+    assert response.json() == {project_id: str(tmp_path / user_id / project_id)}
+
+
+def test_create_project(monkeypatch, tmp_path):
+    monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
+
+    client = TestClient(http.project_api)
+
+    response = client.post("/")
+
+    assert response.status_code == 200
+    assert len(response.json()) == 1
+
+    # should create project with random uuid4
+    project_id = list(response.json().keys())[0]
+    assert isinstance(UUID(project_id), UUID)
+
+    # should create project in user's home directory
+    user_id = "user1"
+    project_path = tmp_path / user_id / project_id
+    assert response.json()[project_id] == str(project_path)
+    assert project_path.exists()
+
+    storage = projects.read_project_path_storage(user_id)
+    assert project_id in storage
+
+
+def test_get_project(monkeypatch, tmp_path):
+    monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
+
+    client = TestClient(http.project_api)
+
+    # create a project
+    user_id = "user1"
+    project_id = "project1"
+    project_path = projects.create_project(user_id, project_id)
+
+    # get the project
+    response = client.get(f"/{project_id}")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "project_id": project_id,
+        "project_path": str(project_path),
+        "filepaths": [],
+    }
+
+
+def test_delete_project(monkeypatch, tmp_path):
+    monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
+
+    client = TestClient(http.project_api)
+
+    # create a project
+    user_id = "user1"
+    project_id = "project1"
+    project_path = projects.create_project(user_id, project_id)
+
+    # delete the project
+    response = client.delete(f"/{project_id}")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "status": "success",
+        "message": "Project deleted",
+        "project_id": project_id,
+    }
+
+    # check that the project was deleted
+    assert not project_path.exists()
+
+    storage = projects.read_project_path_storage(user_id)
+    assert project_id not in storage
+
+
+def test_create_file(monkeypatch, tmp_path):
+    monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
+
+    client = TestClient(http.filesystem_api)
+
+    # create a project
+    user_id = "user1"
+    project_id = "project1"
+    project_path = projects.create_project(user_id, project_id)
+
+    # create a file
+    filename = "uploads/test.pdf"
+    filepath = project_path / filename
+
+    with open(f"{FIXTURES_DIR}/pdf/grobid-fails.pdf", "rb") as f:
+        response = client.put(
+            f"/{project_id}/{filename}",
+            files={"file": ("grobid-fails.pdf", f, "application/pdf")},
+        )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "status": "success",
+        "message": "File uploaded",
+        "filepath": str(filepath),
+    }
+
+    # check that the file was created
+    assert filepath.exists()
+
+    files_and_subdirs = projects.get_project_files(user_id, project_id)
+    expected = [filepath.parent, filepath]
+    assert sorted(files_and_subdirs) == sorted(expected)
+
+
+def test_read_file(monkeypatch, tmp_path):
+    monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
+
+    client = TestClient(http.filesystem_api)
+
+    # create a project
+    user_id = "user1"
+    project_id = "project1"
+    project_path = projects.create_project(user_id, project_id)
+
+    # create a file
+    filename = "uploads/test.pdf"
+    filepath = project_path / filename
+
+    with open(f"{FIXTURES_DIR}/pdf/grobid-fails.pdf", "rb") as f:
+        response = client.put(
+            f"/{project_id}/{filename}",
+            files={"file": ("grobid-fails.pdf", f, "application/pdf")},
+        )
+
+    # read the file
+    response = client.get(f"/{project_id}/{filename}")
+
+    assert response.status_code == 200
+    assert response.content == filepath.read_bytes()
+
+
+def test_delete_file(monkeypatch, tmp_path):
+    monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
+
+    client = TestClient(http.filesystem_api)
+
+    # create a project
+    user_id = "user1"
+    project_id = "project1"
+    project_path = projects.create_project(user_id, project_id)
+
+    # create a file
+    filename = "uploads/test.pdf"
+    filepath = project_path / filename
+
+    with open(f"{FIXTURES_DIR}/pdf/grobid-fails.pdf", "rb") as f:
+        response = client.put(
+            f"/{project_id}/{filename}",
+            files={"file": ("grobid-fails.pdf", f, "application/pdf")},
+        )
+
+    # delete the file
+    response = client.delete(f"/{project_id}/{filename}")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "status": "success",
+        "message": "File deleted",
+        "filepath": str(filepath),
+    }
+
+    # check that the file was deleted
+    assert not filepath.exists()
+
+    files_and_subdirs = projects.get_project_files(user_id, project_id)
+    expected = [filepath.parent]
+    assert sorted(files_and_subdirs) == sorted(expected)
