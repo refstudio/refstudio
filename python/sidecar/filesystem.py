@@ -1,8 +1,6 @@
 import os
 from pathlib import Path
 
-import fsspec
-
 
 def write_file(path: Path, content: str) -> None:
     with open(path, "w") as f:

@@ -21,7 +21,6 @@ fastapi = {extras = ["standard"], version = "^0.101.1"}
 uvicorn = "^0.23.2"
 httpx = "^0.24.1"
 python-multipart = "^0.0.6"
-fsspec = "^2023.6.0"
 
 [tool.poetry.group.dev.dependencies]
 ipython = "^8.13.2"
