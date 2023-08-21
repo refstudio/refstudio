@@ -31,6 +31,9 @@ export default {
       boxShadow: {
         default: '0px 0px 24px 0px rgba(0, 0, 0, 0.04)',
       },
+      borderRadius: {
+        default: '0.25rem',
+      },
       zIndex: {
         modals: 99999,
         notifications: 88888,

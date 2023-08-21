@@ -61,7 +61,7 @@ function WelcomeViewShortcut({ text, keys }: Shortcut) {
               return <div key={index}>+</div>;
             }
             return (
-              <kbd className="flex justify-center items-center w-8 h-8 bg-grayscale-30 rounded text-base" key={key.value}>
+              <kbd className="flex justify-center items-center w-8 h-8 bg-grayscale-30 rounded-default text-base" key={key.value}>
                 {key.value}
               </kbd>
             );
