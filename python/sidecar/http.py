@@ -1,9 +1,10 @@
 import shutil
 from typing import Annotated
+from uuid import uuid4
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, UploadFile
-from sidecar import chat, filesystem, ingest, rewrite, search, storage
+from sidecar import chat, filesystem, ingest, projects, rewrite, search, storage
 from sidecar.typing import (
     ChatRequest,
     ChatResponse,
@@ -26,6 +27,7 @@ load_dotenv()
 
 sidecar_api = FastAPI()  # Legacy API for existing sidecar cli functionality
 filesystem_api = FastAPI()  # API for interacting with the filesystem
+project_api = FastAPI()  # API for interacting with projects
 
 
 # Sidecar API
@@ -36,9 +38,12 @@ async def sidecar_index():
 
 
 @sidecar_api.post("/ingest")
-async def http_ingest() -> IngestResponse:
-    # response = ingest.run_ingest()
-    raise NotImplementedError("Ingest is not supported for the HTTP sidecar API.")
+async def http_ingest(project_id: str) -> IngestResponse:
+    user_id = "user1"
+    project_path = filesystem.get_project_path(user_id, project_id)
+    req = IngestRequest(pdf_directory=project_path)
+    response = ingest.run_ingest(req)
+    return response
 
 
 @sidecar_api.get("/ingest_status")
@@ -89,6 +94,50 @@ async def http_search(req: SearchRequest) -> SearchResponse:
     return response
 
 
+# Project API
+# --------------
+@project_api.post("/")
+async def create_project(project_path: str = None):
+    """
+    Creates a project directory in the filesystem
+
+    Parameters
+    ----------
+    project_path : str
+        The path to the project directory. Only necessary for Desktop.
+        For web, the project is stored in a private directory on the server.
+    """
+    user_id = "user1"
+    project_id = str(uuid4())
+    project_path = projects.create_project(user_id, project_id, project_path)
+    return {
+        project_id: project_path,
+    }
+
+
+@project_api.get("/{project_id}")
+async def get_project(project_id: str):
+    """
+    Returns the project path and a list of files in the project
+    """
+    user_id = "user1"
+    project_path = projects.get_project_path(user_id, project_id)
+    filepaths = projects.get_project_files(user_id, project_id)
+    return {
+        "project_id": project_id,
+        "project_path": project_path,
+        "filepaths": filepaths,
+    }
+
+
+@project_api.get("/{project_id}/files")
+async def get_project_files(project_id: str):
+    user_id = "user1"
+    filepaths = projects.get_project_files(user_id, project_id)
+    return filepaths
+
+
+
 # Filesystem API
 # --------------
 @filesystem_api.get("/")
@@ -96,32 +145,14 @@ async def filesystem_index():
     return {"message": "Hello World from the Filesystem API"}
 
 
-@filesystem_api.get("/project")
-async def get_project(project_id: str):
+@filesystem_api.put("/{project_id}/{filename}")
+async def create_file(project_id: str, filename: str, file: UploadFile = File(...)):
+    # TODO: make sure we can place PDFs in uploads directory
+    # but refstudio documents should be written to root
+    # client should determine where the file should get saved wtihin the project
     user_id = "user1"
-    project_path = filesystem.get_project_path(user_id, project_id)
-    return project_path
-
-
-@filesystem_api.post("/project")
-async def create_project(project_id: str):
-    user_id = "user1"
-    project_path = filesystem.create_project(user_id, project_id)
-    return {project_id: project_path}
-
-
-@filesystem_api.get("/project/files")
-async def get_project_files(project_id: str):
-    user_id = "user1"
-    filepaths = filesystem.get_project_files(user_id, project_id)
-    return filepaths
-
-
-@filesystem_api.post("/create_file")
-async def create_file(project_id: str, file: UploadFile = File(...)):
-    user_id = "user1"
-    project_path = filesystem.get_project_path(user_id, project_id)
-    filepath = project_path / file.filename
+    project_path = projects.get_project_path(user_id, project_id)
+    filepath = project_path / filename
     try:
         with open(filepath, "wb") as f:
             shutil.copyfileobj(file.file, f)
@@ -136,17 +167,17 @@ async def create_file(project_id: str, file: UploadFile = File(...)):
     }
 
 
-@filesystem_api.get("/read_file")
+@filesystem_api.get("/{project_id}/{filename}")
 async def read_file(project_id, filename):
     # TODO
     # response = filesystem.read_file(project_id, filename)
     return 
 
 
-@filesystem_api.delete("/delete_file")
+@filesystem_api.delete("/{project_id}/{filename}")
 async def delete_file(project_id: str, filename: str):
     user_id = "user1"
-    project_path = filesystem.get_project_path(user_id, project_id)
+    project_path = projects.get_project_path(user_id, project_id)
     filepath = project_path / filename
     try:
         _ = filesystem.delete_file(filepath)
@@ -163,11 +194,6 @@ async def delete_file(project_id: str, filename: str):
     }
 
 
-@filesystem_api.post("/file/rename")
+@filesystem_api.post("/{project_id}/{old_filename}/{new_filename}")
 async def rename_file(project_id: str, old_filename: str, new_filename):
-    user_id = "user1"
-    project_path = filesystem.get_project_path(user_id, project_id)
-    response = filesystem.rename_file(
-        project_id, old_filename, new_filename
-    )
-    return response
+    raise NotImplementedError("TODO - this isn't needed for the current web prototype")
