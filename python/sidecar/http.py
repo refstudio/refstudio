@@ -1,13 +1,12 @@
 import shutil
 from pathlib import Path
-from typing import Annotated
 from uuid import uuid4
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import FileResponse
 
-from sidecar import chat, filesystem, ingest, projects, rewrite, search, storage
+from sidecar import chat, ingest, projects, rewrite, search, storage
 from sidecar.typing import (
     ChatRequest,
     ChatResponse,
@@ -206,7 +205,7 @@ async def delete_file(project_id: str, filepath: Path):
     project_path = projects.get_project_path(user_id, project_id)
     filepath = project_path / filepath
     try:
-        _ = filesystem.delete_file(filepath)
+        os.remove(filepath)
     except Exception as e:
         return {
             "status": "error",

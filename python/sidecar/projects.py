@@ -5,6 +5,18 @@ import shutil
 from sidecar import settings
 
 
+def read_project_path_storage(user_id: str) -> dict[str, str]:
+    filepath = settings.WEB_STORAGE_URL / f"projects_{user_id}.json"
+
+    if not Path(filepath).exists():
+        with open(filepath, "w") as f:
+            json.dump({}, f)
+
+    with open(filepath, "r") as f:
+        data = json.load(f)
+    return data
+
+
 def update_project_path_storage(user_id: str, project_id: str, project_path: str) -> dict[str, str]:
     """
     Updates the path storage file, which is responsible for mapping a project id
@@ -23,18 +35,6 @@ def update_project_path_storage(user_id: str, project_id: str, project_path: str
         json.dump(data, f)
     
     return read_project_path_storage(user_id)
-
-
-def read_project_path_storage(user_id: str) -> dict[str, str]:
-    filepath = settings.WEB_STORAGE_URL / f"projects_{user_id}.json"
-
-    if not Path(filepath).exists():
-        with open(filepath, "w") as f:
-            json.dump({}, f)
-
-    with open(filepath, "r") as f:
-        data = json.load(f)
-    return data
 
 
 def get_project_path(user_id: str, project_id: str) -> Path:
@@ -61,6 +61,9 @@ def create_project(user_id: str, project_id: str, project_path: str = None) -> P
 def delete_project(user_id: str, project_id: str) -> None:
     filepath = settings.WEB_STORAGE_URL / f"projects_{user_id}.json"
     data = read_project_path_storage(user_id)
+
+    if project_id not in data:
+        raise KeyError(f"Project {project_id} does not exist")
 
     with open(filepath, "w") as f:
         del data[project_id]

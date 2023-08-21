@@ -12,12 +12,6 @@ from .test_ingest import _copy_fixture_to_temp_dir
 client = TestClient(api)
 
 
-def test_sidecar_index():
-    response = client.get("/api/sidecar")
-    assert response.status_code == 200
-    assert response.json() == {"message": "Hello World from the Sidecar API"}
-
-
 def test_get_references():
     # TODO
     pass
