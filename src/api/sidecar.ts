@@ -19,13 +19,32 @@ class StubCommand implements SharedCommand {
     this.options = options;
   }
 
-  execute: typeof TauriCommand.prototype.execute = () =>
-    Promise.resolve({
-      signal: null,
-      code: 0,
-      stderr: '',
-      stdout: '{"references": []}',
+  execute: typeof TauriCommand.prototype.execute = async () => {
+    const [command, body] = this.args;
+    const response = await fetch(`/api/sidecar/${command}`, {
+      method: command === 'ingest_status' ? 'GET' : 'POST',
+      body,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
     });
+    const responsePayload = await response.text();
+    if (response.ok) {
+      return {
+        signal: null,
+        code: 0,
+        stderr: '',
+        stdout: responsePayload,
+      };
+    }
+    return {
+      signal: null,
+      code: 1,
+      stderr: response.statusText,
+      stdout: responsePayload,
+    };
+  };
 }
 
 const Command = import.meta.env.VITE_IS_WEB ? StubCommand : TauriCommand;

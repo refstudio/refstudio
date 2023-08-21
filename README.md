@@ -63,35 +63,47 @@ This will generate the binary at `src-tauri/bin/python` and append the appropria
 
 You can read more details about the Python backend implementation [here](/python/README.md).
 
-### Frontend (Tauri + TypeScript)
+### Frontend
 
 To install the frontend application built with Tauri and Vite + TypeScript you can run:
 
 ```bash
 yarn install
 ```
+#### Desktop (Tauri + Sidecar python)
 
-You should then be able to launch the app via:
+You should be able to launch the desktop using:
 
 ```bash
 yarn tauri:dev
 ```
-
-To develop the web version of RefStudio, run:
-
-```bash
-yarn web:dev
-```
-
-and open http://localhost:1421/ in your browser.
-
-#### Debug
 
 To automatically open the browser devtools you can launch the app via:
 
 ```bash
 $ yarn tauri:dev:debug
 ```
+
+
+#### Web (Vite + HTTP python backend)
+
+You should be able to launch the web app by running the API and the development server (using Vite):
+
+```bash
+yarn web:api
+```
+
+You can access the HTTP python backend at http://127.0.0.1:8000. The API documentation is available at http://127.0.0.1:8000/api/sidecar/docs.
+
+
+
+```bash
+yarn web:dev
+```
+
+You open the web application at http://localhost:1421/ in your browser.
+
+
 
 ### Logs
 
