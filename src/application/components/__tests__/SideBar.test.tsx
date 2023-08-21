@@ -9,7 +9,7 @@ describe('SideBar', () => {
       { pane: 'References', Icon: <div data-testid="References" /> },
     ];
 
-    render(<SideBar activePane="Explorer" items={panes} position="left" onItemClick={noop} />);
+    render(<SideBar activePane="Explorer" items={panes} onItemClick={noop} />);
     expect(screen.getByRole('menubar')).toBeInTheDocument();
 
     expect(screen.getByTestId('Explorer')).toBeInTheDocument();
@@ -28,7 +28,7 @@ describe('SideBar', () => {
       },
     ];
 
-    render(<SideBar activePane="References" items={panes} position="left" onItemClick={noop} />);
+    render(<SideBar activePane="References" items={panes} onItemClick={noop} />);
     expect(screen.getByRole('menubar')).toBeInTheDocument();
     expect(screen.getByTestId('Explorer').parentElement!.parentElement).not.toHaveClass('active');
     expect(screen.getByTestId('References').parentElement!.parentElement).toHaveClass('active');
@@ -41,7 +41,7 @@ describe('SideBar', () => {
       { pane: 'References', Icon: <div data-testid="References" /> },
     ];
 
-    render(<SideBar activePane="References" items={panes} position="left" onItemClick={fn} />);
+    render(<SideBar activePane="References" items={panes} onItemClick={fn} />);
     await userEvent.setup().click(screen.getByTestId('Explorer'));
     expect(fn).toBeCalled();
     expect(fn).toBeCalledWith('Explorer');
@@ -55,9 +55,7 @@ describe('SideBar', () => {
     ];
     const footerItems = [{ label: 'Settings', Icon: <div data-testid="Settings" />, onClick: settingsFn }];
 
-    render(
-      <SideBar activePane="References" footerItems={footerItems} items={panes} position="left" onItemClick={noop} />,
-    );
+    render(<SideBar activePane="References" footerItems={footerItems} items={panes} onItemClick={noop} />);
     await userEvent.setup().click(screen.getByTestId('Settings'));
     expect(settingsFn).toBeCalled();
   });
