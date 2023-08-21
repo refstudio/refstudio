@@ -11,9 +11,16 @@
     --color-secondary-hover: 193deg 37% 48%;
     --color-muted: 218deg 11% 65%;
     --color-error: 0deg 84% 60%;
-    --color-icon: 0deg 0% 53%;
-    --color-icon-active: 212deg 6% 35%;
-    --color-icon-background-active: 216deg 18% 94%;
+    --grayscale-0: 0deg 0% 100%;
+    --grayscale-10: 220deg 33% 98%;
+    --grayscale-20: 216deg 19% 95%;
+    --grayscale-30: 217deg 15% 90%;
+    --grayscale-60: 0deg 0% 53%;
+    --grayscale-70: 213deg 6% 35%;
+    --grayscale-90: 90deg 2% 21%;
+    --grayscale-100: 0deg 0% 12%;
+    --primary-60: 213deg 44% 25%;
+    --primary-70: 213deg 45% 21%;
   }
 }
 
@@ -65,6 +72,7 @@ a {
 body {
   /* This overflow setting prevents the app to display that extra content on scroll (like pull to refresh) */
   @apply h-full w-full overflow-hidden;
+  font-family: 'Roboto', sans-serif;
 }
 
 /* Make root full-height */

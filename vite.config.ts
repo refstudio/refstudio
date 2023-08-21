@@ -12,6 +12,9 @@ export default defineConfig(async () => ({
   server: {
     port: process.env.VITE_PORT ? parseInt(process.env.VITE_PORT) : 1420,
     strictPort: true,
+    proxy: {
+      '/api': 'http://127.0.0.1:8000',
+    },
   },
   // to make use of `TAURI_DEBUG` and other env variables
   // https://tauri.studio/v1/api/config#buildconfig.beforedevcommand
