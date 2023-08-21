@@ -103,6 +103,11 @@ export function MainCommandMenu({ index }: { index: number }) {
       category: 'File',
       commands: [
         {
+          icon: <VscMarkdown />,
+          text: 'Save File as Markdown',
+          perform: () => emitEvent('refstudio://menu/file/markdown'),
+        },
+        {
           icon: <VscNewFile />,
           text: 'New File',
           perform: () => emitEvent('refstudio://menu/file/new'),
@@ -113,11 +118,6 @@ export function MainCommandMenu({ index }: { index: number }) {
           perform: () => emitEvent('refstudio://menu/file/save'),
         },
         {
-          icon: <VscMarkdown />,
-          text: 'Save File as Markdown',
-          perform: () => emitEvent('refstudio://menu/file/markdown'),
-        },
-        {
           icon: <VscNewFolder />,
           text: 'New Project',
           perform: () => emitEvent('refstudio://menu/file/project/new'),
@@ -125,7 +125,7 @@ export function MainCommandMenu({ index }: { index: number }) {
         {
           icon: <VscEmptyWindow />,
           text: 'Open Project',
-          perform: () => emitEvent('refstudio://menu/file/project/new'),
+          perform: () => emitEvent('refstudio://menu/file/project/open'),
         },
         {
           icon: <VscClose />,

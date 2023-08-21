@@ -69,14 +69,22 @@ describe('CommandPalette', () => {
   });
 
   it.each<{ text: string; event: RefStudioEventName }>([
+    // file
     { text: 'New File', event: 'refstudio://menu/file/new' },
-    { text: 'Close Active Editor', event: 'refstudio://menu/file/close' },
+    { text: 'Save', event: 'refstudio://menu/file/save' },
+    { text: 'Save File as Markdown', event: 'refstudio://menu/file/markdown' },
+    // project
+    { text: 'New Project', event: 'refstudio://menu/file/project/new' },
+    { text: 'Open Project', event: 'refstudio://menu/file/project/open' },
+    { text: 'Close Project', event: 'refstudio://menu/file/project/close' },
+    { text: 'Open Sample Project', event: 'refstudio://menu/file/project/new/sample' },
+    // References
     { text: 'Show References', event: 'refstudio://menu/references/open' },
     { text: 'Upload References', event: 'refstudio://menu/references/upload' },
-  ])('should emit menu event to create new file', async ({ text, event }) => {
+  ])('should emit event $event for action $text', async ({ text, event }) => {
     const { user } = setupWithJotaiProvider(
       <MenuProvider config={{ animationDuration: 0 }}>
-        <CommandPalette index={1} />
+        <CommandPalette index={INDEX_MAIN} />
       </MenuProvider>,
       store,
     );
