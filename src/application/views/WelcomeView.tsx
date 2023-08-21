@@ -3,31 +3,34 @@ import { Logo } from './Logo';
 
 export function WelcomeView() {
   return (
-    <div className={cx('h-full w-full',
-      'flex flex-col items-center justify-center gap-28',
-      'py-6 pb-16 pt-0',
-      'bg-grayscale-10',
-      'select-none cursor-default',
-    )}>
+    <div
+      className={cx(
+        'h-full w-full',
+        'flex flex-col items-center justify-center gap-28',
+        'py-6 pb-16 pt-0',
+        'bg-grayscale-10',
+        'cursor-default select-none',
+      )}
+    >
       <Logo />
       <div className="flex flex-row gap-20">
-        <div className='flex flex-col gap-10 w-[16.5rem]'>
-          <div className='flex flex-col gap-4 items-end'>
+        <div className="flex w-[16.5rem] flex-col gap-10">
+          <div className="flex flex-col items-end gap-4">
             <WelcomeViewShortcut keys={['⌘', 'N']} text="New File" />
             <WelcomeViewShortcut keys={['⌘', 'S']} text="Save File" />
           </div>
-          <div className='flex flex-col gap-4 items-end'>
+          <div className="flex flex-col items-end gap-4">
             <WelcomeViewShortcut keys={['⌘', 'J']} text="AI Text Completion" />
             {/* <WelcomeViewShortcut keys={['⌘', '?']} text="Repeat AI Rewriter" /> */}
           </div>
         </div>
         <div className="h-full w-[1px] bg-grayscale-20" />
-        <div className='flex flex-col gap-10 w-[16.5rem]'>
-          <div className='flex flex-col gap-4 items-end'>
+        <div className="flex w-[16.5rem] flex-col gap-10">
+          <div className="flex flex-col items-end gap-4">
             <WelcomeViewShortcut keys={['⌘', 'K']} text="Quick Actions" />
             <WelcomeViewShortcut keys={['⌘', 'P']} text="Quick Files" />
           </div>
-          <div className='flex flex-col gap-4 items-end'>
+          <div className="flex flex-col items-end gap-4">
             <WelcomeViewShortcut keys={['⌘', 'R']} text="Open References Table" />
             <WelcomeViewShortcut keys={['⌘', 'L']} text="Open Notifications" />
           </div>
@@ -50,22 +53,31 @@ interface Shortcut {
   text: string;
 }
 function WelcomeViewShortcut({ text, keys }: Shortcut) {
-  const keysWithSeparators = keys.reduce<(Key | Separator)[]>((prev, curr, index) => [...prev, ...(index > 0 ? [{ type: 'separator' as const }] : []), { type: 'key', value: curr }], []);
+  const keysWithSeparators = keys.reduce<(Key | Separator)[]>(
+    (prev, curr, index) => [
+      ...prev,
+      ...(index > 0 ? [{ type: 'separator' as const }] : []),
+      { type: 'key', value: curr },
+    ],
+    [],
+  );
   return (
-    <div className="flex flex-row justify-center items-center gap-4">
+    <div className="flex flex-row items-center justify-center gap-4">
       <div>{text}</div>
-      <div className="flex flex-row justify-center items-center gap-1 line-height" style={{ lineHeight: '150%' }}>
-        {keysWithSeparators
-          .map((key, index) => {
-            if (key.type === 'separator') {
-              return <div key={index}>+</div>;
-            }
-            return (
-              <kbd className="flex justify-center items-center w-8 h-8 bg-grayscale-30 rounded-default text-base" key={key.value}>
-                {key.value}
-              </kbd>
-            );
-          })}
+      <div className="line-height flex flex-row items-center justify-center gap-1" style={{ lineHeight: '150%' }}>
+        {keysWithSeparators.map((key, index) => {
+          if (key.type === 'separator') {
+            return <div key={index}>+</div>;
+          }
+          return (
+            <kbd
+              className="flex h-8 w-8 items-center justify-center rounded-default bg-grayscale-30 text-base"
+              key={key.value}
+            >
+              {key.value}
+            </kbd>
+          );
+        })}
       </div>
     </div>
   );

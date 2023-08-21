@@ -7,7 +7,7 @@ import { Logo } from './application/views/Logo';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <div className='flex justify-center items-center w-full h-full'>
+    <div className="flex h-full w-full items-center justify-center">
       <Logo />
     </div>
   </React.StrictMode>,
