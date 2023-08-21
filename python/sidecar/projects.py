@@ -1,5 +1,6 @@
 from pathlib import Path
 import json
+import shutil
 
 from sidecar import settings
 
@@ -27,6 +28,10 @@ def update_project_path_storage(user_id: str, project_id: str, project_path: str
 def read_project_path_storage(user_id: str) -> dict[str, str]:
     filepath = settings.WEB_STORAGE_URL / f"projects_{user_id}.json"
 
+    if not Path(filepath).exists():
+        with open(filepath, "w") as f:
+            json.dump({}, f)
+
     with open(filepath, "r") as f:
         data = json.load(f)
     return data
@@ -51,6 +56,21 @@ def create_project(user_id: str, project_id: str, project_path: str = None) -> P
         project_path=server_path
     )
     return server_path 
+
+
+def delete_project(user_id: str, project_id: str) -> None:
+    filepath = settings.WEB_STORAGE_URL / f"projects_{user_id}.json"
+    data = read_project_path_storage(user_id)
+
+    with open(filepath, "w") as f:
+        del data[project_id]
+        json.dump(data, f)
+    
+    project_path = settings.WEB_STORAGE_URL / user_id / project_id
+    try:
+        shutil.rmtree(project_path)
+    except FileNotFoundError:
+        pass
 
 
 def get_project_files(user_id: str, project_id: str) -> list:

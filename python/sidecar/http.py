@@ -1,9 +1,12 @@
 import shutil
+from pathlib import Path
 from typing import Annotated
 from uuid import uuid4
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, UploadFile
+from fastapi.responses import FileResponse
+
 from sidecar import chat, filesystem, ingest, projects, rewrite, search, storage
 from sidecar.typing import (
     ChatRequest,
@@ -32,15 +35,10 @@ project_api = FastAPI()  # API for interacting with projects
 
 # Sidecar API
 # -----------
-@sidecar_api.get("/")
-async def sidecar_index():
-    return {"message": "Hello World from the Sidecar API"}
-
-
 @sidecar_api.post("/ingest")
 async def http_ingest(project_id: str) -> IngestResponse:
     user_id = "user1"
-    project_path = filesystem.get_project_path(user_id, project_id)
+    project_path = projects.get_project_path(user_id, project_id)
     req = IngestRequest(pdf_directory=project_path)
     response = ingest.run_ingest(req)
     return response
@@ -96,6 +94,16 @@ async def http_search(req: SearchRequest) -> SearchResponse:
 
 # Project API
 # --------------
+@project_api.get("/")
+async def list_projects():
+    """
+    Returns a list of projects for the current user
+    """
+    user_id = "user1"
+    projects_dict = projects.read_project_path_storage(user_id)
+    return projects_dict 
+
+
 @project_api.post("/")
 async def create_project(project_path: str = None):
     """
@@ -130,6 +138,20 @@ async def get_project(project_id: str):
     }
 
 
+@project_api.delete("/{project_id}")
+async def delete_project(project_id: str):
+    """
+    Deletes a project directory and all files in it
+    """
+    user_id = "user1"
+    projects.delete_project(user_id, project_id)
+    return {
+        "status": "success",
+        "message": "Project deleted",
+        "project_id": project_id,
+    }
+
+
 @project_api.get("/{project_id}/files")
 async def get_project_files(project_id: str):
     user_id = "user1"
@@ -140,19 +162,15 @@ async def get_project_files(project_id: str):
 
 # Filesystem API
 # --------------
-@filesystem_api.get("/")
-async def filesystem_index():
-    return {"message": "Hello World from the Filesystem API"}
-
-
-@filesystem_api.put("/{project_id}/{filename}")
-async def create_file(project_id: str, filename: str, file: UploadFile = File(...)):
-    # TODO: make sure we can place PDFs in uploads directory
-    # but refstudio documents should be written to root
-    # client should determine where the file should get saved wtihin the project
+@filesystem_api.put("/{project_id}/{filepath:path}")
+async def create_file(project_id: str, filepath: Path, file: UploadFile = File(...)):
     user_id = "user1"
     project_path = projects.get_project_path(user_id, project_id)
-    filepath = project_path / filename
+    filepath = project_path / filepath
+
+    if not filepath.exists():
+        filepath.parent.mkdir(parents=True, exist_ok=True)
+    
     try:
         with open(filepath, "wb") as f:
             shutil.copyfileobj(file.file, f)
@@ -167,18 +185,26 @@ async def create_file(project_id: str, filename: str, file: UploadFile = File(..
     }
 
 
-@filesystem_api.get("/{project_id}/{filename}")
-async def read_file(project_id, filename):
-    # TODO
-    # response = filesystem.read_file(project_id, filename)
-    return 
-
-
-@filesystem_api.delete("/{project_id}/{filename}")
-async def delete_file(project_id: str, filename: str):
+@filesystem_api.get("/{project_id}/{filepath:path}")
+async def read_file(project_id: str, filepath: Path):
     user_id = "user1"
     project_path = projects.get_project_path(user_id, project_id)
-    filepath = project_path / filename
+    filepath = project_path / filepath
+
+    if not filepath.exists():
+        return {
+            "status": "error",
+            "message": "File not found",
+            "filepath": filepath,
+        }
+    return FileResponse(filepath)
+
+
+@filesystem_api.delete("/{project_id}/{filepath:path}")
+async def delete_file(project_id: str, filepath: Path):
+    user_id = "user1"
+    project_path = projects.get_project_path(user_id, project_id)
+    filepath = project_path / filepath
     try:
         _ = filesystem.delete_file(filepath)
     except Exception as e:
@@ -192,8 +218,3 @@ async def delete_file(project_id: str, filename: str):
         "message": "File deleted",
         "filepath": filepath,
     }
-
-
-@filesystem_api.post("/{project_id}/{old_filename}/{new_filename}")
-async def rename_file(project_id: str, old_filename: str, new_filename):
-    raise NotImplementedError("TODO - this isn't needed for the current web prototype")
