@@ -56,7 +56,6 @@ export const newSampleProjectAtom = atom(null, async (_, set, path: string) => {
   // Create empty project
   set(currentProjectPathAtom, path);
   await sampleProject(path);
-  await set(loadReferencesAtom);
   await set(refreshFileTreeAtom);
 });
 
