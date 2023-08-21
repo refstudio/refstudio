@@ -50,7 +50,7 @@ def create_project(user_id: str, project_id: str, project_path: str = None) -> P
         server_path.mkdir(parents=True, exist_ok=True)
 
     # project_id => project_path
-    project_storage_mappings = update_project_path_storage(
+    _ = update_project_path_storage(
         user_id,
         project_id,
         project_path=server_path
