@@ -4,18 +4,20 @@ import { cx } from '../../lib/cx';
 
 interface SideBarProps<SideBarPane> {
   activePane: SideBarPane | null;
+  className?: string;
   items: { pane: SideBarPane; Icon: React.ReactElement }[];
   footerItems?: { label: string; Icon: React.ReactElement; onClick: () => void }[];
   onItemClick: (pane: SideBarPane) => void;
 }
 export function SideBar<SideBarPane extends string>({
   activePane,
+  className,
   items,
   footerItems,
   onItemClick,
 }: SideBarProps<SideBarPane>) {
   return (
-    <div className="side-bar" role="menubar">
+    <div className={cx('side-bar', className)} role="menubar">
       <div className="flex flex-grow flex-col gap-2 p-2">
         {items.map(({ pane, Icon }) => (
           <IconButton active={pane === activePane} key={pane} onClick={() => onItemClick(pane)}>
