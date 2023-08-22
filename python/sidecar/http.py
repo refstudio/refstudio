@@ -35,7 +35,12 @@ project_api = FastAPI()  # API for interacting with projects
 
 # Sidecar API
 # -----------
-@sidecar_api.post("/ingest")
+@sidecar_api.get("/")
+async def http_index():
+    return {"message": "Hello World"}
+
+
+@sidecar_api.post("/ingest/{project_id}")
 async def http_ingest(project_id: str) -> IngestResponse:
     user_id = "user1"
     project_path = projects.get_project_path(user_id, project_id)
@@ -45,7 +50,7 @@ async def http_ingest(project_id: str) -> IngestResponse:
     return response
 
 
-@sidecar_api.get("/ingest_status")
+@sidecar_api.get("/ingest_status/")
 async def http_get_statuses() -> IngestStatusResponse:
     response = ingest.get_statuses()
     return response

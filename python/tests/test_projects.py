@@ -4,15 +4,6 @@ from pathlib import Path
 from sidecar import projects
 
 
-@pytest.fixture
-def setup_project_path_storage(monkeypatch, tmp_path):
-    user_id = "user1"
-    project_id = "project1"
-    monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
-    projects.create_project(user_id, project_id)
-    return user_id, project_id
-
-
 def test_read_project_path_storage_does_not_exist(monkeypatch, tmp_path):
     monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
 

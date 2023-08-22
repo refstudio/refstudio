@@ -1,21 +1,54 @@
 from pathlib import Path
 from uuid import UUID
+import pytest
 
 from fastapi.testclient import TestClient
 from sidecar import http, projects, search, settings
 from sidecar.chat import Chat
 from sidecar.rewrite import Rewriter
 from sidecar.storage import JsonStorage
-from web import api
 
 from .test_ingest import _copy_fixture_to_temp_dir, FIXTURES_DIR
 
-client = TestClient(api)
+
+sidecar_client = TestClient(http.sidecar_api)
+filesystem_client = TestClient(http.filesystem_api)
+project_client = TestClient(http.project_api)
 
 
-def test_get_references():
-    # TODO
-    pass
+@pytest.fixture
+def setup_uploaded_reference_pdfs(monkeypatch, tmp_path):
+    monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
+
+    # create a project
+    user_id = "user1"
+    project_id = "project1"
+    _ = projects.create_project(user_id, project_id)
+
+    # create a file
+    filename = "uploads/test.pdf"
+
+    with open(f"{FIXTURES_DIR}/pdf/test.pdf", "rb") as f:
+        _ = filesystem_client.put(
+            f"/{project_id}/{filename}",
+            files={"file": ("test.pdf", f, "application/pdf")},
+        )
+
+
+def test_get_references_with_uploads_should_return_references(
+    monkeypatch,
+    tmp_path,
+    setup_uploaded_reference_pdfs
+):
+    project_id = "project1"
+
+    response = sidecar_client.post(f"/ingest/{project_id}")
+    data = response.json()
+
+    assert response.status_code == 200
+    assert data["project_name"] == "project1"
+    assert len(data["references"]) == 1
+    assert data["references"][0]["source_filename"] == "test.pdf"
 
 
 def test_references_upload():
@@ -41,12 +74,11 @@ def test_references_update(monkeypatch, tmp_path):
     jstore.load()
     assert jstore.references[0].citation_key is None
 
-    client = TestClient(api)
     patch = {
         "source_filename": "some_file.pdf",
         "patch": {"data": {"citation_key": "reda2023"}}
     }
-    response = client.post("/api/sidecar/update", json=patch)
+    response = sidecar_client.post("/update", json=patch)
 
     assert response.status_code == 200
     assert response.json() == {
@@ -77,9 +109,8 @@ def test_references_delete(monkeypatch, tmp_path):
     jstore.load()
     assert jstore.references[0].source_filename == "some_file.pdf"
 
-    client = TestClient(api)
     request = {"source_filenames": ["some_file.pdf"]}
-    response = client.post("/api/sidecar/delete", json=request)
+    response = sidecar_client.post("/delete", json=request)
 
     assert response.status_code == 200
     assert response.json() == {
@@ -100,7 +131,7 @@ def test_ai_rewrite_is_ok(monkeypatch, mock_call_model_is_ok):
     monkeypatch.setattr(Rewriter, "call_model", mock_call_model_is_ok)
 
     request = {"text": "This is a test"}
-    response = client.post("/api/sidecar/rewrite", json=request)
+    response = sidecar_client.post("/rewrite", json=request)
 
     assert response.status_code == 200
     assert response.json() == {
@@ -119,7 +150,7 @@ def test_ai_rewrite_missing_required_request_params(monkeypatch, mock_call_model
     monkeypatch.setattr(Rewriter, "call_model", mock_call_model_is_ok)
 
     request = {"missing": "This is an invalid request"}
-    response = client.post("/api/sidecar/rewrite", json=request)
+    response = sidecar_client.post("/rewrite", json=request)
 
     assert response.status_code == 422
     assert response.json() == {
@@ -136,7 +167,7 @@ def test_ai_completion_is_ok(monkeypatch, mock_call_model_is_ok):
     monkeypatch.setattr(Rewriter, "call_model", mock_call_model_is_ok)
 
     request = {"text": "This is a test"}
-    response = client.post("/api/sidecar/completion", json=request)
+    response = sidecar_client.post("/completion", json=request)
 
     assert response.status_code == 200
     assert response.json() == {
@@ -154,7 +185,7 @@ def test_ai_completion_missing_required_request_params(monkeypatch, mock_call_mo
     monkeypatch.setattr(Rewriter, "call_model", mock_call_model_is_ok)
 
     request = {"missing": "This is an invalid request"}
-    response = client.post("/api/sidecar/completion", json=request)
+    response = sidecar_client.post("/completion", json=request)
 
     assert response.status_code == 422
     assert response.json() == {
@@ -179,7 +210,7 @@ def test_ai_chat_is_ok(monkeypatch, mock_call_model_is_ok, tmp_path):
     monkeypatch.setattr(settings, "REFERENCES_JSON_PATH", mocked_path)
 
     request = {"text": "This is a test"}
-    response = client.post("/api/sidecar/chat", json=request)
+    response = sidecar_client.post("/chat", json=request)
 
     assert response.status_code == 200
     assert response.json() == {
@@ -205,7 +236,7 @@ def test_ai_chat_missing_required_request_params(monkeypatch, mock_call_model_is
     monkeypatch.setattr(settings, "REFERENCES_JSON_PATH", mocked_path)
 
     request = {"missing": "This is an invalid request"}
-    response = client.post("/api/sidecar/chat", json=request)
+    response = sidecar_client.post("/chat", json=request)
 
     assert response.status_code == 422
     assert response.json() == {
@@ -222,7 +253,7 @@ def test_search_s2_is_ok(monkeypatch, mock_search_paper):
     monkeypatch.setattr(search.Searcher, "search_func", mock_search_paper)
 
     request = {"query": "any-query-string-you-like"}
-    response = client.post("/api/sidecar/search", json=request)
+    response = sidecar_client.post("/search", json=request)
 
     assert response.status_code == 200
     assert response.json() == {
@@ -259,15 +290,14 @@ def test_http_list_projects(monkeypatch, tmp_path):
     user_id = "user1"
     project_id = "project1"
 
-    client = TestClient(http.project_api)
-    response = client.get("/")
+    response = project_client.get("/")
 
     assert response.status_code == 200
     assert response.json() == {}
 
     projects.create_project(user_id, project_id)
 
-    response = client.get("/")
+    response = project_client.get("/")
     assert response.status_code == 200
     assert response.json() == {project_id: str(tmp_path / user_id / project_id)}
 
@@ -275,9 +305,7 @@ def test_http_list_projects(monkeypatch, tmp_path):
 def test_create_project(monkeypatch, tmp_path):
     monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
 
-    client = TestClient(http.project_api)
-
-    response = client.post("/")
+    response = project_client.post("/")
 
     assert response.status_code == 200
     assert len(response.json()) == 1
@@ -299,15 +327,13 @@ def test_create_project(monkeypatch, tmp_path):
 def test_get_project(monkeypatch, tmp_path):
     monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
 
-    client = TestClient(http.project_api)
-
     # create a project
     user_id = "user1"
     project_id = "project1"
     project_path = projects.create_project(user_id, project_id)
 
     # get the project
-    response = client.get(f"/{project_id}")
+    response = project_client.get(f"/{project_id}")
 
     assert response.status_code == 200
     assert response.json() == {
@@ -320,15 +346,13 @@ def test_get_project(monkeypatch, tmp_path):
 def test_delete_project(monkeypatch, tmp_path):
     monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
 
-    client = TestClient(http.project_api)
-
     # create a project
     user_id = "user1"
     project_id = "project1"
     project_path = projects.create_project(user_id, project_id)
 
     # delete the project
-    response = client.delete(f"/{project_id}")
+    response = project_client.delete(f"/{project_id}")
 
     assert response.status_code == 200
     assert response.json() == {
@@ -347,8 +371,6 @@ def test_delete_project(monkeypatch, tmp_path):
 def test_create_file(monkeypatch, tmp_path):
     monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
 
-    client = TestClient(http.filesystem_api)
-
     # create a project
     user_id = "user1"
     project_id = "project1"
@@ -359,7 +381,7 @@ def test_create_file(monkeypatch, tmp_path):
     filepath = project_path / filename
 
     with open(f"{FIXTURES_DIR}/pdf/grobid-fails.pdf", "rb") as f:
-        response = client.put(
+        response = filesystem_client.put(
             f"/{project_id}/{filename}",
             files={"file": ("grobid-fails.pdf", f, "application/pdf")},
         )
@@ -382,8 +404,6 @@ def test_create_file(monkeypatch, tmp_path):
 def test_read_file(monkeypatch, tmp_path):
     monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
 
-    client = TestClient(http.filesystem_api)
-
     # create a project
     user_id = "user1"
     project_id = "project1"
@@ -394,13 +414,13 @@ def test_read_file(monkeypatch, tmp_path):
     filepath = project_path / filename
 
     with open(f"{FIXTURES_DIR}/pdf/grobid-fails.pdf", "rb") as f:
-        response = client.put(
+        response = filesystem_client.put(
             f"/{project_id}/{filename}",
             files={"file": ("grobid-fails.pdf", f, "application/pdf")},
         )
 
     # read the file
-    response = client.get(f"/{project_id}/{filename}")
+    response = filesystem_client.get(f"/{project_id}/{filename}")
 
     assert response.status_code == 200
     assert response.content == filepath.read_bytes()
@@ -409,8 +429,6 @@ def test_read_file(monkeypatch, tmp_path):
 def test_delete_file(monkeypatch, tmp_path):
     monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
 
-    client = TestClient(http.filesystem_api)
-
     # create a project
     user_id = "user1"
     project_id = "project1"
@@ -421,13 +439,13 @@ def test_delete_file(monkeypatch, tmp_path):
     filepath = project_path / filename
 
     with open(f"{FIXTURES_DIR}/pdf/grobid-fails.pdf", "rb") as f:
-        response = client.put(
+        response = filesystem_client.put(
             f"/{project_id}/{filename}",
             files={"file": ("grobid-fails.pdf", f, "application/pdf")},
         )
 
     # delete the file
-    response = client.delete(f"/{project_id}/{filename}")
+    response = filesystem_client.delete(f"/{project_id}/{filename}")
 
     assert response.status_code == 200
     assert response.json() == {

@@ -1,5 +1,16 @@
 import pytest
 
+from sidecar import projects
+
+
+@pytest.fixture
+def setup_project_path_storage(monkeypatch, tmp_path):
+    user_id = "user1"
+    project_id = "project1"
+    monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
+    projects.create_project(user_id, project_id)
+    return user_id, project_id
+
 
 @pytest.fixture
 def mock_call_model_is_ok(*args, **kwargs):
