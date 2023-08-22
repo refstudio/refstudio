@@ -9,6 +9,8 @@ from sidecar.storage import JsonStorage
 from web import api
 
 from .test_ingest import _copy_fixture_to_temp_dir, FIXTURES_DIR
+from .test_settings import create_settings_json  # noqa: F401
+
 
 client = TestClient(api)
 settings_client = TestClient(http.settings_api)
@@ -445,7 +447,13 @@ def test_delete_file(monkeypatch, tmp_path):
     assert sorted(files_and_subdirs) == sorted(expected)
 
 
-def test_get_settings(monkeypatch, tmp_path, create_settings_json):
+# ruff gets confused here:
+# create_settings_json is a pytest fixture
+def test_get_settings(
+    monkeypatch,
+    tmp_path,
+    create_settings_json  # noqa: F811
+):
     monkeypatch.setattr(settings, "WEB_STORAGE_URL", tmp_path)
 
     response = settings_client.get("/")
@@ -453,7 +461,13 @@ def test_get_settings(monkeypatch, tmp_path, create_settings_json):
     assert response.json()["settings"] == {"openAI": {"OPENAI_API_KEY": "1234"}}
 
 
-def test_update_settings(monkeypatch, tmp_path, create_settings_json):
+# ruff gets confused here:
+# create_settings_json is a pytest fixture
+def test_update_settings(
+    monkeypatch,
+    tmp_path,
+    create_settings_json  # noqa: F811
+):
     monkeypatch.setattr(settings, "WEB_STORAGE_URL", tmp_path)
     user_id = "user1"
 
