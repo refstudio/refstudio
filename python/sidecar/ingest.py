@@ -24,7 +24,8 @@ GROBID_SERVER_URL = "https://kermitt2-grobid.hf.space"
 def run_ingest(args: IngestRequest):
     pdf_directory = Path(args.pdf_directory)
     ingest = PDFIngestion(input_dir=pdf_directory)
-    ingest.run()
+    response = ingest.run()
+    return response
 
 
 def get_statuses():
@@ -38,7 +39,6 @@ def get_references(args: IngestRequest):
     pdf_directory = Path(args.pdf_directory)
     ingest = PDFIngestion(input_dir=pdf_directory)
     response = ingest.create_ingest_response()
-    sys.stdout.write(response.json())
     return response
 
 
@@ -68,12 +68,12 @@ class PDFIngestion:
         self._save_references()
 
         response = self.create_ingest_response()
-        sys.stdout.write(response.json())
 
         for ref in self.references:
             self._remove_temporary_files_for_reference(ref)
 
         logger.info(f"Finished ingestion for project: {self.project_name}")
+        return response
 
     def _create_directories(self) -> None:
         if not self.staging_dir.exists():
@@ -530,7 +530,6 @@ class IngestStatusFetcher:
             status=response_status,
             reference_statuses=reference_statuses
         )
-        sys.stdout.write(response.json())
         return response
 
     def _handle_missing_references_json(self) -> list[typing.ReferenceStatus]:

@@ -24,7 +24,7 @@ def _copy_fixture_to_temp_dir(source_path: Path, write_path: Path) -> None:
         f.write(file_bytes)
 
 
-def test_run_ingest(monkeypatch, tmp_path, capsys):
+def test_run_ingest(monkeypatch, tmp_path):
     # directories where ingest will write files
     staging_dir = tmp_path.joinpath(".staging")
     grobid_output_dir = tmp_path.joinpath(".grobid")
@@ -49,35 +49,31 @@ def test_run_ingest(monkeypatch, tmp_path, capsys):
     monkeypatch.setattr(ingest.GrobidClient, "process", mock_grobid_client_process)
 
     pdf_directory = tmp_path.joinpath("uploads")
-    ingest.run_ingest(IngestRequest(pdf_directory=str(pdf_directory)))
-
-    # check that the expected output was printed to stdout
-    captured = capsys.readouterr()
-    output = json.loads(captured.out)
+    response = ingest.run_ingest(IngestRequest(pdf_directory=str(pdf_directory)))
 
     # project name is the name of the parent directory of the input directory
-    assert output['project_name'] == tmp_path.name
+    assert response.project_name == tmp_path.name
 
     # check that the expected number of references were parsed
-    assert len(output['references']) == 2
+    assert len(response.references) == 2
 
     # sort references by source_filename so list order is consistent
-    references = sorted(output['references'], key=lambda x: x['source_filename'])
+    references = sorted(response.references, key=lambda x: x.source_filename)
 
     # check that grobid-fails.pdf is contained in the reference output
-    assert references[0]['source_filename'] == "grobid-fails.pdf"
-    assert references[0]['citation_key'] == "untitled"
+    assert references[0].source_filename == "grobid-fails.pdf"
+    assert references[0].citation_key == "untitled"
 
     # check that grobid failures have text extracted
-    assert len(references[0]['contents']) > 0
-    assert len(references[0]['chunks']) > 0
+    assert len(references[0].contents) > 0
+    assert len(references[0].chunks) > 0
 
     # check that test.pdf was parsed correctly
-    assert references[1]['title'] == "A Few Useful Things to Know about Machine Learning"
-    assert references[1]['doi'] is None
-    assert len(references[1]['authors']) == 1
-    assert references[1]['authors'][0]['full_name'] == "Pedro Domingos"
-    assert references[1]['citation_key'] == "domingos"
+    assert references[1].title == "A Few Useful Things to Know about Machine Learning"
+    assert references[1].doi is None
+    assert len(references[1].authors) == 1
+    assert references[1].authors[0].full_name == "Pedro Domingos"
+    assert references[1].citation_key == "domingos"
 
     # check that all temporary files were cleaned up ...
     assert len(os.listdir(staging_dir)) == 0
@@ -90,7 +86,7 @@ def test_run_ingest(monkeypatch, tmp_path, capsys):
 
     # references.json should contain the same references in stdout
     with open(references_json_path, "r") as f:
-        assert json.load(f) == output['references']
+        assert json.load(f) == response.dict()['references']
 
 
 def test_ingest_add_citation_keys(monkeypatch, tmp_path):
@@ -266,23 +262,21 @@ def test_ingest_add_citation_keys(monkeypatch, tmp_path):
     assert new_keys == sorted(['jones2021b', 'smitha', 'untitled2'])
 
 
-def test_ingest_get_statuses(monkeypatch, capsys):
+def test_ingest_get_statuses(monkeypatch):
     ingest.UPLOADS_DIR = FIXTURES_DIR.joinpath("pdf")
 
     # test: JsonStorage path does not exist
     # expect: all `uploads` are in process
     jstore = storage.JsonStorage("does_not_exist.json")
     fetcher = ingest.IngestStatusFetcher(storage=jstore)
-    _ = fetcher.emit_statuses()
+    response = fetcher.emit_statuses()
 
-    captured = capsys.readouterr()
-    output = json.loads(captured.out)
-    statuses = output['reference_statuses']
+    statuses = response.reference_statuses
 
-    assert output['status'] == "ok"
+    assert response.status == "ok"
     assert len(statuses) == 2
     for ref in statuses:
-        ref['status'] == "processing"
+        ref.status == "processing"
 
 
     # test: stored references should be checked against uploads
@@ -315,21 +309,19 @@ def test_ingest_get_statuses(monkeypatch, capsys):
     fetcher = ingest.IngestStatusFetcher(storage=jstore)
     monkeypatch.setattr(fetcher, 'uploads', mock_uploads)
 
-    _ = fetcher.emit_statuses()
+    response = fetcher.emit_statuses()
 
-    captured = capsys.readouterr()
-    output = json.loads(captured.out)
-    statuses = output['reference_statuses']
+    statuses = response.reference_statuses
 
-    assert output['status'] == "ok"
+    assert response.status == "ok"
     assert len(statuses) == 3
     for ref in statuses:
-        if ref['source_filename'] == "completed.pdf":
-            ref['status'] == "completed"
-        elif ref['source_filename'] == 'failed.pdf':
-            ref['status'] == "failure"
+        if ref.source_filename == "completed.pdf":
+            ref.status == "completed"
+        elif ref.source_filename == 'failed.pdf':
+            ref.status == "failure"
         else:
-            ref['status'] == "processing"
+            ref.status == "processing"
 
 
     # test: Exception on storage load should return error status
@@ -338,11 +330,9 @@ def test_ingest_get_statuses(monkeypatch, capsys):
         raise Exception
 
     monkeypatch.setattr(jstore, 'load', mock_storage_load_raises_exception)
-    _ = fetcher.emit_statuses()
+    response = fetcher.emit_statuses()
 
-    captured = capsys.readouterr()
-    output = json.loads(captured.out)
-    statuses = output['reference_statuses']
+    statuses = response.reference_statuses
 
-    assert output['status'] == "error"
+    assert response.status == "error"
     assert len(statuses) == 0
