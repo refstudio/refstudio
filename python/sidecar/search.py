@@ -3,7 +3,6 @@ Author: Shaurya
 This script performs a search on Semantic Scholar and retrieves information about a set of papers.
 """
 import logging
-import sys
 
 from semanticscholar import SemanticScholar
 

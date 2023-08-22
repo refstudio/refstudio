@@ -1,4 +1,3 @@
-import json
 
 from sidecar import rewrite
 from sidecar.typing import RewriteRequest, TextCompletionRequest
