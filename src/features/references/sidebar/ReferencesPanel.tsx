@@ -73,9 +73,9 @@ export function ReferencesPanel() {
           { key: 'open', Icon: VscOpenPreview, title: 'Open References', onClick: handleOpenReferences },
           {
             key: 'export',
+            disabled: references.length === 0,
             Icon: VscDesktopDownload,
-            title: 'Export References (NOT IMPLEMENTED)',
-            className: 'text-slate-600/50',
+            title: 'Export References',
             onClick: () => handleExportReferences(),
           },
         ]}

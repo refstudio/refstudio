@@ -5,7 +5,9 @@ import { JSONContent } from '@tiptap/core';
 import { EditorContent } from '../atoms/types/EditorContent';
 import { FileEntry, FileFileEntry } from '../atoms/types/FileEntry';
 import { MarkdownSerializer } from '../features/textEditor/components/tipTapNodes/refStudioDocument/serialization/MarkdownSerializer';
+import { serializeReferences } from '../features/textEditor/components/tipTapNodes/refStudioDocument/serialization/serializeReferences';
 import { notifyError } from '../notifications/notifications';
+import { ReferenceItem } from '../types/ReferenceItem';
 import {
   appConfigDir,
   createDir,
@@ -334,6 +336,31 @@ export async function renameFile(relativePath: string, newName: string): RenameF
   }
 }
 type RenameFileResult = Promise<{ success: false } | { success: true; newPath: string }>;
+
+export async function exportReferences(references: ReferenceItem[]) {
+  try {
+    const exportsDir = getExportsDir();
+    const systemExportsDir = await getSystemPath(exportsDir);
+    if (!(await exists(systemExportsDir))) {
+      await createDir(systemExportsDir);
+    }
+
+    const serializedReferences = serializeReferences(references);
+
+    const defaultPath = await join(systemExportsDir, `references.${serializedReferences.extension}`);
+
+    const filePath = await save({
+      title: 'Export References',
+      defaultPath,
+      filters: [{ name: serializedReferences.extension, extensions: [serializedReferences.extension] }],
+    });
+    if (filePath) {
+      return writeTextFile(filePath, serializedReferences.textContent);
+    }
+  } catch (err) {
+    console.error('Error', err);
+  }
+}
 
 export async function saveAsMarkdown(markdownSerializer: MarkdownSerializer, exportedFilePath: string) {
   try {
