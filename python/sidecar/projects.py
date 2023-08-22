@@ -4,25 +4,28 @@ import shutil
 
 from sidecar import settings
 
-"""
-Ensure that the server's path storage directory exists.
-"""
+
+# Ensure that the server's path storage directory exists.
 Path(settings.WEB_STORAGE_URL).mkdir(parents=True, exist_ok=True)
 
 
-def make_projects_json_path(user_id: str):
-    filepath = settings.WEB_STORAGE_URL / user_id / "projects.json"
+def make_projects_json_path(user_id: str) -> Path:
+    filepath = Path(settings.WEB_STORAGE_URL / user_id / "projects.json")
     return filepath
 
-def make_project_path(user_id: str, project_id: str):
-    filepath = settings.WEB_STORAGE_URL / user_id / project_id
+
+def make_project_path(user_id: str, project_id: str) -> Path:
+    filepath = Path(settings.WEB_STORAGE_URL / user_id / project_id)
+    if not filepath.exists():
+        filepath.mkdir(parents=True, exist_ok=True)
     return filepath
 
 
 def read_project_path_storage(user_id: str) -> dict[str, str]:
     filepath = make_projects_json_path(user_id)
 
-    if not Path(filepath).exists():
+    if not filepath.exists():
+        filepath.parent.mkdir(parents=True, exist_ok=True)
         with open(filepath, "w") as f:
             json.dump({}, f)
 
@@ -38,7 +41,8 @@ def update_project_path_storage(user_id: str, project_id: str, project_path: str
     """
     filepath = make_projects_json_path(user_id)
 
-    if not Path(filepath).exists():
+    if not filepath.exists():
+        filepath.parent.mkdir(parents=True, exist_ok=True)
         with open(filepath, "w") as f:
             json.dump({}, f)
 
