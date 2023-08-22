@@ -55,6 +55,7 @@ export function LeftSidePanelWrapper() {
     <>
       <SideBar
         activePane={primaryPaneCollapsed ? null : primaryPane}
+        className={cx({ 'border-r-[1px] border-r-grayscale-20': !primaryPaneCollapsed })}
         footerItems={[
           // TODO: Implement Keybinds screen
           {
@@ -74,9 +75,7 @@ export function LeftSidePanelWrapper() {
         ]}
         onItemClick={handleSideBarClick}
       />
-      {!primaryPaneCollapsed && <div className="h-full w-[1px] bg-grayscale-20" />}
       <Panel
-        className={cx({ 'border-r-[1px] border-grayscale-20': primaryPaneCollapsed })}
         collapsible
         order={1}
         ref={leftPanelRef}
