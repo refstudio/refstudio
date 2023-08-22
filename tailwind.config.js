@@ -21,6 +21,7 @@ export default {
         'grayscale-10': 'hsl(var(--grayscale-10) / <alpha-value>)',
         'grayscale-20': 'hsl(var(--grayscale-20) / <alpha-value>)',
         'grayscale-30': 'hsl(var(--grayscale-30) / <alpha-value>)',
+        'grayscale-40': 'rgb(219 223 231 / <alpha-value>)',
         'grayscale-60': 'hsl(var(--grayscale-60) / <alpha-value>)',
         'grayscale-70': 'hsl(var(--grayscale-70) / <alpha-value>)',
         'grayscale-90': 'hsl(var(--grayscale-90) / <alpha-value>)',

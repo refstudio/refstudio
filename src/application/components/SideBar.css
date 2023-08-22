@@ -1,0 +1,14 @@
+.side-bar {
+  @apply flex select-none flex-col;
+}
+
+.side-bar .icon {
+  @apply flex h-10 w-10 content-center justify-center gap-2 rounded;
+  @apply text-red-300;
+  @apply bg-grayscale-0 text-grayscale-60;
+}
+
+.side-bar .icon:hover,
+.side-bar .icon.active {
+  @apply bg-grayscale-20 text-grayscale-70;
+}
