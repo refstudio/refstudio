@@ -8,12 +8,15 @@ import { CliCommands } from './types';
 interface SharedCommand {
   execute: typeof TauriCommand.prototype.execute;
 }
+interface StubCommandOptions {
+  env: Record<string, string>;
+}
 
 class StubCommand implements SharedCommand {
   command: string;
   args: string[];
-  options: unknown;
-  constructor(command: string, args: string[], options?: unknown) {
+  options: StubCommandOptions;
+  constructor(command: string, args: string[], options: StubCommandOptions) {
     this.command = command;
     this.args = args;
     this.options = options;
@@ -21,12 +24,19 @@ class StubCommand implements SharedCommand {
 
   execute: typeof TauriCommand.prototype.execute = async () => {
     const [command, body] = this.args;
+
+    const envHeaders = Object.entries(this.options.env).reduce(
+      (acc, [key, value]) => ({ ...acc, [`X-${key.toUpperCase()}`]: value }),
+      {},
+    );
+
     const response = await fetch(`/api/sidecar/${command}`, {
       method: command === 'ingest_status' ? 'GET' : 'POST',
       body,
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
+        ...envHeaders,
       },
     });
     const responsePayload = await response.text();

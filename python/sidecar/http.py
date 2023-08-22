@@ -2,9 +2,10 @@ import os
 import shutil
 from pathlib import Path
 from uuid import uuid4
+from typing import Annotated
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, UploadFile, Request
 from fastapi.responses import FileResponse
 
 from sidecar import chat, ingest, projects, rewrite, search, storage
@@ -32,11 +33,18 @@ sidecar_api = FastAPI()  # Legacy API for existing sidecar cli functionality
 filesystem_api = FastAPI()  # API for interacting with the filesystem
 project_api = FastAPI()  # API for interacting with projects
 
+def update_envs_from_headers(request: Request) -> None:
+    os.environ["PROJECT_DIR"] = str(request.headers.get("X-PROJECT_DIR"))
+    os.environ["OPENAI_API_KEY"] = str(request.headers.get("X-OPENAI_API_KEY"))
+    os.environ["OPENAI_CHAT_MODEL"] = str(request.headers.get("X-OPENAI_CHAT_MODEL"))
+    os.environ["SIDECAR_ENABLE_LOGGING"] = str(request.headers.get("X-SIDECAR_ENABLE_LOGGING"))
+    os.environ["SIDECAR_LOG_DIR"] = str(request.headers.get("X-SIDECAR_LOG_DIR"))
 
 # Sidecar API
 # -----------
 @sidecar_api.post("/ingest")
-async def http_ingest(project_id: str) -> IngestResponse:
+async def http_ingest(project_id: str, request: Request) -> IngestResponse:
+    update_envs_from_headers(request)
     user_id = "user1"
     project_path = projects.get_project_path(user_id, project_id)
     req = IngestRequest(pdf_directory=project_path)
@@ -45,49 +53,58 @@ async def http_ingest(project_id: str) -> IngestResponse:
 
 
 @sidecar_api.get("/ingest_status")
-async def http_get_statuses() -> IngestStatusResponse:
+async def http_get_statuses(request: Request) -> IngestStatusResponse:
+    update_envs_from_headers(request)
     response = ingest.get_statuses()
     return response
 
 
 @sidecar_api.post("/ingest_references")
-async def http_get_references(req: IngestRequest) -> IngestResponse:
+async def http_get_references(req: IngestRequest, request: Request) -> IngestResponse:
+    update_envs_from_headers(request)
+    req.pdf_directory = os.environ.get("PROJECT_DIR") + "/uploads/"
     response = ingest.get_references(req)
     return response
 
 
 @sidecar_api.post("/update")
-async def http_update(req: ReferenceUpdate) -> UpdateStatusResponse:
+async def http_update(req: ReferenceUpdate, request: Request) -> UpdateStatusResponse:
+    update_envs_from_headers(request)
     response = storage.update_reference(req)
     return response
 
 
 @sidecar_api.post("/delete")
-async def http_delete(req: DeleteRequest) -> DeleteStatusResponse:
+async def http_delete(req: DeleteRequest, request: Request) -> DeleteStatusResponse:
+    update_envs_from_headers(request)
     response = storage.delete_references(req)
     return response
 
 
 @sidecar_api.post("/rewrite")
-async def http_rewrite(req: RewriteRequest) -> RewriteResponse:
+async def http_rewrite(req: RewriteRequest, request: Request) -> RewriteResponse:
+    update_envs_from_headers(request)
     response = rewrite.rewrite(req)
     return response
 
 
 @sidecar_api.post("/completion")
-async def http_completion(req: TextCompletionRequest) -> TextCompletionResponse:
+async def http_completion(req: TextCompletionRequest, request: Request) -> TextCompletionResponse:
+    update_envs_from_headers(request)
     response = rewrite.complete_text(req)
     return response
 
 
 @sidecar_api.post("/chat")
-async def http_chat(req: ChatRequest) -> ChatResponse:
+async def http_chat(req: ChatRequest, request: Request) -> ChatResponse:
+    update_envs_from_headers(request)
     response = chat.ask_question(req)
     return response
 
 
 @sidecar_api.post("/search")
-async def http_search(req: SearchRequest) -> SearchResponse:
+async def http_search(req: SearchRequest, request: Request) -> SearchResponse:
+    update_envs_from_headers(request)
     response = search.search_s2(req)
     return response
 
