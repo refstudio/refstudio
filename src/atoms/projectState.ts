@@ -69,6 +69,19 @@ export const closeProjectAtom = atom(null, async (get, set) => {
   }
 });
 
+// -------------
+// Web
+// -------------
+export const newWebProjectAtom = atom(null, async (_, set, project_id: string, path: string) => {
+  // Close current project before create new
+  await set(closeProjectAtom);
+
+  // Create empty project
+  set(currentProjectPathAtom, path);
+  await set(loadReferencesAtom);
+  await set(refreshFileTreeAtom);
+});
+
 // #####################################################################################
 // Utilities
 // #####################################################################################

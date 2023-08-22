@@ -1,12 +1,14 @@
 import { open, save } from '@tauri-apps/api/dialog';
 import { useAtomValue, useSetAtom } from 'jotai';
 
+import { postNewProject } from '../../api/projectsAPI';
 import { createFileAtom } from '../../atoms/fileEntryActions';
 import {
   closeProjectAtom,
   isProjectOpenAtom,
   newProjectAtom,
   newSampleProjectAtom,
+  newWebProjectAtom,
   openProjectAtom,
 } from '../../atoms/projectState';
 import { getNewProjectsBaseDir } from '../../io/filesystem';
@@ -15,17 +17,24 @@ import { saveCachedSettings, setCachedSetting } from '../../settings/settingsMan
 
 export function useFileProjectNewListener() {
   const newProject = useSetAtom(newProjectAtom);
+  const newWebProject = useSetAtom(newWebProjectAtom);
   const createFile = useSetAtom(createFileAtom);
 
   return async () => {
-    const newProjectPath = import.meta.env.VITE_IS_WEB
-      ? `${await getNewProjectsBaseDir()}New Project`
-      : await save({ defaultPath: await getNewProjectsBaseDir() });
-    if (typeof newProjectPath === 'string') {
-      await newProject(newProjectPath);
+    if (import.meta.env.VITE_IS_WEB) {
+      const projectInfo = await postNewProject();
+      persistProjectDirInSettings(projectInfo.projectPath);
+      await newWebProject(projectInfo.projectId, projectInfo.projectPath);
       createFile();
-      persistProjectDirInSettings(newProjectPath);
-      notifyInfo('New project created at ' + newProjectPath);
+      notifyInfo('New project created at ' + projectInfo.projectPath);
+    } else {
+      const newProjectPath = await save({ defaultPath: await getNewProjectsBaseDir() });
+      if (typeof newProjectPath === 'string') {
+        await newProject(newProjectPath);
+        createFile();
+        persistProjectDirInSettings(newProjectPath);
+        notifyInfo('New project created at ' + newProjectPath);
+      }
     }
   };
 }
