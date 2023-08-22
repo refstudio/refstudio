@@ -201,6 +201,14 @@ class SearchResponse(RefStudioModel):
     results: list[S2SearchResult] 
 
 
+class UpdateSettingsRequest(RefStudioModel):
+    settings: dict[str, Any]
+
+
+class SettingsResponse(RefStudioModel):
+    settings: dict[str, Any]
+
+
 class CliCommands(RefStudioModel):
     ingest: tuple[IngestRequest, IngestResponse]
     """Ingest PDFs"""

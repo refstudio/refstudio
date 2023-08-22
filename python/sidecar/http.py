@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import FileResponse
 
-from sidecar import chat, ingest, projects, rewrite, search, storage
+from sidecar import chat, ingest, projects, rewrite, search, storage, settings
 from sidecar.typing import (
     ChatRequest,
     ChatResponse,
@@ -24,6 +24,8 @@ from sidecar.typing import (
     TextCompletionRequest,
     TextCompletionResponse,
     UpdateStatusResponse,
+    UpdateSettingsRequest,
+    SettingsResponse,
 )
 
 load_dotenv()
@@ -31,6 +33,7 @@ load_dotenv()
 sidecar_api = FastAPI()  # Legacy API for existing sidecar cli functionality
 filesystem_api = FastAPI()  # API for interacting with the filesystem
 project_api = FastAPI()  # API for interacting with projects
+settings_api = FastAPI()  # API for interacting with settings
 
 
 # Sidecar API
@@ -218,3 +221,17 @@ async def delete_file(project_id: str, filepath: Path):
         "message": "File deleted",
         "filepath": filepath,
     }
+
+
+# Settings API
+# --------------
+@settings_api.get("/")
+async def get_settings() -> SettingsResponse:
+    user_id = "user1"
+    return settings.get_settings_for_user(user_id)
+
+
+@settings_api.post("/")
+async def update_settings(req: UpdateSettingsRequest) -> SettingsResponse:
+    user_id = "user1"
+    return settings.update_settings_for_user(user_id, req)
