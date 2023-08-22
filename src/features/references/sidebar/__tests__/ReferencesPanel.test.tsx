@@ -34,7 +34,6 @@ describe('ReferencesPanel', () => {
   it.each<{ title: string; event: RefStudioEventName }>([
     { title: 'Add References', event: 'refstudio://menu/references/upload' },
     { title: 'Open References', event: 'refstudio://menu/references/open' },
-    { title: 'Export References (NOT IMPLEMENTED)', event: 'refstudio://menu/references/export' },
   ])('should trigger $title on click', async ({ title, event }) => {
     const { user } = setupWithJotaiProvider(<ReferencesPanel />);
     await user.click(screen.getByTitle(title));
@@ -113,5 +112,25 @@ describe('ReferencesPanel', () => {
     expect(vi.mocked(emitEvent)).toBeCalledWith<
       [RefStudioEventName, RefStudioEventPayload<'refstudio://references/remove'>]
     >('refstudio://references/remove', { referenceIds: [ref1.id] });
+  });
+
+  it('should have disabled export button when no reference is in the store', async () => {
+    const { user } = setupWithJotaiProvider(<ReferencesPanel />);
+    const exportButton = screen.getByTitle('Export References');
+
+    expect(exportButton).toBeInTheDocument();
+
+    await user.click(exportButton);
+    expect(vi.mocked(emitEvent)).not.toBeCalled();
+  });
+
+  it("should emit 'refstudio://menu/references/export' when clicking on the export button", async () => {
+    const { user } = setupWithJotaiProvider(<ReferencesPanel />, store);
+    const exportButton = screen.getByTitle('Export References');
+
+    expect(exportButton).toBeInTheDocument();
+
+    await user.click(exportButton);
+    expect(vi.mocked(emitEvent)).toBeCalledWith<[RefStudioEventName]>('refstudio://menu/references/export');
   });
 });

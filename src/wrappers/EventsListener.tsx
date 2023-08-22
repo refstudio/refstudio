@@ -15,10 +15,11 @@ import {
 import { createFileAtom, deleteFileAtom, renameFileAtom } from '../atoms/fileEntryActions';
 import { fileExplorerEntryPathBeingRenamed } from '../atoms/fileExplorerActions';
 import { useActiveEditorContentAtoms } from '../atoms/hooks/useActiveEditorContentAtoms';
-import { removeReferencesAtom } from '../atoms/referencesState';
+import { getReferencesAtom, removeReferencesAtom } from '../atoms/referencesState';
 import { PaneEditorId } from '../atoms/types/PaneGroup';
 import { emitEvent, RefStudioEventPayload } from '../events';
 import { useListenEvent } from '../hooks/useListenEvent';
+import { exportReferences } from '../io/filesystem';
 import { asyncNoop, noop } from '../lib/noop';
 import {
   useClearNotificationsListener,
@@ -46,6 +47,7 @@ export function EventsListener({ children }: { children?: React.ReactNode }) {
   useListenEvent('refstudio://explorer/delete', useDeleteFileListener());
   // References
   useListenEvent('refstudio://references/remove', useRemoveReferencesListener());
+  useListenEvent('refstudio://menu/references/export', useExportReferencesListener());
   // Notifications
   useListenEvent('refstudio://notifications/new', useCreateNotificationListener());
   useListenEvent('refstudio://notifications/clear', useClearNotificationsListener());
@@ -101,6 +103,11 @@ function useCloseEditorListener() {
 function useRemoveReferencesListener() {
   const removeReferences = useSetAtom(removeReferencesAtom);
   return ({ referenceIds }: { referenceIds: string[] }) => void removeReferences(referenceIds);
+}
+
+function useExportReferencesListener() {
+  const references = useAtomValue(getReferencesAtom);
+  return () => void exportReferences(references);
 }
 
 function useDeleteFileListener() {
