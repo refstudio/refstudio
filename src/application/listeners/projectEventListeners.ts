@@ -1,7 +1,7 @@
 import { open, save } from '@tauri-apps/api/dialog';
 import { useAtomValue, useSetAtom } from 'jotai';
 
-import { postNewProject } from '../../api/projectsAPI';
+import { postRemoteProject } from '../../api/projectsAPI';
 import { createFileAtom } from '../../atoms/fileEntryActions';
 import {
   closeProjectAtom,
@@ -22,7 +22,7 @@ export function useFileProjectNewListener() {
 
   return async () => {
     if (import.meta.env.VITE_IS_WEB) {
-      const projectInfo = await postNewProject();
+      const projectInfo = await postRemoteProject();
       persistProjectDirInSettings(projectInfo.projectPath);
       await newWebProject(projectInfo.projectId, projectInfo.projectPath);
       createFile();

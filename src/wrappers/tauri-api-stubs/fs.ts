@@ -2,6 +2,11 @@
 
 import * as tauriFs from '@tauri-apps/api/fs';
 
+import { deleteRemoteFile, getRemoteFile, writeRemotePdfFile, writeRemoteTextFile } from '../../api/filesystemAPI';
+import { getRemoteProject } from '../../api/projectsAPI';
+
+const PROJECT_ID = '4648e1f2-a89b-4752-960f-2ba74a0dc38c';
+
 interface FakeFile {
   type: 'file';
   contents: string;
@@ -26,7 +31,7 @@ function normalizePath(path: string): NormalizedPath {
 }
 const fs = new Map<NormalizedPath, FakeNode>();
 
-export const createDir: typeof tauriFs.createDir = (dir, options) => {
+export const createDir: typeof tauriFs.createDir = async (dir, options) => {
   if (!options?.recursive) {
     throw new Error('Only recursive createDir is implemented');
   }
@@ -53,6 +58,7 @@ export const readTextFile: typeof tauriFs.readTextFile = (filePath) => {
 };
 
 export const readDir: typeof tauriFs.readDir = async (dir, options) => {
+  console.log('READ DIR for ', dir);
   dir = normalizePath(dir);
   const entries: tauriFs.FileEntry[] = [];
   for (const [path, node] of fs.entries()) {
@@ -64,6 +70,15 @@ export const readDir: typeof tauriFs.readDir = async (dir, options) => {
       });
     }
   }
+
+  const projectInfo = await getRemoteProject(PROJECT_ID);
+  const paths = projectInfo.filepaths.map((path) => path.replace(projectInfo.project_path, ''));
+  return paths.map((path) => ({
+    path,
+    name: path.split('/').slice(-1)[0],
+    children: undefined,
+  }));
+
   return entries;
 };
 
@@ -80,25 +95,27 @@ export const removeDir: typeof tauriFs.removeDir = (dir, options) => {
   return Promise.resolve();
 };
 
-export const removeFile: typeof tauriFs.removeFile = (filePath, options) => {
+export const removeFile: typeof tauriFs.removeFile = async (filePath, options) => {
   if (options) {
     throw new Error('Not implemented.');
   }
   fs.delete(normalizePath(filePath));
-  return Promise.resolve();
+  // FS API CALL
+  await deleteRemoteFile(PROJECT_ID, filePath);
 };
 
-export const writeTextFile: typeof tauriFs.writeTextFile = (filePathOrObj, contentsOrNone, ...args) => {
+export const writeTextFile: typeof tauriFs.writeTextFile = async (filePathOrObj, contentsOrNone, ...args) => {
   if (args.length) {
     throw new Error('Not implemented.');
   }
   const filePath = typeof filePathOrObj === 'object' ? filePathOrObj.path : filePathOrObj;
   const contents = typeof filePathOrObj === 'object' ? filePathOrObj.contents : (contentsOrNone as string);
   fs.set(normalizePath(filePath), { type: 'file', contents });
-  return Promise.resolve();
+  // FS API CALL
+  await writeRemoteTextFile(PROJECT_ID, normalizePath(filePath), contents);
 };
 
-export const writeBinaryFile: typeof tauriFs.writeBinaryFile = (filePathOrObj, contentsOrNone, ...args) => {
+export const writeBinaryFile: typeof tauriFs.writeBinaryFile = async (filePathOrObj, contentsOrNone, ...args) => {
   if (args.length) {
     throw new Error('Not implemented.');
   }
@@ -106,10 +123,11 @@ export const writeBinaryFile: typeof tauriFs.writeBinaryFile = (filePathOrObj, c
   const contents =
     typeof filePathOrObj === 'object' ? filePathOrObj.contents : (contentsOrNone as tauriFs.BinaryFileContents);
   fs.set(normalizePath(filePath), { type: 'file', contents: contents as string /* this is a lie */ });
-  return Promise.resolve();
+  // FS API CALL
+  await writeRemotePdfFile(PROJECT_ID, normalizePath(filePath), contents as ArrayBuffer);
 };
 
-export const renameFile: typeof tauriFs.renameFile = (oldPath, newPath, options) => {
+export const renameFile: typeof tauriFs.renameFile = async (oldPath, newPath, options) => {
   if (options) {
     throw new Error('Not implemented');
   }
@@ -119,11 +137,20 @@ export const renameFile: typeof tauriFs.renameFile = (oldPath, newPath, options)
     throw new Error(`Tried to rename ${oldPath} which does not exist.`);
   }
   if (oldFile.type === 'dir') {
-    throw new Error('Renaming directores is not implemented');
+    throw new Error('Renaming directories is not implemented');
   }
   fs.delete(normOldPath);
-  fs.set(normalizePath(newPath), oldFile);
-  return Promise.resolve();
+  const normNewPath = normalizePath(newPath);
+  fs.set(normNewPath, oldFile);
+
+  // FS API CALL
+  const data = await getRemoteFile(PROJECT_ID, normOldPath);
+  await deleteRemoteFile(PROJECT_ID, normOldPath);
+  if (data instanceof ArrayBuffer) {
+    await writeRemotePdfFile(PROJECT_ID, normNewPath, data);
+  } else {
+    await writeRemoteTextFile(PROJECT_ID, normNewPath, data);
+  }
 };
 
 export function resetInMemoryFsForTesting() {
