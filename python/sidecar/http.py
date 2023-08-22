@@ -2,7 +2,6 @@ import os
 import shutil
 from pathlib import Path
 from uuid import uuid4
-from typing import Annotated
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, UploadFile, Request
