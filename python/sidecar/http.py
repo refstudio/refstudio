@@ -145,7 +145,14 @@ async def delete_project(project_id: str):
     Deletes a project directory and all files in it
     """
     user_id = "user1"
-    projects.delete_project(user_id, project_id)
+    try:
+        projects.delete_project(user_id, project_id)
+    except KeyError:
+        return {
+            "status": "error",
+            "message": "Project not found",
+            "project_id": project_id,
+        }
     return {
         "status": "success",
         "message": "Project deleted",
