@@ -58,7 +58,7 @@ def update_project_path_storage(user_id: str, project_id: str, project_path: str
 
 def get_project_path(user_id: str, project_id: str) -> Path:
     data = read_project_path_storage(user_id)
-    return data[project_id]
+    return Path(data[project_id])
 
 
 def create_project(user_id: str, project_id: str, project_path: str = None) -> Path:

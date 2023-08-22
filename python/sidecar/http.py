@@ -39,7 +39,8 @@ project_api = FastAPI()  # API for interacting with projects
 async def http_ingest(project_id: str) -> IngestResponse:
     user_id = "user1"
     project_path = projects.get_project_path(user_id, project_id)
-    req = IngestRequest(pdf_directory=project_path)
+    uploads_dir = project_path / "uploads"
+    req = IngestRequest(pdf_directory=str(uploads_dir))
     response = ingest.run_ingest(req)
     return response
 
