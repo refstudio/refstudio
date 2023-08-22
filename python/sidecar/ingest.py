@@ -484,7 +484,10 @@ class PDFIngestion:
         # append new references to any we have previously loaded
         for ref in new_references:
             logger.info(f"Creating text chunks for Reference: {ref.source_filename}")
-            ref.chunks = shared.chunk_reference(ref)
+            ref.chunks = shared.chunk_reference(
+                ref,
+                filepath=self.staging_dir.joinpath(ref.source_filename)
+            )
 
             self.references.append(ref)
 
