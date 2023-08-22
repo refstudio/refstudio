@@ -70,7 +70,7 @@ def test_get_project_path_for_project_that_exists(tmp_path, setup_project_path_s
     project_id = "project1"
 
     path = projects.get_project_path(user_id, project_id)
-    assert path == str(tmp_path / user_id / project_id)
+    assert path == Path(tmp_path / user_id / project_id)
 
 
 def test_create_project_should_create_project_path(monkeypatch, tmp_path):
