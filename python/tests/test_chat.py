@@ -7,7 +7,7 @@ from sidecar.typing import ChatRequest
 from .test_ingest import _copy_fixture_to_temp_dir
 
 
-def test_chat_ask_question_is_ok(monkeypatch, capsys, tmp_path, mock_call_model_is_ok):
+def test_chat_ask_question_is_ok(monkeypatch, tmp_path, mock_call_model_is_ok):
     monkeypatch.setattr(chat.Chat, "call_model", mock_call_model_is_ok)
     
     # copy references.json to temp dir and mock settings.REFERENCES_JSON_PATH
@@ -18,11 +18,10 @@ def test_chat_ask_question_is_ok(monkeypatch, capsys, tmp_path, mock_call_model_
     _copy_fixture_to_temp_dir(path_to_test_file, mocked_path)
     monkeypatch.setattr(settings, "REFERENCES_JSON_PATH", mocked_path)
 
-    _ = chat.ask_question(
+    response = chat.ask_question(
         request=ChatRequest(text="This is a question about something"),
     )
-    captured = capsys.readouterr()
-    output = json.loads(captured.out)
+    output = response.dict()
 
     assert output["status"] == "ok"
     assert output["message"] == ""
@@ -30,7 +29,7 @@ def test_chat_ask_question_is_ok(monkeypatch, capsys, tmp_path, mock_call_model_
     assert output["choices"][0]["index"] == 0
 
 
-def test_chat_ask_question_is_openai_error(monkeypatch, capsys, tmp_path, mock_call_model_is_error):
+def test_chat_ask_question_is_openai_error(monkeypatch, tmp_path, mock_call_model_is_error):
     monkeypatch.setattr(chat.Chat, "call_model", mock_call_model_is_error)
     
     # copy references.json to temp dir and mock settings.REFERENCES_JSON_PATH
@@ -41,11 +40,10 @@ def test_chat_ask_question_is_openai_error(monkeypatch, capsys, tmp_path, mock_c
     _copy_fixture_to_temp_dir(path_to_test_file, mocked_path)
     monkeypatch.setattr(settings, "REFERENCES_JSON_PATH", mocked_path)
 
-    _ = chat.ask_question(
+    response = chat.ask_question(
         request=ChatRequest(text="This is a question about something"),
     )
-    captured = capsys.readouterr()
-    output = json.loads(captured.out)
+    output = response.dict()
 
     assert output["status"] == "error"
     assert output["message"] == "This is a mocked error"

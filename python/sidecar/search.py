@@ -108,5 +108,4 @@ def search_s2(request: SearchRequest):
     limit = request.limit
     searcher = Searcher()
     response = searcher.search_func(query, limit=limit)
-    sys.stdout.write(response.json())
     return response
