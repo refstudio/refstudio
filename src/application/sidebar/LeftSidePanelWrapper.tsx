@@ -75,12 +75,7 @@ export function LeftSidePanelWrapper() {
         ]}
         onItemClick={handleSideBarClick}
       />
-      <Panel
-        collapsible
-        order={1}
-        ref={leftPanelRef}
-        onCollapse={(collapsed) => setPrimaryPaneCollapsed(collapsed)}
-      >
+      <Panel collapsible order={1} ref={leftPanelRef} onCollapse={(collapsed) => setPrimaryPaneCollapsed(collapsed)}>
         {primaryPane === 'Explorer' && <ExplorerPanel />}
         {primaryPane === 'References' && <ReferencesPanel />}
       </Panel>
