@@ -9,7 +9,6 @@ from sidecar.storage import JsonStorage
 from web import api
 
 from .test_ingest import _copy_fixture_to_temp_dir, FIXTURES_DIR
-from .test_settings import create_settings_json
 
 client = TestClient(api)
 settings_client = TestClient(http.settings_api)
@@ -448,7 +447,6 @@ def test_delete_file(monkeypatch, tmp_path):
 
 def test_get_settings(monkeypatch, tmp_path, create_settings_json):
     monkeypatch.setattr(settings, "WEB_STORAGE_URL", tmp_path)
-    user_id = "user1"
 
     response = settings_client.get("/")
     assert response.status_code == 200
