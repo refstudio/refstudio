@@ -1,10 +1,10 @@
 /** Utility for calling into the Python sidecar with types. */
 
-import { fetch as tauriFetch } from '@tauri-apps/api/http';
+import { Body, fetch as tauriFetch } from '@tauri-apps/api/http';
 import { Child, ChildProcess, Command as TauriCommand } from '@tauri-apps/api/shell';
 
 import { getCachedSetting } from '../settings/settingsManager';
-import { CliCommands } from './types';
+import { CliCommands, RewriteResponse } from './types';
 
 interface SharedCommand {
   execute: typeof TauriCommand.prototype.execute;
@@ -67,6 +67,19 @@ export async function callSidecar<T extends keyof CliCommands>(
     SIDECAR_ENABLE_LOGGING: String(sidecarSettings.logging.active),
     SIDECAR_LOG_DIR: sidecarSettings.logging.path,
   };
+
+  if (subcommand === 'rewrite') {
+    const httpResponse = await tauriFetch('http://localhost:1487/api/sidecar/rewrite', {
+      method: 'POST',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
+      body: Body.json(arg as any),
+    });
+    if (!httpResponse.ok) {
+      console.log('rewrite request failed', httpResponse.status, httpResponse.data);
+      throw new Error('Error requesting rewrite');
+    }
+    return httpResponse.data as RewriteResponse;
+  }
 
   const command = new Command('call-sidecar', [subcommand, JSON.stringify(arg)], { env });
   console.log('sidecar command ' + subcommand, arg, command);
@@ -174,7 +187,7 @@ export async function getServer() {
   return process;
 }
 
-export function useRefStudioServer() {
+export function useRefStudioServerOnDesktop() {
   if (import.meta.env.VITE_IS_WEB) {
     return; // no server to be started for the web app.
   }

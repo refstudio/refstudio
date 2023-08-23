@@ -1,7 +1,7 @@
 import { useSetAtom } from 'jotai';
 import { useState } from 'react';
 
-import { useRefStudioServer } from './api/sidecar';
+import { useRefStudioServerOnDesktop } from './api/sidecar';
 import { App } from './application/App';
 import { openProjectAtom } from './atoms/projectState';
 import { useAsyncEffect } from './hooks/useAsyncEffect';
@@ -20,7 +20,7 @@ export function AppStartup() {
   const [initialized, setInitialized] = useState(false);
   const openProject = useSetAtom(openProjectAtom);
 
-  useRefStudioServer();
+  useRefStudioServerOnDesktop();
 
   useAsyncEffect(
     async (isMounted) => {
