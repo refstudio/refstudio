@@ -107,10 +107,14 @@ export async function startServer() {
     console.log('server stdout', line);
   });
   command.addListener('close', (data: Pick<ChildProcess, 'code' | 'signal'>) => {
-    console.warn('server closed', data.code, data.signal);
+    console.warn('server closed, restarting', data.code, data.signal);
+    serverProcess = null;
+    void getServer();
   });
   command.addListener('error', (data) => {
-    console.error('server crashed', data);
+    console.error('server crashed, restarting', data);
+    serverProcess = null;
+    void getServer();
   });
   return command.spawn();
 }
@@ -143,7 +147,6 @@ export async function killServer() {
 (window as any).isServerHealthy = isServerHealthy;
 
 export async function getServer() {
-  console.log('getServer');
   if (serverProcess) {
     if (serverProcess.state === 'ready') {
       return serverProcess.process;
@@ -155,7 +158,11 @@ export async function getServer() {
   // Check if there's already a server process running. If so, kill it and start a new one.
   if (await isServerHealthy()) {
     console.log('Found existing API server; killing it before starting a new one.');
-    await tauriFetch('http://localhost:1487/api/meta/shutdown', { method: 'POST' });
+    try {
+      await tauriFetch('http://localhost:1487/api/meta/shutdown', { method: 'POST' });
+    } catch (e) {
+      // Failure is expected here since the server shuts down before responding.
+    }
   }
 
   const process = await startServer();

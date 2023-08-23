@@ -1,9 +1,9 @@
 import os
 import shutil
-import sys
 from pathlib import Path
 from uuid import uuid4
 
+import psutil
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import FileResponse
@@ -231,11 +231,11 @@ async def status():
     }
 
 
-@meta_api.post('/crash')
-async def crash():
-    raise NotImplementedError()
-
-
 @meta_api.post('/shutdown')
 async def shutdown():
-    sys.exit(0)
+    # See https://stackoverflow.com/a/74757349/388951
+    parent_pid = os.getpid()
+    parent = psutil.Process(parent_pid)
+    for child in parent.children(recursive=True):
+        child.kill()
+    parent.kill()
