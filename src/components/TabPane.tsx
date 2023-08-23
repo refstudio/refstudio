@@ -20,11 +20,7 @@ export function TabPane<K extends string>({
 
   return (
     <div
-      className={cx(
-        'flex flex-1 flex-row flex-nowrap',
-        'bg-top-bar-bg-active',
-        'x-hide-scrollbars overflow-x-scroll',
-      )}
+      className={cx('flex flex-1 flex-row flex-nowrap', 'bg-top-bar-bg-active', 'x-hide-scrollbars overflow-x-scroll')}
       role="tablist"
     >
       {items.map((item, index) => (
@@ -34,7 +30,7 @@ export function TabPane<K extends string>({
           className={cx({
             'border-l border-l-top-bar-border': index > 0,
             'border-l-0': activeIndex === index,
-            'border-l-0 rounded-bl-default': activeIndex === index - 1,
+            'rounded-bl-default border-l-0': activeIndex === index - 1,
             'rounded-br-default': activeIndex === index + 1,
           })}
           content={item.text}
@@ -45,9 +41,13 @@ export function TabPane<K extends string>({
           onCloseClick={() => onCloseClick(item.value)}
         />
       ))}
-      {items.length > 0 && <div className={cx('grow bg-top-bar-bg-inactive border-l border-l-top-bar-border', {
-        'border-l-0 rounded-bl-default': activeIndex === items.length - 1,
-      })} />}
+      {items.length > 0 && (
+        <div
+          className={cx('grow border-l border-l-top-bar-border bg-top-bar-bg-inactive', {
+            'rounded-bl-default border-l-0': activeIndex === items.length - 1,
+          })}
+        />
+      )}
     </div>
   );
 }
@@ -62,23 +62,14 @@ interface TabItemProps {
   onClick: () => void;
   onCloseClick: () => void;
 }
-export function TabItem({
-  active,
-  content,
-  isDirty,
-  className,
-  ctxProps,
-  Icon,
-  onClick,
-  onCloseClick,
-}: TabItemProps) {
+export function TabItem({ active, content, isDirty, className, ctxProps, Icon, onClick, onCloseClick }: TabItemProps) {
   const { show } = useContextMenu({ id: TABPANE_TAB_MENU_ID, props: ctxProps });
 
   return (
     <div
       aria-selected={active}
       className={cx(
-        'flex min-w-32 max-w-[11.5rem] p-2 gap-2 items-center',
+        'min-w-32 flex max-w-[11.5rem] items-center gap-2 p-2',
         'cursor-pointer select-none',
         'group',
         {
@@ -99,10 +90,14 @@ export function TabItem({
       onContextMenu={(e) => show({ event: e })}
     >
       {Icon}
-      <span className={cx('flex-1 whitespace-nowrap overflow-hidden overflow-ellipsis', {
-        'text-btn-txt-top-bar-active': active,
-        'text-btn-txt-top-bar-inactive': !active,
-      })}>{content}</span>
+      <span
+        className={cx('flex-1 overflow-hidden overflow-ellipsis whitespace-nowrap', {
+          'text-btn-txt-top-bar-active': active,
+          'text-btn-txt-top-bar-inactive': !active,
+        })}
+      >
+        {content}
+      </span>
       <TabCloseButton isDirty={isDirty} onClick={onCloseClick} />
     </div>
   );

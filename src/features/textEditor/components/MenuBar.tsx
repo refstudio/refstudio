@@ -4,7 +4,19 @@ import { Editor } from '@tiptap/react';
 import * as React from 'react';
 
 import { cx } from '../../../lib/cx';
-import { BoldIcon, CodeIcon, Heading1Icon, Heading2Icon, Heading3Icon, ItalicIcon, OrderedListIcon, RedoIcon, StrikethroughIcon, UndoIcon, UnorderedListIcon } from './icons';
+import {
+  BoldIcon,
+  CodeIcon,
+  Heading1Icon,
+  Heading2Icon,
+  Heading3Icon,
+  ItalicIcon,
+  OrderedListIcon,
+  RedoIcon,
+  StrikethroughIcon,
+  UndoIcon,
+  UnorderedListIcon,
+} from './icons';
 import { isNotionBlockTypeActive } from './tipTapNodes/notionBlock/utils/isNotionBlockTypeActive';
 
 export function MenuBar({ editor }: { editor: Editor }) {
@@ -158,5 +170,5 @@ export function MenuBar({ editor }: { editor: Editor }) {
 }
 
 function Divider() {
-  return <div className="w-[1px] h-6 bg-card-border-primary" />;
+  return <div className="h-6 w-[1px] bg-card-border-primary" />;
 }

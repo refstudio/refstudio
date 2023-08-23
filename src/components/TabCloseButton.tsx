@@ -28,7 +28,7 @@ export function TabCloseButton({ isDirty, onClick }: CloseButtonProps) {
         className={cx('block', 'group-hover/tab-close-button:!block', {
           '!hidden': isDirty,
         })}
-        color='currentcolor'
+        color="currentcolor"
         role="button"
         onClick={(e) => {
           e.stopPropagation();
@@ -39,7 +39,7 @@ export function TabCloseButton({ isDirty, onClick }: CloseButtonProps) {
         className={cx('hidden', 'group-hover/tab-close-button:!hidden', {
           '!block': isDirty,
         })}
-        color='currentcolor'
+        color="currentcolor"
       />
     </div>
   );
