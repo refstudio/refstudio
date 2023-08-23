@@ -40,21 +40,13 @@
   }
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  @apply font-bold;
-}
-
 h1 {
-  @apply text-3xl;
+  @apply text-sm/6 font-bold;
+  @apply uppercase;
 }
 
 h2 {
-  @apply text-2xl;
+  @apply font-semibold;
 }
 
 h3 {
@@ -73,6 +65,7 @@ body {
   /* This overflow setting prevents the app to display that extra content on scroll (like pull to refresh) */
   @apply h-full w-full overflow-hidden;
   font-family: 'Roboto', sans-serif;
+  @apply text-base font-normal;
 }
 
 /* Make root full-height */
