@@ -458,7 +458,7 @@ def test_get_settings(
 
     response = settings_client.get("/")
     assert response.status_code == 200
-    assert response.json()["settings"] == {"openAI": {"OPENAI_API_KEY": "1234"}}
+    assert response.json()["openai"]["api_key"] == "1234"
 
 
 # ruff gets confused here:
@@ -473,11 +473,10 @@ def test_update_settings(
 
     response = settings.get_settings_for_user(user_id)
 
-    data = response.settings
-    data["foo"] = {"bar": "test"}
+    data = response.dict()
+    data["openai"] = {"api_key": "test"}
 
-    request = {"settings": data}
-    response = settings_client.post("/", json=request)
+    response = settings_client.put("/", json=data)
 
     assert response.status_code == 200
-    assert response.json()["settings"] == data
+    assert response.json()["openai"]["api_key"] == "test"

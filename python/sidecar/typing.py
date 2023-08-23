@@ -202,7 +202,7 @@ class SearchResponse(RefStudioModel):
 
 
 class OpenAISettings(RefStudioModel):
-    api_key: str
+    api_key: str = ""
     chat_model: str = "gpt-3.5-turbo"
 
     # TODO: the params below should not be settings
@@ -211,18 +211,23 @@ class OpenAISettings(RefStudioModel):
     temperature: float = 0.7
 
 
+class ProjectSettings(RefStudioModel):
+    current_directory: str = ""
+
+
+class LoggingSettings(RefStudioModel):
+    enable: bool = False
+    filepath: str = "/tmp/refstudio-sidecar.log"
+
+
 class SidecarSettings(RefStudioModel):
-    enable_logging: bool = False
-    log_
+    logging: LoggingSettings = LoggingSettings()
 
 
-class UpdateSettingsRequest(RefStudioModel):
+class SettingsSchema(RefStudioModel):
+    project: ProjectSettings = ProjectSettings()
     openai: OpenAISettings = OpenAISettings()
     sidecar: SidecarSettings = SidecarSettings()
-
-
-class SettingsResponse(RefStudioModel):
-    settings: dict[str, Any]
 
 
 class CliCommands(RefStudioModel):

@@ -24,8 +24,7 @@ from sidecar.typing import (
     TextCompletionRequest,
     TextCompletionResponse,
     UpdateStatusResponse,
-    UpdateSettingsRequest,
-    SettingsResponse,
+    SettingsSchema,
 )
 
 load_dotenv()
@@ -226,12 +225,12 @@ async def delete_file(project_id: str, filepath: Path):
 # Settings API
 # --------------
 @settings_api.get("/")
-async def get_settings() -> SettingsResponse:
+async def get_settings() -> SettingsSchema:
     user_id = "user1"
     return settings.get_settings_for_user(user_id)
 
 
 @settings_api.put("/")
-async def update_settings(req: UpdateSettingsRequest) -> SettingsResponse:
+async def update_settings(req: SettingsSchema) -> SettingsSchema:
     user_id = "user1"
     return settings.update_settings_for_user(user_id, req)

@@ -5,7 +5,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from sidecar.typing import UpdateSettingsRequest, SettingsResponse
+from sidecar.typing import SettingsSchema
 
 load_dotenv()
 
@@ -52,11 +52,14 @@ def make_settings_json_path(user_id: str) -> Path:
 def initialize_settings_for_user(user_id: str) -> None:
     filepath = make_settings_json_path(user_id)
     filepath.parent.mkdir(parents=True, exist_ok=True)
+
+    defaults = SettingsSchema()
+
     with open(filepath, "w") as f:
-        json.dump({}, f)
+        json.dump(defaults.dict(), f)
 
 
-def get_settings_for_user(user_id: str) -> SettingsResponse:
+def get_settings_for_user(user_id: str) -> SettingsSchema:
     """
     Reads a user's settings.json
     """
@@ -67,13 +70,17 @@ def get_settings_for_user(user_id: str) -> SettingsResponse:
 
     with open(filepath, "r") as f:
         data = json.load(f)
-    return SettingsResponse(settings=data)
+    return SettingsSchema(
+        openai=data.get("openai"),
+        project=data.get("project"),
+        sidecar=data.get("sidecar"),
+    )
 
 
 def update_settings_for_user(
     user_id: str,
-    settings: UpdateSettingsRequest
-) -> SettingsResponse:
+    settings: SettingsSchema 
+) -> SettingsSchema:
     """
     Updates a user's settings.json
     """
@@ -84,8 +91,8 @@ def update_settings_for_user(
 
     response = get_settings_for_user(user_id)
 
-    existing = dict(response.settings)
-    existing.update(settings.settings)
+    existing = response.dict()
+    existing.update(settings.dict())
 
     with open(filepath, "w") as f:
         json.dump(existing, f)
