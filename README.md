@@ -2,8 +2,8 @@
   <a href="https://github.com/refstudio/refstudio/actions/workflows/on-push.yml">
     <img src="https://github.com/refstudio/refstudio/actions/workflows/on-push.yml/badge.svg" />
   </a>
-  <a href="https://codecov.io/gh/refstudio/refstudio" > 
-   <img src="https://codecov.io/gh/refstudio/refstudio/branch/main/graph/badge.svg?token=XZMTETRGXC"/> 
+  <a href="https://codecov.io/gh/refstudio/refstudio" >
+   <img src="https://codecov.io/gh/refstudio/refstudio/branch/main/graph/badge.svg?token=XZMTETRGXC"/>
    </a>
 </p>
 
@@ -37,8 +37,6 @@ When editing documents you can ask AI assistance to rewrite parts of the text, a
 
 https://github.com/refstudio/refstudio/assets/174127/f8b847e1-d6b7-4e58-ae04-0d8e96c88382
 
-
-
 ## Setup & Run
 
 ### Prerequisites (development)
@@ -46,7 +44,6 @@ https://github.com/refstudio/refstudio/assets/174127/f8b847e1-d6b7-4e58-ae04-0d8
 - JavaScript: [node.js](https://nodejs.org/en/download) (>= 18.12.0 LTS) and [Yarn](https://yarnpkg.com/getting-started/install) package manager
 - Python: (>= 3.11) and [Poetry](https://python-poetry.org/docs/#installation) package manager
 - Tauri: Check [prerequisites](https://tauri.app/v1/guides/getting-started/prerequisites/) to install Rust and [Cargo](https://doc.rust-lang.org/stable/cargo/) package manager
-
 
 ### Backend (Python sidecar)
 
@@ -57,6 +54,7 @@ poetry install
 ```
 
 To compile the Python sidecar as a binary:
+
 ```bash
 yarn python
 ```
@@ -65,27 +63,47 @@ This will generate the binary at `src-tauri/bin/python` and append the appropria
 
 You can read more details about the Python backend implementation [here](/python/README.md).
 
-### Frontend (Tauri + TypeScript)
+### Frontend
 
 To install the frontend application built with Tauri and Vite + TypeScript you can run:
 
 ```bash
 yarn install
 ```
+#### Desktop (Tauri + Sidecar python)
 
-You should then be able to launch the app via:
+You should be able to launch the desktop using:
 
 ```bash
 yarn tauri:dev
 ```
-
-#### Debug
 
 To automatically open the browser devtools you can launch the app via:
 
 ```bash
 $ yarn tauri:dev:debug
 ```
+
+
+#### Web (Vite + HTTP python backend)
+
+You should be able to launch the web app by running the API and the development server (using Vite):
+
+```bash
+yarn web:api
+```
+
+You can access the HTTP python backend at http://127.0.0.1:8000. The API documentation is available at http://127.0.0.1:8000/api/sidecar/docs.
+
+
+
+```bash
+yarn web:dev
+```
+
+You open the web application at http://localhost:1421/ in your browser.
+
+
 
 ### Logs
 
@@ -99,6 +117,7 @@ Assuming you are in the root project directory, you can run the Python tests and
 ```bash
 poetry run pytest --cov=python python/tests
 ```
+
 ### Frontend (TypeScript)
 
 ```bash
@@ -113,7 +132,6 @@ yarn test:watch
 yarn test:watch:ui
 ```
 
-
 ## Reset
 
 To reset your local environment you should following these steps:
@@ -123,11 +141,11 @@ To reset your local environment you should following these steps:
 * run `yarn tauri:dev` to run the app
 * upload new reference PDFs
 
-Project state is persisted in the Tauri [`appDataDir`][appDataDir], typically `~/Library/Application\ Support/com.tauri.dev`.
+Project state is persisted in the Tauri [`appDataDir`][appDataDir], typically `~/Library/Application\ Support/studio.ref.desktop`.
 To completely reset app state, quit the RefStudio app and remove this directory:
 
 ```bash
-mv ~/Library/Application\ Support/com.tauri.dev /tmp/
+mv ~/Library/Application\ Support/studio.ref.desktop /tmp/
 ```
 
 [appDataDir]: https://tauri.app/v1/api/js/path#appdatadir

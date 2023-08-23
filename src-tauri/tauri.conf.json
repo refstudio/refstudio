@@ -13,6 +13,11 @@
   "tauri": {
     "allowlist": {
       "all": false,
+      "dialog": {
+        "open": true,
+        "ask": true,
+        "save": true
+      },
       "path": {
         "all": true
       },
@@ -22,7 +27,8 @@
           "$APPCONFIG",
           "$APPCONFIG/*",
           "$APPDATA/**",
-          "$RESOURCE/**"
+          "$RESOURCE/**",
+          "$HOME/**"
         ]
       },
       "shell": {
@@ -44,9 +50,7 @@
       "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
       "externalBin": [],
       "identifier": "studio.ref.desktop",
-      "resources": [
-        "bin/*"
-      ],
+      "resources": ["bin/*"],
       "targets": "all"
     },
     "security": {

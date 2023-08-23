@@ -24,7 +24,7 @@ describe('EventsListener.move', () => {
     vi.mocked(readFileContent).mockResolvedValue({ type: 'refstudio', jsonContent: { doc: 'Lorem Ipsum' } });
     store = createStore();
 
-    const file = makeFileAndEditor('File.txt');
+    const file = makeFileAndEditor('File.refstudio');
     fileEntry = file.fileEntry;
 
     store.set(openFileEntryAtom, fileEntry);
@@ -47,7 +47,7 @@ describe('EventsListener.move', () => {
     const leftPaneOpenEditorsCount = runHookWithJotaiProvider(() => useOpenEditorsCountForPane('LEFT'), store);
     const rightPaneOpenEditorsCount = runHookWithJotaiProvider(() => useOpenEditorsCountForPane('RIGHT'), store);
 
-    const { fileEntry: fileEntry2, editorData: editorData2 } = makeFileAndEditor('File2.txt');
+    const { fileEntry: fileEntry2, editorData: editorData2 } = makeFileAndEditor('File2.refstudio');
 
     act(() => store.set(openFileEntryAtom, fileEntry2));
 

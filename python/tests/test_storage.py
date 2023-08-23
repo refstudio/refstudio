@@ -1,4 +1,3 @@
-import json
 from pathlib import Path
 
 from sidecar import storage, typing
@@ -74,7 +73,7 @@ def test_link_references(monkeypatch, tmp_path, capsys):
     assert jstore.references[0].s2_paperId == "1234567890"
 
 
-def test_json_storage_update(monkeypatch, tmp_path, capsys):
+def test_json_storage_update(monkeypatch, tmp_path):
     fp = Path(__file__).parent.joinpath("fixtures/data/references.json")
     jstore = storage.JsonStorage(filepath=fp)
     jstore.load()
@@ -94,10 +93,9 @@ def test_json_storage_update(monkeypatch, tmp_path, capsys):
         patch=typing.ReferencePatch(data={"citation_key": "should-not-change"}),
     )
 
-    jstore.update(bad_update)
+    response = jstore.update(bad_update)
 
-    captured = capsys.readouterr()
-    output = json.loads(captured.out)
+    output = response.dict()
 
     assert output["status"] == "error"
     assert output["message"] != ""
@@ -122,10 +120,8 @@ def test_json_storage_update(monkeypatch, tmp_path, capsys):
         patch=typing.ReferencePatch(data={"citation_key": "reda2023"}),
     )
 
-    jstore.update(reference_update)
-
-    captured = capsys.readouterr()
-    output = json.loads(captured.out)
+    response = jstore.update(reference_update)
+    output = response.dict()
 
     assert output["status"] == "ok"
     assert output["message"] == ""
@@ -150,7 +146,8 @@ def test_json_storage_update(monkeypatch, tmp_path, capsys):
     assert len(jstore.references[1].chunks) == 6
 
 
-def test_storage_delete_references(monkeypatch, tmp_path, capsys):
+
+def test_storage_delete_references(monkeypatch, tmp_path):
     fp = Path(__file__).parent.joinpath("fixtures/data/references.json")
     jstore = storage.JsonStorage(filepath=fp)
     jstore.load()
@@ -164,10 +161,8 @@ def test_storage_delete_references(monkeypatch, tmp_path, capsys):
 
     # test: delete with `all_=True`
     # expect: all References should be deleted, json response in stdout = OK
-    jstore.delete(all_=True)
-
-    captured = capsys.readouterr()
-    output = json.loads(captured.out)
+    response = jstore.delete(all_=True)
+    output = response.dict()
 
     assert output["status"] == "ok"
     assert output["message"] == ""
@@ -190,10 +185,8 @@ def test_storage_delete_references(monkeypatch, tmp_path, capsys):
     #   json response in stdout should be of status: ok
     to_be_deleted = ["some_file.pdf"]
 
-    jstore.delete(source_filenames=to_be_deleted)
-
-    captured = capsys.readouterr()
-    output = json.loads(captured.out)
+    response = jstore.delete(source_filenames=to_be_deleted)
+    output = response.dict()
 
     assert output["status"] == "ok"
     assert output["message"] == ""
@@ -211,10 +204,9 @@ def test_storage_delete_references(monkeypatch, tmp_path, capsys):
     # expect: json response in stdout should be of status: error
     to_be_deleted = ["not_in_references_storage.pdf"]
 
-    jstore.delete(to_be_deleted)
 
-    captured = capsys.readouterr()
-    output = json.loads(captured.out)
+    response = jstore.delete(to_be_deleted)
+    output = response.dict()
 
     assert output["status"] == "error"
     assert output["message"] != ""

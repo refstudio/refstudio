@@ -116,11 +116,10 @@ export const moveEditorToPaneAtom = atom(null, (_get, set, { editorId, fromPaneI
 
 export function targetPaneIdFor(file: FileFileEntry): PaneId {
   switch (file.fileExtension) {
-    case 'pdf':
-    case 'xml':
-    case 'json':
-      return 'RIGHT';
-    default:
+    case 'refstudio':
+    case '':
       return 'LEFT';
+    default:
+      return 'RIGHT';
   }
 }

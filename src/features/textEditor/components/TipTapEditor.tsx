@@ -1,26 +1,34 @@
 import './TipTapEditor.css';
 
 import { Editor, EditorContent, JSONContent } from '@tiptap/react';
-import { useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback, useEffect, useState } from 'react';
 
+import { getReferencesAtom } from '../../../atoms/referencesState';
 import { selectionAtom } from '../../../atoms/selectionState';
 import { EditorContent as EditorContentType } from '../../../atoms/types/EditorContent';
+import { EditorId, parseEditorId } from '../../../atoms/types/EditorData';
 import { Spinner } from '../../../components/Spinner';
+import { emitEvent } from '../../../events';
 import { useListenEvent } from '../../../hooks/useListenEvent';
+import { saveAsMarkdown } from '../../../io/filesystem';
 import { MenuBar } from './MenuBar';
 import { EDITOR_EXTENSIONS, transformPasted } from './tipTapEditorConfigs';
+import { MarkdownSerializer } from './tipTapNodes/refStudioDocument/serialization/MarkdownSerializer';
 
 interface EditorProps {
   editorContent: JSONContent;
+  editorId: EditorId;
   isActive: boolean;
   saveFileInMemory: () => void;
   updateFileBuffer: (editorContent: EditorContentType) => void;
 }
 
-export function TipTapEditor({ editorContent, isActive, saveFileInMemory, updateFileBuffer }: EditorProps) {
+export function TipTapEditor({ editorContent, editorId, isActive, saveFileInMemory, updateFileBuffer }: EditorProps) {
   const [editor, setEditor] = useState<Editor | null>(null);
   const setSelection = useSetAtom(selectionAtom);
+
+  const references = useAtomValue(getReferencesAtom);
 
   useEffect(() => {
     const newEditor = new Editor({
@@ -64,7 +72,20 @@ export function TipTapEditor({ editorContent, isActive, saveFileInMemory, update
     [editor, isActive],
   );
 
+  const saveContentAsMarkdown = useCallback(() => {
+    if (!isActive || !editor) {
+      return;
+    }
+    emitEvent('refstudio://menu/file/save');
+
+    const mdSerializer = new MarkdownSerializer(editor, references);
+    const { id: filePath } = parseEditorId(editorId);
+
+    void saveAsMarkdown(mdSerializer, filePath);
+  }, [editor, editorId, isActive, references]);
+
   useListenEvent('refstudio://ai/suggestion/insert', insertContent);
+  useListenEvent('refstudio://menu/file/markdown', saveContentAsMarkdown);
 
   const focusEditorOnClick = useCallback(() => {
     editor?.commands.focus();

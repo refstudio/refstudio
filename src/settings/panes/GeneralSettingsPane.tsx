@@ -5,12 +5,10 @@ import { getCachedSetting, getSettings, saveCachedSettings, setCachedSetting } f
 import { SettingsPane, SettingsPaneProps } from './SettingsPane';
 
 export function GeneralSettingsPane({ config }: SettingsPaneProps) {
-  const [generalSettings] = useState(getCachedSetting('general'));
   const [sidecarLoggingSettings, setSidecarLoggingSettings] = useState(getCachedSetting('sidecar.logging'));
 
   const saveMutation = useMutation({
-    mutationFn: async (data: { general: typeof generalSettings; sidecarLogging: typeof sidecarLoggingSettings }) => {
-      setCachedSetting('general', data.general);
+    mutationFn: async (data: { sidecarLogging: typeof sidecarLoggingSettings }) => {
       setCachedSetting('sidecar.logging', data.sidecarLogging);
       await saveCachedSettings();
       return getSettings();
@@ -19,41 +17,15 @@ export function GeneralSettingsPane({ config }: SettingsPaneProps) {
 
   const handleSaveSettings = (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
-    saveMutation.mutate({ general: generalSettings, sidecarLogging: sidecarLoggingSettings });
+    saveMutation.mutate({ sidecarLogging: sidecarLoggingSettings });
   };
 
-  const isDirty =
-    JSON.stringify(generalSettings) !== JSON.stringify(getCachedSetting('general')) ||
-    JSON.stringify(sidecarLoggingSettings) !== JSON.stringify(getCachedSetting('sidecar.logging'));
+  const isDirty = JSON.stringify(sidecarLoggingSettings) !== JSON.stringify(getCachedSetting('sidecar.logging'));
 
   return (
-    <SettingsPane config={config} description="General settings for the refstudio application." header={config.title}>
+    <SettingsPane config={config} header={config.title}>
       <form className="mt-10" onSubmit={handleSaveSettings}>
         <fieldset className="space-y-4">
-          <div className="space-y-2">
-            <label className="font-semibold" htmlFor="app-data-dir">
-              Project App Data Dir
-            </label>
-            <input
-              className="w-full border bg-slate-50 px-2 py-0.5 text-gray-500"
-              id="app-data-dir"
-              readOnly
-              value={generalSettings.appDataDir}
-            />
-            <p className="text-xs text-gray-500">NOTE: This setting is readonly (for now!)</p>
-          </div>
-          <div className="space-y-2">
-            <label className="font-semibold" htmlFor="project-name">
-              Project Name
-            </label>
-            <input
-              className="w-full border bg-slate-50 px-2 py-0.5 text-gray-500"
-              id="project-name"
-              readOnly
-              value={generalSettings.projectName}
-            />
-            <p className="text-xs text-gray-500">NOTE: This setting is readonly (for now!)</p>
-          </div>
           <h3>Sidecar Logging</h3>
           <div className="space-y-2">
             <label className="font-semibold" htmlFor="active">
@@ -80,7 +52,7 @@ export function GeneralSettingsPane({ config }: SettingsPaneProps) {
               onChange={(e) => setSidecarLoggingSettings({ ...sidecarLoggingSettings, path: e.currentTarget.value })}
             />
             <p className="text-xs text-gray-500">
-              The log filename is <em>refstudio-sidecar.log</em>.
+              The log filename can be located in <code>{sidecarLoggingSettings.path}/refstudio-sidecar.log</code>.
             </p>
           </div>
         </fieldset>
@@ -90,12 +62,6 @@ export function GeneralSettingsPane({ config }: SettingsPaneProps) {
           <input className="btn-primary" disabled={!isDirty || saveMutation.isLoading} type="submit" value="SAVE" />
         </fieldset>
       </form>
-
-      {/* <JSONDebugContainer className="mt-28">
-        <JSONDebug header="paneSettings" value={projectSettings} />
-        <JSONDebug header="sidecarLogging" value={sidecarLoggingSettings} />
-        <JSONDebug header="API call result" value={result} />
-      </JSONDebugContainer> */}
     </SettingsPane>
   );
 }

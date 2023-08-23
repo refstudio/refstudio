@@ -23,6 +23,7 @@ import {
 } from 'react-icons/lu';
 
 import { cx } from '../../../lib/cx';
+import { isNotionBlockTypeActive } from './tipTapNodes/notionBlock/utils/isNotionBlockTypeActive';
 
 export function MenuBar({ editor }: { editor: Editor }) {
   const [markdownMode, setMarkdownMode] = React.useState(false);
@@ -163,16 +164,16 @@ export function MenuBar({ editor }: { editor: Editor }) {
 
       <button
         className={cx('toolbar-item', {
-          active: editor.isActive('bulletList'),
+          active: isNotionBlockTypeActive(editor.state.selection, 'unorderedList'),
         })}
         title="Bulleted List"
-        onClick={() => editor.chain().focus().toggleBulletList().run()}
+        onClick={() => editor.chain().focus().toggleUnorderedList().run()}
       >
         <IconUnorderedList />
       </button>
       <button
         className={cx('toolbar-item', {
-          active: editor.isActive('orderedList'),
+          active: isNotionBlockTypeActive(editor.state.selection, 'orderedList'),
         })}
         title="Ordered List"
         onClick={() => editor.chain().focus().toggleOrderedList().run()}

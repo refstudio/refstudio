@@ -1,52 +1,84 @@
 import { cx } from '../../lib/cx';
+import { Logo } from './Logo';
 
-export function WelcomeView({ hideShortcuts, className }: { hideShortcuts?: boolean; className?: string }) {
+export function WelcomeView() {
   return (
     <div
       className={cx(
-        'pointer-events-none select-none',
-        'flex w-full  flex-col items-center justify-center gap-2',
-        'bg-slate-300',
-        className,
+        'h-full w-full',
+        'flex flex-col items-center justify-center gap-28',
+        'px-6 pb-16 pt-0',
+        'bg-grayscale-10',
+        'cursor-default select-none',
       )}
     >
-      <div className="relative border border-slate-500 text-[160px] font-extrabold leading-none">
-        <WelcomeViewLetter className="bg-slate-500/50 text-slate-200/50" letter="R" />
-        <WelcomeViewLetter className="bg-slate-200/50 text-slate-500/50" letter="S" />
-      </div>
-
-      {!hideShortcuts && (
-        <div className="mt-10 space-y-4">
-          <WelcomeViewShortcut keys={['⌘', 'K']} text="Show Commands" />
-          <WelcomeViewShortcut keys={['⌘', 'P']} text="Show Files" />
-          <WelcomeViewShortcut keys={['⌘', 'R']} text="Show References" />
-          <WelcomeViewShortcut keys={['⌘', 'N']} text="New File" />
-          <WelcomeViewShortcut keys={['⌘', ',']} text="Show Settings" />
+      <Logo />
+      <div className="flex flex-row gap-20">
+        <div className="flex w-[16.5rem] flex-col gap-10">
+          <div className="flex flex-col items-end gap-4">
+            <WelcomeViewShortcut keys={['⌘', 'N']} text="New File" />
+            <WelcomeViewShortcut keys={['⌘', 'S']} text="Save File" />
+          </div>
+          <div className="flex flex-col items-end gap-4">
+            <WelcomeViewShortcut keys={['⌘', 'J']} text="AI Text Completion" />
+            {/* <WelcomeViewShortcut keys={['⌘', '?']} text="Repeat AI Rewriter" /> */}
+          </div>
         </div>
-      )}
-    </div>
-  );
-}
-
-function WelcomeViewShortcut({ text, keys }: { text: string; keys: string[] }) {
-  return (
-    <div className="flex items-center gap-2">
-      <div className="min-w-[135px] px-1 text-right text-slate-500">{text}</div>
-      <div className="flex gap-1">
-        {keys.map((key) => (
-          <kbd className="rounded-sm bg-slate-500 px-2 py-0.5 font-mono text-slate-200" key={key}>
-            {key}
-          </kbd>
-        ))}
+        <div className="h-full w-[1px] bg-grayscale-20" />
+        <div className="flex w-[16.5rem] flex-col gap-10">
+          <div className="flex flex-col items-end gap-4">
+            <WelcomeViewShortcut keys={['⌘', 'K']} text="Quick Actions" />
+            <WelcomeViewShortcut keys={['⌘', 'P']} text="Quick Files" />
+          </div>
+          <div className="flex flex-col items-end gap-4">
+            <WelcomeViewShortcut keys={['⌘', 'R']} text="Open References Table" />
+            <WelcomeViewShortcut keys={['⌘', 'L']} text="Open Notifications" />
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-function WelcomeViewLetter({ letter, className = '' }: { letter: string; className?: string }) {
+interface Key {
+  type: 'key';
+  value: string;
+}
+interface Separator {
+  type: 'separator';
+}
+
+interface Shortcut {
+  keys: string[];
+  text: string;
+}
+function WelcomeViewShortcut({ text, keys }: Shortcut) {
+  const keysWithSeparators = keys.reduce<(Key | Separator)[]>(
+    (prev, curr, index) => [
+      ...prev,
+      ...(index > 0 ? [{ type: 'separator' as const }] : []),
+      { type: 'key', value: curr },
+    ],
+    [],
+  );
   return (
-    <div className={cx('inline-flex items-center justify-center px-4 text-center', className)}>
-      <span>{letter}</span>
+    <div className="flex flex-row items-center justify-center gap-4">
+      <div>{text}</div>
+      <div className="line-height flex flex-row items-center justify-center gap-1" style={{ lineHeight: '150%' }}>
+        {keysWithSeparators.map((key, index) => {
+          if (key.type === 'separator') {
+            return <div key={index}>+</div>;
+          }
+          return (
+            <kbd
+              className="flex h-8 w-8 items-center justify-center rounded-default bg-grayscale-30 text-base"
+              key={key.value}
+            >
+              {key.value}
+            </kbd>
+          );
+        })}
+      </div>
     </div>
   );
 }

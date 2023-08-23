@@ -1,6 +1,12 @@
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 
 import {
+  useFileProjectCloseListener,
+  useFileProjectNewListener,
+  useFileProjectNewSampleListener,
+  useFileProjectOpenListener,
+} from '../application/listeners/projectEventListeners';
+import {
   activePaneAtom,
   closeAllEditorsAtom,
   closeEditorFromPaneAtom,
@@ -9,10 +15,11 @@ import {
 import { createFileAtom, deleteFileAtom, renameFileAtom } from '../atoms/fileEntryActions';
 import { fileExplorerEntryPathBeingRenamed } from '../atoms/fileExplorerActions';
 import { useActiveEditorContentAtoms } from '../atoms/hooks/useActiveEditorContentAtoms';
-import { removeReferencesAtom } from '../atoms/referencesState';
+import { getReferencesAtom, removeReferencesAtom } from '../atoms/referencesState';
 import { PaneEditorId } from '../atoms/types/PaneGroup';
 import { emitEvent, RefStudioEventPayload } from '../events';
 import { useListenEvent } from '../hooks/useListenEvent';
+import { exportReferences } from '../io/filesystem';
 import { asyncNoop, noop } from '../lib/noop';
 import {
   useClearNotificationsListener,
@@ -28,6 +35,10 @@ export function EventsListener({ children }: { children?: React.ReactNode }) {
   useListenEvent('refstudio://menu/file/save', useSaveActiveFileListener());
   useListenEvent('refstudio://menu/file/close', useCloseActiveEditorListener());
   useListenEvent('refstudio://menu/file/close/all', useCloseAllActiveEditorsListener());
+  useListenEvent('refstudio://menu/file/project/new', useFileProjectNewListener());
+  useListenEvent('refstudio://menu/file/project/new/sample', useFileProjectNewSampleListener());
+  useListenEvent('refstudio://menu/file/project/open', useFileProjectOpenListener());
+  useListenEvent('refstudio://menu/file/project/close', useFileProjectCloseListener());
   // Editors
   useListenEvent('refstudio://editors/close', useCloseEditorListener());
   useListenEvent('refstudio://editors/move', useMoveActiveEditorToPaneListener());
@@ -36,6 +47,7 @@ export function EventsListener({ children }: { children?: React.ReactNode }) {
   useListenEvent('refstudio://explorer/delete', useDeleteFileListener());
   // References
   useListenEvent('refstudio://references/remove', useRemoveReferencesListener());
+  useListenEvent('refstudio://menu/references/export', useExportReferencesListener());
   // Notifications
   useListenEvent('refstudio://notifications/new', useCreateNotificationListener());
   useListenEvent('refstudio://notifications/clear', useClearNotificationsListener());
@@ -54,13 +66,13 @@ function useSaveActiveFileListener() {
   const activeEditor = useActiveEditorContentAtoms();
   const saveFile = useSetAtom(activeEditor?.saveEditorContentAtom ?? atom(null, asyncNoop));
 
-  return () => void saveFile();
+  return saveFile;
 }
 
 function useCreateFileListener() {
   const createFile = useSetAtom(createFileAtom);
 
-  return () => createFile();
+  return createFile;
 }
 
 function useCloseActiveEditorListener() {
@@ -91,6 +103,11 @@ function useCloseEditorListener() {
 function useRemoveReferencesListener() {
   const removeReferences = useSetAtom(removeReferencesAtom);
   return ({ referenceIds }: { referenceIds: string[] }) => void removeReferences(referenceIds);
+}
+
+function useExportReferencesListener() {
+  const references = useAtomValue(getReferencesAtom);
+  return () => void exportReferences(references);
 }
 
 function useDeleteFileListener() {

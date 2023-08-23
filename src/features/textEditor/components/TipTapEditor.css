@@ -26,3 +26,11 @@
 .tiptap-editor {
   @apply flex-1 overflow-y-scroll pl-1 pr-2 pt-2;
 }
+
+.tiptap-editor *::selection {
+  @apply bg-transparent;
+}
+
+.tiptap-editor span.selected {
+  background-color: #c4dcf6;
+}

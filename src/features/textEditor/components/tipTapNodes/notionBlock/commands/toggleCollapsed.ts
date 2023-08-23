@@ -1,7 +1,8 @@
 import { CommandProps } from '@tiptap/core';
 import { TextSelection } from '@tiptap/pm/state';
 
-import { collapsiblePluginKey, NotionBlockNode } from '../NotionBlockNode';
+import { NotionBlockNode } from '../NotionBlockNode';
+import { collapsibleArrowsPluginKey } from '../plugins/collapsibleArrowPlugin';
 
 export function toggleCollapsed({
   pos,
@@ -24,7 +25,9 @@ export function toggleCollapsed({
     if (from <= contentEnd && contentStart <= to) {
       tr.setSelection(TextSelection.near(tr.doc.resolve(contentStart), -1));
     }
-    dispatch(tr.setMeta(collapsiblePluginKey, true).setNodeAttribute(pos, 'collapsed', !notionBlock.attrs.collapsed));
+    dispatch(
+      tr.setMeta(collapsibleArrowsPluginKey, true).setNodeAttribute(pos, 'collapsed', !notionBlock.attrs.collapsed),
+    );
   }
   return true;
 }
