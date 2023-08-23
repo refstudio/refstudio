@@ -1,5 +1,6 @@
 import os
 import shutil
+import sys
 from pathlib import Path
 from uuid import uuid4
 
@@ -31,6 +32,9 @@ load_dotenv()
 sidecar_api = FastAPI()  # Legacy API for existing sidecar cli functionality
 filesystem_api = FastAPI()  # API for interacting with the filesystem
 project_api = FastAPI()  # API for interacting with projects
+
+meta_api = FastAPI()
+"""API for monitoring and controling the server"""
 
 
 # Sidecar API
@@ -218,3 +222,20 @@ async def delete_file(project_id: str, filepath: Path):
         "message": "File deleted",
         "filepath": filepath,
     }
+
+
+@meta_api.get('/status')
+async def status():
+    return {
+        'status': 'ok'
+    }
+
+
+@meta_api.post('/crash')
+async def crash():
+    raise NotImplementedError()
+
+
+@meta_api.post('/shutdown')
+async def shutdown():
+    sys.exit(0)

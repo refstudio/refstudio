@@ -83,8 +83,22 @@ export async function callSidecar<T extends keyof CliCommands>(
   return response;
 }
 
-let serverProcess: Child | null = null;
+interface StartingState {
+  state: 'starting';
+}
+interface FailedState {
+  state: 'failed';
+}
+interface ReadyState {
+  state: 'ready';
+  process: Child;
+}
+type ServerState = StartingState | FailedState | ReadyState;
+
+let serverProcess: ServerState | null = null;
+
 export async function startServer() {
+  console.log('Starting RefStudio server');
   const command = new TauriCommand('call-sidecar', ['serve']);
   command.stderr.addListener('data', (line) => {
     console.log('server stderr', line);
@@ -98,27 +112,61 @@ export async function startServer() {
   command.addListener('error', (data) => {
     console.error('server crashed', data);
   });
-  serverProcess = await command.spawn();
-  console.log('started server', serverProcess);
-  return serverProcess;
+  return command.spawn();
 }
 
-export async function useAPI() {
+export async function isServerHealthy() {
   try {
-    const response = await tauriFetch('http://localhost:58000');
-    const { data } = response;
-    console.log('got back from server', data);
+    const response = await tauriFetch('http://localhost:1487/api/meta/status');
+    if (!response.ok) {
+      return false;
+    }
+    console.log(response.data);
+    const { status } = response.data as { status: string };
+    if (status !== 'ok') {
+      return false;
+    }
+    return true;
   } catch (e) {
-    console.error('Error!', e);
+    return false;
   }
 }
 
 export async function killServer() {
-  if (serverProcess) {
-    await serverProcess.kill();
+  if (serverProcess?.state === 'ready') {
+    await serverProcess.process.kill();
   }
 }
 
 (window as any).startServer = startServer;
 (window as any).killServer = killServer;
-(window as any).useAPI = useAPI;
+(window as any).isServerHealthy = isServerHealthy;
+
+export async function getServer() {
+  console.log('getServer');
+  if (serverProcess) {
+    if (serverProcess.state === 'ready') {
+      return serverProcess.process;
+    }
+    return null;
+  }
+  serverProcess = { state: 'starting' };
+
+  // Check if there's already a server process running. If so, kill it and start a new one.
+  if (await isServerHealthy()) {
+    console.log('Found existing API server; killing it before starting a new one.');
+    await tauriFetch('http://localhost:1487/api/meta/shutdown', { method: 'POST' });
+  }
+
+  const process = await startServer();
+  serverProcess = { state: 'ready', process };
+  return process;
+}
+
+export function useRefStudioServer() {
+  (async () => {
+    await getServer();
+  })().catch((e) => {
+    console.error(e);
+  });
+}
