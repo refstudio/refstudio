@@ -1,6 +1,6 @@
 .toolbar {
   @apply flex items-center gap-1 self-stretch p-1;
-  @apply border-b-[1px] border-b-card-border-primary bg-card-bg-primary;
+  @apply border-b border-b-card-border-primary bg-card-bg-primary;
   @apply overflow-x-scroll;
 }
 

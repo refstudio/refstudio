@@ -26,7 +26,7 @@ export function SideBar<SideBarPane extends string>({
         ))}
       </div>
       {footerItems?.length && (
-        <div className="flex flex-col gap-2 border-t-[1px] border-t-side-bar-border p-2">
+        <div className="flex flex-col gap-2 border-t border-t-side-bar-border p-2">
           {footerItems.map(({ label, Icon, onClick }) => (
             <IconButton key={label} onClick={onClick}>
               {Icon}

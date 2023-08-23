@@ -19,7 +19,7 @@
 }
 
 .tiptap-editor > div {
-  @apply max-w-[45rem];
+  @apply w-full max-w-[45rem];
 }
 
 .tiptap-editor h2 {
