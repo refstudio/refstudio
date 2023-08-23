@@ -1,5 +1,4 @@
 import os
-import sys
 
 import openai
 from dotenv import load_dotenv
@@ -39,7 +38,6 @@ def ask_question(request: ChatRequest):
             message=str(e),
             choices=[],
         )
-        sys.stdout.write(response.json())
         return response
 
     logger.info(f"Returning {len(choices)} chat response choices to client: {choices}")
@@ -48,7 +46,6 @@ def ask_question(request: ChatRequest):
         message="",
         choices=[r.dict() for r in choices],
     )
-    sys.stdout.write(response.json())
     return response
 
 

@@ -1,5 +1,4 @@
 import os
-import sys
 
 import openai
 from dotenv import load_dotenv
@@ -39,7 +38,6 @@ def rewrite(arg: RewriteRequest):
             message=str(e),
             choices=[],
         )
-        sys.stdout.write(response.json())
         return response
 
     logger.info(f"Returning {len(choices)} rewrite choices to client: {choices}")
@@ -48,7 +46,6 @@ def rewrite(arg: RewriteRequest):
         message="",
         choices=[r.dict() for r in choices],
     )
-    sys.stdout.write(response.json())
     return response
 
 
@@ -71,7 +68,6 @@ def complete_text(request: TextCompletionRequest):
             message=str(e),
             choices=[],
         )
-        sys.stdout.write(response.json())
         return response
 
     logger.info(f"Trimming completion prefix text from completion choices: {choices}") 
@@ -83,7 +79,6 @@ def complete_text(request: TextCompletionRequest):
         message="",
         choices=[r.dict() for r in choices],
     )
-    sys.stdout.write(response.json())
     return response
 
 

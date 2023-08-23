@@ -3,7 +3,6 @@ Author: Shaurya
 This script performs a search on Semantic Scholar and retrieves information about a set of papers.
 """
 import logging
-import sys
 
 from semanticscholar import SemanticScholar
 
@@ -108,5 +107,4 @@ def search_s2(request: SearchRequest):
     limit = request.limit
     searcher = Searcher()
     response = searcher.search_func(query, limit=limit)
-    sys.stdout.write(response.json())
     return response

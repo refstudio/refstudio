@@ -3,5 +3,6 @@
 
 yarn check
 yarn test
+yarn python:test
 
 yarn codegen

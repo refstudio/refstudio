@@ -4,6 +4,15 @@ import { VscChevronDown, VscChevronRight } from 'react-icons/vsc';
 
 import { cx } from '../lib/cx';
 
+interface Icon {
+  key: string;
+  disabled?: boolean;
+  Icon: IconType;
+  title?: string;
+  className?: string;
+  onClick: () => void;
+}
+
 export function PanelSection({
   title,
   children,
@@ -13,7 +22,7 @@ export function PanelSection({
   title: string;
   children: React.ReactNode;
   grow?: boolean;
-  rightIcons?: { key: string; Icon: IconType; title?: string; className?: string; onClick: () => void }[];
+  rightIcons?: Icon[];
 }) {
   const [expanded, setExpanded] = useState(true);
 
@@ -40,16 +49,23 @@ export function PanelSection({
             'invisible group-hover/panel-section:visible',
           )}
         >
-          {rightIcons.map(({ key, Icon, title: iconTitle, className, onClick }) => (
+          {rightIcons.map(({ key, disabled, Icon, title: iconTitle, className, onClick }) => (
             <Icon
-              className={cx('cursor-pointer hover:bg-slate-200', className)}
+              aria-disabled={disabled}
+              className={cx('cursor-pointer', className, {
+                disabled,
+                'text-slate-600/50': disabled,
+                'hover:bg-slate-200': !disabled,
+              })}
               key={key}
               size={20}
               title={iconTitle}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                onClick();
+                if (!disabled) {
+                  onClick();
+                }
               }}
             />
           ))}
