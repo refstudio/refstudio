@@ -2,7 +2,7 @@ from pathlib import Path
 
 from sidecar import storage, typing
 from sidecar.typing import Author, Chunk, Reference
-
+import semanticscholar
 
 def test_json_storage_load():
     fp = Path(__file__).parent.joinpath("fixtures/data/references.json")
@@ -172,3 +172,40 @@ def test_storage_delete_references(monkeypatch, tmp_path):
 
     assert output['status'] == 'error'
     assert output['message'] != ""
+
+def test_link_references(monkeypatch, tmp_path):
+    # Create a sample paper for the purpose of testing.
+    # Mock paper class
+    class MockPaper:
+        def __init__(self, title=None, paperId=None, doi=None):
+            self.title = title
+            self.paperId = paperId
+            self.doi = "10.1234/5678"
+
+    s2_paper = MockPaper(title="Some title", paperId="1234567890", doi="10.1234/5678")
+
+    # Mock s2_object so that it always returns the above s2_paper.
+    class MockS2Object:
+        def get_paper(self, doi, fields):
+            return s2_paper
+
+    # Install the mock
+    monkeypatch.setattr(semanticscholar, "SemanticScholar", MockS2Object)
+
+    # Given
+    fp = Path(__file__).parent.joinpath("fixtures/data/references.json")
+    jstore = storage.JsonStorage(filepath=fp)
+    jstore.load()
+
+    # When
+    response = jstore.link_s2_doi()
+
+    # Then
+    output = response.dict()
+
+    # Check that the operation was successful
+    assert output["status"] == "ok"
+    assert output["message"] == "Linking with s2 complete for 1 out of 2 references"
+
+    # Check the new s2_paperId
+    assert jstore.references[1].s2_paperId == "1234567890"
