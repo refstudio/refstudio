@@ -198,7 +198,7 @@ class S2SearchResult(RefStudioModel):
 class SearchResponse(RefStudioModel):
     status: ResponseStatus
     message: str
-    results: list[S2SearchResult] 
+    results: list[S2SearchResult]
 
 
 class CliCommands(RefStudioModel):
@@ -220,6 +220,7 @@ class CliCommands(RefStudioModel):
     """Deletes a Reference"""
     search: tuple[SearchRequest, SearchResponse]
     """Searches for papers on Semantic Scholar"""
+    serve: tuple[None, ReferencePatch]
 
 
 Reference.update_forward_refs()

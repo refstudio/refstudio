@@ -22,7 +22,18 @@ if __name__ == '__main__':
     else:
         param_obj = args_type.parse_obj(param_json)
 
-    if args.command == "ingest":
+    if args.command == 'serve':
+        import uvicorn
+        from fastapi import FastAPI
+        app = FastAPI()
+
+        @app.get("/")
+        def root():
+            return {"hello": "world"}
+
+        uvicorn.run(app, host="0.0.0.0", port=58000, reload=False)
+
+    elif args.command == "ingest":
         response = ingest.run_ingest(param_obj)
         sys.stdout.write(response.json())
 
