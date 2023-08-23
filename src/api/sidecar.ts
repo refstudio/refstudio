@@ -1,7 +1,7 @@
 /** Utility for calling into the Python sidecar with types. */
 
 import { fetch as tauriFetch } from '@tauri-apps/api/http';
-import { Command as TauriCommand } from '@tauri-apps/api/shell';
+import { Child, ChildProcess, Command as TauriCommand } from '@tauri-apps/api/shell';
 
 import { getCachedSetting } from '../settings/settingsManager';
 import { CliCommands } from './types';
@@ -83,11 +83,24 @@ export async function callSidecar<T extends keyof CliCommands>(
   return response;
 }
 
+let serverProcess: Child | null = null;
 export async function startServer() {
   const command = new TauriCommand('call-sidecar', ['serve']);
-  const process = await command.spawn();
-  console.log('started server', process);
-  return process;
+  command.stderr.addListener('data', (line) => {
+    console.log('server stderr', line);
+  });
+  command.stdout.addListener('data', (line) => {
+    console.log('server stdout', line);
+  });
+  command.addListener('close', (data: Pick<ChildProcess, 'code' | 'signal'>) => {
+    console.warn('server closed', data.code, data.signal);
+  });
+  command.addListener('error', (data) => {
+    console.error('server crashed', data);
+  });
+  serverProcess = await command.spawn();
+  console.log('started server', serverProcess);
+  return serverProcess;
 }
 
 export async function useAPI() {
@@ -100,5 +113,12 @@ export async function useAPI() {
   }
 }
 
+export async function killServer() {
+  if (serverProcess) {
+    await serverProcess.kill();
+  }
+}
+
 (window as any).startServer = startServer;
+(window as any).killServer = killServer;
 (window as any).useAPI = useAPI;
