@@ -45,7 +45,7 @@ logger.disabled = os.environ.get("SIDECAR_ENABLE_LOGGING", "false").lower() == "
 
 
 def make_settings_json_path(user_id: str) -> Path:
-    filepath = Path(WEB_STORAGE_URL / "settings.json")
+    filepath = Path(WEB_STORAGE_URL / user_id / "settings.json")
     return filepath
 
 

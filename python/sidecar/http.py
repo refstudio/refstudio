@@ -231,7 +231,7 @@ async def get_settings() -> SettingsResponse:
     return settings.get_settings_for_user(user_id)
 
 
-@settings_api.post("/")
+@settings_api.put("/")
 async def update_settings(req: UpdateSettingsRequest) -> SettingsResponse:
     user_id = "user1"
     return settings.update_settings_for_user(user_id, req)

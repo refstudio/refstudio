@@ -201,8 +201,24 @@ class SearchResponse(RefStudioModel):
     results: list[S2SearchResult] 
 
 
+class OpenAISettings(RefStudioModel):
+    api_key: str
+    chat_model: str = "gpt-3.5-turbo"
+
+    # TODO: the params below should not be settings
+    # they should be configurable as part of the API request
+    manner: RewriteMannerType = RewriteMannerType.SCHOLARLY
+    temperature: float = 0.7
+
+
+class SidecarSettings(RefStudioModel):
+    enable_logging: bool = False
+    log_
+
+
 class UpdateSettingsRequest(RefStudioModel):
-    settings: dict[str, Any]
+    openai: OpenAISettings = OpenAISettings()
+    sidecar: SidecarSettings = SidecarSettings()
 
 
 class SettingsResponse(RefStudioModel):
