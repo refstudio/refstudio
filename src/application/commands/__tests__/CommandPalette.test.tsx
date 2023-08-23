@@ -97,7 +97,7 @@ describe('CommandPalette', () => {
 
   it.each<{ text: string; index: number }>([
     { text: 'Rewrite selection...', index: INDEX_REWRITE_WIDGET },
-    { text: 'Open File...', index: INDEX_FILES },
+    { text: 'Quick Files...', index: INDEX_FILES },
     { text: 'Find References...', index: INDEX_REFERENCES },
   ])('Should open menu $index on $text', async ({ text, index }) => {
     const onOpen = vi.fn();
@@ -122,21 +122,6 @@ describe('CommandPalette', () => {
 
     expect(screen.getByText(REFERENCES[0].title)).toBeInTheDocument();
     expect(screen.getByText(REFERENCES[1].title)).toBeInTheDocument();
-  });
-
-  it('should open files menu on CMD+P', async () => {
-    const onOpen = vi.fn();
-    const { user } = setupWithJotaiProvider(
-      <MenuProvider config={{ animationDuration: 0 }}>
-        <CommandPalette index={INDEX_MAIN} onOpen={onOpen} />
-      </MenuProvider>,
-      store,
-    );
-
-    await user.keyboard('{Meta>}[KeyP]');
-    expect(screen.getByText('Files')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Select file to open...')).toBeInTheDocument();
-    expect(onOpen).toHaveBeenLastCalledWith(INDEX_FILES);
   });
 
   it.each<{ char: string; index: number }>([

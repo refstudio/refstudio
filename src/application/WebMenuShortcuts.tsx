@@ -1,7 +1,4 @@
-import { useHotkeys } from 'react-hotkeys-hook';
-import type { OptionsOrDependencyArray } from 'react-hotkeys-hook/dist/types';
-
-import { emitEvent, RefStudioEventName, RefStudioEventPayload } from '../events';
+import { useRefStudioEventHotkeys } from '../hooks/useRefStudioHotkeys';
 
 /**
  * Add keyboard shortcuts to the app.
@@ -23,35 +20,15 @@ import { emitEvent, RefStudioEventName, RefStudioEventPayload } from '../events'
  */
 export function WebMenuShortcuts() {
   // RefStudio
-  useMenuEventHotKeyForWeb(['meta+,'], 'refstudio://menu/settings');
+  useRefStudioEventHotkeys(['meta+,'], true, 'refstudio://menu/settings');
   // File
-  useMenuEventHotKeyForWeb(['ctrl+n'], 'refstudio://menu/file/new');
-  useMenuEventHotKeyForWeb(['ctrl+s', 'meta+s'], 'refstudio://menu/file/save');
-  useMenuEventHotKeyForWeb(['ctrl+w'], 'refstudio://menu/file/close');
+  useRefStudioEventHotkeys(['ctrl+n'], true, 'refstudio://menu/file/new');
+  useRefStudioEventHotkeys(['ctrl+s', 'meta+s'], true, 'refstudio://menu/file/save');
+  useRefStudioEventHotkeys(['ctrl+w'], true, 'refstudio://menu/file/close');
   // References
-  useMenuEventHotKeyForWeb(['meta+r'], 'refstudio://menu/references/open');
+  useRefStudioEventHotkeys(['meta+r'], true, 'refstudio://menu/references/open');
   // Notifications
-  useMenuEventHotKeyForWeb(['F11'], 'refstudio://menu/view/notifications');
+  useRefStudioEventHotkeys(['F11'], true, 'refstudio://menu/view/notifications');
 
   return <></>;
-}
-function useMenuEventHotKeyForWeb<Event extends RefStudioEventName>(
-  keys: string[],
-  eventName: Event,
-  ...args: RefStudioEventPayload<Event> extends undefined ? [] : [payload: RefStudioEventPayload<Event>]
-) {
-  const options: OptionsOrDependencyArray = {
-    enableOnContentEditable: true,
-    preventDefault: true,
-    splitKey: '#',
-    enabled: !!import.meta.env.VITE_IS_WEB, // safeguard that this only works for web
-  };
-
-  useHotkeys(
-    keys,
-    () => {
-      emitEvent(eventName, ...args);
-    },
-    options,
-  );
 }

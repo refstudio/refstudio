@@ -2,7 +2,6 @@ import './CommandPalette.css';
 
 import { Command, CommandMenu, CommandWrapper, useCommands, useKmenu } from 'kmenu';
 import { useEffect } from 'react';
-import { useHotkeys } from 'react-hotkeys-hook';
 import {
   VscBell,
   VscClose,
@@ -25,6 +24,7 @@ import { useActiveEditorId } from '../../atoms/hooks/useActiveEditorId';
 import { emitEvent } from '../../events';
 import { RewriteCommandWidgetMenu } from '../../features/ai/commands/RewriteCommandWidgetMenu';
 import { ReferencesCommandMenu } from '../../features/references/commands/ReferencesCommandMenu';
+import { useRefStudioHotkeys } from '../../hooks/useRefStudioHotkeys';
 import { INDEX_FILES, INDEX_MAIN, INDEX_REFERENCES, INDEX_REWRITE_WIDGET } from './CommandPaletteConfigs';
 import { FilesCommandMenu } from './FilesCommandMenu';
 
@@ -43,7 +43,7 @@ export function CommandPalette({ index, onOpen }: { index?: number; onOpen?: (in
     onOpen?.(open);
   }, [onOpen, open]);
 
-  useHotkeys(['meta+p'], () => setOpen(INDEX_FILES, true), { preventDefault: true });
+  useRefStudioHotkeys(['meta+p'], () => setOpen(INDEX_FILES, true));
 
   return (
     <div className="command-palette" data-testid={CommandPalette.name}>
@@ -96,11 +96,6 @@ export function MainCommandMenu({ index }: { index: number }) {
       category: 'File',
       commands: [
         {
-          icon: <VscMarkdown />,
-          text: 'Save File as Markdown',
-          perform: () => emitEvent('refstudio://menu/file/markdown'),
-        },
-        {
           icon: <VscNewFile />,
           text: 'New File',
           perform: () => emitEvent('refstudio://menu/file/new'),
@@ -109,6 +104,11 @@ export function MainCommandMenu({ index }: { index: number }) {
           icon: <VscSave />,
           text: 'Save',
           perform: () => emitEvent('refstudio://menu/file/save'),
+        },
+        {
+          icon: <VscMarkdown />,
+          text: 'Save File as Markdown',
+          perform: () => emitEvent('refstudio://menu/file/markdown'),
         },
         {
           icon: <VscNewFolder />,
@@ -171,7 +171,7 @@ export function MainCommandMenu({ index }: { index: number }) {
         },
         {
           icon: <VscFiles />,
-          text: 'Open File...',
+          text: 'Quick Files...',
           perform: () => setOpen(INDEX_FILES, true),
         },
       ],

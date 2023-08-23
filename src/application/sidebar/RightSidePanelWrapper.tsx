@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { useHotkeys } from 'react-hotkeys-hook';
 import { ImperativePanelHandle, Panel } from 'react-resizable-panels';
 
 import { VerticalResizeHandle } from '../../components/VerticalResizeHandle';
 import { ChatbotPanel } from '../../features/ai/sidebar/ChatPanel';
 import { RewriterPanel } from '../../features/ai/sidebar/RewriterPanel';
+import { useRefStudioHotkeys } from '../../hooks/useRefStudioHotkeys';
 import { cx } from '../../lib/cx';
 import { SideBar } from '../components/SideBar';
 import { BotIcon, PenIcon } from './icons';
@@ -27,8 +27,8 @@ export function RightSidePanelWrapper() {
   };
 
   // Configure keyboard shortcuts to open/close side panel
-  useHotkeys(['meta+9'], () => handleSideBarClick('Chatbot'), { preventDefault: true });
-  useHotkeys(['meta+0'], () => handleSideBarClick('Rewriter'), { preventDefault: true });
+  useRefStudioHotkeys(['meta+9'], () => handleSideBarClick('Rewriter'));
+  useRefStudioHotkeys(['meta+0'], () => handleSideBarClick('Chatbot'));
 
   React.useEffect(() => {
     if (secondaryPaneCollapsed) {
