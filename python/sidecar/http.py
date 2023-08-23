@@ -4,7 +4,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, Request, UploadFile
 from fastapi.responses import FileResponse
 
 from sidecar import chat, ingest, projects, rewrite, search, storage
@@ -33,6 +33,14 @@ filesystem_api = FastAPI()  # API for interacting with the filesystem
 project_api = FastAPI()  # API for interacting with projects
 
 
+def update_envs_from_headers(request: Request, call_next) -> None:
+    os.environ["PROJECT_DIR"] = str(request.headers.get("X-PROJECT_DIR"))
+    os.environ["OPENAI_API_KEY"] = str(request.headers.get("X-OPENAI_API_KEY"))
+    os.environ["OPENAI_CHAT_MODEL"] = str(request.headers.get("X-OPENAI_CHAT_MODEL"))
+    os.environ["SIDECAR_ENABLE_LOGGING"] = str(request.headers.get("X-SIDECAR_ENABLE_LOGGING"))
+    os.environ["SIDECAR_LOG_DIR"] = str(request.headers.get("X-SIDECAR_LOG_DIR"))
+
+
 # Sidecar API
 # -----------
 @sidecar_api.get("/")
@@ -40,36 +48,43 @@ async def http_index():
     return {"message": "Hello World"}
 
 
-@sidecar_api.post("/ingest/{project_id}")
-async def http_ingest(project_id: str) -> IngestResponse:
+@sidecar_api.post("/ingest")
+async def http_ingest(project_id: str, request: Request) -> IngestResponse:
+    update_envs_from_headers(request)
     user_id = "user1"
     project_path = projects.get_project_path(user_id, project_id)
-    uploads_dir = project_path / "uploads"
-    req = IngestRequest(pdf_directory=str(uploads_dir))
+    req = IngestRequest(
+        pdf_directory=project_path / "uploads"
+    )
     response = ingest.run_ingest(req)
     return response
 
 
-@sidecar_api.get("/ingest_status/")
-async def http_get_statuses() -> IngestStatusResponse:
+@sidecar_api.get("/ingest_status")
+async def http_get_statuses(request: Request) -> IngestStatusResponse:
+    update_envs_from_headers(request)
     response = ingest.get_statuses()
     return response
 
 
 @sidecar_api.post("/ingest_references")
-async def http_get_references(req: IngestRequest) -> IngestResponse:
+async def http_get_references(req: IngestRequest, request: Request) -> IngestResponse:
+    update_envs_from_headers(request)
+    req.pdf_directory = os.environ["PROJECT_DIR"] + "/uploads"
     response = ingest.get_references(req)
     return response
 
 
 @sidecar_api.post("/update")
-async def http_update(req: ReferenceUpdate) -> UpdateStatusResponse:
+async def http_update(req: ReferenceUpdate, request: Request) -> UpdateStatusResponse:
+    update_envs_from_headers(request)
     response = storage.update_reference(req)
     return response
 
 
 @sidecar_api.post("/delete")
-async def http_delete(req: DeleteRequest) -> DeleteStatusResponse:
+async def http_delete(req: DeleteRequest, request: Request) -> DeleteStatusResponse:
+    update_envs_from_headers(request)
     response = storage.delete_references(req)
     return response
 
