@@ -47,7 +47,7 @@ export function RightSidePanelWrapper() {
       </Panel>
       <SideBar
         activePane={secondaryPaneCollapsed ? null : secondaryPane}
-        className={cx({ 'border-l-[1px] border-l-grayscale-20': !secondaryPaneCollapsed })}
+        className={cx({ 'border-l-[1px] border-l-side-bar-border': !secondaryPaneCollapsed })}
         items={[
           { pane: 'Rewriter', Icon: <PenIcon /> },
           { pane: 'Chatbot', Icon: <BotIcon /> },

@@ -47,7 +47,7 @@ export function LeftSidePanelWrapper() {
     <>
       <SideBar
         activePane={primaryPaneCollapsed ? null : primaryPane}
-        className={cx({ 'border-r-[1px] border-r-grayscale-20': !primaryPaneCollapsed })}
+        className={cx({ 'border-r-[1px] border-r-side-bar-border': !primaryPaneCollapsed })}
         footerItems={[
           // TODO: Implement Keybinds screen
           {

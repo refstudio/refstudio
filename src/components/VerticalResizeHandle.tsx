@@ -8,7 +8,9 @@ export function VerticalResizeHandle() {
 
   return (
     <PanelResizeHandle
-      className={cx('flex h-full w-1', 'bg-grayscale-20 hover:bg-grayscale-40', { 'bg-grayscale-40': isDragging })}
+      className={cx('flex h-full w-1', 'bg-resizer-bg-default hover:bg-resizer-bg-hover', {
+        'bg-resizer-bg-hover': isDragging,
+      })}
       onDragging={setDragging}
     />
   );

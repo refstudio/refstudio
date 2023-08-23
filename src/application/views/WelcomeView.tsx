@@ -8,7 +8,7 @@ export function WelcomeView() {
         'h-full w-full',
         'flex flex-col items-center justify-center gap-28',
         'px-6 pb-16 pt-0',
-        'bg-grayscale-10',
+        'bg-content-area-bg-primary',
         'cursor-default select-none',
       )}
     >
@@ -24,7 +24,7 @@ export function WelcomeView() {
             {/* <WelcomeViewShortcut keys={['⌘', '?']} text="Repeat AI Rewriter" /> */}
           </div>
         </div>
-        <div className="h-full w-[1px] bg-grayscale-20" />
+        <div className="h-full w-[1px] bg-shortcuts-border" />
         <div className="flex w-[16.5rem] flex-col gap-10">
           <div className="flex flex-col items-end gap-4">
             <WelcomeViewShortcut keys={['⌘', 'K']} text="Quick Actions" />
@@ -71,7 +71,7 @@ function WelcomeViewShortcut({ text, keys }: Shortcut) {
           }
           return (
             <kbd
-              className="flex h-8 w-8 items-center justify-center rounded-default bg-grayscale-30 text-base"
+              className="flex h-8 w-8 items-center justify-center rounded-default bg-content-area-bg-secondary text-base"
               key={key.value}
             >
               {key.value}
