@@ -4,7 +4,6 @@ from pathlib import Path
 from sidecar import storage, typing
 from sidecar.typing import Author, Chunk, Reference
 import semanticscholar
-from semanticscholar import SemanticScholarObject
 
 
 def test_json_storage_load():
