@@ -1,5 +1,6 @@
 /** Utility for calling into the Python sidecar with types. */
 
+import { fetch as tauriFetch } from '@tauri-apps/api/http';
 import { Command as TauriCommand } from '@tauri-apps/api/shell';
 
 import { getCachedSetting } from '../settings/settingsManager';
@@ -81,3 +82,23 @@ export async function callSidecar<T extends keyof CliCommands>(
   console.log('sidecar response', response);
   return response;
 }
+
+export async function startServer() {
+  const command = new TauriCommand('call-sidecar', ['serve']);
+  const process = await command.spawn();
+  console.log('started server', process);
+  return process;
+}
+
+export async function useAPI() {
+  try {
+    const response = await tauriFetch('http://localhost:58000');
+    const { data } = response;
+    console.log('got back from server', data);
+  } catch (e) {
+    console.error('Error!', e);
+  }
+}
+
+(window as any).startServer = startServer;
+(window as any).useAPI = useAPI;

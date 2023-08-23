@@ -101,7 +101,7 @@ async def list_projects():
     """
     user_id = "user1"
     projects_dict = projects.read_project_path_storage(user_id)
-    return projects_dict 
+    return projects_dict
 
 
 @project_api.post("/")
@@ -170,7 +170,7 @@ async def create_file(project_id: str, filepath: Path, file: UploadFile = File(.
 
     if not filepath.exists():
         filepath.parent.mkdir(parents=True, exist_ok=True)
-    
+
     try:
         with open(filepath, "wb") as f:
             shutil.copyfileobj(file.file, f)
