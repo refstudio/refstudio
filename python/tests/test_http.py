@@ -6,7 +6,7 @@ from sidecar import http, projects, search, settings
 from sidecar.chat import Chat
 from sidecar.rewrite import Rewriter
 from sidecar.storage import JsonStorage
-from http import api
+from web import api
 
 from .test_ingest import _copy_fixture_to_temp_dir, FIXTURES_DIR
 
