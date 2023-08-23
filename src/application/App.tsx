@@ -16,6 +16,7 @@ import { CommandPalette } from './commands/CommandPalette';
 import { MainPanel } from './components/MainPanel';
 import { LeftSidePanelWrapper } from './sidebar/LeftSidePanelWrapper';
 import { RightSidePanelWrapper } from './sidebar/RightSidePanelWrapper';
+import { WebMenuShortcuts } from './WebMenuShortcuts';
 
 export function App() {
   const panelRef = React.createRef<ImperativePanelGroupHandle>();
@@ -62,6 +63,7 @@ export function App() {
           <ContextMenus>
             <MenuProvider config={{ animationDuration: 0 }}>
               <CommandPalette />
+              {import.meta.env.VITE_IS_WEB && <WebMenuShortcuts />}
               <PanelGroup
                 className="relative h-full"
                 direction="horizontal"

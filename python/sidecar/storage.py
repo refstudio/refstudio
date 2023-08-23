@@ -1,5 +1,4 @@
 import json
-import sys
 
 from sidecar import settings, typing
 from sidecar.settings import logger
@@ -92,8 +91,7 @@ class JsonStorage:
                     status=typing.ResponseStatus.ERROR,
                     message=msg
                 )
-                sys.stdout.write(response.json())
-                return
+                return response
 
         self.references = list(refs.values())
         self.save()
@@ -102,7 +100,6 @@ class JsonStorage:
             status=typing.ResponseStatus.OK,
             message=""
         )
-        sys.stdout.write(response.json())
         return response
 
     def update(self, reference_update: typing.ReferenceUpdate):
@@ -130,7 +127,6 @@ class JsonStorage:
                 status=typing.ResponseStatus.ERROR,
                 message=msg
             )
-            sys.stdout.write(response.json())
             return response
 
         logger.info(f"Updating {source_filename} with new values: {patch.data}")
@@ -143,7 +139,6 @@ class JsonStorage:
             status=typing.ResponseStatus.OK,
             message=""
         )
-        sys.stdout.write(response.json())
         return response
 
     def create_corpus(self):

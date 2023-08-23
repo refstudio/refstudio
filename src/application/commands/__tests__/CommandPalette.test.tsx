@@ -69,14 +69,22 @@ describe('CommandPalette', () => {
   });
 
   it.each<{ text: string; event: RefStudioEventName }>([
+    // file
     { text: 'New File', event: 'refstudio://menu/file/new' },
-    { text: 'Close Active Editor', event: 'refstudio://menu/file/close' },
+    { text: 'Save', event: 'refstudio://menu/file/save' },
+    { text: 'Save File as Markdown', event: 'refstudio://menu/file/markdown' },
+    // project
+    { text: 'New Project', event: 'refstudio://menu/file/project/new' },
+    { text: 'Open Project', event: 'refstudio://menu/file/project/open' },
+    { text: 'Close Project', event: 'refstudio://menu/file/project/close' },
+    { text: 'Open Sample Project', event: 'refstudio://menu/file/project/new/sample' },
+    // References
     { text: 'Show References', event: 'refstudio://menu/references/open' },
     { text: 'Upload References', event: 'refstudio://menu/references/upload' },
-  ])('should emit menu event to create new file', async ({ text, event }) => {
+  ])('should emit event $event for action $text', async ({ text, event }) => {
     const { user } = setupWithJotaiProvider(
       <MenuProvider config={{ animationDuration: 0 }}>
-        <CommandPalette index={1} />
+        <CommandPalette index={INDEX_MAIN} />
       </MenuProvider>,
       store,
     );
@@ -89,7 +97,7 @@ describe('CommandPalette', () => {
 
   it.each<{ text: string; index: number }>([
     { text: 'Rewrite selection...', index: INDEX_REWRITE_WIDGET },
-    { text: 'Open File...', index: INDEX_FILES },
+    { text: 'Quick Files...', index: INDEX_FILES },
     { text: 'Find References...', index: INDEX_REFERENCES },
   ])('Should open menu $index on $text', async ({ text, index }) => {
     const onOpen = vi.fn();
@@ -114,21 +122,6 @@ describe('CommandPalette', () => {
 
     expect(screen.getByText(REFERENCES[0].title)).toBeInTheDocument();
     expect(screen.getByText(REFERENCES[1].title)).toBeInTheDocument();
-  });
-
-  it('should open files menu on CMD+P', async () => {
-    const onOpen = vi.fn();
-    const { user } = setupWithJotaiProvider(
-      <MenuProvider config={{ animationDuration: 0 }}>
-        <CommandPalette index={INDEX_MAIN} onOpen={onOpen} />
-      </MenuProvider>,
-      store,
-    );
-
-    await user.keyboard('{Meta>}[KeyP]');
-    expect(screen.getByText('Files')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Select file to open...')).toBeInTheDocument();
-    expect(onOpen).toHaveBeenLastCalledWith(INDEX_FILES);
   });
 
   it.each<{ char: string; index: number }>([
