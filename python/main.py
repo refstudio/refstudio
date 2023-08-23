@@ -57,6 +57,10 @@ if __name__ == '__main__':
     elif args.command == "search":
         response = search.search_s2(param_obj)
         sys.stdout.write(response.json())
+    
+    elif args.command == "link_references":
+        response = storage.link_references(param_obj)
+        sys.stdout.write(response.json())
 
     else:
         raise NotImplementedError(f"Command {args.command} is not implemented.")
