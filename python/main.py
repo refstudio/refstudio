@@ -1,5 +1,6 @@
 import inspect
 import json
+import sys
 
 from sidecar import chat, cli, ingest, rewrite, search, storage
 from sidecar.typing import CliCommands
@@ -22,31 +23,40 @@ if __name__ == '__main__':
         param_obj = args_type.parse_obj(param_json)
 
     if args.command == "ingest":
-        ingest.run_ingest(param_obj)
+        response = ingest.run_ingest(param_obj)
+        sys.stdout.write(response.json())
 
     elif args.command == "ingest_status":
-        ingest.get_statuses()
+        response = ingest.get_statuses()
+        sys.stdout.write(response.json())
 
     elif args.command == "ingest_references":
-        ingest.get_references(param_obj)
+        response = ingest.get_references(param_obj)
+        sys.stdout.write(response.json())
 
     elif args.command == "rewrite":
-        rewrite.rewrite(param_obj)
+        response = rewrite.rewrite(param_obj)
+        sys.stdout.write(response.json())
 
     elif args.command == "completion":
-        rewrite.complete_text(param_obj)
+        response = rewrite.complete_text(param_obj)
+        sys.stdout.write(response.json())
 
     elif args.command == "chat":
-        chat.ask_question(param_obj)
+        response = chat.ask_question(param_obj)
+        sys.stdout.write(response.json())
 
     elif args.command == "update":
-        storage.update_reference(param_obj)
+        response = storage.update_reference(param_obj)
+        sys.stdout.write(response.json())
 
     elif args.command == "delete":
-        storage.delete_references(param_obj)
+        response = storage.delete_references(param_obj)
+        sys.stdout.write(response.json())
 
     elif args.command == "search":
-        search.search_s2(param_obj)
+        response = search.search_s2(param_obj)
+        sys.stdout.write(response.json())
 
     else:
         raise NotImplementedError(f"Command {args.command} is not implemented.")
