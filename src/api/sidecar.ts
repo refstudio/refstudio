@@ -145,6 +145,10 @@ export async function killServer() {
 (window as any).startServer = startServer;
 (window as any).killServer = killServer;
 (window as any).isServerHealthy = isServerHealthy;
+(window as any).getProjects = async () => {
+  const response = await tauriFetch('http://localhost:1487/api/projects');
+  console.log(response.data);
+};
 
 export async function getServer() {
   if (serverProcess) {
@@ -171,6 +175,10 @@ export async function getServer() {
 }
 
 export function useRefStudioServer() {
+  if (import.meta.env.VITE_IS_WEB) {
+    return; // no server to be started for the web app.
+  }
+
   (async () => {
     await getServer();
   })().catch((e) => {
