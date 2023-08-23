@@ -3,6 +3,8 @@ from pathlib import Path
 
 from sidecar import storage, typing
 from sidecar.typing import Author, Chunk, Reference
+import semanticscholar
+from semanticscholar import SemanticScholarObject
 
 
 def test_json_storage_load():
@@ -34,6 +36,45 @@ def test_json_storage_load():
             assert isinstance(chunk, Chunk)
 
 
+def test_link_references(monkeypatch, tmp_path, capsys):
+    # Create a sample paper for the purpose of testing.
+    # Mock paper class
+    class MockPaper:
+        def __init__(self, title=None, paperId=None, doi=None):
+            self.title = title
+            self.paperId = paperId
+            self.doi = "10.1234/5678"
+
+    s2_paper = MockPaper(title="Some title", paperId="1234567890", doi="10.1234/5678")
+
+    # Mock s2_object so that it always returns the above s2_paper.
+    class MockS2Object:
+        def get_paper(self, doi, fields):
+            return s2_paper
+
+    # Install the mock
+    monkeypatch.setattr(semanticscholar, "SemanticScholar", MockS2Object)
+
+    # Given
+    fp = Path(__file__).parent.joinpath("fixtures/data/references.json")
+    jstore = storage.JsonStorage(filepath=fp)
+    jstore.load()
+
+    # When
+    jstore.link_s2_doi()
+
+    # Then
+    captured = capsys.readouterr()
+    output = json.loads(captured.out)
+
+    # Check that the operation was successful
+    assert output["status"] == "ok"
+    assert output["message"] == "Linking with s2 complete for 1 out of 2 references"
+
+    # Check the new s2_paperId
+    assert jstore.references[0].s2_paperId == "1234567890"
+
+
 def test_json_storage_update(monkeypatch, tmp_path, capsys):
     fp = Path(__file__).parent.joinpath("fixtures/data/references.json")
     jstore = storage.JsonStorage(filepath=fp)
@@ -50,10 +91,8 @@ def test_json_storage_update(monkeypatch, tmp_path, capsys):
     # expect: no References are changed and json response in stdout = ERROR
 
     bad_update = typing.ReferenceUpdate(
-        source_filename='does_not_exist.pdf',
-        patch=typing.ReferencePatch(
-            data={'citation_key': 'should-not-change'}
-        )
+        source_filename="does_not_exist.pdf",
+        patch=typing.ReferencePatch(data={"citation_key": "should-not-change"}),
     )
 
     jstore.update(bad_update)
@@ -61,8 +100,8 @@ def test_json_storage_update(monkeypatch, tmp_path, capsys):
     captured = capsys.readouterr()
     output = json.loads(captured.out)
 
-    assert output['status'] == 'error'
-    assert output['message'] != ""
+    assert output["status"] == "error"
+    assert output["message"] != ""
 
     # -------------
 
@@ -81,9 +120,7 @@ def test_json_storage_update(monkeypatch, tmp_path, capsys):
 
     reference_update = typing.ReferenceUpdate(
         source_filename=ref.source_filename,
-        patch=typing.ReferencePatch(
-            data={'citation_key': 'reda2023'}
-        )
+        patch=typing.ReferencePatch(data={"citation_key": "reda2023"}),
     )
 
     jstore.update(reference_update)
@@ -91,8 +128,8 @@ def test_json_storage_update(monkeypatch, tmp_path, capsys):
     captured = capsys.readouterr()
     output = json.loads(captured.out)
 
-    assert output['status'] == 'ok'
-    assert output['message'] == ""
+    assert output["status"] == "ok"
+    assert output["message"] == ""
 
     # reload from `savepath` to check that the update was successful
     jstore = storage.JsonStorage(filepath=savepath)
@@ -100,7 +137,7 @@ def test_json_storage_update(monkeypatch, tmp_path, capsys):
 
     # check that the citation key has been updated
     assert jstore.references[0].citation_key == "reda2023"
-    
+
     # check that the other reference data has not been updated
     assert len(jstore.references) == 2
     assert jstore.references[0].source_filename == "some_file.pdf"
@@ -112,7 +149,6 @@ def test_json_storage_update(monkeypatch, tmp_path, capsys):
     assert jstore.references[1].citation_key is None
     assert len(jstore.references[1].authors) == 2
     assert len(jstore.references[1].chunks) == 6
-
 
 
 def test_storage_delete_references(monkeypatch, tmp_path, capsys):
@@ -134,8 +170,8 @@ def test_storage_delete_references(monkeypatch, tmp_path, capsys):
     captured = capsys.readouterr()
     output = json.loads(captured.out)
 
-    assert output['status'] == 'ok'
-    assert output['message'] == ""
+    assert output["status"] == "ok"
+    assert output["message"] == ""
 
     # reload from `savepath` to check that the delete was successful
     jstore = storage.JsonStorage(filepath=savepath)
@@ -156,12 +192,12 @@ def test_storage_delete_references(monkeypatch, tmp_path, capsys):
     to_be_deleted = ["some_file.pdf"]
 
     jstore.delete(source_filenames=to_be_deleted)
-    
+
     captured = capsys.readouterr()
     output = json.loads(captured.out)
 
-    assert output['status'] == 'ok'
-    assert output['message'] == ""
+    assert output["status"] == "ok"
+    assert output["message"] == ""
 
     # reload from `savepath` to check that the delete was successful
     jstore = storage.JsonStorage(filepath=savepath)
@@ -177,9 +213,9 @@ def test_storage_delete_references(monkeypatch, tmp_path, capsys):
     to_be_deleted = ["not_in_references_storage.pdf"]
 
     jstore.delete(to_be_deleted)
-    
+
     captured = capsys.readouterr()
     output = json.loads(captured.out)
 
-    assert output['status'] == 'error'
-    assert output['message'] != ""
+    assert output["status"] == "error"
+    assert output["message"] != ""
