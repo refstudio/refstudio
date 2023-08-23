@@ -2,7 +2,8 @@ import json
 
 from sidecar import settings, typing
 from sidecar.settings import logger
-from sidecar.typing import DeleteRequest, ReferenceUpdate
+from sidecar.typing import DeleteRequest, ReferenceUpdate, LinkRequest
+import semanticscholar
 
 logger = logger.getChild(__name__)
 
@@ -22,6 +23,14 @@ def delete_references(delete_request: DeleteRequest):
         all_=delete_request.all
     )
     return response
+
+def link_references(reference_update: LinkRequest):
+    storage = JsonStorage(settings.REFERENCES_JSON_PATH)
+    storage.load()
+    if reference_update.doi:
+        response = storage.link_s2_doi()
+        return response
+
 
 
 class JsonStorage:
@@ -139,6 +148,38 @@ class JsonStorage:
             status=typing.ResponseStatus.OK,
             message=""
         )
+        return response
+
+    def link_s2_doi(self):
+        """
+        Link the references to S2 paperId using DOI.
+        """
+        success_count = 0
+        total_count = len(self.references)
+        s2_object = semanticscholar.SemanticScholar()
+        for reference in self.references:
+            if reference.doi:
+                try:
+                    paper = s2_object.get_paper(reference.doi, fields=["title", "paperId"])
+                    logger.info(
+                        f" Linking DOI: {reference.doi} --> {paper.title} and {paper.paperId}"
+                    )
+                    reference.s2_paperId = paper.paperId
+                    success_count+=1
+
+                except (
+                    semanticscholar.SemanticScholarException.ObjectNotFoundExeception
+                ) as e:
+                    logger.info(f"Paper with doi {reference.doi} not found. Exception: {e}")
+
+                except Exception as e:
+                    logger.info(f"Linking: An unexpected error occurred: {e}")
+        self.save()
+        response = typing.LinkResponse(
+            status=typing.ResponseStatus.OK,
+            message="Linking with s2 complete for {} out of {} references".format(success_count, total_count),
+        )
+
         return response
 
     def create_corpus(self):
