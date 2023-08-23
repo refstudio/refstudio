@@ -63,7 +63,7 @@ const MainPanelPane = memo(({ paneId }: MainPanelPaneProps) => {
       <div className="grow-0">
         <OpenEditorsTabPane paneId={paneId} />
       </div>
-      <div className="flex w-full px-10 pt-10 bg-grayscale-10 grow overflow-hidden">
+      <div className="flex w-full px-10 pt-10 bg-content-area-bg-primary grow overflow-hidden">
         {activeEditorAtoms ? <MainPaneViewContent activeEditorAtoms={activeEditorAtoms} /> : <WelcomeView />}
       </div>
     </div>

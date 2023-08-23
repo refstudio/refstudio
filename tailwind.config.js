@@ -71,6 +71,7 @@ export default {
         },
         'btn-bg-tool': {
           active: 'rgb(var(--grayscale-20) / <alpha-value>)',
+          disabled: 'rgb(var(--grayscale-00) / <alpha-value>)',
           hover: 'rgb(var(--grayscale-20) / <alpha-value>)',
           default: 'rgb(var(--grayscale-00) / <alpha-value>)',
         },

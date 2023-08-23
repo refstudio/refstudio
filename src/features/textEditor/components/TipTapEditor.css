@@ -1,5 +1,6 @@
-.tiptap-editor menu.menu-bar button {
-  @apply mx-1 my-1 rounded-lg bg-gray-200 px-2 py-1 hover:bg-gray-500 hover:text-white;
+.editor-container {
+  @apply flex h-full w-full flex-col;
+  @apply overflow-hidden rounded-default shadow-default;
 }
 
 .tiptap-editor cite {
@@ -13,17 +14,12 @@
 .tiptap-editor {
   @apply flex-1 overflow-y-scroll px-12 py-16;
   @apply text-lg/6 font-normal;
-  @apply bg-grayscale-0;
+  @apply bg-card-bg-primary;
   @apply flex justify-center;
-  @apply overflow-y-auto;
 }
 
 .tiptap-editor > div {
   @apply max-w-[45rem];
-}
-
-.tiptap-editor menu.menu-bar {
-  @apply bg-grayscale-0;
 }
 
 .tiptap-editor h2 {
