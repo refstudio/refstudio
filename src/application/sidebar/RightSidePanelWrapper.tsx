@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 import { ImperativePanelHandle, Panel } from 'react-resizable-panels';
 
 import { VerticalResizeHandle } from '../../components/VerticalResizeHandle';
@@ -24,6 +25,10 @@ export function RightSidePanelWrapper() {
     }
     setSecondaryPane(selectedPane);
   };
+
+  // Configure keyboard shortcuts to open/close side panel
+  useHotkeys(['meta+9'], () => handleSideBarClick('Chatbot'), { preventDefault: true });
+  useHotkeys(['meta+0'], () => handleSideBarClick('Rewriter'), { preventDefault: true });
 
   React.useEffect(() => {
     if (secondaryPaneCollapsed) {

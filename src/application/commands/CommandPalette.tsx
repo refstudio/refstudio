@@ -2,6 +2,7 @@ import './CommandPalette.css';
 
 import { Command, CommandMenu, CommandWrapper, useCommands, useKmenu } from 'kmenu';
 import { useEffect } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 import {
   VscBell,
   VscClose,
@@ -19,7 +20,6 @@ import {
   VscSearch,
   VscSymbolString,
 } from 'react-icons/vsc';
-import { useEventListener } from 'usehooks-ts';
 
 import { useActiveEditorId } from '../../atoms/hooks/useActiveEditorId';
 import { emitEvent } from '../../events';
@@ -43,14 +43,7 @@ export function CommandPalette({ index, onOpen }: { index?: number; onOpen?: (in
     onOpen?.(open);
   }, [onOpen, open]);
 
-  // Open Files on "META + p"
-  useEventListener('keydown', (e) => {
-    if (e.metaKey && e.key.toLowerCase() === 'p') {
-      e.preventDefault();
-      e.stopPropagation();
-      setOpen(INDEX_FILES, true);
-    }
-  });
+  useHotkeys(['meta+p'], () => setOpen(INDEX_FILES, true), { preventDefault: true });
 
   return (
     <div className="command-palette" data-testid={CommandPalette.name}>

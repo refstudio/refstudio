@@ -8,7 +8,7 @@ import { emitEvent, RefStudioEventName, RefStudioEventPayload } from '../events'
  *
  *  NOTE: Some shortcuts can+t be added to the app
  *    - ⌘ + N - replaced by Ctrl + N
- *    - ⌘ + W - replaced by Ctrl + N
+ *    - ⌘ + W - replaced by Ctrl + W
  *
  *  WARNING:  https://react-hotkeys-hook.vercel.app/docs/documentation/useHotkeys/basic-usage
  *  > Please be aware that there are some hotkeys that we cannot override,

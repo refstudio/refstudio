@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 import { MdKeyboard, MdSettings } from 'react-icons/md';
 import { ImperativePanelHandle, Panel } from 'react-resizable-panels';
-import { useEventListener } from 'usehooks-ts';
 
 import { VerticalResizeHandle } from '../../components/VerticalResizeHandle';
 import { emitEvent } from '../../events';
@@ -30,16 +30,8 @@ export function LeftSidePanelWrapper() {
   };
 
   // Configure keyboard shortcuts to open/close side panel
-  useEventListener('keydown', (e) => {
-    if (e.metaKey) {
-      switch (e.key.toLowerCase()) {
-        case '1':
-          return handleSideBarClick('Explorer');
-        case '2':
-          return handleSideBarClick('References');
-      }
-    }
-  });
+  useHotkeys(['meta+1'], () => handleSideBarClick('Explorer'), { preventDefault: true });
+  useHotkeys(['meta+2'], () => handleSideBarClick('References'), { preventDefault: true });
 
   React.useEffect(() => {
     if (primaryPaneCollapsed) {
