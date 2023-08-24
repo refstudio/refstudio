@@ -12,7 +12,7 @@ export function VerticalResizeHandle({ transparent }: { transparent?: boolean })
         className={cx(
           'flex h-full w-1',
           'bg-resizer-bg-default hover:bg-resizer-bg-hover',
-          'absolute -ml-0.5 z-resize-handle',
+          'absolute z-resize-handle -ml-0.5',
           {
             'bg-resizer-bg-hover': isDragging,
             'bg-transparent': transparent && !isDragging,

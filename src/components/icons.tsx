@@ -10,3 +10,20 @@ export const RefStudioEditorIcon = () => (
     </svg>
   </div>
 );
+
+export const CloseIcon = () => (
+  <div className="flex h-6 w-6 items-center justify-center">
+    <svg height="12" viewBox="0 0 12 12" width="12" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M6.00012 7.41433L1.75748 11.657L0.343262 10.2428L4.5859 6.00012L0.343262 1.75748L1.75748 0.343262L6.00012 4.5859L10.2428 0.343262L11.657 1.75748L7.41433 6.00012L11.657 10.2428L10.2428 11.657L6.00012 7.41433Z"
+        fill="currentcolor"
+      />
+    </svg>
+  </div>
+);
+
+export const CircleIcon = () => (
+  <div className="flex h-6 w-6 items-center justify-center">
+    <div className="h-2 w-2 shrink-0 rounded-2xl bg-current" />
+  </div>
+);
