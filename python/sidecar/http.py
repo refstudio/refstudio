@@ -3,6 +3,7 @@ import shutil
 from pathlib import Path
 from uuid import uuid4
 
+import psutil
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import FileResponse
@@ -33,6 +34,9 @@ sidecar_api = FastAPI()  # Legacy API for existing sidecar cli functionality
 filesystem_api = FastAPI()  # API for interacting with the filesystem
 project_api = FastAPI()  # API for interacting with projects
 settings_api = FastAPI()  # API for interacting with settings
+
+meta_api = FastAPI()
+"""API for monitoring and controling the server"""
 
 
 # Sidecar API
@@ -103,7 +107,7 @@ async def list_projects():
     """
     user_id = "user1"
     projects_dict = projects.read_project_path_storage(user_id)
-    return projects_dict 
+    return projects_dict
 
 
 @project_api.post("/")
@@ -172,7 +176,7 @@ async def create_file(project_id: str, filepath: Path, file: UploadFile = File(.
 
     if not filepath.exists():
         filepath.parent.mkdir(parents=True, exist_ok=True)
-    
+
     try:
         with open(filepath, "wb") as f:
             shutil.copyfileobj(file.file, f)
@@ -220,6 +224,23 @@ async def delete_file(project_id: str, filepath: Path):
         "message": "File deleted",
         "filepath": filepath,
     }
+
+
+@meta_api.get('/status')
+async def status():
+    return {
+        'status': 'ok'
+    }
+
+
+@meta_api.post('/shutdown')
+async def shutdown():
+    # See https://stackoverflow.com/a/74757349/388951
+    parent_pid = os.getpid()
+    parent = psutil.Process(parent_pid)
+    for child in parent.children(recursive=True):
+        child.kill()
+    parent.kill()
 
 
 # Settings API

@@ -1,6 +1,7 @@
 import { useSetAtom } from 'jotai';
 import { useState } from 'react';
 
+import { runRefStudioServerOnDesktop } from './api/server';
 import { App } from './application/App';
 import { openProjectAtom } from './atoms/projectState';
 import { useAsyncEffect } from './hooks/useAsyncEffect';
@@ -18,6 +19,8 @@ if (import.meta.env.DEV) {
 export function AppStartup() {
   const [initialized, setInitialized] = useState(false);
   const openProject = useSetAtom(openProjectAtom);
+
+  runRefStudioServerOnDesktop();
 
   useAsyncEffect(
     async (isMounted) => {

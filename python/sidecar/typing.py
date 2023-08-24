@@ -198,7 +198,7 @@ class S2SearchResult(RefStudioModel):
 class SearchResponse(RefStudioModel):
     status: ResponseStatus
     message: str
-    results: list[S2SearchResult] 
+    results: list[S2SearchResult]
 
 
 class OpenAISettings(RefStudioModel):
@@ -249,6 +249,8 @@ class CliCommands(RefStudioModel):
     """Deletes a Reference"""
     search: tuple[SearchRequest, SearchResponse]
     """Searches for papers on Semantic Scholar"""
+    serve: tuple[None, None]
+    """Start an HTTP server"""
 
 
 Reference.update_forward_refs()

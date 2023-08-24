@@ -64,6 +64,11 @@ export interface CliCommands {
    * @maxItems 2
    */
   search: [SearchRequest, SearchResponse];
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  serve: [null, null];
 }
 export interface IngestRequest {
   pdf_directory: string;
