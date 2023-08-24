@@ -26,8 +26,6 @@ export type SettingsManagerView = Pick<
 
 let settingsManager: SettingsManagerView | undefined;
 
-export const DEFAULT_OPEN_AI_CHAT_MODEL = 'gpt-3.5-turbo';
-
 export async function initSettings() {
   let settings: SettingsSchema;
   try {
