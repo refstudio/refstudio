@@ -4,7 +4,6 @@
 
 .side-bar .icon {
   @apply flex h-10 w-10 content-center justify-center gap-2 rounded;
-  @apply text-red-300;
   @apply bg-btn-bg-side-bar-tool-default text-btn-ico-side-bar-tool-default;
 }
 

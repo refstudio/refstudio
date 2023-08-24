@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useContextMenu } from 'react-contexify';
 
 import { cx } from '../lib/cx';
@@ -10,23 +11,28 @@ export function TabPane<K extends string>({
   onClick,
   onCloseClick,
 }: {
-  items: { text: string; value: K; ctxProps?: unknown; isDirty?: boolean }[];
+  items: { text: string; value: K; ctxProps?: unknown; isDirty?: boolean; Icon?: React.ReactElement }[];
   value: K | null;
   onClick(value: K): void;
   onCloseClick(value: K): void;
 }) {
+  const activeIndex = useMemo(() => items.findIndex((item) => item.value === value), [items, value]);
+
   return (
     <div
-      className={cx(
-        'flex flex-1 flex-row flex-nowrap',
-        'border-b border-b-slate-200',
-        'x-hide-scrollbars overflow-x-scroll',
-      )}
+      className={cx('flex flex-1 flex-row flex-nowrap', 'bg-top-bar-bg-active', 'x-hide-scrollbars overflow-x-scroll')}
       role="tablist"
     >
-      {items.map((item) => (
+      {items.map((item, index) => (
         <TabItem
-          active={item.value === value}
+          Icon={item.Icon}
+          active={activeIndex === index}
+          className={cx({
+            'border-l border-l-top-bar-border': index > 0,
+            'border-l-0': activeIndex === index,
+            'rounded-bl-default border-l-0': activeIndex === index - 1,
+            'rounded-br-default': activeIndex === index + 1,
+          })}
           content={item.text}
           ctxProps={item.ctxProps}
           isDirty={item.isDirty}
@@ -35,39 +41,46 @@ export function TabPane<K extends string>({
           onCloseClick={() => onCloseClick(item.value)}
         />
       ))}
+      {items.length > 0 && (
+        <div
+          className={cx('grow border-l border-l-top-bar-border bg-top-bar-bg-inactive', {
+            'rounded-bl-default border-l-0': activeIndex === items.length - 1,
+          })}
+        />
+      )}
     </div>
   );
 }
 
-export function TabItem({
-  active,
-  content,
-  isDirty,
-  ctxProps,
-  onClick,
-  onCloseClick,
-}: {
+interface TabItemProps {
   active: boolean;
   ctxProps: unknown;
   content: React.ReactNode;
+  className?: string;
   isDirty?: boolean;
+  Icon?: React.ReactElement;
   onClick: () => void;
   onCloseClick: () => void;
-}) {
+}
+export function TabItem({ active, content, isDirty, className, ctxProps, Icon, onClick, onCloseClick }: TabItemProps) {
   const { show } = useContextMenu({ id: TABPANE_TAB_MENU_ID, props: ctxProps });
 
   return (
     <div
       aria-selected={active}
       className={cx(
-        'inline-flex items-center justify-between gap-2 px-2 pb-1 pt-2',
-        'cursor-pointer select-none whitespace-nowrap',
-        'border-r border-r-slate-200 first:border-l first:border-l-slate-200',
+        'min-w-32 flex max-w-[11.5rem] items-center gap-2 p-2',
+        'cursor-pointer select-none',
         'group',
         {
-          'border-t-2 border-t-slate-200 hover:bg-slate-100': !active,
-          'border-t-2 border-t-primary bg-slate-200': active,
+          'bg-top-bar-bg-inactive hover:bg-top-bar-bg-active': !active,
+          'bg-top-bar-bg-active': active,
         },
+        {
+          'text-btn-ico-top-bar-active': active,
+          'text-btn-ico-top-bar-inactive': !active,
+        },
+        className,
       )}
       role="tab"
       onClick={(e) => {
@@ -76,7 +89,15 @@ export function TabItem({
       }}
       onContextMenu={(e) => show({ event: e })}
     >
-      <span>{content}</span>
+      {Icon}
+      <span
+        className={cx('flex-1 overflow-hidden overflow-ellipsis whitespace-nowrap', {
+          'text-btn-txt-top-bar-active': active,
+          'text-btn-txt-top-bar-inactive': !active,
+        })}
+      >
+        {content}
+      </span>
       <TabCloseButton isDirty={isDirty} onClick={onCloseClick} />
     </div>
   );

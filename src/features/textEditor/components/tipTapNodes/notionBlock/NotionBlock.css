@@ -5,7 +5,7 @@
 .notion-block > .drag-handle {
   @apply invisible;
   @apply flex flex-shrink-0 flex-grow-0;
-  @apply ml-1.5 mt-2 h-4 w-4;
+  @apply ml-1.5 mt-1 h-4 w-4;
   @apply cursor-grab;
   @apply bg-contain bg-center bg-no-repeat;
   background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 16"><path fill-opacity="0.2" d="M4 14c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zM2 6C.9 6 0 6.9 0 8s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6C.9 0 0 .9 0 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" /></svg>');
@@ -16,18 +16,15 @@
 }
 
 .notion-block:has(> .content > div > h1) > .drag-handle {
-  /* 1.75rem / 2 */
-  @apply mt-[0.875rem];
-}
-
-.notion-block:has(> .content > div > h2) > .drag-handle {
-  /* 1.5rem / 2 */
   @apply mt-3;
 }
 
+.notion-block:has(> .content > div > h2) > .drag-handle {
+  @apply mt-2;
+}
+
 .notion-block:has(> .content > div > h3, h4) > .drag-handle {
-  /* 1.25rem / 2 */
-  @apply mt-[0.625rem];
+  @apply mt-1.5;
 }
 
 .notion-block.selected > .content {
@@ -42,14 +39,6 @@
   @apply flex-1 rounded-sm;
 }
 
-.notion-block p,
-.notion-block h1,
-.notion-block h2,
-.notion-block h3,
-.notion-block h4 {
-  @apply px-0.5 py-1;
-}
-
 .hidden-drag-handle .drag-handle {
   @apply !invisible;
 }
@@ -59,12 +48,16 @@
   @apply mr-0.5 h-6 w-6 items-center justify-center p-1.5;
   @apply opacity-100;
   @apply inline-block;
-  @apply rounded;
+  @apply rounded-default;
 }
 
 .notion-block .collapsible-arrow > svg {
   @apply rotate-180;
   transition: transform 200ms ease-out 0s, background 20ms ease-in 0s;
+}
+
+.notion-block.collapsed .collapsible-arrow > svg {
+  @apply rotate-90;
 }
 
 .notion-block .collapsible-arrow:hover {
@@ -75,16 +68,12 @@
   @apply opacity-50;
 }
 
-.notion-block.collapsed .collapsible-arrow > svg {
-  @apply rotate-90;
-}
-
 .notion-block.collapsed .notion-block {
   @apply hidden;
 }
 
 .notion-block .empty-collapsible-placeholder {
-  @apply ml-[26px] py-[3px] pl-0.5;
+  @apply ml-[26px] mt-[5px] py-[3px] pl-0.5;
   @apply cursor-pointer;
   @apply rounded;
   transition: background 20ms ease-in 0s;
@@ -119,4 +108,25 @@
 }
 .notion-block .ordered-list-item.roman::before {
   content: counter(counter, lower-roman) '. ';
+}
+
+.node-notionBlock + .node-notionBlock {
+  @apply mt-6;
+}
+
+/* Add space between a parent notion block and its first child */
+.node-notionBlock .node-notionBlock:first-of-type {
+  @apply mt-2;
+}
+
+/* No space between sibling unordered list items */
+.node-notionBlock:has(.content > div > .unordered-list-item)
+  + .node-notionBlock:has(.content > div > .unordered-list-item) {
+  @apply mt-0;
+}
+
+/* No space between sibling ordered list items */
+.node-notionBlock:has(.content > div > .ordered-list-item)
+  + .node-notionBlock:has(.content > div > .ordered-list-item) {
+  @apply mt-0;
 }
