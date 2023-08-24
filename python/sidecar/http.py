@@ -99,10 +99,11 @@ async def ingest_references(project_id: str):
 
 
 @references_api.get("/{project_id}/{reference_id}")
-async def http_get(project_id: str, reference_id: str) -> Reference:
+async def http_get(project_id: str, reference_id: str) -> Reference | None:
     user_id = "user1"
     project_path = projects.get_project_path(user_id, project_id)
     store = storage.JsonStorage(project_path / ".storage" / "references.json")
+    store.load()
     response = store.get_reference(reference_id)
     return response
 

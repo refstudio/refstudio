@@ -62,7 +62,10 @@ class JsonStorage:
         with open(self.filepath, 'w') as f:
             json.dump(contents, f, indent=2, default=str)
     
-    def get_reference(self, reference_id: str):
+    def get_reference(self, reference_id: str) -> typing.Reference | None:
+        """
+        Get a Reference from storage by id.
+        """
         for ref in self.references:
             if ref.id == reference_id:
                 return ref

@@ -40,6 +40,31 @@ def setup_uploaded_reference_pdfs(monkeypatch, tmp_path):
         )
 
 
+def test_get_reference(monkeypatch, tmp_path):
+    user_id = "user1"
+    project_id = "project1"
+
+    monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
+    project_path = projects.create_project(user_id, project_id, project_name="foo")
+    mocked_path = project_path / ".storage" / "references.json"
+
+    # copy references.json to mocked storage path
+    test_file = "fixtures/data/references.json"
+    path_to_test_file = Path(__file__).parent.joinpath(test_file)
+
+    _copy_fixture_to_temp_dir(path_to_test_file, mocked_path)
+
+    jstore = JsonStorage(filepath=mocked_path)
+    jstore.load()
+
+    # get the first reference
+    ref = jstore.references[0]
+
+    response = references_client.get(f"/{project_id}/{ref.id}")
+    assert response.status_code == 200
+    assert response.json() == ref.dict()
+
+
 def test_references_update(monkeypatch, tmp_path):
     user_id = "user1"
     project_id = "project1"
@@ -150,6 +175,7 @@ def test_ai_rewrite_missing_required_request_params(monkeypatch, mock_call_model
         ]
     }
 
+
 def test_ai_completion_is_ok(monkeypatch, mock_call_model_is_ok):
     monkeypatch.setattr(Rewriter, "call_model", mock_call_model_is_ok)
 
@@ -168,6 +194,7 @@ def test_ai_completion_is_ok(monkeypatch, mock_call_model_is_ok):
         ],
     }
 
+
 def test_ai_completion_missing_required_request_params(monkeypatch, mock_call_model_is_ok):
     monkeypatch.setattr(Rewriter, "call_model", mock_call_model_is_ok)
 
@@ -184,6 +211,7 @@ def test_ai_completion_missing_required_request_params(monkeypatch, mock_call_mo
             }
         ]
     }
+
 
 def test_ai_chat_is_ok(monkeypatch, mock_call_model_is_ok, tmp_path):
     monkeypatch.setattr(Chat, "call_model", mock_call_model_is_ok)
@@ -211,6 +239,7 @@ def test_ai_chat_is_ok(monkeypatch, mock_call_model_is_ok, tmp_path):
         ],
     }
 
+
 def test_ai_chat_missing_required_request_params(monkeypatch, mock_call_model_is_ok, tmp_path):
     monkeypatch.setattr(Chat, "call_model", mock_call_model_is_ok)
 
@@ -235,6 +264,7 @@ def test_ai_chat_missing_required_request_params(monkeypatch, mock_call_model_is
             }
         ]
     }
+
 
 def test_search_s2_is_ok(monkeypatch, mock_search_paper):
     monkeypatch.setattr(search.Searcher, "search_func", mock_search_paper)
