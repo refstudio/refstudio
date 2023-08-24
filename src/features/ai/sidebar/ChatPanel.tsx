@@ -1,10 +1,9 @@
-import { useState } from 'react';
-import { VscMegaphone, VscRunAll, VscWand } from 'react-icons/vsc';
+import { useEffect, useRef, useState } from 'react';
 
 import { chatWithAI } from '../../../api/chat';
-import { PanelSection } from '../../../components/PanelSection';
 import { PanelWrapper } from '../../../components/PanelWrapper';
 import { cx } from '../../../lib/cx';
+import { SendIcon } from '../../components/icons';
 
 interface ChatThreadItem {
   id: string;
@@ -63,53 +62,40 @@ export function ChatbotPanel() {
 
   return (
     <PanelWrapper title="Chatbot">
-      <PanelSection grow title="Chat">
-        <div className="ml-4 mr-6 grid min-h-[400px] grid-rows-[1fr_auto] gap-4">
-          <ChatThreadBlock
-            className="border border-slate-100 bg-slate-50"
-            thread={currentChatThreadItem ? [...chatThread, currentChatThreadItem] : chatThread}
-          />
-          <div className="flex grow gap-2 rounded-xl border border-slate-200 p-2 shadow-lg shadow-slate-200">
-            <textarea
-              className="grow resize-none p-2 outline-none"
-              disabled={!!currentChatThreadItem}
-              placeholder="Send a message."
-              rows={3}
-              value={text}
-              onChange={(evt) => setText(evt.currentTarget.value)}
-              onKeyDown={handleKeyDown}
-            />
-            <div className="flex grow-0 items-end">
-              <VscRunAll
-                className="cursor-pointer hover:text-primary-hover"
-                size={20}
-                title="Send"
-                onClick={() => handleChat(text)}
-              />
-            </div>
-          </div>
-        </div>
-      </PanelSection>
+      <div className="flex flex-1 flex-col items-center justify-end self-stretch overflow-y-hidden pt-2">
+        <ChatThreadBlock thread={currentChatThreadItem ? [...chatThread, currentChatThreadItem] : chatThread} />
+      </div>
+      <div className="flex flex-col items-start justify-end self-stretch p-4">
+        <MessageBox
+          disabled={!!currentChatThreadItem}
+          value={text}
+          onChange={setText}
+          onChat={handleChat}
+          onKeyDown={handleKeyDown}
+        />
+      </div>
     </PanelWrapper>
   );
 }
 
-function ChatThreadBlock({ thread, className = '' }: { className?: string; thread: ChatThread }) {
-  if (thread.length === 0) {
-    return (
-      <div className={cx(className, 'p-4 text-sm text-slate-500')}>
-        <em>Your chat history will be shown here.</em>
-      </div>
-    );
-  }
+function ChatThreadBlock({ thread }: { thread: ChatThread }) {
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Despite what typescript says, scrollIntoView is undefined when running unit tests
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    messagesEndRef.current?.scrollIntoView?.();
+  }, [thread]);
+
   return (
-    <div className={className}>
+    <div className="w-full overflow-y-auto">
       {thread.map((chat) => (
         <div key={chat.id}>
           <ChatThreadItemBlock actor="user" text={chat.question} />
           <ChatThreadItemBlock actor="ai" text={chat.answer} />
         </div>
       ))}
+      <div ref={messagesEndRef} />
     </div>
   );
 }
@@ -117,17 +103,56 @@ function ChatThreadBlock({ thread, className = '' }: { className?: string; threa
 function ChatThreadItemBlock({ text, actor }: { text?: string; actor: 'user' | 'ai' }) {
   return (
     <div
-      className={cx('grid grid-cols-[auto_1fr] items-center gap-2 p-2 pb-4', {
-        'bg-gray-200': actor === 'ai',
+      className={cx('g-2 flex items-center self-stretch p-4', {
+        'bg-side-bar-bg-secondary': actor === 'ai',
       })}
     >
-      <div className="flex shrink-0 items-start self-start">
-        {actor === 'user' && <VscMegaphone size="24" />}
-        {actor === 'ai' && <VscWand size="24" />}
-      </div>
-      <div>
-        <div>{text ?? '...'}</div>
-      </div>
+      {text ?? '...'}
+    </div>
+  );
+}
+
+interface MessageBoxProps {
+  disabled: boolean;
+  value: string;
+  onChange: (newValue: string) => void;
+  onChat: (question: string) => void;
+  onKeyDown: (evt: React.KeyboardEvent<HTMLTextAreaElement>) => void;
+}
+function MessageBox({ disabled, value, onChange, onChat, onKeyDown }: MessageBoxProps) {
+  return (
+    <div
+      className={cx(
+        'g-2 flex items-end justify-end self-stretch p-2',
+        'rounded-default border border-solid border-input-border',
+      )}
+    >
+      <textarea
+        className={cx(
+          'g-2 flex flex-1 resize-none items-end justify-end p-2 outline-none',
+          'text-input-txt-primary placeholder:text-input-txt-placeholder',
+          { 'text-input-txt-disabled placeholder:text-input-txt-disabled': disabled },
+        )}
+        disabled={disabled}
+        placeholder="Ask questions about your references to start chatting..."
+        rows={3}
+        value={value}
+        onChange={(evt) => onChange(evt.currentTarget.value)}
+        onKeyDown={onKeyDown}
+      />
+      <button
+        aria-disabled={disabled}
+        className={cx(
+          'flex h-8 w-8 items-center justify-center rounded-default',
+          'bg-btn-bg-primary-default text-btn-ico-primary-default',
+          { 'bg-btn-bg-primary-disabled text-btn-ico-primary-disabled': disabled },
+        )}
+        disabled={disabled}
+        title="Send"
+        onClick={() => onChat(value)}
+      >
+        <SendIcon />
+      </button>
     </div>
   );
 }

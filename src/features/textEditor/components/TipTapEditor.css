@@ -1,18 +1,6 @@
-.tiptap-editor menu.menu-bar button {
-  @apply mx-1 my-1 rounded-lg bg-gray-200 px-2 py-1 hover:bg-gray-500 hover:text-white;
-}
-
-.tiptap-editor ul,
-.tiptap-editor ol {
-  @apply ml-7;
-}
-
-.tiptap-editor ul > li {
-  @apply list-disc;
-}
-
-.tiptap-editor ol > li {
-  @apply list-decimal;
+.editor-container {
+  @apply flex h-full w-full flex-col;
+  @apply overflow-hidden rounded-default shadow-default;
 }
 
 .tiptap-editor cite {
@@ -24,7 +12,23 @@
 }
 
 .tiptap-editor {
-  @apply flex-1 overflow-y-scroll pl-1 pr-2 pt-2;
+  @apply flex-1 overflow-y-scroll px-12 py-16;
+  @apply text-lg/6 font-normal;
+  @apply bg-card-bg-primary;
+  @apply flex justify-center;
+}
+
+.tiptap-editor > div {
+  @apply w-full max-w-[45rem];
+}
+
+.tiptap-editor h2 {
+  @apply text-2xl font-semibold;
+}
+
+.tiptap-editor h1 {
+  @apply text-[2rem]/10 font-extrabold;
+  @apply normal-case;
 }
 
 .tiptap-editor *::selection {
@@ -32,5 +36,5 @@
 }
 
 .tiptap-editor span.selected {
-  background-color: #c4dcf6;
+  @apply bg-editor-selection;
 }

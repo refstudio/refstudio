@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import FileResponse
 
-from sidecar import chat, ingest, projects, rewrite, search, storage
+from sidecar import chat, ingest, projects, rewrite, search, storage, settings
 from sidecar.typing import (
     ChatRequest,
     ChatResponse,
@@ -25,6 +25,7 @@ from sidecar.typing import (
     TextCompletionRequest,
     TextCompletionResponse,
     UpdateStatusResponse,
+    SettingsSchema,
 )
 
 load_dotenv()
@@ -32,6 +33,7 @@ load_dotenv()
 sidecar_api = FastAPI()  # Legacy API for existing sidecar cli functionality
 filesystem_api = FastAPI()  # API for interacting with the filesystem
 project_api = FastAPI()  # API for interacting with projects
+settings_api = FastAPI()  # API for interacting with settings
 
 meta_api = FastAPI()
 """API for monitoring and controling the server"""
@@ -239,3 +241,17 @@ async def shutdown():
     for child in parent.children(recursive=True):
         child.kill()
     parent.kill()
+
+
+# Settings API
+# --------------
+@settings_api.get("/")
+async def get_settings() -> SettingsSchema:
+    user_id = "user1"
+    return settings.get_settings_for_user(user_id)
+
+
+@settings_api.put("/")
+async def update_settings(req: SettingsSchema) -> SettingsSchema:
+    user_id = "user1"
+    return settings.update_settings_for_user(user_id, req)

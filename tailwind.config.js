@@ -71,6 +71,7 @@ export default {
         },
         'btn-bg-tool': {
           active: 'rgb(var(--grayscale-20) / <alpha-value>)',
+          disabled: 'rgb(var(--grayscale-00) / <alpha-value>)',
           hover: 'rgb(var(--grayscale-20) / <alpha-value>)',
           default: 'rgb(var(--grayscale-00) / <alpha-value>)',
         },
@@ -88,7 +89,10 @@ export default {
           hover: 'rgb(var(--grayscale-20) / <alpha-value>)',
           default: 'rgb(var(--grayscale-00) / <alpha-value>)',
         },
-        'btn-bg-top-bar-i': { active: 'rgb(var(--grayscale-30) / <alpha-value>)' },
+        'btn-bg-top-bar': {
+          inactive: 'rgb(var(--grayscale-30) / <alpha-value>)',
+          active: 'rgb(var(--grayscale-10) / <alpha-value>)',
+        },
         'btn-ico-side-bar-icon': {
           hover: 'rgb(var(--grayscale-70) / <alpha-value>)',
           default: 'rgb(var(--grayscale-60) / <alpha-value>)',
@@ -99,13 +103,19 @@ export default {
           default: 'rgb(var(--grayscale-00) / <alpha-value>)',
         },
         'status-bar-border': 'rgb(var(--grayscale-70) / <alpha-value>)',
-        'btn-ico-top-bar-i': { active: 'rgb(var(--grayscale-70) / <alpha-value>)' },
-        'btn-txt-top-bar-i': { active: 'rgb(var(--grayscale-70) / <alpha-value>)' },
-        'top-bar-bg': { active: 'rgb(var(--grayscale-10) / <alpha-value>)' },
-        'btn-bg-top-bar': { active: 'rgb(var(--grayscale-10) / <alpha-value>)' },
+        'btn-ico-top-bar': {
+          inactive: 'rgb(var(--grayscale-70) / <alpha-value>)',
+          active: 'rgb(var(--grayscale-80) / <alpha-value>)',
+        },
+        'btn-txt-top-bar': {
+          inactive: 'rgb(var(--grayscale-70) / <alpha-value>)',
+          active: 'rgb(var(--grayscale-80) / <alpha-value>)',
+        },
+        'top-bar-bg': {
+          active: 'rgb(var(--grayscale-10) / <alpha-value>)',
+          inactive: 'rgb(var(--grayscale-30) / <alpha-value>)',
+        },
         'top-bar-border': 'rgb(var(--grayscale-50) / <alpha-value>)',
-        'btn-txt-top-bar': { active: 'rgb(var(--grayscale-80) / <alpha-value>)' },
-        'btn-ico-top-bar': { active: 'rgb(var(--grayscale-80) / <alpha-value>)' },
         'content-area-bg': {
           primary: 'rgb(var(--grayscale-10) / <alpha-value>)',
           secondary: 'rgb(var(--grayscale-30) / <alpha-value>)',
@@ -127,7 +137,6 @@ export default {
           default: 'rgb(var(--grayscale-00) / <alpha-value>)',
           disabled: 'rgb(var(--grayscale-40) / <alpha-value>)',
         },
-        'top-bar-bg-i': { active: 'rgb(var(--grayscale-30) / <alpha-value>)' },
         'input-bg-action': 'rgb(var(--primary-50) / <alpha-value>)',
         'btn-bg-modal-item': {
           default: 'rgb(var(--grayscale-00) / <alpha-value>)',
@@ -169,6 +178,7 @@ export default {
           secondary: 'rgb(var(--grayscale-00) / <alpha-value>)',
         },
         'shortcuts-border': 'rgb(var(--grayscale-20) / <alpha-value>)',
+        'editor-selection': 'rgb(196 220 246 / <alpha-value>)',
       },
       boxShadow: {
         default: '0px 0px 24px 0px rgba(0, 0, 0, 0.04)',
@@ -180,6 +190,7 @@ export default {
         modals: 99999,
         notifications: 88888,
         'drop-zone': 55555,
+        'resize-handle': 44444,
       },
     },
   },
