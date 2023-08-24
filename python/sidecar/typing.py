@@ -201,6 +201,10 @@ class SearchResponse(RefStudioModel):
     results: list[S2SearchResult]
 
 
+class ServeResponse(RefStudioModel):
+    pass
+
+
 class OpenAISettings(RefStudioModel):
     api_key: str = ""
     chat_model: str = "gpt-3.5-turbo"
@@ -249,7 +253,8 @@ class CliCommands(RefStudioModel):
     """Deletes a Reference"""
     search: tuple[SearchRequest, SearchResponse]
     """Searches for papers on Semantic Scholar"""
-    serve: tuple[None, ReferencePatch]
+    serve: tuple[None, ServeResponse]
+    """Start an HTTP server"""
 
 
 Reference.update_forward_refs()

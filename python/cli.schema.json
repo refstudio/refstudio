@@ -128,7 +128,7 @@
           "type": "null"
         },
         {
-          "$ref": "#/definitions/ReferencePatch"
+          "$ref": "#/definitions/ServeResponse"
         }
       ]
     }
@@ -685,6 +685,11 @@
         "message",
         "results"
       ]
+    },
+    "ServeResponse": {
+      "title": "ServeResponse",
+      "type": "object",
+      "properties": {}
     }
   }
 }

@@ -68,7 +68,7 @@ export interface CliCommands {
    * @minItems 2
    * @maxItems 2
    */
-  serve: [null, ReferencePatch];
+  serve: [null, ServeResponse];
 }
 export interface IngestRequest {
   pdf_directory: string;
@@ -199,3 +199,4 @@ export interface S2SearchResult {
   openAccessPdf?: string;
   authors?: string[];
 }
+export interface ServeResponse {}
