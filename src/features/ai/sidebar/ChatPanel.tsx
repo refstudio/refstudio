@@ -62,7 +62,7 @@ export function ChatbotPanel() {
 
   return (
     <PanelWrapper title="Chatbot">
-      <div className="flex flex-1 flex-col items-center justify-end w-full overflow-y-hidden pt-2">
+      <div className="flex w-full flex-1 flex-col items-center justify-end overflow-y-hidden pt-2">
         <ChatThreadBlock thread={currentChatThreadItem ? [...chatThread, currentChatThreadItem] : chatThread} />
       </div>
       <div className="flex flex-col items-start justify-end self-stretch p-4">
@@ -88,9 +88,9 @@ function ChatThreadBlock({ thread }: { thread: ChatThread }) {
   }, [thread]);
 
   return (
-    <div className="flex flex-1 self-strech flex-col items-center justify-end overflow-y-auto">
+    <div className="self-strech flex flex-1 flex-col items-center justify-end overflow-y-auto">
       {thread.map((chat) => (
-        <div className='self-stretch' key={chat.id}>
+        <div className="self-stretch" key={chat.id}>
           <ChatThreadItemBlock actor="user" text={chat.question} />
           <ChatThreadItemBlock actor="ai" text={chat.answer} />
         </div>
