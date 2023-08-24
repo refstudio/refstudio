@@ -70,7 +70,7 @@ async def http_search(req: SearchRequest) -> SearchResponse:
 
 # AI API
 # --------------
-@sidecar_api.post("/{project_id}/chat")
+@ai_api.post("/{project_id}/chat")
 async def http_ai_chat(project_id: str, req: ChatRequest) -> ChatResponse:
     response = chat.ask_question(req, project_id=project_id)
     return response
@@ -79,13 +79,14 @@ async def http_ai_chat(project_id: str, req: ChatRequest) -> ChatResponse:
 # References API
 # --------------
 @references_api.get("/{project_id}")
-async def list_references(project_id: str) -> IngestResponse:
+async def list_references(project_id: str) -> list[Reference]:
     """
     Returns a list of references for the current user
     """
     user_id = "user1"
     project_path = projects.get_project_path(user_id, project_id)
     store = storage.JsonStorage(project_path / ".storage" / "references.json")
+    store.load()
     return store.references
 
 

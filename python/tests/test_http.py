@@ -40,6 +40,29 @@ def setup_uploaded_reference_pdfs(monkeypatch, tmp_path):
         )
 
 
+def test_list_references(monkeypatch, tmp_path):
+    user_id = "user1"
+    project_id = "project1"
+
+    monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
+    project_path = projects.create_project(user_id, project_id, project_name="foo")
+    mocked_path = project_path / ".storage" / "references.json"
+
+    # copy references.json to mocked storage path
+    test_file = "fixtures/data/references.json"
+    path_to_test_file = Path(__file__).parent.joinpath(test_file)
+
+    _copy_fixture_to_temp_dir(path_to_test_file, mocked_path)
+
+    jstore = JsonStorage(filepath=mocked_path)
+    jstore.load()
+
+    response = references_client.get(f"/{project_id}")
+    assert response.status_code == 200
+    assert len(response.json()) == len(jstore.references)
+    assert len(response.json()) != 0
+
+
 def test_get_reference(monkeypatch, tmp_path):
     user_id = "user1"
     project_id = "project1"
