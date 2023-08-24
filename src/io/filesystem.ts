@@ -9,6 +9,16 @@ import { serializeReferences } from '../features/textEditor/components/tipTapNod
 import { notifyError } from '../notifications/notifications';
 import { ReferenceItem } from '../types/ReferenceItem';
 import {
+  deleteFileFromWeb,
+  isRunningOnWeb,
+  readBinaryFileFromWeb,
+  readProjectFilesFromWeb,
+  readTextFileFromWeb,
+  renameFileFromWeb,
+  writeBinaryFileFromWeb,
+  writeTextFileFromWeb,
+} from '../web';
+import {
   appConfigDir,
   createDir,
   desktopDir,
@@ -127,18 +137,27 @@ export function isInUploadsDir(relativePath: string) {
 }
 
 export async function uploadFiles(systemFiles: File[]) {
-  // Ensure uploads dir
-  const systemUploadsDir = await getSystemPath(getUploadsDir());
-  if (!(await exists(systemUploadsDir))) {
-    await createDir(systemUploadsDir);
-  }
+  if (isRunningOnWeb()) {
+    for (const file of systemFiles) {
+      const relativePath = makeUploadPath(file.name);
+      const bytes = await file.arrayBuffer();
+      await writeBinaryFileFromWeb(currentProjectId, relativePath, bytes);
+    }
+    return Array.from(systemFiles).map((file) => file.name);
+  } else {
+    // Ensure uploads dir
+    const systemUploadsDir = await getSystemPath(getUploadsDir());
+    if (!(await exists(systemUploadsDir))) {
+      await createDir(systemUploadsDir);
+    }
 
-  for (const file of systemFiles) {
-    const bytes = await file.arrayBuffer();
-    const systemUploadFilePath = await getSystemPath(makeUploadPath(file.name));
-    await writeBinaryFile(systemUploadFilePath, bytes);
+    for (const file of systemFiles) {
+      const bytes = await file.arrayBuffer();
+      const systemUploadFilePath = await getSystemPath(makeUploadPath(file.name));
+      await writeBinaryFile(systemUploadFilePath, bytes);
+    }
+    return Array.from(systemFiles).map((file) => file.name);
   }
-  return Array.from(systemFiles).map((file) => file.name);
 }
 
 // #####################################################################################
@@ -194,6 +213,11 @@ export async function sampleProject(projectPath: string) {
   }
 }
 
+let currentProjectId = '';
+export function setCurrentProjectId(projectId: string) {
+  currentProjectId = projectId;
+}
+
 export async function createSampleFiles(overrideFiles = false) {
   try {
     await ensureFile('file 1.refstudio', INITIAL_CONTENT, overrideFiles);
@@ -213,10 +237,16 @@ async function ensureFile(fileName: string, content: string, overrideFiles = fal
 }
 
 export async function readAllProjectFiles() {
-  const systemBaseDir = await getSystemPath('');
-  console.log('reading file structure from ', systemBaseDir);
-  const entries = await readDir(systemBaseDir, { recursive: true });
-  return Promise.all(entries.map(convertTauriFileEntryToFileEntry));
+  if (isRunningOnWeb()) {
+    console.log('reading file structure from web');
+    const entries = await readProjectFilesFromWeb(currentProjectId);
+    return Promise.all(entries.map(convertTauriFileEntryToFileEntry));
+  } else {
+    const systemBaseDir = await getSystemPath('');
+    console.log('reading file structure from ', systemBaseDir);
+    const entries = await readDir(systemBaseDir, { recursive: true });
+    return Promise.all(entries.map(convertTauriFileEntryToFileEntry));
+  }
 }
 
 async function convertTauriFileEntryToFileEntry(entry: TauriFileEntry): Promise<FileEntry> {
@@ -270,9 +300,14 @@ export function getParentFolder(filePath: string) {
 // #####################################################################################
 export async function writeFileContent(relativePath: string, textContent: string) {
   try {
-    const systemPath = await getSystemPath(relativePath);
-    await writeTextFile(systemPath, textContent);
-    return true;
+    if (isRunningOnWeb()) {
+      await writeTextFileFromWeb(currentProjectId, relativePath, textContent);
+      return true;
+    } else {
+      const systemPath = await getSystemPath(relativePath);
+      await writeTextFile(systemPath, textContent);
+      return true;
+    }
   } catch (err) {
     console.error('Error', err);
     return false;
@@ -283,16 +318,23 @@ export async function readFileContent(file: FileFileEntry): Promise<EditorConten
   const systemPath = await getSystemPath(file.path);
   switch (file.fileExtension) {
     case 'json': {
-      const textContent = await readTextFile(systemPath);
+      const textContent = isRunningOnWeb()
+        ? await readTextFileFromWeb(currentProjectId, file.path)
+        : await readTextFile(systemPath);
       return { type: 'json', textContent };
     }
     case 'pdf': {
-      const binaryContent = await readBinaryFile(systemPath);
+      const binaryContent = isRunningOnWeb()
+        ? await readBinaryFileFromWeb(currentProjectId, file.path)
+        : await readBinaryFile(systemPath);
       return { type: 'pdf', binaryContent };
     }
     case 'refstudio':
     case '': {
-      const textContent = await readTextFile(systemPath);
+      const textContent = isRunningOnWeb()
+        ? await readTextFileFromWeb(currentProjectId, file.path)
+        : await readTextFile(systemPath);
+
       try {
         const jsonContent = JSON.parse(textContent) as JSONContent;
         return { type: 'refstudio', jsonContent };
@@ -302,17 +344,25 @@ export async function readFileContent(file: FileFileEntry): Promise<EditorConten
       }
     }
     default: {
-      const textContent = await readTextFile(systemPath);
+      const textContent = isRunningOnWeb()
+        ? await readTextFileFromWeb(currentProjectId, file.path)
+        : await readTextFile(systemPath);
+
       return { type: 'text', textContent };
     }
   }
 }
 
 export async function deleteFile(relativePath: string): Promise<boolean> {
-  const systemPath = await getSystemPath(relativePath);
   try {
-    await removeFile(systemPath);
-    return true;
+    if (isRunningOnWeb()) {
+      await deleteFileFromWeb(currentProjectId, relativePath);
+      return true;
+    } else {
+      const systemPath = await getSystemPath(relativePath);
+      await removeFile(systemPath);
+      return true;
+    }
   } catch (err) {
     console.error('Error', err);
     return false;
@@ -320,16 +370,22 @@ export async function deleteFile(relativePath: string): Promise<boolean> {
 }
 
 export async function renameFile(relativePath: string, newName: string): RenameFileResult {
-  const systemPath = await getSystemPath(relativePath);
-  const newSystemPath = await join(getParentFolder(systemPath), newName);
   try {
-    if (await exists(newSystemPath)) {
-      console.warn(`Another file with the same name already exists: ${newSystemPath}`);
-      return { success: false };
+    if (isRunningOnWeb()) {
+      const newRelativePath = getRefStudioPath(newName);
+      await renameFileFromWeb(currentProjectId, relativePath, newRelativePath);
+      return { success: true, newPath: newRelativePath };
+    } else {
+      const systemPath = await getSystemPath(relativePath);
+      const newSystemPath = await join(getParentFolder(systemPath), newName);
+      if (await exists(newSystemPath)) {
+        console.warn(`Another file with the same name already exists: ${newSystemPath}`);
+        return { success: false };
+      }
+      await tauriRenameFile(systemPath, newSystemPath);
+      const newRelativePath = getRefStudioPath(newSystemPath);
+      return { success: true, newPath: newRelativePath };
     }
-    await tauriRenameFile(systemPath, newSystemPath);
-    const newRelativePath = getRefStudioPath(newSystemPath);
-    return { success: true, newPath: newRelativePath };
   } catch (err) {
     console.error('Error', err);
     return { success: false };
