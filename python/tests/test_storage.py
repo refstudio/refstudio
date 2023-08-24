@@ -1,5 +1,4 @@
 from pathlib import Path
-from uuid import uuid4
 
 from sidecar import storage, typing
 from sidecar.typing import Author, Chunk, Reference

@@ -30,7 +30,7 @@ def setup_project_with_uploads(monkeypatch, tmp_path):
 
     # create a file
     filename = "uploads/test.pdf"
-    filepath = project_path / filename
+    project_path / filename
 
     with open(f"{FIXTURES_DIR}/pdf/test.pdf", "rb") as f:
         _ = client.put(
