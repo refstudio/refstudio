@@ -15,7 +15,6 @@ from sidecar.typing import (
     DeleteRequest,
     DeleteStatusResponse,
     IngestRequest,
-    IngestResponse,
     Reference,
     ReferencePatch,
     RewriteRequest,
