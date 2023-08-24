@@ -11,16 +11,19 @@
     --color-secondary-hover: 193deg 37% 48%;
     --color-muted: 218deg 11% 65%;
     --color-error: 0deg 84% 60%;
-    --grayscale-0: 0deg 0% 100%;
-    --grayscale-10: 220deg 33% 98%;
-    --grayscale-20: 216deg 19% 95%;
-    --grayscale-30: 217deg 15% 90%;
-    --grayscale-60: 0deg 0% 53%;
-    --grayscale-70: 213deg 6% 35%;
-    --grayscale-90: 90deg 2% 21%;
-    --grayscale-100: 0deg 0% 12%;
-    --primary-60: 213deg 44% 25%;
-    --primary-70: 213deg 45% 21%;
+    --grayscale-00: 255 255 255;
+    --grayscale-10: 249 250 252;
+    --grayscale-20: 239 241 244;
+    --grayscale-30: 226 230 238;
+    --grayscale-40: 219 223 231;
+    --grayscale-50: 209 215 225;
+    --grayscale-60: 136 136 136;
+    --grayscale-70: 84 89 95;
+    --grayscale-80: 53 54 52;
+    --grayscale-90: 30 30 30;
+    --primary-10: 220 234 250;
+    --primary-50: 36 62 93;
+    --primary-90: 29 51 77;
   }
 }
 
@@ -40,21 +43,13 @@
   }
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  @apply font-bold;
-}
-
 h1 {
-  @apply text-3xl;
+  @apply text-sm/6 font-bold;
+  @apply uppercase;
 }
 
 h2 {
-  @apply text-2xl;
+  @apply font-semibold;
 }
 
 h3 {
@@ -73,6 +68,7 @@ body {
   /* This overflow setting prevents the app to display that extra content on scroll (like pull to refresh) */
   @apply h-full w-full overflow-hidden;
   font-family: 'Roboto', sans-serif;
+  @apply text-base font-normal;
 }
 
 /* Make root full-height */

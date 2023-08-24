@@ -1,47 +1,24 @@
 .toolbar {
-  @apply flex items-stretch p-1;
-  @apply bg-slate-100;
-  @apply rounded-none;
+  @apply flex items-center gap-1 self-stretch p-1;
+  @apply border-b border-b-card-border-primary bg-card-bg-primary;
   @apply overflow-x-scroll;
 }
 
-.toolbar button.toolbar-item {
-  @apply !bg-transparent;
-  @apply flex items-center;
-  @apply mx-0.5 cursor-pointer rounded-lg border-0 p-2;
+.toolbar .toolbar-item {
+  @apply flex items-center justify-center;
+  @apply h-8 w-8;
+  @apply rounded-default;
+  @apply bg-btn-bg-tool-default text-btn-ico-tool-default;
 }
 
-.toolbar button.toolbar-item:disabled {
-  @apply cursor-not-allowed;
+.toolbar .toolbar-item:hover {
+  @apply bg-btn-bg-tool-hover text-btn-ico-tool-hover;
 }
 
-.toolbar button.toolbar-item.spaced {
-  @apply mr-1;
+.toolbar .toolbar-item.active {
+  @apply bg-btn-bg-tool-active text-btn-ico-tool-active;
 }
 
-.toolbar button.toolbar-item i.format {
-  @apply flex;
-  @apply bg-contain opacity-60;
-  @apply h-[18px] w-[18px];
-}
-
-.toolbar button.toolbar-item:disabled i.format {
-  @apply opacity-20;
-}
-
-.toolbar button.toolbar-item.active {
-  @apply !bg-slate-200;
-}
-
-.toolbar button.toolbar-item.active i {
-  @apply opacity-100;
-}
-
-.toolbar .toolbar-item:hover:not([disabled]) {
-  @apply !bg-slate-300;
-}
-
-.toolbar .divider {
-  @apply mx-1 my-1;
-  @apply w-[1px] bg-slate-300;
+.toolbar .toolbar-item:disabled {
+  @apply bg-btn-bg-tool-disabled text-btn-ico-tool-disabled;
 }

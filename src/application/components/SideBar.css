@@ -4,11 +4,13 @@
 
 .side-bar .icon {
   @apply flex h-10 w-10 content-center justify-center gap-2 rounded;
-  @apply text-red-300;
-  @apply bg-grayscale-0 text-grayscale-60;
+  @apply bg-btn-bg-side-bar-tool-default text-btn-ico-side-bar-tool-default;
 }
 
-.side-bar .icon:hover,
 .side-bar .icon.active {
-  @apply bg-grayscale-20 text-grayscale-70;
+  @apply bg-btn-bg-side-bar-tool-active text-btn-ico-side-bar-tool-active;
+}
+
+.side-bar .icon:hover {
+  @apply bg-btn-bg-side-bar-tool-hover text-btn-ico-side-bar-tool-hover;
 }

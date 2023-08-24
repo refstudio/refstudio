@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { MdKeyboard, MdSettings } from 'react-icons/md';
 import { ImperativePanelHandle, Panel } from 'react-resizable-panels';
-import { useEventListener } from 'usehooks-ts';
 
 import { VerticalResizeHandle } from '../../components/VerticalResizeHandle';
 import { emitEvent } from '../../events';
 import { ReferencesPanel } from '../../features/references/sidebar/ReferencesPanel';
+import { useRefStudioHotkeys } from '../../hooks/useRefStudioHotkeys';
 import { cx } from '../../lib/cx';
 import { noop } from '../../lib/noop';
 import { SideBar } from '../components/SideBar';
@@ -30,16 +30,8 @@ export function LeftSidePanelWrapper() {
   };
 
   // Configure keyboard shortcuts to open/close side panel
-  useEventListener('keydown', (e) => {
-    if (e.metaKey) {
-      switch (e.key.toLowerCase()) {
-        case '1':
-          return handleSideBarClick('Explorer');
-        case '2':
-          return handleSideBarClick('References');
-      }
-    }
-  });
+  useRefStudioHotkeys(['meta+1'], () => handleSideBarClick('Explorer'));
+  useRefStudioHotkeys(['meta+2'], () => handleSideBarClick('References'));
 
   React.useEffect(() => {
     if (primaryPaneCollapsed) {
@@ -55,7 +47,7 @@ export function LeftSidePanelWrapper() {
     <>
       <SideBar
         activePane={primaryPaneCollapsed ? null : primaryPane}
-        className={cx({ 'border-r-[1px] border-r-grayscale-20': !primaryPaneCollapsed })}
+        className={cx({ 'border-r border-r-side-bar-border': !primaryPaneCollapsed })}
         footerItems={[
           // TODO: Implement Keybinds screen
           {
@@ -79,7 +71,7 @@ export function LeftSidePanelWrapper() {
         {primaryPane === 'Explorer' && <ExplorerPanel />}
         {primaryPane === 'References' && <ReferencesPanel />}
       </Panel>
-      <VerticalResizeHandle />
+      <VerticalResizeHandle transparent />
     </>
   );
 }

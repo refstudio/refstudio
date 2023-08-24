@@ -96,7 +96,7 @@ export function TipTapEditor({ editorContent, editorId, isActive, saveFileInMemo
   }
 
   return (
-    <div className="flex h-full w-full flex-col" onClick={focusEditorOnClick}>
+    <div className="editor-container" onClick={focusEditorOnClick}>
       <MenuBar editor={editor} />
       <EditorContent className="tiptap-editor" editor={editor} />
     </div>

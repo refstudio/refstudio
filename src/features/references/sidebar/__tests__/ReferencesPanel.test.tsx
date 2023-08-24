@@ -27,7 +27,7 @@ describe('ReferencesPanel', () => {
 
   it('should display welcome message with empty references', () => {
     setupWithJotaiProvider(<ReferencesPanel />);
-    expect(screen.getByText('REFERENCES')).toBeInTheDocument();
+    expect(screen.getByText('References')).toBeInTheDocument();
     expect(screen.getByText(/welcome to your refstudio references library/i)).toBeInTheDocument();
   });
 

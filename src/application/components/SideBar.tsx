@@ -26,16 +26,13 @@ export function SideBar<SideBarPane extends string>({
         ))}
       </div>
       {footerItems?.length && (
-        <>
-          <div className="h-[1px] w-full bg-grayscale-20" />
-          <div className="flex flex-col gap-2 p-2">
-            {footerItems.map(({ label, Icon, onClick }) => (
-              <IconButton key={label} onClick={onClick}>
-                {Icon}
-              </IconButton>
-            ))}
-          </div>
-        </>
+        <div className="flex flex-col gap-2 border-t border-t-side-bar-border p-2">
+          {footerItems.map(({ label, Icon, onClick }) => (
+            <IconButton key={label} onClick={onClick}>
+              {Icon}
+            </IconButton>
+          ))}
+        </div>
       )}
     </div>
   );
