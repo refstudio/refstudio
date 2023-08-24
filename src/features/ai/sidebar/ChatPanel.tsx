@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { VscMegaphone, VscRunAll, VscWand } from 'react-icons/vsc';
+import { useEffect, useRef, useState } from 'react';
 
 import { chatWithAI } from '../../../api/chat';
 import { PanelWrapper } from '../../../components/PanelWrapper';
@@ -80,24 +79,12 @@ export function ChatbotPanel() {
 }
 
 function ChatThreadBlock({ thread }: { thread: ChatThread }) {
-function ChatThreadBlock({ thread, className = '' }: { className?: string; thread: ChatThread }) {
-  if (thread.length === 0) {
-    return (
-      <div className={cx(className, 'p-4 text-sm text-slate-500')}>
-        <em>Your chat history will be shown here.</em>
-      </div>
-    );
-  }
-  return (
-    <div className={className}>
-      {thread.map((chat) => (
-        <div key={chat.id}>
-          <ChatThreadItemBlock actor="user" text={chat.question} />
-          <ChatThreadItemBlock actor="ai" text={chat.answer} />
-        </div>
-      ))}
-    </div>
-  );
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView();
+  }, [thread]);
+
   return <div className='overflow-y-auto'>
     {thread.map((chat) => (
       <div key={chat.id}>
@@ -105,6 +92,7 @@ function ChatThreadBlock({ thread, className = '' }: { className?: string; threa
         <ChatThreadItemBlock actor="ai" text={chat.answer} />
       </div>
     ))}
+    <div ref={messagesEndRef} />
   </div>;
 }
 
