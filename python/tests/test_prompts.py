@@ -4,14 +4,18 @@ from sidecar.typing import Chunk, RewriteMannerType, TextCompletionRequest
 
 def test_create_prompt_for_rewrite():
     manner = RewriteMannerType.CONCISE
-    expected = ("Please rewrite the following text in a more concise manner. Do not make up facts.\n"
-                "TEXT: This is a test")
+    expected = (
+        "Please rewrite the following text in a more concise manner. Do not make up facts.\n"
+        "TEXT: This is a test"
+    )
     prompt = prompts.create_prompt_for_rewrite("This is a test", manner)
     assert prompt == expected
 
     manner = RewriteMannerType.ELABORATE
-    expected = ("Please rewrite the following text in a more elaborate manner. Do not make up facts.\n"
-                "TEXT: This is a test")
+    expected = (
+        "Please rewrite the following text in a more elaborate manner. Do not make up facts.\n"
+        "TEXT: This is a test"
+    )
     prompt = prompts.create_prompt_for_rewrite("This is a test", manner)
     assert prompt == expected
 
@@ -36,7 +40,7 @@ def test_create_prompt_for_text_completion():
         "I am a researcher at a university. "
         "You are my research assistant. "
         "I am writing a document. \n"
-        "TITLE: \"test\" \n"
+        'TITLE: "test" \n'
         "Please help me complete the portion of text input below. "
         "Use complete sentences and proper grammer. \n"
         "INPUT: This is a test [MASK]"
@@ -45,12 +49,14 @@ def test_create_prompt_for_text_completion():
     assert result == expected
 
     # test 3: with abstract
-    test_request = TextCompletionRequest(text="This is a test", abstract="A paper about tests")
+    test_request = TextCompletionRequest(
+        text="This is a test", abstract="A paper about tests"
+    )
     expected = (
         "I am a researcher at a university. "
         "You are my research assistant. "
         "I am writing a document. \n"
-        "ABSTRACT: \"A paper about tests\" \n"
+        'ABSTRACT: "A paper about tests" \n'
         "Please help me complete the portion of text input below. "
         "Use complete sentences and proper grammer. \n"
         "INPUT: This is a test [MASK]"
@@ -63,11 +69,11 @@ def test_prepare_chunks_for_prompt():
     chunks = [
         Chunk(
             text="This is a test",
-            metadata={"source_filename": "test.pdf", "page_num": 1}
+            metadata={"source_filename": "test.pdf", "page_num": 1},
         ),
         Chunk(
             text="This is another test",
-            metadata={"source_filename": "test.pdf", "page_num": 2}
+            metadata={"source_filename": "test.pdf", "page_num": 2},
         ),
     ]
     expected = (

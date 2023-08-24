@@ -48,16 +48,14 @@ def test_json_storage_update(monkeypatch, tmp_path):
     # test: update for `source_filename` that does not exist
     # expect: no References are changed and json response in stdout = ERROR
 
-    patch = typing.ReferencePatch(
-        data={'citation_key': 'should-not-change'}
-    )
+    patch = typing.ReferencePatch(data={"citation_key": "should-not-change"})
 
     response = jstore.update("id-does-not-exist", patch)
 
     output = response.dict()
 
-    assert output['status'] == 'error'
-    assert output['message'] != ""
+    assert output["status"] == "error"
+    assert output["message"] != ""
 
     # -------------
 
@@ -74,15 +72,13 @@ def test_json_storage_update(monkeypatch, tmp_path):
     # create the ReferenceUpdate object for input
     ref = jstore.references[0]
 
-    patch = typing.ReferencePatch(
-        data={'citation_key': 'reda2023'}
-    )
+    patch = typing.ReferencePatch(data={"citation_key": "reda2023"})
 
     response = jstore.update(ref.id, patch)
     output = response.dict()
 
-    assert output['status'] == 'ok'
-    assert output['message'] == ""
+    assert output["status"] == "ok"
+    assert output["message"] == ""
 
     # reload from `savepath` to check that the update was successful
     jstore = storage.JsonStorage(filepath=savepath)
@@ -90,7 +86,7 @@ def test_json_storage_update(monkeypatch, tmp_path):
 
     # check that the citation key has been updated
     assert jstore.references[0].citation_key == "reda2023"
-    
+
     # check that the other reference data has not been updated
     assert len(jstore.references) == 2
     assert jstore.references[0].source_filename == "some_file.pdf"
@@ -121,8 +117,8 @@ def test_storage_delete_references(monkeypatch, tmp_path):
     response = jstore.delete(all_=True)
     output = response.dict()
 
-    assert output['status'] == 'ok'
-    assert output['message'] == ""
+    assert output["status"] == "ok"
+    assert output["message"] == ""
 
     # reload from `savepath` to check that the delete was successful
     jstore = storage.JsonStorage(filepath=savepath)
@@ -145,15 +141,15 @@ def test_storage_delete_references(monkeypatch, tmp_path):
     response = jstore.delete(reference_ids=to_be_deleted)
     output = response.dict()
 
-    assert output['status'] == 'ok'
-    assert output['message'] == ""
+    assert output["status"] == "ok"
+    assert output["message"] == ""
 
     # reload from `savepath` to check that the delete was successful
     jstore = storage.JsonStorage(filepath=savepath)
     jstore.load()
 
     ids_from_storage = [ref.id for ref in jstore.references]
-    assert to_be_deleted[0] not in ids_from_storage 
+    assert to_be_deleted[0] not in ids_from_storage
 
     # -------------
 
@@ -164,5 +160,5 @@ def test_storage_delete_references(monkeypatch, tmp_path):
     response = jstore.delete(to_be_deleted)
     output = response.dict()
 
-    assert output['status'] == 'error'
-    assert output['message'] != ""
+    assert output["status"] == "error"
+    assert output["message"] != ""

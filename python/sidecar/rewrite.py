@@ -4,9 +4,13 @@ import openai
 from dotenv import load_dotenv
 from sidecar import prompts, shared, typing
 from sidecar.settings import logger
-from sidecar.typing import (RewriteChoice, RewriteRequest,
-                            TextCompletionChoice, TextCompletionRequest,
-                            TextSuggestionChoice)
+from sidecar.typing import (
+    RewriteChoice,
+    RewriteRequest,
+    TextCompletionChoice,
+    TextCompletionRequest,
+    TextSuggestionChoice,
+)
 from tenacity import retry, stop_after_attempt, wait_fixed
 
 load_dotenv()
@@ -50,7 +54,9 @@ def rewrite(arg: RewriteRequest):
 
 
 def complete_text(request: TextCompletionRequest):
-    logger.info(f"Calling text completion with the following parameters: {request.dict()}")
+    logger.info(
+        f"Calling text completion with the following parameters: {request.dict()}"
+    )
     prompt = prompts.create_prompt_for_text_completion(request)
     chat = Rewriter(
         prompt,
@@ -70,8 +76,10 @@ def complete_text(request: TextCompletionRequest):
         )
         return response
 
-    logger.info(f"Trimming completion prefix text from completion choices: {choices}") 
-    choices = shared.trim_completion_prefix_from_choices(prefix=request.text, choices=choices)
+    logger.info(f"Trimming completion prefix text from completion choices: {choices}")
+    choices = shared.trim_completion_prefix_from_choices(
+        prefix=request.text, choices=choices
+    )
     logger.info(f"Returning {len(choices)} completion choices to client: {choices}")
 
     response = typing.TextCompletionResponse(
@@ -97,13 +105,14 @@ class Rewriter:
     max_tokens : int, optional, default=512
         The maximum number of tokens to generate from the OpenAI chat API.
     """
+
     def __init__(
-            self,
-            prompt: str,
-            n_choices: int = 1,
-            temperature: float = 0.7,
-            max_tokens: int = 512
-        ):
+        self,
+        prompt: str,
+        n_choices: int = 1,
+        temperature: float = 0.7,
+        max_tokens: int = 512,
+    ):
         self.prompt = prompt
         self.n_choices = int(n_choices)
         self.temperature = temperature
@@ -112,22 +121,26 @@ class Rewriter:
     def get_response(self, response_type: TextSuggestionChoice):
         messages = self.prepare_messages_for_chat(self.prompt)
         response = self.call_model(messages)
-        response = self.prepare_choices_for_client(response, response_type=response_type)
+        response = self.prepare_choices_for_client(
+            response, response_type=response_type
+        )
         return response
 
     def prepare_choices_for_client(
-            self,
-            response: dict,
-            response_type: TextSuggestionChoice
-        ) -> list[TextSuggestionChoice]:
+        self, response: dict, response_type: TextSuggestionChoice
+    ) -> list[TextSuggestionChoice]:
         return [
-            response_type(index=choice['index'], text=choice["message"]["content"].strip())
-            for choice in response['choices']
+            response_type(
+                index=choice["index"], text=choice["message"]["content"].strip()
+            )
+            for choice in response["choices"]
         ]
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(1))
     def call_model(self, messages: list):
-        logger.info(f"Calling OpenAI chat API with the following input message(s): {messages}")
+        logger.info(
+            f"Calling OpenAI chat API with the following input message(s): {messages}"
+        )
         response = openai.ChatCompletion.create(
             model=os.environ["OPENAI_CHAT_MODEL"],
             messages=messages,

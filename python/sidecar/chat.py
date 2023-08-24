@@ -2,13 +2,12 @@ import os
 
 import openai
 from dotenv import load_dotenv
-from tenacity import retry, stop_after_attempt, wait_fixed
-
-from sidecar import prompts, settings, typing, projects
+from sidecar import projects, prompts, settings, typing
 from sidecar.ranker import BM25Ranker
 from sidecar.settings import logger
 from sidecar.storage import JsonStorage
 from sidecar.typing import ChatRequest, ChatResponse, ChatResponseChoice
+from tenacity import retry, stop_after_attempt, wait_fixed
 
 load_dotenv()
 openai.api_key = os.environ.get("OPENAI_API_KEY")
@@ -27,7 +26,7 @@ def ask_question(request: ChatRequest, project_id: str = None) -> typing.ChatRes
         storage = JsonStorage(filepath=filepath)
     else:
         storage = JsonStorage(filepath=settings.REFERENCES_JSON_PATH)
-    
+
     logger.info(f"Loading documents from storage: {storage.filepath}")
     storage.load()
     logger.info(f"Loaded {len(storage.chunks)} documents from storage")
@@ -72,7 +71,9 @@ class Chat:
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(1))
     def call_model(self, messages: list, n_choices: int = 1, temperature: float = 0.7):
-        logger.info(f"Calling OpenAI chat API with the following input message(s): {messages}")
+        logger.info(
+            f"Calling OpenAI chat API with the following input message(s): {messages}"
+        )
         response = openai.ChatCompletion.create(
             model=os.environ["OPENAI_CHAT_MODEL"],
             messages=messages,
@@ -91,8 +92,8 @@ class Chat:
 
     def prepare_choices_for_client(self, response: dict) -> list[ChatResponseChoice]:
         return [
-            ChatResponseChoice(index=choice['index'], text=choice["message"]["content"])
-            for choice in response['choices']
+            ChatResponseChoice(index=choice["index"], text=choice["message"]["content"])
+            for choice in response["choices"]
         ]
 
     def ask_question(self, n_choices: int = 1, temperature: float = 0.7) -> dict:
@@ -100,8 +101,12 @@ class Chat:
         docs = self.get_relevant_documents()
         logger.info("Creating input prompt for chat API")
         context_str = prompts.prepare_chunks_for_prompt(chunks=docs)
-        prompt = prompts.create_prompt_for_chat(query=self.input_text, context=context_str)
+        prompt = prompts.create_prompt_for_chat(
+            query=self.input_text, context=context_str
+        )
         messages = self.prepare_messages_for_chat(text=prompt)
-        response = self.call_model(messages=messages, n_choices=n_choices, temperature=temperature)
+        response = self.call_model(
+            messages=messages, n_choices=n_choices, temperature=temperature
+        )
         choices = self.prepare_choices_for_client(response=response)
         return choices

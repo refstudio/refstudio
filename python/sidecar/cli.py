@@ -11,15 +11,15 @@ def get_arg_parser():
         action="store_true",
     )
     parser.add_argument(
-        'command',
+        "command",
         # To add a new Sidecar command, add it to the CliCommands class.
         choices=[*inspect.signature(CliCommands).parameters.keys()],
     )
     parser.add_argument(
-        'param_json',
+        "param_json",
         type=str,
-        nargs='?',
-        default='null',
-        help='Command argument as JSON. Expected schema depends on the command.'
+        nargs="?",
+        default="null",
+        help="Command argument as JSON. Expected schema depends on the command.",
     )
     return parser

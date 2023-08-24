@@ -1,4 +1,3 @@
-
 from sidecar import search
 from sidecar.typing import SearchRequest
 

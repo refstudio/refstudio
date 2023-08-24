@@ -2,10 +2,7 @@ from sidecar import typing
 from sidecar.typing import Chunk, TextCompletionRequest
 
 
-def create_prompt_for_rewrite(
-        text: str,
-        manner: typing.RewriteMannerType
-    ) -> str:
+def create_prompt_for_rewrite(text: str, manner: typing.RewriteMannerType) -> str:
     prompt = (
         f"Please rewrite the following text in a more {manner} manner. "
         "Do not make up facts.\n"
@@ -18,9 +15,9 @@ def create_prompt_for_text_completion(request: TextCompletionRequest) -> str:
     prompt = "I am a researcher at a university. You are my research assistant. "
     prompt += "I am writing a document. \n"
     if request.title:
-        prompt += f"TITLE: \"{request.title.strip()}\" \n"
+        prompt += f'TITLE: "{request.title.strip()}" \n'
     if request.abstract:
-        prompt += f"ABSTRACT: \"{request.abstract.strip()}\" \n"
+        prompt += f'ABSTRACT: "{request.abstract.strip()}" \n'
     prompt += "Please help me complete the portion of text input below. "
     # prompt += "Only append to the text input. "
     # prompt += "Do not include the text input at the beginning of your response. "
