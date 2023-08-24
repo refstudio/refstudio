@@ -85,10 +85,10 @@ describe('OpenAiSettingsPane component', () => {
     await user.click(screen.getByRole('button', { name: /save/i }));
     expect(vi.mocked(setCachedSetting).mock.calls.length).toBe(1);
     expect(vi.mocked(setCachedSetting).mock.calls[0]).toStrictEqual([
-      'openAI',
+      'openai',
       {
-        apiKey: `${mockSettings.openai.api_key}-Updated-1`,
-        chatModel: `${mockSettings.openai.chat_model}-Updated-2`,
+        api_key: `${mockSettings.openai.api_key}-Updated-1`,
+        chat_model: `${mockSettings.openai.chat_model}-Updated-2`,
         manner: 'scholarly',
         temperature: 0.9,
       },
