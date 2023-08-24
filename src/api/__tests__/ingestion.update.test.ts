@@ -18,7 +18,7 @@ describe('ingestion.update', () => {
       message: '',
     } as UpdateStatusResponse);
 
-    await updateReference(ref1.filename, {
+    await updateReference(ref1.id, {
       citationKey: ref1.citationKey + 'xx',
       title: ref1.title + ' NEW',
       publishedDate: '2023-07-01',
@@ -26,7 +26,7 @@ describe('ingestion.update', () => {
     });
     expect(callSidecar).toHaveBeenCalledTimes(1);
     expect(callSidecar).toHaveBeenCalledWith<[string, ReferenceUpdate]>('update', {
-      source_filename: ref1.filename,
+      reference_id: ref1.id,
       patch: {
         data: {
           citation_key: 'doe2023xx',
@@ -61,6 +61,6 @@ describe('ingestion.update', () => {
       message: 'what!',
     } as UpdateStatusResponse);
 
-    await expect(updateReference(ref1.filename, { title: ref1.title + ' updated' })).rejects.toThrow();
+    await expect(updateReference(ref1.id, { title: ref1.title + ' updated' })).rejects.toThrow();
   });
 });
