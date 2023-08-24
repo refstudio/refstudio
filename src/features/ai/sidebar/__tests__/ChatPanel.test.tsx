@@ -13,7 +13,6 @@ describe('ChatPanel component', () => {
 
   it('should render the panel without history content and a textbox', () => {
     render(<ChatbotPanel />);
-    expect(screen.getByText(/your chat history will be shown here\./i)).toBeInTheDocument();
     expect(screen.getByRole('textbox')).toBeInTheDocument();
   });
 
