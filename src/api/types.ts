@@ -64,6 +64,11 @@ export interface CliCommands {
    * @maxItems 2
    */
   search: [SearchRequest, SearchResponse];
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  serve: [null, null];
 }
 export interface IngestRequest {
   pdf_directory: string;
@@ -76,6 +81,7 @@ export interface IngestResponse {
  * A reference for an academic paper / PDF
  */
 export interface Reference {
+  id: string;
   source_filename: string;
   status: IngestStatus;
   citation_key?: string;
@@ -154,7 +160,7 @@ export interface ChatResponseChoice {
   text: string;
 }
 export interface ReferenceUpdate {
-  source_filename: string;
+  reference_id: string;
   patch: ReferencePatch;
 }
 /**
@@ -168,7 +174,7 @@ export interface UpdateStatusResponse {
   message: string;
 }
 export interface DeleteRequest {
-  source_filenames: string[];
+  reference_ids: string[];
   all?: boolean;
 }
 export interface DeleteStatusResponse {

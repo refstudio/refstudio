@@ -22,7 +22,11 @@ if __name__ == '__main__':
     else:
         param_obj = args_type.parse_obj(param_json)
 
-    if args.command == "ingest":
+    if args.command == 'serve':
+        from web import serve
+        serve(host="0.0.0.0", port=1487)
+
+    elif args.command == "ingest":
         response = ingest.run_ingest(param_obj)
         sys.stdout.write(response.json())
 

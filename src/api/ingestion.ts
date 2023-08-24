@@ -5,7 +5,8 @@ import { IngestResponse, Reference } from './types';
 
 function parsePdfIngestionResponse(response: IngestResponse): ReferenceItem[] {
   return response.references.map((reference) => ({
-    id: reference.source_filename,
+    id: reference.id,
+    source_filename: reference.source_filename,
     filepath: makeUploadPath(reference.source_filename),
     filename: reference.source_filename,
     citationKey: reference.citation_key ?? 'unknown',
@@ -26,8 +27,8 @@ export async function runPDFIngestion(): Promise<ReferenceItem[]> {
   return parsePdfIngestionResponse(response);
 }
 
-export async function removeReferences(fileNames: string[]) {
-  const response = await callSidecar('delete', { source_filenames: fileNames });
+export async function removeReferences(ids: string[]) {
+  const response = await callSidecar('delete', { reference_ids: ids });
   if (response.status === 'error') {
     throw new Error('Error removing references: ' + response.message);
   }
@@ -41,7 +42,7 @@ function applyPatch(field: keyof ReferenceItem, patch: Partial<ReferenceItem>, g
   return {};
 }
 
-export async function updateReference(filename: string, patch: Partial<ReferenceItem>) {
+export async function updateReference(id: string, patch: Partial<ReferenceItem>) {
   const referencePatch: Partial<Reference> = {
     ...applyPatch('citationKey', patch, () => ({ citation_key: patch.citationKey })),
     ...applyPatch('title', patch, () => ({ title: patch.title })),
@@ -56,7 +57,7 @@ export async function updateReference(filename: string, patch: Partial<Reference
   }
 
   const response = await callSidecar('update', {
-    source_filename: filename,
+    reference_id: id,
     patch: {
       data: referencePatch,
     },

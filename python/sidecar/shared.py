@@ -191,6 +191,7 @@ def chunk_text(text: str, chunk_size: int = 1000, chunk_overlap: int = 200) -> L
 
 def chunk_reference(
         ref: Reference,
+        filepath: Path = None,
         chunk_size: int = 1000,
         chunk_overlap: int = 200
     ) -> List[Chunk]:
@@ -210,7 +211,9 @@ def chunk_reference(
     -------
     List[Chunk]
     """
-    filepath = Path(settings.UPLOADS_DIR).joinpath(ref.source_filename)
+    if not filepath:
+        filepath = Path(settings.UPLOADS_DIR).joinpath(ref.source_filename)
+    
     try:
         reader = pypdf.PdfReader(filepath)
     except FileNotFoundError:

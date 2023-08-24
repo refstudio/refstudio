@@ -3,7 +3,9 @@ import { useSetAtom } from 'jotai';
 import { selectEditorInPaneAtom } from '../../atoms/editorActions';
 import { useActiveEditorIdForPane } from '../../atoms/hooks/useActiveEditorIdForPane';
 import { useOpenEditorsDataForPane } from '../../atoms/hooks/useOpenEditorsDataForPane';
+import { parseEditorId } from '../../atoms/types/EditorData';
 import { PaneId } from '../../atoms/types/PaneGroup';
+import { RefStudioEditorIcon } from '../../components/icons';
 import { TabPane } from '../../components/TabPane';
 import { TabPaneTabContextMenuProps } from '../../components/TabPaneTabContextMenu';
 import { emitEvent } from '../../events';
@@ -18,15 +20,19 @@ export function OpenEditorsTabPane({ paneId }: OpenEditorsTabPaneProps) {
 
   const selectFileInPane = useSetAtom(selectEditorInPaneAtom);
 
-  const items = openEditorsData.map((editorData) => ({
-    text: editorData.title,
-    value: editorData.id,
-    isDirty: editorData.isDirty,
-    ctxProps: {
-      editorId: editorData.id,
-      paneId,
-    } as TabPaneTabContextMenuProps,
-  }));
+  const items = openEditorsData.map((editorData) => {
+    const { type } = parseEditorId(editorData.id);
+    return {
+      text: editorData.title,
+      value: editorData.id,
+      isDirty: editorData.isDirty,
+      Icon: type === 'refstudio' ? <RefStudioEditorIcon /> : undefined,
+      ctxProps: {
+        editorId: editorData.id,
+        paneId,
+      } as TabPaneTabContextMenuProps,
+    };
+  });
 
   return (
     <TabPane

@@ -3,6 +3,7 @@ import shutil
 from pathlib import Path
 from uuid import uuid4
 
+import psutil
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, UploadFile, Request
 from fastapi.responses import FileResponse
@@ -14,9 +15,8 @@ from sidecar.typing import (
     DeleteRequest,
     DeleteStatusResponse,
     IngestRequest,
-    IngestResponse,
-    IngestStatusResponse,
-    ReferenceUpdate,
+    Reference,
+    ReferencePatch,
     RewriteRequest,
     RewriteResponse,
     SearchRequest,
@@ -30,55 +30,19 @@ from sidecar.typing import (
 load_dotenv()
 
 sidecar_api = FastAPI()  # Legacy API for existing sidecar cli functionality
+references_api = FastAPI()  # API for interacting with references
+ai_api = FastAPI()  # API for interacting with AI
 filesystem_api = FastAPI()  # API for interacting with the filesystem
 project_api = FastAPI()  # API for interacting with projects
 settings_api = FastAPI()  # API for interacting with settings
 
-@sidecar_api.middleware("http")
-async def update_envs_from_headers(request: Request, call_next):
-    os.environ["PROJECT_DIR"] = str(request.headers.get("X-PROJECT_DIR"))
-    os.environ["OPENAI_API_KEY"] = str(request.headers.get("X-OPENAI_API_KEY"))
-    os.environ["OPENAI_CHAT_MODEL"] = str(request.headers.get("X-OPENAI_CHAT_MODEL"))
-    os.environ["SIDECAR_ENABLE_LOGGING"] = str(request.headers.get("X-SIDECAR_ENABLE_LOGGING"))
-    os.environ["SIDECAR_LOG_DIR"] = str(request.headers.get("X-SIDECAR_LOG_DIR"))
-    return await call_next(request)
+meta_api = FastAPI()
+"""API for monitoring and controling the server"""
+
+
 
 # Sidecar API
 # -----------
-@sidecar_api.post("/ingest")
-async def http_ingest(project_id: str, request: Request) -> IngestResponse:
-    user_id = "user1"
-    project_path = projects.get_project_path(user_id, project_id)
-    req = IngestRequest(pdf_directory=project_path)
-    response = ingest.run_ingest(req)
-    return response
-
-
-@sidecar_api.get("/ingest_status")
-async def http_get_statuses(request: Request) -> IngestStatusResponse:
-    response = ingest.get_statuses()
-    return response
-
-
-@sidecar_api.post("/ingest_references")
-async def http_get_references(req: IngestRequest, request: Request) -> IngestResponse:
-    req.pdf_directory = os.environ.get("PROJECT_DIR") + "/uploads/"
-    response = ingest.get_references(req)
-    return response
-
-
-@sidecar_api.post("/update")
-async def http_update(req: ReferenceUpdate, request: Request) -> UpdateStatusResponse:
-    response = storage.update_reference(req)
-    return response
-
-
-@sidecar_api.post("/delete")
-async def http_delete(req: DeleteRequest, request: Request) -> DeleteStatusResponse:
-    response = storage.delete_references(req)
-    return response
-
-
 @sidecar_api.post("/rewrite")
 async def http_rewrite(req: RewriteRequest, request: Request) -> RewriteResponse:
     response = rewrite.rewrite(req)
@@ -103,6 +67,81 @@ async def http_search(req: SearchRequest, request: Request) -> SearchResponse:
     return response
 
 
+# AI API
+# --------------
+@ai_api.post("/{project_id}/chat")
+async def http_ai_chat(project_id: str, req: ChatRequest) -> ChatResponse:
+    response = chat.ask_question(req, project_id=project_id)
+    return response
+
+
+# References API
+# --------------
+@references_api.get("/{project_id}")
+async def list_references(project_id: str) -> list[Reference]:
+    """
+    Returns a list of references for the current user
+    """
+    user_id = "user1"
+    project_path = projects.get_project_path(user_id, project_id)
+    store = storage.JsonStorage(project_path / ".storage" / "references.json")
+    store.load()
+    return store.references
+
+
+@references_api.post("/{project_id}")
+async def ingest_references(project_id: str):
+    """
+    Ingests references from PDFs in the project uploads directory
+    """
+    user_id = "user1"
+    project_path = projects.get_project_path(user_id, project_id)
+    uploads_dir = project_path / "uploads"
+    req = IngestRequest(pdf_directory=str(uploads_dir))
+    response = ingest.run_ingest(req)
+    return response
+
+
+@references_api.get("/{project_id}/{reference_id}")
+async def http_get(project_id: str, reference_id: str) -> Reference | None:
+    user_id = "user1"
+    project_path = projects.get_project_path(user_id, project_id)
+    store = storage.JsonStorage(project_path / ".storage" / "references.json")
+    store.load()
+    response = store.get_reference(reference_id)
+    return response
+
+
+@references_api.put("/{project_id}/{reference_id}")
+async def http_update(project_id: str, reference_id: str, req: ReferencePatch) -> UpdateStatusResponse:
+    user_id = "user1"
+    project_path = projects.get_project_path(user_id, project_id)
+    store = storage.JsonStorage(project_path / ".storage" / "references.json")
+    store.load()
+    response = store.update(reference_id, req)
+    return response
+
+
+@references_api.delete("/{project_id}/{reference_id}")
+async def http_delete(project_id: str, reference_id: str) -> DeleteStatusResponse:
+    user_id = "user1"
+    project_path = projects.get_project_path(user_id, project_id)
+    store = storage.JsonStorage(project_path / ".storage" / "references.json")
+    store.load()
+    response = store.delete(reference_ids=[reference_id])
+    return response
+
+
+@references_api.post("/{project_id}/bulk_delete")
+async def http_bulk_delete(project_id: str, req: DeleteRequest) -> DeleteStatusResponse:
+    user_id = "user1"
+    project_path = projects.get_project_path(user_id, project_id)
+    store = storage.JsonStorage(project_path / ".storage" / "references.json")
+    store.load()
+    response = store.delete(reference_ids=req.reference_ids, all_=req.all)
+    return response
+
+
 # Project API
 # --------------
 @project_api.get("/")
@@ -112,25 +151,30 @@ async def list_projects():
     """
     user_id = "user1"
     projects_dict = projects.read_project_path_storage(user_id)
-    return projects_dict 
+    return projects_dict
 
 
 @project_api.post("/")
-async def create_project(project_path: str = None):
+async def create_project(project_name: str, project_path: str = None):
     """
     Creates a project directory in the filesystem
 
     Parameters
     ----------
+    project_name : str
+        The name of the project
     project_path : str
         The path to the project directory. Only necessary for Desktop.
         For web, the project is stored in a private directory on the server.
     """
     user_id = "user1"
     project_id = str(uuid4())
-    project_path = projects.create_project(user_id, project_id, project_path)
+    project_path = projects.create_project(user_id, project_id, project_name, project_path)
     return {
-        project_id: project_path,
+        project_id: {
+            "project_name": project_name,
+            "project_path": project_path,
+        }
     }
 
 
@@ -155,7 +199,14 @@ async def delete_project(project_id: str):
     Deletes a project directory and all files in it
     """
     user_id = "user1"
-    projects.delete_project(user_id, project_id)
+    try:
+        projects.delete_project(user_id, project_id)
+    except KeyError:
+        return {
+            "status": "error",
+            "message": "Project not found",
+            "project_id": project_id,
+        }
     return {
         "status": "success",
         "message": "Project deleted",
@@ -181,7 +232,7 @@ async def create_file(project_id: str, filepath: Path, file: UploadFile = File(.
 
     if not filepath.exists():
         filepath.parent.mkdir(parents=True, exist_ok=True)
-    
+
     try:
         with open(filepath, "wb") as f:
             shutil.copyfileobj(file.file, f)
@@ -229,6 +280,23 @@ async def delete_file(project_id: str, filepath: Path):
         "message": "File deleted",
         "filepath": filepath,
     }
+
+
+@meta_api.get('/status')
+async def status():
+    return {
+        'status': 'ok'
+    }
+
+
+@meta_api.post('/shutdown')
+async def shutdown():
+    # See https://stackoverflow.com/a/74757349/388951
+    parent_pid = os.getpid()
+    parent = psutil.Process(parent_pid)
+    for child in parent.children(recursive=True):
+        child.kill()
+    parent.kill()
 
 
 # Settings API

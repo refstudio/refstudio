@@ -1,10 +1,7 @@
 import React from 'react';
-import { VscClose } from 'react-icons/vsc';
 
 export function PanelWrapper({
   title,
-  closable = false,
-  onCloseClick,
   children,
 }: {
   title: string;
@@ -13,14 +10,11 @@ export function PanelWrapper({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-full flex-col">
-      <div className="flex flex-shrink-0 flex-grow-0 select-none items-center border-b-2 border-t-2 border-slate-300 p-2 text-sm text-black">
-        <div>{title.toUpperCase()}</div>
-        <div className="ml-auto">
-          {closable && <VscClose className="cursor-pointer" title="close" onClick={() => onCloseClick?.()} />}
-        </div>
+    <div className="flex h-full flex-col items-start self-stretch bg-side-bar-bg-primary text-side-bar-txt">
+      <div className="g-2 flex items-start self-stretch p-4">
+        <h1 className="self-stretch">{title}</h1>
       </div>
-      <div className="flex flex-col gap-1 overflow-hidden pt-2">{children}</div>
+      {children}
     </div>
   );
 }

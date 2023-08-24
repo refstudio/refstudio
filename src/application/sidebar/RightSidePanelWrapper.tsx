@@ -40,14 +40,14 @@ export function RightSidePanelWrapper() {
 
   return (
     <>
-      <VerticalResizeHandle />
+      <VerticalResizeHandle transparent />
       <Panel collapsible order={3} ref={rightPanelRef} onCollapse={(collapsed) => setSecondaryPaneCollapsed(collapsed)}>
         {secondaryPane === 'Rewriter' && <RewriterPanel />}
         {secondaryPane === 'Chatbot' && <ChatbotPanel />}
       </Panel>
       <SideBar
         activePane={secondaryPaneCollapsed ? null : secondaryPane}
-        className={cx({ 'border-l-[1px] border-l-side-bar-border': !secondaryPaneCollapsed })}
+        className={cx({ 'border-l border-l-side-bar-border': !secondaryPaneCollapsed })}
         items={[
           { pane: 'Rewriter', Icon: <PenIcon /> },
           { pane: 'Chatbot', Icon: <BotIcon /> },

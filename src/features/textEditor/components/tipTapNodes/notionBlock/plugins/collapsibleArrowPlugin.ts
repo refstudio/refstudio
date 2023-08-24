@@ -59,7 +59,7 @@ function createCollapsibleArrowButtonWidget(pos: number, isEmpty: boolean) {
       const button = document.createElement('button');
       button.classList.add('collapsible-arrow');
       button.innerHTML = `
-        <svg className="triangle" viewBox="0 0 100 100">
+        <svg className="text-grayscale-90" viewBox="0 0 100 100">
           <polygon points="5.9,88.2 50,11.8 94.1,88.2 " />
         </svg>`;
 
