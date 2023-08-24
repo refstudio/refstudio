@@ -73,6 +73,6 @@ export function useFileProjectCloseListener() {
 }
 
 function persistProjectDirInSettings(path: string) {
-  setCachedSetting('project.currentDir', path);
+  setCachedSetting('project.current_directory', path);
   void saveCachedSettings();
 }

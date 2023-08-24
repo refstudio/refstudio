@@ -21,10 +21,10 @@ const panelConfig: PaneConfig = {
   title: 'OPEN AI',
 };
 
-const mockSettings: Pick<SettingsSchema, 'openAI'> = {
-  openAI: {
-    apiKey: 'API KEY',
-    chatModel: 'CHAT MODEL',
+const mockSettings: Pick<SettingsSchema, 'openai'> = {
+  openai: {
+    api_key: 'API KEY',
+    chat_model: 'CHAT MODEL',
     manner: 'elaborate',
     temperature: 0.8,
   },
@@ -35,7 +35,7 @@ describe('OpenAiSettingsPane component', () => {
     // Fake settings methods
     vi.mocked(initSettings).mockResolvedValue();
     vi.mocked(saveCachedSettings).mockResolvedValue();
-    vi.mocked(getCachedSetting).mockReturnValue(mockSettings.openAI);
+    vi.mocked(getCachedSetting).mockReturnValue(mockSettings.openai);
     vi.mocked(setCachedSetting).mockImplementation(noop);
     vi.mocked(getMannerOptions).mockReturnValue(['concise', 'elaborate', 'scholarly']);
   });
@@ -54,10 +54,10 @@ describe('OpenAiSettingsPane component', () => {
 
     expect(getCachedSetting).toHaveBeenCalled();
     expect(screen.getByTestId('openai-settings-form')).toHaveFormValues({
-      apiKey: mockSettings.openAI.apiKey,
-      chatModel: mockSettings.openAI.chatModel,
-      manner: mockSettings.openAI.manner,
-      temperature: String(mockSettings.openAI.temperature),
+      apiKey: mockSettings.openai.api_key,
+      chatModel: mockSettings.openai.chat_model,
+      manner: mockSettings.openai.manner,
+      temperature: String(mockSettings.openai.temperature),
     });
   });
 
@@ -77,8 +77,8 @@ describe('OpenAiSettingsPane component', () => {
     // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.change(range, { target: { value: 0.9 } });
 
-    expect(screen.getByLabelText('API Key')).toHaveValue(`${mockSettings.openAI.apiKey}-Updated-1`);
-    expect(screen.getByLabelText('Chat Model')).toHaveValue(`${mockSettings.openAI.chatModel}-Updated-2`);
+    expect(screen.getByLabelText('API Key')).toHaveValue(`${mockSettings.openai.api_key}-Updated-1`);
+    expect(screen.getByLabelText('Chat Model')).toHaveValue(`${mockSettings.openai.chat_model}-Updated-2`);
     expect(screen.getByRole('button', { name: /save/i })).toBeEnabled();
 
     // Submit
@@ -87,8 +87,8 @@ describe('OpenAiSettingsPane component', () => {
     expect(vi.mocked(setCachedSetting).mock.calls[0]).toStrictEqual([
       'openAI',
       {
-        apiKey: `${mockSettings.openAI.apiKey}-Updated-1`,
-        chatModel: `${mockSettings.openAI.chatModel}-Updated-2`,
+        apiKey: `${mockSettings.openai.api_key}-Updated-1`,
+        chatModel: `${mockSettings.openai.chat_model}-Updated-2`,
         manner: 'scholarly',
         temperature: 0.9,
       },

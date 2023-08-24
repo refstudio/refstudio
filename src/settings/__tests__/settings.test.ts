@@ -83,7 +83,7 @@ describe('settings', () => {
         } as unknown as SettingsManager<SettingsSchema>),
     );
     await initSettings();
-    expect(getSettings().default.openAI.chatModel).toBe('OPENAI_CHAT_MODEL-value');
+    expect(getSettings().default.openai.chat_model).toBe('OPENAI_CHAT_MODEL-value');
   });
 
   it('should call settingsManager via getCachedSetting and setCachedSetting', async () => {
@@ -101,11 +101,11 @@ describe('settings', () => {
         } as unknown as SettingsManager<SettingsSchema>),
     );
     await initSettings();
-    getCachedSetting('openAI.apiKey');
+    getCachedSetting('openai.api_key');
     expect(getCachedFn).toBeCalled();
     expect(getCachedFn).toBeCalledWith('openAI.apiKey');
 
-    setCachedSetting('openAI.chatModel', 'value');
+    setCachedSetting('openai.chat_model', 'value');
     expect(setCachedFn).toBeCalled();
     expect(setCachedFn).toBeCalledWith('openAI.chatModel', 'value');
   });

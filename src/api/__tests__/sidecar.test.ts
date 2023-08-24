@@ -15,18 +15,18 @@ vi.mock('@tauri-apps/api/shell');
 
 const mockSettings: SettingsSchema = {
   project: {
-    currentDir: 'PROJECT-DIR',
+    current_directory: 'PROJECT-DIR',
   },
-  openAI: {
-    apiKey: 'API KEY',
-    chatModel: 'CHAT MODEL',
+  openai: {
+    api_key: 'API KEY',
+    chat_model: 'CHAT MODEL',
     manner: 'concise',
     temperature: 0.7,
   },
   sidecar: {
     logging: {
-      active: true,
-      path: 'PATH',
+      enable: true,
+      filepath: 'PATH',
     },
   },
 };
@@ -38,7 +38,7 @@ describe('sidecar', () => {
     vi.mocked(saveCachedSettings).mockResolvedValue();
     vi.mocked(getCachedSetting).mockImplementation((key) => {
       switch (key) {
-        case 'openAI':
+        case 'openai':
         case 'project':
         case 'sidecar':
           return mockSettings[key];
@@ -71,13 +71,13 @@ describe('sidecar', () => {
     expect(Object.keys(env ?? {}).length).toBe(5);
 
     // General
-    expect(env?.PROJECT_DIR).toBe(mockSettings.project.currentDir);
+    expect(env?.PROJECT_DIR).toBe(mockSettings.project.current_directory);
     // OpenAI
-    expect(env?.OPENAI_API_KEY).toBe(mockSettings.openAI.apiKey);
-    expect(env?.OPENAI_CHAT_MODEL).toBe(mockSettings.openAI.chatModel);
+    expect(env?.OPENAI_API_KEY).toBe(mockSettings.openai.api_key);
+    expect(env?.OPENAI_CHAT_MODEL).toBe(mockSettings.openai.chat_model);
     // Logging
-    expect(env?.SIDECAR_ENABLE_LOGGING).toBe(String(mockSettings.sidecar.logging.active));
-    expect(env?.SIDECAR_LOG_DIR).toBe(mockSettings.sidecar.logging.path);
+    expect(env?.SIDECAR_ENABLE_LOGGING).toBe(String(mockSettings.sidecar.logging.enable));
+    expect(env?.SIDECAR_LOG_DIR).toBe(mockSettings.sidecar.logging.filepath);
   });
 
   it('should throw exception if stderr has content', async () => {
