@@ -128,7 +128,7 @@
           "type": "null"
         },
         {
-          "$ref": "#/definitions/ServeResponse"
+          "type": "null"
         }
       ]
     }
@@ -685,11 +685,6 @@
         "message",
         "results"
       ]
-    },
-    "ServeResponse": {
-      "title": "ServeResponse",
-      "type": "object",
-      "properties": {}
     }
   }
 }
