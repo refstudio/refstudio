@@ -1,7 +1,7 @@
 import { useSetAtom } from 'jotai';
 import { useState } from 'react';
 
-import { runRefStudioServerOnDesktop } from './api/server';
+import { useRefStudioServerOnDesktop } from './api/server';
 import { App } from './application/App';
 import { openProjectAtom } from './atoms/projectState';
 import { useAsyncEffect } from './hooks/useAsyncEffect';
@@ -20,10 +20,15 @@ export function AppStartup() {
   const [initialized, setInitialized] = useState(false);
   const openProject = useSetAtom(openProjectAtom);
 
-  runRefStudioServerOnDesktop();
+  const isServerRunning = useRefStudioServerOnDesktop();
+  console.log('isServerRunning=', isServerRunning);
 
   useAsyncEffect(
     async (isMounted) => {
+      if (!isServerRunning) {
+        console.log('waiting for server startup');
+        return; // wait for the server to start
+      }
       try {
         if (initialized) {
           return;
@@ -46,7 +51,7 @@ export function AppStartup() {
       }
     },
     noop,
-    [initialized],
+    [initialized, isServerRunning],
   );
 
   if (!initialized) {

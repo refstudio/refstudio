@@ -2,6 +2,7 @@
 
 import { fetch as tauriFetch } from '@tauri-apps/api/http';
 import { Child, ChildProcess, Command as TauriCommand } from '@tauri-apps/api/shell';
+import React from 'react';
 
 export const REFSTUDIO_HOST = 'http://localhost:1487';
 
@@ -101,14 +102,22 @@ async function getOrStartServer() {
  * If an existing server not managed by us is already running, it will be killed. (This can happen
  * when you run Tauri Desktop in dev mode and make TypeScript changes.)
  */
-export function runRefStudioServerOnDesktop() {
-  if (import.meta.env.VITE_IS_WEB) {
-    return; // no server to be started for the web app.
+export function useRefStudioServerOnDesktop() {
+  // the server is always running for the web version
+  const [isServerRunning, setIsServerRunning] = React.useState(!!import.meta.env.VITE_IS_WEB);
+
+  if (isServerRunning) {
+    return true;
   }
 
   (async () => {
-    await getOrStartServer();
+    const child = await getOrStartServer();
+    if (child) {
+      setIsServerRunning(true);
+    }
   })().catch((e) => {
     console.error(e);
   });
+
+  return false;
 }
