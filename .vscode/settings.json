@@ -14,15 +14,16 @@
     "editor.formatOnSave": true
   },
   "[python]": {
-    "editor.formatOnSave": false,
-    "editor.defaultFormatter": "ms-python.python",
-    "editor.codeActionsOnSave": []
+    "editor.rulers": [88],
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.codeActionsOnSave": ["source.organizeImports", "source.fixAll.black"]
   },
   "editor.codeActionsOnSave": [
     // Run ESLint fixers _before_ prettier to ensure the user doesn't need to do multiple saves
     "source.organizeImports",
     "source.fixAll.eslint",
-    "source.fixAll.format",
+    "source.fixAll.format"
   ],
   "explorer.excludeGitIgnore": true,
   "search.exclude": {

@@ -7,7 +7,7 @@ class BM25Ranker:
     def __init__(self, storage: JsonStorage):
         self.storage = storage
         self.ranker = BM25Plus(self.storage.tokenized_corpus)
-    
+
     def get_top_n(self, query: str, limit: int = 5) -> list[Chunk]:
         """
         Rank documents based on input text
@@ -26,4 +26,3 @@ class BM25Ranker:
         tokenized_query = query.lower().split()
         docs = self.ranker.get_top_n(tokenized_query, self.storage.chunks, n=limit)
         return docs
-    

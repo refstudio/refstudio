@@ -11,7 +11,9 @@ def test_read_project_path_storage_does_not_exist(monkeypatch, tmp_path):
     assert projects_dict == {}
 
 
-def test_read_project_path_storage_exists(monkeypatch, tmp_path, setup_project_path_storage):
+def test_read_project_path_storage_exists(
+    monkeypatch, tmp_path, setup_project_path_storage
+):
     user_id = "user1"
     projects_dict = projects.read_project_path_storage(user_id)
     expected = {
@@ -32,7 +34,9 @@ def test_update_project_path_storage_should_be_created(monkeypatch, tmp_path):
     project_path = tmp_path / user_id / project_id
     project_path.mkdir(parents=True, exist_ok=True)
 
-    projects.update_project_path_storage(user_id, project_id, project_name, project_path)
+    projects.update_project_path_storage(
+        user_id, project_id, project_name, project_path
+    )
 
     projects_dict = projects.read_project_path_storage(user_id)
     expected = {
@@ -44,14 +48,18 @@ def test_update_project_path_storage_should_be_created(monkeypatch, tmp_path):
     assert projects_dict == expected
 
 
-def test_update_project_path_storage_should_be_appended_to(monkeypatch, tmp_path, setup_project_path_storage):
+def test_update_project_path_storage_should_be_appended_to(
+    monkeypatch, tmp_path, setup_project_path_storage
+):
     user_id = "user1"
     project_id = "project2"
     project_name = "project2name"
     project_path = tmp_path / user_id / project_id
     project_path.mkdir(parents=True, exist_ok=True)
 
-    projects.update_project_path_storage(user_id, project_id, project_name, project_path)
+    projects.update_project_path_storage(
+        user_id, project_id, project_name, project_path
+    )
 
     projects_dict = projects.read_project_path_storage(user_id)
     assert projects_dict == {
@@ -62,11 +70,13 @@ def test_update_project_path_storage_should_be_appended_to(monkeypatch, tmp_path
         "project2": {
             "project_name": project_name,
             "project_path": str(project_path),
-        }
+        },
     }
 
 
-def test_get_project_path_for_project_that_does_not_exist(tmp_path, setup_project_path_storage):
+def test_get_project_path_for_project_that_does_not_exist(
+    tmp_path, setup_project_path_storage
+):
     user_id = "user1"
     project_id = "project999"
     try:
@@ -118,7 +128,9 @@ def test_create_project_should_create_provided_project_path(monkeypatch, tmp_pat
     # if the path doesn't actually exist, `create_project` will raise an exception
     filepath.mkdir(parents=True, exist_ok=True)
 
-    project_path = projects.create_project(user_id, project_id, project_name, project_path=filepath)
+    project_path = projects.create_project(
+        user_id, project_id, project_name, project_path=filepath
+    )
 
     # correct path should be returned
     assert project_path == filepath
@@ -135,7 +147,9 @@ def test_create_project_should_create_provided_project_path(monkeypatch, tmp_pat
     assert projects_dict == expected
 
 
-def test_delete_project_should_raise_exception_if_project_does_not_exist(monkeypatch, tmp_path):
+def test_delete_project_should_raise_exception_if_project_does_not_exist(
+    monkeypatch, tmp_path
+):
     monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
 
     user_id = "user1"
@@ -147,7 +161,9 @@ def test_delete_project_should_raise_exception_if_project_does_not_exist(monkeyp
         assert True
 
 
-def test_delete_project_should_delete_project(monkeypatch, tmp_path, setup_project_path_storage):
+def test_delete_project_should_delete_project(
+    monkeypatch, tmp_path, setup_project_path_storage
+):
     monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
 
     user_id = "user1"
@@ -159,7 +175,9 @@ def test_delete_project_should_delete_project(monkeypatch, tmp_path, setup_proje
     assert projects_dict == {}
 
 
-def test_get_project_files_should_return_list_of_files(monkeypatch, tmp_path, setup_project_path_storage):
+def test_get_project_files_should_return_list_of_files(
+    monkeypatch, tmp_path, setup_project_path_storage
+):
     monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
 
     user_id = "user1"

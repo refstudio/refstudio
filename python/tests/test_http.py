@@ -12,7 +12,6 @@ from .test_ingest import _copy_fixture_to_temp_dir, FIXTURES_DIR
 from .test_settings import create_settings_json  # noqa: F401
 
 
-
 sidecar_client = TestClient(http.sidecar_api)
 references_client = TestClient(http.references_api)
 ai_client = TestClient(http.ai_api)
@@ -218,7 +217,9 @@ def test_ai_completion_is_ok(monkeypatch, mock_call_model_is_ok):
     }
 
 
-def test_ai_completion_missing_required_request_params(monkeypatch, mock_call_model_is_ok):
+def test_ai_completion_missing_required_request_params(
+    monkeypatch, mock_call_model_is_ok
+):
     monkeypatch.setattr(Rewriter, "call_model", mock_call_model_is_ok)
 
     request = {"missing": "This is an invalid request"}
@@ -263,7 +264,9 @@ def test_ai_chat_is_ok(monkeypatch, mock_call_model_is_ok, tmp_path):
     }
 
 
-def test_ai_chat_missing_required_request_params(monkeypatch, mock_call_model_is_ok, tmp_path):
+def test_ai_chat_missing_required_request_params(
+    monkeypatch, mock_call_model_is_ok, tmp_path
+):
     monkeypatch.setattr(Chat, "call_model", mock_call_model_is_ok)
 
     # copy references.json to temp dir and mock settings.REFERENCES_JSON_PATH
@@ -522,11 +525,7 @@ def test_delete_file(monkeypatch, tmp_path):
 
 # ruff gets confused here:
 # create_settings_json is a pytest fixture
-def test_get_settings(
-    monkeypatch,
-    tmp_path,
-    create_settings_json  # noqa: F811
-):
+def test_get_settings(monkeypatch, tmp_path, create_settings_json):  # noqa: F811
     monkeypatch.setattr(settings, "WEB_STORAGE_URL", tmp_path)
 
     response = settings_client.get("/")
@@ -536,11 +535,7 @@ def test_get_settings(
 
 # ruff gets confused here:
 # create_settings_json is a pytest fixture
-def test_update_settings(
-    monkeypatch,
-    tmp_path,
-    create_settings_json  # noqa: F811
-):
+def test_update_settings(monkeypatch, tmp_path, create_settings_json):  # noqa: F811
     monkeypatch.setattr(settings, "WEB_STORAGE_URL", tmp_path)
     user_id = "user1"
 

@@ -22,11 +22,15 @@ def test_parse_date():
 def test_get_first_author_surname():
     a = [
         Author(full_name="Dan Vanderkam", given_name="Dan", surname="Vanderkam"),
-        Author(full_name="Jeff Hammerbacher", given_name="Jeff", surname="Hammerbacher"),
+        Author(
+            full_name="Jeff Hammerbacher", given_name="Jeff", surname="Hammerbacher"
+        ),
     ]
     assert shared.get_first_author_surname(a) == "Vanderkam"
 
-    b = [Author(full_name="Jeff Hammerbacher", given_name="Jeff", surname="Hammerbacher")]
+    b = [
+        Author(full_name="Jeff Hammerbacher", given_name="Jeff", surname="Hammerbacher")
+    ]
     assert shared.get_first_author_surname(b) == "Hammerbacher"
 
     c = [Author(full_name="Jeff Hammerbacher", given_name="Jeff")]
@@ -43,18 +47,28 @@ def test_create_citation_key():
             "source_filename": "abc.pdf",
             "status": "complete",
             "authors": [
-                Author(full_name="Dan Vanderkam", given_name="Dan", surname="Vanderkam"),
-                Author(full_name="Jeff Hammerbacher", given_name="Jeff", surname="Hammerbacher"),
+                Author(
+                    full_name="Dan Vanderkam", given_name="Dan", surname="Vanderkam"
+                ),
+                Author(
+                    full_name="Jeff Hammerbacher",
+                    given_name="Jeff",
+                    surname="Hammerbacher",
+                ),
             ],
             "published_date": datetime(2016, 1, 1),
-            "title": "pileup.js: a JavaScript library for interactive and in-browser visualization of genomic data"
+            "title": "pileup.js: a JavaScript library for interactive and in-browser visualization of genomic data",  # noqa: E501
         },
         {
             "id": str(uuid4()),
             "source_filename": "abc.pdf",
             "status": "complete",
             "authors": [
-                Author(full_name="Jeff Hammerbacher", given_name="Jeff", surname="Hammerbacher")
+                Author(
+                    full_name="Jeff Hammerbacher",
+                    given_name="Jeff",
+                    surname="Hammerbacher",
+                )
             ],
             "published_date": None,
         },
@@ -113,7 +127,7 @@ def test_chunk_text():
 
 
 def test_chunk_reference(monkeypatch, tmp_path):
-    test_file = "fixtures/pdf/test.pdf" 
+    test_file = "fixtures/pdf/test.pdf"
     filepath = Path(__file__).parent.joinpath(test_file)
 
     # mock uploads directory
@@ -133,15 +147,19 @@ def test_chunk_reference(monkeypatch, tmp_path):
     for chunk in chunks:
         assert chunk.text is not None
         assert chunk.metadata != {}
-        assert chunk.metadata['page_num'] is not None
-    
+        assert chunk.metadata["page_num"] is not None
+
 
 def test_trim_completion_prefix_from_choices():
     # test 1: prefix is a single sentence and response includes part of the sentence
     test_prefix = "This is a prefix and we have "
     choices = [
-        typing.TextCompletionChoice(index=0, text="This is a prefix and we have inserted some text."),
-        typing.TextCompletionChoice(index=1, text="This is a prefix and we have added some text."),
+        typing.TextCompletionChoice(
+            index=0, text="This is a prefix and we have inserted some text."
+        ),
+        typing.TextCompletionChoice(
+            index=1, text="This is a prefix and we have added some text."
+        ),
         typing.TextCompletionChoice(index=2, text="updated some text."),
     ]
     trimmed_choices = shared.trim_completion_prefix_from_choices(test_prefix, choices)
@@ -151,10 +169,17 @@ def test_trim_completion_prefix_from_choices():
     assert trimmed_choices[2].text == "updated some text."
 
     # test 2: prefix is many sentences and response includes part of the last sentence
-    test_prefix = "This is a very long prefix. But we only append to the last piece. The last piece is "
+    test_prefix = (
+        "This is a very long prefix. But we only append to the last piece. "
+        "The last piece is "
+    )
     choices = [
-        typing.TextCompletionChoice(index=0, text="The last piece is part of the prefix."),
-        typing.TextCompletionChoice(index=1, text="The last piece is part of the test."),
+        typing.TextCompletionChoice(
+            index=0, text="The last piece is part of the prefix."
+        ),
+        typing.TextCompletionChoice(
+            index=1, text="The last piece is part of the test."
+        ),
         typing.TextCompletionChoice(index=2, text="something else."),
     ]
     trimmed_choices = shared.trim_completion_prefix_from_choices(test_prefix, choices)
@@ -164,22 +189,31 @@ def test_trim_completion_prefix_from_choices():
     assert trimmed_choices[2].text == "something else."
 
     # test 3: prefix is many sentences and response includes the entire prefix
-    test_prefix = "This is a very long prefix. But we only append to the last piece. The last piece is "
+    test_prefix = (
+        "This is a very long prefix. But we only append to the last piece. "
+        "The last piece is "
+    )
     choices = [
         typing.TextCompletionChoice(
             index=0,
-            text=("This is a very long prefix. But we only append to the last piece. "
-                  "The last piece is part of the prefix.")
+            text=(
+                "This is a very long prefix. But we only append to the last piece. "
+                "The last piece is part of the prefix."
+            ),
         ),
         typing.TextCompletionChoice(
             index=1,
-            text=("This is a very long prefix. But we only append to the last piece. "
-                  "The last piece is part of the test.")
+            text=(
+                "This is a very long prefix. But we only append to the last piece. "
+                "The last piece is part of the test."
+            ),
         ),
         typing.TextCompletionChoice(
             index=2,
-            text=("This is a very long prefix. But we only append to the last piece. "
-                  "The last piece is something else.")
+            text=(
+                "This is a very long prefix. But we only append to the last piece. "
+                "The last piece is something else."
+            ),
         ),
     ]
     trimmed_choices = shared.trim_completion_prefix_from_choices(test_prefix, choices)
