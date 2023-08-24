@@ -62,7 +62,7 @@ export function ChatbotPanel() {
 
   return (
     <PanelWrapper title="Chatbot">
-      <div className="flex flex-1 flex-col items-center justify-end self-stretch overflow-y-hidden pt-2">
+      <div className="flex flex-1 flex-col items-center justify-end w-full overflow-y-hidden pt-2">
         <ChatThreadBlock thread={currentChatThreadItem ? [...chatThread, currentChatThreadItem] : chatThread} />
       </div>
       <div className="flex flex-col items-start justify-end self-stretch p-4">
@@ -86,9 +86,9 @@ function ChatThreadBlock({ thread }: { thread: ChatThread }) {
   }, [thread]);
 
   return (
-    <div className="overflow-y-auto">
+    <div className="flex flex-1 self-strech flex-col items-center justify-end overflow-y-auto">
       {thread.map((chat) => (
-        <div key={chat.id}>
+        <div className='self-stretch' key={chat.id}>
           <ChatThreadItemBlock actor="user" text={chat.question} />
           <ChatThreadItemBlock actor="ai" text={chat.answer} />
         </div>
@@ -129,6 +129,7 @@ function MessageBox({ disabled, value, onChange, onChat, onKeyDown }: MessageBox
         className={cx(
           'g-2 flex flex-1 resize-none items-end justify-end p-2 outline-none',
           'text-input-txt-primary placeholder:text-input-txt-placeholder',
+          { 'text-input-txt-disabled placeholder:text-input-txt-disabled': disabled },
         )}
         disabled={disabled}
         placeholder="Ask questions about your references to start chatting..."
@@ -138,10 +139,13 @@ function MessageBox({ disabled, value, onChange, onChat, onKeyDown }: MessageBox
         onKeyDown={onKeyDown}
       />
       <button
+        aria-disabled={disabled}
         className={cx(
           'flex h-8 w-8 items-center justify-center rounded-default',
           'bg-btn-bg-primary-default text-btn-ico-primary-default',
+          { 'bg-btn-bg-primary-disabled text-btn-ico-primary-disabled': disabled },
         )}
+        disabled={disabled}
         title="Send"
         onClick={() => onChat(value)}
       >
