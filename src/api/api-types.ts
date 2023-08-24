@@ -11,7 +11,7 @@
  * This interface was referenced by `ApiSchema`'s JSON-Schema
  * via the `definition` "ResponseStatus".
  */
-export type ResponseStatus = "ok" | "error";
+export type ResponseStatus = 'ok' | 'error';
 export type Location = (string | number)[];
 export type Message = string;
 export type ErrorType = string;
@@ -22,14 +22,14 @@ export type Detail = ValidationError[];
  * This interface was referenced by `ApiSchema`'s JSON-Schema
  * via the `definition` "IngestStatus".
  */
-export type IngestStatus = "processing" | "failure" | "complete";
+export type IngestStatus = 'processing' | 'failure' | 'complete';
 /**
  * An enumeration.
  *
  * This interface was referenced by `ApiSchema`'s JSON-Schema
  * via the `definition` "RewriteMannerType".
  */
-export type RewriteMannerType = "concise" | "elaborate" | "scholarly";
+export type RewriteMannerType = 'concise' | 'elaborate' | 'scholarly';
 export type File = string;
 
 export interface ApiSchema {
