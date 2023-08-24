@@ -10,6 +10,7 @@ import { notifyError } from '../notifications/notifications';
 import { ReferenceItem } from '../types/ReferenceItem';
 import {
   deleteFileFromWeb,
+  existsFileFromWeb,
   isRunningOnWeb,
   readBinaryFileFromWeb,
   readProjectFilesFromWeb,
@@ -373,6 +374,10 @@ export async function renameFile(relativePath: string, newName: string): RenameF
   try {
     if (isRunningOnWeb()) {
       const newRelativePath = getRefStudioPath(newName);
+      if (await existsFileFromWeb(currentProjectId, newRelativePath)) {
+        console.warn(`Another file with the same name already exists: ${newRelativePath}`);
+        return { success: false };
+      }
       await renameFileFromWeb(currentProjectId, relativePath, newRelativePath);
       return { success: true, newPath: newRelativePath };
     } else {

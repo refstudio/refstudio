@@ -17,7 +17,6 @@ const currentProjectIdAtom = atom('');
 // #####################################################################################
 export const isProjectOpenAtom = atom((get) => get(currentProjectPathAtom) !== '');
 export const projectPathAtom: Atom<string> = currentProjectPathAtom;
-export const projectIdAtom: Atom<string> = currentProjectIdAtom;
 export const projectNameAtom = selectAtom(currentProjectPathAtom, extractProjectName);
 
 export const openProjectAtom = atom(null, async (_, set, path: string) => {
