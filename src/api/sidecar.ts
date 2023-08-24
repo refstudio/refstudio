@@ -1,10 +1,9 @@
 /** Utility for calling into the Python sidecar with types. */
 
-import { Body, fetch as tauriFetch } from '@tauri-apps/api/http';
-import { Child, ChildProcess, Command as TauriCommand } from '@tauri-apps/api/shell';
+import { Command as TauriCommand } from '@tauri-apps/api/shell';
 
 import { getCachedSetting } from '../settings/settingsManager';
-import { CliCommands, RewriteResponse } from './types';
+import { CliCommands } from './types';
 
 interface SharedCommand {
   execute: typeof TauriCommand.prototype.execute;
@@ -68,19 +67,6 @@ export async function callSidecar<T extends keyof CliCommands>(
     SIDECAR_LOG_DIR: sidecarSettings.logging.path,
   };
 
-  if (subcommand === 'rewrite') {
-    const httpResponse = await tauriFetch('http://localhost:1487/api/sidecar/rewrite', {
-      method: 'POST',
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
-      body: Body.json(arg as any),
-    });
-    if (!httpResponse.ok) {
-      console.log('rewrite request failed', httpResponse.status, httpResponse.data);
-      throw new Error('Error requesting rewrite');
-    }
-    return httpResponse.data as RewriteResponse;
-  }
-
   const command = new Command('call-sidecar', [subcommand, JSON.stringify(arg)], { env });
   console.log('sidecar command ' + subcommand, arg, command);
   const output = await command.execute();
@@ -94,107 +80,4 @@ export async function callSidecar<T extends keyof CliCommands>(
   const response = JSON.parse(output.stdout) as CliCommands[T][1];
   console.log('sidecar response', response);
   return response;
-}
-
-interface StartingState {
-  state: 'starting';
-}
-interface FailedState {
-  state: 'failed';
-}
-interface ReadyState {
-  state: 'ready';
-  process: Child;
-}
-type ServerState = StartingState | FailedState | ReadyState;
-
-let serverProcess: ServerState | null = null;
-
-export async function startServer() {
-  console.log('Starting RefStudio server');
-  const command = new TauriCommand('call-sidecar', ['serve']);
-  command.stderr.addListener('data', (line) => {
-    console.log('server stderr', line);
-  });
-  command.stdout.addListener('data', (line) => {
-    console.log('server stdout', line);
-  });
-  command.addListener('close', (data: Pick<ChildProcess, 'code' | 'signal'>) => {
-    console.warn('server closed, restarting', data.code, data.signal);
-    serverProcess = null;
-    void getServer();
-  });
-  command.addListener('error', (data) => {
-    console.error('server crashed, restarting', data);
-    serverProcess = null;
-    void getServer();
-  });
-  return command.spawn();
-}
-
-export async function isServerHealthy() {
-  try {
-    const response = await tauriFetch('http://localhost:1487/api/meta/status');
-    if (!response.ok) {
-      return false;
-    }
-    console.log(response.data);
-    const { status } = response.data as { status: string };
-    if (status !== 'ok') {
-      return false;
-    }
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-
-export async function killServer() {
-  if (serverProcess?.state === 'ready') {
-    await serverProcess.process.kill();
-  }
-}
-
-(window as any).startServer = startServer;
-(window as any).killServer = killServer;
-(window as any).isServerHealthy = isServerHealthy;
-(window as any).getProjects = async () => {
-  const response = await tauriFetch('http://localhost:1487/api/projects');
-  console.log(response.data);
-};
-
-export async function getServer() {
-  if (serverProcess) {
-    if (serverProcess.state === 'ready') {
-      return serverProcess.process;
-    }
-    return null;
-  }
-  serverProcess = { state: 'starting' };
-
-  // Check if there's already a server process running. If so, kill it and start a new one.
-  if (await isServerHealthy()) {
-    console.log('Found existing API server; killing it before starting a new one.');
-    try {
-      await tauriFetch('http://localhost:1487/api/meta/shutdown', { method: 'POST' });
-    } catch (e) {
-      // Failure is expected here since the server shuts down before responding.
-    }
-  }
-
-  const process = await startServer();
-  serverProcess = { state: 'ready', process };
-  return process;
-}
-
-export function useRefStudioServerOnDesktop() {
-  if (import.meta.env.VITE_IS_WEB) {
-    return; // no server to be started for the web app.
-  }
-
-  (async () => {
-    await getServer();
-  })().catch((e) => {
-    console.error(e);
-  });
 }

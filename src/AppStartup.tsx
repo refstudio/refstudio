@@ -1,7 +1,7 @@
 import { useSetAtom } from 'jotai';
 import { useState } from 'react';
 
-import { useRefStudioServerOnDesktop } from './api/sidecar';
+import { useRefStudioServerOnDesktop } from './api/server';
 import { App } from './application/App';
 import { openProjectAtom } from './atoms/projectState';
 import { useAsyncEffect } from './hooks/useAsyncEffect';
