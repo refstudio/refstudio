@@ -71,7 +71,7 @@ export function LeftSidePanelWrapper() {
         {primaryPane === 'Explorer' && <ExplorerPanel />}
         {primaryPane === 'References' && <ReferencesPanel />}
       </Panel>
-      <VerticalResizeHandle />
+      <VerticalResizeHandle transparent />
     </>
   );
 }
