@@ -178,6 +178,7 @@ export default {
           secondary: 'rgb(var(--grayscale-00) / <alpha-value>)',
         },
         'shortcuts-border': 'rgb(var(--grayscale-20) / <alpha-value>)',
+        selection: 'rgb(196 220 246 / <alpha-value>)',
       },
       boxShadow: {
         default: '0px 0px 24px 0px rgba(0, 0, 0, 0.04)',

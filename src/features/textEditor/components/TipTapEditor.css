@@ -36,5 +36,5 @@
 }
 
 .tiptap-editor span.selected {
-  @apply bg-[#c4dcf6];
+  @apply bg-selection;
 }
