@@ -62,7 +62,7 @@ export function ChatbotPanel() {
 
   return (
     <PanelWrapper title="Chatbot">
-      <div className="flex flex-1 flex-col items-center justify-end self-stretch pt-2 overflow-y-hidden">
+      <div className="flex flex-1 flex-col items-center justify-end self-stretch overflow-y-hidden pt-2">
         <ChatThreadBlock thread={currentChatThreadItem ? [...chatThread, currentChatThreadItem] : chatThread} />
       </div>
       <div className="flex flex-col items-start justify-end self-stretch p-4">
@@ -85,15 +85,17 @@ function ChatThreadBlock({ thread }: { thread: ChatThread }) {
     messagesEndRef.current?.scrollIntoView();
   }, [thread]);
 
-  return <div className='overflow-y-auto'>
-    {thread.map((chat) => (
-      <div key={chat.id}>
-        <ChatThreadItemBlock actor="user" text={chat.question} />
-        <ChatThreadItemBlock actor="ai" text={chat.answer} />
-      </div>
-    ))}
-    <div ref={messagesEndRef} />
-  </div>;
+  return (
+    <div className="overflow-y-auto">
+      {thread.map((chat) => (
+        <div key={chat.id}>
+          <ChatThreadItemBlock actor="user" text={chat.question} />
+          <ChatThreadItemBlock actor="ai" text={chat.answer} />
+        </div>
+      ))}
+      <div ref={messagesEndRef} />
+    </div>
+  );
 }
 
 function ChatThreadItemBlock({ text, actor }: { text?: string; actor: 'user' | 'ai' }) {
