@@ -1,6 +1,5 @@
 """Generate cli.schema.json, which contains return types for the subcommands."""
 import json
-import sys
 
 from fastapi.openapi.utils import get_openapi
 from starlette.routing import Mount
@@ -29,4 +28,4 @@ if __name__ == '__main__':
     output_schema = output_schema.replace('#/components/schemas/', '#/definitions/')
     schema = json.loads(output_schema)
     with open('python/api.schema.json', 'w') as out:
-        json.dump({'definitions': schema}, sys.stdout, indent=2)
+        json.dump({'definitions': schema}, out, indent=2)
