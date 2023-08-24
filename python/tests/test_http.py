@@ -9,8 +9,11 @@ from sidecar.storage import JsonStorage
 from web import api
 
 from .test_ingest import _copy_fixture_to_temp_dir, FIXTURES_DIR
+from .test_settings import create_settings_json  # noqa: F401
+
 
 client = TestClient(api)
+settings_client = TestClient(http.settings_api)
 
 
 def test_get_references():
@@ -442,3 +445,38 @@ def test_delete_file(monkeypatch, tmp_path):
     files_and_subdirs = projects.get_project_files(user_id, project_id)
     expected = [filepath.parent]
     assert sorted(files_and_subdirs) == sorted(expected)
+
+
+# ruff gets confused here:
+# create_settings_json is a pytest fixture
+def test_get_settings(
+    monkeypatch,
+    tmp_path,
+    create_settings_json  # noqa: F811
+):
+    monkeypatch.setattr(settings, "WEB_STORAGE_URL", tmp_path)
+
+    response = settings_client.get("/")
+    assert response.status_code == 200
+    assert response.json()["openai"]["api_key"] == "1234"
+
+
+# ruff gets confused here:
+# create_settings_json is a pytest fixture
+def test_update_settings(
+    monkeypatch,
+    tmp_path,
+    create_settings_json  # noqa: F811
+):
+    monkeypatch.setattr(settings, "WEB_STORAGE_URL", tmp_path)
+    user_id = "user1"
+
+    response = settings.get_settings_for_user(user_id)
+
+    data = response.dict()
+    data["openai"] = {"api_key": "test"}
+
+    response = settings_client.put("/", json=data)
+
+    assert response.status_code == 200
+    assert response.json()["openai"]["api_key"] == "test"
