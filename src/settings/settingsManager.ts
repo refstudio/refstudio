@@ -1,4 +1,4 @@
-import { SettingsManager } from 'tauri-settings';
+import type { SettingsManager } from 'tauri-settings';
 import { Path, PathValue } from 'tauri-settings/dist/types/dot-notation';
 import { getDotNotation, setDotNotation } from 'tauri-settings/dist/utils/dot-notation';
 
