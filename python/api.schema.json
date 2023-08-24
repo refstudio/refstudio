@@ -618,7 +618,7 @@
       "properties": {
         "api_key": {
           "type": "string",
-          "default": ""
+          "default": "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"
         },
         "chat_model": {
           "type": "string",
@@ -669,7 +669,7 @@
             }
           ],
           "default": {
-            "api_key": "",
+            "api_key": "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",
             "chat_model": "gpt-3.5-turbo",
             "manner": "scholarly",
             "temperature": 0.7

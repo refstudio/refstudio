@@ -5,10 +5,13 @@ import sys
 from fastapi.openapi.utils import get_openapi
 from starlette.routing import Mount
 
+from sidecar.typing import CliCommands
 from web import api
 
 if __name__ == '__main__':
-    # cli_schema = json.loads(CliCommands.schema_json())
+    cli_schema = json.loads(CliCommands.schema_json())
+    with open('python/cli.schema.json', 'w') as out:
+        json.dump(cli_schema, out, indent=2)
 
     combined_schemas = {}
     for route in api.routes:
@@ -20,7 +23,10 @@ if __name__ == '__main__':
         if components:
             combined_schemas.update(components['schemas'])
 
+    # OpenAPI puts request/response definitions under "/components/schemas", but
+    # json2ts wants them under "/definitions".
     output_schema = json.dumps(combined_schemas)
     output_schema = output_schema.replace('#/components/schemas/', '#/definitions/')
     schema = json.loads(output_schema)
-    json.dump({'definitions': schema}, sys.stdout, indent=2)
+    with open('python/api.schema.json', 'w') as out:
+        json.dump({'definitions': schema}, sys.stdout, indent=2)
