@@ -42,6 +42,11 @@
             "args": true
           }
         ]
+      },
+      "http": {
+        "all": true,
+        "request": true,
+        "scope": [ "http://localhost:1487/*" ]
       }
     },
     "bundle": {

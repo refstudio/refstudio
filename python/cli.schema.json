@@ -118,6 +118,19 @@
           "$ref": "#/definitions/SearchResponse"
         }
       ]
+    },
+    "serve": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "null"
+        }
+      ]
     }
   },
   "required": [
@@ -129,7 +142,8 @@
     "chat",
     "update",
     "delete",
-    "search"
+    "search",
+    "serve"
   ],
   "definitions": {
     "IngestRequest": {
