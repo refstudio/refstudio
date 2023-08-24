@@ -82,7 +82,9 @@ function ChatThreadBlock({ thread }: { thread: ChatThread }) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView();
+    // Despite what typescript says, scrollIntoView is undefined when running unit tests
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    messagesEndRef.current?.scrollIntoView?.();
   }, [thread]);
 
   return (
