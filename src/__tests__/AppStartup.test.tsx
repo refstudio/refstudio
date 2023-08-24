@@ -13,6 +13,9 @@ vi.mock('../application/App', () => {
     App: FakeApp,
   };
 });
+vi.mock('../api/server', () => ({
+  useRefStudioServerOnDesktop: () => true,
+}));
 
 describe('AppStartup', () => {
   afterEach(() => {
