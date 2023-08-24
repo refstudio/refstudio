@@ -76,6 +76,7 @@ export interface IngestResponse {
  * A reference for an academic paper / PDF
  */
 export interface Reference {
+  id: string;
   source_filename: string;
   status: IngestStatus;
   citation_key?: string;
@@ -154,7 +155,7 @@ export interface ChatResponseChoice {
   text: string;
 }
 export interface ReferenceUpdate {
-  source_filename: string;
+  reference_id: string;
   patch: ReferencePatch;
 }
 /**
@@ -168,7 +169,7 @@ export interface UpdateStatusResponse {
   message: string;
 }
 export interface DeleteRequest {
-  source_filenames: string[];
+  reference_ids: string[];
   all?: boolean;
 }
 export interface DeleteStatusResponse {
