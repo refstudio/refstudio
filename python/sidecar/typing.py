@@ -1,6 +1,8 @@
+import os
 from datetime import date
 from typing import Any
 
+from dotenv import load_dotenv
 from pydantic import BaseModel
 
 try:
@@ -11,6 +13,9 @@ except ImportError:
     # https://github.com/python/cpython/issues/100458
     # Python 3.10 and below
     from strenum import StrEnum
+
+
+load_dotenv()
 
 
 class RefStudioModel(BaseModel):
@@ -202,7 +207,7 @@ class SearchResponse(RefStudioModel):
 
 
 class OpenAISettings(RefStudioModel):
-    api_key: str = ""
+    api_key: str = os.environ.get("OPENAI_API_KEY")
     chat_model: str = "gpt-3.5-turbo"
 
     # TODO: the params below should not be settings
