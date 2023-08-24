@@ -48,7 +48,7 @@ export async function initSettings() {
       return value;
     },
     syncCache: async () => {
-      const newSettings = (await universalPost('/api/settings', settings, 'PUT')) as SettingsSchema;
+      const newSettings = (await universalPost('/api/settings/', settings, 'PUT')) as SettingsSchema;
       settings = newSettings;
       return settings;
     },
