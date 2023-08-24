@@ -1,15 +1,42 @@
 import pytest
+from fastapi.testclient import TestClient
 
-from sidecar import projects
+from sidecar import projects, http
+from .test_ingest import FIXTURES_DIR
 
 
 @pytest.fixture
 def setup_project_path_storage(monkeypatch, tmp_path):
     user_id = "user1"
     project_id = "project1"
+    project_name = "project1name"
     monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
-    projects.create_project(user_id, project_id)
+    projects.create_project(user_id, project_id, project_name)
     return user_id, project_id
+
+
+@pytest.fixture
+def setup_project_with_uploads(monkeypatch, tmp_path):
+    user_id = "user1"
+    project_id = "project1"
+    project_name = "project1name"
+    monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
+
+    projects.create_project(user_id, project_id, project_name)
+    project_path = projects.get_project_path(user_id, project_id)
+
+    client = TestClient(http.filesystem_api)
+    client.post(f"/{project_id}/uploads", files={"file": ("file1.txt", "content")})
+
+    # create a file
+    filename = "uploads/test.pdf"
+    filepath = project_path / filename
+
+    with open(f"{FIXTURES_DIR}/pdf/test.pdf", "rb") as f:
+        _ = client.put(
+            f"/{project_id}/{filename}",
+            files={"file": ("test.pdf", f, "application/pdf")},
+        )
 
 
 @pytest.fixture

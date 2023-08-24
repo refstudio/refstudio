@@ -2,6 +2,7 @@ import json
 import os
 from datetime import date
 from pathlib import Path
+from uuid import uuid4
 
 from sidecar import ingest, settings, storage, typing
 from sidecar.typing import Author, IngestRequest, Reference
@@ -95,6 +96,7 @@ def test_ingest_add_citation_keys(monkeypatch, tmp_path):
     # set up base reference with required fields
     # we'll be copying this reference and modifying it for each test
     base_reference = Reference(
+        id=str(uuid4()),
         source_filename="test.pdf",
         status="complete"
     )
@@ -221,38 +223,45 @@ def test_ingest_add_citation_keys(monkeypatch, tmp_path):
     #   ... but new references should have unique citation keys
     existing_refs = [
         Reference(
+            id=str(uuid4()),
             source_filename='test.pdf', status=typing.IngestStatus.PROCESSING,
             authors=[Author(full_name="Kathy Jones")], published_date=date(2021, 1, 1),
             citation_key='jones2021'
         ),
         Reference(
+            id=str(uuid4()),
             source_filename='test.pdf', status=typing.IngestStatus.PROCESSING,
             authors=[Author(full_name="Kathy Jones")], published_date=date(2021, 1, 1),
             citation_key='jones2021a'
         ),
         Reference(
+            id=str(uuid4()),
             source_filename='test.pdf', status=typing.IngestStatus.PROCESSING,
             authors=[Author(full_name="John Smith")], citation_key='smith'
         ),
         Reference(
+            id=str(uuid4()),
             source_filename='test.pdf', status=typing.IngestStatus.PROCESSING,
             citation_key='untitled'
         ),
         Reference(
+            id=str(uuid4()),
             source_filename='test.pdf', status=typing.IngestStatus.PROCESSING,
             citation_key='untitled1'
         ),
     ]
     new_refs = [
         Reference(
+            id=str(uuid4()),
             source_filename='test.pdf', status=typing.IngestStatus.PROCESSING,
             authors=[Author(full_name="Kathy Jones")], published_date=date(2021, 1, 1)
         ),
         Reference(
+            id=str(uuid4()),
             source_filename='test.pdf', status=typing.IngestStatus.PROCESSING,
             authors=[Author(full_name="John Smith")],
         ),
-        Reference(source_filename='test.pdf', status=typing.IngestStatus.PROCESSING),
+        Reference(id=str(uuid4), source_filename='test.pdf', status=typing.IngestStatus.PROCESSING),
     ]
     monkeypatch.setattr(ingestion, 'references', existing_refs)
 
@@ -284,10 +293,12 @@ def test_ingest_get_statuses(monkeypatch):
     #   uploads (not yet stored) return processeding
     mock_references = [
         Reference(
+            id=str(uuid4()),
             source_filename="completed.pdf",
             status=typing.IngestStatus.COMPLETE
         ),
         Reference(
+            id=str(uuid4()),
             source_filename="failed.pdf",
             status=typing.IngestStatus.FAILURE
         ),

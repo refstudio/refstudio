@@ -4,6 +4,7 @@ import shutil
 import sys
 from collections import defaultdict
 from pathlib import Path
+from uuid import uuid4
 
 import grobid_tei_xml
 from dotenv import load_dotenv
@@ -344,6 +345,7 @@ class PDFIngestion:
 
             references.append(
                 Reference(
+                    id=str(uuid4()),
                     source_filename=source_pdf,
                     status=typing.IngestStatus.FAILURE,
                     citation_key="untitled",
@@ -462,6 +464,7 @@ class PDFIngestion:
             pub_date = shared.parse_date(header.get("published_date", ""))
 
             ref = Reference(
+                id=str(uuid4()),
                 source_filename=source_pdf,
                 status=typing.IngestStatus.COMPLETE,
                 title=header.get("title"),

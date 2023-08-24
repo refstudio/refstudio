@@ -4,7 +4,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, File, Request, UploadFile
+from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import FileResponse
 
 from sidecar import chat, ingest, projects, rewrite, search, storage, settings
@@ -15,8 +15,8 @@ from sidecar.typing import (
     DeleteStatusResponse,
     IngestRequest,
     IngestResponse,
-    IngestStatusResponse,
-    ReferenceUpdate,
+    Reference,
+    ReferencePatch,
     RewriteRequest,
     RewriteResponse,
     SearchRequest,
@@ -30,67 +30,16 @@ from sidecar.typing import (
 load_dotenv()
 
 sidecar_api = FastAPI()  # Legacy API for existing sidecar cli functionality
+references_api = FastAPI()  # API for interacting with references
+ai_api = FastAPI()  # API for interacting with AI
 filesystem_api = FastAPI()  # API for interacting with the filesystem
 project_api = FastAPI()  # API for interacting with projects
 settings_api = FastAPI()  # API for interacting with settings
 
 
-def update_envs_from_headers(request: Request, call_next) -> None:
-    os.environ["PROJECT_DIR"] = str(request.headers.get("X-PROJECT_DIR"))
-    os.environ["OPENAI_API_KEY"] = str(request.headers.get("X-OPENAI_API_KEY"))
-    os.environ["OPENAI_CHAT_MODEL"] = str(request.headers.get("X-OPENAI_CHAT_MODEL"))
-    os.environ["SIDECAR_ENABLE_LOGGING"] = str(request.headers.get("X-SIDECAR_ENABLE_LOGGING"))
-    os.environ["SIDECAR_LOG_DIR"] = str(request.headers.get("X-SIDECAR_LOG_DIR"))
-
 
 # Sidecar API
 # -----------
-@sidecar_api.get("/")
-async def http_index():
-    return {"message": "Hello World"}
-
-
-@sidecar_api.post("/ingest")
-async def http_ingest(project_id: str, request: Request) -> IngestResponse:
-    update_envs_from_headers(request)
-    user_id = "user1"
-    project_path = projects.get_project_path(user_id, project_id)
-    req = IngestRequest(
-        pdf_directory=project_path / "uploads"
-    )
-    response = ingest.run_ingest(req)
-    return response
-
-
-@sidecar_api.get("/ingest_status")
-async def http_get_statuses(request: Request) -> IngestStatusResponse:
-    update_envs_from_headers(request)
-    response = ingest.get_statuses()
-    return response
-
-
-@sidecar_api.post("/ingest_references")
-async def http_get_references(req: IngestRequest, request: Request) -> IngestResponse:
-    update_envs_from_headers(request)
-    req.pdf_directory = os.environ["PROJECT_DIR"] + "/uploads"
-    response = ingest.get_references(req)
-    return response
-
-
-@sidecar_api.post("/update")
-async def http_update(req: ReferenceUpdate, request: Request) -> UpdateStatusResponse:
-    update_envs_from_headers(request)
-    response = storage.update_reference(req)
-    return response
-
-
-@sidecar_api.post("/delete")
-async def http_delete(req: DeleteRequest, request: Request) -> DeleteStatusResponse:
-    update_envs_from_headers(request)
-    response = storage.delete_references(req)
-    return response
-
-
 @sidecar_api.post("/rewrite")
 async def http_rewrite(req: RewriteRequest) -> RewriteResponse:
     response = rewrite.rewrite(req)
@@ -115,6 +64,79 @@ async def http_search(req: SearchRequest) -> SearchResponse:
     return response
 
 
+# AI API
+# --------------
+@sidecar_api.post("/{project_id}/chat")
+async def http_ai_chat(project_id: str, req: ChatRequest) -> ChatResponse:
+    response = chat.ask_question(req, project_id=project_id)
+    return response
+
+
+# References API
+# --------------
+@references_api.get("/{project_id}")
+async def list_references(project_id: str) -> IngestResponse:
+    """
+    Returns a list of references for the current user
+    """
+    user_id = "user1"
+    project_path = projects.get_project_path(user_id, project_id)
+    store = storage.JsonStorage(project_path / ".storage" / "references.json")
+    return store.references
+
+
+@references_api.post("/{project_id}")
+async def ingest_references(project_id: str):
+    """
+    Ingests references from PDFs in the project uploads directory
+    """
+    user_id = "user1"
+    project_path = projects.get_project_path(user_id, project_id)
+    uploads_dir = project_path / "uploads"
+    req = IngestRequest(pdf_directory=str(uploads_dir))
+    response = ingest.run_ingest(req)
+    return response
+
+
+@references_api.get("/{project_id}/{reference_id}")
+async def http_get(project_id: str, reference_id: str) -> Reference:
+    user_id = "user1"
+    project_path = projects.get_project_path(user_id, project_id)
+    store = storage.JsonStorage(project_path / ".storage" / "references.json")
+    response = store.get_reference(reference_id)
+    return response
+
+
+@references_api.put("/{project_id}/{reference_id}")
+async def http_update(project_id: str, reference_id: str, req: ReferencePatch) -> UpdateStatusResponse:
+    user_id = "user1"
+    project_path = projects.get_project_path(user_id, project_id)
+    store = storage.JsonStorage(project_path / ".storage" / "references.json")
+    store.load()
+    response = store.update(reference_id, req)
+    return response
+
+
+@references_api.delete("/{project_id}/{reference_id}")
+async def http_delete(project_id: str, reference_id: str) -> DeleteStatusResponse:
+    user_id = "user1"
+    project_path = projects.get_project_path(user_id, project_id)
+    store = storage.JsonStorage(project_path / ".storage" / "references.json")
+    store.load()
+    response = store.delete(reference_ids=[reference_id])
+    return response
+
+
+@references_api.post("/{project_id}/bulk_delete")
+async def http_bulk_delete(project_id: str, req: DeleteRequest) -> DeleteStatusResponse:
+    user_id = "user1"
+    project_path = projects.get_project_path(user_id, project_id)
+    store = storage.JsonStorage(project_path / ".storage" / "references.json")
+    store.load()
+    response = store.delete(reference_ids=req.reference_ids, all_=req.all)
+    return response
+
+
 # Project API
 # --------------
 @project_api.get("/")
@@ -128,21 +150,26 @@ async def list_projects():
 
 
 @project_api.post("/")
-async def create_project(project_path: str = None):
+async def create_project(project_name: str, project_path: str = None):
     """
     Creates a project directory in the filesystem
 
     Parameters
     ----------
+    project_name : str
+        The name of the project
     project_path : str
         The path to the project directory. Only necessary for Desktop.
         For web, the project is stored in a private directory on the server.
     """
     user_id = "user1"
     project_id = str(uuid4())
-    project_path = projects.create_project(user_id, project_id, project_path)
+    project_path = projects.create_project(user_id, project_id, project_name, project_path)
     return {
-        project_id: project_path,
+        project_id: {
+            "project_name": project_name,
+            "project_path": project_path,
+        }
     }
 
 
