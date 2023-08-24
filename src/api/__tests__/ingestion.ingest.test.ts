@@ -37,6 +37,7 @@ describe('ingestion.ingest', () => {
       project_name: 'project-name',
       references: [
         {
+          id: '45722618-c4fb-4ae1-9230-7fc19a7219ed',
           source_filename: 'file.pdf',
           status: 'complete',
         },
@@ -45,7 +46,7 @@ describe('ingestion.ingest', () => {
 
     const response = await runPDFIngestion();
     expect(response).toHaveLength(1);
-    expect(response[0].id).toBe('file.pdf');
+    expect(response[0].id).toBe('45722618-c4fb-4ae1-9230-7fc19a7219ed');
     expect(response[0].filename).toBe('file.pdf');
   });
 
@@ -54,6 +55,7 @@ describe('ingestion.ingest', () => {
       project_name: 'project-name',
       references: [
         {
+          id: '45722618-c4fb-4ae1-9230-7fc19a7219ed',
           source_filename: 'file.pdf',
           status: 'complete',
           authors: [

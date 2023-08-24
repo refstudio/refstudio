@@ -37,7 +37,7 @@ def read_project_path_storage(user_id: str) -> dict[str, str]:
     return data
 
 
-def update_project_path_storage(user_id: str, project_id: str, project_path: str) -> dict[str, str]:
+def update_project_path_storage(user_id: str, project_id: str, project_name: str, project_path: str) -> dict[str, str]:
     """
     Updates the path storage file, which is responsible for mapping a project id
     to the corresponding filepath for storing project files.
@@ -51,6 +51,10 @@ def update_project_path_storage(user_id: str, project_id: str, project_path: str
 
     with open(filepath, "w") as f:
         data[project_id] = str(project_path)
+        data[project_id] = {
+            "project_name": project_name,
+            "project_path": str(project_path),
+        }
         json.dump(data, f)
     
     return read_project_path_storage(user_id)
@@ -58,10 +62,10 @@ def update_project_path_storage(user_id: str, project_id: str, project_path: str
 
 def get_project_path(user_id: str, project_id: str) -> Path:
     data = read_project_path_storage(user_id)
-    return data[project_id]
+    return Path(data[project_id]["project_path"])
 
 
-def create_project(user_id: str, project_id: str, project_path: str = None) -> Path:
+def create_project(user_id: str, project_id: str, project_name: str, project_path: str = None) -> Path:
     if project_path:
         server_path = project_path
     else:
@@ -72,6 +76,7 @@ def create_project(user_id: str, project_id: str, project_path: str = None) -> P
     _ = update_project_path_storage(
         user_id,
         project_id,
+        project_name,
         project_path=server_path
     )
     return server_path 

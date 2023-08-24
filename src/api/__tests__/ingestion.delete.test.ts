@@ -10,15 +10,15 @@ describe('ingestion.delete', () => {
     vi.clearAllMocks();
   });
 
-  it('should call sidecar delete with --source_filenames', async () => {
+  it('should call sidecar delete with --reference_ids', async () => {
     vi.mocked(callSidecar).mockResolvedValue({
       status: 'ok',
     } as DeleteStatusResponse);
 
-    const filenames = ['filea.pdf', 'fileb.pdf'];
-    const result = await removeReferences(filenames);
+    const referenceIds = ['45722618-c4fb-4ae1-9230-7fc19a7219ed', '45722618-c4fb-4ae1-9230-7fc19a7219ed'];
+    const result = await removeReferences(referenceIds);
     expect(vi.mocked(callSidecar).mock.calls).toHaveLength(1);
-    expect(vi.mocked(callSidecar).mock.calls[0]).toStrictEqual(['delete', { source_filenames: filenames }]);
+    expect(vi.mocked(callSidecar).mock.calls[0]).toStrictEqual(['delete', { reference_ids: referenceIds }]);
     expect(result).toBeUndefined();
   });
 

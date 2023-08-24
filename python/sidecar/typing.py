@@ -38,7 +38,7 @@ class IngestStatus(StrEnum):
 
 class Reference(RefStudioModel):
     """A reference for an academic paper / PDF"""
-
+    id: str
     source_filename: str
     status: IngestStatus
     citation_key: str | None = None
@@ -56,12 +56,11 @@ class ReferencePatch(RefStudioModel):
     """
     ReferencePatch is the input type for updating a Reference's metadata.
     """
-
     data: dict[str, Any]
 
 
 class ReferenceUpdate(RefStudioModel):
-    source_filename: str
+    reference_id: str
     patch: ReferencePatch
 
 
@@ -107,7 +106,7 @@ class UpdateStatusResponse(RefStudioModel):
 
 
 class DeleteRequest(RefStudioModel):
-    source_filenames: list[str]
+    reference_ids: list[str]
     all: bool = False
 
 

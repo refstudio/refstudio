@@ -6,6 +6,8 @@ from sidecar import http
 
 api = FastAPI()
 api.mount("/api/sidecar", http.sidecar_api)
+api.mount("/api/references", http.references_api)
+api.mount("/api/ai", http.ai_api)
 api.mount("/api/fs", http.filesystem_api)
 api.mount("/api/projects", http.project_api)
 api.mount("/api/meta", http.meta_api)

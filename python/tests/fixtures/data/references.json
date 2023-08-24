@@ -1,120 +1,164 @@
 [
   {
+    "abstract": null,
+    "authors": [
+      {
+        "email": "john.doe@example.com",
+        "full_name": "John Doe",
+        "given_name": "John",
+        "surname": "Doe"
+      },
+      {
+        "email": "jane.doe@example.com",
+        "full_name": "Jane Doe",
+        "given_name": "Jane",
+        "surname": "Doe"
+      }
+    ],
+    "chunks": [
+      {
+        "metadata": {
+          "page_num": 1,
+          "source_filename": "some_file.pdf"
+        },
+        "text": "Chicago is the most populous city in the U.S. state of Illinois and the third-most populous in the United States after New York City and Los Angeles.",
+        "vector": []
+      },
+      {
+        "metadata": {
+          "page_num": 1,
+          "source_filename": "some_file.pdf"
+        },
+        "text": "With a population of 2,746,388 in the 2020 census, it is also the most populous city in the Midwest.",
+        "vector": []
+      },
+      {
+        "metadata": {
+          "page_num": 1,
+          "source_filename": "some_file.pdf"
+        },
+        "text": "As the seat of Cook County (the second-most populous U.S. county), the city is the center of the Chicago metropolitan area, one of the largest in the world.",
+        "vector": []
+      },
+      {
+        "metadata": {
+          "page_num": 1,
+          "source_filename": "some_file.pdf"
+        },
+        "text": "On the shore of Lake Michigan, Chicago was incorporated as a city in 1837 near a portage between the Great Lakes and the Mississippi River watershed.",
+        "vector": []
+      },
+      {
+        "metadata": {
+          "page_num": 1,
+          "source_filename": "some_file.pdf"
+        },
+        "text": "It grew rapidly in the mid-19th century; by 1860, Chicago was the youngest U.S. city to exceed a population of 100,000.",
+        "vector": []
+      },
+      {
+        "metadata": {
+          "page_num": 1,
+          "source_filename": "some_file.pdf"
+        },
+        "text": "The Great Chicago Fire in 1871 destroyed several square miles and left more than 100,000 homeless, but Chicago's population continued to grow to 503,000 by 1880 and then doubled to more than a million within the decade.",
+        "vector": []
+      },
+      {
+        "metadata": {
+          "page_num": 1,
+          "source_filename": "some_file.pdf"
+        },
+        "text": "The construction boom accelerated population growth throughout the following decades, and by 1900, less than 30 years after the fire, Chicago was the fifth-largest city in the world.",
+        "vector": []
+      },
+      {
+        "metadata": {
+          "page_num": 1,
+          "source_filename": "some_file.pdf"
+        },
+        "text": "Chicago made noted contributions to urban planning and zoning standards, including new construction styles (such as Chicago School architecture, the development of the City Beautiful Movement, and the steel-framed skyscraper).",
+        "vector": []
+      }
+    ],
+    "contents": null,
+    "id": "545553fb-1d82-41d1-ac60-cb60b5eeed37",
+    "metadata": {},
     "source_filename": "some_file.pdf",
     "status": "complete",
-    "title": "Some title",
-    "abstract": null,
-    "contents": null,
-    "authors": [
-      {
-        "full_name": "John Doe",
-        "given_name": "John",
-        "surname": "Doe",
-        "email": "john.doe@example.com"
-      },
-      {
-        "full_name": "Jane Doe",
-        "given_name": "Jane",
-        "surname": "Doe",
-        "email": "jane.doe@example.com"
-      }
-    ],
-    "chunks": [
-      {
-        "text": "Chicago is the most populous city in the U.S. state of Illinois and the third-most populous in the United States after New York City and Los Angeles.",
-        "vector": [],
-        "metadata": {"source_filename": "some_file.pdf", "page_num": 1}
-      },
-      {
-        "text": "With a population of 2,746,388 in the 2020 census, it is also the most populous city in the Midwest.",
-        "vector": [],
-        "metadata": {"source_filename": "some_file.pdf", "page_num": 1}
-      },
-      {
-        "text": "As the seat of Cook County (the second-most populous U.S. county), the city is the center of the Chicago metropolitan area, one of the largest in the world.",
-        "vector": [],
-        "metadata": {"source_filename": "some_file.pdf", "page_num": 1}
-      },
-      {
-        "text": "On the shore of Lake Michigan, Chicago was incorporated as a city in 1837 near a portage between the Great Lakes and the Mississippi River watershed.",
-        "vector": [],
-        "metadata": {"source_filename": "some_file.pdf", "page_num": 1}
-      },
-      {
-        "text": "It grew rapidly in the mid-19th century; by 1860, Chicago was the youngest U.S. city to exceed a population of 100,000.",
-        "vector": [],
-        "metadata": {"source_filename": "some_file.pdf", "page_num": 1}
-      },
-      {
-        "text": "The Great Chicago Fire in 1871 destroyed several square miles and left more than 100,000 homeless, but Chicago's population continued to grow to 503,000 by 1880 and then doubled to more than a million within the decade.",
-        "vector": [],
-        "metadata": {"source_filename": "some_file.pdf", "page_num": 1}
-      },
-      {
-        "text": "The construction boom accelerated population growth throughout the following decades, and by 1900, less than 30 years after the fire, Chicago was the fifth-largest city in the world.",
-        "vector": [],
-        "metadata": {"source_filename": "some_file.pdf", "page_num": 1}
-      },
-      {
-        "text": "Chicago made noted contributions to urban planning and zoning standards, including new construction styles (such as Chicago School architecture, the development of the City Beautiful Movement, and the steel-framed skyscraper).",
-        "vector": [],
-        "metadata": {"source_filename": "some_file.pdf", "page_num": 1}
-      }
-    ],
-    "metadata": {}
+    "title": "Some title"
   },
   {
-    "source_filename": "another_file.pdf",
-    "status": "complete",
-    "title": "Another title",
     "abstract": null,
-    "contents": null,
     "authors": [
       {
+        "email": "john.doe@example.com",
         "full_name": "John Doe",
         "given_name": "John",
-        "surname": "Doe",
-        "email": "john.doe@example.com"
+        "surname": "Doe"
       },
       {
+        "email": "jane.doe@example.com",
         "full_name": "Jane Doe",
         "given_name": "Jane",
-        "surname": "Doe",
-        "email": "jane.doe@example.com"
+        "surname": "Doe"
       }
     ],
     "chunks": [
       {
+        "metadata": {
+          "page_num": 1,
+          "source_filename": "another_file.pdf"
+        },
         "text": "A baseball game is played between two teams, each usually composed of nine players, that take turns playing offense (batting and baserunning) and defense (pitching and fielding).",
-        "vector": [],
-        "metadata": {"source_filename": "another_file.pdf", "page_num": 1}
+        "vector": []
       },
       {
+        "metadata": {
+          "page_num": 1,
+          "source_filename": "another_file.pdf"
+        },
         "text": "A pair of turns, one at bat and one in the field, by each team constitutes an inning. A game consists of nine innings (seven innings at the high school level and in doubleheaders in college, Minor League Baseball and, since the 2020 season, Major League Baseball; and six innings at the Little League level).",
-        "vector": [],
-        "metadata": {"source_filename": "another_file.pdf", "page_num": 1}
+        "vector": []
       },
       {
-        "text": "One team—customarily the visiting team—bats in the top, or first half, of every inning. The other team—customarily the home team—bats in the bottom, or second half, of every inning. The goal of the game is to score more points (runs) than the other team.",
-        "vector": [],
-        "metadata": {"source_filename": "another_file.pdf", "page_num": 1}
+        "metadata": {
+          "page_num": 1,
+          "source_filename": "another_file.pdf"
+        },
+        "text": "One team\u2014customarily the visiting team\u2014bats in the top, or first half, of every inning. The other team\u2014customarily the home team\u2014bats in the bottom, or second half, of every inning. The goal of the game is to score more points (runs) than the other team.",
+        "vector": []
       },
       {
+        "metadata": {
+          "page_num": 1,
+          "source_filename": "another_file.pdf"
+        },
         "text": "The players on the team at bat attempt to score runs by touching all four bases, in order, set at the corners of the square-shaped baseball diamond. A player bats at home plate and must attempt to safely reach a base before proceeding, counterclockwise, from first base, to second base, third base, and back home to score a run.",
-        "vector": [],
-        "metadata": {"source_filename": "another_file.pdf", "page_num": 1}
+        "vector": []
       },
       {
+        "metadata": {
+          "page_num": 1,
+          "source_filename": "another_file.pdf"
+        },
         "text": "The team in the field attempts to prevent runs from scoring by recording outs, which remove opposing players from offensive action, until their next turn at bat comes up again. When three outs are recorded, the teams switch roles for the next half-inning.",
-        "vector": [],
-        "metadata": {"source_filename": "another_file.pdf", "page_num": 1}
+        "vector": []
       },
       {
+        "metadata": {
+          "page_num": 1,
+          "source_filename": "another_file.pdf"
+        },
         "text": "If the score of the game is tied after nine innings, extra innings are played to resolve the contest. Many amateur games, particularly unorganized ones, involve different numbers of players and innings.",
-        "vector": [],
-        "metadata": {"source_filename": "another_file.pdf", "page_num": 1}
+        "vector": []
       }
     ],
-    "metadata": {}
+    "contents": null,
+    "id": "700c1692-995f-46b7-896b-f68cd7f64dc6",
+    "metadata": {},
+    "source_filename": "another_file.pdf",
+    "status": "complete",
+    "title": "Another title"
   }
 ]

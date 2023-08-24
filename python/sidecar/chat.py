@@ -4,7 +4,7 @@ import openai
 from dotenv import load_dotenv
 from tenacity import retry, stop_after_attempt, wait_fixed
 
-from sidecar import prompts, settings, typing
+from sidecar import prompts, settings, typing, projects
 from sidecar.ranker import BM25Ranker
 from sidecar.settings import logger
 from sidecar.storage import JsonStorage
@@ -14,14 +14,20 @@ load_dotenv()
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 
-def ask_question(request: ChatRequest):
+def ask_question(request: ChatRequest, project_id: str = None) -> typing.ChatResponse:
     input_text = request.text
     n_choices = request.n_choices
     temperature = request.temperature
 
     logger.info(f"Calling chat with the following parameters: {request.dict()}")
 
-    storage = JsonStorage(filepath=settings.REFERENCES_JSON_PATH)
+    if project_id:
+        project_path = projects.get_project_path(user_id="user1", project_id=project_id)
+        filepath = project_path / ".storage" / "references.json"
+        storage = JsonStorage(filepath=filepath)
+    else:
+        storage = JsonStorage(filepath=settings.REFERENCES_JSON_PATH)
+    
     logger.info(f"Loading documents from storage: {storage.filepath}")
     storage.load()
     logger.info(f"Loaded {len(storage.chunks)} documents from storage")
