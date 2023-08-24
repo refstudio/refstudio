@@ -40,7 +40,7 @@ export function AppStartup() {
 
         if (isMounted()) {
           setInitialized(true);
-          const projectDir = getCachedSetting('project.currentDir');
+          const projectDir = getCachedSetting('project.current_directory');
           if (projectDir) {
             await openProject(projectDir);
           }

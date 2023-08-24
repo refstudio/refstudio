@@ -32,12 +32,12 @@ export function GeneralSettingsPane({ config }: SettingsPaneProps) {
               Active
             </label>
             <input
-              checked={sidecarLoggingSettings.active}
+              checked={sidecarLoggingSettings.enable}
               className="w-full border px-2 py-0.5"
               id="active"
               type="checkbox"
               onChange={(e) =>
-                setSidecarLoggingSettings({ ...sidecarLoggingSettings, active: e.currentTarget.checked })
+                setSidecarLoggingSettings({ ...sidecarLoggingSettings, enable: e.currentTarget.checked })
               }
             />
           </div>
@@ -48,11 +48,13 @@ export function GeneralSettingsPane({ config }: SettingsPaneProps) {
             <input
               className="w-full border bg-slate-50 px-2 py-0.5"
               id="path"
-              value={sidecarLoggingSettings.path}
-              onChange={(e) => setSidecarLoggingSettings({ ...sidecarLoggingSettings, path: e.currentTarget.value })}
+              value={sidecarLoggingSettings.filepath}
+              onChange={(e) =>
+                setSidecarLoggingSettings({ ...sidecarLoggingSettings, filepath: e.currentTarget.value })
+              }
             />
             <p className="text-xs text-gray-500">
-              The log filename can be located in <code>{sidecarLoggingSettings.path}/refstudio-sidecar.log</code>.
+              The log filename can be located in <code>{sidecarLoggingSettings.filepath}/refstudio-sidecar.log</code>.
             </p>
           </div>
         </fieldset>

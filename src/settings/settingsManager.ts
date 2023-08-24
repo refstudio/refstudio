@@ -10,7 +10,7 @@ export function getMannerOptions(): OpenAiManner[] {
   return ['concise', 'elaborate', 'scholarly'];
 }
 
-type DeepRequired<T> = T extends object ? { [k in keyof T]-?: T[k] } : T;
+type DeepRequired<T> = T extends object ? { [k in keyof T]-?: DeepRequired<T[k]> } : T;
 
 export type SettingsSchema = DeepRequired<apiTypes.SettingsSchema>;
 
