@@ -40,7 +40,7 @@ export function RightSidePanelWrapper() {
 
   return (
     <>
-      <VerticalResizeHandle />
+      <VerticalResizeHandle transparent />
       <Panel collapsible order={3} ref={rightPanelRef} onCollapse={(collapsed) => setSecondaryPaneCollapsed(collapsed)}>
         {secondaryPane === 'Rewriter' && <RewriterPanel />}
         {secondaryPane === 'Chatbot' && <ChatbotPanel />}

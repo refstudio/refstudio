@@ -1,6 +1,5 @@
-import { VscCircleFilled, VscClose } from 'react-icons/vsc';
-
 import { cx } from '../lib/cx';
+import { CircleIcon, CloseIcon } from './icons';
 
 interface CloseButtonProps {
   className?: string;
@@ -24,23 +23,25 @@ export function TabCloseButton({ isDirty, onClick }: CloseButtonProps) {
         },
       )}
     >
-      <VscClose
-        className={cx('block', 'group-hover/tab-close-button:!block', {
+      <div
+        className={cx('block', 'group-hover/tab-close-button:!block', 'hover:text-btn-ico-top-bar-active', {
           '!hidden': isDirty,
         })}
-        color="currentcolor"
         role="button"
         onClick={(e) => {
           e.stopPropagation();
           onClick();
         }}
-      />
-      <VscCircleFilled
+      >
+        <CloseIcon />
+      </div>
+      <div
         className={cx('hidden', 'group-hover/tab-close-button:!hidden', {
           '!block': isDirty,
         })}
-        color="currentcolor"
-      />
+      >
+        <CircleIcon />
+      </div>
     </div>
   );
 }
