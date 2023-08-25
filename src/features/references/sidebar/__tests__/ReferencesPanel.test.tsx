@@ -5,8 +5,8 @@ import { useActiveEditorContentAtoms } from '../../../../atoms/hooks/useActiveEd
 import { useActiveEditorId } from '../../../../atoms/hooks/useActiveEditorId';
 import { setReferencesAtom } from '../../../../atoms/referencesState';
 import { buildEditorId } from '../../../../atoms/types/EditorData';
-import { emitEvent, RefStudioEventName, RefStudioEventPayload } from '../../../../events';
-import { screen, setupWithJotaiProvider, waitFor, within } from '../../../../test/test-utils';
+import { emitEvent, RefStudioEventName } from '../../../../events';
+import { screen, setupWithJotaiProvider, waitFor } from '../../../../test/test-utils';
 import { REFERENCES } from '../../__tests__/test-fixtures';
 import { ReferencesPanel } from '../ReferencesPanel';
 
@@ -25,19 +25,10 @@ describe('ReferencesPanel', () => {
     vi.clearAllMocks();
   });
 
-  it('should display welcome message with empty references', () => {
-    setupWithJotaiProvider(<ReferencesPanel />);
-    expect(screen.getByText('References')).toBeInTheDocument();
-    expect(screen.getByText(/welcome to your refstudio references library/i)).toBeInTheDocument();
-  });
-
-  it.each<{ title: string; event: RefStudioEventName }>([
-    { title: 'Add References', event: 'refstudio://menu/references/upload' },
-    { title: 'Open References', event: 'refstudio://menu/references/open' },
-  ])('should trigger $title on click', async ({ title, event }) => {
+  it('should trigger refstudio://menu/references/open on click', async () => {
     const { user } = setupWithJotaiProvider(<ReferencesPanel />);
-    await user.click(screen.getByTitle(title));
-    expect(vi.mocked(emitEvent)).toBeCalledWith(event);
+    await user.click(screen.getByTitle('Open References'));
+    expect(vi.mocked(emitEvent)).toBeCalledWith<[RefStudioEventName]>('refstudio://menu/references/open');
   });
 
   it('should display ReferencesList with references', () => {
@@ -51,7 +42,7 @@ describe('ReferencesPanel', () => {
   it('should filter ReferencesList with text', async () => {
     const { user } = setupWithJotaiProvider(<ReferencesPanel />, store);
 
-    await user.type(screen.getByPlaceholderText('Filter (e.g. title, author)'), ref1.title);
+    await user.type(screen.getByPlaceholderText('Filter author/title...'), ref1.title);
 
     // The filter is debounced
     await waitFor(() => expect(screen.queryByText(ref2.title)).not.toBeInTheDocument());
@@ -66,19 +57,6 @@ describe('ReferencesPanel', () => {
     const activeEditorId = runHookWithJotaiProvider(useActiveEditorId, store).current;
     expect(activeEditorId).not.toBeNull();
     expect(activeEditorId).toBe(buildEditorId('reference', ref1.id));
-  });
-
-  it('should open reference PDF on PDF icon click', async () => {
-    const { user } = setupWithJotaiProvider(<ReferencesPanel />, store);
-
-    const elem = screen.getByRole('listitem', { name: ref1.title });
-
-    await user.hover(elem);
-    await user.click(within(elem).getByTitle('Open PDF'));
-
-    const activeEditorId = runHookWithJotaiProvider(useActiveEditorId, store).current;
-    expect(activeEditorId).not.toBeNull();
-    expect(activeEditorId).toBe(buildEditorId('pdf', ref1.filepath));
   });
 
   it('should open references table on author click', async () => {
@@ -98,20 +76,6 @@ describe('ReferencesPanel', () => {
     } else {
       fail('Unexpected editorContent');
     }
-  });
-
-  it(`should emit ${'refstudio://references/remove' as RefStudioEventName} on remove clicked`, async () => {
-    const { user } = setupWithJotaiProvider(<ReferencesPanel />, store);
-
-    const elem = screen.getByRole('listitem', { name: ref1.title });
-
-    await user.hover(elem);
-    await user.click(within(elem).getByTitle('Remove Reference'));
-
-    expect(vi.mocked(emitEvent)).toBeCalled();
-    expect(vi.mocked(emitEvent)).toBeCalledWith<
-      [RefStudioEventName, RefStudioEventPayload<'refstudio://references/remove'>]
-    >('refstudio://references/remove', { referenceIds: [ref1.id] });
   });
 
   it('should have disabled export button when no reference is in the store', async () => {
