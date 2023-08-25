@@ -23,21 +23,39 @@ export const join = import.meta.env.VITE_IS_WEB ? stubPath.join : tauriPath.join
 export const sep = import.meta.env.VITE_IS_WEB ? stubPath.sep : tauriPath.sep;
 
 // @tauri-apps/api/fs
-export const createDir = import.meta.env.VITE_IS_WEB ? dontUseFsInWeb : tauriFs.createDir;
-export const exists = import.meta.env.VITE_IS_WEB ? dontUseFsInWeb : tauriFs.exists;
-export const readBinaryFile = import.meta.env.VITE_IS_WEB ? dontUseFsInWeb : tauriFs.readBinaryFile;
-export const readTextFile = import.meta.env.VITE_IS_WEB ? dontUseFsInWeb : tauriFs.readTextFile;
-export const readDir = import.meta.env.VITE_IS_WEB ? dontUseFsInWeb : tauriFs.readDir;
-export const removeDir = import.meta.env.VITE_IS_WEB ? dontUseFsInWeb : tauriFs.removeDir;
-export const removeFile = import.meta.env.VITE_IS_WEB ? dontUseFsInWeb : tauriFs.removeFile;
-export const writeTextFile = import.meta.env.VITE_IS_WEB ? dontUseFsInWeb : tauriFs.writeTextFile;
-export const writeBinaryFile = import.meta.env.VITE_IS_WEB ? dontUseFsInWeb : tauriFs.writeBinaryFile;
-export const renameFile = import.meta.env.VITE_IS_WEB ? dontUseFsInWeb : tauriFs.renameFile;
+export const createDir = import.meta.env.VITE_IS_WEB
+  ? dontUseFsInWeb<ReturnType<typeof tauriFs.createDir>>
+  : tauriFs.createDir;
+export const exists = import.meta.env.VITE_IS_WEB ? dontUseFsInWeb<ReturnType<typeof tauriFs.exists>> : tauriFs.exists;
+export const readBinaryFile = import.meta.env.VITE_IS_WEB
+  ? dontUseFsInWeb<ReturnType<typeof tauriFs.readBinaryFile>>
+  : tauriFs.readBinaryFile;
+export const readTextFile = import.meta.env.VITE_IS_WEB
+  ? dontUseFsInWeb<ReturnType<typeof tauriFs.readTextFile>>
+  : tauriFs.readTextFile;
+export const readDir = import.meta.env.VITE_IS_WEB
+  ? dontUseFsInWeb<ReturnType<typeof tauriFs.readDir>>
+  : tauriFs.readDir;
+export const removeDir = import.meta.env.VITE_IS_WEB
+  ? dontUseFsInWeb<ReturnType<typeof tauriFs.removeDir>>
+  : tauriFs.removeDir;
+export const removeFile = import.meta.env.VITE_IS_WEB
+  ? dontUseFsInWeb<ReturnType<typeof tauriFs.removeFile>>
+  : tauriFs.removeFile;
+export const writeTextFile = import.meta.env.VITE_IS_WEB
+  ? dontUseFsInWeb<ReturnType<typeof tauriFs.writeTextFile>>
+  : tauriFs.writeTextFile;
+export const writeBinaryFile = import.meta.env.VITE_IS_WEB
+  ? dontUseFsInWeb<ReturnType<typeof tauriFs.writeBinaryFile>>
+  : tauriFs.writeBinaryFile;
+export const renameFile = import.meta.env.VITE_IS_WEB
+  ? dontUseFsInWeb<ReturnType<typeof tauriFs.renameFile>>
+  : tauriFs.renameFile;
 
 // @tauri-apps/api/event
 export const emit = import.meta.env.VITE_IS_WEB ? stubEvent.emit : tauriEvent.emit;
 export const listen = import.meta.env.VITE_IS_WEB ? stubEvent.listen : tauriEvent.listen;
 
-function dontUseFsInWeb() {
+function dontUseFsInWeb<Res>(): Res {
   throw new Error('Dont use FS in the WEB. Use the HTTP API instead');
 }
