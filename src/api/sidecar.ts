@@ -64,17 +64,17 @@ export async function callSidecar<T extends keyof CliCommands>(
   arg: CliCommands[T][0],
 ): Promise<CliCommands[T][1]> {
   const projectSettings = getCachedSetting('project');
-  const openAISettings = getCachedSetting('openAI');
+  const openAISettings = getCachedSetting('openai');
   const sidecarSettings = getCachedSetting('sidecar');
   const env: Record<string, string> = {
     // Paths
-    PROJECT_DIR: projectSettings.currentDir,
+    PROJECT_DIR: projectSettings.current_directory,
     // Open AI
-    OPENAI_API_KEY: openAISettings.apiKey,
-    OPENAI_CHAT_MODEL: openAISettings.chatModel,
+    OPENAI_API_KEY: openAISettings.api_key,
+    OPENAI_CHAT_MODEL: openAISettings.chat_model,
     // Sidecar
-    SIDECAR_ENABLE_LOGGING: String(sidecarSettings.logging.active),
-    SIDECAR_LOG_DIR: sidecarSettings.logging.path,
+    SIDECAR_ENABLE_LOGGING: String(sidecarSettings.logging.enable),
+    SIDECAR_LOG_DIR: sidecarSettings.logging.filepath,
   };
 
   const command = new Command('call-sidecar', [subcommand, JSON.stringify(arg)], { env });

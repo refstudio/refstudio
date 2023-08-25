@@ -21,12 +21,12 @@ const panelConfig: PaneConfig = {
 
 const mockSettings: Pick<SettingsSchema, 'project' | 'sidecar'> = {
   project: {
-    currentDir: 'APP-DATA-DIR',
+    current_directory: 'APP-DATA-DIR',
   },
   sidecar: {
     logging: {
-      active: true,
-      path: 'PATH',
+      enable: true,
+      filepath: 'PATH',
     },
   },
 };
@@ -64,7 +64,7 @@ describe('GeneralSettingsPane component', () => {
 
     expect(getCachedSettingMock.mock.calls.length).toBeGreaterThan(0);
     expect(screen.getByLabelText('Active')).toBeChecked();
-    expect(screen.getByLabelText('Path')).toHaveValue(mockSettings.sidecar.logging.path);
+    expect(screen.getByLabelText('Path')).toHaveValue(mockSettings.sidecar.logging.filepath);
   });
 
   it('should save (setCached, flush) with edited values on save', async () => {
@@ -77,7 +77,7 @@ describe('GeneralSettingsPane component', () => {
     await user.click(screen.getByLabelText('Active'));
     await user.type(screen.getByLabelText('Path'), '-Updated-2');
     expect(screen.getByLabelText('Active')).not.toBeChecked();
-    expect(screen.getByLabelText('Path')).toHaveValue(`${mockSettings.sidecar.logging.path}-Updated-2`);
+    expect(screen.getByLabelText('Path')).toHaveValue(`${mockSettings.sidecar.logging.filepath}-Updated-2`);
     expect(screen.getByRole('button', { name: /save/i })).toBeEnabled();
 
     // Submit

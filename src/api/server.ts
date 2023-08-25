@@ -2,26 +2,39 @@
 
 import { fetch as tauriFetch } from '@tauri-apps/api/http';
 import { Child, ChildProcess, Command as TauriCommand } from '@tauri-apps/api/shell';
+import React from 'react';
+
+import { noop } from '../lib/noop';
 
 export const REFSTUDIO_HOST = 'http://localhost:1487';
 
 interface StartingState {
   state: 'starting';
 }
-interface ReadyState {
-  state: 'ready';
+/** Process has started but is not yet accepting HTTP requests. */
+interface WaitingState {
+  state: 'waiting';
   process: Child;
 }
-type ServerState = StartingState | ReadyState;
+/** Process is ready to serve. */
+interface ServingState {
+  state: 'serving';
+  process: Child;
+}
+type ServerState = StartingState | WaitingState | ServingState;
 
 // A null value means that no one has requested a server yet.
 let serverProcess: ServerState | null = null;
 
-async function startServer() {
+async function startServer(servingCallback: () => void) {
   console.log('Starting RefStudio server');
   const command = new TauriCommand('call-sidecar', ['serve']);
   command.stderr.addListener('data', (line) => {
     console.log('server stderr', line);
+    if (line.includes('running on http')) {
+      console.log('matched the magic words');
+      servingCallback();
+    }
   });
   command.stdout.addListener('data', (line) => {
     console.log('server stdout', line);
@@ -29,12 +42,12 @@ async function startServer() {
   command.addListener('close', (data: Pick<ChildProcess, 'code' | 'signal'>) => {
     console.warn('server closed, restarting', data.code, data.signal);
     serverProcess = null;
-    void getOrStartServer();
+    void getOrStartServer(noop);
   });
   command.addListener('error', (data) => {
     console.error('server crashed, restarting', data);
     serverProcess = null;
-    void getOrStartServer();
+    void getOrStartServer(noop);
   });
   return command.spawn();
 }
@@ -59,7 +72,7 @@ async function isServerHealthy() {
 
 /** Kill an existing server under our management if there is one. This will trigger a restart. */
 async function killServer() {
-  if (serverProcess?.state === 'ready') {
+  if (serverProcess?.state === 'waiting' || serverProcess?.state === 'serving') {
     await serverProcess.process.kill();
   }
 }
@@ -70,9 +83,9 @@ if (import.meta.env.DEV) {
 }
 
 /** Get a reference to an existing server under our management, starting one if necessary. */
-async function getOrStartServer() {
+async function getOrStartServer(servingCallback: () => void) {
   if (serverProcess) {
-    if (serverProcess.state === 'ready') {
+    if (serverProcess.state === 'waiting' || serverProcess.state === 'serving') {
       return serverProcess.process;
     }
     return null;
@@ -89,8 +102,11 @@ async function getOrStartServer() {
     }
   }
 
-  const process = await startServer();
-  serverProcess = { state: 'ready', process };
+  const process = await startServer(() => {
+    serverProcess = { state: 'serving', process };
+    servingCallback();
+  });
+  serverProcess = { state: 'waiting', process };
   return process;
 }
 
@@ -101,14 +117,23 @@ async function getOrStartServer() {
  * If an existing server not managed by us is already running, it will be killed. (This can happen
  * when you run Tauri Desktop in dev mode and make TypeScript changes.)
  */
-export function runRefStudioServerOnDesktop() {
-  if (import.meta.env.VITE_IS_WEB) {
-    return; // no server to be started for the web app.
-  }
+export function useRefStudioServerOnDesktop() {
+  // the server is always running for the web version
+  const [isServerRunning, setIsServerRunning] = React.useState(!!import.meta.env.VITE_IS_WEB);
 
-  (async () => {
-    await getOrStartServer();
-  })().catch((e) => {
-    console.error(e);
-  });
+  React.useEffect(() => {
+    if (isServerRunning) {
+      return;
+    }
+    (async () => {
+      await getOrStartServer(() => {
+        console.log('setting isServerRunning');
+        setIsServerRunning(true);
+      });
+    })().catch((e) => {
+      console.error(e);
+    });
+  }, [isServerRunning]);
+
+  return isServerRunning;
 }

@@ -17,18 +17,18 @@ const panelConfig: PaneConfig = {
 
 const mockSettings: SettingsSchema = {
   project: {
-    currentDir: 'app-dir',
+    current_directory: 'app-dir',
   },
-  openAI: {
-    apiKey: '',
-    chatModel: 'gpt-3.5-turbo',
+  openai: {
+    api_key: '',
+    chat_model: 'gpt-3.5-turbo',
     manner: 'concise',
     temperature: 0.7,
   },
   sidecar: {
     logging: {
-      active: true,
-      path: '/tmp',
+      enable: true,
+      filepath: '/tmp',
     },
   },
 };

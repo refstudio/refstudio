@@ -1,6 +1,7 @@
 from datetime import date
 from typing import Any
 
+from dotenv import load_dotenv
 from pydantic import BaseModel
 
 try:
@@ -11,6 +12,9 @@ except ImportError:
     # https://github.com/python/cpython/issues/100458
     # Python 3.10 and below
     from strenum import StrEnum
+
+
+load_dotenv()
 
 
 class RefStudioModel(BaseModel):

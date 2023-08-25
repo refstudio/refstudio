@@ -14,11 +14,11 @@ import {
 } from '../../../settings/settingsManager';
 
 export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
-  const [paneSettings, setPaneSettings] = useState(getCachedSetting('openAI'));
+  const [paneSettings, setPaneSettings] = useState(getCachedSetting('openai'));
 
   const saveMutation = useMutation({
     mutationFn: async (value: typeof paneSettings) => {
-      setCachedSetting('openAI', value);
+      setCachedSetting('openai', value);
       await saveCachedSettings();
       return getSettings();
     },
@@ -29,7 +29,7 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
     saveMutation.mutate(paneSettings);
   };
 
-  const isDirty = JSON.stringify(paneSettings) !== JSON.stringify(getCachedSetting('openAI'));
+  const isDirty = JSON.stringify(paneSettings) !== JSON.stringify(getCachedSetting('openai'));
 
   return (
     <SettingsPane
@@ -46,8 +46,8 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
               data-testid="apiKey"
               id="apiKey"
               name="apiKey"
-              value={paneSettings.apiKey}
-              onChange={(e) => setPaneSettings({ ...paneSettings, apiKey: e.currentTarget.value })}
+              value={paneSettings.api_key}
+              onChange={(e) => setPaneSettings({ ...paneSettings, api_key: e.currentTarget.value })}
             />
           </div>
           <div>
@@ -56,8 +56,8 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
               className="w-full border bg-slate-50 px-2 py-0.5"
               id="chatModel"
               name="chatModel"
-              value={paneSettings.chatModel}
-              onChange={(e) => setPaneSettings({ ...paneSettings, chatModel: e.currentTarget.value })}
+              value={paneSettings.chat_model}
+              onChange={(e) => setPaneSettings({ ...paneSettings, chat_model: e.currentTarget.value })}
             />
           </div>
           <div>
