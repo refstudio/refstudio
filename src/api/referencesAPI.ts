@@ -17,12 +17,6 @@ export async function getRemoteReferences(projectId: string) {
   return references;
 }
 
-export async function deleteRemoteReference(projectId: string, referenceId: string) {
-  await fetch(`/api/references/${projectId}/${referenceId}`, {
-    method: 'DELETE',
-  });
-}
-
 export async function deleteRemoteReferences(projectId: string, referenceIds: string[]) {
   await fetch(`/api/references/${projectId}/bulk_delete`, {
     method: 'DELETE',

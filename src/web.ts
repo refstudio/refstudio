@@ -18,15 +18,6 @@ export async function readOneProjectFromWeb() {
   };
 }
 
-export async function readProjectInfoFromWeb(projectId: string) {
-  const projectInfo = await getRemoteProject(projectId);
-  return {
-    id: projectId,
-    path: projectInfo.project_path,
-    name: projectInfo.project_path.split('/').pop(),
-  };
-}
-
 /** NOTE: This is a simplified version of the function */
 export async function readProjectFilesFromWeb(projectId: string) {
   const projectInfo = await getRemoteProject(projectId);
