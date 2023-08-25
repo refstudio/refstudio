@@ -1,10 +1,11 @@
 import { getSystemPath, getUploadsDir, makeUploadPath } from '../io/filesystem';
 import { ReferenceItem } from '../types/ReferenceItem';
+import { getRemoteReferences, startRemoteReferencesIngestion } from './referencesAPI';
 import { callSidecar } from './sidecar';
-import { IngestResponse, Reference } from './types';
+import { Reference } from './types';
 
-function parsePdfIngestionResponse(response: IngestResponse): ReferenceItem[] {
-  return response.references.map((reference) => ({
+function parsePdfIngestionResponse(references: Reference[]): ReferenceItem[] {
+  return references.map((reference) => ({
     id: reference.id,
     source_filename: reference.source_filename,
     filepath: makeUploadPath(reference.source_filename),
@@ -21,10 +22,18 @@ function parsePdfIngestionResponse(response: IngestResponse): ReferenceItem[] {
   }));
 }
 
-export async function runPDFIngestion(): Promise<ReferenceItem[]> {
-  const uploadsDir = await getSystemPath(getUploadsDir());
-  const response = await callSidecar('ingest', { pdf_directory: String(uploadsDir) });
-  return parsePdfIngestionResponse(response);
+export async function runPDFIngestion(projectId?: string): Promise<ReferenceItem[]> {
+  if (import.meta.env.VITE_IS_WEB) {
+    if (!projectId) {
+      throw new Error('Project ID is required for web version');
+    }
+    const references = await startRemoteReferencesIngestion(projectId);
+    return parsePdfIngestionResponse(references);
+  } else {
+    const uploadsDir = await getSystemPath(getUploadsDir());
+    const response = await callSidecar('ingest', { pdf_directory: String(uploadsDir) });
+    return parsePdfIngestionResponse(response.references);
+  }
 }
 
 export async function removeReferences(ids: string[]) {
@@ -67,10 +76,18 @@ export async function updateReference(id: string, patch: Partial<ReferenceItem>)
   }
 }
 
-export async function getIngestedReferences(): Promise<ReferenceItem[]> {
-  const uploadsDir = await getSystemPath(getUploadsDir());
-  const response = await callSidecar('ingest_references', { pdf_directory: String(uploadsDir) });
-  return parsePdfIngestionResponse(response);
+export async function getIngestedReferences(projectId?: string): Promise<ReferenceItem[]> {
+  if (import.meta.env.VITE_IS_WEB) {
+    if (!projectId) {
+      throw new Error('Project ID is required for web version');
+    }
+    const references = await getRemoteReferences(projectId);
+    return parsePdfIngestionResponse(references);
+  } else {
+    const uploadsDir = await getSystemPath(getUploadsDir());
+    const response = await callSidecar('ingest_references', { pdf_directory: String(uploadsDir) });
+    return parsePdfIngestionResponse(response.references);
+  }
 }
 
 export async function getIngestionStatus() {
