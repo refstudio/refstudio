@@ -24,9 +24,26 @@ export async function universalPost<ResponsePayload = unknown, RequestPayload = 
   path: string,
   payload: RequestPayload,
 ): Promise<ResponsePayload> {
+  return universalRequest('POST', path, payload);
+}
+
+/** Issue a PUT request with a JSON payload using either web fetch or Tauri fetch */
+export async function universalPut<ResponsePayload = unknown, RequestPayload = unknown>(
+  path: string,
+  payload: RequestPayload,
+): Promise<ResponsePayload> {
+  return universalRequest('PUT', path, payload);
+}
+
+/** Issue a request with a JSON payload using either web fetch or Tauri fetch */
+async function universalRequest<ResponsePayload = unknown, RequestPayload = unknown>(
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+  path: string,
+  payload: RequestPayload,
+): Promise<ResponsePayload> {
   if (import.meta.env.VITE_IS_WEB) {
     const response = await fetch(path, {
-      method: 'POST',
+      method,
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
@@ -39,7 +56,7 @@ export async function universalPost<ResponsePayload = unknown, RequestPayload = 
     return response.json() as ResponsePayload;
   } else {
     const response = await tauriFetch(REFSTUDIO_HOST + path, {
-      method: 'POST',
+      method,
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
       body: Body.json(payload as any),
     });

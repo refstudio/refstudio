@@ -2,7 +2,7 @@ import { SettingsManager } from 'tauri-settings';
 import { Path, PathValue } from 'tauri-settings/dist/types/dot-notation';
 import { getDotNotation, setDotNotation } from 'tauri-settings/dist/utils/dot-notation';
 
-import { universalGet, universalPost } from '../api/api';
+import { universalGet, universalPut } from '../api/api';
 import type * as apiTypes from '../api/api-types';
 
 export type OpenAiManner = apiTypes.RewriteMannerType;
@@ -46,7 +46,7 @@ export async function initSettings() {
       return value;
     },
     syncCache: async () => {
-      const newSettings = await universalPost<SettingsSchema>('/api/settings/', settings, 'PUT');
+      const newSettings = await universalPut<SettingsSchema>('/api/settings/', settings);
       settings = newSettings;
       return settings;
     },
