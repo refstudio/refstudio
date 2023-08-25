@@ -46,9 +46,9 @@ export const referencesSyncInProgressAtom = atom<boolean>(false);
 // #####################################################################################
 const referencesLoadedAtom = atom<boolean | null>(null);
 
-export const loadReferencesAtom = atom(null, async (_get, set) => {
+export const loadReferencesAtom = atom(null, async (_get, set, projectId?: string) => {
   set(referencesLoadedAtom, false);
-  const initialReferences = await getIngestedReferences();
+  const initialReferences = await getIngestedReferences(projectId);
   set(setReferencesAtom, initialReferences);
   set(referencesLoadedAtom, true);
 });
@@ -65,37 +65,40 @@ const removeReferenceAtom = atom(null, (get, set, id: string) => {
 });
 
 const UPDATABLE_FIELDS: (keyof ReferenceItem)[] = ['citationKey', 'title', 'publishedDate', 'authors'];
-export const updateReferenceAtom = atom(null, async (get, set, id: string, updatedReference: ReferenceItem) => {
-  const reference = get(getDerivedReferenceAtom(id));
-  if (!reference) {
-    console.warn('Cannot find reference with ID', id);
-    return;
-  }
+export const updateReferenceAtom = atom(
+  null,
+  async (get, set, id: string, updatedReference: ReferenceItem, projectId?: string) => {
+    const reference = get(getDerivedReferenceAtom(id));
+    if (!reference) {
+      console.warn('Cannot find reference with ID', id);
+      return;
+    }
 
-  const patch: Partial<ReferenceItem> = UPDATABLE_FIELDS.reduce(
-    (acc, field) => ({
-      ...acc,
-      ...patchEntry(field, reference, updatedReference),
-    }),
-    {},
-  );
+    const patch: Partial<ReferenceItem> = UPDATABLE_FIELDS.reduce(
+      (acc, field) => ({
+        ...acc,
+        ...patchEntry(field, reference, updatedReference),
+      }),
+      {},
+    );
 
-  if (Object.keys(patch).length === 0) {
-    console.log('No change detected.');
-    return;
-  }
+    if (Object.keys(patch).length === 0) {
+      console.log('No change detected.');
+      return;
+    }
 
-  // Call backend (patch of updatable fields)
-  await updateReference(reference.filename, patch);
+    // Call backend (patch of updatable fields)
+    await updateReference(reference.filename, patch, reference.id, projectId);
 
-  // Update local atoms
-  const references = get(getReferencesAtom);
-  const updatedReferences: ReferencesState = {};
-  references.forEach((ref) => {
-    updatedReferences[ref.id] = ref.id === updatedReference.id ? updatedReference : ref;
-  });
-  set(referencesAtom, updatedReferences);
-});
+    // Update local atoms
+    const references = get(getReferencesAtom);
+    const updatedReferences: ReferencesState = {};
+    references.forEach((ref) => {
+      updatedReferences[ref.id] = ref.id === updatedReference.id ? updatedReference : ref;
+    });
+    set(referencesAtom, updatedReferences);
+  },
+);
 
 function patchEntry(key: keyof ReferenceItem, original: ReferenceItem, updated: ReferenceItem): Partial<ReferenceItem> {
   const originalValue = original[key];
@@ -107,7 +110,7 @@ function patchEntry(key: keyof ReferenceItem, original: ReferenceItem, updated: 
   return {};
 }
 
-export const removeReferencesAtom = atom(null, async (get, set, ids: string[]) => {
+export const removeReferencesAtom = atom(null, async (get, set, ids: string[], projectId: string) => {
   const referencesToRemove = ids.map((id) => get(getDerivedReferenceAtom(id))).filter(isNonNullish);
 
   // Close any open editor with references (details or pdf) about to be removed
@@ -119,7 +122,10 @@ export const removeReferencesAtom = atom(null, async (get, set, ids: string[]) =
   });
 
   // Remove references from BE
-  await removeReferences(referencesToRemove.map((ref) => ref.filename));
+  await removeReferences(
+    referencesToRemove.map((ref) => ref.filename),
+    projectId,
+  );
 
   // Remove files from filesystem
   const success = await Promise.all(referencesToRemove.map((reference) => deleteFile(reference.filepath)));
