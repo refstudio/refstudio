@@ -1,3 +1,7 @@
+import Lottie from 'react-lottie';
+
+import chatbotLoadingAnimationData from '../../lotties/chatbot-loading.json';
+
 export const SendIcon = () => (
   <div className="flex h-6 w-6 shrink-0 items-center justify-center self-center">
     <svg height="18" viewBox="0 0 20 18" width="20" xmlns="http://www.w3.org/2000/svg">
@@ -11,5 +15,11 @@ export const SendIcon = () => (
         fill="currentcolor"
       />
     </svg>
+  </div>
+);
+
+export const LoadingIcon = () => (
+  <div className="flex h-6 w-6 shrink-0 items-center justify-center self-center">
+    <Lottie options={{ loop: true, autoplay: true, animationData: chatbotLoadingAnimationData }} />
   </div>
 );

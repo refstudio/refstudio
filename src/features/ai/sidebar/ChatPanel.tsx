@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { chatWithAI } from '../../../api/chat';
 import { PanelWrapper } from '../../../components/PanelWrapper';
 import { cx } from '../../../lib/cx';
-import { SendIcon } from '../../components/icons';
+import { LoadingIcon, SendIcon } from '../../components/icons';
 
 interface ChatThreadItem {
   id: string;
@@ -107,7 +107,7 @@ function ChatThreadItemBlock({ text, actor }: { text?: string; actor: 'user' | '
         'bg-side-bar-bg-secondary': actor === 'ai',
       })}
     >
-      {text ?? '...'}
+      {text ?? <LoadingIcon />}
     </div>
   );
 }
