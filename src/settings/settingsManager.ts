@@ -1,4 +1,4 @@
-import type { SettingsManager } from 'tauri-settings';
+import { SettingsManager } from 'tauri-settings';
 import { Path, PathValue } from 'tauri-settings/dist/types/dot-notation';
 import { getDotNotation, setDotNotation } from 'tauri-settings/dist/utils/dot-notation';
 
@@ -29,7 +29,7 @@ let settingsManager: SettingsManagerView | undefined;
 export async function initSettings() {
   let settings: SettingsSchema;
   try {
-    settings = (await universalGet('/api/settings/')) as SettingsSchema;
+    settings = await universalGet('/api/settings/');
 
     console.log('Settings initialized with success with', settings);
     console.log('openAI', settings.openai);
@@ -46,7 +46,7 @@ export async function initSettings() {
       return value;
     },
     syncCache: async () => {
-      const newSettings = (await universalPost('/api/settings/', settings, 'PUT')) as SettingsSchema;
+      const newSettings = await universalPost<SettingsSchema>('/api/settings/', settings, 'PUT');
       settings = newSettings;
       return settings;
     },
