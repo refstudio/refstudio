@@ -1,6 +1,11 @@
 import { getSystemPath, getUploadsDir, makeUploadPath } from '../io/filesystem';
 import { ReferenceItem } from '../types/ReferenceItem';
-import { deleteRemoteReferences, getRemoteReferences, startRemoteReferencesIngestion } from './referencesAPI';
+import {
+  deleteRemoteReferences,
+  getRemoteReferences,
+  patchRemoteReference,
+  startRemoteReferencesIngestion,
+} from './referencesAPI';
 import { callSidecar } from './sidecar';
 import { Reference } from './types';
 
@@ -59,7 +64,12 @@ function applyPatch(field: keyof ReferenceItem, patch: Partial<ReferenceItem>, g
   return {};
 }
 
-export async function updateReference(id: string, patch: Partial<ReferenceItem>) {
+export async function updateReference(
+  filename: string,
+  patch: Partial<ReferenceItem>,
+  referenceId: string,
+  projectId?: string,
+) {
   const referencePatch: Partial<Reference> = {
     ...applyPatch('citationKey', patch, () => ({ citation_key: patch.citationKey })),
     ...applyPatch('title', patch, () => ({ title: patch.title })),
@@ -73,14 +83,21 @@ export async function updateReference(id: string, patch: Partial<ReferenceItem>)
     return;
   }
 
-  const response = await callSidecar('update', {
-    reference_id: id,
-    patch: {
-      data: referencePatch,
-    },
-  });
-  if (response.status === 'error') {
-    throw new Error('Error updating reference: ' + response.message);
+  if (import.meta.env.VITE_IS_WEB) {
+    if (!projectId) {
+      throw new Error('Project ID is required for web version');
+    }
+    await patchRemoteReference(projectId, referenceId, referencePatch);
+  } else {
+    const response = await callSidecar('update', {
+      reference_id: filename,
+      patch: {
+        data: referencePatch,
+      },
+    });
+    if (response.status === 'error') {
+      throw new Error('Error updating reference: ' + response.message);
+    }
   }
 }
 

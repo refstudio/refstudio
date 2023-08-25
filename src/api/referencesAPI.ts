@@ -27,12 +27,18 @@ export async function deleteRemoteReferences(projectId: string, referenceIds: st
   await fetch(`/api/references/${projectId}/bulk_delete`, {
     method: 'DELETE',
     body: JSON.stringify({ reference_ids: referenceIds }),
+    headers: {
+      'Content-Type': 'application/json',
+    },
   });
 }
 
-export async function patchRemoteReferences(projectId: string, referenceId: string, reference: Partial<Reference>) {
+export async function patchRemoteReference(projectId: string, referenceId: string, patch: Partial<Reference>) {
   await fetch(`/api/references/${projectId}/${referenceId}`, {
     method: 'PATCH',
-    body: JSON.stringify({ reference }),
+    body: JSON.stringify({ data: patch }),
+    headers: {
+      'Content-Type': 'application/json',
+    },
   });
 }

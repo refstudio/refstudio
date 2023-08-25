@@ -16,6 +16,7 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { VscDesktopDownload, VscKebabVertical, VscNewFile, VscTable, VscTrash } from 'react-icons/vsc';
 
+import { projectIdAtom } from '../../../atoms/projectState';
 import { getReferencesAtom, updateReferenceAtom } from '../../../atoms/referencesState';
 import { emitEvent } from '../../../events';
 import { autoFocusAndSelect } from '../../../lib/autoFocusAndSelect';
@@ -33,6 +34,7 @@ ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: string }) {
   const references = useAtomValue(getReferencesAtom);
+  const projectId = useAtomValue(projectIdAtom);
   const updateReference = useSetAtom(updateReferenceAtom);
   const [quickFilter, setQuickFilter] = useState(defaultFilter);
 
@@ -43,8 +45,8 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
   const gridRef = useRef<AgGridReact<ReferenceItem>>(null);
 
   const handleCellValueChanged = useCallback(
-    (params: NewValueParams<ReferenceItem>) => void updateReference(params.data.id, params.data),
-    [updateReference],
+    (params: NewValueParams<ReferenceItem>) => void updateReference(params.data.id, params.data, projectId),
+    [updateReference, projectId],
   );
 
   const onSelectionChanged = useCallback((event: SelectionChangedEvent<ReferenceItem>) => {
