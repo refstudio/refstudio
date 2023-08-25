@@ -1,6 +1,7 @@
 """
 Author: Shaurya
-This script performs a search on Semantic Scholar and retrieves information about a set of papers.
+This script performs a search on Semantic Scholar and 
+retrieves information about a set of papers.
 """
 import logging
 
@@ -27,7 +28,7 @@ class Searcher:
 
     # Method to perform the search
     # Other search fields can be found here:
-    # https://github.com/danielnsilva/semanticscholar/blob/da433a1f45e0c17bbd58300de0602c969602675a/semanticscholar/Paper.py#L93
+    # https://github.com/danielnsilva/semanticscholar/blob/da433a1f45e0c17bbd58300de0602c969602675a/semanticscholar/Paper.py#L93 # noqa: E501
     def search_func(
         self,
         query,
@@ -60,7 +61,7 @@ class Searcher:
 
         Returns
         -------
-            This function doesn't return any value. It writes the search results to stdout.
+        SearchResponse
         """
 
         # Preprocess the query (e.g., lowercase, remove stopwords)

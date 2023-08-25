@@ -16,7 +16,7 @@
     "knip:check": "yarn knip",
     "prettier:check": "prettier --config package.json --check 'src/**'",
     "prettier:fix": "prettier --config package.json --write 'src/**'",
-    "pylint:check": "poetry run ruff check ./python",
+    "pylint:check": "poetry run ruff check ./python && poetry run black ./python",
     "pylint:fix": "poetry run ruff check --fix ./python",
     "lint:check": "eslint --ext .js,.ts,.tsx ./src",
     "lint:fix": "eslint --fix --ext .js,.ts,.tsx ./src",

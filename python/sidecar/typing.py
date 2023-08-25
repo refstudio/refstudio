@@ -38,6 +38,7 @@ class IngestStatus(StrEnum):
 
 class Reference(RefStudioModel):
     """A reference for an academic paper / PDF"""
+
     id: str
     source_filename: str
     status: IngestStatus
@@ -56,6 +57,7 @@ class ReferencePatch(RefStudioModel):
     """
     ReferencePatch is the input type for updating a Reference's metadata.
     """
+
     data: dict[str, Any]
 
 

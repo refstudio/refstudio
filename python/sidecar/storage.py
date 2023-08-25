@@ -23,10 +23,7 @@ def update_reference(reference_id: str, reference_update: ReferenceUpdate):
 def delete_references(delete_request: DeleteRequest):
     storage = JsonStorage(settings.REFERENCES_JSON_PATH)
     storage.load()
-    response = storage.delete(
-        ids=delete_request.reference_ids,
-        all_=delete_request.all
-    )
+    response = storage.delete(ids=delete_request.reference_ids, all_=delete_request.all)
     return response
 
 
@@ -39,7 +36,7 @@ class JsonStorage:
         self.tokenized_corpus = []
 
     def load(self):
-        with open(self.filepath, 'r') as f:
+        with open(self.filepath, "r") as f:
             data = json.load(f)
 
         for item in data:
@@ -59,9 +56,9 @@ class JsonStorage:
         Save the references to the storage file as JSON.
         """
         contents = [ref.dict() for ref in self.references]
-        with open(self.filepath, 'w') as f:
+        with open(self.filepath, "w") as f:
             json.dump(contents, f, indent=2, default=str)
-    
+
     def get_reference(self, reference_id: str) -> typing.Reference | None:
         """
         Get a Reference from storage by id.
@@ -83,15 +80,14 @@ class JsonStorage:
             Delete all References from storage
         """
         if not reference_ids and not all_:
-            msg = ("`delete` operation requires one of "
-                   "`ids` or `all_` input parameters")
+            msg = (
+                "`delete` operation requires one of " "`ids` or `all_` input parameters"
+            )
             raise ValueError(msg)
 
         # preprocess references into a dict of reference_ids: Reference
         # so that we can simply do `del refs[ref_id]]`
-        refs = {
-            ref.id: ref for ref in self.references
-        }
+        refs = {ref.id: ref for ref in self.references}
 
         if all_:
             reference_ids = list(refs.keys())
@@ -103,8 +99,7 @@ class JsonStorage:
                 msg = f"Unable to delete {ref_id}: not found in storage"
                 logger.warning(msg)
                 response = typing.DeleteStatusResponse(
-                    status=typing.ResponseStatus.ERROR,
-                    message=msg
+                    status=typing.ResponseStatus.ERROR, message=msg
                 )
                 return response
 
@@ -112,8 +107,7 @@ class JsonStorage:
         self.save()
 
         response = typing.DeleteStatusResponse(
-            status=typing.ResponseStatus.OK,
-            message=""
+            status=typing.ResponseStatus.OK, message=""
         )
         return response
 
@@ -129,9 +123,7 @@ class JsonStorage:
         patch : ReferencePatch
             The patch object containing the updated reference data
         """
-        refs = {
-            ref.id: ref for ref in self.references
-        }
+        refs = {ref.id: ref for ref in self.references}
 
         try:
             target = refs[reference_id]
@@ -139,8 +131,7 @@ class JsonStorage:
             msg = f"Unable to update {reference_id}: not found in storage"
             logger.error(msg)
             response = typing.UpdateStatusResponse(
-                status=typing.ResponseStatus.ERROR,
-                message=msg
+                status=typing.ResponseStatus.ERROR, message=msg
             )
             return response
 
@@ -151,8 +142,7 @@ class JsonStorage:
         self.save()
 
         response = typing.UpdateStatusResponse(
-            status=typing.ResponseStatus.OK,
-            message=""
+            status=typing.ResponseStatus.OK, message=""
         )
         return response
 

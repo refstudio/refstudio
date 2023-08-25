@@ -7,8 +7,7 @@ import psutil
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import FileResponse
-
-from sidecar import chat, ingest, projects, rewrite, search, storage, settings
+from sidecar import chat, ingest, projects, rewrite, search, settings, storage
 from sidecar.typing import (
     ChatRequest,
     ChatResponse,
@@ -21,10 +20,10 @@ from sidecar.typing import (
     RewriteResponse,
     SearchRequest,
     SearchResponse,
+    SettingsSchema,
     TextCompletionRequest,
     TextCompletionResponse,
     UpdateStatusResponse,
-    SettingsSchema,
 )
 
 load_dotenv()
@@ -38,7 +37,6 @@ settings_api = FastAPI()  # API for interacting with settings
 
 meta_api = FastAPI()
 """API for monitoring and controling the server"""
-
 
 
 # Sidecar API
@@ -113,7 +111,9 @@ async def http_get(project_id: str, reference_id: str) -> Reference | None:
 
 
 @references_api.patch("/{project_id}/{reference_id}")
-async def http_update(project_id: str, reference_id: str, req: ReferencePatch) -> UpdateStatusResponse:
+async def http_update(
+    project_id: str, reference_id: str, req: ReferencePatch
+) -> UpdateStatusResponse:
     user_id = "user1"
     project_path = projects.get_project_path(user_id, project_id)
     store = storage.JsonStorage(project_path / ".storage" / "references.json")
@@ -169,7 +169,9 @@ async def create_project(project_name: str, project_path: str = None):
     """
     user_id = "user1"
     project_id = str(uuid4())
-    project_path = projects.create_project(user_id, project_id, project_name, project_path)
+    project_path = projects.create_project(
+        user_id, project_id, project_name, project_path
+    )
     return {
         project_id: {
             "project_name": project_name,
@@ -219,7 +221,6 @@ async def get_project_files(project_id: str):
     user_id = "user1"
     filepaths = projects.get_project_files(user_id, project_id)
     return filepaths
-
 
 
 # Filesystem API
@@ -282,14 +283,12 @@ async def delete_file(project_id: str, filepath: Path):
     }
 
 
-@meta_api.get('/status')
+@meta_api.get("/status")
 async def status():
-    return {
-        'status': 'ok'
-    }
+    return {"status": "ok"}
 
 
-@meta_api.post('/shutdown')
+@meta_api.post("/shutdown")
 async def shutdown():
     # See https://stackoverflow.com/a/74757349/388951
     parent_pid = os.getpid()

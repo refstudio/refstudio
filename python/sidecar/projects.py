@@ -37,7 +37,9 @@ def read_project_path_storage(user_id: str) -> dict[str, str]:
     return data
 
 
-def update_project_path_storage(user_id: str, project_id: str, project_name: str, project_path: str) -> dict[str, str]:
+def update_project_path_storage(
+    user_id: str, project_id: str, project_name: str, project_path: str
+) -> dict[str, str]:
     """
     Updates the path storage file, which is responsible for mapping a project id
     to the corresponding filepath for storing project files.
@@ -56,7 +58,7 @@ def update_project_path_storage(user_id: str, project_id: str, project_name: str
             "project_path": str(project_path),
         }
         json.dump(data, f)
-    
+
     return read_project_path_storage(user_id)
 
 
@@ -65,7 +67,9 @@ def get_project_path(user_id: str, project_id: str) -> Path:
     return Path(data[project_id]["project_path"])
 
 
-def create_project(user_id: str, project_id: str, project_name: str, project_path: str = None) -> Path:
+def create_project(
+    user_id: str, project_id: str, project_name: str, project_path: str = None
+) -> Path:
     if project_path:
         server_path = project_path
     else:
@@ -74,12 +78,9 @@ def create_project(user_id: str, project_id: str, project_name: str, project_pat
 
     # project_id => project_path
     _ = update_project_path_storage(
-        user_id,
-        project_id,
-        project_name,
-        project_path=server_path
+        user_id, project_id, project_name, project_path=server_path
     )
-    return server_path 
+    return server_path
 
 
 def delete_project(user_id: str, project_id: str) -> None:
@@ -92,7 +93,7 @@ def delete_project(user_id: str, project_id: str) -> None:
     with open(filepath, "w") as f:
         del data[project_id]
         json.dump(data, f)
-    
+
     project_path = make_project_path(user_id, project_id)
     try:
         shutil.rmtree(project_path)

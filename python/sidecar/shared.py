@@ -8,10 +8,11 @@ from typing import List
 import pypdf
 from sidecar import settings
 
-from .typing import Author, Chunk, Reference, TextCompletionChoice
 from .settings import logger
+from .typing import Author, Chunk, Reference, TextCompletionChoice
 
 logger = logger.getChild(__name__)
+
 
 def get_word_count(text: str) -> int:
     return len(text.strip().split(" "))
@@ -28,9 +29,8 @@ def remove_file(filepath: str) -> None:
 
 
 def trim_completion_prefix_from_choices(
-        prefix: str,
-        choices: List[TextCompletionChoice]
-    ) -> List[TextCompletionChoice]:
+    prefix: str, choices: List[TextCompletionChoice]
+) -> List[TextCompletionChoice]:
     """
     Trim a text completion prefix from a list of text completion choices.
 
@@ -48,32 +48,32 @@ def trim_completion_prefix_from_choices(
 
     Examples
     --------
-    >>> prefix = "This is a prefix and we have "
+    >>> prefix = "This is a prefix and "
     >>> choices = [
-    ...     TextCompletionChoice(index=0, text="This is a prefix and we have inserted some text."),
-    ...     TextCompletionChoice(index=1, text="This is a prefix and we have added some text."),
-    ...     TextCompletionChoice(index=2, text="updated some text."),
+    ...     TextCompletionChoice(index=0, text="This is a prefix and more text."),
+    ...     TextCompletionChoice(index=1, text="This is a prefix and other text."),
+    ...     TextCompletionChoice(index=2, text="some text."),
     ... ]
     >>> trimmed_choices = trim_completion_prefix_from_choices(prefix, choices)
     >>> trimmed_choices[0].text
-    'inserted some text.'
+    'more text.'
     >>> trimmed_choices[1].text
-    'added some text.'
+    'other text.'
     >>> trimmed_choices[2].text
-    'updated some text.'
+    'some text.'
     """
     # split prefix into sentences
-    sentence_splitter_regex = r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s'
+    sentence_splitter_regex = r"(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s"
     prefix_sentences = re.split(sentence_splitter_regex, prefix)
 
     # and remove any sentences from the prompt that were included in the responses
     for choice in choices:
         for sentence in prefix_sentences:
             if choice.text.strip().startswith(sentence.strip()):
-                choice.text = choice.text[len(sentence):].strip()
+                choice.text = choice.text[len(sentence) :].strip()
 
-            if '[MASK]' in choice.text:
-                choice.text = choice.text.replace('[MASK]', '')
+            if "[MASK]" in choice.text:
+                choice.text = choice.text.replace("[MASK]", "")
     return choices
 
 
@@ -103,7 +103,7 @@ def get_first_author_surname(authors: List[Author]) -> str:
     """
     if not authors:
         return None
-    
+
     author = authors[0]
     if author.surname:
         return author.surname
@@ -121,7 +121,7 @@ def create_citation_key(ref: Reference) -> str:
     """
     if not ref.authors and not ref.published_date:
         return "untitled"
-    
+
     if not ref.authors and ref.published_date:
         return f"untitled{ref.published_date.year}"
 
@@ -143,7 +143,7 @@ def extract_text_from_pdf(pdf_path: str) -> str:
     ----------
     pdf_path : str
         Path to PDF file
-    
+
     Returns
     -------
     str
@@ -156,7 +156,9 @@ def extract_text_from_pdf(pdf_path: str) -> str:
     return text
 
 
-def chunk_text(text: str, chunk_size: int = 1000, chunk_overlap: int = 200) -> List[Chunk]:
+def chunk_text(
+    text: str, chunk_size: int = 1000, chunk_overlap: int = 200
+) -> List[Chunk]:
     """
     Chunk text into smaller pieces for embedding
 
@@ -183,18 +185,18 @@ def chunk_text(text: str, chunk_size: int = 1000, chunk_overlap: int = 200) -> L
     for i in range(0, len(text), chunk_size - chunk_overlap):
         chunks.append(
             Chunk(
-                text=text[i:i + chunk_size],
+                text=text[i : i + chunk_size],
             )
         )
     return chunks
 
 
 def chunk_reference(
-        ref: Reference,
-        filepath: Path = None,
-        chunk_size: int = 1000,
-        chunk_overlap: int = 200
-    ) -> List[Chunk]:
+    ref: Reference,
+    filepath: Path = None,
+    chunk_size: int = 1000,
+    chunk_overlap: int = 200,
+) -> List[Chunk]:
     """
     Chunks a Reference document into small pieces of overlapping text
 
@@ -213,7 +215,7 @@ def chunk_reference(
     """
     if not filepath:
         filepath = Path(settings.UPLOADS_DIR).joinpath(ref.source_filename)
-    
+
     try:
         reader = pypdf.PdfReader(filepath)
     except FileNotFoundError:
@@ -226,12 +228,12 @@ def chunk_reference(
 
         for i in range(0, len(page_text), chunk_size - chunk_overlap):
             chunk = Chunk(
-                text=page_text[i:i + chunk_size],
+                text=page_text[i : i + chunk_size],
                 metadata={
-                    'source_filename': ref.source_filename,
-                    'title': ref.title,
+                    "source_filename": ref.source_filename,
+                    "title": ref.title,
                     # 'authors': ref.authors,
-                    'page_num': page.page_number + 1
+                    "page_num": page.page_number + 1,
                 },
             )
             chunks.append(chunk)
@@ -241,7 +243,7 @@ def chunk_reference(
 class HiddenPrints:
     def __enter__(self):
         self._original_stdout = sys.stdout
-        sys.stdout = open(os.devnull, 'w')
+        sys.stdout = open(os.devnull, "w")
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         sys.stdout.close()
