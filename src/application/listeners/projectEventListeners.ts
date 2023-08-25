@@ -24,9 +24,10 @@ export function useFileProjectNewListener() {
 
   return async () => {
     if (import.meta.env.VITE_IS_WEB) {
-      const projectInfo = await postRemoteProject();
+      // Open a custom dialog to ask the project name
+      const projectInfo = await postRemoteProject('Project Web');
       persistProjectDirInSettings(projectInfo.projectPath);
-      await newWebProject(projectInfo.projectId, projectInfo.projectPath);
+      await newWebProject(projectInfo.projectId, projectInfo.projectPath, projectInfo.projectName);
       createFile();
       notifyInfo('New project created at ' + projectInfo.projectPath);
     } else {
@@ -57,8 +58,9 @@ export function useFileProjectOpenListener() {
 
   return async () => {
     if (import.meta.env.VITE_IS_WEB) {
-      const projectInfo = await readProjectInfoFromWeb('4648e1f2-a89b-4752-960f-2ba74a0dc38c');
-      return openWebProject(projectInfo.id, projectInfo.path);
+      // Open a custom dialog with all projects to select one
+      const projectInfo = await readProjectInfoFromWeb('00000000-cafe-babe-0000-000000000000');
+      return openWebProject(projectInfo.id, projectInfo.path, 'Test Project');
     }
 
     const selectedPath = await open({
