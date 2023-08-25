@@ -5,7 +5,7 @@ import { chatWithAI } from '../../../api/chat';
 import { projectIdAtom } from '../../../atoms/projectState';
 import { PanelWrapper } from '../../../components/PanelWrapper';
 import { cx } from '../../../lib/cx';
-import { SendIcon } from '../../components/icons';
+import { LoadingIcon, SendIcon } from '../../components/icons';
 
 interface ChatThreadItem {
   id: string;
@@ -110,7 +110,11 @@ function ChatThreadItemBlock({ text, actor }: { text?: string; actor: 'user' | '
         'bg-side-bar-bg-secondary': actor === 'ai',
       })}
     >
-      {text ?? '...'}
+      {text ?? (
+        <div data-testid="chatLoadingAnimation">
+          <LoadingIcon />
+        </div>
+      )}
     </div>
   );
 }
