@@ -30,7 +30,7 @@ describe('ingestion.update', () => {
     );
     expect(callSidecar).toHaveBeenCalledTimes(1);
     expect(callSidecar).toHaveBeenCalledWith<[string, ReferenceUpdate]>('update', {
-      reference_id: ref1.id,
+      reference_id: ref1.filename,
       patch: {
         data: {
           citation_key: 'doe2023xx',
