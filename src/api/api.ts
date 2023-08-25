@@ -20,12 +20,13 @@ export async function universalGet<ResponsePayload = unknown>(path: string): Pro
 }
 
 /** Issue a POST request with a JSON payload using either web fetch or Tauri fetch */
-export async function universalPost<ResponsePayload = unknown, RequestPayload = unknown>(
-  path: string,
-  payload: RequestPayload,
-): Promise<ResponsePayload> {
-  return universalRequest('POST', path, payload);
-}
+// Note: Comment this out for the first need of POST. We need to comment this out because of Knip.
+// export async function universalPost<ResponsePayload = unknown, RequestPayload = unknown>(
+//   path: string,
+//   payload: RequestPayload,
+// ): Promise<ResponsePayload> {
+//   return universalRequest('POST', path, payload);
+// }
 
 /** Issue a PUT request with a JSON payload using either web fetch or Tauri fetch */
 export async function universalPut<ResponsePayload = unknown, RequestPayload = unknown>(
