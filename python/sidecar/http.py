@@ -7,8 +7,7 @@ import psutil
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import FileResponse
-
-from sidecar import chat, ingest, projects, rewrite, search, storage, settings
+from sidecar import chat, ingest, projects, rewrite, search, settings, storage
 from sidecar.typing import (
     ChatRequest,
     ChatResponse,
@@ -21,10 +20,10 @@ from sidecar.typing import (
     RewriteResponse,
     SearchRequest,
     SearchResponse,
+    SettingsSchema,
     TextCompletionRequest,
     TextCompletionResponse,
     UpdateStatusResponse,
-    SettingsSchema,
 )
 
 load_dotenv()
@@ -111,7 +110,7 @@ async def http_get(project_id: str, reference_id: str) -> Reference | None:
     return response
 
 
-@references_api.put("/{project_id}/{reference_id}")
+@references_api.patch("/{project_id}/{reference_id}")
 async def http_update(
     project_id: str, reference_id: str, req: ReferencePatch
 ) -> UpdateStatusResponse:

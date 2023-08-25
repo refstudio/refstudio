@@ -74,7 +74,7 @@ describe('ChatPanel component', () => {
     expect(screen.getByText('Sure!')).toBeInTheDocument();
   });
 
-  it('should render ... while waiting for reply', async () => {
+  it('should render the thinking animation while waiting for reply', async () => {
     // Note: this is a promise that _don't resolve_ so that we can test the "..." below.
     vi.mocked(chatWithAI).mockImplementation(async () => new Promise<string[]>(() => ['---']));
     const user = userEvent.setup();
@@ -84,10 +84,10 @@ describe('ChatPanel component', () => {
     await user.click(screen.getByTitle('Send'));
 
     expect(screen.getByText('Will this test pass?')).toBeInTheDocument();
-    expect(screen.getByText('...')).toBeInTheDocument();
+    expect(screen.getByTestId('chatLoadingAnimation')).toBeInTheDocument();
   });
 
-  it('should render ... and then the ### reply text', async () => {
+  it('should render the thinking animation and then the ### reply text', async () => {
     let resolveFn: () => void = () => fail();
     vi.mocked(chatWithAI).mockImplementation(async () => {
       await new Promise<void>((resolve) => {
@@ -103,7 +103,7 @@ describe('ChatPanel component', () => {
     await user.click(screen.getByTitle('Send'));
 
     expect(screen.getByText('Will this test pass?')).toBeInTheDocument();
-    expect(screen.getByText('...')).toBeInTheDocument();
+    expect(screen.getByTestId('chatLoadingAnimation')).toBeInTheDocument();
 
     resolveFn();
 
