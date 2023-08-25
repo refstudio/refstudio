@@ -111,7 +111,7 @@ def test_references_update(monkeypatch, tmp_path):
     assert ref.citation_key is None
 
     patch = {"data": {"citation_key": "reda2023"}}
-    response = references_client.put(f"/{project_id}/{ref.id}", json=patch)
+    response = references_client.patch(f"/{project_id}/{ref.id}", json=patch)
 
     assert response.status_code == 200
     assert response.json()["status"] == "ok"
