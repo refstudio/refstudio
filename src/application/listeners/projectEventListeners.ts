@@ -15,7 +15,7 @@ import {
 import { getNewProjectsBaseDir } from '../../io/filesystem';
 import { notifyInfo } from '../../notifications/notifications';
 import { saveCachedSettings, setCachedSetting } from '../../settings/settingsManager';
-import { isRunningOnWeb, readProjectInfoFromWeb } from '../../web';
+import { readProjectInfoFromWeb } from '../../web';
 
 export function useFileProjectNewListener() {
   const newProject = useSetAtom(newProjectAtom);
@@ -23,7 +23,7 @@ export function useFileProjectNewListener() {
   const createFile = useSetAtom(createFileAtom);
 
   return async () => {
-    if (isRunningOnWeb()) {
+    if (import.meta.env.VITE_IS_WEB) {
       const projectInfo = await postRemoteProject();
       persistProjectDirInSettings(projectInfo.projectPath);
       await newWebProject(projectInfo.projectId, projectInfo.projectPath);
@@ -56,7 +56,7 @@ export function useFileProjectOpenListener() {
   const openWebProject = useSetAtom(openWebProjectAtom);
 
   return async () => {
-    if (isRunningOnWeb()) {
+    if (import.meta.env.VITE_IS_WEB) {
       const projectInfo = await readProjectInfoFromWeb('4648e1f2-a89b-4752-960f-2ba74a0dc38c');
       return openWebProject(projectInfo.id, projectInfo.path);
     }

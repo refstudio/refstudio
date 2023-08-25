@@ -11,7 +11,6 @@ import { ReferenceItem } from '../types/ReferenceItem';
 import {
   deleteFileFromWeb,
   existsFileFromWeb,
-  isRunningOnWeb,
   readBinaryFileFromWeb,
   readProjectFilesFromWeb,
   readTextFileFromWeb,
@@ -138,7 +137,7 @@ export function isInUploadsDir(relativePath: string) {
 }
 
 export async function uploadFiles(systemFiles: File[]) {
-  if (isRunningOnWeb()) {
+  if (import.meta.env.VITE_IS_WEB) {
     for (const file of systemFiles) {
       const relativePath = makeUploadPath(file.name);
       const bytes = await file.arrayBuffer();
@@ -238,7 +237,7 @@ async function ensureFile(fileName: string, content: string, overrideFiles = fal
 }
 
 export async function readAllProjectFiles() {
-  if (isRunningOnWeb()) {
+  if (import.meta.env.VITE_IS_WEB) {
     console.log('reading file structure from web');
     const entries = await readProjectFilesFromWeb(currentProjectId);
     return Promise.all(entries.map(convertTauriFileEntryToFileEntry));
@@ -301,7 +300,7 @@ export function getParentFolder(filePath: string) {
 // #####################################################################################
 export async function writeFileContent(relativePath: string, textContent: string) {
   try {
-    if (isRunningOnWeb()) {
+    if (import.meta.env.VITE_IS_WEB) {
       await writeTextFileFromWeb(currentProjectId, relativePath, textContent);
       return true;
     } else {
@@ -319,20 +318,20 @@ export async function readFileContent(file: FileFileEntry): Promise<EditorConten
   const systemPath = await getSystemPath(file.path);
   switch (file.fileExtension) {
     case 'json': {
-      const textContent = isRunningOnWeb()
+      const textContent = import.meta.env.VITE_IS_WEB
         ? await readTextFileFromWeb(currentProjectId, file.path)
         : await readTextFile(systemPath);
       return { type: 'json', textContent };
     }
     case 'pdf': {
-      const binaryContent = isRunningOnWeb()
+      const binaryContent = import.meta.env.VITE_IS_WEB
         ? await readBinaryFileFromWeb(currentProjectId, file.path)
         : await readBinaryFile(systemPath);
       return { type: 'pdf', binaryContent };
     }
     case 'refstudio':
     case '': {
-      const textContent = isRunningOnWeb()
+      const textContent = import.meta.env.VITE_IS_WEB
         ? await readTextFileFromWeb(currentProjectId, file.path)
         : await readTextFile(systemPath);
 
@@ -345,7 +344,7 @@ export async function readFileContent(file: FileFileEntry): Promise<EditorConten
       }
     }
     default: {
-      const textContent = isRunningOnWeb()
+      const textContent = import.meta.env.VITE_IS_WEB
         ? await readTextFileFromWeb(currentProjectId, file.path)
         : await readTextFile(systemPath);
 
@@ -356,7 +355,7 @@ export async function readFileContent(file: FileFileEntry): Promise<EditorConten
 
 export async function deleteFile(relativePath: string): Promise<boolean> {
   try {
-    if (isRunningOnWeb()) {
+    if (import.meta.env.VITE_IS_WEB) {
       await deleteFileFromWeb(currentProjectId, relativePath);
       return true;
     } else {
@@ -372,7 +371,7 @@ export async function deleteFile(relativePath: string): Promise<boolean> {
 
 export async function renameFile(relativePath: string, newName: string): RenameFileResult {
   try {
-    if (isRunningOnWeb()) {
+    if (import.meta.env.VITE_IS_WEB) {
       const newRelativePath = getRefStudioPath(newName);
       if (await existsFileFromWeb(currentProjectId, newRelativePath)) {
         console.warn(`Another file with the same name already exists: ${newRelativePath}`);

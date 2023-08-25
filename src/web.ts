@@ -1,19 +1,6 @@
 import { getRemoteProject } from './api/projectsAPI';
 
 // ########################################################################################
-// HOSTING ENVIRONMENT CHECK
-// ########################################################################################
-
-/**
- * Check if the app is running outside of Tauri, in a web context.
- *
- * @returns true if the app is running in a web context, outside of Tauri
- */
-export function isRunningOnWeb() {
-  return !!import.meta.env.VITE_IS_WEB;
-}
-
-// ########################################################################################
 // PROJECT
 // ########################################################################################
 export async function readProjectInfoFromWeb(projectId: string) {
