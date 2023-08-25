@@ -29,7 +29,7 @@ let settingsManager: SettingsManagerView | undefined;
 export async function initSettings() {
   let settings: SettingsSchema;
   try {
-    settings = await universalGet('/api/settings/');
+    settings = await universalGet<SettingsSchema>('/api/settings/');
 
     console.log('Settings initialized with success with', settings);
     console.log('openAI', settings.openai);
