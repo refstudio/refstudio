@@ -1,4 +1,4 @@
-import { Body, fetch as tauriFetch, HttpVerb } from '@tauri-apps/api/http';
+import { Body, fetch as tauriFetch } from '@tauri-apps/api/http';
 
 import { REFSTUDIO_HOST } from './server';
 
@@ -23,11 +23,10 @@ export async function universalGet<ResponsePayload = unknown>(path: string): Pro
 export async function universalPost<ResponsePayload = unknown, RequestPayload = unknown>(
   path: string,
   payload: RequestPayload,
-  method: HttpVerb = 'POST',
 ): Promise<ResponsePayload> {
   if (import.meta.env.VITE_IS_WEB) {
     const response = await fetch(path, {
-      method,
+      method: 'POST',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
@@ -40,7 +39,7 @@ export async function universalPost<ResponsePayload = unknown, RequestPayload = 
     return response.json() as ResponsePayload;
   } else {
     const response = await tauriFetch(REFSTUDIO_HOST + path, {
-      method,
+      method: 'POST',
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
       body: Body.json(payload as any),
     });
