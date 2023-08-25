@@ -84,7 +84,7 @@ describe('ChatPanel component', () => {
     await user.click(screen.getByTitle('Send'));
 
     expect(screen.getByText('Will this test pass?')).toBeInTheDocument();
-    expect(screen.getByText('...')).toBeInTheDocument();
+    expect(screen.getByTestId('chatLoadingAnimation')).toBeInTheDocument();
   });
 
   it('should render ... and then the ### reply text', async () => {
@@ -103,7 +103,7 @@ describe('ChatPanel component', () => {
     await user.click(screen.getByTitle('Send'));
 
     expect(screen.getByText('Will this test pass?')).toBeInTheDocument();
-    expect(screen.getByText('...')).toBeInTheDocument();
+    expect(screen.getByTestId('chatLoadingAnimation')).toBeInTheDocument();
 
     resolveFn();
 

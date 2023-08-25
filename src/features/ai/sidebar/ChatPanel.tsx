@@ -110,7 +110,11 @@ function ChatThreadItemBlock({ text, actor }: { text?: string; actor: 'user' | '
         'bg-side-bar-bg-secondary': actor === 'ai',
       })}
     >
-      {text ?? <LoadingIcon />}
+      {text ?? (
+        <div data-testid="chatLoadingAnimation">
+          <LoadingIcon />
+        </div>
+      )}
     </div>
   );
 }
