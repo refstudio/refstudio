@@ -1,15 +1,13 @@
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
-import { VscDesktopDownload, VscNewFile, VscOpenPreview } from 'react-icons/vsc';
 
 import { openReferenceAtom, openReferencePdfAtom, openReferencesAtom } from '../../../atoms/editorActions';
 import { getReferencesAtom } from '../../../atoms/referencesState';
-import { PanelSection } from '../../../components/PanelSection';
 import { PanelWrapper } from '../../../components/PanelWrapper';
+import { SearchBar } from '../../../components/SearchBar';
 import { emitEvent } from '../../../events';
-import { useDebouncedCallback } from '../../../hooks/useDebouncedCallback';
 import { Author, ReferenceItem } from '../../../types/ReferenceItem';
-import { UploadTipInstructions } from '../components/UploadTipInstructions';
+import { ExportIcon, TableIcon } from '../components/icons';
 import { ReferencesList } from './ReferencesList';
 
 export function ReferencesPanel() {
@@ -22,10 +20,6 @@ export function ReferencesPanel() {
   useEffect(() => {
     setVisibleReferences(references);
   }, [references]);
-
-  const handleAddReferences = () => {
-    emitEvent('refstudio://menu/references/upload');
-  };
 
   const handleOpenReferences = () => {
     emitEvent('refstudio://menu/references/open');
@@ -45,10 +39,6 @@ export function ReferencesPanel() {
 
   const handleAuthorClicked = (author: Author) => openReferences(author.lastName);
 
-  const handleRemoveClicked = (reference: ReferenceItem) => {
-    emitEvent('refstudio://references/remove', { referenceIds: [reference.id] });
-  };
-
   const handleFilterChanged = (filter: string) => {
     if (filter.trim() === '') {
       return setVisibleReferences(references);
@@ -65,58 +55,32 @@ export function ReferencesPanel() {
   };
 
   return (
-    <PanelWrapper title="References">
-      <PanelSection
-        grow
-        rightIcons={[
-          { key: 'new', Icon: VscNewFile, title: 'Add References', onClick: handleAddReferences },
-          { key: 'open', Icon: VscOpenPreview, title: 'Open References', onClick: handleOpenReferences },
-          {
-            key: 'export',
-            disabled: references.length === 0,
-            Icon: VscDesktopDownload,
-            title: 'Export References',
-            onClick: () => handleExportReferences(),
-          },
-        ]}
-        title="Library"
-      >
-        <div className="min-h-[200px] ">
-          <FilterInput placeholder="Filter (e.g. title, author)" onChange={handleFilterChanged} />
-          <ReferencesList
-            references={visibleReferences}
-            onAuthorClicked={handleAuthorClicked}
-            onRefClicked={handleRefClicked}
-            onRemoveClicked={handleRemoveClicked}
-          />
-
-          {references.length === 0 && (
-            <div className="p-2">Welcome to your RefStudio references library. Start by uploading some PDFs.</div>
-          )}
-
-          <UploadTipInstructions />
-        </div>
-      </PanelSection>
+    <PanelWrapper
+      actions={[
+        {
+          key: 'new',
+          title: 'Open References',
+          Icon: <TableIcon />,
+          onClick: handleOpenReferences,
+        },
+        {
+          key: 'export',
+          disabled: references.length === 0,
+          title: 'Export References',
+          Icon: <ExportIcon />,
+          onClick: handleExportReferences,
+        },
+      ]}
+      title="References"
+    >
+      <div className="flex flex-1 flex-col items-start gap-4 self-stretch p-4 pt-2">
+        <SearchBar placeholder="Filter author/title..." onChange={handleFilterChanged} />
+        <ReferencesList
+          references={visibleReferences}
+          onAuthorClicked={handleAuthorClicked}
+          onRefClicked={handleRefClicked}
+        />
+      </div>
     </PanelWrapper>
-  );
-}
-
-function FilterInput({ placeholder, onChange }: { placeholder: string; onChange: (filter: string) => void }) {
-  const [value, setValue] = useState('');
-  const debouncedOnChange = useDebouncedCallback(onChange, 200);
-
-  return (
-    <div className="relative mx-1 flex">
-      <input
-        className="grow border border-slate-400 bg-slate-100 px-4 py-2 outline-none"
-        placeholder={placeholder}
-        type="text"
-        value={value}
-        onChange={(evt) => {
-          setValue(evt.target.value);
-          debouncedOnChange(evt.target.value);
-        }}
-      />
-    </div>
   );
 }
