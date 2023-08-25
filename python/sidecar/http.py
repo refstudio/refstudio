@@ -5,7 +5,7 @@ from uuid import uuid4
 
 import psutil
 from dotenv import load_dotenv
-from fastapi import FastAPI, File, UploadFile, Request
+from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import FileResponse
 
 from sidecar import chat, ingest, projects, rewrite, search, storage, settings
@@ -44,25 +44,25 @@ meta_api = FastAPI()
 # Sidecar API
 # -----------
 @sidecar_api.post("/rewrite")
-async def http_rewrite(req: RewriteRequest, request: Request) -> RewriteResponse:
+async def http_rewrite(req: RewriteRequest) -> RewriteResponse:
     response = rewrite.rewrite(req)
     return response
 
 
 @sidecar_api.post("/completion")
-async def http_completion(req: TextCompletionRequest, request: Request) -> TextCompletionResponse:
+async def http_completion(req: TextCompletionRequest) -> TextCompletionResponse:
     response = rewrite.complete_text(req)
     return response
 
 
 @sidecar_api.post("/chat")
-async def http_chat(req: ChatRequest, request: Request) -> ChatResponse:
+async def http_chat(req: ChatRequest) -> ChatResponse:
     response = chat.ask_question(req)
     return response
 
 
 @sidecar_api.post("/search")
-async def http_search(req: SearchRequest, request: Request) -> SearchResponse:
+async def http_search(req: SearchRequest) -> SearchResponse:
     response = search.search_s2(req)
     return response
 
