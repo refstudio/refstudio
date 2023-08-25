@@ -4,6 +4,7 @@ import shutil
 import sys
 from collections import defaultdict
 from pathlib import Path
+from uuid import uuid4
 
 import grobid_tei_xml
 from dotenv import load_dotenv
@@ -23,6 +24,11 @@ GROBID_SERVER_URL = "https://kermitt2-grobid.hf.space"
 
 def run_ingest(args: IngestRequest):
     pdf_directory = Path(args.pdf_directory)
+
+    # PDF files for ingest must be written to the `uploads` directory
+    if pdf_directory.parent != "uploads":
+        pdf_directory = pdf_directory.parent / "uploads"
+    
     ingest = PDFIngestion(input_dir=pdf_directory)
     response = ingest.run()
     return response
@@ -339,6 +345,7 @@ class PDFIngestion:
 
             references.append(
                 Reference(
+                    id=str(uuid4()),
                     source_filename=source_pdf,
                     status=typing.IngestStatus.FAILURE,
                     citation_key="untitled",
@@ -457,6 +464,7 @@ class PDFIngestion:
             pub_date = shared.parse_date(header.get("published_date", ""))
 
             ref = Reference(
+                id=str(uuid4()),
                 source_filename=source_pdf,
                 status=typing.IngestStatus.COMPLETE,
                 title=header.get("title"),
@@ -484,7 +492,10 @@ class PDFIngestion:
         # append new references to any we have previously loaded
         for ref in new_references:
             logger.info(f"Creating text chunks for Reference: {ref.source_filename}")
-            ref.chunks = shared.chunk_reference(ref)
+            ref.chunks = shared.chunk_reference(
+                ref,
+                filepath=self.staging_dir.joinpath(ref.source_filename)
+            )
 
             self.references.append(ref)
 

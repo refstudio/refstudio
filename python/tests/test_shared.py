@@ -1,5 +1,6 @@
 from datetime import date, datetime
 from pathlib import Path
+from uuid import uuid4
 
 from sidecar import settings, shared, typing
 from sidecar.typing import Author, Reference
@@ -38,6 +39,7 @@ def test_get_first_author_surname():
 def test_create_citation_key():
     test_data = [
         {
+            "id": str(uuid4()),
             "source_filename": "abc.pdf",
             "status": "complete",
             "authors": [
@@ -48,6 +50,7 @@ def test_create_citation_key():
             "title": "pileup.js: a JavaScript library for interactive and in-browser visualization of genomic data"
         },
         {
+            "id": str(uuid4()),
             "source_filename": "abc.pdf",
             "status": "complete",
             "authors": [
@@ -56,12 +59,14 @@ def test_create_citation_key():
             "published_date": None,
         },
         {
+            "id": str(uuid4()),
             "source_filename": "abc.pdf",
             "status": "complete",
             "authors": [],
             "published_date": None,
         },
         {
+            "id": str(uuid4()),
             "source_filename": "abc.pdf",
             "status": "complete",
             "authors": [],
@@ -116,6 +121,7 @@ def test_chunk_reference(monkeypatch, tmp_path):
     monkeypatch.setattr(settings, "UPLOADS_DIR", tmp_path)
 
     reference = Reference(
+        id=str(uuid4()),
         source_filename="test.pdf",
         status="complete",
     )

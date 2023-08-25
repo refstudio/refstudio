@@ -1,11 +1,18 @@
 import { getSystemPath, getUploadsDir, makeUploadPath } from '../io/filesystem';
 import { ReferenceItem } from '../types/ReferenceItem';
+import {
+  deleteRemoteReferences,
+  getRemoteReferences,
+  patchRemoteReference,
+  startRemoteReferencesIngestion,
+} from './referencesAPI';
 import { callSidecar } from './sidecar';
-import { IngestResponse, Reference } from './types';
+import { Reference } from './types';
 
-function parsePdfIngestionResponse(response: IngestResponse): ReferenceItem[] {
-  return response.references.map((reference) => ({
-    id: reference.source_filename,
+function parsePdfIngestionResponse(references: Reference[]): ReferenceItem[] {
+  return references.map((reference) => ({
+    id: reference.id,
+    source_filename: reference.source_filename,
     filepath: makeUploadPath(reference.source_filename),
     filename: reference.source_filename,
     citationKey: reference.citation_key ?? 'unknown',
@@ -20,16 +27,32 @@ function parsePdfIngestionResponse(response: IngestResponse): ReferenceItem[] {
   }));
 }
 
-export async function runPDFIngestion(): Promise<ReferenceItem[]> {
-  const uploadsDir = await getSystemPath(getUploadsDir());
-  const response = await callSidecar('ingest', { pdf_directory: String(uploadsDir) });
-  return parsePdfIngestionResponse(response);
+export async function runPDFIngestion(projectId?: string): Promise<ReferenceItem[]> {
+  if (import.meta.env.VITE_IS_WEB) {
+    if (!projectId) {
+      throw new Error('Project ID is required for web version');
+    }
+    const references = await startRemoteReferencesIngestion(projectId);
+    return parsePdfIngestionResponse(references);
+  } else {
+    const uploadsDir = await getSystemPath(getUploadsDir());
+    const response = await callSidecar('ingest', { pdf_directory: String(uploadsDir) });
+    return parsePdfIngestionResponse(response.references);
+  }
 }
 
-export async function removeReferences(fileNames: string[]) {
-  const response = await callSidecar('delete', { source_filenames: fileNames });
-  if (response.status === 'error') {
-    throw new Error('Error removing references: ' + response.message);
+export async function removeReferences(ids: string[], projectId?: string) {
+  if (import.meta.env.VITE_IS_WEB) {
+    if (!projectId) {
+      throw new Error('Project ID is required for web version');
+    }
+    await deleteRemoteReferences(projectId, ids);
+    return;
+  } else {
+    const response = await callSidecar('delete', { reference_ids: ids });
+    if (response.status === 'error') {
+      throw new Error('Error removing references: ' + response.message);
+    }
   }
 }
 
@@ -41,7 +64,12 @@ function applyPatch(field: keyof ReferenceItem, patch: Partial<ReferenceItem>, g
   return {};
 }
 
-export async function updateReference(filename: string, patch: Partial<ReferenceItem>) {
+export async function updateReference(
+  filename: string,
+  patch: Partial<ReferenceItem>,
+  referenceId: string,
+  projectId?: string,
+) {
   const referencePatch: Partial<Reference> = {
     ...applyPatch('citationKey', patch, () => ({ citation_key: patch.citationKey })),
     ...applyPatch('title', patch, () => ({ title: patch.title })),
@@ -55,21 +83,36 @@ export async function updateReference(filename: string, patch: Partial<Reference
     return;
   }
 
-  const response = await callSidecar('update', {
-    source_filename: filename,
-    patch: {
-      data: referencePatch,
-    },
-  });
-  if (response.status === 'error') {
-    throw new Error('Error updating reference: ' + response.message);
+  if (import.meta.env.VITE_IS_WEB) {
+    if (!projectId) {
+      throw new Error('Project ID is required for web version');
+    }
+    await patchRemoteReference(projectId, referenceId, referencePatch);
+  } else {
+    const response = await callSidecar('update', {
+      reference_id: filename,
+      patch: {
+        data: referencePatch,
+      },
+    });
+    if (response.status === 'error') {
+      throw new Error('Error updating reference: ' + response.message);
+    }
   }
 }
 
-export async function getIngestedReferences(): Promise<ReferenceItem[]> {
-  const uploadsDir = await getSystemPath(getUploadsDir());
-  const response = await callSidecar('ingest_references', { pdf_directory: String(uploadsDir) });
-  return parsePdfIngestionResponse(response);
+export async function getIngestedReferences(projectId?: string): Promise<ReferenceItem[]> {
+  if (import.meta.env.VITE_IS_WEB) {
+    if (!projectId) {
+      throw new Error('Project ID is required for web version');
+    }
+    const references = await getRemoteReferences(projectId);
+    return parsePdfIngestionResponse(references);
+  } else {
+    const uploadsDir = await getSystemPath(getUploadsDir());
+    const response = await callSidecar('ingest_references', { pdf_directory: String(uploadsDir) });
+    return parsePdfIngestionResponse(response.references);
+  }
 }
 
 export async function getIngestionStatus() {

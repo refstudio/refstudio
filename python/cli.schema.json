@@ -217,6 +217,9 @@
       "description": "A reference for an academic paper / PDF",
       "type": "object",
       "properties": {
+        "id": {
+          "type": "string"
+        },
         "source_filename": {
           "type": "string"
         },
@@ -262,6 +265,7 @@
         }
       },
       "required": [
+        "id",
         "source_filename",
         "status"
       ]
@@ -551,7 +555,7 @@
       "title": "ReferenceUpdate",
       "type": "object",
       "properties": {
-        "source_filename": {
+        "reference_id": {
           "type": "string"
         },
         "patch": {
@@ -559,7 +563,7 @@
         }
       },
       "required": [
-        "source_filename",
+        "reference_id",
         "patch"
       ]
     },
@@ -583,7 +587,7 @@
       "title": "DeleteRequest",
       "type": "object",
       "properties": {
-        "source_filenames": {
+        "reference_ids": {
           "type": "array",
           "items": {
             "type": "string"
@@ -595,7 +599,7 @@
         }
       },
       "required": [
-        "source_filenames"
+        "reference_ids"
       ]
     },
     "DeleteStatusResponse": {

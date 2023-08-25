@@ -7,10 +7,16 @@ from sidecar.typing import DeleteRequest, ReferenceUpdate
 logger = logger.getChild(__name__)
 
 
-def update_reference(reference_update: ReferenceUpdate):
+def get_reference(reference_id: str):
     storage = JsonStorage(settings.REFERENCES_JSON_PATH)
     storage.load()
-    response = storage.update(reference_update=reference_update)
+    return storage.get_reference(reference_id)
+
+
+def update_reference(reference_id: str, reference_update: ReferenceUpdate):
+    storage = JsonStorage(settings.REFERENCES_JSON_PATH)
+    storage.load()
+    response = storage.update(reference_id, reference_update=reference_update)
     return response
 
 
@@ -18,7 +24,7 @@ def delete_references(delete_request: DeleteRequest):
     storage = JsonStorage(settings.REFERENCES_JSON_PATH)
     storage.load()
     response = storage.delete(
-        source_filenames=delete_request.source_filenames,
+        ids=delete_request.reference_ids,
         all_=delete_request.all
     )
     return response
@@ -55,37 +61,46 @@ class JsonStorage:
         contents = [ref.dict() for ref in self.references]
         with open(self.filepath, 'w') as f:
             json.dump(contents, f, indent=2, default=str)
+    
+    def get_reference(self, reference_id: str) -> typing.Reference | None:
+        """
+        Get a Reference from storage by id.
+        """
+        for ref in self.references:
+            if ref.id == reference_id:
+                return ref
+        return None
 
-    def delete(self, source_filenames: list[str] = [], all_: bool = False):
+    def delete(self, reference_ids: list[str] = [], all_: bool = False):
         """
         Delete one or more References from storage.
 
         Parameters
         ----------
-        source_filenames : list[str]
-            List of source filenames to be deleted
+        reference_ids : list[str]
+            List of reference ids to be deleted
         all_ : bool, default False
             Delete all References from storage
         """
-        if not source_filenames and not all_:
+        if not reference_ids and not all_:
             msg = ("`delete` operation requires one of "
-                   "`source_filenames` or `all_` input parameters")
+                   "`ids` or `all_` input parameters")
             raise ValueError(msg)
 
-        # preprocess references into a dict of source_filename: Reference
-        # so that we can simply do `del refs[filename]`
+        # preprocess references into a dict of reference_ids: Reference
+        # so that we can simply do `del refs[ref_id]]`
         refs = {
-            ref.source_filename: ref for ref in self.references
+            ref.id: ref for ref in self.references
         }
 
         if all_:
-            source_filenames = list(refs.keys())
+            reference_ids = list(refs.keys())
 
-        for filename in source_filenames:
+        for ref_id in reference_ids:
             try:
-                del refs[filename]
+                del refs[ref_id]
             except KeyError:
-                msg = f"Unable to delete {filename}: not found in storage"
+                msg = f"Unable to delete {ref_id}: not found in storage"
                 logger.warning(msg)
                 response = typing.DeleteStatusResponse(
                     status=typing.ResponseStatus.ERROR,
@@ -102,26 +117,26 @@ class JsonStorage:
         )
         return response
 
-    def update(self, reference_update: typing.ReferenceUpdate):
+    def update(self, reference_id: str, patch: typing.ReferencePatch):
         """
         Update a Reference in storage with the target reference.
         This is used when the client has updated the reference in the UI.
 
         Parameters
         ----------
-        reference_update : typing.ReferenceUpdate
+        reference_id : str
+            The id of the reference to be updated
+        patch : ReferencePatch
+            The patch object containing the updated reference data
         """
         refs = {
-            ref.source_filename: ref for ref in self.references
+            ref.id: ref for ref in self.references
         }
 
-        source_filename = reference_update.source_filename
-        patch = reference_update.patch
-
         try:
-            target = refs[source_filename]
+            target = refs[reference_id]
         except KeyError:
-            msg = f"Unable to update {source_filename}: not found in storage"
+            msg = f"Unable to update {reference_id}: not found in storage"
             logger.error(msg)
             response = typing.UpdateStatusResponse(
                 status=typing.ResponseStatus.ERROR,
@@ -129,8 +144,8 @@ class JsonStorage:
             )
             return response
 
-        logger.info(f"Updating {source_filename} with new values: {patch.data}")
-        refs[source_filename] = target.copy(update=patch.data)
+        logger.info(f"Updating {reference_id} with new values: {patch.data}")
+        refs[reference_id] = target.copy(update=patch.data)
 
         self.references = list(refs.values())
         self.save()
