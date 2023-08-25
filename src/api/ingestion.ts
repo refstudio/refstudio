@@ -1,6 +1,6 @@
 import { getSystemPath, getUploadsDir, makeUploadPath } from '../io/filesystem';
 import { ReferenceItem } from '../types/ReferenceItem';
-import { getRemoteReferences, startRemoteReferencesIngestion } from './referencesAPI';
+import { deleteRemoteReferences, getRemoteReferences, startRemoteReferencesIngestion } from './referencesAPI';
 import { callSidecar } from './sidecar';
 import { Reference } from './types';
 
@@ -36,10 +36,18 @@ export async function runPDFIngestion(projectId?: string): Promise<ReferenceItem
   }
 }
 
-export async function removeReferences(ids: string[]) {
-  const response = await callSidecar('delete', { reference_ids: ids });
-  if (response.status === 'error') {
-    throw new Error('Error removing references: ' + response.message);
+export async function removeReferences(ids: string[], projectId?: string) {
+  if (import.meta.env.VITE_IS_WEB) {
+    if (!projectId) {
+      throw new Error('Project ID is required for web version');
+    }
+    await deleteRemoteReferences(projectId, ids);
+    return;
+  } else {
+    const response = await callSidecar('delete', { reference_ids: ids });
+    if (response.status === 'error') {
+      throw new Error('Error removing references: ' + response.message);
+    }
   }
 }
 

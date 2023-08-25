@@ -46,9 +46,9 @@ export const referencesSyncInProgressAtom = atom<boolean>(false);
 // #####################################################################################
 const referencesLoadedAtom = atom<boolean | null>(null);
 
-export const loadReferencesAtom = atom(null, async (_get, set) => {
+export const loadReferencesAtom = atom(null, async (_get, set, projectId?: string) => {
   set(referencesLoadedAtom, false);
-  const initialReferences = await getIngestedReferences();
+  const initialReferences = await getIngestedReferences(projectId);
   set(setReferencesAtom, initialReferences);
   set(referencesLoadedAtom, true);
 });
@@ -107,7 +107,7 @@ function patchEntry(key: keyof ReferenceItem, original: ReferenceItem, updated: 
   return {};
 }
 
-export const removeReferencesAtom = atom(null, async (get, set, ids: string[]) => {
+export const removeReferencesAtom = atom(null, async (get, set, ids: string[], projectId: string) => {
   const referencesToRemove = ids.map((id) => get(getDerivedReferenceAtom(id))).filter(isNonNullish);
 
   // Close any open editor with references (details or pdf) about to be removed
@@ -119,7 +119,10 @@ export const removeReferencesAtom = atom(null, async (get, set, ids: string[]) =
   });
 
   // Remove references from BE
-  await removeReferences(referencesToRemove.map((ref) => ref.filename));
+  await removeReferences(
+    referencesToRemove.map((ref) => ref.filename),
+    projectId,
+  );
 
   // Remove files from filesystem
   const success = await Promise.all(referencesToRemove.map((reference) => deleteFile(reference.filepath)));

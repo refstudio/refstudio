@@ -87,7 +87,7 @@ export const newWebProjectAtom = atom(null, async (_, set, projectId: string, pa
   set(currentProjectPathAtom, path);
   set(currentProjectNameAtom, name);
 
-  await set(loadReferencesAtom);
+  await set(loadReferencesAtom, projectId);
   await set(refreshFileTreeAtom);
 });
 
@@ -101,7 +101,7 @@ export const openWebProjectAtom = atom(null, async (_, set, projectId: string, p
   set(currentProjectPathAtom, path);
   set(currentProjectNameAtom, name);
 
-  await set(loadReferencesAtom);
+  await set(loadReferencesAtom, projectId);
   await set(refreshFileTreeAtom);
 });
 
