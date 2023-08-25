@@ -1,26 +1,5 @@
 {
   "definitions": {
-    "Author": {
-      "properties": {
-        "full_name": {
-          "type": "string"
-        },
-        "given_name": {
-          "type": "string"
-        },
-        "surname": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "required": [
-        "full_name"
-      ],
-      "title": "Author"
-    },
     "ChatRequest": {
       "properties": {
         "text": {
@@ -80,64 +59,6 @@
       ],
       "title": "ChatResponseChoice"
     },
-    "Chunk": {
-      "properties": {
-        "text": {
-          "type": "string"
-        },
-        "vector": {
-          "items": {
-            "type": "number"
-          },
-          "type": "array",
-          "default": []
-        },
-        "metadata": {
-          "type": "object",
-          "default": {}
-        }
-      },
-      "type": "object",
-      "required": [
-        "text"
-      ],
-      "title": "Chunk"
-    },
-    "DeleteRequest": {
-      "properties": {
-        "source_filenames": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "all": {
-          "type": "boolean",
-          "default": false
-        }
-      },
-      "type": "object",
-      "required": [
-        "source_filenames"
-      ],
-      "title": "DeleteRequest"
-    },
-    "DeleteStatusResponse": {
-      "properties": {
-        "status": {
-          "$ref": "#/definitions/ResponseStatus"
-        },
-        "message": {
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "required": [
-        "status",
-        "message"
-      ],
-      "title": "DeleteStatusResponse"
-    },
     "HTTPValidationError": {
       "properties": {
         "detail": {
@@ -150,165 +71,6 @@
       },
       "type": "object",
       "title": "HTTPValidationError"
-    },
-    "IngestRequest": {
-      "properties": {
-        "pdf_directory": {
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "required": [
-        "pdf_directory"
-      ],
-      "title": "IngestRequest"
-    },
-    "IngestResponse": {
-      "properties": {
-        "project_name": {
-          "type": "string"
-        },
-        "references": {
-          "items": {
-            "$ref": "#/definitions/Reference"
-          },
-          "type": "array"
-        }
-      },
-      "type": "object",
-      "required": [
-        "project_name",
-        "references"
-      ],
-      "title": "IngestResponse"
-    },
-    "IngestStatus": {
-      "type": "string",
-      "enum": [
-        "processing",
-        "failure",
-        "complete"
-      ],
-      "title": "IngestStatus",
-      "description": "An enumeration."
-    },
-    "IngestStatusResponse": {
-      "properties": {
-        "status": {
-          "$ref": "#/definitions/ResponseStatus"
-        },
-        "reference_statuses": {
-          "items": {
-            "$ref": "#/definitions/ReferenceStatus"
-          },
-          "type": "array"
-        }
-      },
-      "type": "object",
-      "required": [
-        "status",
-        "reference_statuses"
-      ],
-      "title": "IngestStatusResponse"
-    },
-    "Reference": {
-      "properties": {
-        "source_filename": {
-          "type": "string"
-        },
-        "status": {
-          "$ref": "#/definitions/IngestStatus"
-        },
-        "citation_key": {
-          "type": "string"
-        },
-        "doi": {
-          "type": "string"
-        },
-        "title": {
-          "type": "string"
-        },
-        "abstract": {
-          "type": "string"
-        },
-        "contents": {
-          "type": "string"
-        },
-        "published_date": {
-          "type": "string",
-          "format": "date"
-        },
-        "authors": {
-          "items": {
-            "$ref": "#/definitions/Author"
-          },
-          "type": "array",
-          "default": []
-        },
-        "chunks": {
-          "items": {
-            "$ref": "#/definitions/Chunk"
-          },
-          "type": "array",
-          "default": []
-        },
-        "metadata": {
-          "type": "object",
-          "default": {}
-        }
-      },
-      "type": "object",
-      "required": [
-        "source_filename",
-        "status"
-      ],
-      "title": "Reference",
-      "description": "A reference for an academic paper / PDF"
-    },
-    "ReferencePatch": {
-      "properties": {
-        "data": {
-          "type": "object"
-        }
-      },
-      "type": "object",
-      "required": [
-        "data"
-      ],
-      "title": "ReferencePatch",
-      "description": "ReferencePatch is the input type for updating a Reference's metadata."
-    },
-    "ReferenceStatus": {
-      "properties": {
-        "source_filename": {
-          "type": "string"
-        },
-        "status": {
-          "$ref": "#/definitions/IngestStatus"
-        }
-      },
-      "type": "object",
-      "required": [
-        "source_filename",
-        "status"
-      ],
-      "title": "ReferenceStatus"
-    },
-    "ReferenceUpdate": {
-      "properties": {
-        "source_filename": {
-          "type": "string"
-        },
-        "patch": {
-          "$ref": "#/definitions/ReferencePatch"
-        }
-      },
-      "type": "object",
-      "required": [
-        "source_filename",
-        "patch"
-      ],
-      "title": "ReferenceUpdate"
     },
     "ResponseStatus": {
       "type": "string",
@@ -537,22 +299,6 @@
       ],
       "title": "TextCompletionResponse"
     },
-    "UpdateStatusResponse": {
-      "properties": {
-        "status": {
-          "$ref": "#/definitions/ResponseStatus"
-        },
-        "message": {
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "required": [
-        "status",
-        "message"
-      ],
-      "title": "UpdateStatusResponse"
-    },
     "ValidationError": {
       "properties": {
         "loc": {
@@ -586,6 +332,182 @@
       ],
       "title": "ValidationError"
     },
+    "Author": {
+      "properties": {
+        "full_name": {
+          "type": "string"
+        },
+        "given_name": {
+          "type": "string"
+        },
+        "surname": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "full_name"
+      ],
+      "title": "Author"
+    },
+    "Chunk": {
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "vector": {
+          "items": {
+            "type": "number"
+          },
+          "type": "array",
+          "default": []
+        },
+        "metadata": {
+          "type": "object",
+          "default": {}
+        }
+      },
+      "type": "object",
+      "required": [
+        "text"
+      ],
+      "title": "Chunk"
+    },
+    "DeleteRequest": {
+      "properties": {
+        "reference_ids": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "all": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "type": "object",
+      "required": [
+        "reference_ids"
+      ],
+      "title": "DeleteRequest"
+    },
+    "DeleteStatusResponse": {
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "status",
+        "message"
+      ],
+      "title": "DeleteStatusResponse"
+    },
+    "IngestStatus": {
+      "type": "string",
+      "enum": [
+        "processing",
+        "failure",
+        "complete"
+      ],
+      "title": "IngestStatus",
+      "description": "An enumeration."
+    },
+    "Reference": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "source_filename": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/IngestStatus"
+        },
+        "citation_key": {
+          "type": "string"
+        },
+        "doi": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "abstract": {
+          "type": "string"
+        },
+        "contents": {
+          "type": "string"
+        },
+        "published_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "authors": {
+          "items": {
+            "$ref": "#/definitions/Author"
+          },
+          "type": "array",
+          "default": []
+        },
+        "chunks": {
+          "items": {
+            "$ref": "#/definitions/Chunk"
+          },
+          "type": "array",
+          "default": []
+        },
+        "metadata": {
+          "type": "object",
+          "default": {}
+        }
+      },
+      "type": "object",
+      "required": [
+        "id",
+        "source_filename",
+        "status"
+      ],
+      "title": "Reference",
+      "description": "A reference for an academic paper / PDF"
+    },
+    "ReferencePatch": {
+      "properties": {
+        "data": {
+          "type": "object"
+        }
+      },
+      "type": "object",
+      "required": [
+        "data"
+      ],
+      "title": "ReferencePatch",
+      "description": "ReferencePatch is the input type for updating a Reference's metadata."
+    },
+    "UpdateStatusResponse": {
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "status",
+        "message"
+      ],
+      "title": "UpdateStatusResponse"
+    },
     "Body_create_file__project_id___filepath__put": {
       "properties": {
         "file": {
@@ -618,7 +540,7 @@
       "properties": {
         "api_key": {
           "type": "string",
-          "default": "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"
+          "default": ""
         },
         "chat_model": {
           "type": "string",
@@ -669,7 +591,7 @@
             }
           ],
           "default": {
-            "api_key": "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",
+            "api_key": "",
             "chat_model": "gpt-3.5-turbo",
             "manner": "scholarly",
             "temperature": 0.7

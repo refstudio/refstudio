@@ -1,4 +1,3 @@
-import os
 from datetime import date
 from typing import Any
 
@@ -206,7 +205,7 @@ class SearchResponse(RefStudioModel):
 
 
 class OpenAISettings(RefStudioModel):
-    api_key: str = os.environ.get("OPENAI_API_KEY")
+    api_key: str = ""
     chat_model: str = "gpt-3.5-turbo"
 
     # TODO: the params below should not be settings

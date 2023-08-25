@@ -20,30 +20,20 @@ export type Detail = ValidationError[];
  * An enumeration.
  *
  * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "IngestStatus".
+ * via the `definition` "RewriteMannerType".
  */
-export type IngestStatus = 'processing' | 'failure' | 'complete';
+export type RewriteMannerType = 'concise' | 'elaborate' | 'scholarly';
 /**
  * An enumeration.
  *
  * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "RewriteMannerType".
+ * via the `definition` "IngestStatus".
  */
-export type RewriteMannerType = 'concise' | 'elaborate' | 'scholarly';
+export type IngestStatus = 'processing' | 'failure' | 'complete';
 export type File = string;
 
 export interface ApiSchema {
   [k: string]: unknown;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "Author".
- */
-export interface Author {
-  full_name: string;
-  given_name?: string;
-  surname?: string;
-  email?: string;
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
@@ -73,31 +63,6 @@ export interface ChatResponseChoice {
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "Chunk".
- */
-export interface Chunk {
-  text: string;
-  vector?: number[];
-  metadata?: {};
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "DeleteRequest".
- */
-export interface DeleteRequest {
-  source_filenames: string[];
-  all?: boolean;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "DeleteStatusResponse".
- */
-export interface DeleteStatusResponse {
-  status: ResponseStatus;
-  message: string;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
  * via the `definition` "HTTPValidationError".
  */
 export interface HTTPValidationError {
@@ -111,73 +76,6 @@ export interface ValidationError {
   loc: Location;
   msg: Message;
   type: ErrorType;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "IngestRequest".
- */
-export interface IngestRequest {
-  pdf_directory: string;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "IngestResponse".
- */
-export interface IngestResponse {
-  project_name: string;
-  references: Reference[];
-}
-/**
- * A reference for an academic paper / PDF
- *
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "Reference".
- */
-export interface Reference {
-  source_filename: string;
-  status: IngestStatus;
-  citation_key?: string;
-  doi?: string;
-  title?: string;
-  abstract?: string;
-  contents?: string;
-  published_date?: string;
-  authors?: Author[];
-  chunks?: Chunk[];
-  metadata?: {};
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "IngestStatusResponse".
- */
-export interface IngestStatusResponse {
-  status: ResponseStatus;
-  reference_statuses: ReferenceStatus[];
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "ReferenceStatus".
- */
-export interface ReferenceStatus {
-  source_filename: string;
-  status: IngestStatus;
-}
-/**
- * ReferencePatch is the input type for updating a Reference's metadata.
- *
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "ReferencePatch".
- */
-export interface ReferencePatch {
-  data: {};
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "ReferenceUpdate".
- */
-export interface ReferenceUpdate {
-  source_filename: string;
-  patch: ReferencePatch;
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
@@ -265,6 +163,70 @@ export interface TextCompletionResponse {
   status: ResponseStatus;
   message: string;
   choices: TextCompletionChoice[];
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "Author".
+ */
+export interface Author {
+  full_name: string;
+  given_name?: string;
+  surname?: string;
+  email?: string;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "Chunk".
+ */
+export interface Chunk {
+  text: string;
+  vector?: number[];
+  metadata?: {};
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "DeleteRequest".
+ */
+export interface DeleteRequest {
+  reference_ids: string[];
+  all?: boolean;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "DeleteStatusResponse".
+ */
+export interface DeleteStatusResponse {
+  status: ResponseStatus;
+  message: string;
+}
+/**
+ * A reference for an academic paper / PDF
+ *
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "Reference".
+ */
+export interface Reference {
+  id: string;
+  source_filename: string;
+  status: IngestStatus;
+  citation_key?: string;
+  doi?: string;
+  title?: string;
+  abstract?: string;
+  contents?: string;
+  published_date?: string;
+  authors?: Author[];
+  chunks?: Chunk[];
+  metadata?: {};
+}
+/**
+ * ReferencePatch is the input type for updating a Reference's metadata.
+ *
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "ReferencePatch".
+ */
+export interface ReferencePatch {
+  data: {};
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
