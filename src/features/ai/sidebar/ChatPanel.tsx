@@ -1,6 +1,8 @@
+import { useAtomValue } from 'jotai';
 import { useEffect, useRef, useState } from 'react';
 
 import { chatWithAI } from '../../../api/chat';
+import { projectIdAtom } from '../../../atoms/projectState';
 import { PanelWrapper } from '../../../components/PanelWrapper';
 import { cx } from '../../../lib/cx';
 import { LoadingIcon, SendIcon } from '../../components/icons';
@@ -13,6 +15,7 @@ interface ChatThreadItem {
 type ChatThread = ChatThreadItem[];
 
 export function ChatbotPanel() {
+  const projectId = useAtomValue(projectIdAtom);
   const [text, setText] = useState('');
 
   const [chatThread, setChatThread] = useState<ChatThread>([
@@ -45,7 +48,7 @@ export function ChatbotPanel() {
     }
     setCurrentChatThreadItem({ id: String(chatThread.length + 1), question: text });
     setText('');
-    chatWithAI(question)
+    chatWithAI(projectId, question)
       .then((reply) => {
         setChatThread([...chatThread, { id: String(chatThread.length + 1), question: text, answer: reply[0] }]);
         setCurrentChatThreadItem(null);
