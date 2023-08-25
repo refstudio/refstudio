@@ -1,8 +1,23 @@
-import { getRemoteProject } from './api/projectsAPI';
+import { getRemoteProject, getRemoteProjects } from './api/projectsAPI';
 
 // ########################################################################################
 // PROJECT
 // ########################################################################################
+/** This is an utility method to return one open project from the server, while we don't have a UI to list projects */
+export async function readOneProjectFromWeb() {
+  const projects = await getRemoteProjects();
+  if (Object.keys(projects).length === 0) {
+    throw new Error('No projects found');
+  }
+  const projectId = Object.keys(projects)[0];
+  const project = projects[projectId];
+  return {
+    id: projectId,
+    path: project.project_path,
+    name: project.project_name,
+  };
+}
+
 export async function readProjectInfoFromWeb(projectId: string) {
   const projectInfo = await getRemoteProject(projectId);
   return {

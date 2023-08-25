@@ -6,9 +6,17 @@ interface ProjectIdResponse {
   filepaths: string[];
 }
 
+type ProjectsResponse = Record<string, { project_name: string; project_path: string }>;
+
+export async function getRemoteProjects() {
+  const res = await fetch(`/api/projects/`);
+  const data = res.json() as unknown as ProjectsResponse;
+  return data;
+}
+
 export async function getRemoteProject(projectId: string) {
   const res = await fetch(`/api/projects/${projectId}`);
-  const data: ProjectIdResponse = res.json() as unknown as ProjectIdResponse;
+  const data = res.json() as unknown as ProjectIdResponse;
   return data;
 }
 
@@ -22,7 +30,7 @@ export async function postRemoteProject(projectName: string) {
       Accept: 'application/json',
     },
   });
-  const payload = (await response.json()) as Record<string, { project_name: string; project_path: string }>;
+  const payload = (await response.json()) as ProjectsResponse;
   const projectId = Object.keys(payload)[0];
   const { project_path, project_name } = payload[projectId];
   return {

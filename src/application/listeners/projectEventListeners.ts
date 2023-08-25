@@ -15,7 +15,7 @@ import {
 import { getNewProjectsBaseDir } from '../../io/filesystem';
 import { notifyInfo } from '../../notifications/notifications';
 import { saveCachedSettings, setCachedSetting } from '../../settings/settingsManager';
-import { readProjectInfoFromWeb } from '../../web';
+import { readOneProjectFromWeb } from '../../web';
 
 export function useFileProjectNewListener() {
   const newProject = useSetAtom(newProjectAtom);
@@ -58,9 +58,10 @@ export function useFileProjectOpenListener() {
 
   return async () => {
     if (import.meta.env.VITE_IS_WEB) {
-      // Open a custom dialog with all projects to select one
-      const projectInfo = await readProjectInfoFromWeb('00000000-cafe-babe-0000-000000000000');
-      return openWebProject(projectInfo.id, projectInfo.path, 'Test Project');
+      // TODO: Open a custom dialog with all projects to select one
+      // For now, opens the first project found
+      const projectInfo = await readOneProjectFromWeb();
+      return openWebProject(projectInfo.id, projectInfo.path, projectInfo.name);
     }
 
     const selectedPath = await open({
