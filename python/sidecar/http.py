@@ -32,6 +32,7 @@ load_dotenv()
 sidecar_api = FastAPI()  # Legacy API for existing sidecar cli functionality
 references_api = FastAPI()  # API for interacting with references
 ai_api = FastAPI()  # API for interacting with AI
+search_api = FastAPI()  # API for interacting with search
 filesystem_api = FastAPI()  # API for interacting with the filesystem
 project_api = FastAPI()  # API for interacting with projects
 settings_api = FastAPI()  # API for interacting with settings
@@ -60,8 +61,17 @@ async def http_chat(req: ChatRequest) -> ChatResponse:
     return response
 
 
+# TODO: remove this endpoint once the Search API is adopted
 @sidecar_api.post("/search")
 async def http_search(req: SearchRequest) -> SearchResponse:
+    response = search.search_s2(req)
+    return response
+
+
+# Search API
+# --------------
+@search_api.post("/s2")
+async def http_search_s2(req: SearchRequest) -> SearchResponse:
     response = search.search_s2(req)
     return response
 
