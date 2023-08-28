@@ -1,23 +1,29 @@
 import os
 
 import openai
-from dotenv import load_dotenv
-from tenacity import retry, stop_after_attempt, wait_fixed
-
-from sidecar import prompts, settings, typing, projects
+from sidecar import projects, prompts, settings, typing
 from sidecar.ranker import BM25Ranker
 from sidecar.settings import logger
 from sidecar.storage import JsonStorage
 from sidecar.typing import ChatRequest, ChatResponse, ChatResponseChoice
-
-load_dotenv()
-openai.api_key = os.environ.get("OPENAI_API_KEY")
+from tenacity import retry, stop_after_attempt, wait_fixed
 
 
-def ask_question(request: ChatRequest, project_id: str = None) -> typing.ChatResponse:
+def ask_question(
+    request: ChatRequest,
+    project_id: str = None,
+    user_settings: typing.SettingsSchema = None,
+) -> typing.ChatResponse:
     input_text = request.text
     n_choices = request.n_choices
     temperature = request.temperature
+
+    if user_settings is not None:
+        openai.api_key = user_settings.openai.api_key
+        model = user_settings.openai.chat_model
+    else:
+        openai.api_key = os.environ["OPENAI_API_KEY"]
+        model = "gpt-3.5-turbo"
 
     logger.info(f"Calling chat with the following parameters: {request.dict()}")
 
@@ -33,7 +39,7 @@ def ask_question(request: ChatRequest, project_id: str = None) -> typing.ChatRes
     logger.info(f"Loaded {len(storage.chunks)} documents from storage")
 
     ranker = BM25Ranker(storage=storage)
-    chat = Chat(input_text=input_text, storage=storage, ranker=ranker)
+    chat = Chat(input_text=input_text, storage=storage, ranker=ranker, model=model)
 
     try:
         choices = chat.ask_question(n_choices=n_choices, temperature=temperature)
@@ -61,10 +67,12 @@ class Chat:
         input_text: str,
         storage: JsonStorage,
         ranker: BM25Ranker,
+        model: str = "gpt-3.5-turbo",
     ):
         self.input_text = input_text
         self.ranker = ranker
         self.storage = storage
+        self.model = model
 
     def get_relevant_documents(self):
         docs = self.ranker.get_top_n(query=self.input_text, limit=5)
@@ -76,7 +84,7 @@ class Chat:
             f"Calling OpenAI chat API with the following input message(s): {messages}"
         )
         response = openai.ChatCompletion.create(
-            model=os.environ["OPENAI_CHAT_MODEL"],
+            model=self.model,
             messages=messages,
             n=n_choices,  # number of completions to generate
             temperature=temperature,  # 0 = no randomness, deterministic

@@ -1,7 +1,6 @@
 import os
 
 import openai
-from dotenv import load_dotenv
 from sidecar import prompts, shared, typing
 from sidecar.settings import logger
 from sidecar.typing import (
@@ -13,15 +12,19 @@ from sidecar.typing import (
 )
 from tenacity import retry, stop_after_attempt, wait_fixed
 
-load_dotenv()
-openai.api_key = os.environ.get("OPENAI_API_KEY")
 
-
-def rewrite(arg: RewriteRequest):
+def rewrite(arg: RewriteRequest, user_settings: typing.SettingsSchema = None):
     text = arg.text
     manner = arg.manner
     n_choices = arg.n_choices
     temperature = arg.temperature
+
+    if user_settings is not None:
+        openai.api_key = user_settings.openai.api_key
+        model = user_settings.openai.chat_model
+    else:
+        openai.api_key = os.environ["OPENAI_API_KEY"]
+        model = "gpt-3.5-turbo"
 
     # there are 1.33 tokens per word on average
     # seems reasonable to require a max_tokens roughly equivalent to our input text
@@ -31,7 +34,7 @@ def rewrite(arg: RewriteRequest):
     logger.info(f"Calling rewrite with the following parameters: {arg.dict()}")
 
     prompt = prompts.create_prompt_for_rewrite(text, manner)
-    chat = Rewriter(prompt, n_choices, temperature, max_tokens)
+    chat = Rewriter(prompt, n_choices, temperature, max_tokens, model)
 
     try:
         choices = chat.get_response(response_type=RewriteChoice)
@@ -53,7 +56,16 @@ def rewrite(arg: RewriteRequest):
     return response
 
 
-def complete_text(request: TextCompletionRequest):
+def complete_text(
+    request: TextCompletionRequest, user_settings: typing.SettingsSchema = None
+):
+    if user_settings is not None:
+        openai.api_key = user_settings.openai.api_key
+        model = user_settings.openai.chat_model
+    else:
+        openai.api_key = os.environ["OPENAI_API_KEY"]
+        model = "gpt-3.5-turbo"
+
     logger.info(
         f"Calling text completion with the following parameters: {request.dict()}"
     )
@@ -63,6 +75,7 @@ def complete_text(request: TextCompletionRequest):
         n_choices=request.n_choices,
         temperature=request.temperature,
         max_tokens=request.max_tokens,
+        model=model,
     )
 
     try:
@@ -104,6 +117,8 @@ class Rewriter:
         The temperature to use when generating text from the OpenAI chat API.
     max_tokens : int, optional, default=512
         The maximum number of tokens to generate from the OpenAI chat API.
+    model : str, optional, default="gpt-3.5-turbo"
+        The name of the OpenAI model to use.
     """
 
     def __init__(
@@ -112,11 +127,13 @@ class Rewriter:
         n_choices: int = 1,
         temperature: float = 0.7,
         max_tokens: int = 512,
+        model: str = "gpt-3.5-turbo",
     ):
         self.prompt = prompt
         self.n_choices = int(n_choices)
         self.temperature = temperature
         self.max_tokens = max_tokens
+        self.model = model
 
     def get_response(self, response_type: TextSuggestionChoice):
         messages = self.prepare_messages_for_chat(self.prompt)
@@ -142,7 +159,7 @@ class Rewriter:
             f"Calling OpenAI chat API with the following input message(s): {messages}"
         )
         response = openai.ChatCompletion.create(
-            model=os.environ["OPENAI_CHAT_MODEL"],
+            model=self.model,
             messages=messages,
             n=self.n_choices,  # number of completions to generate
             temperature=self.temperature,
