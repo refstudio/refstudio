@@ -345,4 +345,3 @@ async def get_settings() -> SettingsSchema:
 async def update_settings(req: SettingsSchema) -> SettingsSchema:
     user_id = "user1"
     return settings.update_settings_for_user(user_id, req)
-    return settings.update_settings_for_user(user_id, req)
