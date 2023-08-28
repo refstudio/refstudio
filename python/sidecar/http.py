@@ -92,7 +92,9 @@ async def http_ai_chat(
     req: ChatRequest,
     user_settings: Annotated[SettingsSchema, Depends(settings.get_settings_for_user)],
 ) -> ChatResponse:
-    response = chat.ask_question(req, project_id=project_id, user_settings=user_settings)
+    response = chat.ask_question(
+        req, project_id=project_id, user_settings=user_settings
+    )
     return response
 
 
