@@ -1,11 +1,11 @@
 # Contributing
 
-When contributing to this repository, please first discuss the change you wish to make via [issue](https://github.com/refstudio/refstudio/issues), or any other method with the owners of this repository before making a change.
+Before making a change please discuss the change you wish to make with the owners of this repository. Dicuss changes via issue [issue](https://github.com/refstudio/refstudio/issues) or any other method.
 
 
 ## Our code style
 
-There is an _eslint_, _prettier_ and _python_ config that ensures a consistent code style. We also have auto-save and format on save configured for VS Code. To check for errors, run `$ yarn *:check`. That’ll be checked when you push using a git hook, too. Make sure it’s passing, before sending a pull request.
+There is an _eslint_, _prettier_ and _python_ config that ensures a consistent code style. We also reccomend auto-save and format on save configured for VS Code. To check for style errors, run `$ yarn check`. Code style will also be checked when you push using a git hook. Make sure it’s passing before sending a pull request.
 
 ## Branching guidelines
 
@@ -14,8 +14,8 @@ We don't have a strict rule for branch name guidelines. You should try to name y
 
 ## Pull Request Process
 
-Please try to keep your pull request focused in scope and avoid including unrelated commits.
+Please try to keep your pull request focused, in scope, and avoid including unrelated commits.
 
-We adopted the [Squash and merge](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/about-pull-request-merges#squash-and-merge-your-commits) convention to give a nice, clean, linear history on main which makes it easier to bisect and track changes.
+We adopted the [Squash and merge](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/about-pull-request-merges#squash-and-merge-your-commits) convention to give a nice, clean, linear history on `main` which makes it easier to bisect and track changes.
 
 Thank you for contributing!
