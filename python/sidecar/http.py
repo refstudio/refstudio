@@ -187,10 +187,12 @@ async def get_project(project_id: str):
     """
     user_id = "user1"
     project_path = projects.get_project_path(user_id, project_id)
+    project_name = projects.get_project_name(user_id, project_id)
     filepaths = projects.get_project_files(user_id, project_id)
     return {
         "project_id": project_id,
         "project_path": project_path,
+        "project_name": project_name,
         "filepaths": filepaths,
     }
 

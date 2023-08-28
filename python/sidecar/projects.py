@@ -1,9 +1,8 @@
-from pathlib import Path
 import json
 import shutil
+from pathlib import Path
 
 from sidecar import settings
-
 
 # Ensure that the server's path storage directory exists.
 Path(settings.WEB_STORAGE_URL).mkdir(parents=True, exist_ok=True)
@@ -57,7 +56,7 @@ def update_project_path_storage(
             "project_name": project_name,
             "project_path": str(project_path),
         }
-        json.dump(data, f)
+        json.dump(data, f, indent=2, default=str)
 
     return read_project_path_storage(user_id)
 
@@ -67,11 +66,17 @@ def get_project_path(user_id: str, project_id: str) -> Path:
     return Path(data[project_id]["project_path"])
 
 
+def get_project_name(user_id: str, project_id: str) -> Path:
+    data = read_project_path_storage(user_id)
+    return Path(data[project_id]["project_name"])
+
+
 def create_project(
     user_id: str, project_id: str, project_name: str, project_path: str = None
 ) -> Path:
     if project_path:
         server_path = project_path
+        Path(server_path).mkdir(parents=True, exist_ok=True)
     else:
         server_path = make_project_path(user_id, project_id)
         server_path.mkdir(parents=True, exist_ok=True)
@@ -102,6 +107,6 @@ def delete_project(user_id: str, project_id: str) -> None:
 
 
 def get_project_files(user_id: str, project_id: str) -> list:
-    project_path = make_project_path(user_id, project_id)
+    project_path = get_project_path(user_id, project_id)
     filepaths = list(project_path.glob("**/*"))
     return filepaths
