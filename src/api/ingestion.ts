@@ -1,13 +1,8 @@
-import { getSystemPath, getUploadsDir, makeUploadPath } from '../io/filesystem';
+import { makeUploadPath } from '../io/filesystem';
 import { ReferenceItem } from '../types/ReferenceItem';
-import {
-  deleteRemoteReferences,
-  getRemoteReferences,
-  patchRemoteReference,
-  startRemoteReferencesIngestion,
-} from './referencesAPI';
+import { universalDelete, universalGet, universalPatch, universalPost } from './api';
 import { callSidecar } from './sidecar';
-import { Reference } from './types';
+import { IngestResponse, Reference } from './types';
 
 function parsePdfIngestionResponse(references: Reference[]): ReferenceItem[] {
   return references.map((reference) => ({
@@ -27,33 +22,13 @@ function parsePdfIngestionResponse(references: Reference[]): ReferenceItem[] {
   }));
 }
 
-export async function runPDFIngestion(projectId?: string): Promise<ReferenceItem[]> {
-  if (import.meta.env.VITE_IS_WEB) {
-    if (!projectId) {
-      throw new Error('Project ID is required for web version');
-    }
-    const references = await startRemoteReferencesIngestion(projectId);
-    return parsePdfIngestionResponse(references);
-  } else {
-    const uploadsDir = await getSystemPath(getUploadsDir());
-    const response = await callSidecar('ingest', { pdf_directory: String(uploadsDir) });
-    return parsePdfIngestionResponse(response.references);
-  }
+export async function runPDFIngestion(projectId: string): Promise<ReferenceItem[]> {
+  const ingestResponse = await universalPost<IngestResponse>(`/api/references/${projectId}`);
+  return parsePdfIngestionResponse(ingestResponse.references);
 }
 
-export async function removeReferences(ids: string[], projectId?: string) {
-  if (import.meta.env.VITE_IS_WEB) {
-    if (!projectId) {
-      throw new Error('Project ID is required for web version');
-    }
-    await deleteRemoteReferences(projectId, ids);
-    return;
-  } else {
-    const response = await callSidecar('delete', { reference_ids: ids });
-    if (response.status === 'error') {
-      throw new Error('Error removing references: ' + response.message);
-    }
-  }
+export async function removeReferences(ids: string[], projectId: string) {
+  await universalDelete(`/api/references/${projectId}/bulk_delete`, { reference_ids: ids });
 }
 
 const UPDATABLE_FIELDS: (keyof ReferenceItem)[] = ['citationKey', 'title', 'publishedDate', 'authors'];
@@ -68,7 +43,7 @@ export async function updateReference(
   filename: string,
   patch: Partial<ReferenceItem>,
   referenceId: string,
-  projectId?: string,
+  projectId: string,
 ) {
   const referencePatch: Partial<Reference> = {
     ...applyPatch('citationKey', patch, () => ({ citation_key: patch.citationKey })),
@@ -83,36 +58,12 @@ export async function updateReference(
     return;
   }
 
-  if (import.meta.env.VITE_IS_WEB) {
-    if (!projectId) {
-      throw new Error('Project ID is required for web version');
-    }
-    await patchRemoteReference(projectId, referenceId, referencePatch);
-  } else {
-    const response = await callSidecar('update', {
-      reference_id: filename,
-      patch: {
-        data: referencePatch,
-      },
-    });
-    if (response.status === 'error') {
-      throw new Error('Error updating reference: ' + response.message);
-    }
-  }
+  await universalPatch(`/api/references/${projectId}/${referenceId}`, { data: patch });
 }
 
-export async function getIngestedReferences(projectId?: string): Promise<ReferenceItem[]> {
-  if (import.meta.env.VITE_IS_WEB) {
-    if (!projectId) {
-      throw new Error('Project ID is required for web version');
-    }
-    const references = await getRemoteReferences(projectId);
-    return parsePdfIngestionResponse(references);
-  } else {
-    const uploadsDir = await getSystemPath(getUploadsDir());
-    const response = await callSidecar('ingest_references', { pdf_directory: String(uploadsDir) });
-    return parsePdfIngestionResponse(response.references);
-  }
+export async function getIngestedReferences(projectId: string): Promise<ReferenceItem[]> {
+  const references = await universalGet<Reference[]>(`/api/references/${projectId}`);
+  return parsePdfIngestionResponse(references);
 }
 
 export async function getIngestionStatus() {

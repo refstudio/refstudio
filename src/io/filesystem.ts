@@ -24,14 +24,8 @@ import {
   desktopDir,
   exists,
   join,
-  readBinaryFile,
-  readDir,
-  readTextFile,
   removeDir,
-  removeFile,
-  renameFile as tauriRenameFile,
   sep,
-  writeBinaryFile,
   writeTextFile,
 } from '../wrappers/tauri-wrapper';
 import { FILE2_CONTENT, FILE3_CONTENT, INITIAL_CONTENT } from './filesystem.sample-content';
@@ -137,27 +131,12 @@ export function isInUploadsDir(relativePath: string) {
 }
 
 export async function uploadFiles(systemFiles: File[]) {
-  if (import.meta.env.VITE_IS_WEB) {
-    for (const file of systemFiles) {
-      const relativePath = makeUploadPath(file.name);
-      const bytes = await file.arrayBuffer();
-      await writeBinaryFileFromWeb(currentProjectId, relativePath, bytes);
-    }
-    return Array.from(systemFiles).map((file) => file.name);
-  } else {
-    // Ensure uploads dir
-    const systemUploadsDir = await getSystemPath(getUploadsDir());
-    if (!(await exists(systemUploadsDir))) {
-      await createDir(systemUploadsDir);
-    }
-
-    for (const file of systemFiles) {
-      const bytes = await file.arrayBuffer();
-      const systemUploadFilePath = await getSystemPath(makeUploadPath(file.name));
-      await writeBinaryFile(systemUploadFilePath, bytes);
-    }
-    return Array.from(systemFiles).map((file) => file.name);
+  for (const file of systemFiles) {
+    const relativePath = makeUploadPath(file.name);
+    const bytes = await file.arrayBuffer();
+    await writeBinaryFileFromWeb(currentProjectId, relativePath, bytes);
   }
+  return Array.from(systemFiles).map((file) => file.name);
 }
 
 // #####################################################################################
@@ -237,16 +216,9 @@ async function ensureFile(fileName: string, content: string, overrideFiles = fal
 }
 
 export async function readAllProjectFiles() {
-  if (import.meta.env.VITE_IS_WEB) {
-    console.log('reading file structure from web');
-    const entries = await readProjectFilesFromWeb(currentProjectId);
-    return Promise.all(entries.map(convertTauriFileEntryToFileEntry));
-  } else {
-    const systemBaseDir = await getSystemPath('');
-    console.log('reading file structure from ', systemBaseDir);
-    const entries = await readDir(systemBaseDir, { recursive: true });
-    return Promise.all(entries.map(convertTauriFileEntryToFileEntry));
-  }
+  console.log('reading file structure from web');
+  const entries = await readProjectFilesFromWeb(currentProjectId);
+  return Promise.all(entries.map(convertTauriFileEntryToFileEntry));
 }
 
 async function convertTauriFileEntryToFileEntry(entry: TauriFileEntry): Promise<FileEntry> {
@@ -300,14 +272,8 @@ export function getParentFolder(filePath: string) {
 // #####################################################################################
 export async function writeFileContent(relativePath: string, textContent: string) {
   try {
-    if (import.meta.env.VITE_IS_WEB) {
-      await writeTextFileFromWeb(currentProjectId, relativePath, textContent);
-      return true;
-    } else {
-      const systemPath = await getSystemPath(relativePath);
-      await writeTextFile(systemPath, textContent);
-      return true;
-    }
+    await writeTextFileFromWeb(currentProjectId, relativePath, textContent);
+    return true;
   } catch (err) {
     console.error('Error', err);
     return false;
@@ -315,26 +281,18 @@ export async function writeFileContent(relativePath: string, textContent: string
 }
 
 export async function readFileContent(file: FileFileEntry): Promise<EditorContent> {
-  const systemPath = await getSystemPath(file.path);
   switch (file.fileExtension) {
     case 'json': {
-      const textContent = import.meta.env.VITE_IS_WEB
-        ? await readTextFileFromWeb(currentProjectId, file.path)
-        : await readTextFile(systemPath);
+      const textContent = await readTextFileFromWeb(currentProjectId, file.path);
       return { type: 'json', textContent };
     }
     case 'pdf': {
-      const binaryContent = import.meta.env.VITE_IS_WEB
-        ? await readBinaryFileFromWeb(currentProjectId, file.path)
-        : await readBinaryFile(systemPath);
+      const binaryContent = await readBinaryFileFromWeb(currentProjectId, file.path);
       return { type: 'pdf', binaryContent };
     }
     case 'refstudio':
     case '': {
-      const textContent = import.meta.env.VITE_IS_WEB
-        ? await readTextFileFromWeb(currentProjectId, file.path)
-        : await readTextFile(systemPath);
-
+      const textContent = await readTextFileFromWeb(currentProjectId, file.path);
       try {
         const jsonContent = JSON.parse(textContent) as JSONContent;
         return { type: 'refstudio', jsonContent };
@@ -344,10 +302,7 @@ export async function readFileContent(file: FileFileEntry): Promise<EditorConten
       }
     }
     default: {
-      const textContent = import.meta.env.VITE_IS_WEB
-        ? await readTextFileFromWeb(currentProjectId, file.path)
-        : await readTextFile(systemPath);
-
+      const textContent = await readTextFileFromWeb(currentProjectId, file.path);
       return { type: 'text', textContent };
     }
   }
@@ -355,14 +310,8 @@ export async function readFileContent(file: FileFileEntry): Promise<EditorConten
 
 export async function deleteFile(relativePath: string): Promise<boolean> {
   try {
-    if (import.meta.env.VITE_IS_WEB) {
-      await deleteFileFromWeb(currentProjectId, relativePath);
-      return true;
-    } else {
-      const systemPath = await getSystemPath(relativePath);
-      await removeFile(systemPath);
-      return true;
-    }
+    await deleteFileFromWeb(currentProjectId, relativePath);
+    return true;
   } catch (err) {
     console.error('Error', err);
     return false;
@@ -371,25 +320,13 @@ export async function deleteFile(relativePath: string): Promise<boolean> {
 
 export async function renameFile(relativePath: string, newName: string): RenameFileResult {
   try {
-    if (import.meta.env.VITE_IS_WEB) {
-      const newRelativePath = getRefStudioPath(newName);
-      if (await existsFileFromWeb(currentProjectId, newRelativePath)) {
-        console.warn(`Another file with the same name already exists: ${newRelativePath}`);
-        return { success: false };
-      }
-      await renameFileFromWeb(currentProjectId, relativePath, newRelativePath);
-      return { success: true, newPath: newRelativePath };
-    } else {
-      const systemPath = await getSystemPath(relativePath);
-      const newSystemPath = await join(getParentFolder(systemPath), newName);
-      if (await exists(newSystemPath)) {
-        console.warn(`Another file with the same name already exists: ${newSystemPath}`);
-        return { success: false };
-      }
-      await tauriRenameFile(systemPath, newSystemPath);
-      const newRelativePath = getRefStudioPath(newSystemPath);
-      return { success: true, newPath: newRelativePath };
+    const newRelativePath = getRefStudioPath(newName);
+    if (await existsFileFromWeb(currentProjectId, newRelativePath)) {
+      console.warn(`Another file with the same name already exists: ${newRelativePath}`);
+      return { success: false };
     }
+    await renameFileFromWeb(currentProjectId, relativePath, newRelativePath);
+    return { success: true, newPath: newRelativePath };
   } catch (err) {
     console.error('Error', err);
     return { success: false };

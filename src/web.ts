@@ -1,26 +1,42 @@
-import { getRemoteProject, getRemoteProjects } from './api/projectsAPI';
+import { universalGet, universalPost } from './api/api';
+
+export interface ProjectInfo {
+  id: string;
+  path: string;
+  name: string;
+}
+
+interface ProjectGetResponse {
+  project_id: string;
+  project_path: string;
+  project_name: string;
+  filepaths: string[];
+}
+
+type ProjectsResponse = Record<string, { project_name: string; project_path: string }>;
+type ProjectPostResponse = ProjectsResponse;
 
 // ########################################################################################
 // PROJECT
 // ########################################################################################
-/** This is an utility method to return one open project from the server, while we don't have a UI to list projects */
-export async function readOneProjectFromWeb() {
-  const projects = await getRemoteProjects();
-  if (Object.keys(projects).length === 0) {
-    throw new Error('No projects found');
-  }
-  const projectId = Object.keys(projects)[0];
-  const project = projects[projectId];
+export async function readAllProjects() {
+  const projects = await universalGet<ProjectsResponse>(`/api/projects/`);
+  return Object.keys(projects).map(
+    (id) => ({ id, path: projects[id].project_path, name: projects[id].project_name } as ProjectInfo),
+  );
+}
+export async function readProjectById(projectId: string) {
+  const projectInfo = await universalGet<ProjectGetResponse>(`/api/projects/${projectId}`);
   return {
-    id: projectId,
-    path: project.project_path,
-    name: project.project_name,
-  };
+    id: projectInfo.project_id,
+    path: projectInfo.project_path,
+    name: projectInfo.project_name,
+  } as ProjectInfo;
 }
 
 /** NOTE: This is a simplified version of the function */
 export async function readProjectFilesFromWeb(projectId: string) {
-  const projectInfo = await getRemoteProject(projectId);
+  const projectInfo = await universalGet<ProjectGetResponse>(`/api/projects/${projectId}`);
   const relativePaths = projectInfo.filepaths
     .map((path) => path.replace(projectInfo.project_path + '/', '')) // Remove project path from API output
     .map((path) => path.replace(/^\//, '')); // Remove the leading / (we don't want them in the output)
@@ -49,6 +65,21 @@ export async function readProjectFilesFromWeb(projectId: string) {
       children: uploadsFiles,
     },
   ];
+}
+
+export async function createRemoteProject(projectName: string, projectPath?: string) {
+  const payload = await universalPost<ProjectPostResponse>(
+    `/api/projects/?project_name=${projectName}&project_path=${encodeURIComponent(projectPath ?? '')}`,
+    {},
+  );
+  const projectId = Object.keys(payload)[0];
+  const { project_path, project_name } = payload[projectId];
+
+  return {
+    id: projectId,
+    path: project_path,
+    name: project_name,
+  } as ProjectInfo;
 }
 
 // ########################################################################################

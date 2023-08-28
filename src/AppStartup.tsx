@@ -9,6 +9,7 @@ import { noop } from './lib/noop';
 import { notifyErr, notifyInfo } from './notifications/notifications';
 import { interceptConsoleMessages } from './notifications/notifications.console';
 import { getCachedSetting, initSettings } from './settings/settingsManager';
+import { readProjectById } from './web';
 import { invoke } from './wrappers/tauri-wrapper';
 
 // Note: Intercepting INFO, WARN and ERROR console.* in DEV mode
@@ -40,9 +41,10 @@ export function AppStartup() {
 
         if (isMounted()) {
           setInitialized(true);
-          const projectDir = getCachedSetting('project.current_directory');
-          if (projectDir) {
-            await openProject(projectDir);
+          const projectId = getCachedSetting('project.current_directory'); // TODO: Open project using project ID
+          if (projectId) {
+            const projectInfo = await readProjectById(projectId);
+            await openProject(projectId, projectInfo.path, projectInfo.name);
           }
           notifyInfo('Application Initialized');
         }

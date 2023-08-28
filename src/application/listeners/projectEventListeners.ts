@@ -1,44 +1,42 @@
 import { open, save } from '@tauri-apps/api/dialog';
 import { useAtomValue, useSetAtom } from 'jotai';
 
-import { postRemoteProject } from '../../api/projectsAPI';
 import { createFileAtom } from '../../atoms/fileEntryActions';
 import {
   closeProjectAtom,
   isProjectOpenAtom,
   newProjectAtom,
   newSampleProjectAtom,
-  newWebProjectAtom,
   openProjectAtom,
-  openWebProjectAtom,
 } from '../../atoms/projectState';
 import { getNewProjectsBaseDir } from '../../io/filesystem';
-import { notifyInfo } from '../../notifications/notifications';
+import { notifyInfo, notifyWarning } from '../../notifications/notifications';
 import { saveCachedSettings, setCachedSetting } from '../../settings/settingsManager';
-import { readOneProjectFromWeb } from '../../web';
+import { createRemoteProject, ProjectInfo, readAllProjects, readProjectById } from '../../web';
 
 export function useFileProjectNewListener() {
   const newProject = useSetAtom(newProjectAtom);
-  const newWebProject = useSetAtom(newWebProjectAtom);
   const createFile = useSetAtom(createFileAtom);
 
   return async () => {
+    let projectInfo: ProjectInfo;
     if (import.meta.env.VITE_IS_WEB) {
-      // Open a custom dialog to ask the project name
-      const projectInfo = await postRemoteProject('Project Web');
-      persistProjectDirInSettings(projectInfo.projectPath);
-      await newWebProject(projectInfo.projectId, projectInfo.projectPath, projectInfo.projectName);
-      createFile();
-      notifyInfo('New project created at ' + projectInfo.projectPath);
+      const projectName = 'Project Web'; // TODO: Open a custom dialog to ask the project name
+      projectInfo = await createRemoteProject(projectName);
     } else {
       const newProjectPath = await save({ defaultPath: await getNewProjectsBaseDir() });
-      if (typeof newProjectPath === 'string') {
-        await newProject(newProjectPath);
-        createFile();
-        persistProjectDirInSettings(newProjectPath);
-        notifyInfo('New project created at ' + newProjectPath);
+      if (typeof newProjectPath !== 'string') {
+        notifyInfo('User canceled operation to create new project');
+        return;
       }
+      const projectName = newProjectPath.split('/').pop() ?? 'Project';
+      projectInfo = await createRemoteProject(projectName, newProjectPath);
     }
+
+    await newProject(projectInfo.id, projectInfo.path, projectInfo.name);
+    createFile();
+    notifyInfo('New project created with success');
+    persistProjectIdInSettings(projectInfo.id);
   };
 }
 
@@ -47,35 +45,47 @@ export function useFileProjectNewSampleListener() {
   return async () => {
     const newProjectPath = `${await getNewProjectsBaseDir()}RefStudio Sample`;
     await sampleProject(newProjectPath);
-    persistProjectDirInSettings(newProjectPath);
+    persistProjectIdInSettings(newProjectPath);
     notifyInfo('New project created at ' + newProjectPath);
   };
 }
 
 export function useFileProjectOpenListener() {
   const openProject = useSetAtom(openProjectAtom);
-  const openWebProject = useSetAtom(openWebProjectAtom);
 
   return async () => {
+    let projectId: string;
     if (import.meta.env.VITE_IS_WEB) {
       // TODO: Open a custom dialog with all projects to select one
       // For now, opens the first project found
-      const projectInfo = await readOneProjectFromWeb();
-      return openWebProject(projectInfo.id, projectInfo.path, projectInfo.name);
+      const projects = await readAllProjects();
+      projectId = projects[0].id;
+    } else {
+      const selectedPath = await open({
+        directory: true,
+        multiple: false,
+        defaultPath: await getNewProjectsBaseDir(),
+        title: 'Open RefStudio project',
+      });
+
+      if (typeof selectedPath === 'string') {
+        const projects = await readAllProjects();
+        const projectWithSamePath = projects.find((project) => project.path === selectedPath);
+        if (!projectWithSamePath) {
+          notifyWarning('You need to open a project that was previously created with RefStudio.');
+          return;
+        }
+        projectId = projectWithSamePath.id;
+      } else {
+        notifyInfo('User canceled operation to open new project');
+        return;
+      }
     }
 
-    const selectedPath = await open({
-      directory: true,
-      multiple: false,
-      defaultPath: await getNewProjectsBaseDir(),
-      title: 'Open RefStudio project',
-    });
-
-    if (typeof selectedPath === 'string') {
-      await openProject(selectedPath);
-      persistProjectDirInSettings(selectedPath);
-      notifyInfo('New project open at ' + selectedPath);
-    }
+    const projectToOpen = await readProjectById(projectId);
+    await openProject(projectId, projectToOpen.path, projectToOpen.name);
+    persistProjectIdInSettings(projectId);
+    notifyInfo('New project open.');
   };
 }
 
@@ -86,13 +96,14 @@ export function useFileProjectCloseListener() {
   return () => {
     if (isOpen) {
       void closeProject();
-      persistProjectDirInSettings('');
+      persistProjectIdInSettings('');
       notifyInfo('Project closed');
     }
   };
 }
 
-function persistProjectDirInSettings(path: string) {
+// TODO: This method needs to be refactored to have use a project id instead of a path
+function persistProjectIdInSettings(path: string) {
   setCachedSetting('project.current_directory', path);
   void saveCachedSettings();
 }
