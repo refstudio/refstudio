@@ -1,11 +1,12 @@
 import os
 import shutil
 from pathlib import Path
+from typing import Annotated
 from uuid import uuid4
 
 import psutil
 from dotenv import load_dotenv
-from fastapi import FastAPI, File, UploadFile
+from fastapi import Depends, FastAPI, File, UploadFile
 from fastapi.responses import FileResponse
 from sidecar import chat, ingest, projects, rewrite, search, settings, storage
 from sidecar.typing import (
@@ -77,9 +78,33 @@ async def http_search_s2(req: SearchRequest) -> SearchResponse:
 
 # AI API
 # --------------
+@ai_api.post("/rewrite")
+async def http_ai_rewrite(
+    req: RewriteRequest,
+    user_settings: Annotated[SettingsSchema, Depends(settings.get_settings_for_user)],
+) -> RewriteResponse:
+    response = rewrite.rewrite(req, user_settings=user_settings)
+    return response
+
+
+@ai_api.post("/completion")
+async def http_ai_completion(
+    req: TextCompletionRequest,
+    user_settings: Annotated[SettingsSchema, Depends(settings.get_settings_for_user)],
+) -> TextCompletionResponse:
+    response = rewrite.complete_text(req, user_settings=user_settings)
+    return response
+
+
 @ai_api.post("/{project_id}/chat")
-async def http_ai_chat(project_id: str, req: ChatRequest) -> ChatResponse:
-    response = chat.ask_question(req, project_id=project_id)
+async def http_ai_chat(
+    project_id: str,
+    req: ChatRequest,
+    user_settings: Annotated[SettingsSchema, Depends(settings.get_settings_for_user)],
+) -> ChatResponse:
+    response = chat.ask_question(
+        req, project_id=project_id, user_settings=user_settings
+    )
     return response
 
 
