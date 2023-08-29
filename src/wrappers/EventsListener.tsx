@@ -12,7 +12,7 @@ import {
   closeEditorFromPaneAtom,
   moveEditorToPaneAtom,
 } from '../atoms/editorActions';
-import { createFileAtom, deleteFileAtom, renameFileAtom } from '../atoms/fileEntryActions';
+import { createFileAtom, deleteFileAtom, openFilePathAtom, renameFileAtom } from '../atoms/fileEntryActions';
 import { fileExplorerEntryPathBeingRenamed } from '../atoms/fileExplorerActions';
 import { useActiveEditorContentAtoms } from '../atoms/hooks/useActiveEditorContentAtoms';
 import { projectIdAtom } from '../atoms/projectState';
@@ -44,8 +44,9 @@ export function EventsListener({ children }: { children?: React.ReactNode }) {
   useListenEvent('refstudio://editors/close', useCloseEditorListener());
   useListenEvent('refstudio://editors/move', useMoveActiveEditorToPaneListener());
   // Explorer
-  useListenEvent('refstudio://explorer/rename', useRenameFileListener());
   useListenEvent('refstudio://explorer/delete', useDeleteFileListener());
+  useListenEvent('refstudio://explorer/open', useOpenFileListener());
+  useListenEvent('refstudio://explorer/rename', useRenameFileListener());
   // References
   useListenEvent('refstudio://references/remove', useRemoveReferencesListener());
   useListenEvent('refstudio://menu/references/export', useExportReferencesListener());
@@ -116,6 +117,12 @@ function useDeleteFileListener() {
   const deleteFile = useSetAtom(deleteFileAtom);
 
   return ({ path }: RefStudioEventPayload<'refstudio://explorer/delete'>) => void deleteFile(path);
+}
+
+function useOpenFileListener() {
+  const open = useSetAtom(openFilePathAtom);
+
+  return ({ path }: RefStudioEventPayload<'refstudio://explorer/open'>) => open(path);
 }
 
 function useRenameFileListener() {
