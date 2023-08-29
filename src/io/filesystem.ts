@@ -2,32 +2,23 @@ import { save } from '@tauri-apps/api/dialog';
 import type { FileEntry as TauriFileEntry } from '@tauri-apps/api/fs';
 import { JSONContent } from '@tiptap/core';
 
+import {
+  deleteProjectFile,
+  existsProjectFile,
+  readProjectBinaryFile,
+  readProjectFiles,
+  readProjectTextFile,
+  renameProjectFile,
+  writeProjectBinaryFile,
+  writeProjectTextFile,
+} from '../api/projectsAPI';
 import { EditorContent } from '../atoms/types/EditorContent';
 import { FileEntry, FileFileEntry } from '../atoms/types/FileEntry';
 import { MarkdownSerializer } from '../features/textEditor/components/tipTapNodes/refStudioDocument/serialization/MarkdownSerializer';
 import { serializeReferences } from '../features/textEditor/components/tipTapNodes/refStudioDocument/serialization/serializeReferences';
 import { notifyError } from '../notifications/notifications';
 import { ReferenceItem } from '../types/ReferenceItem';
-import {
-  deleteFileFromWeb,
-  existsFileFromWeb,
-  readBinaryFileFromWeb,
-  readProjectFilesFromWeb,
-  readTextFileFromWeb,
-  renameFileFromWeb,
-  writeBinaryFileFromWeb,
-  writeTextFileFromWeb,
-} from '../web';
-import {
-  appConfigDir,
-  createDir,
-  desktopDir,
-  exists,
-  join,
-  removeDir,
-  sep,
-  writeTextFile,
-} from '../wrappers/tauri-wrapper';
+import { desktopDir, join, sep } from '../wrappers/tauri-wrapper';
 import { FILE2_CONTENT, FILE3_CONTENT, INITIAL_CONTENT } from './filesystem.sample-content';
 
 const UPLOADS_DIR = 'uploads';
@@ -38,55 +29,12 @@ const EXPORTS_DIR = 'exports';
 // #####################################################################################
 
 /**
- * System configurations directory for the Tauri app.
- *
- * Note that this path is "outside" of the project dir. Configurations are global.
- * Should only be used by the configuration.
- *
- * @returns An operating-system absolute path
- */
-export async function getSystemConfigurationsDir() {
-  return appConfigDir();
-}
-
-/**
  * Default dir for new projects.
  *
  * @returns An operating-system absolute path
  */
 export async function getNewProjectsBaseDir() {
   return desktopDir();
-}
-
-let projectBaseDir = '';
-
-/**
- * The project base directory configures the root folder for the project files.
- *
- * When opening
- */
-export function getProjectBaseDir() {
-  return projectBaseDir;
-}
-/**
- * Set the project base directory
- *
- * @param dir new project directory
- * @returns
- */
-export function setProjectBaseDir(dir: string) {
-  return (projectBaseDir = dir);
-}
-
-/**
- * Convert a ref-studio absolute path into operating-system absolute path
- *
- * (/folder/file.txt) -> (/usr/name/etc/tauri.foo/project-x/folder/file.txt)
- *
- * @param rsPath a ref-studio absolute path
- **/
-export async function getSystemPath(rsPath: string) {
-  return join(getProjectBaseDir(), rsPath);
 }
 
 /**
@@ -98,7 +46,7 @@ export async function getSystemPath(rsPath: string) {
  * @returns
  */
 export function getRefStudioPath(absolutePath: string) {
-  const baseDir = getProjectBaseDir();
+  const baseDir = '';
   return absolutePath.replace(new RegExp(`^${baseDir}`), '');
 }
 
@@ -134,90 +82,38 @@ export async function uploadFiles(systemFiles: File[]) {
   for (const file of systemFiles) {
     const relativePath = makeUploadPath(file.name);
     const bytes = await file.arrayBuffer();
-    await writeBinaryFileFromWeb(currentProjectId, relativePath, bytes);
+    await writeProjectBinaryFile(currentProjectId, relativePath, bytes);
   }
   return Array.from(systemFiles).map((file) => file.name);
 }
 
 // #####################################################################################
-// Open Project Structure and read project files
+// FileSystem project ID
+//  - This is needed to make calls to the backend API for a specific project
 // #####################################################################################
-export async function newProject(projectPath: string) {
-  try {
-    setProjectBaseDir(projectPath);
-    const systemBaseDir = await getSystemPath('');
-
-    if (await exists(systemBaseDir)) {
-      await removeDir(systemBaseDir, { recursive: true });
-    }
-
-    await createDir(systemBaseDir, { recursive: true });
-
-    console.log('New project created in folder ', systemBaseDir);
-  } catch (err) {
-    console.error('ERROR', err);
-    throw new Error('Error creating new project in ' + projectPath);
-  }
-}
-
-export async function openProject(projectPath: string) {
-  try {
-    setProjectBaseDir(projectPath);
-    const systemBaseDir = await getSystemPath('');
-
-    console.log('Project opened for folder ', systemBaseDir);
-  } catch (err) {
-    console.error('ERROR', err);
-    throw new Error('Error open project in ' + projectPath);
-  }
-}
-
-export async function sampleProject(projectPath: string) {
-  try {
-    setProjectBaseDir(projectPath);
-    const systemBaseDir = await getSystemPath('');
-
-    if (await exists(systemBaseDir)) {
-      await removeDir(systemBaseDir, { recursive: true });
-    }
-
-    await createDir(systemBaseDir, { recursive: true });
-
-    await createSampleFiles(true);
-
-    console.log('Sample project open for folder ', systemBaseDir);
-  } catch (err) {
-    console.error('ERROR', err);
-    throw new Error('Error open project in ' + projectPath);
-  }
-}
-
 let currentProjectId = '';
-export function setCurrentProjectId(projectId: string) {
+export function setCurrentFileSystemProjectId(projectId: string) {
   currentProjectId = projectId;
 }
 
-export async function createSampleFiles(overrideFiles = false) {
+// #####################################################################################
+// Open Project Structure and read project files
+// #####################################################################################
+export async function ensureSampleProjectFiles(projectId: string) {
   try {
-    await ensureFile('file 1.refstudio', INITIAL_CONTENT, overrideFiles);
-    await ensureFile('file 2.refstudio', FILE2_CONTENT, overrideFiles);
-    await ensureFile('file 3.refstudio', FILE3_CONTENT, overrideFiles);
+    await writeProjectTextFile(projectId, 'file 1.refstudio', INITIAL_CONTENT);
+    await writeProjectTextFile(projectId, 'file 2.refstudio', FILE2_CONTENT);
+    await writeProjectTextFile(projectId, 'file 3.refstudio', FILE3_CONTENT);
+    console.log('Sample project opened with success');
   } catch (err) {
     console.error('ERROR', err);
-    throw new Error('Error creating sample files');
-  }
-}
-
-async function ensureFile(fileName: string, content: string, overrideFiles = false) {
-  const absoluteFilePath = await getSystemPath(fileName);
-  if (overrideFiles || !(await exists(absoluteFilePath))) {
-    await writeTextFile(absoluteFilePath, content);
+    throw new Error('Error open sample project');
   }
 }
 
 export async function readAllProjectFiles() {
   console.log('reading file structure from web');
-  const entries = await readProjectFilesFromWeb(currentProjectId);
+  const entries = await readProjectFiles(currentProjectId);
   return Promise.all(entries.map(convertTauriFileEntryToFileEntry));
 }
 
@@ -262,17 +158,12 @@ export function splitRefStudioPath(filePath: string): string[] {
   return filePath.split(sep);
 }
 
-// /some/absolute/path/file.txt -> /some/absolute/path
-export function getParentFolder(filePath: string) {
-  return filePath.split(sep).slice(0, -1).join(sep);
-}
-
 // #####################################################################################
 // FILE Operations: read, write, delete, rename
 // #####################################################################################
 export async function writeFileContent(relativePath: string, textContent: string) {
   try {
-    await writeTextFileFromWeb(currentProjectId, relativePath, textContent);
+    await writeProjectTextFile(currentProjectId, relativePath, textContent);
     return true;
   } catch (err) {
     console.error('Error', err);
@@ -283,16 +174,16 @@ export async function writeFileContent(relativePath: string, textContent: string
 export async function readFileContent(file: FileFileEntry): Promise<EditorContent> {
   switch (file.fileExtension) {
     case 'json': {
-      const textContent = await readTextFileFromWeb(currentProjectId, file.path);
+      const textContent = await readProjectTextFile(currentProjectId, file.path);
       return { type: 'json', textContent };
     }
     case 'pdf': {
-      const binaryContent = await readBinaryFileFromWeb(currentProjectId, file.path);
+      const binaryContent = await readProjectBinaryFile(currentProjectId, file.path);
       return { type: 'pdf', binaryContent };
     }
     case 'refstudio':
     case '': {
-      const textContent = await readTextFileFromWeb(currentProjectId, file.path);
+      const textContent = await readProjectTextFile(currentProjectId, file.path);
       try {
         const jsonContent = JSON.parse(textContent) as JSONContent;
         return { type: 'refstudio', jsonContent };
@@ -302,7 +193,7 @@ export async function readFileContent(file: FileFileEntry): Promise<EditorConten
       }
     }
     default: {
-      const textContent = await readTextFileFromWeb(currentProjectId, file.path);
+      const textContent = await readProjectTextFile(currentProjectId, file.path);
       return { type: 'text', textContent };
     }
   }
@@ -310,7 +201,7 @@ export async function readFileContent(file: FileFileEntry): Promise<EditorConten
 
 export async function deleteFile(relativePath: string): Promise<boolean> {
   try {
-    await deleteFileFromWeb(currentProjectId, relativePath);
+    await deleteProjectFile(currentProjectId, relativePath);
     return true;
   } catch (err) {
     console.error('Error', err);
@@ -318,14 +209,17 @@ export async function deleteFile(relativePath: string): Promise<boolean> {
   }
 }
 
-export async function renameFile(relativePath: string, newName: string): RenameFileResult {
+export async function renameFile(relativePath: string, newRelativePath: string): RenameFileResult {
+  if (relativePath.split(getSeparator()).length > 1) {
+    console.warn(`Only root files can be renamed. Found ${relativePath}`);
+    return { success: false };
+  }
   try {
-    const newRelativePath = getRefStudioPath(newName);
-    if (await existsFileFromWeb(currentProjectId, newRelativePath)) {
+    if (await existsProjectFile(currentProjectId, newRelativePath)) {
       console.warn(`Another file with the same name already exists: ${newRelativePath}`);
       return { success: false };
     }
-    await renameFileFromWeb(currentProjectId, relativePath, newRelativePath);
+    await renameProjectFile(currentProjectId, relativePath, newRelativePath);
     return { success: true, newPath: newRelativePath };
   } catch (err) {
     console.error('Error', err);
@@ -334,17 +228,16 @@ export async function renameFile(relativePath: string, newName: string): RenameF
 }
 type RenameFileResult = Promise<{ success: false } | { success: true; newPath: string }>;
 
+// #####################################################################################
+// Export Operations: references, markdown
+// #####################################################################################
 export async function exportReferences(references: ReferenceItem[]) {
   try {
     const exportsDir = getExportsDir();
-    const systemExportsDir = await getSystemPath(exportsDir);
-    if (!(await exists(systemExportsDir))) {
-      await createDir(systemExportsDir);
-    }
 
     const serializedReferences = serializeReferences(references);
 
-    const defaultPath = await join(systemExportsDir, `references.${serializedReferences.extension}`);
+    const defaultPath = await join(exportsDir, `references.${serializedReferences.extension}`);
 
     const filePath = await save({
       title: 'Export References',
@@ -352,7 +245,7 @@ export async function exportReferences(references: ReferenceItem[]) {
       filters: [{ name: serializedReferences.extension, extensions: [serializedReferences.extension] }],
     });
     if (filePath) {
-      return writeTextFile(filePath, serializedReferences.textContent);
+      return writeProjectTextFile(currentProjectId, filePath, serializedReferences.textContent);
     }
   } catch (err) {
     console.error('Error', err);
@@ -362,10 +255,6 @@ export async function exportReferences(references: ReferenceItem[]) {
 export async function saveAsMarkdown(markdownSerializer: MarkdownSerializer, exportedFilePath: string) {
   try {
     const exportsDir = getExportsDir();
-    const systemExportsDir = await getSystemPath(exportsDir);
-    if (!(await exists(systemExportsDir))) {
-      await createDir(systemExportsDir);
-    }
 
     const splittedPath = exportedFilePath.split(sep);
     const fileName = splittedPath.pop();
@@ -381,13 +270,14 @@ export async function saveAsMarkdown(markdownSerializer: MarkdownSerializer, exp
       markdownFileName = `${fileName}.md`;
     }
 
-    const markdownFilePath = [systemExportsDir, markdownFileName].join(sep);
+    const markdownFilePath = [exportsDir, markdownFileName].join(sep);
+    const filePath = markdownFilePath;
 
-    const filePath = await save({
-      title: 'Export file as Markdown',
-      defaultPath: await getSystemPath(markdownFilePath),
-      filters: [{ name: 'Markdown', extensions: ['md'] }],
-    });
+    // const filePath = await save({
+    //   title: 'Export file as Markdown',
+    //   defaultPath: await getSystemPath(markdownFilePath),
+    //   filters: [{ name: 'Markdown', extensions: ['md'] }],
+    // });
 
     if (filePath) {
       const filePathParts = filePath.split(sep);
@@ -400,7 +290,7 @@ export async function saveAsMarkdown(markdownSerializer: MarkdownSerializer, exp
         const serializedContent = markdownSerializer.serialize(newFileNameWithoutExtension);
 
         if (!serializedContent.bibliography) {
-          return writeTextFile(filePath, serializedContent.markdownContent);
+          return writeProjectTextFile(currentProjectId, filePath, serializedContent.markdownContent);
         }
 
         const bibliographyFilePath = [
@@ -409,8 +299,8 @@ export async function saveAsMarkdown(markdownSerializer: MarkdownSerializer, exp
         ].join(sep);
 
         return Promise.all([
-          writeTextFile(filePath, serializedContent.markdownContent),
-          writeTextFile(bibliographyFilePath, serializedContent.bibliography.textContent),
+          writeProjectTextFile(currentProjectId, filePath, serializedContent.markdownContent),
+          writeProjectTextFile(currentProjectId, bibliographyFilePath, serializedContent.bibliography.textContent),
         ]);
       }
     }

@@ -1,39 +1,39 @@
-import { getSystemPath, getUploadsDir } from '../../io/filesystem';
-import { getIngestedReferences, runPDFIngestion } from '../ingestion';
-import { callSidecar } from '../sidecar';
+import { universalPost } from '../api';
+import { runPDFIngestion } from '../ingestion';
 
-vi.mock('../sidecar');
+vi.mock('../api');
 vi.mock('../../io/filesystem');
+
+const PROJECT_ID = 'cafe-babe-1234-5678-1234-5678-1234-5678';
 
 describe('ingestion.ingest', () => {
   afterEach(() => {
     vi.clearAllMocks();
   });
 
-  it('should call sidecar ingest with upload dir arg', async () => {
-    vi.mocked(callSidecar).mockResolvedValue({
+  it('should call backend API to start ingest', async () => {
+    vi.mocked(universalPost).mockResolvedValue({
       project_name: 'project-name',
       references: [],
     });
 
-    await runPDFIngestion();
-    expect(vi.mocked(callSidecar).mock.calls).toHaveLength(1);
-    const uploadsDir = await getSystemPath(getUploadsDir());
-    expect(vi.mocked(callSidecar).mock.calls[0]).toStrictEqual(['ingest', { pdf_directory: uploadsDir }]);
+    await runPDFIngestion(PROJECT_ID);
+    expect(universalPost).toHaveBeenCalledTimes(1);
+    expect(universalPost).toHaveBeenCalledWith(`/api/references/${PROJECT_ID}`);
   });
 
   it('Should map empty IngestResponse[] to empty ReferenceItem[]', async () => {
-    vi.mocked(callSidecar).mockResolvedValue({
+    vi.mocked(universalPost).mockResolvedValue({
       project_name: 'project-name',
       references: [],
     });
 
-    const response = await runPDFIngestion();
+    const response = await runPDFIngestion(PROJECT_ID);
     expect(response).toStrictEqual([]);
   });
 
   it('Should map undefined IngestResponse to ReferenceItem', async () => {
-    vi.mocked(callSidecar).mockResolvedValue({
+    vi.mocked(universalPost).mockResolvedValue({
       project_name: 'project-name',
       references: [
         {
@@ -44,14 +44,14 @@ describe('ingestion.ingest', () => {
       ],
     });
 
-    const response = await runPDFIngestion();
+    const response = await runPDFIngestion(PROJECT_ID);
     expect(response).toHaveLength(1);
     expect(response[0].id).toBe('45722618-c4fb-4ae1-9230-7fc19a7219ed');
     expect(response[0].filename).toBe('file.pdf');
   });
 
   it('Should map fullName of authors ReferenceItem', async () => {
-    vi.mocked(callSidecar).mockResolvedValue({
+    vi.mocked(universalPost).mockResolvedValue({
       project_name: 'project-name',
       references: [
         {
@@ -73,7 +73,7 @@ describe('ingestion.ingest', () => {
       ],
     });
 
-    const response = await runPDFIngestion();
+    const response = await runPDFIngestion(PROJECT_ID);
     expect(response).toHaveLength(1);
     expect(response[0].authors).toStrictEqual([
       {
@@ -85,18 +85,5 @@ describe('ingestion.ingest', () => {
         lastName: 'Maria',
       },
     ]);
-  });
-
-  it('should call sidecar ingest_references with upload dir arg', async () => {
-    vi.mocked(callSidecar).mockResolvedValue({
-      project_name: 'project-name',
-      references: [],
-    });
-
-    const result = await getIngestedReferences();
-    expect(vi.mocked(callSidecar).mock.calls).toHaveLength(1);
-    const uploadsDir = await getSystemPath(getUploadsDir());
-    expect(vi.mocked(callSidecar).mock.calls[0]).toStrictEqual(['ingest_references', { pdf_directory: uploadsDir }]);
-    expect(result).toStrictEqual([]);
   });
 });

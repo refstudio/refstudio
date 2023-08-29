@@ -1,6 +1,7 @@
 import { makeUploadPath } from '../io/filesystem';
 import { ReferenceItem } from '../types/ReferenceItem';
 import { universalDelete, universalGet, universalPatch, universalPost } from './api';
+import { DeleteStatusResponse, UpdateStatusResponse } from './api-types';
 import { callSidecar } from './sidecar';
 import { IngestResponse, Reference } from './types';
 
@@ -28,7 +29,12 @@ export async function runPDFIngestion(projectId: string): Promise<ReferenceItem[
 }
 
 export async function removeReferences(ids: string[], projectId: string) {
-  await universalDelete(`/api/references/${projectId}/bulk_delete`, { reference_ids: ids });
+  const status = await universalDelete<DeleteStatusResponse>(`/api/references/${projectId}/bulk_delete`, {
+    reference_ids: ids,
+  });
+  if (status.status !== 'ok') {
+    throw new Error(status.message);
+  }
 }
 
 const UPDATABLE_FIELDS: (keyof ReferenceItem)[] = ['citationKey', 'title', 'publishedDate', 'authors'];
@@ -39,12 +45,7 @@ function applyPatch(field: keyof ReferenceItem, patch: Partial<ReferenceItem>, g
   return {};
 }
 
-export async function updateReference(
-  filename: string,
-  patch: Partial<ReferenceItem>,
-  referenceId: string,
-  projectId: string,
-) {
+export async function updateReference(projectId: string, referenceId: string, patch: Partial<ReferenceItem>) {
   const referencePatch: Partial<Reference> = {
     ...applyPatch('citationKey', patch, () => ({ citation_key: patch.citationKey })),
     ...applyPatch('title', patch, () => ({ title: patch.title })),
@@ -58,7 +59,12 @@ export async function updateReference(
     return;
   }
 
-  await universalPatch(`/api/references/${projectId}/${referenceId}`, { data: patch });
+  const status = await universalPatch<UpdateStatusResponse>(`/api/references/${projectId}/${referenceId}`, {
+    data: referencePatch,
+  });
+  if (status.status !== 'ok') {
+    throw new Error(status.message);
+  }
 }
 
 export async function getIngestedReferences(projectId: string): Promise<ReferenceItem[]> {

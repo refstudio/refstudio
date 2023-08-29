@@ -1,6 +1,7 @@
 import { useSetAtom } from 'jotai';
 import { useState } from 'react';
 
+import { readProjectById } from './api/projectsAPI';
 import { useRefStudioServerOnDesktop } from './api/server';
 import { App } from './application/App';
 import { openProjectAtom } from './atoms/projectState';
@@ -9,7 +10,6 @@ import { noop } from './lib/noop';
 import { notifyErr, notifyInfo } from './notifications/notifications';
 import { interceptConsoleMessages } from './notifications/notifications.console';
 import { getCachedSetting, initSettings } from './settings/settingsManager';
-import { readProjectById } from './web';
 import { invoke } from './wrappers/tauri-wrapper';
 
 // Note: Intercepting INFO, WARN and ERROR console.* in DEV mode

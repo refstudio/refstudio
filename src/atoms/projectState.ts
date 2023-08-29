@@ -1,6 +1,6 @@
 import { Atom, atom } from 'jotai';
 
-import { getSeparator, sampleProject, setCurrentProjectId } from '../io/filesystem';
+import { ensureSampleProjectFiles, setCurrentFileSystemProjectId } from '../io/filesystem';
 import { closeAllEditorsAtom } from './editorActions';
 import { refreshFileTreeAtom } from './fileExplorerActions';
 import { clearAllReferencesAtom, loadReferencesAtom } from './referencesState';
@@ -25,7 +25,7 @@ export const newProjectAtom = atom(null, async (_, set, projectId: string, path:
   await set(closeProjectAtom);
 
   // Create empty project
-  setCurrentProjectId(projectId);
+  setCurrentFileSystemProjectId(projectId);
   set(currentProjectIdAtom, projectId);
   set(currentProjectPathAtom, path);
   set(currentProjectNameAtom, name);
@@ -39,7 +39,7 @@ export const openProjectAtom = atom(null, async (_, set, projectId: string, path
   await set(closeProjectAtom);
 
   // Create empty project
-  setCurrentProjectId(projectId);
+  setCurrentFileSystemProjectId(projectId);
   set(currentProjectIdAtom, projectId);
   set(currentProjectPathAtom, path);
   set(currentProjectNameAtom, name);
@@ -58,27 +58,14 @@ export const closeProjectAtom = atom(null, async (get, set) => {
   }
 });
 
-export const newSampleProjectAtom = atom(null, async (_, set, path: string) => {
-  if (!path) {
-    return;
-  }
+export const newSampleProjectAtom = atom(null, async (_, set, projectId: string, projectName: string) => {
   // Close current project before create new
   await set(closeProjectAtom);
 
-  // Create empty project
-  set(currentProjectPathAtom, path);
-  set(currentProjectNameAtom, extractProjectName(path));
-  await sampleProject(path);
+  // Open sample project
+  setCurrentFileSystemProjectId(projectId);
+  set(currentProjectIdAtom, projectId);
+  set(currentProjectNameAtom, projectName);
+  await ensureSampleProjectFiles(projectId);
   await set(refreshFileTreeAtom);
 });
-
-// #####################################################################################
-// Utilities
-// #####################################################################################
-function extractProjectName(projectPath: string) {
-  const segments = projectPath.split(getSeparator());
-  if (segments.length > 1) {
-    return segments.pop()!.toUpperCase().replace(/-\./g, ' ');
-  }
-  return '';
-}

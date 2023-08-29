@@ -1,6 +1,7 @@
 import { open, save } from '@tauri-apps/api/dialog';
 import { useAtomValue, useSetAtom } from 'jotai';
 
+import { createRemoteProject, ProjectInfo, readAllProjects, readProjectById } from '../../api/projectsAPI';
 import { createFileAtom } from '../../atoms/fileEntryActions';
 import {
   closeProjectAtom,
@@ -12,7 +13,8 @@ import {
 import { getNewProjectsBaseDir } from '../../io/filesystem';
 import { notifyInfo, notifyWarning } from '../../notifications/notifications';
 import { saveCachedSettings, setCachedSetting } from '../../settings/settingsManager';
-import { createRemoteProject, ProjectInfo, readAllProjects, readProjectById } from '../../web';
+
+export const SAMPLE_PROJECT_NAME = 'RefStudio Sample';
 
 export function useFileProjectNewListener() {
   const newProject = useSetAtom(newProjectAtom);
@@ -43,10 +45,14 @@ export function useFileProjectNewListener() {
 export function useFileProjectNewSampleListener() {
   const sampleProject = useSetAtom(newSampleProjectAtom);
   return async () => {
-    const newProjectPath = `${await getNewProjectsBaseDir()}RefStudio Sample`;
-    await sampleProject(newProjectPath);
-    persistProjectIdInSettings(newProjectPath);
-    notifyInfo('New project created at ' + newProjectPath);
+    const projects = await readAllProjects();
+    let project = projects.find((p) => p.name === SAMPLE_PROJECT_NAME);
+    if (!project) {
+      project = await createRemoteProject('RefStudio Sample');
+    }
+    await sampleProject(project.id, project.name);
+    persistProjectIdInSettings(project.id);
+    notifyInfo('Sample project opened with success');
   };
 }
 

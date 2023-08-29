@@ -46,7 +46,7 @@ export const referencesSyncInProgressAtom = atom<boolean>(false);
 // #####################################################################################
 const referencesLoadedAtom = atom<boolean | null>(null);
 
-export const loadReferencesAtom = atom(null, async (_get, set, projectId?: string) => {
+export const loadReferencesAtom = atom(null, async (_get, set, projectId: string) => {
   set(referencesLoadedAtom, false);
   const initialReferences = await getIngestedReferences(projectId);
   set(setReferencesAtom, initialReferences);
@@ -67,10 +67,10 @@ const removeReferenceAtom = atom(null, (get, set, id: string) => {
 const UPDATABLE_FIELDS: (keyof ReferenceItem)[] = ['citationKey', 'title', 'publishedDate', 'authors'];
 export const updateReferenceAtom = atom(
   null,
-  async (get, set, id: string, updatedReference: ReferenceItem, projectId?: string) => {
-    const reference = get(getDerivedReferenceAtom(id));
+  async (get, set, projectId: string, referenceId: string, updatedReference: ReferenceItem) => {
+    const reference = get(getDerivedReferenceAtom(referenceId));
     if (!reference) {
-      console.warn('Cannot find reference with ID', id);
+      console.warn('Cannot find reference with ID', referenceId);
       return;
     }
 
@@ -88,7 +88,7 @@ export const updateReferenceAtom = atom(
     }
 
     // Call backend (patch of updatable fields)
-    await updateReference(reference.filename, patch, reference.id, projectId);
+    await updateReference(projectId, reference.id, patch);
 
     // Update local atoms
     const references = get(getReferencesAtom);
