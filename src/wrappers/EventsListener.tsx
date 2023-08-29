@@ -15,6 +15,7 @@ import {
 import { createFileAtom, deleteFileAtom, renameFileAtom } from '../atoms/fileEntryActions';
 import { fileExplorerEntryPathBeingRenamed } from '../atoms/fileExplorerActions';
 import { useActiveEditorContentAtoms } from '../atoms/hooks/useActiveEditorContentAtoms';
+import { projectIdAtom } from '../atoms/projectState';
 import { getReferencesAtom, removeReferencesAtom } from '../atoms/referencesState';
 import { PaneEditorId } from '../atoms/types/PaneGroup';
 import { emitEvent, RefStudioEventPayload } from '../events';
@@ -102,7 +103,8 @@ function useCloseEditorListener() {
 
 function useRemoveReferencesListener() {
   const removeReferences = useSetAtom(removeReferencesAtom);
-  return ({ referenceIds }: { referenceIds: string[] }) => void removeReferences(referenceIds);
+  const projectId = useAtomValue(projectIdAtom);
+  return ({ referenceIds }: { referenceIds: string[] }) => void removeReferences(referenceIds, projectId);
 }
 
 function useExportReferencesListener() {

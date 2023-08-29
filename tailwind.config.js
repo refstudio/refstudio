@@ -190,6 +190,7 @@ export default {
         modals: 99999,
         notifications: 88888,
         'drop-zone': 55555,
+        'resize-handle': 44444,
       },
     },
   },

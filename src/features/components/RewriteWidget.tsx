@@ -17,7 +17,7 @@ export function RewriteWidget({
   className?: string;
   onChoiceSelected?: (choice: string) => void;
 }) {
-  const openAiSettings = getCachedSetting('openAI');
+  const openAiSettings = getCachedSetting('openai');
 
   const [rewriteOptions, setRewriteOptions] = useState<RewriteOptions>({
     nChoices: 3,

@@ -74,6 +74,6 @@ def test_update_settings_for_user(monkeypatch, tmp_path, create_settings_json):
     data["openai"] = {"temperature": 100.0}
     request = typing.SettingsSchema(**data)
     response = settings.update_settings_for_user(user_id, request)
-    
+
     # should be updated settings
     assert response.dict() == request.dict()

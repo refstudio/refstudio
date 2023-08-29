@@ -4,6 +4,7 @@ import shutil
 import sys
 from collections import defaultdict
 from pathlib import Path
+from uuid import uuid4
 
 import grobid_tei_xml
 from dotenv import load_dotenv
@@ -23,6 +24,11 @@ GROBID_SERVER_URL = "https://kermitt2-grobid.hf.space"
 
 def run_ingest(args: IngestRequest):
     pdf_directory = Path(args.pdf_directory)
+
+    # PDF files for ingest must be written to the `uploads` directory
+    if pdf_directory.parent != "uploads":
+        pdf_directory = pdf_directory.parent / "uploads"
+
     ingest = PDFIngestion(input_dir=pdf_directory)
     response = ingest.run()
     return response
@@ -43,16 +49,15 @@ def get_references(args: IngestRequest):
 
 
 class PDFIngestion:
-
     def __init__(self, input_dir: Path):
         self.input_dir = input_dir
         self.project_name = input_dir.parent.name
-        self.uploaded_files = list(self.input_dir.glob('*.pdf'))
+        self.uploaded_files = list(self.input_dir.glob("*.pdf"))
 
         # directories for storing intermediate files
-        self.staging_dir = input_dir.parent.joinpath('.staging')
-        self.grobid_output_dir = input_dir.parent.joinpath('.grobid')
-        self.storage_dir = input_dir.parent.joinpath('.storage')
+        self.staging_dir = input_dir.parent.joinpath(".staging")
+        self.grobid_output_dir = input_dir.parent.joinpath(".grobid")
+        self.storage_dir = input_dir.parent.joinpath(".storage")
         self._create_directories()
 
         self.references = self._load_references()
@@ -119,7 +124,7 @@ class PDFIngestion:
         References that have been previously processed will not be ingested
         again.
         """
-        filepath = self.storage_dir.joinpath('references.json')
+        filepath = self.storage_dir.joinpath("references.json")
         if not filepath.exists():
             logger.warning(f"No previous `references.json` found at {filepath}")
             return []
@@ -139,9 +144,12 @@ class PDFIngestion:
 
         uploaded_filestems = {fp.stem: fp for fp in self.input_dir.glob("*.pdf")}
         processed_filestems = {
-            Path(ref.source_filename).stem: ref.source_filename for ref in self.references
+            Path(ref.source_filename).stem: ref.source_filename
+            for ref in self.references
         }
-        needs_ingestion_filestems = set(uploaded_filestems.keys()) - set(processed_filestems.keys())
+        needs_ingestion_filestems = set(uploaded_filestems.keys()) - set(
+            processed_filestems.keys()
+        )
 
         if not needs_ingestion_filestems:
             logger.info("All uploaded PDFs have already been processed")
@@ -210,8 +218,8 @@ class PDFIngestion:
         logger.info(f"Calling Grobid server for {num_files} files")
 
         # The Grobid client library we use prints info and error messages to stdout.
-        # This is a problem because the Tauri client <-> sidecar communicate over stdout.
-        # So we need to wrap all Grobid calls inside of `HiddenPrints` to prevent `print`
+        # This is a problem because the Tauri client <-> sidecar communicate over stdout
+        # So we need to wrap Grobid calls inside of `HiddenPrints` to prevent `print`
         # messages from ending up in stdout (https://stackoverflow.com/a/45669280).
         #
         # Longer-term, we should probably fork the Grobid client and make changes
@@ -226,7 +234,7 @@ class PDFIngestion:
                 "processHeaderDocument",
                 input_path=self.staging_dir,
                 output=self.grobid_output_dir,
-                force=True
+                force=True,
             )
         logger.info("Finished calling Grobid server")
 
@@ -268,7 +276,7 @@ class PDFIngestion:
             with open(file, "r") as fin:
                 xml = fin.read()
 
-            # XML files written by Grobid have the filename structured as: {filename}.tei.xml
+            # XML files written by Grobid have the filename as: {filename}.tei.xml
             # We want to strip both the .tei and .xml extensions => {filename}.json
             json_filename = f"{file.stem.rpartition('.tei')[0]}"
             json_filepath = os.path.join(self.storage_dir, f"{json_filename}.json")
@@ -339,6 +347,7 @@ class PDFIngestion:
 
             references.append(
                 Reference(
+                    id=str(uuid4()),
                     source_filename=source_pdf,
                     status=typing.IngestStatus.FAILURE,
                     citation_key="untitled",
@@ -448,7 +457,7 @@ class PDFIngestion:
         for file in json_files:
             logger.info(f"Creating Reference from file: {file.name}")
 
-            with open(file, 'r') as fin:
+            with open(file, "r") as fin:
                 doc = json.load(fin)
 
             source_pdf = f"{file.stem}.pdf"
@@ -457,6 +466,7 @@ class PDFIngestion:
             pub_date = shared.parse_date(header.get("published_date", ""))
 
             ref = Reference(
+                id=str(uuid4()),
                 source_filename=source_pdf,
                 status=typing.IngestStatus.COMPLETE,
                 title=header.get("title"),
@@ -474,7 +484,7 @@ class PDFIngestion:
 
         msg = (
             f"Created {num_created} Reference objects: "
-            f"{len(successes)} successful Grobid parses, {len(failures)} Grobid failures"
+            f"{len(successes)} Grobid successes, {len(failures)} Grobid failures"
         )
         logger.info(msg)
 
@@ -484,7 +494,9 @@ class PDFIngestion:
         # append new references to any we have previously loaded
         for ref in new_references:
             logger.info(f"Creating text chunks for Reference: {ref.source_filename}")
-            ref.chunks = shared.chunk_reference(ref)
+            ref.chunks = shared.chunk_reference(
+                ref, filepath=self.staging_dir.joinpath(ref.source_filename)
+            )
 
             self.references.append(ref)
 
@@ -519,16 +531,15 @@ class IngestStatusFetcher:
         self.uploads = list(UPLOADS_DIR.glob("*.pdf"))
 
     def _emit_ingest_status_response(
-            self,
-            response_status: typing.ResponseStatus,
-            reference_statuses: list[typing.ReferenceStatus]
-        ):
+        self,
+        response_status: typing.ResponseStatus,
+        reference_statuses: list[typing.ReferenceStatus],
+    ):
         """
         Emits IngestStatusResponse as json to stdout and exits.
         """
         response = typing.IngestStatusResponse(
-            status=response_status,
-            reference_statuses=reference_statuses
+            status=response_status, reference_statuses=reference_statuses
         )
         return response
 
@@ -543,8 +554,7 @@ class IngestStatusFetcher:
         for filepath in self.uploads:
             statuses.append(
                 typing.ReferenceStatus(
-                    source_filename=filepath.name,
-                    status=typing.IngestStatus.PROCESSING
+                    source_filename=filepath.name, status=typing.IngestStatus.PROCESSING
                 )
             )
         return statuses
@@ -556,9 +566,7 @@ class IngestStatusFetcher:
 
         Files that are not yet in `references.json` are in process.
         """
-        references = {
-            ref.source_filename: ref for ref in self.storage.references
-        }
+        references = {ref.source_filename: ref for ref in self.storage.references}
 
         statuses = []
         for filepath in self.uploads:
@@ -566,13 +574,11 @@ class IngestStatusFetcher:
                 ref = references[filepath.name]
 
                 status = typing.ReferenceStatus(
-                    source_filename=ref.source_filename,
-                    status=ref.status
+                    source_filename=ref.source_filename, status=ref.status
                 )
             else:
                 status = typing.ReferenceStatus(
-                    source_filename=filepath.name,
-                    status=typing.IngestStatus.PROCESSING
+                    source_filename=filepath.name, status=typing.IngestStatus.PROCESSING
                 )
             statuses.append(status)
         return statuses
@@ -584,22 +590,18 @@ class IngestStatusFetcher:
             logger.warning(e)
             statuses = self._handle_missing_references_json()
             response = self._emit_ingest_status_response(
-                response_status=typing.ResponseStatus.OK,
-                reference_statuses=statuses
+                response_status=typing.ResponseStatus.OK, reference_statuses=statuses
             )
             return response
         except Exception as e:
             logger.error(f"Error loading references.json: {e}")
             response = self._emit_ingest_status_response(
-                response_status=typing.ResponseStatus.ERROR,
-                reference_statuses=[]
+                response_status=typing.ResponseStatus.ERROR, reference_statuses=[]
             )
             return response
 
         statuses = self._compare_uploads_against_references_json()
         response = self._emit_ingest_status_response(
-            response_status=typing.ResponseStatus.OK,
-            reference_statuses=statuses
+            response_status=typing.ResponseStatus.OK, reference_statuses=statuses
         )
         return response
-

@@ -29,4 +29,3 @@ def test_bm25_ranker():
     # relevant docs should not be about Chicago
     for chunk in docs:
         assert "chicago" not in chunk.text.lower()
-

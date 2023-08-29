@@ -1,6 +1,7 @@
 from datetime import date
 from typing import Any
 
+from dotenv import load_dotenv
 from pydantic import BaseModel
 
 try:
@@ -11,6 +12,9 @@ except ImportError:
     # https://github.com/python/cpython/issues/100458
     # Python 3.10 and below
     from strenum import StrEnum
+
+
+load_dotenv()
 
 
 class RefStudioModel(BaseModel):
@@ -39,6 +43,7 @@ class IngestStatus(StrEnum):
 class Reference(RefStudioModel):
     """A reference for an academic paper / PDF"""
 
+    id: str
     source_filename: str
     status: IngestStatus
     citation_key: str | None = None
@@ -61,7 +66,7 @@ class ReferencePatch(RefStudioModel):
 
 
 class ReferenceUpdate(RefStudioModel):
-    source_filename: str
+    reference_id: str
     patch: ReferencePatch
 
 
@@ -107,7 +112,7 @@ class UpdateStatusResponse(RefStudioModel):
 
 
 class DeleteRequest(RefStudioModel):
-    source_filenames: list[str]
+    reference_ids: list[str]
     all: bool = False
 
 
@@ -198,7 +203,7 @@ class S2SearchResult(RefStudioModel):
 class SearchResponse(RefStudioModel):
     status: ResponseStatus
     message: str
-    results: list[S2SearchResult] 
+    results: list[S2SearchResult]
 
 
 class OpenAISettings(RefStudioModel):
@@ -249,6 +254,8 @@ class CliCommands(RefStudioModel):
     """Deletes a Reference"""
     search: tuple[SearchRequest, SearchResponse]
     """Searches for papers on Semantic Scholar"""
+    serve: tuple[None, None]
+    """Start an HTTP server"""
 
 
 Reference.update_forward_refs()

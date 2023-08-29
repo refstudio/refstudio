@@ -18,10 +18,10 @@ vi.mock('../../../api/rewrite');
 vi.mock('../../../settings/settingsManager');
 vi.mock('../../../events');
 
-const mockSettings: Pick<SettingsSchema, 'openAI'> = {
-  openAI: {
-    chatModel: 'dont-care',
-    apiKey: 'dont-care',
+const mockSettings: Pick<SettingsSchema, 'openai'> = {
+  openai: {
+    chat_model: 'dont-care',
+    api_key: 'dont-care',
     manner: 'elaborate',
     temperature: 0.75,
   },
@@ -31,7 +31,7 @@ describe('RewriteWidget', () => {
   beforeEach(() => {
     vi.mocked(getCachedSetting).mockImplementation((key) => {
       switch (key) {
-        case 'openAI':
+        case 'openai':
           return mockSettings[key];
         default:
           throw new Error('UNEXPECTED CALL FOR KEY ' + key);
@@ -50,8 +50,8 @@ describe('RewriteWidget', () => {
 
   it('should display openAI settings by default', () => {
     render(<RewriteWidget selection={SELECTED_TEXT} onChoiceSelected={noop} />);
-    expect(screen.getByLabelText('creativity')).toHaveValue(String(mockSettings.openAI.temperature));
-    expect(screen.getByLabelText('manner')).toHaveValue(mockSettings.openAI.manner);
+    expect(screen.getByLabelText('creativity')).toHaveValue(String(mockSettings.openai.temperature));
+    expect(screen.getByLabelText('manner')).toHaveValue(mockSettings.openai.manner);
   });
 
   it('should configure openAI settings and call askForRewrite', async () => {

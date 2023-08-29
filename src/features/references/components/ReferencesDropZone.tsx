@@ -1,10 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
-import { useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { createRef, useState } from 'react';
 import { VscFilePdf } from 'react-icons/vsc';
 
 import { runPDFIngestion } from '../../../api/ingestion';
 import { refreshFileTreeAtom } from '../../../atoms/fileExplorerActions';
+import { projectIdAtom } from '../../../atoms/projectState';
 import { referencesSyncInProgressAtom, setReferencesAtom } from '../../../atoms/referencesState';
 import { useListenEvent } from '../../../hooks/useListenEvent';
 import { uploadFiles } from '../../../io/filesystem';
@@ -21,11 +22,13 @@ export function ReferencesDropZone({ children }: { children: React.ReactNode }) 
   const setReferences = useSetAtom(setReferencesAtom);
   const refreshFileTree = useSetAtom(refreshFileTreeAtom);
   const setSyncInProgress = useSetAtom(referencesSyncInProgressAtom);
+  const projectId = useAtomValue(projectIdAtom);
 
   const inputRef = createRef<HTMLInputElement>();
 
   const ingestMutation = useMutation({
-    mutationFn: runPDFIngestion,
+    mutationKey: [projectId],
+    mutationFn: () => runPDFIngestion(projectId),
     onSuccess: (updatedReferences) => {
       setReferences(updatedReferences);
       setSyncInProgress(false);

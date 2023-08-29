@@ -1,33 +1,45 @@
 import os
 
 import openai
-from dotenv import load_dotenv
-from tenacity import retry, stop_after_attempt, wait_fixed
-
-from sidecar import prompts, settings, typing
+from sidecar import projects, prompts, settings, typing
 from sidecar.ranker import BM25Ranker
 from sidecar.settings import logger
 from sidecar.storage import JsonStorage
 from sidecar.typing import ChatRequest, ChatResponse, ChatResponseChoice
-
-load_dotenv()
-openai.api_key = os.environ.get("OPENAI_API_KEY")
+from tenacity import retry, stop_after_attempt, wait_fixed
 
 
-def ask_question(request: ChatRequest):
+def ask_question(
+    request: ChatRequest,
+    project_id: str = None,
+    user_settings: typing.SettingsSchema = None,
+) -> typing.ChatResponse:
     input_text = request.text
     n_choices = request.n_choices
     temperature = request.temperature
 
+    if user_settings is not None:
+        openai.api_key = user_settings.openai.api_key
+        model = user_settings.openai.chat_model
+    else:
+        openai.api_key = os.environ.get("OPENAI_API_KEY")
+        model = "gpt-3.5-turbo"
+
     logger.info(f"Calling chat with the following parameters: {request.dict()}")
 
-    storage = JsonStorage(filepath=settings.REFERENCES_JSON_PATH)
+    if project_id:
+        project_path = projects.get_project_path(user_id="user1", project_id=project_id)
+        filepath = project_path / ".storage" / "references.json"
+        storage = JsonStorage(filepath=filepath)
+    else:
+        storage = JsonStorage(filepath=settings.REFERENCES_JSON_PATH)
+
     logger.info(f"Loading documents from storage: {storage.filepath}")
     storage.load()
     logger.info(f"Loaded {len(storage.chunks)} documents from storage")
 
     ranker = BM25Ranker(storage=storage)
-    chat = Chat(input_text=input_text, storage=storage, ranker=ranker)
+    chat = Chat(input_text=input_text, storage=storage, ranker=ranker, model=model)
 
     try:
         choices = chat.ask_question(n_choices=n_choices, temperature=temperature)
@@ -55,10 +67,12 @@ class Chat:
         input_text: str,
         storage: JsonStorage,
         ranker: BM25Ranker,
+        model: str = "gpt-3.5-turbo",
     ):
         self.input_text = input_text
         self.ranker = ranker
         self.storage = storage
+        self.model = model
 
     def get_relevant_documents(self):
         docs = self.ranker.get_top_n(query=self.input_text, limit=5)
@@ -66,9 +80,11 @@ class Chat:
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(1))
     def call_model(self, messages: list, n_choices: int = 1, temperature: float = 0.7):
-        logger.info(f"Calling OpenAI chat API with the following input message(s): {messages}")
+        logger.info(
+            f"Calling OpenAI chat API with the following input message(s): {messages}"
+        )
         response = openai.ChatCompletion.create(
-            model=os.environ["OPENAI_CHAT_MODEL"],
+            model=self.model,
             messages=messages,
             n=n_choices,  # number of completions to generate
             temperature=temperature,  # 0 = no randomness, deterministic
@@ -85,8 +101,8 @@ class Chat:
 
     def prepare_choices_for_client(self, response: dict) -> list[ChatResponseChoice]:
         return [
-            ChatResponseChoice(index=choice['index'], text=choice["message"]["content"])
-            for choice in response['choices']
+            ChatResponseChoice(index=choice["index"], text=choice["message"]["content"])
+            for choice in response["choices"]
         ]
 
     def ask_question(self, n_choices: int = 1, temperature: float = 0.7) -> dict:
@@ -94,8 +110,12 @@ class Chat:
         docs = self.get_relevant_documents()
         logger.info("Creating input prompt for chat API")
         context_str = prompts.prepare_chunks_for_prompt(chunks=docs)
-        prompt = prompts.create_prompt_for_chat(query=self.input_text, context=context_str)
+        prompt = prompts.create_prompt_for_chat(
+            query=self.input_text, context=context_str
+        )
         messages = self.prepare_messages_for_chat(text=prompt)
-        response = self.call_model(messages=messages, n_choices=n_choices, temperature=temperature)
+        response = self.call_model(
+            messages=messages, n_choices=n_choices, temperature=temperature
+        )
         choices = self.prepare_choices_for_client(response=response)
         return choices

@@ -8,7 +8,7 @@ from .test_ingest import _copy_fixture_to_temp_dir
 
 def test_chat_ask_question_is_ok(monkeypatch, tmp_path, mock_call_model_is_ok):
     monkeypatch.setattr(chat.Chat, "call_model", mock_call_model_is_ok)
-    
+
     # copy references.json to temp dir and mock settings.REFERENCES_JSON_PATH
     test_file = "fixtures/data/references.json"
     path_to_test_file = Path(__file__).parent.joinpath(test_file)
@@ -28,9 +28,11 @@ def test_chat_ask_question_is_ok(monkeypatch, tmp_path, mock_call_model_is_ok):
     assert output["choices"][0]["index"] == 0
 
 
-def test_chat_ask_question_is_openai_error(monkeypatch, tmp_path, mock_call_model_is_error):
+def test_chat_ask_question_is_openai_error(
+    monkeypatch, tmp_path, mock_call_model_is_error
+):
     monkeypatch.setattr(chat.Chat, "call_model", mock_call_model_is_error)
-    
+
     # copy references.json to temp dir and mock settings.REFERENCES_JSON_PATH
     test_file = "fixtures/data/references.json"
     path_to_test_file = Path(__file__).parent.joinpath(test_file)

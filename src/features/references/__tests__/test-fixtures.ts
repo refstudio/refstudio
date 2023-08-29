@@ -2,7 +2,7 @@ import { ReferenceItem } from '../../../types/ReferenceItem';
 
 export const REFERENCES: ReferenceItem[] = [
   {
-    id: 'a_few_useful_things_to_know_about_machine_learning',
+    id: '9ddf658f-66d0-48e2-b0f2-e2ab168d6cab',
     filepath: '/any/path/A Few Useful Things to Know about Machine Learning.pdf',
     filename: 'A Few Useful Things to Know about Machine Learning.pdf',
     title: 'REF1 A Few Useful Things to Know about Machine Learning',
@@ -12,7 +12,7 @@ export const REFERENCES: ReferenceItem[] = [
     publishedDate: '2023-08-15',
   },
   {
-    id: 'rules_of_machine_learning_-_best_practices_for_ml_engineering',
+    id: '45722618-c4fb-4ae1-9230-7fc19a7219ed',
     filepath: '/any/path/Rules of Machine Learning - Best Practices for ML Engineering.pdf',
     filename: 'Rules of Machine Learning - Best Practices for ML Engineering.pdf',
     title: 'REF2 Rules of Machine Learning - Best Practices for ML Engineering',

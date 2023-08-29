@@ -25,7 +25,7 @@ describe('referencesState.update', () => {
     await store.set(updateReferenceAtom, ref1.id, { ...ref1, title: newTitle });
 
     expect(updateReference).toHaveBeenCalledTimes(1);
-    expect(updateReference).toHaveBeenCalledWith(ref1.filename, { title: newTitle });
+    expect(updateReference).toHaveBeenCalledWith(ref1.filename, { title: newTitle }, ref1.id, undefined);
   });
 
   it('should save updated fields back to store reference', async () => {
@@ -65,18 +65,23 @@ describe('referencesState.update', () => {
       authors: [{ fullName: 'Author Name', lastName: 'Name' }, ...ref1.authors],
     });
     expect(updateReference).toHaveBeenCalledTimes(1);
-    expect(updateReference).toHaveBeenCalledWith<[string, Partial<ReferenceItem>]>(ref1.filename, {
-      authors: [
-        {
-          fullName: 'Author Name',
-          lastName: 'Name',
-        },
-        ...ref1.authors,
-      ],
-      citationKey: ref1.citationKey + 'z',
-      publishedDate: '2023-07-11',
-      title: ref1.title + ' updated',
-    });
+    expect(updateReference).toHaveBeenCalledWith<[string, Partial<ReferenceItem>, string, string | undefined]>(
+      ref1.filename,
+      {
+        authors: [
+          {
+            fullName: 'Author Name',
+            lastName: 'Name',
+          },
+          ...ref1.authors,
+        ],
+        citationKey: ref1.citationKey + 'z',
+        publishedDate: '2023-07-11',
+        title: ref1.title + ' updated',
+      },
+      ref1.id,
+      undefined,
+    );
 
     const updated = store.get(getDerivedReferenceAtom(ref1.id));
     expect(updated?.abstract).not.toBe('new abstract');

@@ -1,0 +1,635 @@
+{
+  "definitions": {
+    "ChatRequest": {
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "n_choices": {
+          "type": "integer",
+          "default": 1
+        },
+        "temperature": {
+          "type": "number",
+          "default": 0.7
+        }
+      },
+      "type": "object",
+      "required": [
+        "text"
+      ],
+      "title": "ChatRequest"
+    },
+    "ChatResponse": {
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string"
+        },
+        "choices": {
+          "items": {
+            "$ref": "#/definitions/ChatResponseChoice"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object",
+      "required": [
+        "status",
+        "message",
+        "choices"
+      ],
+      "title": "ChatResponse"
+    },
+    "ChatResponseChoice": {
+      "properties": {
+        "index": {
+          "type": "integer"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "index",
+        "text"
+      ],
+      "title": "ChatResponseChoice"
+    },
+    "HTTPValidationError": {
+      "properties": {
+        "detail": {
+          "items": {
+            "$ref": "#/definitions/ValidationError"
+          },
+          "type": "array",
+          "title": "Detail"
+        }
+      },
+      "type": "object",
+      "title": "HTTPValidationError"
+    },
+    "ResponseStatus": {
+      "type": "string",
+      "enum": [
+        "ok",
+        "error"
+      ],
+      "title": "ResponseStatus",
+      "description": "An enumeration."
+    },
+    "RewriteChoice": {
+      "properties": {
+        "index": {
+          "type": "integer"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "index",
+        "text"
+      ],
+      "title": "RewriteChoice"
+    },
+    "RewriteMannerType": {
+      "type": "string",
+      "enum": [
+        "concise",
+        "elaborate",
+        "scholarly"
+      ],
+      "title": "RewriteMannerType",
+      "description": "An enumeration."
+    },
+    "RewriteRequest": {
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "manner": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/RewriteMannerType"
+            }
+          ],
+          "default": "concise"
+        },
+        "n_choices": {
+          "type": "integer",
+          "default": 1
+        },
+        "temperature": {
+          "type": "number",
+          "default": 0.7
+        }
+      },
+      "type": "object",
+      "required": [
+        "text"
+      ],
+      "title": "RewriteRequest"
+    },
+    "RewriteResponse": {
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string"
+        },
+        "choices": {
+          "items": {
+            "$ref": "#/definitions/RewriteChoice"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object",
+      "required": [
+        "status",
+        "message",
+        "choices"
+      ],
+      "title": "RewriteResponse"
+    },
+    "S2SearchResult": {
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "abstract": {
+          "type": "string"
+        },
+        "venue": {
+          "type": "string"
+        },
+        "year": {
+          "type": "integer"
+        },
+        "paperId": {
+          "type": "string"
+        },
+        "citationCount": {
+          "type": "integer"
+        },
+        "openAccessPdf": {
+          "type": "string"
+        },
+        "authors": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object",
+      "title": "S2SearchResult"
+    },
+    "SearchRequest": {
+      "properties": {
+        "query": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "integer",
+          "default": 10
+        }
+      },
+      "type": "object",
+      "required": [
+        "query"
+      ],
+      "title": "SearchRequest"
+    },
+    "SearchResponse": {
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string"
+        },
+        "results": {
+          "items": {
+            "$ref": "#/definitions/S2SearchResult"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object",
+      "required": [
+        "status",
+        "message",
+        "results"
+      ],
+      "title": "SearchResponse"
+    },
+    "TextCompletionChoice": {
+      "properties": {
+        "index": {
+          "type": "integer"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "index",
+        "text"
+      ],
+      "title": "TextCompletionChoice"
+    },
+    "TextCompletionRequest": {
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "n_choices": {
+          "type": "integer",
+          "default": 1
+        },
+        "temperature": {
+          "type": "number",
+          "default": 0.7
+        },
+        "max_tokens": {
+          "type": "integer",
+          "default": 512
+        },
+        "title": {
+          "type": "string"
+        },
+        "abstract": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "text"
+      ],
+      "title": "TextCompletionRequest"
+    },
+    "TextCompletionResponse": {
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string"
+        },
+        "choices": {
+          "items": {
+            "$ref": "#/definitions/TextCompletionChoice"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object",
+      "required": [
+        "status",
+        "message",
+        "choices"
+      ],
+      "title": "TextCompletionResponse"
+    },
+    "ValidationError": {
+      "properties": {
+        "loc": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              }
+            ]
+          },
+          "type": "array",
+          "title": "Location"
+        },
+        "msg": {
+          "type": "string",
+          "title": "Message"
+        },
+        "type": {
+          "type": "string",
+          "title": "Error Type"
+        }
+      },
+      "type": "object",
+      "required": [
+        "loc",
+        "msg",
+        "type"
+      ],
+      "title": "ValidationError"
+    },
+    "Author": {
+      "properties": {
+        "full_name": {
+          "type": "string"
+        },
+        "given_name": {
+          "type": "string"
+        },
+        "surname": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "full_name"
+      ],
+      "title": "Author"
+    },
+    "Chunk": {
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "vector": {
+          "items": {
+            "type": "number"
+          },
+          "type": "array",
+          "default": []
+        },
+        "metadata": {
+          "type": "object",
+          "default": {}
+        }
+      },
+      "type": "object",
+      "required": [
+        "text"
+      ],
+      "title": "Chunk"
+    },
+    "DeleteRequest": {
+      "properties": {
+        "reference_ids": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "all": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "type": "object",
+      "required": [
+        "reference_ids"
+      ],
+      "title": "DeleteRequest"
+    },
+    "DeleteStatusResponse": {
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "status",
+        "message"
+      ],
+      "title": "DeleteStatusResponse"
+    },
+    "IngestStatus": {
+      "type": "string",
+      "enum": [
+        "processing",
+        "failure",
+        "complete"
+      ],
+      "title": "IngestStatus",
+      "description": "An enumeration."
+    },
+    "Reference": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "source_filename": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/IngestStatus"
+        },
+        "citation_key": {
+          "type": "string"
+        },
+        "doi": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "abstract": {
+          "type": "string"
+        },
+        "contents": {
+          "type": "string"
+        },
+        "published_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "authors": {
+          "items": {
+            "$ref": "#/definitions/Author"
+          },
+          "type": "array",
+          "default": []
+        },
+        "chunks": {
+          "items": {
+            "$ref": "#/definitions/Chunk"
+          },
+          "type": "array",
+          "default": []
+        },
+        "metadata": {
+          "type": "object",
+          "default": {}
+        }
+      },
+      "type": "object",
+      "required": [
+        "id",
+        "source_filename",
+        "status"
+      ],
+      "title": "Reference",
+      "description": "A reference for an academic paper / PDF"
+    },
+    "ReferencePatch": {
+      "properties": {
+        "data": {
+          "type": "object"
+        }
+      },
+      "type": "object",
+      "required": [
+        "data"
+      ],
+      "title": "ReferencePatch",
+      "description": "ReferencePatch is the input type for updating a Reference's metadata."
+    },
+    "UpdateStatusResponse": {
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "status",
+        "message"
+      ],
+      "title": "UpdateStatusResponse"
+    },
+    "Body_create_file__project_id___filepath__put": {
+      "properties": {
+        "file": {
+          "type": "string",
+          "format": "binary",
+          "title": "File"
+        }
+      },
+      "type": "object",
+      "required": [
+        "file"
+      ],
+      "title": "Body_create_file__project_id___filepath__put"
+    },
+    "LoggingSettings": {
+      "properties": {
+        "enable": {
+          "type": "boolean",
+          "default": false
+        },
+        "filepath": {
+          "type": "string",
+          "default": "/tmp/refstudio-sidecar.log"
+        }
+      },
+      "type": "object",
+      "title": "LoggingSettings"
+    },
+    "OpenAISettings": {
+      "properties": {
+        "api_key": {
+          "type": "string",
+          "default": ""
+        },
+        "chat_model": {
+          "type": "string",
+          "default": "gpt-3.5-turbo"
+        },
+        "manner": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/RewriteMannerType"
+            }
+          ],
+          "default": "scholarly"
+        },
+        "temperature": {
+          "type": "number",
+          "default": 0.7
+        }
+      },
+      "type": "object",
+      "title": "OpenAISettings"
+    },
+    "ProjectSettings": {
+      "properties": {
+        "current_directory": {
+          "type": "string",
+          "default": ""
+        }
+      },
+      "type": "object",
+      "title": "ProjectSettings"
+    },
+    "SettingsSchema": {
+      "properties": {
+        "project": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ProjectSettings"
+            }
+          ],
+          "default": {
+            "current_directory": ""
+          }
+        },
+        "openai": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/OpenAISettings"
+            }
+          ],
+          "default": {
+            "api_key": "",
+            "chat_model": "gpt-3.5-turbo",
+            "manner": "scholarly",
+            "temperature": 0.7
+          }
+        },
+        "sidecar": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/SidecarSettings"
+            }
+          ],
+          "default": {
+            "logging": {
+              "enable": false,
+              "filepath": "/tmp/refstudio-sidecar.log"
+            }
+          }
+        }
+      },
+      "type": "object",
+      "title": "SettingsSchema"
+    },
+    "SidecarSettings": {
+      "properties": {
+        "logging": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/LoggingSettings"
+            }
+          ],
+          "default": {
+            "enable": false,
+            "filepath": "/tmp/refstudio-sidecar.log"
+          }
+        }
+      },
+      "type": "object",
+      "title": "SidecarSettings"
+    }
+  }
+}

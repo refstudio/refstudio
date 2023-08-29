@@ -5,7 +5,7 @@ import sys
 from sidecar import chat, cli, ingest, rewrite, search, storage
 from sidecar.typing import CliCommands
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = cli.get_arg_parser()
     args = parser.parse_args()
 
@@ -13,16 +13,23 @@ if __name__ == '__main__':
         print(args)
 
     param_json = json.loads(args.param_json)
-    args_type = inspect.signature(CliCommands).parameters[args.command].annotation.__args__[0]
+    args_type = (
+        inspect.signature(CliCommands).parameters[args.command].annotation.__args__[0]
+    )
 
     if args_type is None:
         if param_json is not None:
-            raise ValueError(f'Command {args.command} does not take an argument')
+            raise ValueError(f"Command {args.command} does not take an argument")
         param_obj = None
     else:
         param_obj = args_type.parse_obj(param_json)
 
-    if args.command == "ingest":
+    if args.command == "serve":
+        from web import serve
+
+        serve(host="0.0.0.0", port=1487)
+
+    elif args.command == "ingest":
         response = ingest.run_ingest(param_obj)
         sys.stdout.write(response.json())
 

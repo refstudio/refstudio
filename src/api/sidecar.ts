@@ -8,12 +8,15 @@ import { CliCommands } from './types';
 interface SharedCommand {
   execute: typeof TauriCommand.prototype.execute;
 }
+interface StubCommandOptions {
+  env: Record<string, string>;
+}
 
 class StubCommand implements SharedCommand {
   command: string;
   args: string[];
-  options: unknown;
-  constructor(command: string, args: string[], options?: unknown) {
+  options: StubCommandOptions;
+  constructor(command: string, args: string[], options: StubCommandOptions) {
     this.command = command;
     this.args = args;
     this.options = options;
@@ -21,12 +24,19 @@ class StubCommand implements SharedCommand {
 
   execute: typeof TauriCommand.prototype.execute = async () => {
     const [command, body] = this.args;
+
+    const envHeaders = Object.entries(this.options.env).reduce(
+      (acc, [key, value]) => ({ ...acc, [`X-${key.toUpperCase()}`]: value }),
+      {},
+    );
+
     const response = await fetch(`/api/sidecar/${command}`, {
       method: command === 'ingest_status' ? 'GET' : 'POST',
       body,
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
+        ...envHeaders,
       },
     });
     const responsePayload = await response.text();
@@ -54,17 +64,17 @@ export async function callSidecar<T extends keyof CliCommands>(
   arg: CliCommands[T][0],
 ): Promise<CliCommands[T][1]> {
   const projectSettings = getCachedSetting('project');
-  const openAISettings = getCachedSetting('openAI');
+  const openAISettings = getCachedSetting('openai');
   const sidecarSettings = getCachedSetting('sidecar');
   const env: Record<string, string> = {
     // Paths
-    PROJECT_DIR: projectSettings.currentDir,
+    PROJECT_DIR: projectSettings.current_directory,
     // Open AI
-    OPENAI_API_KEY: openAISettings.apiKey,
-    OPENAI_CHAT_MODEL: openAISettings.chatModel,
+    OPENAI_API_KEY: openAISettings.api_key,
+    OPENAI_CHAT_MODEL: openAISettings.chat_model,
     // Sidecar
-    SIDECAR_ENABLE_LOGGING: String(sidecarSettings.logging.active),
-    SIDECAR_LOG_DIR: sidecarSettings.logging.path,
+    SIDECAR_ENABLE_LOGGING: String(sidecarSettings.logging.enable),
+    SIDECAR_LOG_DIR: sidecarSettings.logging.filepath,
   };
 
   const command = new Command('call-sidecar', [subcommand, JSON.stringify(arg)], { env });

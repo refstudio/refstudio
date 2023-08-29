@@ -20,7 +20,7 @@ describe('chatWithAI', () => {
       ],
     });
 
-    const response = await chatWithAI('input text');
+    const response = await chatWithAI('', 'input text');
     expect(response).toStrictEqual(['some reply']);
   });
 
@@ -40,12 +40,12 @@ describe('chatWithAI', () => {
       ],
     });
 
-    const response = await chatWithAI('input text');
+    const response = await chatWithAI('', 'input text');
     expect(response).toStrictEqual(['some reply', 'Another reply']);
   });
 
   it('should return empty list, and not call sidecar, if provided text is empty', async () => {
-    const response = await chatWithAI('');
+    const response = await chatWithAI('', '');
     expect(response).toStrictEqual([]);
     expect(callSidecar).not.toHaveBeenCalled();
   });
@@ -53,7 +53,7 @@ describe('chatWithAI', () => {
   it('should return error message reply if exception thrown calling sidecar', async () => {
     vi.mocked(callSidecar).mockRejectedValue(new Error('Invalid API Key'));
 
-    const response = await chatWithAI('input text');
+    const response = await chatWithAI('', 'input text');
     expect(response.length).toBe(1);
     expect(response[0]).toMatch(/Invalid API Key/);
   });
