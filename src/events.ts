@@ -29,6 +29,7 @@ interface RefStudioEvents {
   'refstudio://references/remove': { referenceIds: string[] };
   // Explorer actions
   'refstudio://explorer/delete': { path: string };
+  'refstudio://explorer/open': { path: string };
   'refstudio://explorer/rename': { path: string; newName?: string };
   // Notifications actions
   'refstudio://notifications/clear': { type?: NotificationItemType };

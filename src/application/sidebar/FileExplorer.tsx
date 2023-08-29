@@ -1,7 +1,6 @@
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useCallback, useMemo } from 'react';
 
-import { openFilePathAtom } from '../../atoms/fileEntryActions';
 import {
   fileExplorerAtom,
   fileExplorerEntryPathBeingRenamed,
@@ -85,7 +84,7 @@ export function FolderNode({ folder }: FolderNodeProps) {
         <h2>{folder.name}</h2>
       </div>
       {!collapsed && (
-        <div className="flex flex-col items-start gap-2 self-stretch pl-6">
+        <div className="flex flex-col items-start gap-2 self-stretch pl-5">
           {childrenEntries.map((child) =>
             child.isFolder ? (
               <FolderNode folder={child} key={child.path} />
@@ -105,8 +104,6 @@ interface FileNodeProps {
 }
 export function FileNode({ file, isNameValid }: FileNodeProps) {
   const [pathBeingRenamed, setPathBeingRenamed] = useAtom(fileExplorerEntryPathBeingRenamed);
-
-  const openFile = useSetAtom(openFilePathAtom);
 
   const leftPaneActiveEditorId = useActiveEditorIdForPane('LEFT');
   const rightPaneActiveEditorId = useActiveEditorIdForPane('RIGHT');
@@ -140,7 +137,7 @@ export function FileNode({ file, isNameValid }: FileNodeProps) {
           'bg-btn-bg-side-bar-item-active': isFileActive,
         },
       )}
-      onClick={() => openFile(file.path)}
+      onClick={() => emitEvent('refstudio://explorer/open', { path: file.path })}
       onContextMenu={show}
     >
       {file.name}
