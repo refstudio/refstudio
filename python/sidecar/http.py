@@ -1,11 +1,12 @@
 import os
 import shutil
 from pathlib import Path
+from typing import Annotated
 from uuid import uuid4
 
 import psutil
 from dotenv import load_dotenv
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from sidecar import chat, ingest, projects, rewrite, search, settings, storage
 from sidecar.typing import (
@@ -31,6 +32,7 @@ load_dotenv()
 sidecar_api = FastAPI()  # Legacy API for existing sidecar cli functionality
 references_api = FastAPI()  # API for interacting with references
 ai_api = FastAPI()  # API for interacting with AI
+search_api = FastAPI()  # API for interacting with search
 filesystem_api = FastAPI()  # API for interacting with the filesystem
 project_api = FastAPI()  # API for interacting with projects
 settings_api = FastAPI()  # API for interacting with settings
@@ -59,17 +61,50 @@ async def http_chat(req: ChatRequest) -> ChatResponse:
     return response
 
 
+# TODO: remove this endpoint once the Search API is adopted
 @sidecar_api.post("/search")
 async def http_search(req: SearchRequest) -> SearchResponse:
     response = search.search_s2(req)
     return response
 
 
+# Search API
+# --------------
+@search_api.post("/s2")
+async def http_search_s2(req: SearchRequest) -> SearchResponse:
+    response = search.search_s2(req)
+    return response
+
+
 # AI API
 # --------------
+@ai_api.post("/rewrite")
+async def http_ai_rewrite(
+    req: RewriteRequest,
+    user_settings: Annotated[SettingsSchema, Depends(settings.get_settings_for_user)],
+) -> RewriteResponse:
+    response = rewrite.rewrite(req, user_settings=user_settings)
+    return response
+
+
+@ai_api.post("/completion")
+async def http_ai_completion(
+    req: TextCompletionRequest,
+    user_settings: Annotated[SettingsSchema, Depends(settings.get_settings_for_user)],
+) -> TextCompletionResponse:
+    response = rewrite.complete_text(req, user_settings=user_settings)
+    return response
+
+
 @ai_api.post("/{project_id}/chat")
-async def http_ai_chat(project_id: str, req: ChatRequest) -> ChatResponse:
-    response = chat.ask_question(req, project_id=project_id)
+async def http_ai_chat(
+    project_id: str,
+    req: ChatRequest,
+    user_settings: Annotated[SettingsSchema, Depends(settings.get_settings_for_user)],
+) -> ChatResponse:
+    response = chat.ask_question(
+        req, project_id=project_id, user_settings=user_settings
+    )
     return response
 
 
