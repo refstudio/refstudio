@@ -22,7 +22,7 @@ def ask_question(
         openai.api_key = user_settings.openai.api_key
         model = user_settings.openai.chat_model
     else:
-        openai.api_key = os.environ["OPENAI_API_KEY"]
+        openai.api_key = os.environ.get("OPENAI_API_KEY")
         model = "gpt-3.5-turbo"
 
     logger.info(f"Calling chat with the following parameters: {request.dict()}")

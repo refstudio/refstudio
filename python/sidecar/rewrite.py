@@ -23,7 +23,7 @@ def rewrite(arg: RewriteRequest, user_settings: typing.SettingsSchema = None):
         openai.api_key = user_settings.openai.api_key
         model = user_settings.openai.chat_model
     else:
-        openai.api_key = os.environ["OPENAI_API_KEY"]
+        openai.api_key = os.environ.get("OPENAI_API_KEY")
         model = "gpt-3.5-turbo"
 
     # there are 1.33 tokens per word on average
@@ -63,7 +63,7 @@ def complete_text(
         openai.api_key = user_settings.openai.api_key
         model = user_settings.openai.chat_model
     else:
-        openai.api_key = os.environ["OPENAI_API_KEY"]
+        openai.api_key = os.environ.get("OPENAI_API_KEY")
         model = "gpt-3.5-turbo"
 
     logger.info(
