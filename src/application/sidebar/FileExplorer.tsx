@@ -1,27 +1,98 @@
-import { useAtom, useAtomValue } from 'jotai';
-import { useCallback } from 'react';
-import { VscChevronDown, VscChevronRight, VscFile } from 'react-icons/vsc';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useCallback, useMemo } from 'react';
 
-import { fileExplorerEntryPathBeingRenamed } from '../../atoms/fileExplorerActions';
-import { FileExplorerFolderEntry } from '../../atoms/types/FileExplorerEntry';
-import { FileNode } from '../../components/FileNode';
+import {
+  fileExplorerAtom,
+  fileExplorerEntryPathBeingRenamed,
+  refreshFileTreeAtom,
+} from '../../atoms/fileExplorerActions';
+import { useActiveEditorIdForPane } from '../../atoms/hooks/useActiveEditorIdForPane';
+import { parseEditorId } from '../../atoms/types/EditorData';
+import { FileExplorerFileEntry, FileExplorerFolderEntry } from '../../atoms/types/FileExplorerEntry';
+import { FileNameInput } from '../../components/FileNameInput';
 import { emitEvent } from '../../events';
+import { useAsyncEffect } from '../../hooks/useAsyncEffect';
+import { cx } from '../../lib/cx';
+import { isNonNullish } from '../../lib/isNonNullish';
 import { FILE_EXPLORER_FILE_MENU_ID } from './fileExplorerContextMenu/FileExplorerFileContextMenu';
+import { useFileExplorerContextMenu } from './fileExplorerContextMenu/useFileExplorerContextMenu';
+import { ArrowDownIcon, ArrowRightIcon } from './icons';
 
-interface FileExplorerProps {
-  fileExplorerEntry: FileExplorerFolderEntry;
-  onFileClick: (filePath: string) => void;
-  selectedFiles: string[];
-  paddingLeft?: string;
+export function FileExplorer() {
+  const rootFileExplorerEntry = useAtomValue(fileExplorerAtom);
+  const projectFileEntries = useAtomValue(rootFileExplorerEntry.childrenAtom);
+
+  const refreshFileTree = useSetAtom(refreshFileTreeAtom);
+
+  useAsyncEffect(refreshFileTree);
+
+  return (
+    <>
+      {projectFileEntries.map((fileEntry) =>
+        fileEntry.isFolder ? (
+          <FolderNode folder={fileEntry} key={fileEntry.path} />
+        ) : (
+          <FileNode
+            existingFileNames={projectFileEntries.map((file) => file.name)}
+            file={fileEntry}
+            key={fileEntry.path}
+          />
+        ),
+      )}
+    </>
+  );
 }
 
-export function FileExplorer(props: FileExplorerProps) {
-  const { fileExplorerEntry, onFileClick, selectedFiles, paddingLeft = '0' } = props;
-  const files = useAtomValue(fileExplorerEntry.childrenAtom);
+interface FolderNodeProps {
+  folder: FileExplorerFolderEntry;
+}
+export function FolderNode({ folder }: FolderNodeProps) {
+  const childrenEntries = useAtomValue(folder.childrenAtom);
+  const [collapsed, setCollapsed] = useAtom(folder.collapsedAtom);
 
+  return (
+    <div className="flex flex-col items-start gap-2 self-stretch">
+      <div
+        className={cx('flex cursor-pointer select-none items-start gap-1 self-stretch')}
+        onClick={() => setCollapsed((currentState) => !currentState)}
+      >
+        <div className="text-btn-ico-side-bar-item">{collapsed ? <ArrowRightIcon /> : <ArrowDownIcon />}</div>
+        <h2 className="overflow-hidden overflow-ellipsis whitespace-nowrap">{folder.name}</h2>
+      </div>
+      {!collapsed && (
+        <div className="flex flex-col items-start gap-2 self-stretch pl-5">
+          {childrenEntries.map((child) =>
+            child.isFolder ? (
+              <FolderNode folder={child} key={child.path} />
+            ) : (
+              <FileNode existingFileNames={childrenEntries.map((file) => file.name)} file={child} key={child.path} />
+            ),
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+interface FileNodeProps {
+  file: FileExplorerFileEntry;
+  existingFileNames: string[];
+}
+export function FileNode({ file, existingFileNames }: FileNodeProps) {
   const [pathBeingRenamed, setPathBeingRenamed] = useAtom(fileExplorerEntryPathBeingRenamed);
 
-  const [collapsed, setCollapsed] = useAtom(fileExplorerEntry.collapsedAtom);
+  const leftPaneActiveEditorId = useActiveEditorIdForPane('LEFT');
+  const rightPaneActiveEditorId = useActiveEditorIdForPane('RIGHT');
+  const isFileActive = useMemo(
+    () =>
+      [leftPaneActiveEditorId, rightPaneActiveEditorId]
+        .filter(isNonNullish)
+        .map((editorId) => parseEditorId(editorId).id)
+        .includes(file.path),
+    [leftPaneActiveEditorId, rightPaneActiveEditorId, file.path],
+  );
+
+  const show = useFileExplorerContextMenu(FILE_EXPLORER_FILE_MENU_ID, { id: file.path });
 
   const isNameValid = useCallback(
     (name: string) => {
@@ -32,55 +103,34 @@ export function FileExplorer(props: FileExplorerProps) {
         return false;
       }
 
-      return !files.find((file) => file.name === name);
+      return !existingFileNames.includes(name);
     },
-    [files],
+    [existingFileNames],
   );
 
-  const { root } = fileExplorerEntry;
-  return (
-    <div className="flex w-full flex-col">
-      {!root && (
-        <FileNode
-          VscIcon={collapsed ? VscChevronRight : VscChevronDown}
-          bold
-          fileId={fileExplorerEntry.path}
-          fileName={fileExplorerEntry.name}
-          paddingLeft={`calc(${paddingLeft} - 1rem)`}
-          onClick={() => setCollapsed(!collapsed)}
-        />
+  return pathBeingRenamed === file.path ? (
+    <FileNameInput
+      fileName={file.name}
+      isNameValid={isNameValid}
+      onCancel={() => setPathBeingRenamed(null)}
+      onSubmit={(newName: string) => emitEvent('refstudio://explorer/rename', { path: file.path, newName })}
+    />
+  ) : (
+    <div
+      className={cx(
+        'flex shrink-0 items-center gap-1 self-stretch px-2 py-1',
+        'text-btn-txt-side-bar-item-primary',
+        'rounded-default hover:bg-btn-bg-side-bar-item-hover',
+        'cursor-pointer select-none',
+        {
+          'bg-btn-bg-side-bar-item-default': !isFileActive,
+          'bg-btn-bg-side-bar-item-active': isFileActive,
+        },
       )}
-      {(root || !collapsed) && (
-        <>
-          {files.map((fileEntry) =>
-            fileEntry.isFolder ? (
-              <FileExplorer
-                {...props}
-                fileExplorerEntry={fileEntry}
-                key={fileEntry.path}
-                paddingLeft={`calc(${paddingLeft} + 1rem)`}
-              />
-            ) : (
-              <FileNode
-                VscIcon={VscFile}
-                contextMenuId={FILE_EXPLORER_FILE_MENU_ID}
-                fileId={fileEntry.path}
-                fileName={fileEntry.name}
-                isEditMode={pathBeingRenamed === fileEntry.path}
-                isNameValid={isNameValid}
-                key={fileEntry.path}
-                paddingLeft={paddingLeft}
-                selected={selectedFiles.includes(fileEntry.path)}
-                onCancelRename={() => setPathBeingRenamed(null)}
-                onClick={() => onFileClick(fileEntry.path)}
-                onFileRename={(newName: string) =>
-                  emitEvent('refstudio://explorer/rename', { path: fileEntry.path, newName })
-                }
-              />
-            ),
-          )}
-        </>
-      )}
+      onClick={() => emitEvent('refstudio://explorer/open', { path: file.path })}
+      onContextMenu={show}
+    >
+      <div className="overflow-hidden overflow-ellipsis whitespace-nowrap">{file.name}</div>
     </div>
   );
 }
