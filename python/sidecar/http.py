@@ -5,7 +5,7 @@ from uuid import uuid4
 
 import psutil
 from dotenv import load_dotenv
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from sidecar import chat, ingest, projects, rewrite, search, settings, storage
 from sidecar.typing import (
@@ -263,6 +263,16 @@ async def read_file(project_id: str, filepath: Path):
             "filepath": filepath,
         }
     return FileResponse(filepath)
+
+
+@filesystem_api.head("/{project_id}/{filepath:path}", status_code=200)
+async def head_file(project_id: str, filepath: Path):
+    user_id = "user1"
+    project_path = projects.get_project_path(user_id, project_id)
+    filepath = project_path / filepath
+
+    if not filepath.exists():
+        raise HTTPException(status_code=404, detail="File not found")
 
 
 @filesystem_api.delete("/{project_id}/{filepath:path}")
