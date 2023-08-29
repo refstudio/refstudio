@@ -81,7 +81,7 @@ export function FolderNode({ folder }: FolderNodeProps) {
         onClick={() => setCollapsed((currentState) => !currentState)}
       >
         <div className="text-btn-ico-side-bar-item">{collapsed ? <ArrowRightIcon /> : <ArrowDownIcon />}</div>
-        <h2 className='overflow-hidden overflow-ellipsis whitespace-nowrap'>{folder.name}</h2>
+        <h2 className="overflow-hidden overflow-ellipsis whitespace-nowrap">{folder.name}</h2>
       </div>
       {!collapsed && (
         <div className="flex flex-col items-start gap-2 self-stretch pl-5">
@@ -140,9 +140,7 @@ export function FileNode({ file, isNameValid }: FileNodeProps) {
       onClick={() => emitEvent('refstudio://explorer/open', { path: file.path })}
       onContextMenu={show}
     >
-      <div className='overflow-hidden overflow-ellipsis whitespace-nowrap'>
-        {file.name}
-      </div>
+      <div className="overflow-hidden overflow-ellipsis whitespace-nowrap">{file.name}</div>
     </div>
   );
 }

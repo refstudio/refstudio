@@ -21,7 +21,7 @@ export function ExplorerPanel() {
       title="Project"
     >
       {isProjectOpen && (
-        <div className="flex flex-1 flex-col items-start gap-2 self-stretch p-4 pt-2 overflow-x-hidden overflow-y-auto">
+        <div className="flex flex-1 flex-col items-start gap-2 self-stretch overflow-y-auto overflow-x-hidden p-4 pt-2">
           <FileExplorer />
         </div>
       )}
