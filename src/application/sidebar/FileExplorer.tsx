@@ -26,27 +26,17 @@ export function FileExplorer() {
 
   useAsyncEffect(refreshFileTree);
 
-  const isNameValid = useCallback(
-    (name: string) => {
-      if (name.startsWith('.')) {
-        return false;
-      }
-      if (name.includes('/')) {
-        return false;
-      }
-
-      return !projectFileEntries.find((file) => file.name === name);
-    },
-    [projectFileEntries],
-  );
-
   return (
     <>
       {projectFileEntries.map((fileEntry) =>
         fileEntry.isFolder ? (
           <FolderNode folder={fileEntry} key={fileEntry.path} />
         ) : (
-          <FileNode file={fileEntry} isNameValid={isNameValid} key={fileEntry.path} />
+          <FileNode
+            existingFileNames={projectFileEntries.map((file) => file.name)}
+            file={fileEntry}
+            key={fileEntry.path}
+          />
         ),
       )}
     </>
@@ -59,20 +49,6 @@ interface FolderNodeProps {
 export function FolderNode({ folder }: FolderNodeProps) {
   const childrenEntries = useAtomValue(folder.childrenAtom);
   const [collapsed, setCollapsed] = useAtom(folder.collapsedAtom);
-
-  const isNameValid = useCallback(
-    (name: string) => {
-      if (name.startsWith('.')) {
-        return false;
-      }
-      if (name.includes('/')) {
-        return false;
-      }
-
-      return !childrenEntries.find((file) => file.name === name);
-    },
-    [childrenEntries],
-  );
 
   return (
     <div className="flex flex-col items-start gap-2 self-stretch">
@@ -89,7 +65,7 @@ export function FolderNode({ folder }: FolderNodeProps) {
             child.isFolder ? (
               <FolderNode folder={child} key={child.path} />
             ) : (
-              <FileNode file={child} isNameValid={isNameValid} key={child.path} />
+              <FileNode existingFileNames={childrenEntries.map((file) => file.name)} file={child} key={child.path} />
             ),
           )}
         </div>
@@ -100,9 +76,9 @@ export function FolderNode({ folder }: FolderNodeProps) {
 
 interface FileNodeProps {
   file: FileExplorerFileEntry;
-  isNameValid: (name: string) => boolean;
+  existingFileNames: string[];
 }
-export function FileNode({ file, isNameValid }: FileNodeProps) {
+export function FileNode({ file, existingFileNames }: FileNodeProps) {
   const [pathBeingRenamed, setPathBeingRenamed] = useAtom(fileExplorerEntryPathBeingRenamed);
 
   const leftPaneActiveEditorId = useActiveEditorIdForPane('LEFT');
@@ -117,6 +93,20 @@ export function FileNode({ file, isNameValid }: FileNodeProps) {
   );
 
   const show = useFileExplorerContextMenu(FILE_EXPLORER_FILE_MENU_ID, { id: file.path });
+
+  const isNameValid = useCallback(
+    (name: string) => {
+      if (name.startsWith('.')) {
+        return false;
+      }
+      if (name.includes('/')) {
+        return false;
+      }
+
+      return !existingFileNames.includes(name);
+    },
+    [existingFileNames],
+  );
 
   return pathBeingRenamed === file.path ? (
     <FileNameInput
