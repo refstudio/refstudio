@@ -1,8 +1,7 @@
 import inspect
 import json
-import sys
 
-from sidecar import chat, cli, ingest, rewrite, search, storage
+from sidecar import cli
 from sidecar.typing import CliCommands
 
 if __name__ == "__main__":
@@ -28,42 +27,6 @@ if __name__ == "__main__":
         from web import serve
 
         serve(host="0.0.0.0", port=1487)
-
-    elif args.command == "ingest":
-        response = ingest.run_ingest(param_obj)
-        sys.stdout.write(response.json())
-
-    elif args.command == "ingest_status":
-        response = ingest.get_statuses()
-        sys.stdout.write(response.json())
-
-    elif args.command == "ingest_references":
-        response = ingest.get_references(param_obj)
-        sys.stdout.write(response.json())
-
-    elif args.command == "rewrite":
-        response = rewrite.rewrite(param_obj)
-        sys.stdout.write(response.json())
-
-    elif args.command == "completion":
-        response = rewrite.complete_text(param_obj)
-        sys.stdout.write(response.json())
-
-    elif args.command == "chat":
-        response = chat.ask_question(param_obj)
-        sys.stdout.write(response.json())
-
-    elif args.command == "update":
-        response = storage.update_reference(param_obj)
-        sys.stdout.write(response.json())
-
-    elif args.command == "delete":
-        response = storage.delete_references(param_obj)
-        sys.stdout.write(response.json())
-
-    elif args.command == "search":
-        response = search.search_s2(param_obj)
-        sys.stdout.write(response.json())
 
     else:
         raise NotImplementedError(f"Command {args.command} is not implemented.")

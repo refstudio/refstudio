@@ -29,7 +29,6 @@ from sidecar.typing import (
 
 load_dotenv()
 
-sidecar_api = FastAPI()  # Legacy API for existing sidecar cli functionality
 references_api = FastAPI()  # API for interacting with references
 ai_api = FastAPI()  # API for interacting with AI
 search_api = FastAPI()  # API for interacting with search
@@ -39,33 +38,6 @@ settings_api = FastAPI()  # API for interacting with settings
 
 meta_api = FastAPI()
 """API for monitoring and controling the server"""
-
-
-# Sidecar API
-# -----------
-@sidecar_api.post("/rewrite")
-async def http_rewrite(req: RewriteRequest) -> RewriteResponse:
-    response = rewrite.rewrite(req)
-    return response
-
-
-@sidecar_api.post("/completion")
-async def http_completion(req: TextCompletionRequest) -> TextCompletionResponse:
-    response = rewrite.complete_text(req)
-    return response
-
-
-@sidecar_api.post("/chat")
-async def http_chat(req: ChatRequest) -> ChatResponse:
-    response = chat.ask_question(req)
-    return response
-
-
-# TODO: remove this endpoint once the Search API is adopted
-@sidecar_api.post("/search")
-async def http_search(req: SearchRequest) -> SearchResponse:
-    response = search.search_s2(req)
-    return response
 
 
 # Search API
