@@ -139,22 +139,6 @@ export interface paths {
     /** Update Settings */
     put: operations['update_settings__put'];
   };
-  '/api/sidecar/chat': {
-    /** Http Chat */
-    post: operations['http_chat_chat_post'];
-  };
-  '/api/sidecar/completion': {
-    /** Http Completion */
-    post: operations['http_completion_completion_post'];
-  };
-  '/api/sidecar/rewrite': {
-    /** Http Rewrite */
-    post: operations['http_rewrite_rewrite_post'];
-  };
-  '/api/sidecar/search': {
-    /** Http Search */
-    post: operations['http_search_search_post'];
-  };
 }
 
 export type webhooks = Record<string, never>;
@@ -926,94 +910,6 @@ export interface operations {
       200: {
         content: {
           'application/json': SettingsSchema;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          'application/json': HTTPValidationError;
-        };
-      };
-    };
-  };
-  /** Http Chat */
-  http_chat_chat_post: {
-    requestBody: {
-      content: {
-        'application/json': ChatRequest;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          'application/json': ChatResponse;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          'application/json': HTTPValidationError;
-        };
-      };
-    };
-  };
-  /** Http Completion */
-  http_completion_completion_post: {
-    requestBody: {
-      content: {
-        'application/json': TextCompletionRequest;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          'application/json': TextCompletionResponse;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          'application/json': HTTPValidationError;
-        };
-      };
-    };
-  };
-  /** Http Rewrite */
-  http_rewrite_rewrite_post: {
-    requestBody: {
-      content: {
-        'application/json': RewriteRequest;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          'application/json': RewriteResponse;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          'application/json': HTTPValidationError;
-        };
-      };
-    };
-  };
-  /** Http Search */
-  http_search_search_post: {
-    requestBody: {
-      content: {
-        'application/json': SearchRequest;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          'application/json': SearchResponse;
         };
       };
       /** @description Validation Error */
