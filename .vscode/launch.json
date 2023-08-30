@@ -11,7 +11,6 @@
         "module": "uvicorn",
         "cwd": "${workspaceFolder}/python",
         "args": ["web:api", "--reload"],
-        "jinja": true,
         "justMyCode": true
       }
     ]
