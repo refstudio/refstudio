@@ -1,6 +1,7 @@
 import { FileEntry as TauriFileEntry } from '@tauri-apps/api/fs';
 
-import { apiGetJson, universalDelete, universalGet, universalHead, universalPost, universalPutFile } from './api';
+import { universalDelete, universalGet, universalHead, universalPost, universalPutFile } from './api';
+import { apiGetJson } from './typed-api';
 
 export interface ProjectInfo {
   id: string;

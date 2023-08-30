@@ -2,8 +2,9 @@ import { SettingsManager } from 'tauri-settings';
 import { Path, PathValue } from 'tauri-settings/dist/types/dot-notation';
 import { getDotNotation, setDotNotation } from 'tauri-settings/dist/utils/dot-notation';
 
-import { apiGetJson, universalPut } from '../api/api';
+import { universalPut } from '../api/api';
 import type * as apiTypes from '../api/api-types';
+import { apiGetJson } from '../api/typed-api';
 
 export type OpenAiManner = apiTypes.RewriteMannerType;
 export function getMannerOptions(): OpenAiManner[] {

@@ -1,4 +1,4 @@
-import { apiPost } from './api';
+import { apiPost } from './typed-api';
 
 export async function chatWithAI(projectId: string, text: string): Promise<string[]> {
   try {

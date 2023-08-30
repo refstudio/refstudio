@@ -1,5 +1,5 @@
 import { notifyError } from '../notifications/notifications';
-import { apiPost } from './api';
+import { apiPost } from './typed-api';
 
 export async function completeSentence(text: string): Promise<string[]> {
   try {

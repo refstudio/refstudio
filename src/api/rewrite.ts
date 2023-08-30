@@ -1,6 +1,6 @@
 import { notifyErr, notifyError } from '../notifications/notifications';
-import { apiPost } from './api';
 import { DEFAULT_OPTIONS, RewriteOptions } from './rewrite.config';
+import { apiPost } from './typed-api';
 
 export type AskForRewriteReturn = { ok: true; choices: string[] } | { ok: false; message: string };
 export async function askForRewrite(selection: string, options?: RewriteOptions): Promise<AskForRewriteReturn> {
