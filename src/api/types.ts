@@ -8,15 +8,15 @@
 /**
  * An enumeration.
  */
-export type IngestStatus = 'processing' | 'failure' | 'complete';
+export type IngestStatus = "processing" | "failure" | "complete";
 /**
  * An enumeration.
  */
-export type ResponseStatus = 'ok' | 'error';
+export type ResponseStatus = "ok" | "error";
 /**
  * An enumeration.
  */
-export type RewriteMannerType = 'concise' | 'elaborate' | 'scholarly';
+export type RewriteMannerType = "concise" | "elaborate" | "scholarly";
 
 export interface CliCommands {
   /**

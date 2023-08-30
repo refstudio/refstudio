@@ -12,6 +12,7 @@ if __name__ == "__main__":
         json.dump(cli_schema, out, indent=2)
 
     combined_schemas = {}
+    combined_paths = {}
     for route in api.routes:
         if not isinstance(route, Mount):
             continue  # must be a built-in route like /docs
@@ -22,6 +23,23 @@ if __name__ == "__main__":
         components = openapi.get("components")
         if components:
             combined_schemas.update(components["schemas"])
+        paths = openapi["paths"]
+        for path, path_spec in paths.items():
+            combined_paths[mount_path + path] = path_spec
+
+    with open("python/combined.openapi.json", "w") as out:
+        json.dump(
+            {
+                "openapi": "3.1.0",
+                "info": {
+                    "title": "RefStudio API",
+                    "version": "0.1",
+                },
+                "paths": combined_paths,
+                "components": {"schemas": combined_schemas},
+            },
+            out,
+        )
 
     # OpenAPI puts request/response definitions under "/components/schemas", but
     # json2ts wants them under "/definitions".
