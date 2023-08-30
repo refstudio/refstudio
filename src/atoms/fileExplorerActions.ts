@@ -13,7 +13,7 @@ export const refreshFileTreeAtom = atom(null, async (get, set) => {
 });
 
 export const getFileExplorerEntryFromPathAtom = (filePath: string) =>
-  atom((get) => getFileExplorerEntryFromPath(splitRefStudioPath(filePath).slice(1), get));
+  atom((get) => getFileExplorerEntryFromPath(splitRefStudioPath(filePath), get));
 
 function getFileExplorerEntryFromPath(
   path: string[],

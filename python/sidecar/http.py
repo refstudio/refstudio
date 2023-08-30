@@ -1,12 +1,11 @@
 import os
 import shutil
 from pathlib import Path
-from typing import Annotated
 from uuid import uuid4
 
 import psutil
 from dotenv import load_dotenv
-from fastapi import Depends, FastAPI, File, UploadFile
+from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from sidecar import chat, ingest, projects, rewrite, search, settings, storage
 from sidecar.typing import (
@@ -79,10 +78,9 @@ async def http_search_s2(req: SearchRequest) -> SearchResponse:
 # AI API
 # --------------
 @ai_api.post("/rewrite")
-async def http_ai_rewrite(
-    req: RewriteRequest,
-    user_settings: Annotated[SettingsSchema, Depends(settings.get_settings_for_user)],
-) -> RewriteResponse:
+async def http_ai_rewrite(req: RewriteRequest) -> RewriteResponse:
+    user_id = "user1"
+    user_settings = settings.get_settings_for_user(user_id)
     response = rewrite.rewrite(req, user_settings=user_settings)
     return response
 
@@ -90,8 +88,9 @@ async def http_ai_rewrite(
 @ai_api.post("/completion")
 async def http_ai_completion(
     req: TextCompletionRequest,
-    user_settings: Annotated[SettingsSchema, Depends(settings.get_settings_for_user)],
 ) -> TextCompletionResponse:
+    user_id = "user1"
+    user_settings = settings.get_settings_for_user(user_id)
     response = rewrite.complete_text(req, user_settings=user_settings)
     return response
 
@@ -100,8 +99,9 @@ async def http_ai_completion(
 async def http_ai_chat(
     project_id: str,
     req: ChatRequest,
-    user_settings: Annotated[SettingsSchema, Depends(settings.get_settings_for_user)],
 ) -> ChatResponse:
+    user_id = "user1"
+    user_settings = settings.get_settings_for_user(user_id)
     response = chat.ask_question(
         req, project_id=project_id, user_settings=user_settings
     )
@@ -222,10 +222,12 @@ async def get_project(project_id: str):
     """
     user_id = "user1"
     project_path = projects.get_project_path(user_id, project_id)
+    project_name = projects.get_project_name(user_id, project_id)
     filepaths = projects.get_project_files(user_id, project_id)
     return {
         "project_id": project_id,
         "project_path": project_path,
+        "project_name": project_name,
         "filepaths": filepaths,
     }
 
@@ -296,6 +298,16 @@ async def read_file(project_id: str, filepath: Path):
             "filepath": filepath,
         }
     return FileResponse(filepath)
+
+
+@filesystem_api.head("/{project_id}/{filepath:path}", status_code=200)
+async def head_file(project_id: str, filepath: Path):
+    user_id = "user1"
+    project_path = projects.get_project_path(user_id, project_id)
+    filepath = project_path / filepath
+
+    if not filepath.exists():
+        raise HTTPException(status_code=404, detail="File not found")
 
 
 @filesystem_api.delete("/{project_id}/{filepath:path}")

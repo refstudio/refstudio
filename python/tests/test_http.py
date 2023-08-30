@@ -394,6 +394,7 @@ def test_get_project(monkeypatch, tmp_path):
     assert response.status_code == 200
     assert response.json() == {
         "project_id": project_id,
+        "project_name": "project1name",
         "project_path": str(project_path),
         "filepaths": [],
     }

@@ -1,5 +1,6 @@
 import { notifyError } from '../notifications/notifications';
-import { callSidecar } from './sidecar';
+import { universalPost } from './api';
+import { TextCompletionRequest, TextCompletionResponse } from './api-types';
 
 export async function completeSentence(text: string): Promise<string[]> {
   try {
@@ -7,7 +8,10 @@ export async function completeSentence(text: string): Promise<string[]> {
       return [];
     }
 
-    const response = await callSidecar('completion', { text, n_choices: 3 });
+    const response = await universalPost<TextCompletionResponse, TextCompletionRequest>('/api/ai/completion', {
+      text,
+      n_choices: 3,
+    });
 
     if (response.status === 'error') {
       notifyError('Completion error', response.message);
