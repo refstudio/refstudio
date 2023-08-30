@@ -43,7 +43,7 @@ def test_list_references_should_return_empty_list(monkeypatch, tmp_path):
     project_id = "project1"
 
     monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
-    project_path = projects.create_project(user_id, project_id, project_name="foo")
+    _ = projects.create_project(user_id, project_id, project_name="foo")
 
     # .storage/references.json does not exist as no references have been ingested
     response = references_client.get(f"/{project_id}")
