@@ -1,3 +1,5 @@
+/** This file forwards generated API types as a convenience. */
+
 import { components } from './raw-api-types';
 type schemas = components['schemas'];
 

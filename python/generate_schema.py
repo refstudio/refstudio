@@ -37,6 +37,7 @@ if __name__ == "__main__":
         )
 
     with open("src/api/api-types.ts", "w") as out:
+        out.write("/** This file forwards generated API types as a convenience. */\n\n")
         out.write("import {components} from './raw-api-types';\n")
         out.write("type schemas = components['schemas'];\n\n")
         for typename in sorted(combined_schemas.keys()):

@@ -5,6 +5,7 @@ set -x
 
 poetry run python python/generate_schema.py
 (
+    echo '/** You probably want to use the types from api-types.ts instead. */'
     echo '/* eslint-disable */'
     yarn run openapi-typescript python/openapi.json
 ) > ./src/api/raw-api-types.d.ts
