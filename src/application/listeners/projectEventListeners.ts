@@ -44,6 +44,7 @@ export function useFileProjectNewListener() {
 
 export function useFileProjectNewSampleListener() {
   const sampleProject = useSetAtom(newSampleProjectAtom);
+  const createFile = useSetAtom(createFileAtom);
   return async () => {
     const projects = await readAllProjects();
     let project = projects.find((p) => p.name === SAMPLE_PROJECT_NAME);
@@ -51,8 +52,9 @@ export function useFileProjectNewSampleListener() {
       project = await createRemoteProject('RefStudio Sample');
     }
     await sampleProject(project.id, project.name);
-    persistProjectIdInSettings(project.id);
+    createFile();
     notifyInfo('Sample project opened with success');
+    persistProjectIdInSettings(project.id);
   };
 }
 

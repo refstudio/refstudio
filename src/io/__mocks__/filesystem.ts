@@ -1,4 +1,3 @@
-const SYSTEM_PATH = '/usr/name/foo/tauri.foo';
 const UPLOADS_DIR = 'uploads';
 const EXPORTS_DIR = 'exports';
 
@@ -9,17 +8,16 @@ function join(...segments: string[]) {
 // #####################################################################################
 // Top Level PATH API
 // #####################################################################################
-export const getNewProjectsBaseDir = vi.fn(() => '/desktop');
-export const getRefStudioPath = vi.fn((path: string) => path.replace(SYSTEM_PATH, ''));
+export const getNewProjectsBaseDir = vi.fn(() => '/usr/name/desktop');
 export const getSeparator = vi.fn(() => '/');
 
 // #####################################################################################
 // UPLOADS
 // #####################################################################################
-export const getUploadsDir = vi.fn(() => join('/', UPLOADS_DIR));
-export const getExportsDir = vi.fn(() => join('/', EXPORTS_DIR));
+export const getUploadsDir = vi.fn(() => UPLOADS_DIR);
+export const getExportsDir = vi.fn(() => EXPORTS_DIR);
 export const makeUploadPath = vi.fn((filename: string) => join(UPLOADS_DIR, filename));
-export const isInUploadsDir = vi.fn((path: string) => path.startsWith(join('/', UPLOADS_DIR)));
+export const isInUploadsDir = vi.fn((path: string) => path.startsWith(UPLOADS_DIR));
 export const uploadFiles = vi.fn();
 
 // #####################################################################################

@@ -38,19 +38,6 @@ export async function getNewProjectsBaseDir() {
 }
 
 /**
- * Convert an operating-system absolute path into a ref-studio absolute path.
- *
- * (/usr/name/etc/tauri.foo/project-x/folder/file.txt) -> (/folder/file.txt)
- *
- * @param absolutePath an operating-system absolute path
- * @returns
- */
-export function getRefStudioPath(absolutePath: string) {
-  const baseDir = '';
-  return absolutePath.replace(new RegExp(`^${baseDir}`), '');
-}
-
-/**
  * Returns the the OS-specific separator
  *
  * @returns the separator (/ or \\)
@@ -74,8 +61,8 @@ export function makeUploadPath(filename: string) {
   return `${getUploadsDir()}${sep}${filename}`;
 }
 
-export function isInUploadsDir(relativePath: string) {
-  return relativePath.startsWith(`${sep}${UPLOADS_DIR}`);
+export function isInUploadsDir(relativeFilePath: string) {
+  return relativeFilePath.startsWith(`${UPLOADS_DIR}${sep}`);
 }
 
 export async function uploadFiles(systemFiles: File[]) {
@@ -121,7 +108,7 @@ async function convertTauriFileEntryToFileEntry(entry: TauriFileEntry): Promise<
   const isFolder = !!entry.children;
   const name = entry.name ?? '';
   const isDotfile = name.startsWith('.');
-  const refStudioPath = getRefStudioPath(entry.path);
+  const refStudioPath = entry.path;
 
   if (isFolder) {
     return {
@@ -147,13 +134,15 @@ async function convertTauriFileEntryToFileEntry(entry: TauriFileEntry): Promise<
 
 // #####################################################################################
 // file path utils
+//
+// NOTE: We decided that ref studio paths should always start WITHOUT a leading /.
+//       file.txt -> file.txt
 // #####################################################################################
-// file.txt -> /file.txt
-export function makeRefStudioPath(fileName: string) {
-  return `${sep}${fileName}`;
+export function makeRefStudioPath(filePath: string) {
+  return filePath;
 }
 
-// /some/absolute/path/file.txt -> ["", "some", "absolute", "path", "file.txt"]
+// some/refstudio/absolute/path/file.txt -> ["some", "refstudio", "absolute", "path", "file.txt"]
 export function splitRefStudioPath(filePath: string): string[] {
   return filePath.split(sep);
 }

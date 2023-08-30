@@ -40,21 +40,13 @@ export async function universalDelete<ResponsePayload = unknown, RequestPayload 
   return universalRequest('DELETE', path, payload, responseParser);
 }
 
-/** Issue a PATH request with a JSON payload using either web fetch or Tauri fetch */
+/** Issue a PATCH request with a JSON payload using either web fetch or Tauri fetch */
 export async function universalPatch<ResponsePayload = unknown, RequestPayload = unknown>(
   path: string,
   payload: RequestPayload,
   responseParser: ResponseParser = 'JSON',
 ): Promise<ResponsePayload> {
   return universalRequest('PATCH', path, payload, responseParser);
-}
-
-/** Issue a FILE Upload using either web fetch or Tauri fetch */
-export async function universalPutFile(path: string, filePath: string, content: string | ArrayBuffer) {
-  const data = new FormData();
-  const file = new File([content], filePath);
-  data.append('file', file);
-  return universalRequest('PUT', path, data);
 }
 
 /** Issue a HEAD request using either web fetch or Tauri fetch */
@@ -128,19 +120,13 @@ async function makeTauriRequest<ResponsePayload = unknown, RequestPayload = unkn
   payload: RequestPayload | undefined,
   responseParser: ResponseParser,
 ) {
-  // try {
   const url = REFSTUDIO_HOST + path;
   console.log(`TAURI FETCH REQUEST: ${method} ${url}`);
-  const body =
-    payload instanceof FormData
-      ? Body.form(payload) // file upload
-      : payload
-      ? Body.json(payload)
-      : undefined;
   const responseType = responseParser === 'JSON' ? ResponseType.JSON : ResponseType.Binary;
   const response = await tauriFetch(url, {
     method,
-    body,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
+    body: payload ? Body.json(payload as any) : undefined,
     responseType,
   });
   console.log('TAURI FETCH RESPONSE STATUS', response.status);
@@ -155,4 +141,35 @@ async function makeTauriRequest<ResponsePayload = unknown, RequestPayload = unkn
       console.log('TAURI FETCH RESPONSE DATA', response.data);
       return response.data as ResponsePayload;
   }
+}
+
+/** Issue a FILE Upload using either web fetch or Tauri fetch */
+export async function universalPutFile(path: string, filePath: string, content: string | ArrayBuffer) {
+  if (import.meta.env.VITE_IS_WEB) {
+    const formData = new FormData();
+    formData.append('file', new File([content], filePath));
+    return fetch(path, { method: 'PUT', body: formData });
+  }
+
+  // TAURI
+  const url = REFSTUDIO_HOST + path;
+  const buffer = typeof content === 'string' ? new TextEncoder().encode(content) : new Uint8Array(content);
+  const body = Body.form({
+    file: {
+      // either a path or an array buffer of the file contents.
+      // We can't use a path bc Tauri check if file exists and has read permissions. Also, will send the file content.
+      file: buffer,
+      // optional (as defined in the documentation)
+      // We need to send a value bc is a mandatory field for the backend API
+      fileName: filePath,
+    },
+  });
+  await tauriFetch(url, {
+    method: 'PUT',
+    body,
+    headers: {
+      // Note that this is a mandatory header when sending binary content
+      'Content-Type': 'multipart/form-data',
+    },
+  });
 }

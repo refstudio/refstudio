@@ -21,22 +21,20 @@ type ProjectPostResponse = ProjectsResponse;
 // ########################################################################################
 // PROJECT LIFE CYCLE
 // ########################################################################################
-export async function readAllProjects() {
+export async function readAllProjects(): Promise<ProjectInfo[]> {
   const projects = await universalGet<ProjectsResponse>(`/api/projects/`);
-  return Object.keys(projects).map(
-    (id) => ({ id, path: projects[id].project_path, name: projects[id].project_name } as ProjectInfo),
-  );
+  return Object.keys(projects).map((id) => ({ id, path: projects[id].project_path, name: projects[id].project_name }));
 }
-export async function readProjectById(projectId: string) {
+export async function readProjectById(projectId: string): Promise<ProjectInfo> {
   const projectInfo = await universalGet<ProjectGetResponse>(`/api/projects/${projectId}`);
   return {
     id: projectInfo.project_id,
     path: projectInfo.project_path,
     name: projectInfo.project_name,
-  } as ProjectInfo;
+  };
 }
 
-export async function createRemoteProject(projectName: string, projectPath?: string) {
+export async function createRemoteProject(projectName: string, projectPath?: string): Promise<ProjectInfo> {
   const payload = await universalPost<ProjectPostResponse>(
     `/api/projects/?project_name=${projectName}&project_path=${encodeURIComponent(projectPath ?? '')}`,
     {},
@@ -48,7 +46,7 @@ export async function createRemoteProject(projectName: string, projectPath?: str
     id: projectId,
     path: project_path,
     name: project_name,
-  } as ProjectInfo;
+  };
 }
 
 // ########################################################################################
