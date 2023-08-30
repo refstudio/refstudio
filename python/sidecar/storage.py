@@ -1,5 +1,4 @@
 import json
-from pathlib import Path
 
 from sidecar import settings, typing
 from sidecar.settings import logger
