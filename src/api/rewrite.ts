@@ -1,6 +1,5 @@
 import { notifyErr, notifyError } from '../notifications/notifications';
-import { universalPost } from './api';
-import { RewriteRequest, RewriteResponse } from './api-types';
+import { apiPost } from './api';
 import { DEFAULT_OPTIONS, RewriteOptions } from './rewrite.config';
 
 export type AskForRewriteReturn = { ok: true; choices: string[] } | { ok: false; message: string };
@@ -14,7 +13,8 @@ export async function askForRewrite(selection: string, options?: RewriteOptions)
       ...DEFAULT_OPTIONS,
       ...options,
     };
-    const response = await universalPost<RewriteResponse, RewriteRequest>('api/ai/rewrite', {
+    // const response = await universalPost<RewriteResponse, RewriteRequest>('api/ai/rewrite', {
+    const response = await apiPost('/api/ai/rewrite', {
       text: selection,
       n_choices: options.nChoices,
       temperature: options.temperature,
