@@ -5,12 +5,21 @@ import { paths } from './api-paths';
 
 type LowerMethod = 'get' | 'post' | 'put' | 'delete' | 'patch';
 
+/** Helper to convert an object to a union of k/v pairs */
 type Unionize<T> = { [k in keyof T]: { k: k; v: T[k] } }[keyof T];
+
 type ExtractPathsForMethod<T, Method extends LowerMethod> = T extends { k: infer Path; v: Record<Method, unknown> }
   ? Path
   : never;
+
+/** Get a union of all the paths for a particular HTTP method (get, post, etc.) */
 type PathsForMethod<Method extends LowerMethod> = ExtractPathsForMethod<Unionize<paths>, Method>;
 
+/**
+ * Get the 'parameters' object for a path / method pair, if it takes parameters.
+ *
+ * Parameters are path parameters (`/path/{param}`) or search parameters (`?q=search`).
+ */
 type ParamsFor<Path extends keyof paths, Method extends LowerMethod> = paths extends Record<
   Path,
   Record<Method, { parameters: infer Params }>
@@ -18,6 +27,7 @@ type ParamsFor<Path extends keyof paths, Method extends LowerMethod> = paths ext
   ? Params
   : never;
 
+/** Extract the JSON response type for a path/method pair from the paths interface. */
 type JsonResponseFor<Path extends keyof paths, Method extends LowerMethod> = paths extends Record<
   Path,
   Record<Method, { responses: { 200: { content: { 'application/json': infer ResponseType } } } }>
@@ -25,6 +35,7 @@ type JsonResponseFor<Path extends keyof paths, Method extends LowerMethod> = pat
   ? ResponseType
   : never;
 
+/** Extract the JSON request body type for a path/method pair from the paths interface. */
 type JsonRequestBodyFor<Path extends keyof paths, Method extends LowerMethod> = paths extends Record<
   Path,
   Record<Method, { requestBody: { content: { 'application/json': infer RequestBody } } }>
@@ -32,15 +43,21 @@ type JsonRequestBodyFor<Path extends keyof paths, Method extends LowerMethod> = 
   ? RequestBody
   : never;
 
+/**
+ * This is used to model how apiGet() takes one argument (the path) if the endpoint has no parameters
+ * but two arguments (the path and the parameters) if it does.
+ */
 type PathArgs<Path extends keyof paths, Method extends LowerMethod> = [ParamsFor<Path, Method>] extends [never]
   ? []
   : [options: ParamsFor<Path, Method>];
 
+/** The type of OpenAPI's parameters interface */
 interface RouteParameters {
   path?: Record<string, string>;
   query?: Record<string, string>;
 }
 
+/** "Complete" a path by filling in path parameters and appending query parameters. */
 function completePath(path: string, params: RouteParameters) {
   if (params.path) {
     for (const [key, value] of Object.entries(params.path)) {
