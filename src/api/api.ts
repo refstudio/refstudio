@@ -28,6 +28,13 @@ type JsonResponseFor<Path extends keyof paths, Method extends LowerMethod> = pat
   ? ResponseType
   : never;
 
+type JsonRequestBodyFor<Path extends keyof paths, Method extends LowerMethod> = paths extends Record<
+  Path,
+  Record<Method, { requestBody: { content: { 'application/json': infer RequestBody } } }>
+>
+  ? RequestBody
+  : never;
+
 type PathArgs<Path extends keyof paths, Method extends LowerMethod> = [ParamsFor<Path, Method>] extends [never]
   ? []
   : [options: ParamsFor<Path, Method>];
@@ -65,6 +72,17 @@ export async function apiGetJson<Path extends GetPaths>(pathSpec: Path, ...args:
   const path = options ? completePath(pathSpec, options) : pathSpec;
   type ResponseType = JsonResponseFor<Path, 'get'>;
   return universalRequest<ResponseType>('GET', path, undefined);
+}
+
+export async function apiPost<Path extends keyof paths>(
+  pathSpec: Path,
+  ...args: [...params: PathArgs<Path, 'post'>, body: JsonRequestBodyFor<Path, 'post'>]
+) {
+  const safeArgs = args as unknown as [params: RouteParameters, body: unknown] | [body: unknown];
+  const [options, body] = safeArgs.length === 2 ? safeArgs : [undefined, ...safeArgs];
+  const path = options ? completePath(pathSpec, options) : pathSpec;
+  type ResponseType = JsonResponseFor<Path, 'post'>;
+  return universalPost<ResponseType>(path, body);
 }
 
 /** Issue a POST request with a JSON payload using either web fetch or Tauri fetch */

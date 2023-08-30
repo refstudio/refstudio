@@ -2,7 +2,7 @@ import { SettingsManager } from 'tauri-settings';
 import { Path, PathValue } from 'tauri-settings/dist/types/dot-notation';
 import { getDotNotation, setDotNotation } from 'tauri-settings/dist/utils/dot-notation';
 
-import { universalGet, universalPut } from '../api/api';
+import { apiGetJson, universalPut } from '../api/api';
 import type * as apiTypes from '../api/api-types';
 
 export type OpenAiManner = apiTypes.RewriteMannerType;
@@ -10,8 +10,8 @@ export function getMannerOptions(): OpenAiManner[] {
   return ['concise', 'elaborate', 'scholarly'];
 }
 
+// TODO: remove this after we separate the request/response types in the settings API
 type DeepRequired<T> = T extends object ? { [k in keyof T]-?: DeepRequired<T[k]> } : T;
-
 export type SettingsSchema = DeepRequired<apiTypes.SettingsSchema>;
 
 /**
@@ -29,7 +29,8 @@ let settingsManager: SettingsManagerView | undefined;
 export async function initSettings() {
   let settings: SettingsSchema;
   try {
-    settings = await universalGet<SettingsSchema>('/api/settings/');
+    // settings = await universalGet<SettingsSchema>('/api/settings/');
+    settings = (await apiGetJson('/api/settings/')) as SettingsSchema;
 
     console.log('Settings initialized with success with', settings);
     console.log('openAI', settings.openai);
