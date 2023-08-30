@@ -221,6 +221,10 @@ type RenameFileResult = Promise<{ success: false } | { success: true; newPath: s
 // Export Operations: references, markdown
 // #####################################################################################
 export async function exportReferences(references: ReferenceItem[]) {
+  if (import.meta.env.VITE_IS_WEB) {
+    throw new Error('Not implemented');
+  }
+
   try {
     const exportsDir = getExportsDir();
 
@@ -242,6 +246,10 @@ export async function exportReferences(references: ReferenceItem[]) {
 }
 
 export async function saveAsMarkdown(markdownSerializer: MarkdownSerializer, exportedFilePath: string) {
+  if (import.meta.env.VITE_IS_WEB) {
+    throw new Error('Not implemented');
+  }
+
   try {
     const exportsDir = getExportsDir();
 
@@ -260,13 +268,12 @@ export async function saveAsMarkdown(markdownSerializer: MarkdownSerializer, exp
     }
 
     const markdownFilePath = [exportsDir, markdownFileName].join(sep);
-    const filePath = markdownFilePath;
 
-    // const filePath = await save({
-    //   title: 'Export file as Markdown',
-    //   defaultPath: await getSystemPath(markdownFilePath),
-    //   filters: [{ name: 'Markdown', extensions: ['md'] }],
-    // });
+    const filePath = await save({
+      title: 'Export file as Markdown',
+      defaultPath: markdownFilePath,
+      filters: [{ name: 'Markdown', extensions: ['md'] }],
+    });
 
     if (filePath) {
       const filePathParts = filePath.split(sep);
