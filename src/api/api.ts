@@ -1,6 +1,6 @@
 import { Body, fetch as tauriFetch, ResponseType } from '@tauri-apps/api/http';
 
-import { paths } from './raw-api-types';
+import { paths } from './api-paths';
 import { REFSTUDIO_HOST } from './server';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
