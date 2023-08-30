@@ -23,7 +23,7 @@ export function Button({ Action, className, disabled, size = 'S', text, type = '
         },
         className,
       )}
-      onClick={onClick}
+      onClick={disabled ? undefined : onClick}
     >
       {Action}
       {text}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { MdKeyboard, MdSettings } from 'react-icons/md';
 import { ImperativePanelHandle, Panel } from 'react-resizable-panels';
 
@@ -12,42 +12,55 @@ import { SideBar } from '../components/SideBar';
 import { ExplorerPanel } from './ExplorerPanel';
 import { FilesIcon, ReferencesIcon } from './icons';
 
-type PrimarySideBarPane = 'Explorer' | 'References';
-export function LeftSidePanelWrapper() {
-  const leftPanelRef = React.useRef<ImperativePanelHandle>(null);
-  const [primaryPaneCollapsed, setPrimaryPaneCollapsed] = useState(false);
-  const [primaryPane, setPrimaryPane] = useState<PrimarySideBarPane>('Explorer');
+type PrimarySideBarPanel = 'Explorer' | 'References';
+export function LeftSidePanelWrapper({ disabled }: { disabled?: boolean }) {
+  const leftPanelRef = useRef<ImperativePanelHandle>(null);
+  const [isPanelCollapsed, setIsPanelCollapsed] = useState(false);
+  const [activePanel, setActivePanel] = useState<PrimarySideBarPanel>('Explorer');
 
-  const handleSideBarClick = (selectedPane: PrimarySideBarPane) => {
-    if (selectedPane === primaryPane) {
-      // Toggle collapsing
-      setPrimaryPaneCollapsed(!primaryPaneCollapsed);
-    } else {
-      // Always open the sidebar
-      setPrimaryPaneCollapsed(false);
+  const handleSideBarClick = useCallback((clickedPane: PrimarySideBarPanel) => {
+    if (!disabled) {
+      if (clickedPane === activePanel) {
+        // Toggle collapsing
+        setIsPanelCollapsed(currentPaneState => !currentPaneState);
+      } else {
+        // Always open the sidebar
+        setIsPanelCollapsed(false);
+      }
+      setActivePanel(clickedPane);
     }
-    setPrimaryPane(selectedPane);
-  };
+  }, [activePanel, disabled]);
 
   // Configure keyboard shortcuts to open/close side panel
   useRefStudioHotkeys(['meta+1'], () => handleSideBarClick('Explorer'));
   useRefStudioHotkeys(['meta+2'], () => handleSideBarClick('References'));
 
-  React.useEffect(() => {
-    if (primaryPaneCollapsed) {
+  useEffect(() => {
+    if (isPanelCollapsed) {
       leftPanelRef.current?.collapse();
     } else {
       leftPanelRef.current?.expand();
     }
-  }, [leftPanelRef, primaryPaneCollapsed]);
+  }, [leftPanelRef, isPanelCollapsed]);
 
-  const openSettings = React.useCallback(() => emitEvent('refstudio://menu/settings'), []);
+  useEffect(() => {
+    if (disabled) {
+      // Close the panel when disabled
+      setIsPanelCollapsed(true);
+    } else {
+      // Open the defaut panel (Explorer) when enabled
+      setIsPanelCollapsed(false);
+      setActivePanel('Explorer');
+    }
+  }, [disabled]);
+
+  const openSettings = useCallback(() => emitEvent('refstudio://menu/settings'), []);
 
   return (
     <>
       <SideBar
-        activePane={primaryPaneCollapsed ? null : primaryPane}
-        className={cx({ 'border-r border-r-side-bar-border': !primaryPaneCollapsed })}
+        activePane={isPanelCollapsed ? null : activePanel}
+        className={cx({ 'border-r border-r-side-bar-border': !isPanelCollapsed })}
         footerItems={[
           // TODO: Implement Keybinds screen
           {
@@ -62,14 +75,14 @@ export function LeftSidePanelWrapper() {
           },
         ]}
         items={[
-          { pane: 'Explorer', Icon: <FilesIcon /> },
-          { pane: 'References', Icon: <ReferencesIcon /> },
+          { disabled, pane: 'Explorer', Icon: <FilesIcon /> },
+          { disabled, pane: 'References', Icon: <ReferencesIcon /> },
         ]}
         onItemClick={handleSideBarClick}
       />
-      <Panel collapsible order={1} ref={leftPanelRef} onCollapse={(collapsed) => setPrimaryPaneCollapsed(collapsed)}>
-        {primaryPane === 'Explorer' && <ExplorerPanel />}
-        {primaryPane === 'References' && <ReferencesPanel />}
+      <Panel collapsible order={1} ref={leftPanelRef} onCollapse={(collapsed) => setIsPanelCollapsed(collapsed)}>
+        {activePanel === 'Explorer' && <ExplorerPanel />}
+        {activePanel === 'References' && <ReferencesPanel />}
       </Panel>
       <VerticalResizeHandle transparent />
     </>

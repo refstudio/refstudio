@@ -5,7 +5,7 @@ import { cx } from '../../lib/cx';
 interface SideBarProps<SideBarPane> {
   activePane: SideBarPane | null;
   className?: string;
-  items: { pane: SideBarPane; Icon: React.ReactElement }[];
+  items: { pane: SideBarPane; Icon: React.ReactElement; disabled?: boolean }[];
   footerItems?: { label: string; Icon: React.ReactElement; onClick: () => void }[];
   onItemClick: (pane: SideBarPane) => void;
 }
@@ -19,8 +19,8 @@ export function SideBar<SideBarPane extends string>({
   return (
     <div className={cx('side-bar', className)} role="menubar">
       <div className="flex flex-grow flex-col gap-2 p-2">
-        {items.map(({ pane, Icon }) => (
-          <IconButton active={pane === activePane} key={pane} onClick={() => onItemClick(pane)}>
+        {items.map(({ disabled, pane, Icon }) => (
+          <IconButton active={pane === activePane} disabled={disabled} key={pane} onClick={() => onItemClick(pane)}>
             {Icon}
           </IconButton>
         ))}
@@ -41,23 +41,22 @@ export function SideBar<SideBarPane extends string>({
 function IconButton({
   active,
   children,
+  disabled,
   onClick,
 }: {
   active?: boolean;
   children: React.ReactNode;
+  disabled?: boolean;
   onClick: () => void;
 }) {
   return (
-    <div
-      className={cx('icon cursor-pointer', { active })}
+    <button
+      className={cx('icon', { active, disabled })}
+      disabled={disabled}
       role="menuitem"
-      onClick={(evt) => {
-        evt.preventDefault();
-        evt.stopPropagation();
-        onClick();
-      }}
+      onClick={disabled ? undefined : onClick}
     >
-      <div className="self-center">{children}</div>
-    </div>
+      {children}
+    </button>
   );
 }

@@ -1,10 +1,12 @@
 import 'react-contexify/dist/ReactContexify.css';
 
+import { useAtomValue } from 'jotai';
 import { MenuProvider } from 'kmenu';
 import React, { useCallback, useLayoutEffect } from 'react';
 import { ImperativePanelGroupHandle, Panel, PanelGroup } from 'react-resizable-panels';
 import { useLocalStorage, useWindowSize } from 'usehooks-ts';
 
+import { isProjectOpenAtom } from '../atoms/projectState';
 import { emitEvent } from '../events';
 import { ReferencesDropZone } from '../features/references/components/ReferencesDropZone';
 import { useDebouncedCallback } from '../hooks/useDebouncedCallback';
@@ -56,6 +58,8 @@ export function App() {
     }
   }, [panelRef, size, panelDimensions]);
 
+  const isProjectOpen = useAtomValue(isProjectOpenAtom);
+
   return (
     <EventsListener>
       <ReferencesDropZone>
@@ -70,11 +74,11 @@ export function App() {
                 ref={panelRef}
                 onLayout={handleLayoutUpdate}
               >
-                <LeftSidePanelWrapper />
+                <LeftSidePanelWrapper disabled={!isProjectOpen} />
                 <Panel order={2}>
                   <MainPanel />
                 </Panel>
-                <RightSidePanelWrapper />
+                <RightSidePanelWrapper disabled={!isProjectOpen} />
               </PanelGroup>
             </MenuProvider>
           </ContextMenus>
