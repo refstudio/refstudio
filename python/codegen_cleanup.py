@@ -39,7 +39,12 @@ if __name__ == "__main__":
         )
         used_types.add(api_typename)
 
-    imports = "{" + ", ".join(used_types) + "}"
-    api_paths = f"import {imports} from './api-types';\n\n" + api_paths
+    imports = "{" + ", ".join(sorted(used_types)) + "}"
+    api_paths = (
+        "/** You probably want to use the types from api-types.ts instead. */\n"
+        + "/* eslint-disable */\h"
+        + f"import {imports} from './api-types';\n\n"
+        + api_paths
+    )
     with open("src/api/api-paths.ts", "w") as out:
         out.write(api_paths)
