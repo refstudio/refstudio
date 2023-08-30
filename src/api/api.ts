@@ -38,9 +38,6 @@ type PathArgs<Path extends keyof paths, Method extends LowerMethod> = [ParamsFor
   ? []
   : [options: ParamsFor<Path, Method>];
 
-type T2 = ParamsFor<'/api/projects/{project_id}', 'delete'>;
-type T3 = JsonResponseFor<'/api/projects/{project_id}', 'delete'>;
-
 /** Issue a GET request using either web fetch or Tauri fetch */
 export async function universalGet<ResponsePayload = unknown>(
   path: string,
@@ -69,6 +66,7 @@ function completePath(path: string, params: RouteParameters) {
 export async function apiGetJson<Path extends PathsForMethod<'get'>>(pathSpec: Path, ...args: PathArgs<Path, 'get'>) {
   const options = (args as unknown[])[0] as RouteParameters | undefined;
   const path = options ? completePath(pathSpec, options) : pathSpec;
+  console.log('apiGetJSON', pathSpec, path);
   type ResponseType = JsonResponseFor<Path, 'get'>;
   return universalRequest<ResponseType>('GET', path, undefined);
 }
@@ -80,6 +78,7 @@ export async function apiPost<Path extends PathsForMethod<'post'>>(
   const safeArgs = args as unknown as [params: RouteParameters, body: unknown] | [body: unknown];
   const [options, body] = safeArgs.length === 2 ? safeArgs : [undefined, ...safeArgs];
   const path = options ? completePath(pathSpec, options) : pathSpec;
+  console.log('apiPostJSON', pathSpec, path);
   type ResponseType = JsonResponseFor<Path, 'post'>;
   return universalPost<ResponseType>(path, body);
 }
