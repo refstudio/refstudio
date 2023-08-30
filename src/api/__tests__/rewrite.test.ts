@@ -28,7 +28,7 @@ describe('askForRewrite', () => {
     const REWRITE_REQUEST_TEXT = 'Some text to rewrite';
     await askForRewrite(REWRITE_REQUEST_TEXT);
     expect(universalPost).toHaveBeenCalledTimes(1);
-    expect(universalPost).toHaveBeenCalledWith<[string, RewriteRequest]>('api/ai/rewrite', {
+    expect(universalPost).toHaveBeenCalledWith<[string, RewriteRequest]>('/api/ai/rewrite', {
       text: REWRITE_REQUEST_TEXT,
       n_choices: DEFAULT_OPTIONS.nChoices,
       temperature: DEFAULT_OPTIONS.temperature,
@@ -43,7 +43,7 @@ describe('askForRewrite', () => {
     const REWRITE_REQUEST_TEXT = 'Some text to rewrite';
     await askForRewrite(REWRITE_REQUEST_TEXT, { manner: 'scholarly' });
     expect(universalPost).toHaveBeenCalledTimes(1);
-    expect(universalPost).toHaveBeenCalledWith<[string, RewriteRequest]>('api/ai/rewrite', {
+    expect(universalPost).toHaveBeenCalledWith<[string, RewriteRequest]>('/api/ai/rewrite', {
       text: REWRITE_REQUEST_TEXT,
       n_choices: DEFAULT_OPTIONS.nChoices,
       temperature: DEFAULT_OPTIONS.temperature,
@@ -58,7 +58,7 @@ describe('askForRewrite', () => {
     const REWRITE_REQUEST_TEXT = 'Some text to rewrite';
     await askForRewrite(REWRITE_REQUEST_TEXT, { temperature: 0.8, manner: 'scholarly', nChoices: 4 });
     expect(universalPost).toHaveBeenCalledTimes(1);
-    expect(universalPost).toHaveBeenCalledWith<[string, RewriteRequest]>('api/ai/rewrite', {
+    expect(universalPost).toHaveBeenCalledWith<[string, RewriteRequest]>('/api/ai/rewrite', {
       text: REWRITE_REQUEST_TEXT,
       n_choices: 4,
       temperature: 0.8,
