@@ -1,3 +1,5 @@
+/** You probably want to use the types from api-types.ts instead. */
+/* eslint-disable */
 import {
   Author,
   BodyCreateFile_ProjectId__Filepath_Put,
@@ -56,13 +58,11 @@ export interface paths {
   '/api/references/{project_id}': {
     /**
      * List References
-     *
      * @description Returns a list of references for the current user
      */
     get: operations['list_references__project_id__get'];
     /**
      * Ingest References
-     *
      * @description Ingests references from PDFs in the project uploads directory
      */
     post: operations['ingest_references__project_id__post'];
@@ -108,13 +108,11 @@ export interface paths {
   '/api/projects/': {
     /**
      * List Projects
-     *
      * @description Returns a list of projects for the current user
      */
     get: operations['list_projects__get'];
     /**
      * Create Project
-     *
      * @description Creates a project directory in the filesystem
      *
      * Parameters
@@ -130,13 +128,11 @@ export interface paths {
   '/api/projects/{project_id}': {
     /**
      * Get Project
-     *
      * @description Returns the project path and a list of files in the project
      */
     get: operations['get_project__project_id__get'];
     /**
      * Delete Project
-     *
      * @description Deletes a project directory and all files in it
      */
     delete: operations['delete_project__project_id__delete'];
@@ -191,7 +187,6 @@ export interface components {
     };
     /**
      * ResponseStatus
-     *
      * @description An enumeration.
      * @enum {string}
      */
@@ -203,7 +198,6 @@ export interface components {
     };
     /**
      * RewriteMannerType
-     *
      * @description An enumeration.
      * @enum {string}
      */
@@ -307,14 +301,12 @@ export interface components {
     };
     /**
      * IngestStatus
-     *
      * @description An enumeration.
      * @enum {string}
      */
     IngestStatus: 'processing' | 'failure' | 'complete';
     /**
      * Reference
-     *
      * @description A reference for an academic paper / PDF
      */
     Reference: {
@@ -337,7 +329,6 @@ export interface components {
     };
     /**
      * ReferencePatch
-     *
      * @description ReferencePatch is the input type for updating a Reference's metadata.
      */
     ReferencePatch: {
@@ -350,7 +341,10 @@ export interface components {
     };
     /** Body_create_file__project_id___filepath__put */
     Body_create_file__project_id___filepath__put: {
-      /** File Format: binary */
+      /**
+       * File
+       * Format: binary
+       */
       file: string;
     };
     /** LoggingSettings */
@@ -516,7 +510,6 @@ export interface operations {
   };
   /**
    * List References
-   *
    * @description Returns a list of references for the current user
    */
   list_references__project_id__get: {
@@ -542,7 +535,6 @@ export interface operations {
   };
   /**
    * Ingest References
-   *
    * @description Ingests references from PDFs in the project uploads directory
    */
   ingest_references__project_id__post: {
@@ -859,7 +851,6 @@ export interface operations {
   };
   /**
    * List Projects
-   *
    * @description Returns a list of projects for the current user
    */
   list_projects__get: {
@@ -874,7 +865,6 @@ export interface operations {
   };
   /**
    * Create Project
-   *
    * @description Creates a project directory in the filesystem
    *
    * Parameters
@@ -909,7 +899,6 @@ export interface operations {
   };
   /**
    * Get Project
-   *
    * @description Returns the project path and a list of files in the project
    */
   get_project__project_id__get: {
@@ -935,7 +924,6 @@ export interface operations {
   };
   /**
    * Delete Project
-   *
    * @description Deletes a project directory and all files in it
    */
   delete_project__project_id__delete: {

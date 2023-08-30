@@ -42,7 +42,7 @@ if __name__ == "__main__":
     imports = "{" + ", ".join(sorted(used_types)) + "}"
     api_paths = (
         "/** You probably want to use the types from api-types.ts instead. */\n"
-        + "/* eslint-disable */\h"
+        + "/* eslint-disable */\n"
         + f"import {imports} from './api-types';\n\n"
         + api_paths
     )
