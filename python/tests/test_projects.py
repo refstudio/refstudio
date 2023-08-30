@@ -175,16 +175,32 @@ def test_delete_project_should_delete_project(
     assert projects_dict == {}
 
 
-def test_get_project_files_should_return_list_of_files(
-    monkeypatch, tmp_path, setup_project_path_storage
-):
+def test_get_project_files(monkeypatch, tmp_path, setup_project_path_storage):
     monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
 
     user_id = "user1"
     project_id = "project1"
 
+    # setup project files
     project_path = projects.get_project_path(user_id, project_id)
-    (Path(project_path) / "file1.txt").touch()
+    project_name = projects.get_project_name(user_id, project_id)
 
-    files = projects.get_project_files(user_id, project_id)
-    assert files == [Path(f"{project_path}/file1.txt")]
+    project_path.joinpath("uploads").mkdir()
+    project_path.joinpath(".storage").mkdir()
+    (Path(project_path) / "file1.refstudio").touch()
+    (Path(project_path) / ".ignoreme").touch()
+    (Path(project_path) / "uploads" / "file2.pdf").touch()
+    (Path(project_path) / ".storage" / "references.json").touch()
+
+    output = projects.get_project_files(user_id, project_id)
+
+    # hidden dirs/files should be ignored
+    assert output == {
+        "project_id": project_id,
+        "project_name": project_name,
+        "project_path": str(project_path),
+        "contents": {
+            "": ["file1.refstudio"],
+            "uploads": ["file2.pdf"],
+        },
+    }
