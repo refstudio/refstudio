@@ -8,11 +8,10 @@ type LowerMethod = 'get' | 'post' | 'put' | 'delete' | 'patch';
 type ResponseParser = 'JSON' | 'ArrayBuffer';
 
 type Unionize<T> = { [k in keyof T]: { k: k; v: T[k] } }[keyof T];
-type ExtractGetPaths<T> = T extends { k: infer Path; v: { get: infer Info } } ? { path: Path; info: Info } : never;
-
-type PathsUnion = Unionize<paths>;
-type GetPathsInfo = ExtractGetPaths<PathsUnion>;
-type GetPaths = GetPathsInfo['path'];
+type ExtractPathsForMethod<T, Method extends LowerMethod> = T extends { k: infer Path; v: Record<Method, unknown> }
+  ? Path
+  : never;
+type PathsForMethod<Method extends LowerMethod> = ExtractPathsForMethod<Unionize<paths>, Method>;
 
 type ParamsFor<Path extends keyof paths, Method extends LowerMethod> = paths extends Record<
   Path,
@@ -67,14 +66,14 @@ function completePath(path: string, params: RouteParameters) {
   return path;
 }
 
-export async function apiGetJson<Path extends GetPaths>(pathSpec: Path, ...args: PathArgs<Path, 'get'>) {
+export async function apiGetJson<Path extends PathsForMethod<'get'>>(pathSpec: Path, ...args: PathArgs<Path, 'get'>) {
   const options = (args as unknown[])[0] as RouteParameters | undefined;
   const path = options ? completePath(pathSpec, options) : pathSpec;
   type ResponseType = JsonResponseFor<Path, 'get'>;
   return universalRequest<ResponseType>('GET', path, undefined);
 }
 
-export async function apiPost<Path extends keyof paths>(
+export async function apiPost<Path extends PathsForMethod<'post'>>(
   pathSpec: Path,
   ...args: [...params: PathArgs<Path, 'post'>, body: JsonRequestBodyFor<Path, 'post'>]
 ) {
