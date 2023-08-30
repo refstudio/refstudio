@@ -1,7 +1,6 @@
 import os
 import shutil
 from pathlib import Path
-from typing import Annotated
 from uuid import uuid4
 
 import psutil
