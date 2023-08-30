@@ -106,7 +106,59 @@ def delete_project(user_id: str, project_id: str) -> None:
         pass
 
 
-def get_project_files(user_id: str, project_id: str) -> list:
+def get_project_files(user_id: str, project_id: str) -> dict:
+    """
+    Get the files in a project as a tree structure.
+
+    Returns
+    -------
+    dict
+        A dictionary of the form:
+        {
+            "project_id": some-id,
+            "project_name": some-name,
+            "project_path": "/some/path",
+            "contents": {
+                "directory_name": [
+                    "file1",
+                    "file2",
+                    "file3",
+                ]
+                "another_directory": [
+                    "file1",
+                    "file2",
+                    "file3",
+                ]
+            }
+        }
+    """
     project_path = get_project_path(user_id, project_id)
-    filepaths = list(project_path.glob("**/*"))
-    return filepaths
+    project_name = get_project_name(user_id, project_id)
+
+    if not project_path.exists():
+        raise FileNotFoundError(f"Project {project_id} does not exist")
+
+    contents = {}
+    for obj in project_path.rglob("*"):
+        relpath = str(obj.parent).replace(str(project_path), "")
+
+        if relpath.startswith("/"):
+            relpath = relpath[1:]
+
+        # Skip hidden files and directories
+        if relpath.startswith("."):
+            continue
+
+        if obj.is_dir():
+            continue
+
+        if str(obj.parent) not in contents:
+            contents[relpath] = []
+
+        contents[relpath].append(obj.name)
+    return {
+        "project_id": project_id,
+        "project_name": project_name,
+        "project_path": str(project_path),
+        "contents": contents,
+    }
