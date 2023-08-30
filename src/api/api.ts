@@ -4,27 +4,36 @@ import { paths } from './raw-api-types';
 import { REFSTUDIO_HOST } from './server';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+type LowerMethod = 'get' | 'post' | 'put' | 'delete' | 'patch';
 type ResponseParser = 'JSON' | 'ArrayBuffer';
 
 type Unionize<T> = { [k in keyof T]: { k: k; v: T[k] } }[keyof T];
 type ExtractGetPaths<T> = T extends { k: infer Path; v: { get: infer Info } } ? { path: Path; info: Info } : never;
 
-type GetPathsInfo = ExtractGetPaths<Unionize<paths>>;
+type PathsUnion = Unionize<paths>;
+type GetPathsInfo = ExtractGetPaths<PathsUnion>;
 type GetPaths = GetPathsInfo['path'];
-type ParamsFor<Path extends GetPaths, PathInfos = GetPathsInfo> = PathInfos extends {
-  path: Path;
-  info: { parameters: infer Params };
+
+type ParamsFor<Path extends keyof paths, Method extends LowerMethod, PathInfos = PathsUnion> = PathInfos extends {
+  k: Path;
+  v: Record<Method, { parameters: infer Params }>;
 }
   ? Params
   : never;
-type JsonResponseFor<Path extends GetPaths, PathInfos = GetPathsInfo> = PathInfos extends {
-  path: Path;
-  info: { responses: { 200: { content: { 'application/json': infer ResponseType } } } };
+
+type JsonResponseFor<Path extends keyof paths, Method extends LowerMethod, PathInfos = PathsUnion> = PathInfos extends {
+  k: Path;
+  v: Record<Method, { responses: { 200: { content: { 'application/json': infer ResponseType } } } }>;
 }
   ? ResponseType
   : never;
 
-type T2 = ParamsFor<'/api/projects/{project_id}'>;
+type PathArgs<Path extends keyof paths, Method extends LowerMethod> = [ParamsFor<Path, Method>] extends [never]
+  ? []
+  : [options: ParamsFor<Path, Method>];
+
+type T2 = ParamsFor<'/api/projects/{project_id}', 'delete'>;
+type T3 = JsonResponseFor<'/api/projects/{project_id}', 'delete'>;
 
 /** Issue a GET request using either web fetch or Tauri fetch */
 export async function universalGet<ResponsePayload = unknown>(
@@ -39,21 +48,22 @@ interface RouteParameters {
   query?: Record<string, string>;
 }
 
-export async function apiGetJson<Path extends GetPaths>(
-  pathSpec: Path,
-  ...args: [ParamsFor<Path>] extends [never] ? [] : [options: ParamsFor<Path>]
-) {
-  const options = (args as any[])[0] as RouteParameters;
-  let path = pathSpec as string;
-  if (options.path) {
-    for (const [key, value] of Object.entries(options.path)) {
+function completePath(path: string, params: RouteParameters) {
+  if (params.path) {
+    for (const [key, value] of Object.entries(params.path)) {
       path = path.replace('{' + key + '}', value);
     }
   }
-  if (options.query) {
-    path += '?' + new URLSearchParams(options.query).toString();
+  if (params.query) {
+    path += '?' + new URLSearchParams(params.query).toString();
   }
-  type ResponseType = JsonResponseFor<Path>;
+  return path;
+}
+
+export async function apiGetJson<Path extends GetPaths>(pathSpec: Path, ...args: PathArgs<Path, 'get'>) {
+  const options = (args as unknown[])[0] as RouteParameters | undefined;
+  const path = options ? completePath(pathSpec, options) : pathSpec;
+  type ResponseType = JsonResponseFor<Path, 'get'>;
   return universalRequest<ResponseType>('GET', path, undefined);
 }
 
