@@ -1,3 +1,21 @@
+import {
+  BodyCreateFile_ProjectId__Filepath_Put,
+  ChatRequest,
+  ChatResponse,
+  DeleteRequest,
+  DeleteStatusResponse,
+  HTTPValidationError,
+  Reference,
+  ReferencePatch,
+  RewriteRequest,
+  RewriteResponse,
+  SearchRequest,
+  SearchResponse,
+  SettingsSchema,
+  TextCompletionRequest,
+  TextCompletionResponse,
+  UpdateStatusResponse,
+} from './api-types';
 /** You probably want to use the types from api-types.ts instead. */
 /* eslint-disable */
 /**
@@ -135,20 +153,20 @@ export interface operations {
   http_rewrite_rewrite_post: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['RewriteRequest'];
+        'application/json': RewriteRequest;
       };
     };
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['RewriteResponse'];
+          'application/json': RewriteResponse;
         };
       };
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['HTTPValidationError'];
+          'application/json': HTTPValidationError;
         };
       };
     };
@@ -157,20 +175,20 @@ export interface operations {
   http_completion_completion_post: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['TextCompletionRequest'];
+        'application/json': TextCompletionRequest;
       };
     };
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['TextCompletionResponse'];
+          'application/json': TextCompletionResponse;
         };
       };
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['HTTPValidationError'];
+          'application/json': HTTPValidationError;
         };
       };
     };
@@ -179,20 +197,20 @@ export interface operations {
   http_chat_chat_post: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['ChatRequest'];
+        'application/json': ChatRequest;
       };
     };
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['ChatResponse'];
+          'application/json': ChatResponse;
         };
       };
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['HTTPValidationError'];
+          'application/json': HTTPValidationError;
         };
       };
     };
@@ -201,20 +219,20 @@ export interface operations {
   http_search_search_post: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['SearchRequest'];
+        'application/json': SearchRequest;
       };
     };
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['SearchResponse'];
+          'application/json': SearchResponse;
         };
       };
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['HTTPValidationError'];
+          'application/json': HTTPValidationError;
         };
       };
     };
@@ -233,13 +251,13 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['Reference'][];
+          'application/json': Reference[];
         };
       };
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['HTTPValidationError'];
+          'application/json': HTTPValidationError;
         };
       };
     };
@@ -264,7 +282,7 @@ export interface operations {
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['HTTPValidationError'];
+          'application/json': HTTPValidationError;
         };
       };
     };
@@ -281,13 +299,13 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['Reference'];
+          'application/json': Reference;
         };
       };
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['HTTPValidationError'];
+          'application/json': HTTPValidationError;
         };
       };
     };
@@ -304,13 +322,13 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['DeleteStatusResponse'];
+          'application/json': DeleteStatusResponse;
         };
       };
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['HTTPValidationError'];
+          'application/json': HTTPValidationError;
         };
       };
     };
@@ -325,20 +343,20 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': components['schemas']['ReferencePatch'];
+        'application/json': ReferencePatch;
       };
     };
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['UpdateStatusResponse'];
+          'application/json': UpdateStatusResponse;
         };
       };
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['HTTPValidationError'];
+          'application/json': HTTPValidationError;
         };
       };
     };
@@ -352,20 +370,20 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': components['schemas']['DeleteRequest'];
+        'application/json': DeleteRequest;
       };
     };
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['DeleteStatusResponse'];
+          'application/json': DeleteStatusResponse;
         };
       };
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['HTTPValidationError'];
+          'application/json': HTTPValidationError;
         };
       };
     };
@@ -374,20 +392,20 @@ export interface operations {
   http_ai_rewrite_rewrite_post: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['RewriteRequest'];
+        'application/json': RewriteRequest;
       };
     };
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['RewriteResponse'];
+          'application/json': RewriteResponse;
         };
       };
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['HTTPValidationError'];
+          'application/json': HTTPValidationError;
         };
       };
     };
@@ -396,20 +414,20 @@ export interface operations {
   http_ai_completion_completion_post: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['TextCompletionRequest'];
+        'application/json': TextCompletionRequest;
       };
     };
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['TextCompletionResponse'];
+          'application/json': TextCompletionResponse;
         };
       };
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['HTTPValidationError'];
+          'application/json': HTTPValidationError;
         };
       };
     };
@@ -423,20 +441,20 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': components['schemas']['ChatRequest'];
+        'application/json': ChatRequest;
       };
     };
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['ChatResponse'];
+          'application/json': ChatResponse;
         };
       };
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['HTTPValidationError'];
+          'application/json': HTTPValidationError;
         };
       };
     };
@@ -445,20 +463,20 @@ export interface operations {
   http_search_s2_s2_post: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['SearchRequest'];
+        'application/json': SearchRequest;
       };
     };
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['SearchResponse'];
+          'application/json': SearchResponse;
         };
       };
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['HTTPValidationError'];
+          'application/json': HTTPValidationError;
         };
       };
     };
@@ -481,7 +499,7 @@ export interface operations {
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['HTTPValidationError'];
+          'application/json': HTTPValidationError;
         };
       };
     };
@@ -496,7 +514,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'multipart/form-data': components['schemas']['Body_create_file__project_id___filepath__put'];
+        'multipart/form-data': BodyCreateFile_ProjectId__Filepath_Put;
       };
     };
     responses: {
@@ -509,7 +527,7 @@ export interface operations {
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['HTTPValidationError'];
+          'application/json': HTTPValidationError;
         };
       };
     };
@@ -532,7 +550,7 @@ export interface operations {
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['HTTPValidationError'];
+          'application/json': HTTPValidationError;
         };
       };
     };
@@ -555,7 +573,7 @@ export interface operations {
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['HTTPValidationError'];
+          'application/json': HTTPValidationError;
         };
       };
     };
@@ -603,7 +621,7 @@ export interface operations {
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['HTTPValidationError'];
+          'application/json': HTTPValidationError;
         };
       };
     };
@@ -628,7 +646,7 @@ export interface operations {
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['HTTPValidationError'];
+          'application/json': HTTPValidationError;
         };
       };
     };
@@ -653,7 +671,7 @@ export interface operations {
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['HTTPValidationError'];
+          'application/json': HTTPValidationError;
         };
       };
     };
@@ -675,7 +693,7 @@ export interface operations {
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['HTTPValidationError'];
+          'application/json': HTTPValidationError;
         };
       };
     };
@@ -708,7 +726,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['SettingsSchema'];
+          'application/json': SettingsSchema;
         };
       };
     };
@@ -717,20 +735,20 @@ export interface operations {
   update_settings__put: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['SettingsSchema'];
+        'application/json': SettingsSchema;
       };
     };
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['SettingsSchema'];
+          'application/json': SettingsSchema;
         };
       };
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['HTTPValidationError'];
+          'application/json': HTTPValidationError;
         };
       };
     };

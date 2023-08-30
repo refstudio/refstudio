@@ -39,6 +39,7 @@ if __name__ == "__main__":
         )
         used_types.add(api_typename)
 
-    api_paths = "import \{{','.join(used_types)}\} from './api-types';\n" + api_paths
+    imports = "{" + ", ".join(used_types) + "}"
+    api_paths = f"import {imports} from './api-types';\n\n" + api_paths
     with open("src/api/api-paths.ts", "w") as out:
         out.write(api_paths)
