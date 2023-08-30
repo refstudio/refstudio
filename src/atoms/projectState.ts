@@ -15,7 +15,7 @@ const currentProjectIdAtom = atom('');
 // #####################################################################################
 // Public API
 // #####################################################################################
-export const isProjectOpenAtom = atom((get) => get(currentProjectIdAtom) !== '');
+export const isProjectOpenAtom = atom((get) => get(currentProjectPathAtom) !== '');
 export const projectPathAtom: Atom<string> = currentProjectPathAtom;
 export const projectIdAtom: Atom<string> = currentProjectIdAtom;
 
