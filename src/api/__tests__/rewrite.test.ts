@@ -1,10 +1,10 @@
 import { notifyErr, notifyError } from '../../notifications/notifications';
+import { universalPost } from '../api';
 import { askForRewrite, AskForRewriteReturn } from '../rewrite';
 import { DEFAULT_OPTIONS } from '../rewrite.config';
-import { callSidecar } from '../sidecar';
 import { RewriteRequest, RewriteResponse } from '../types';
 
-vi.mock('../sidecar');
+vi.mock('../api');
 vi.mock('../../notifications/notifications');
 
 describe('askForRewrite', () => {
@@ -14,23 +14,21 @@ describe('askForRewrite', () => {
 
   it('should call sidecar rewrite with text', async () => {
     const response: RewriteResponse = { status: 'ok', message: '', choices: [] };
-    vi.mocked(callSidecar).mockResolvedValue(response);
+    vi.mocked(universalPost).mockResolvedValue(response);
 
     const REWRITE_REQUEST_TEXT = 'Some text to rewrite';
     await askForRewrite(REWRITE_REQUEST_TEXT);
-    expect(callSidecar).toHaveBeenCalledTimes(1);
-    expect(vi.mocked(callSidecar).mock.lastCall![0]).toBe('rewrite');
-    expect(vi.mocked(callSidecar).mock.lastCall![1]).toMatchObject({ text: REWRITE_REQUEST_TEXT });
+    expect(universalPost).toHaveBeenCalledTimes(1);
   });
 
   it('should call sidecar rewrite with default options', async () => {
     const response: RewriteResponse = { status: 'ok', message: '', choices: [] };
-    vi.mocked(callSidecar).mockResolvedValue(response);
+    vi.mocked(universalPost).mockResolvedValue(response);
 
     const REWRITE_REQUEST_TEXT = 'Some text to rewrite';
     await askForRewrite(REWRITE_REQUEST_TEXT);
-    expect(callSidecar).toHaveBeenCalledTimes(1);
-    expect(callSidecar).toHaveBeenCalledWith<[string, RewriteRequest]>('rewrite', {
+    expect(universalPost).toHaveBeenCalledTimes(1);
+    expect(universalPost).toHaveBeenCalledWith<[string, RewriteRequest]>('rewrite', {
       text: REWRITE_REQUEST_TEXT,
       n_choices: DEFAULT_OPTIONS.nChoices,
       temperature: DEFAULT_OPTIONS.temperature,
@@ -40,12 +38,12 @@ describe('askForRewrite', () => {
 
   it('should call sidecar rewrite with some custom options', async () => {
     const response: RewriteResponse = { status: 'ok', message: '', choices: [] };
-    vi.mocked(callSidecar).mockResolvedValue(response);
+    vi.mocked(universalPost).mockResolvedValue(response);
 
     const REWRITE_REQUEST_TEXT = 'Some text to rewrite';
     await askForRewrite(REWRITE_REQUEST_TEXT, { manner: 'scholarly' });
-    expect(callSidecar).toHaveBeenCalledTimes(1);
-    expect(callSidecar).toHaveBeenCalledWith<[string, RewriteRequest]>('rewrite', {
+    expect(universalPost).toHaveBeenCalledTimes(1);
+    expect(universalPost).toHaveBeenCalledWith<[string, RewriteRequest]>('rewrite', {
       text: REWRITE_REQUEST_TEXT,
       n_choices: DEFAULT_OPTIONS.nChoices,
       temperature: DEFAULT_OPTIONS.temperature,
@@ -55,12 +53,12 @@ describe('askForRewrite', () => {
 
   it('should call sidecar rewrite with custom options', async () => {
     const response: RewriteResponse = { status: 'ok', message: '', choices: [] };
-    vi.mocked(callSidecar).mockResolvedValue(response);
+    vi.mocked(universalPost).mockResolvedValue(response);
 
     const REWRITE_REQUEST_TEXT = 'Some text to rewrite';
     await askForRewrite(REWRITE_REQUEST_TEXT, { temperature: 0.8, manner: 'scholarly', nChoices: 4 });
-    expect(callSidecar).toHaveBeenCalledTimes(1);
-    expect(callSidecar).toHaveBeenCalledWith<[string, RewriteRequest]>('rewrite', {
+    expect(universalPost).toHaveBeenCalledTimes(1);
+    expect(universalPost).toHaveBeenCalledWith<[string, RewriteRequest]>('rewrite', {
       text: REWRITE_REQUEST_TEXT,
       n_choices: 4,
       temperature: 0.8,
@@ -84,7 +82,7 @@ describe('askForRewrite', () => {
         },
       ],
     };
-    vi.mocked(callSidecar).mockResolvedValue(mockResponse);
+    vi.mocked(universalPost).mockResolvedValue(mockResponse);
 
     const response = await askForRewrite('some input');
     expect(response).toEqual<AskForRewriteReturn>({
@@ -95,7 +93,7 @@ describe('askForRewrite', () => {
 
   it('Should return error text for error status sidecar', async () => {
     const mockResponse: RewriteResponse = { status: 'error', message: 'Error message', choices: [] };
-    vi.mocked(callSidecar).mockResolvedValue(mockResponse);
+    vi.mocked(universalPost).mockResolvedValue(mockResponse);
 
     const response = await askForRewrite('some input');
     expect(response).toEqual<AskForRewriteReturn>({
@@ -107,7 +105,7 @@ describe('askForRewrite', () => {
   });
 
   it('Should return error text for internal sidecar exception', async () => {
-    vi.mocked(callSidecar).mockRejectedValue('some failure');
+    vi.mocked(universalPost).mockRejectedValue('some failure');
 
     const response = await askForRewrite('some input');
     expect(response).toEqual<AskForRewriteReturn>({
@@ -125,6 +123,6 @@ describe('askForRewrite', () => {
       message: 'You should provide a selection with text.',
     });
 
-    expect(callSidecar).not.toHaveBeenCalled();
+    expect(universalPost).not.toHaveBeenCalled();
   });
 });
