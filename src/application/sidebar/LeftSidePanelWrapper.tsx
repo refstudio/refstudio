@@ -18,18 +18,21 @@ export function LeftSidePanelWrapper({ disabled }: { disabled?: boolean }) {
   const [isPanelCollapsed, setIsPanelCollapsed] = useState(!disabled);
   const [activePanel, setActivePanel] = useState<PrimarySideBarPanel>('Explorer');
 
-  const handleSideBarClick = useCallback((clickedPane: PrimarySideBarPanel) => {
-    if (!disabled) {
-      if (clickedPane === activePanel) {
-        // Toggle collapsing
-        setIsPanelCollapsed(currentPaneState => !currentPaneState);
-      } else {
-        // Always open the sidebar
-        setIsPanelCollapsed(false);
+  const handleSideBarClick = useCallback(
+    (clickedPane: PrimarySideBarPanel) => {
+      if (!disabled) {
+        if (clickedPane === activePanel) {
+          // Toggle collapsing
+          setIsPanelCollapsed((currentPaneState) => !currentPaneState);
+        } else {
+          // Always open the sidebar
+          setIsPanelCollapsed(false);
+        }
+        setActivePanel(clickedPane);
       }
-      setActivePanel(clickedPane);
-    }
-  }, [activePanel, disabled]);
+    },
+    [activePanel, disabled],
+  );
 
   // Configure keyboard shortcuts to open/close side panel
   useRefStudioHotkeys(['meta+1'], () => handleSideBarClick('Explorer'));

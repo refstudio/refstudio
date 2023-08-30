@@ -1,4 +1,3 @@
-
 import { CloseIcon, OpenIcon } from '../../components/icons';
 import { PanelWrapper } from '../../components/PanelWrapper';
 import { emitEvent } from '../../events';

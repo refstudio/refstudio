@@ -15,18 +15,21 @@ export function RightSidePanelWrapper({ disabled }: { disabled?: boolean }) {
   const [isPanelCollapsed, setIsPanelCollapsed] = useState(true);
   const [activePanel, setActivePanel] = useState<SecondarySideBarPanel>('Rewriter');
 
-  const handleSideBarClick = useCallback((clickedPanel: SecondarySideBarPanel) => {
-    if (!disabled) {
-      if (clickedPanel === activePanel) {
-        // Toggle collapsing
-        setIsPanelCollapsed(currentPaneState => !currentPaneState);
-      } else {
-        // Always open the sidebar
-        setIsPanelCollapsed(false);
+  const handleSideBarClick = useCallback(
+    (clickedPanel: SecondarySideBarPanel) => {
+      if (!disabled) {
+        if (clickedPanel === activePanel) {
+          // Toggle collapsing
+          setIsPanelCollapsed((currentPaneState) => !currentPaneState);
+        } else {
+          // Always open the sidebar
+          setIsPanelCollapsed(false);
+        }
+        setActivePanel(clickedPanel);
       }
-      setActivePanel(clickedPanel);
-    }
-  }, [activePanel, disabled]);
+    },
+    [activePanel, disabled],
+  );
 
   // Configure keyboard shortcuts to open/close side panel
   useRefStudioHotkeys(['meta+9'], () => handleSideBarClick('Rewriter'));
