@@ -2,15 +2,10 @@
 import json
 
 from fastapi.openapi.utils import get_openapi
-from sidecar.typing import CliCommands
 from starlette.routing import Mount
 from web import api
 
 if __name__ == "__main__":
-    cli_schema = json.loads(CliCommands.schema_json())
-    with open("python/cli.schema.json", "w") as out:
-        json.dump(cli_schema, out, indent=2)
-
     combined_schemas = {}
     combined_paths = {}
     for route in api.routes:
@@ -27,7 +22,7 @@ if __name__ == "__main__":
         for path, path_spec in paths.items():
             combined_paths[mount_path + path] = path_spec
 
-    with open("python/combined.openapi.json", "w") as out:
+    with open("python/openapi.json", "w") as out:
         json.dump(
             {
                 "openapi": "3.1.0",
@@ -41,10 +36,8 @@ if __name__ == "__main__":
             out,
         )
 
-    # OpenAPI puts request/response definitions under "/components/schemas", but
-    # json2ts wants them under "/definitions".
-    output_schema = json.dumps(combined_schemas)
-    output_schema = output_schema.replace("#/components/schemas/", "#/definitions/")
-    schema = json.loads(output_schema)
-    with open("python/api.schema.json", "w") as out:
-        json.dump({"definitions": schema}, out, indent=2)
+    with open("src/api/api-types.ts", "w") as out:
+        out.write("import {components} from './raw-api-types';\n")
+        out.write("type schemas = components['schemas'];\n\n")
+        for typename in sorted(combined_schemas.keys()):
+            out.write(f"export type {typename} = schemas['{typename}'];\n")
