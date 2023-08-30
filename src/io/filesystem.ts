@@ -4,7 +4,6 @@ import { JSONContent } from '@tiptap/core';
 
 import {
   deleteProjectFile,
-  existsProjectFile,
   readProjectBinaryFile,
   readProjectFiles,
   readProjectTextFile,
@@ -50,11 +49,11 @@ export function getSeparator() {
 // UPLOADS
 // #####################################################################################
 export function getUploadsDir() {
-  return makeRefStudioPath(UPLOADS_DIR);
+  return UPLOADS_DIR;
 }
 
 export function getExportsDir() {
-  return makeRefStudioPath(EXPORTS_DIR);
+  return EXPORTS_DIR;
 }
 
 export function makeUploadPath(filename: string) {
@@ -134,13 +133,7 @@ async function convertTauriFileEntryToFileEntry(entry: TauriFileEntry): Promise<
 
 // #####################################################################################
 // file path utils
-//
-// NOTE: We decided that ref studio paths should always start WITHOUT a leading /.
-//       file.txt -> file.txt
 // #####################################################################################
-export function makeRefStudioPath(filePath: string) {
-  return filePath;
-}
 
 // some/refstudio/absolute/path/file.txt -> ["some", "refstudio", "absolute", "path", "file.txt"]
 export function splitRefStudioPath(filePath: string): string[] {
@@ -204,10 +197,6 @@ export async function renameFile(relativePath: string, newRelativePath: string):
     return { success: false };
   }
   try {
-    if (await existsProjectFile(currentProjectId, newRelativePath)) {
-      console.warn(`Another file with the same name already exists: ${newRelativePath}`);
-      return { success: false };
-    }
     await renameProjectFile(currentProjectId, relativePath, newRelativePath);
     return { success: true, newPath: newRelativePath };
   } catch (err) {

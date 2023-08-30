@@ -29,7 +29,6 @@ export const readAllProjectFiles = vi.fn(() => []);
 // #####################################################################################
 // file path utils
 // #####################################################################################
-export const makeRefStudioPath = vi.fn((file: string) => '/' + file);
 export const splitRefStudioPath = vi.fn((path: string) => path.split('/'));
 
 // #####################################################################################

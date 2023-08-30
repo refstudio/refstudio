@@ -38,7 +38,7 @@ export function useFileProjectNewListener() {
     await newProject(projectInfo.id, projectInfo.path, projectInfo.name);
     createFile();
     notifyInfo('New project created with success');
-    persistProjectIdInSettings(projectInfo.id);
+    persistActiveProjectInSettings(projectInfo.id);
   };
 }
 
@@ -54,7 +54,7 @@ export function useFileProjectNewSampleListener() {
     await sampleProject(project.id, project.name, project.path);
     createFile();
     notifyInfo('Sample project opened with success');
-    persistProjectIdInSettings(project.id);
+    persistActiveProjectInSettings(project.id);
   };
 }
 
@@ -67,6 +67,9 @@ export function useFileProjectOpenListener() {
       // TODO: Open a custom dialog with all projects to select one
       // For now, opens the first project found
       const projects = await readAllProjects();
+      if (projects.length === 0) {
+        throw new Error('No projects found');
+      }
       projectId = projects[0].id;
     } else {
       const selectedPath = await open({
@@ -92,7 +95,7 @@ export function useFileProjectOpenListener() {
 
     const projectToOpen = await readProjectById(projectId);
     await openProject(projectId, projectToOpen.path, projectToOpen.name);
-    persistProjectIdInSettings(projectId);
+    persistActiveProjectInSettings(projectId);
     notifyInfo('New project open.');
   };
 }
@@ -104,14 +107,14 @@ export function useFileProjectCloseListener() {
   return () => {
     if (isOpen) {
       void closeProject();
-      persistProjectIdInSettings('');
+      persistActiveProjectInSettings('');
       notifyInfo('Project closed');
     }
   };
 }
 
 // TODO: This method needs to be refactored to have use a project id instead of a path
-function persistProjectIdInSettings(id: string) {
+function persistActiveProjectInSettings(id: string) {
   setCachedSetting('project.current_directory', id);
   void saveCachedSettings();
 }

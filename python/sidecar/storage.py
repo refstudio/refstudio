@@ -58,7 +58,7 @@ class JsonStorage:
             logger.info(f"Creating {self.filepath}...")
             Path(self.filepath).parent.mkdir(parents=True, exist_ok=True)
             with open(self.filepath, "w") as f:
-                json.dump([], f, indent=2, default=str)
+                json.dump([], f, indent=2)
 
     def save(self):
         """
