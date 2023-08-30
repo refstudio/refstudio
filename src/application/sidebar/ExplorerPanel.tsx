@@ -1,24 +1,30 @@
-import { useAtomValue, useSetAtom } from 'jotai';
-import { VscClose, VscEmptyWindow } from 'react-icons/vsc';
+import { useAtomValue } from 'jotai';
 
-import { openFilePathAtom } from '../../atoms/fileEntryActions';
-import { fileExplorerAtom, refreshFileTreeAtom } from '../../atoms/fileExplorerActions';
-import { useActiveEditorIdForPane } from '../../atoms/hooks/useActiveEditorIdForPane';
-import { isProjectOpenAtom, projectNameAtom } from '../../atoms/projectState';
-import { parseEditorId } from '../../atoms/types/EditorData';
-import { PanelSection } from '../../components/PanelSection';
+import { isProjectOpenAtom } from '../../atoms/projectState';
+import { CloseIcon, OpenIcon } from '../../components/icons';
 import { PanelWrapper } from '../../components/PanelWrapper';
 import { emitEvent } from '../../events';
-import { useAsyncEffect } from '../../hooks/useAsyncEffect';
-import { isNonNullish } from '../../lib/isNonNullish';
 import { FileExplorer } from './FileExplorer';
 
 export function ExplorerPanel() {
   const isProjectOpen = useAtomValue(isProjectOpenAtom);
 
+  const openProject = () => emitEvent('refstudio://menu/file/project/open');
+  const closeProject = () => emitEvent('refstudio://menu/file/project/close');
+
   return (
-    <PanelWrapper title="Explorer">
-      {isProjectOpen && <ProjectSection />}
+    <PanelWrapper
+      actions={[
+        { key: 'open', Icon: <OpenIcon />, title: 'Open Project', onClick: openProject },
+        { key: 'close', disabled: !isProjectOpen, Icon: <CloseIcon />, title: 'Close Project', onClick: closeProject },
+      ]}
+      title="Project"
+    >
+      {isProjectOpen && (
+        <div className="flex flex-1 flex-col items-start gap-2 self-stretch overflow-y-auto overflow-x-hidden p-4 pt-2">
+          <FileExplorer />
+        </div>
+      )}
 
       {!isProjectOpen && (
         <div className="p-4">
@@ -30,40 +36,6 @@ export function ExplorerPanel() {
         </div>
       )}
     </PanelWrapper>
-  );
-}
-
-export function ProjectSection() {
-  const leftPaneActiveEditorId = useActiveEditorIdForPane('LEFT');
-  const rightPaneActiveEditorId = useActiveEditorIdForPane('RIGHT');
-  const rootFileExplorerEntry = useAtomValue(fileExplorerAtom);
-  const openFile = useSetAtom(openFilePathAtom);
-  const refreshFileTree = useSetAtom(refreshFileTreeAtom);
-  const projectName = useAtomValue(projectNameAtom);
-
-  useAsyncEffect(refreshFileTree);
-
-  const openProject = () => emitEvent('refstudio://menu/file/project/open');
-  const closeProject = () => emitEvent('refstudio://menu/file/project/close');
-
-  return (
-    <PanelSection
-      grow
-      rightIcons={[
-        { key: 'open', Icon: VscEmptyWindow, title: 'Open Project', onClick: openProject },
-        { key: 'close', Icon: VscClose, title: 'Close Project', onClick: closeProject },
-      ]}
-      title={projectName}
-    >
-      <FileExplorer
-        fileExplorerEntry={rootFileExplorerEntry}
-        paddingLeft="1.25rem"
-        selectedFiles={[leftPaneActiveEditorId, rightPaneActiveEditorId]
-          .filter(isNonNullish)
-          .map((editorId) => parseEditorId(editorId).id)}
-        onFileClick={openFile}
-      />
-    </PanelSection>
   );
 }
 
