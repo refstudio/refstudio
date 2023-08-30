@@ -57,14 +57,10 @@ export async function universalPatch<ResponsePayload = unknown, RequestPayload =
  * */
 export async function universalHead(path: string): Promise<number> {
   if (import.meta.env.VITE_IS_WEB) {
-    console.log(`WEB FETCH REQUEST: HEAD ${path}`);
     const response = await fetch(path, { method: 'HEAD' });
-    console.log('WEB FETCH RESPONSE STATUS', response.status);
     return response.status;
   } else {
-    console.log(`TAURI FETCH REQUEST: HEAD ${path}`);
     const response = await tauriFetch(REFSTUDIO_HOST + path, { method: 'HEAD' });
-    console.log('TAURI FETCH RESPONSE STATUS', response.status);
     return response.status;
   }
 }
@@ -107,7 +103,6 @@ async function makeWebRequest<ResponsePayload = unknown, RequestPayload = unknow
     headers,
     body: payload instanceof FormData ? payload : payload ? JSON.stringify(payload) : undefined,
   });
-  console.log('WEB FETCH RESPONSE STATUS:', response.status);
   if (!response.ok) {
     throw new Error(`Failed to ${method} ${path}: ${response.statusText}`);
   }
@@ -126,7 +121,6 @@ async function makeTauriRequest<ResponsePayload = unknown, RequestPayload = unkn
   responseParser: ResponseParser,
 ) {
   const url = REFSTUDIO_HOST + path;
-  console.log(`TAURI FETCH REQUEST: ${method} ${url}`);
   const responseType = responseParser === 'JSON' ? ResponseType.JSON : ResponseType.Binary;
   const response = await tauriFetch(url, {
     method,
@@ -134,16 +128,13 @@ async function makeTauriRequest<ResponsePayload = unknown, RequestPayload = unkn
     body: payload ? Body.json(payload as any) : undefined,
     responseType,
   });
-  console.log('TAURI FETCH RESPONSE STATUS', response.status);
   if (!response.ok) {
     throw new Error(`Failed to ${method} ${path}: ${response.status} - ${JSON.stringify(response.data)}`);
   }
   switch (responseParser) {
     case 'JSON':
-      console.log('TAURI FETCH RESPONSE DATA', response.data);
       return response.data as ResponsePayload;
     case 'ArrayBuffer':
-      console.log('TAURI FETCH RESPONSE DATA', response.data);
       return response.data as ResponsePayload;
   }
 }
