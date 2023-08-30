@@ -48,6 +48,9 @@ export default {
           secondary: 'rgb(var(--grayscale-70) / <alpha-value>)',
           primary: 'rgb(var(--grayscale-80) / <alpha-value>)',
         },
+        'card-ico': {
+          primary: 'rgb(var(--grayscale-80) / <alpha-value>)',
+        },
         'input-txt': {
           disabled: 'rgb(var(--grayscale-60) / <alpha-value>)',
           secondary: 'rgb(var(--grayscale-70) / <alpha-value>)',
@@ -185,6 +188,9 @@ export default {
       },
       borderRadius: {
         default: '0.25rem',
+      },
+      fontFamily: {
+        default: ['"Roboto", sans-serif'],
       },
       zIndex: {
         modals: 99999,
