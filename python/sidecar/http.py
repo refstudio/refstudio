@@ -78,11 +78,9 @@ async def http_search_s2(req: SearchRequest) -> SearchResponse:
 # AI API
 # --------------
 @ai_api.post("/rewrite")
-async def http_ai_rewrite(
-    req: RewriteRequest,
-    # user_settings: Annotated[SettingsSchema, Depends(settings.get_settings_for_user)],
-) -> RewriteResponse:
-    user_settings = settings.get_settings_for_user("user1")
+async def http_ai_rewrite(req: RewriteRequest) -> RewriteResponse:
+    user_id = "user1"
+    user_settings = settings.get_settings_for_user(user_id)
     response = rewrite.rewrite(req, user_settings=user_settings)
     return response
 
@@ -90,9 +88,9 @@ async def http_ai_rewrite(
 @ai_api.post("/completion")
 async def http_ai_completion(
     req: TextCompletionRequest,
-    # user_settings: Annotated[SettingsSchema, Depends(settings.get_settings_for_user)],
 ) -> TextCompletionResponse:
-    user_settings = settings.get_settings_for_user("user1")
+    user_id = "user1"
+    user_settings = settings.get_settings_for_user(user_id)
     response = rewrite.complete_text(req, user_settings=user_settings)
     return response
 
@@ -101,9 +99,9 @@ async def http_ai_completion(
 async def http_ai_chat(
     project_id: str,
     req: ChatRequest,
-    # user_settings: Annotated[SettingsSchema, Depends(settings.get_settings_for_user)],
 ) -> ChatResponse:
-    user_settings = settings.get_settings_for_user("user1")
+    user_id = "user1"
+    user_settings = settings.get_settings_for_user(user_id)
     response = chat.ask_question(
         req, project_id=project_id, user_settings=user_settings
     )

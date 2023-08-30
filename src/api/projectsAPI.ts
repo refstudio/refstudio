@@ -92,13 +92,11 @@ export async function readProjectFiles(projectId: string): Promise<TauriFileEntr
 // ########################################################################################
 // PROJECT FILE SYSTEM
 // ########################################################################################
-export const writeProjectTextFile = async (projectId: string, relativeFilePath: string, contents: string) => {
-  await universalPutFile(`/api/fs/${projectId}/${relativeFilePath}`, relativeFilePath, contents);
-};
+export const writeProjectTextFile = async (projectId: string, relativeFilePath: string, contents: string) =>
+  universalPutFile(`/api/fs/${projectId}/${relativeFilePath}`, relativeFilePath, contents);
 
-export const writeProjectBinaryFile = async (projectId: string, relativeFilePath: string, contents: ArrayBuffer) => {
-  await universalPutFile(`/api/fs/${projectId}/${relativeFilePath}`, relativeFilePath, contents);
-};
+export const writeProjectBinaryFile = async (projectId: string, relativeFilePath: string, contents: ArrayBuffer) =>
+  universalPutFile(`/api/fs/${projectId}/${relativeFilePath}`, relativeFilePath, contents);
 
 export const readProjectTextFile = async (projectId: string, filePath: string) => {
   try {

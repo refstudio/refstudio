@@ -56,7 +56,7 @@ def update_project_path_storage(
             "project_name": project_name,
             "project_path": str(project_path),
         }
-        json.dump(data, f, indent=2, default=str)
+        json.dump(data, f, indent=2)
 
     return read_project_path_storage(user_id)
 
@@ -66,9 +66,9 @@ def get_project_path(user_id: str, project_id: str) -> Path:
     return Path(data[project_id]["project_path"])
 
 
-def get_project_name(user_id: str, project_id: str) -> Path:
+def get_project_name(user_id: str, project_id: str) -> str:
     data = read_project_path_storage(user_id)
-    return Path(data[project_id]["project_name"])
+    return data[project_id]["project_name"]
 
 
 def create_project(
