@@ -15,7 +15,7 @@ const currentProjectIdAtom = atom('');
 // #####################################################################################
 // Public API
 // #####################################################################################
-export const isProjectOpenAtom = atom((get) => get(currentProjectPathAtom) !== '');
+export const isProjectOpenAtom = atom((get) => get(currentProjectIdAtom) !== '');
 export const projectPathAtom: Atom<string> = currentProjectPathAtom;
 export const projectIdAtom: Atom<string> = currentProjectIdAtom;
 
@@ -57,14 +57,18 @@ export const closeProjectAtom = atom(null, async (get, set) => {
   }
 });
 
-export const newSampleProjectAtom = atom(null, async (_, set, projectId: string, projectName: string) => {
-  // Close current project before create new
-  await set(closeProjectAtom);
+export const newSampleProjectAtom = atom(
+  null,
+  async (_, set, projectId: string, projectName: string, projectPath: string) => {
+    // Close current project before create new
+    await set(closeProjectAtom);
 
-  // Open sample project
-  setCurrentFileSystemProjectId(projectId);
-  set(currentProjectIdAtom, projectId);
-  set(currentProjectNameAtom, projectName);
-  await ensureSampleProjectFiles(projectId);
-  await set(refreshFileTreeAtom);
-});
+    // Open sample project
+    setCurrentFileSystemProjectId(projectId);
+    set(currentProjectIdAtom, projectId);
+    set(currentProjectPathAtom, projectPath);
+    set(currentProjectNameAtom, projectName);
+    await ensureSampleProjectFiles(projectId);
+    await set(refreshFileTreeAtom);
+  },
+);

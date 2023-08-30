@@ -51,7 +51,7 @@ export function useFileProjectNewSampleListener() {
     if (!project) {
       project = await createRemoteProject('RefStudio Sample');
     }
-    await sampleProject(project.id, project.name);
+    await sampleProject(project.id, project.name, project.path);
     createFile();
     notifyInfo('Sample project opened with success');
     persistProjectIdInSettings(project.id);
