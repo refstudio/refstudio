@@ -4,7 +4,7 @@ set -o errexit
 set -x
 
 poetry run python python/generate_schema.py
-yarn run openapi-typescript python/openapi.json > ./src/api/api-paths.ts
+yarn run openapi-typescript --alphabetize python/openapi.json > ./src/api/api-paths.ts
 
 yarn run json2ts python/api.schema.json --no-additionalProperties --unreachableDefinitions > src/api/api-types.ts
 yarn prettier --config package.json --write ./src/api/api-paths.ts ./src/api/api-types.ts

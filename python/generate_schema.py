@@ -34,6 +34,8 @@ if __name__ == "__main__":
                 "components": {"schemas": combined_schemas},
             },
             out,
+            sort_keys=True,
+            indent=2,
         )
 
     # OpenAPI puts request/response definitions under "/components/schemas", but
