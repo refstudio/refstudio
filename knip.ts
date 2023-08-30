@@ -6,7 +6,7 @@ const config: KnipConfig = {
   ignore: [
     'src/api/types.ts',
     'src/api/api-types.ts',
-    'src/api/raw-api-types.d.ts',
+    'src/api/api-paths.ts',
     'src/vite-env.d.ts',
     'src/**/__mocks__/*.ts',
     'src/declarations/*.d.ts',
