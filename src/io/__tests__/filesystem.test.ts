@@ -170,15 +170,30 @@ describe('filesystem', () => {
   // file path utils
   // #####################################################################################
   describe('file path utils', () => {
-    it('should make ref studio path', () => {
+    it("should make ref studio file path, that shouldn't start with /", () => {
       const file = 'file.txt';
       const rsFilePath = makeRefStudioPath(file);
       expect(rsFilePath).toBeDefined();
-      expect(rsFilePath).not.toBe(file);
+      expect(rsFilePath.charAt(0)).not.toBe('/');
+    });
+
+    it('should make ref studio file path with segments', () => {
+      const file = 'some/folder/file.txt';
+      const rsFilePath = makeRefStudioPath(file);
+      expect(rsFilePath).toBeDefined();
+      expect(rsFilePath.charAt(0)).not.toBe('/');
     });
 
     it('should split ref studio path', () => {
-      expect(splitRefStudioPath(makeRefStudioPath('file.txt'))).toStrictEqual(['', 'file.txt']);
+      expect(splitRefStudioPath(makeRefStudioPath('file.txt'))).toStrictEqual(['file.txt']);
+    });
+
+    it('should split ref studio path with many segments', () => {
+      expect(splitRefStudioPath(makeRefStudioPath('some/folder/file.txt'))).toStrictEqual([
+        'some',
+        'folder',
+        'file.txt',
+      ]);
     });
   });
 

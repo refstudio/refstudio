@@ -2,7 +2,7 @@ import { buildEditorIdFromPath, EditorData } from '../types/EditorData';
 import { FileEntry, FileFileEntry, FolderFileEntry } from '../types/FileEntry';
 
 export function makeFileAndEditor(name: string, parentPath = ''): { fileEntry: FileFileEntry; editorData: EditorData } {
-  const filePath = `${parentPath}/${name}`;
+  const filePath = parentPath ? `${parentPath}/${name}` : name;
   const nameParts = name.split('.');
   return {
     fileEntry: {
@@ -23,7 +23,7 @@ export function makeFile(name: string, parentPath = ''): FileFileEntry {
   return makeFileAndEditor(name, parentPath).fileEntry;
 }
 export function makeFolder(name: string, children: FileEntry[] = [], parentPath = ''): FolderFileEntry {
-  const path = `${parentPath}/${name}`;
+  const path = parentPath ? `${parentPath}/${name}` : name;
   return {
     name,
     path,
