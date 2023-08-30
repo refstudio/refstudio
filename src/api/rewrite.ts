@@ -14,7 +14,7 @@ export async function askForRewrite(selection: string, options?: RewriteOptions)
       ...DEFAULT_OPTIONS,
       ...options,
     };
-    const response = await universalPost<RewriteResponse, RewriteRequest>('api/ai/rewrite', {
+    const response = await universalPost<RewriteResponse, RewriteRequest>('/api/ai/rewrite', {
       text: selection,
       n_choices: options.nChoices,
       temperature: options.temperature,
