@@ -14,17 +14,17 @@ type PathsUnion = Unionize<paths>;
 type GetPathsInfo = ExtractGetPaths<PathsUnion>;
 type GetPaths = GetPathsInfo['path'];
 
-type ParamsFor<Path extends keyof paths, Method extends LowerMethod, PathInfos = PathsUnion> = PathInfos extends {
-  k: Path;
-  v: Record<Method, { parameters: infer Params }>;
-}
+type ParamsFor<Path extends keyof paths, Method extends LowerMethod> = paths extends Record<
+  Path,
+  Record<Method, { parameters: infer Params }>
+>
   ? Params
   : never;
 
-type JsonResponseFor<Path extends keyof paths, Method extends LowerMethod, PathInfos = PathsUnion> = PathInfos extends {
-  k: Path;
-  v: Record<Method, { responses: { 200: { content: { 'application/json': infer ResponseType } } } }>;
-}
+type JsonResponseFor<Path extends keyof paths, Method extends LowerMethod> = paths extends Record<
+  Path,
+  Record<Method, { responses: { 200: { content: { 'application/json': infer ResponseType } } } }>
+>
   ? ResponseType
   : never;
 
