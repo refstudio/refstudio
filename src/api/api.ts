@@ -1,9 +1,30 @@
 import { Body, fetch as tauriFetch, ResponseType } from '@tauri-apps/api/http';
 
+import { paths } from './raw-api-types';
 import { REFSTUDIO_HOST } from './server';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 type ResponseParser = 'JSON' | 'ArrayBuffer';
+
+type Unionize<T> = { [k in keyof T]: { k: k; v: T[k] } }[keyof T];
+type ExtractGetPaths<T> = T extends { k: infer Path; v: { get: infer Info } } ? { path: Path; info: Info } : never;
+
+type GetPathsInfo = ExtractGetPaths<Unionize<paths>>;
+type GetPaths = GetPathsInfo['path'];
+type ParamsFor<Path extends GetPaths, PathInfos = GetPathsInfo> = PathInfos extends {
+  path: Path;
+  info: { parameters: infer Params };
+}
+  ? Params
+  : never;
+type JsonResponseFor<Path extends GetPaths, PathInfos = GetPathsInfo> = PathInfos extends {
+  path: Path;
+  info: { responses: { 200: { content: { 'application/json': infer ResponseType } } } };
+}
+  ? ResponseType
+  : never;
+
+type T2 = ParamsFor<'/api/projects/{project_id}'>;
 
 /** Issue a GET request using either web fetch or Tauri fetch */
 export async function universalGet<ResponsePayload = unknown>(
@@ -11,6 +32,29 @@ export async function universalGet<ResponsePayload = unknown>(
   responseParser: ResponseParser = 'JSON',
 ): Promise<ResponsePayload> {
   return universalRequest<ResponsePayload>('GET', path, undefined, responseParser);
+}
+
+interface RouteParameters {
+  path?: Record<string, string>;
+  query?: Record<string, string>;
+}
+
+export async function apiGetJson<Path extends GetPaths>(
+  pathSpec: Path,
+  ...args: [ParamsFor<Path>] extends [never] ? [] : [options: ParamsFor<Path>]
+) {
+  const options = (args as any[])[0] as RouteParameters;
+  let path = pathSpec as string;
+  if (options.path) {
+    for (const [key, value] of Object.entries(options.path)) {
+      path = path.replace('{' + key + '}', value);
+    }
+  }
+  if (options.query) {
+    path += '?' + new URLSearchParams(options.query).toString();
+  }
+  type ResponseType = JsonResponseFor<Path>;
+  return universalRequest<ResponseType>('GET', path, undefined);
 }
 
 /** Issue a POST request with a JSON payload using either web fetch or Tauri fetch */
