@@ -15,7 +15,7 @@ import { FilesIcon, ReferencesIcon } from './icons';
 type PrimarySideBarPanel = 'Explorer' | 'References';
 export function LeftSidePanelWrapper({ disabled }: { disabled?: boolean }) {
   const leftPanelRef = useRef<ImperativePanelHandle>(null);
-  const [isPanelCollapsed, setIsPanelCollapsed] = useState(false);
+  const [isPanelCollapsed, setIsPanelCollapsed] = useState(!disabled);
   const [activePanel, setActivePanel] = useState<PrimarySideBarPanel>('Explorer');
 
   const handleSideBarClick = useCallback((clickedPane: PrimarySideBarPanel) => {

@@ -30,8 +30,23 @@ describe('SideBar', () => {
 
     render(<SideBar activePane="References" items={panes} onItemClick={noop} />);
     expect(screen.getByRole('menubar')).toBeInTheDocument();
-    expect(screen.getByTestId('Explorer').parentElement!.parentElement).not.toHaveClass('active');
-    expect(screen.getByTestId('References').parentElement!.parentElement).toHaveClass('active');
+    expect(screen.getByTestId('Explorer').parentElement).not.toHaveClass('active');
+    expect(screen.getByTestId('References').parentElement).toHaveClass('active');
+  });
+
+  it('should display disabled icons as disabled', () => {
+    const panes = [
+      { disabled: true, pane: 'Explorer', Icon: <div data-testid="Explorer" /> },
+      { pane: 'References', Icon: <div data-testid="References" /> },
+    ];
+
+    render(<SideBar activePane="Explorer" items={panes} onItemClick={noop} />);
+    expect(screen.getByRole('menubar')).toBeInTheDocument();
+
+    expect(screen.getByTestId('References')).toBeInTheDocument();
+    const explorerIcon = screen.getByTestId('Explorer');
+    expect(explorerIcon).toBeInTheDocument();
+    expect(explorerIcon.parentElement).toBeDisabled();
   });
 
   it('should call onClick with pane name', async () => {
@@ -45,6 +60,18 @@ describe('SideBar', () => {
     await userEvent.setup().click(screen.getByTestId('Explorer'));
     expect(fn).toBeCalled();
     expect(fn).toBeCalledWith('Explorer');
+  });
+
+  it('should not call onClick when disabled', async () => {
+    const fn = vi.fn();
+    const panes = [
+      { disabled: true, pane: 'Explorer', Icon: <div data-testid="Explorer" /> },
+      { pane: 'References', Icon: <div data-testid="References" /> },
+    ];
+
+    render(<SideBar activePane="References" items={panes} onItemClick={fn} />);
+    await userEvent.setup().click(screen.getByTestId('Explorer'));
+    expect(fn).not.toBeCalled();
   });
 
   it('should call onSettingsClick with click in the settings icon', async () => {
