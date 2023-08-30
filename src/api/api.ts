@@ -49,7 +49,12 @@ export async function universalPatch<ResponsePayload = unknown, RequestPayload =
   return universalRequest('PATCH', path, payload, responseParser);
 }
 
-/** Issue a HEAD request using either web fetch or Tauri fetch */
+/**
+ * Issue a HEAD request using either web fetch or Tauri fetch
+ *
+ * @param path a request url
+ * @returns the HTTP response status code
+ * */
 export async function universalHead(path: string): Promise<number> {
   if (import.meta.env.VITE_IS_WEB) {
     console.log(`WEB FETCH REQUEST: HEAD ${path}`);
