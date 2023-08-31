@@ -53,9 +53,9 @@ export function RewriterPanel({ debounceMs = 200 }: { debounceMs?: number }) {
 
   return (
     <PanelWrapper title="Rewriter">
-      <div className='flex-1 self-stretch relative'>
+      <div className="relative flex-1 self-stretch">
         <RewriteOptionsView
-          className={cx('absolute transition-left ease-in-out duration-200', {
+          className={cx('absolute transition-left duration-200 ease-in-out', {
             'left-0': step === 'options',
             '-left-full': step !== 'options',
           })}
@@ -66,7 +66,7 @@ export function RewriterPanel({ debounceMs = 200 }: { debounceMs?: number }) {
           onChange={setRewriteOptions}
         />
         <RewriteSuggestionsView
-          className={cx('absolute transition-left ease-in-out duration-200', {
+          className={cx('absolute transition-left duration-200 ease-in-out', {
             'left-0': step === 'suggestions',
             'left-full': step !== 'suggestions',
           })}
@@ -74,6 +74,6 @@ export function RewriterPanel({ debounceMs = 200 }: { debounceMs?: number }) {
           onGoBack={() => setStep('options')}
         />
       </div>
-    </PanelWrapper >
+    </PanelWrapper>
   );
 }

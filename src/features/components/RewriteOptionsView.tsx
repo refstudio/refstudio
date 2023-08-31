@@ -24,10 +24,10 @@ export function RewriteOptionsView({
   rewriteSelection,
 }: RewriteOptionsViewProps) {
   return (
-    <div className={cx('h-full w-full flex flex-col items-start p-4 pt-2', className)}>
-      <div className="flex flex-1 flex-col items-start gap-6 self-stretch text-side-bar-txt overflow-scroll">
+    <div className={cx('flex h-full w-full flex-col items-start p-4 pt-2', className)}>
+      <div className="flex flex-1 flex-col items-start gap-6 self-stretch overflow-scroll text-side-bar-txt">
         <div className="flex flex-col items-start gap-2 self-stretch">
-          <h2 className='select-none cursor-default'>Text Selection</h2>
+          <h2 className="cursor-default select-none">Text Selection</h2>
           <div
             className={cx(
               'flex h-[9.5rem] items-center justify-center gap-2 p-4',
@@ -41,11 +41,11 @@ export function RewriteOptionsView({
             )}
           </div>
         </div>
-        <div className="flex flex-col items-start gap-2 self-stretch select-none cursor-default">
+        <div className="flex cursor-default select-none flex-col items-start gap-2 self-stretch">
           <h2>Speech Type</h2>
           <Dropdown
             aria-label="manner"
-            options={REWRITE_MANNER.map(manner => ({
+            options={REWRITE_MANNER.map((manner) => ({
               name: manner.charAt(0).toUpperCase() + manner.slice(1),
               value: manner,
             }))}
@@ -53,13 +53,13 @@ export function RewriteOptionsView({
             onChange={(manner: (typeof REWRITE_MANNER)[number]) => onChange({ ...options, manner })}
           />
         </div>
-        <div className="flex flex-col items-start gap-2 self-stretch select-none cursor-default">
-          <div className='flex items-start gap-1 self-stretch'>
+        <div className="flex cursor-default select-none flex-col items-start gap-2 self-stretch">
+          <div className="flex items-start gap-1 self-stretch">
             <h2>Creativity Level</h2>
             <InfoTooltip />
           </div>
           <Slider
-            className='w-full'
+            className="w-full"
             max={0.9}
             min={0.7}
             name="creativity"
@@ -71,9 +71,9 @@ export function RewriteOptionsView({
       </div>
       <Button
         Action={isFetching ? <SpinnerIcon /> : undefined}
-        actionPosition='right'
+        actionPosition="right"
         disabled={selection.length === 0}
-        size='M'
+        size="M"
         text="Rewrite"
         onClick={() => !isFetching && rewriteSelection()}
       />
@@ -82,9 +82,13 @@ export function RewriteOptionsView({
 }
 
 function InfoTooltip() {
-  return <div className='text-btn-ico-tool-active'>
-    <div id="info-icon"><InfoIcon /></div>
-    {/* TODO: Get copy for tooltip */}
-    <Tooltip anchorSelect='#info-icon' content="Temperature" />
-  </div>;
+  return (
+    <div className="text-btn-ico-tool-active">
+      <div id="info-icon">
+        <InfoIcon />
+      </div>
+      {/* TODO: Get copy for tooltip */}
+      <Tooltip anchorSelect="#info-icon" content="Temperature" />
+    </div>
+  );
 }

@@ -10,11 +10,20 @@ interface ButtonProps {
   type?: 'primary' | 'secondary';
   onClick: () => void;
 }
-export function Button({ Action, actionPosition = 'left', className, disabled, size = 'S', text, type = 'primary', onClick }: ButtonProps) {
+export function Button({
+  Action,
+  actionPosition = 'left',
+  className,
+  disabled,
+  size = 'S',
+  text,
+  type = 'primary',
+  onClick,
+}: ButtonProps) {
   return (
     <button
       className={cx(
-        'w-full rounded-default px-2 py-2 flex items-center gap-2',
+        'flex w-full items-center gap-2 rounded-default px-2 py-2',
         {
           'justify-center px-5 py-3': size === 'M',
         },

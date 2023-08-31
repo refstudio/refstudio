@@ -33,7 +33,7 @@ export function Dropdown<T extends string>({ disabled, options, value, onChange 
   }, [options, value]);
 
   return (
-    <div className="flex w-full flex-col gap-1 items-stretch select-none">
+    <div className="flex w-full select-none flex-col items-stretch gap-1">
       <div
         className={cx(
           'flex items-start justify-between rounded-default border border-solid p-3 pl-4',
@@ -60,17 +60,19 @@ export function Dropdown<T extends string>({ disabled, options, value, onChange 
       </div>
       {!disabled && open && (
         <div className="relative">
-          <div className={cx(
-            'absolute w-full flex p-2 flex-col items-stretch gap-2 z-dropdown',
-            'rounded-default border border-solid border-input-border bg-input-bg-default',
-          )}>
+          <div
+            className={cx(
+              'absolute z-dropdown flex w-full flex-col items-stretch gap-2 p-2',
+              'rounded-default border border-solid border-input-border bg-input-bg-default',
+            )}
+          >
             {options.map((option) => {
               const name = typeof option === 'string' ? option : option.name;
               const val = typeof option === 'string' ? option : option.value;
               return (
                 <div
                   className={cx(
-                    'cursor-pointer flex px-2 py-1 items-center gap-1',
+                    'flex cursor-pointer items-center gap-1 px-2 py-1',
                     'rounded-default hover:bg-btn-bg-side-bar-item-hover',
                   )}
                   key={val}
