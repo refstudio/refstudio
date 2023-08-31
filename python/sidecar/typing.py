@@ -1,30 +1,41 @@
-from copy import deepcopy
 from datetime import date
-from typing import Any, Optional, Tuple, Type
+from typing import Any, Optional, Type, get_type_hints
 
 from dotenv import load_dotenv
-from pydantic import BaseModel, create_model
-from pydantic.fields import FieldInfo
+from pydantic import BaseModel
 
 
-def partial_model(model: Type[BaseModel]):
-    def make_field_optional(
-        field: FieldInfo, default: Any = None
-    ) -> Tuple[Any, FieldInfo]:
-        new = deepcopy(field)
-        new.default = default
-        new.annotation = Optional[field.annotation]  # type: ignore
-        return new.annotation, new
+def make_optional(
+    include: Optional[list[str]] = None,
+    exclude: Optional[list[str]] = None,
+):
+    """Return a decorator to make model fields optional"""
 
-    return create_model(
-        f"Partial{model.__name__}",
-        __base__=model,
-        __module__=model.__module__,
-        **{
-            field_name: make_field_optional(field_info)
-            for field_name, field_info in model.__fields__.items()
-        },
-    )
+    if exclude is None:
+        exclude = []
+
+    # Create the decorator
+    def decorator(cls: Type[BaseModel]):
+        type_hints = get_type_hints(cls)
+        fields = cls.__fields__
+        if include is None:
+            fields = fields.items()
+        else:
+            # Create iterator for specified fields
+            fields = ((name, fields[name]) for name in include if name in fields)
+            # Fields in 'include' that are not in the model are simply ignored, as in BaseModel.dict
+        for name, field in fields:
+            if name in exclude:
+                continue
+            if not field.required:
+                continue
+            # Update pydantic ModelField to not required
+            field.required = False
+            # Update/append annotation
+            cls.__annotations__[name] = Optional[type_hints[name]]
+        return cls
+
+    return decorator
 
 
 try:
@@ -38,21 +49,6 @@ except ImportError:
 
 
 load_dotenv()
-
-
-def make_optional(baseclass: Type[BaseModel], new_name: str) -> Type[BaseModel]:
-    # Extracts the fields and validators from the baseclass and make fields optional
-    fields = baseclass.__fields__
-    validators = {"__validators__": baseclass.__validators__}
-    optional_fields = {
-        key: (Optional[item.type_], None) for key, item in fields.items()
-    }
-    return create_model(
-        new_name,
-        **optional_fields,
-        __validators__=validators,
-        __config__=baseclass.__config__,
-    )
 
 
 class RefStudioModel(BaseModel):
@@ -283,7 +279,7 @@ class FlatSettingsSchema(RefStudioModel):
     openai_temperature: float
 
 
-@partial_model
+@make_optional()
 class FlatSettingsSchemaPatch(FlatSettingsSchema):
     pass
 
