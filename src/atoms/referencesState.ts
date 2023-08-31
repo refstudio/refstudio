@@ -123,7 +123,7 @@ export const removeReferencesAtom = atom(null, async (get, set, ids: string[], p
 
   // Remove references from BE
   await removeReferences(
-    referencesToRemove.map((ref) => ref.filename),
+    referencesToRemove.map((ref) => ref.id),
     projectId,
   );
 

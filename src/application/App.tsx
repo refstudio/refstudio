@@ -3,11 +3,12 @@ import 'react-contexify/dist/ReactContexify.css';
 import { MenuProvider } from 'kmenu';
 import React, { useCallback, useLayoutEffect } from 'react';
 import { ImperativePanelGroupHandle, Panel, PanelGroup } from 'react-resizable-panels';
-import { useLocalStorage, useWindowSize } from 'usehooks-ts';
+import { useEventListener, useLocalStorage, useWindowSize } from 'usehooks-ts';
 
 import { emitEvent } from '../events';
 import { ReferencesDropZone } from '../features/references/components/ReferencesDropZone';
 import { useDebouncedCallback } from '../hooks/useDebouncedCallback';
+import { notifyError } from '../notifications/notifications';
 import { SettingsModalOpener } from '../settings/SettingsModalOpener';
 import { ApplicationFrame } from '../wrappers/ApplicationFrame';
 import { ContextMenus } from '../wrappers/ContextMenus';
@@ -40,6 +41,10 @@ export function App() {
     ),
     200,
   );
+
+  useEventListener('unhandledrejection', (event) => {
+    notifyError('An error occurred', `Unhandled rejection in promise. Reason: ${event.reason}).`);
+  });
 
   // React to width resize or panelDimensions resize (via setLayout/resize panels)
   useLayoutEffect(() => {
