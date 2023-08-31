@@ -1,6 +1,5 @@
 import { notifyError } from '../notifications/notifications';
-import { universalPost } from './api';
-import { TextCompletionRequest, TextCompletionResponse } from './api-types';
+import { apiPost } from './typed-api';
 
 export async function completeSentence(text: string): Promise<string[]> {
   try {
@@ -8,7 +7,7 @@ export async function completeSentence(text: string): Promise<string[]> {
       return [];
     }
 
-    const response = await universalPost<TextCompletionResponse, TextCompletionRequest>('/api/ai/completion', {
+    const response = await apiPost('/api/ai/completion', {
       text,
       n_choices: 3,
     });

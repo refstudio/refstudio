@@ -1,6 +1,7 @@
 import { FileEntry as TauriFileEntry } from '@tauri-apps/api/fs';
 
 import { universalDelete, universalGet, universalHead, universalPost, universalPutFile } from './api';
+import { apiGetJson } from './typed-api';
 
 export interface ProjectInfo {
   id: string;
@@ -22,11 +23,13 @@ type ProjectPostResponse = ProjectsResponse;
 // PROJECT LIFE CYCLE
 // ########################################################################################
 export async function readAllProjects(): Promise<ProjectInfo[]> {
-  const projects = await universalGet<ProjectsResponse>(`/api/projects/`);
+  const projects = (await apiGetJson('/api/projects/')) as ProjectsResponse;
   return Object.keys(projects).map((id) => ({ id, path: projects[id].project_path, name: projects[id].project_name }));
 }
 export async function readProjectById(projectId: string): Promise<ProjectInfo> {
-  const projectInfo = await universalGet<ProjectGetResponse>(`/api/projects/${projectId}`);
+  const projectInfo = (await apiGetJson('/api/projects/{project_id}', {
+    path: { project_id: projectId },
+  })) as ProjectGetResponse;
   return {
     id: projectInfo.project_id,
     path: projectInfo.project_path,
