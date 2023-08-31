@@ -250,8 +250,6 @@ export interface BodyCreateFile_ProjectId__Filepath_Put {
 export interface FileEntry {
   name: string;
   path: string;
-  is_file?: boolean;
-  is_folder?: boolean;
   file_extension: string;
 }
 /**
@@ -261,8 +259,6 @@ export interface FileEntry {
 export interface FolderEntry {
   name: string;
   path: string;
-  is_file?: boolean;
-  is_folder?: boolean;
   children: FileEntry[];
 }
 /**

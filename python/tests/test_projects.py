@@ -205,28 +205,20 @@ def test_get_project_files(monkeypatch, tmp_path, setup_project_path_storage):
             {
                 "name": "file1.refstudio",
                 "path": "file1.refstudio",
-                "is_file": True,
-                "is_folder": False,
                 "file_extension": ".refstudio",
             },
             {
                 "name": "empty",
                 "path": "empty",
-                "is_file": False,
-                "is_folder": True,
                 "children": [],
             },
             {
                 "name": "uploads",
                 "path": "uploads",
-                "is_file": False,
-                "is_folder": True,
                 "children": [
                     {
                         "name": "file2.pdf",
                         "path": "uploads/file2.pdf",
-                        "is_file": True,
-                        "is_folder": False,
                         "file_extension": ".pdf",
                     }
                 ],

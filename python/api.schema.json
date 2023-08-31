@@ -530,14 +530,6 @@
         "path": {
           "type": "string"
         },
-        "is_file": {
-          "type": "boolean",
-          "default": true
-        },
-        "is_folder": {
-          "type": "boolean",
-          "default": false
-        },
         "file_extension": {
           "type": "string"
         }
@@ -557,14 +549,6 @@
         },
         "path": {
           "type": "string"
-        },
-        "is_file": {
-          "type": "boolean",
-          "default": false
-        },
-        "is_folder": {
-          "type": "boolean",
-          "default": true
         },
         "children": {
           "items": {

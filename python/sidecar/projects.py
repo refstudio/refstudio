@@ -152,8 +152,6 @@ def create_file_entry(path: Path, project_path: Path) -> FileEntry:
     return FileEntry(
         name=path.name,
         path=str(path.relative_to(project_path)),
-        is_file=path.is_file(),
-        is_folder=path.is_dir(),
         file_extension=path.suffix,
     )
 
@@ -166,7 +164,5 @@ def create_folder_entry(path: Path, project_path: Path) -> FolderEntry:
     return FolderEntry(
         name=path.name,
         path=str(path.relative_to(project_path)),
-        is_file=path.is_file(),
-        is_folder=path.is_dir(),
         children=children,
     )

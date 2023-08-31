@@ -212,14 +212,10 @@ class FileEntryBase(RefStudioModel):
 
 
 class FileEntry(FileEntryBase):
-    is_file: bool = True
-    is_folder: bool = False
     file_extension: str
 
 
 class FolderEntry(FileEntryBase):
-    is_file: bool = False
-    is_folder: bool = True
     children: list[FileEntry]
 
 
