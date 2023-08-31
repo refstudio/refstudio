@@ -56,9 +56,7 @@ function IconButton({
       role="menuitem"
       onClick={disabled ? undefined : onClick}
     >
-      <div className="self-center">
-        {children}
-      </div>
+      <div className="self-center">{children}</div>
     </button>
   );
 }
