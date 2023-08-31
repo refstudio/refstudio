@@ -20,7 +20,6 @@ def partial_model(model: Type[BaseModel]):
         f"Partial{model.__name__}",
         __base__=model,
         __module__=model.__module__,
-        __config__=model.__config__,
         **{
             field_name: make_field_optional(field_info)
             for field_name, field_info in model.__fields__.items()
