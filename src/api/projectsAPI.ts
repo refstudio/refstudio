@@ -130,7 +130,7 @@ export const renameProjectFile = async (projectId: string, relativeFilePath: str
     throw new Error("File to rename don't exists in the project.");
   }
   const targetFileExists = await existsProjectFile(projectId, newFilePath);
-  if (!targetFileExists) {
+  if (targetFileExists) {
     throw new Error('Target file name already exists in the project.');
   }
 
