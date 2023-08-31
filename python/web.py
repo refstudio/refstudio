@@ -3,7 +3,6 @@ from fastapi import FastAPI
 from sidecar import http
 
 api = FastAPI()
-api.mount("/api/sidecar", http.sidecar_api, name="sidecar")
 api.mount("/api/references", http.references_api, name="references")
 api.mount("/api/ai", http.ai_api, name="ai")
 api.mount("/api/search", http.search_api, name="search")

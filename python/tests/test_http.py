@@ -11,7 +11,7 @@ from sidecar.storage import JsonStorage
 from .test_ingest import FIXTURES_DIR, _copy_fixture_to_temp_dir
 from .test_settings import create_settings_json  # noqa: F401
 
-sidecar_client = TestClient(http.sidecar_api)
+search_client = TestClient(http.search_api)
 references_client = TestClient(http.references_api)
 ai_client = TestClient(http.ai_api)
 filesystem_client = TestClient(http.filesystem_api)
@@ -38,7 +38,20 @@ def setup_uploaded_reference_pdfs(monkeypatch, tmp_path):
         )
 
 
-def test_list_references(monkeypatch, tmp_path):
+def test_list_references_should_return_empty_list(monkeypatch, tmp_path):
+    user_id = "user1"
+    project_id = "project1"
+
+    monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
+    _ = projects.create_project(user_id, project_id, project_name="foo")
+
+    # .storage/references.json does not exist as no references have been ingested
+    response = references_client.get(f"/{project_id}")
+    assert response.status_code == 200
+    assert len(response.json()) == 0
+
+
+def test_list_references_should_return_references(monkeypatch, tmp_path):
     user_id = "user1"
     project_id = "project1"
 
@@ -163,8 +176,9 @@ def test_references_bulk_delete(monkeypatch, tmp_path):
 def test_ai_rewrite_is_ok(monkeypatch, mock_call_model_is_ok):
     monkeypatch.setattr(Rewriter, "call_model", mock_call_model_is_ok)
 
+    params = {"user_id": "user1"}
     request = {"text": "This is a test"}
-    response = sidecar_client.post("/rewrite", json=request)
+    response = ai_client.post("/rewrite", params=params, json=request)
 
     assert response.status_code == 200
     assert response.json() == {
@@ -182,8 +196,9 @@ def test_ai_rewrite_is_ok(monkeypatch, mock_call_model_is_ok):
 def test_ai_rewrite_missing_required_request_params(monkeypatch, mock_call_model_is_ok):
     monkeypatch.setattr(Rewriter, "call_model", mock_call_model_is_ok)
 
+    params = {"user_id": "user1"}
     request = {"missing": "This is an invalid request"}
-    response = sidecar_client.post("/rewrite", json=request)
+    response = ai_client.post("/rewrite", params=params, json=request)
 
     assert response.status_code == 422
     assert response.json() == {
@@ -200,8 +215,9 @@ def test_ai_rewrite_missing_required_request_params(monkeypatch, mock_call_model
 def test_ai_completion_is_ok(monkeypatch, mock_call_model_is_ok):
     monkeypatch.setattr(Rewriter, "call_model", mock_call_model_is_ok)
 
+    params = {"user_id": "user1"}
     request = {"text": "This is a test"}
-    response = sidecar_client.post("/completion", json=request)
+    response = ai_client.post("/completion", params=params, json=request)
 
     assert response.status_code == 200
     assert response.json() == {
@@ -221,8 +237,9 @@ def test_ai_completion_missing_required_request_params(
 ):
     monkeypatch.setattr(Rewriter, "call_model", mock_call_model_is_ok)
 
+    params = {"user_id": "user1"}
     request = {"missing": "This is an invalid request"}
-    response = sidecar_client.post("/completion", json=request)
+    response = ai_client.post("/completion", params=params, json=request)
 
     assert response.status_code == 422
     assert response.json() == {
@@ -239,16 +256,22 @@ def test_ai_completion_missing_required_request_params(
 def test_ai_chat_is_ok(monkeypatch, mock_call_model_is_ok, tmp_path):
     monkeypatch.setattr(Chat, "call_model", mock_call_model_is_ok)
 
-    # copy references.json to temp dir and mock settings.REFERENCES_JSON_PATH
+    user_id = "user1"
+    project_id = "project1"
+
+    monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
+    project_path = projects.create_project(user_id, project_id, project_name="foo")
+    mocked_path = project_path / ".storage" / "references.json"
+
+    # copy references.json to mocked storage path
     test_file = "fixtures/data/references.json"
     path_to_test_file = Path(__file__).parent.joinpath(test_file)
-    mocked_path = tmp_path.joinpath("references.json")
 
     _copy_fixture_to_temp_dir(path_to_test_file, mocked_path)
-    monkeypatch.setattr(settings, "REFERENCES_JSON_PATH", mocked_path)
 
+    params = {"user_id": user_id}
     request = {"text": "This is a test"}
-    response = sidecar_client.post("/chat", json=request)
+    response = ai_client.post(f"/{project_id}/chat", params=params, json=request)
 
     assert response.status_code == 200
     assert response.json() == {
@@ -276,8 +299,10 @@ def test_ai_chat_missing_required_request_params(
     _copy_fixture_to_temp_dir(path_to_test_file, mocked_path)
     monkeypatch.setattr(settings, "REFERENCES_JSON_PATH", mocked_path)
 
+    project_id = "project1"
+    params = {"user_id": "user1"}
     request = {"missing": "This is an invalid request"}
-    response = sidecar_client.post("/chat", json=request)
+    response = ai_client.post(f"/{project_id}/chat", params=params, json=request)
 
     assert response.status_code == 422
     assert response.json() == {
@@ -295,7 +320,7 @@ def test_search_s2_is_ok(monkeypatch, mock_search_paper):
     monkeypatch.setattr(search.Searcher, "search_func", mock_search_paper)
 
     request = {"query": "any-query-string-you-like"}
-    response = sidecar_client.post("/search", json=request)
+    response = search_client.post("/s2", json=request)
 
     assert response.status_code == 200
     assert response.json() == {

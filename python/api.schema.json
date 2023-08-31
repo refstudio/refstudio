@@ -1,337 +1,5 @@
 {
   "definitions": {
-    "ChatRequest": {
-      "properties": {
-        "text": {
-          "type": "string"
-        },
-        "n_choices": {
-          "type": "integer",
-          "default": 1
-        },
-        "temperature": {
-          "type": "number",
-          "default": 0.7
-        }
-      },
-      "type": "object",
-      "required": [
-        "text"
-      ],
-      "title": "ChatRequest"
-    },
-    "ChatResponse": {
-      "properties": {
-        "status": {
-          "$ref": "#/definitions/ResponseStatus"
-        },
-        "message": {
-          "type": "string"
-        },
-        "choices": {
-          "items": {
-            "$ref": "#/definitions/ChatResponseChoice"
-          },
-          "type": "array"
-        }
-      },
-      "type": "object",
-      "required": [
-        "status",
-        "message",
-        "choices"
-      ],
-      "title": "ChatResponse"
-    },
-    "ChatResponseChoice": {
-      "properties": {
-        "index": {
-          "type": "integer"
-        },
-        "text": {
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "required": [
-        "index",
-        "text"
-      ],
-      "title": "ChatResponseChoice"
-    },
-    "HTTPValidationError": {
-      "properties": {
-        "detail": {
-          "items": {
-            "$ref": "#/definitions/ValidationError"
-          },
-          "type": "array",
-          "title": "Detail"
-        }
-      },
-      "type": "object",
-      "title": "HTTPValidationError"
-    },
-    "ResponseStatus": {
-      "type": "string",
-      "enum": [
-        "ok",
-        "error"
-      ],
-      "title": "ResponseStatus",
-      "description": "An enumeration."
-    },
-    "RewriteChoice": {
-      "properties": {
-        "index": {
-          "type": "integer"
-        },
-        "text": {
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "required": [
-        "index",
-        "text"
-      ],
-      "title": "RewriteChoice"
-    },
-    "RewriteMannerType": {
-      "type": "string",
-      "enum": [
-        "concise",
-        "elaborate",
-        "scholarly"
-      ],
-      "title": "RewriteMannerType",
-      "description": "An enumeration."
-    },
-    "RewriteRequest": {
-      "properties": {
-        "text": {
-          "type": "string"
-        },
-        "manner": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/RewriteMannerType"
-            }
-          ],
-          "default": "concise"
-        },
-        "n_choices": {
-          "type": "integer",
-          "default": 1
-        },
-        "temperature": {
-          "type": "number",
-          "default": 0.7
-        }
-      },
-      "type": "object",
-      "required": [
-        "text"
-      ],
-      "title": "RewriteRequest"
-    },
-    "RewriteResponse": {
-      "properties": {
-        "status": {
-          "$ref": "#/definitions/ResponseStatus"
-        },
-        "message": {
-          "type": "string"
-        },
-        "choices": {
-          "items": {
-            "$ref": "#/definitions/RewriteChoice"
-          },
-          "type": "array"
-        }
-      },
-      "type": "object",
-      "required": [
-        "status",
-        "message",
-        "choices"
-      ],
-      "title": "RewriteResponse"
-    },
-    "S2SearchResult": {
-      "properties": {
-        "title": {
-          "type": "string"
-        },
-        "abstract": {
-          "type": "string"
-        },
-        "venue": {
-          "type": "string"
-        },
-        "year": {
-          "type": "integer"
-        },
-        "paperId": {
-          "type": "string"
-        },
-        "citationCount": {
-          "type": "integer"
-        },
-        "openAccessPdf": {
-          "type": "string"
-        },
-        "authors": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        }
-      },
-      "type": "object",
-      "title": "S2SearchResult"
-    },
-    "SearchRequest": {
-      "properties": {
-        "query": {
-          "type": "string"
-        },
-        "limit": {
-          "type": "integer",
-          "default": 10
-        }
-      },
-      "type": "object",
-      "required": [
-        "query"
-      ],
-      "title": "SearchRequest"
-    },
-    "SearchResponse": {
-      "properties": {
-        "status": {
-          "$ref": "#/definitions/ResponseStatus"
-        },
-        "message": {
-          "type": "string"
-        },
-        "results": {
-          "items": {
-            "$ref": "#/definitions/S2SearchResult"
-          },
-          "type": "array"
-        }
-      },
-      "type": "object",
-      "required": [
-        "status",
-        "message",
-        "results"
-      ],
-      "title": "SearchResponse"
-    },
-    "TextCompletionChoice": {
-      "properties": {
-        "index": {
-          "type": "integer"
-        },
-        "text": {
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "required": [
-        "index",
-        "text"
-      ],
-      "title": "TextCompletionChoice"
-    },
-    "TextCompletionRequest": {
-      "properties": {
-        "text": {
-          "type": "string"
-        },
-        "n_choices": {
-          "type": "integer",
-          "default": 1
-        },
-        "temperature": {
-          "type": "number",
-          "default": 0.7
-        },
-        "max_tokens": {
-          "type": "integer",
-          "default": 512
-        },
-        "title": {
-          "type": "string"
-        },
-        "abstract": {
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "required": [
-        "text"
-      ],
-      "title": "TextCompletionRequest"
-    },
-    "TextCompletionResponse": {
-      "properties": {
-        "status": {
-          "$ref": "#/definitions/ResponseStatus"
-        },
-        "message": {
-          "type": "string"
-        },
-        "choices": {
-          "items": {
-            "$ref": "#/definitions/TextCompletionChoice"
-          },
-          "type": "array"
-        }
-      },
-      "type": "object",
-      "required": [
-        "status",
-        "message",
-        "choices"
-      ],
-      "title": "TextCompletionResponse"
-    },
-    "ValidationError": {
-      "properties": {
-        "loc": {
-          "items": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "integer"
-              }
-            ]
-          },
-          "type": "array",
-          "title": "Location"
-        },
-        "msg": {
-          "type": "string",
-          "title": "Message"
-        },
-        "type": {
-          "type": "string",
-          "title": "Error Type"
-        }
-      },
-      "type": "object",
-      "required": [
-        "loc",
-        "msg",
-        "type"
-      ],
-      "title": "ValidationError"
-    },
     "Author": {
       "properties": {
         "full_name": {
@@ -410,6 +78,19 @@
         "message"
       ],
       "title": "DeleteStatusResponse"
+    },
+    "HTTPValidationError": {
+      "properties": {
+        "detail": {
+          "items": {
+            "$ref": "#/definitions/ValidationError"
+          },
+          "type": "array",
+          "title": "Detail"
+        }
+      },
+      "type": "object",
+      "title": "HTTPValidationError"
     },
     "IngestStatus": {
       "type": "string",
@@ -492,6 +173,15 @@
       "title": "ReferencePatch",
       "description": "ReferencePatch is the input type for updating a Reference's metadata."
     },
+    "ResponseStatus": {
+      "type": "string",
+      "enum": [
+        "ok",
+        "error"
+      ],
+      "title": "ResponseStatus",
+      "description": "An enumeration."
+    },
     "UpdateStatusResponse": {
       "properties": {
         "status": {
@@ -507,6 +197,316 @@
         "message"
       ],
       "title": "UpdateStatusResponse"
+    },
+    "ValidationError": {
+      "properties": {
+        "loc": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              }
+            ]
+          },
+          "type": "array",
+          "title": "Location"
+        },
+        "msg": {
+          "type": "string",
+          "title": "Message"
+        },
+        "type": {
+          "type": "string",
+          "title": "Error Type"
+        }
+      },
+      "type": "object",
+      "required": [
+        "loc",
+        "msg",
+        "type"
+      ],
+      "title": "ValidationError"
+    },
+    "ChatRequest": {
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "n_choices": {
+          "type": "integer",
+          "default": 1
+        },
+        "temperature": {
+          "type": "number",
+          "default": 0.7
+        }
+      },
+      "type": "object",
+      "required": [
+        "text"
+      ],
+      "title": "ChatRequest"
+    },
+    "ChatResponse": {
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string"
+        },
+        "choices": {
+          "items": {
+            "$ref": "#/definitions/ChatResponseChoice"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object",
+      "required": [
+        "status",
+        "message",
+        "choices"
+      ],
+      "title": "ChatResponse"
+    },
+    "ChatResponseChoice": {
+      "properties": {
+        "index": {
+          "type": "integer"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "index",
+        "text"
+      ],
+      "title": "ChatResponseChoice"
+    },
+    "RewriteChoice": {
+      "properties": {
+        "index": {
+          "type": "integer"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "index",
+        "text"
+      ],
+      "title": "RewriteChoice"
+    },
+    "RewriteMannerType": {
+      "type": "string",
+      "enum": [
+        "concise",
+        "elaborate",
+        "scholarly"
+      ],
+      "title": "RewriteMannerType",
+      "description": "An enumeration."
+    },
+    "RewriteRequest": {
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "manner": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/RewriteMannerType"
+            }
+          ],
+          "default": "concise"
+        },
+        "n_choices": {
+          "type": "integer",
+          "default": 1
+        },
+        "temperature": {
+          "type": "number",
+          "default": 0.7
+        }
+      },
+      "type": "object",
+      "required": [
+        "text"
+      ],
+      "title": "RewriteRequest"
+    },
+    "RewriteResponse": {
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string"
+        },
+        "choices": {
+          "items": {
+            "$ref": "#/definitions/RewriteChoice"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object",
+      "required": [
+        "status",
+        "message",
+        "choices"
+      ],
+      "title": "RewriteResponse"
+    },
+    "TextCompletionChoice": {
+      "properties": {
+        "index": {
+          "type": "integer"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "index",
+        "text"
+      ],
+      "title": "TextCompletionChoice"
+    },
+    "TextCompletionRequest": {
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "n_choices": {
+          "type": "integer",
+          "default": 1
+        },
+        "temperature": {
+          "type": "number",
+          "default": 0.7
+        },
+        "max_tokens": {
+          "type": "integer",
+          "default": 512
+        },
+        "title": {
+          "type": "string"
+        },
+        "abstract": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "text"
+      ],
+      "title": "TextCompletionRequest"
+    },
+    "TextCompletionResponse": {
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string"
+        },
+        "choices": {
+          "items": {
+            "$ref": "#/definitions/TextCompletionChoice"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object",
+      "required": [
+        "status",
+        "message",
+        "choices"
+      ],
+      "title": "TextCompletionResponse"
+    },
+    "S2SearchResult": {
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "abstract": {
+          "type": "string"
+        },
+        "venue": {
+          "type": "string"
+        },
+        "year": {
+          "type": "integer"
+        },
+        "paperId": {
+          "type": "string"
+        },
+        "citationCount": {
+          "type": "integer"
+        },
+        "openAccessPdf": {
+          "type": "string"
+        },
+        "authors": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object",
+      "title": "S2SearchResult"
+    },
+    "SearchRequest": {
+      "properties": {
+        "query": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "integer",
+          "default": 10
+        }
+      },
+      "type": "object",
+      "required": [
+        "query"
+      ],
+      "title": "SearchRequest"
+    },
+    "SearchResponse": {
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string"
+        },
+        "results": {
+          "items": {
+            "$ref": "#/definitions/S2SearchResult"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object",
+      "required": [
+        "status",
+        "message",
+        "results"
+      ],
+      "title": "SearchResponse"
     },
     "Body_create_file__project_id___filepath__put": {
       "properties": {
