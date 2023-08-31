@@ -7,7 +7,6 @@ export async function completeSentence(text: string): Promise<string[]> {
       return [];
     }
 
-    // const response = await universalPost<TextCompletionResponse, TextCompletionRequest>('/api/ai/completion', {
     const response = await apiPost('/api/ai/completion', {
       text,
       n_choices: 3,

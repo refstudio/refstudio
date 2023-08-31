@@ -24,11 +24,9 @@ type ProjectPostResponse = ProjectsResponse;
 // ########################################################################################
 export async function readAllProjects(): Promise<ProjectInfo[]> {
   const projects = (await apiGetJson('/api/projects/')) as ProjectsResponse;
-  // const projects = await universalGet<ProjectsResponse>(`/api/projects/`);
   return Object.keys(projects).map((id) => ({ id, path: projects[id].project_path, name: projects[id].project_name }));
 }
 export async function readProjectById(projectId: string): Promise<ProjectInfo> {
-  // const projectInfo = await universalGet<ProjectGetResponse>(`/api/projects/${projectId}`);
   const projectInfo = (await apiGetJson('/api/projects/{project_id}', {
     path: { project_id: projectId },
   })) as ProjectGetResponse;

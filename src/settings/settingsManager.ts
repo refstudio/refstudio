@@ -30,7 +30,6 @@ let settingsManager: SettingsManagerView | undefined;
 export async function initSettings() {
   let settings: SettingsSchema;
   try {
-    // settings = await universalGet<SettingsSchema>('/api/settings/');
     settings = (await apiGetJson('/api/settings/')) as SettingsSchema;
 
     console.log('Settings initialized with success with', settings);
