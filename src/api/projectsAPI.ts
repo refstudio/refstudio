@@ -1,5 +1,6 @@
 import { FileEntry as TauriFileEntry } from '@tauri-apps/api/fs';
 
+import { isNonNullish } from '../lib/isNonNullish';
 import { universalDelete, universalGet, universalHead, universalPost, universalPutFile } from './api';
 
 export interface ProjectInfo {
@@ -57,10 +58,13 @@ export async function readProjectFiles(projectId: string): Promise<TauriFileEntr
   const projectInfo = await universalGet<ProjectGetResponse>(`/api/projects/${projectId}`);
   const relativePaths = projectInfo.filepaths
     .map((path) => path.replace(projectInfo.project_path + '/', '')) // Remove project path from API output
-    .map((path) => path.replace(/^\//, '')); // Remove the leading / (we don't want them in the output)
+    .map((path) => path.replace(/^\//, '')) // Remove the leading / (we don't want them in the output)
+    .filter((path) => !path.startsWith('.'));
 
   const rootFiles = relativePaths
-    .filter((path) => !path.startsWith('uploads'))
+    .filter((path) => !path.includes('/'))
+    .filter((path) => path !== 'uploads')
+    .filter((path) => path !== 'exports')
     .map((path) => ({
       path,
       name: path.replace('/', ''),
@@ -75,14 +79,31 @@ export async function readProjectFiles(projectId: string): Promise<TauriFileEntr
       children: undefined,
     }));
 
+  const exportsFiles = relativePaths
+    .filter((path) => path.startsWith('exports/'))
+    .map((path) => ({
+      path,
+      name: path.replace('exports/', ''),
+      children: undefined,
+    }));
+
   return [
     ...rootFiles,
-    {
-      path: 'uploads',
-      name: 'uploads',
-      children: uploadsFiles,
-    },
-  ];
+    uploadsFiles.length > 0
+      ? {
+          path: 'uploads',
+          name: 'uploads',
+          children: uploadsFiles,
+        }
+      : null,
+    exportsFiles.length > 0
+      ? {
+          path: 'exports',
+          name: 'exports',
+          children: exportsFiles,
+        }
+      : null,
+  ].filter(isNonNullish);
 }
 
 // ########################################################################################
