@@ -1,8 +1,9 @@
 import { makeUploadPath } from '../io/filesystem';
 import { ReferenceItem } from '../types/ReferenceItem';
-import { universalGet, universalPatch, universalPost } from './api';
-import { DeleteStatusResponse, UpdateStatusResponse } from './api-types';
+import { universalGet } from './api';
+import { DeleteStatusResponse } from './api-types';
 import { callSidecar } from './sidecar';
+import { apiPatch, apiPost } from './typed-api';
 import { IngestResponse, Reference } from './types';
 
 function parsePdfIngestionResponse(references: Reference[]): ReferenceItem[] {
@@ -24,7 +25,10 @@ function parsePdfIngestionResponse(references: Reference[]): ReferenceItem[] {
 }
 
 export async function runPDFIngestion(projectId: string): Promise<ReferenceItem[]> {
-  const ingestResponse = await universalPost<IngestResponse>(`/api/references/${projectId}`);
+  // const ingestResponse = await universalPost<IngestResponse>(`/api/references/${projectId}`);
+  const ingestResponse = (await apiPost('/api/references/{project_id}', {
+    path: { project_id: projectId },
+  })) as IngestResponse;
   return parsePdfIngestionResponse(ingestResponse.references);
 }
 
@@ -59,9 +63,13 @@ export async function updateReference(projectId: string, referenceId: string, pa
     return;
   }
 
-  const status = await universalPatch<UpdateStatusResponse>(`/api/references/${projectId}/${referenceId}`, {
-    data: referencePatch,
-  });
+  const status = await apiPatch(
+    '/api/references/{project_id}/{reference_id}',
+    { path: { project_id: projectId, reference_id: referenceId } },
+    {
+      data: referencePatch,
+    },
+  );
   if (status.status !== 'ok') {
     throw new Error(status.message);
   }

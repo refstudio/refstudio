@@ -14,8 +14,10 @@ from sidecar.typing import (
     DeleteRequest,
     DeleteStatusResponse,
     IngestRequest,
+    IngestResponse,
     Reference,
     ReferencePatch,
+    RefStudioModel,
     RewriteRequest,
     RewriteResponse,
     SearchRequest,
@@ -99,7 +101,7 @@ async def list_references(project_id: str) -> list[Reference]:
 
 
 @references_api.post("/{project_id}")
-async def ingest_references(project_id: str):
+async def ingest_references(project_id: str, payload: RefStudioModel) -> IngestResponse:
     """
     Ingests references from PDFs in the project uploads directory
     """
