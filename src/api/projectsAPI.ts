@@ -1,7 +1,7 @@
 import { FileEntry as TauriFileEntry } from '@tauri-apps/api/fs';
 
-import { universalDelete, universalGet, universalHead, universalPost, universalPutFile } from './api';
-import { apiGetJson } from './typed-api';
+import { universalGet, universalHead, universalPutFile } from './api';
+import { apiDelete, apiGetJson, apiPost } from './typed-api';
 
 export interface ProjectInfo {
   id: string;
@@ -38,10 +38,12 @@ export async function readProjectById(projectId: string): Promise<ProjectInfo> {
 }
 
 export async function createRemoteProject(projectName: string, projectPath?: string): Promise<ProjectInfo> {
-  const payload = await universalPost<ProjectPostResponse>(
-    `/api/projects/?project_name=${projectName}&project_path=${encodeURIComponent(projectPath ?? '')}`,
+  const payload = (await apiPost(
+    '/api/projects/',
+    { query: { project_name: projectName, project_path: projectPath } },
     {},
-  );
+  )) as ProjectPostResponse;
+
   const projectId = Object.keys(payload)[0];
   const { project_path, project_name } = payload[projectId];
 
@@ -57,7 +59,9 @@ export async function createRemoteProject(projectName: string, projectPath?: str
 // ########################################################################################
 /** NOTE: This is a simplified version of the function */
 export async function readProjectFiles(projectId: string): Promise<TauriFileEntry[]> {
-  const projectInfo = await universalGet<ProjectGetResponse>(`/api/projects/${projectId}`);
+  const projectInfo = (await apiGetJson('/api/projects/{project_id}', {
+    path: { project_id: projectId },
+  })) as ProjectGetResponse;
   const relativePaths = projectInfo.filepaths
     .map((path) => path.replace(projectInfo.project_path + '/', '')) // Remove project path from API output
     .map((path) => path.replace(/^\//, '')); // Remove the leading / (we don't want them in the output)
@@ -124,7 +128,7 @@ export const existsProjectFile = async (projectId: string, filePath: string) => 
 };
 
 export const deleteProjectFile = async (projectId: string, relativeFilePath: string) => {
-  await universalDelete(`/api/fs/${projectId}/${relativeFilePath}`);
+  await apiDelete('/api/fs/{project_id}/{filepath}', { path: { project_id: projectId, filepath: relativeFilePath } });
 };
 
 export const renameProjectFile = async (projectId: string, relativeFilePath: string, newFilePath: string) => {

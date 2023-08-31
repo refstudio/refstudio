@@ -168,7 +168,9 @@ async def list_projects():
 
 
 @project_api.post("/")
-async def create_project(project_name: str, project_path: str = None):
+async def create_project(
+    payload: EmptyRequest, project_name: str, project_path: str = None
+):
     """
     Creates a project directory in the filesystem
 

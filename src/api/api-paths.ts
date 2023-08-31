@@ -639,6 +639,11 @@ export interface operations {
         project_path?: string;
       };
     };
+    requestBody: {
+      content: {
+        'application/json': EmptyRequest;
+      };
+    };
     responses: {
       /** @description Successful Response */
       200: {
