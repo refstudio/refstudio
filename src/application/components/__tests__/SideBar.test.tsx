@@ -30,8 +30,8 @@ describe('SideBar', () => {
 
     render(<SideBar activePane="References" items={panes} onItemClick={noop} />);
     expect(screen.getByRole('menubar')).toBeInTheDocument();
-    expect(screen.getByTestId('Explorer').parentElement).not.toHaveClass('active');
-    expect(screen.getByTestId('References').parentElement).toHaveClass('active');
+    expect(screen.getByTestId('Explorer').parentElement!.parentElement).not.toHaveClass('active');
+    expect(screen.getByTestId('References').parentElement!.parentElement).toHaveClass('active');
   });
 
   it('should display disabled icons as disabled', () => {
@@ -46,7 +46,7 @@ describe('SideBar', () => {
     expect(screen.getByTestId('References')).toBeInTheDocument();
     const explorerIcon = screen.getByTestId('Explorer');
     expect(explorerIcon).toBeInTheDocument();
-    expect(explorerIcon.parentElement).toBeDisabled();
+    expect(explorerIcon.parentElement!.parentElement).toBeDisabled();
   });
 
   it('should call onClick with pane name', async () => {
