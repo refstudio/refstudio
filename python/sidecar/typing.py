@@ -29,6 +29,12 @@ class RefStudioModel(BaseModel):
                 prop.pop("title", None)
 
 
+class EmptyRequest(RefStudioModel):
+    """Use this to indicate that a request only accepts an empty object ({})"""
+
+    pass
+
+
 class ResponseStatus(StrEnum):
     OK = "ok"
     ERROR = "error"

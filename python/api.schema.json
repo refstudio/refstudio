@@ -79,6 +79,12 @@
       ],
       "title": "DeleteStatusResponse"
     },
+    "EmptyRequest": {
+      "properties": {},
+      "type": "object",
+      "title": "EmptyRequest",
+      "description": "Use this to indicate that a request only accepts an empty object ({})"
+    },
     "HTTPValidationError": {
       "properties": {
         "detail": {
@@ -91,6 +97,25 @@
       },
       "type": "object",
       "title": "HTTPValidationError"
+    },
+    "IngestResponse": {
+      "properties": {
+        "project_name": {
+          "type": "string"
+        },
+        "references": {
+          "items": {
+            "$ref": "#/definitions/Reference"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object",
+      "required": [
+        "project_name",
+        "references"
+      ],
+      "title": "IngestResponse"
     },
     "IngestStatus": {
       "type": "string",

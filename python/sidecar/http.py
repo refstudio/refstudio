@@ -13,11 +13,11 @@ from sidecar.typing import (
     ChatResponse,
     DeleteRequest,
     DeleteStatusResponse,
+    EmptyRequest,
     IngestRequest,
     IngestResponse,
     Reference,
     ReferencePatch,
-    RefStudioModel,
     RewriteRequest,
     RewriteResponse,
     SearchRequest,
@@ -101,7 +101,7 @@ async def list_references(project_id: str) -> list[Reference]:
 
 
 @references_api.post("/{project_id}")
-async def ingest_references(project_id: str, payload: RefStudioModel) -> IngestResponse:
+async def ingest_references(project_id: str, payload: EmptyRequest) -> IngestResponse:
     """
     Ingests references from PDFs in the project uploads directory
     """
@@ -334,4 +334,5 @@ async def get_settings() -> SettingsSchema:
 @settings_api.put("/")
 async def update_settings(req: SettingsSchema) -> SettingsSchema:
     user_id = "user1"
+    return settings.update_settings_for_user(user_id, req)
     return settings.update_settings_for_user(user_id, req)

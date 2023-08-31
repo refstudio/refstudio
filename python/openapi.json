@@ -153,6 +153,12 @@
         "title": "DeleteStatusResponse",
         "type": "object"
       },
+      "EmptyRequest": {
+        "description": "Use this to indicate that a request only accepts an empty object ({})",
+        "properties": {},
+        "title": "EmptyRequest",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -164,6 +170,25 @@
           }
         },
         "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "IngestResponse": {
+        "properties": {
+          "project_name": {
+            "type": "string"
+          },
+          "references": {
+            "items": {
+              "$ref": "#/components/schemas/Reference"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "project_name",
+          "references"
+        ],
+        "title": "IngestResponse",
         "type": "object"
       },
       "IngestStatus": {
@@ -1219,11 +1244,23 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmptyRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/IngestResponse"
+                }
               }
             },
             "description": "Successful Response"

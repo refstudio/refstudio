@@ -9,7 +9,9 @@ import {
   Chunk,
   DeleteRequest,
   DeleteStatusResponse,
+  EmptyRequest,
   HTTPValidationError,
+  IngestResponse,
   IngestStatus,
   LoggingSettings,
   OpenAISettings,
@@ -198,10 +200,20 @@ export interface components {
       message: string;
       status: ResponseStatus;
     };
+    /**
+     * EmptyRequest
+     * @description Use this to indicate that a request only accepts an empty object ({})
+     */
+    EmptyRequest: Record<string, never>;
     /** HTTPValidationError */
     HTTPValidationError: {
       /** Detail */
       detail?: ValidationError[];
+    };
+    /** IngestResponse */
+    IngestResponse: {
+      project_name: string;
+      references: Reference[];
     };
     /**
      * IngestStatus
@@ -749,11 +761,16 @@ export interface operations {
         project_id: string;
       };
     };
+    requestBody: {
+      content: {
+        'application/json': EmptyRequest;
+      };
+    };
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': unknown;
+          'application/json': IngestResponse;
         };
       };
       /** @description Validation Error */
