@@ -90,13 +90,13 @@ function RecentProjectsList() {
   const { data: projects } = useQuery({ queryKey: ['recent-projects'], queryFn: readAllProjects });
 
   return (
-    <div className="flex flex-col items-stretch gap-4">
+    <div className="flex flex-col items-stretch gap-4 overflow-y-hidden">
       <h1>Recent Projects</h1>
       {projects && (
-        <div className="flex flex-col items-stretch gap-2">
+        <div className="flex flex-col items-stretch gap-2 overflow-y-scroll">
           {projects.map((project, index) => (
             <>
-              {index > 0 && <div className="h-[1px] bg-welcome-border" key={index} />}
+              {index > 0 && <div className="h-[1px] shrink-0 bg-welcome-border" key={index} />}
               <ProjectItem key={project.id} project={project} />
             </>
           ))}
