@@ -1,5 +1,4 @@
 import json
-from pathlib import Path
 
 from sidecar import settings, typing
 from sidecar.settings import logger
@@ -35,7 +34,6 @@ class JsonStorage:
         self.chunks = []
         self.corpus = []
         self.tokenized_corpus = []
-        self.ensureStorageFileExists()
 
     def load(self):
         with open(self.filepath, "r") as f:
@@ -52,13 +50,6 @@ class JsonStorage:
             ref.chunks = chunks
             self.references.append(ref)
         self.create_corpus()
-
-    def ensureStorageFileExists(self):
-        if not Path(self.filepath).exists():
-            logger.info(f"Creating {self.filepath}...")
-            Path(self.filepath).parent.mkdir(parents=True, exist_ok=True)
-            with open(self.filepath, "w") as f:
-                json.dump([], f, indent=2)
 
     def save(self):
         """

@@ -90,7 +90,11 @@ async def list_references(project_id: str) -> list[Reference]:
     user_id = "user1"
     project_path = projects.get_project_path(user_id, project_id)
     store = storage.JsonStorage(project_path / ".storage" / "references.json")
-    store.load()
+    try:
+        store.load()
+    except FileNotFoundError:
+        # no references have been ingested yet
+        return []
     return store.references
 
 

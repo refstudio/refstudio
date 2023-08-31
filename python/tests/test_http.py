@@ -38,7 +38,20 @@ def setup_uploaded_reference_pdfs(monkeypatch, tmp_path):
         )
 
 
-def test_list_references(monkeypatch, tmp_path):
+def test_list_references_should_return_empty_list(monkeypatch, tmp_path):
+    user_id = "user1"
+    project_id = "project1"
+
+    monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
+    _ = projects.create_project(user_id, project_id, project_name="foo")
+
+    # .storage/references.json does not exist as no references have been ingested
+    response = references_client.get(f"/{project_id}")
+    assert response.status_code == 200
+    assert len(response.json()) == 0
+
+
+def test_list_references_should_return_references(monkeypatch, tmp_path):
     user_id = "user1"
     project_id = "project1"
 
