@@ -19,7 +19,7 @@ describe('Typed API', () => {
 
   it('should issue POST requests with query parameters', async () => {
     vi.mocked(universalPost).mockResolvedValueOnce({
-      abc: { project_name: 'ABC', project_path: '/path/to/project' },
+      abc: { project_name: 'abc', project_path: '/path/to/project' },
     });
     const response = await apiPost(
       '/api/projects/',
@@ -32,8 +32,28 @@ describe('Typed API', () => {
       {} as unknown as never,
     );
     expect(response).toEqual({
-      abc: { project_name: 'ABC', project_path: '/path/to/project' },
+      abc: { project_name: 'abc', project_path: '/path/to/project' },
     });
     expect(universalPost).toHaveBeenCalledWith('/api/projects/?project_name=abc', {});
+  });
+
+  it('should escape query parameters', async () => {
+    vi.mocked(universalPost).mockResolvedValueOnce({
+      'a&b/c': { project_name: 'a&b/c', project_path: '/path/to/project' },
+    });
+    const response = await apiPost(
+      '/api/projects/',
+      {
+        query: {
+          project_name: 'a&b/c',
+        },
+      },
+      // TODO: update request body type for this endpoint
+      {} as unknown as never,
+    );
+    expect(response).toEqual({
+      'a&b/c': { project_name: 'a&b/c', project_path: '/path/to/project' },
+    });
+    expect(universalPost).toHaveBeenCalledWith('/api/projects/?project_name=a%26b%2Fc', {});
   });
 });
