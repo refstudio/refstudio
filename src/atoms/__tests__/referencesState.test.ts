@@ -33,8 +33,9 @@ describe('referencesState', () => {
 
   it('should load ingested references into store', async () => {
     vi.mocked(getIngestedReferences).mockResolvedValue(REFERENCES);
-    await store.set(loadReferencesAtom);
+    await store.set(loadReferencesAtom, 'project-id');
     expect(getIngestedReferences).toHaveBeenCalled();
+    expect(getIngestedReferences).toHaveBeenCalledWith('project-id');
     expect(store.get(areReferencesLoadedAtom)).toBeTruthy();
     expect(store.get(getReferencesAtom)).toHaveLength(REFERENCES.length);
   });

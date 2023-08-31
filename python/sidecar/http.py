@@ -1,12 +1,11 @@
 import os
 import shutil
 from pathlib import Path
-from typing import Annotated
 from uuid import uuid4
 
 import psutil
 from dotenv import load_dotenv
-from fastapi import Depends, FastAPI, File, UploadFile
+from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from sidecar import chat, ingest, projects, rewrite, search, settings, storage
 from sidecar.typing import (
@@ -29,7 +28,6 @@ from sidecar.typing import (
 
 load_dotenv()
 
-sidecar_api = FastAPI()  # Legacy API for existing sidecar cli functionality
 references_api = FastAPI()  # API for interacting with references
 ai_api = FastAPI()  # API for interacting with AI
 search_api = FastAPI()  # API for interacting with search
@@ -39,33 +37,6 @@ settings_api = FastAPI()  # API for interacting with settings
 
 meta_api = FastAPI()
 """API for monitoring and controling the server"""
-
-
-# Sidecar API
-# -----------
-@sidecar_api.post("/rewrite")
-async def http_rewrite(req: RewriteRequest) -> RewriteResponse:
-    response = rewrite.rewrite(req)
-    return response
-
-
-@sidecar_api.post("/completion")
-async def http_completion(req: TextCompletionRequest) -> TextCompletionResponse:
-    response = rewrite.complete_text(req)
-    return response
-
-
-@sidecar_api.post("/chat")
-async def http_chat(req: ChatRequest) -> ChatResponse:
-    response = chat.ask_question(req)
-    return response
-
-
-# TODO: remove this endpoint once the Search API is adopted
-@sidecar_api.post("/search")
-async def http_search(req: SearchRequest) -> SearchResponse:
-    response = search.search_s2(req)
-    return response
 
 
 # Search API
@@ -79,10 +50,9 @@ async def http_search_s2(req: SearchRequest) -> SearchResponse:
 # AI API
 # --------------
 @ai_api.post("/rewrite")
-async def http_ai_rewrite(
-    req: RewriteRequest,
-    user_settings: Annotated[SettingsSchema, Depends(settings.get_settings_for_user)],
-) -> RewriteResponse:
+async def http_ai_rewrite(req: RewriteRequest) -> RewriteResponse:
+    user_id = "user1"
+    user_settings = settings.get_settings_for_user(user_id)
     response = rewrite.rewrite(req, user_settings=user_settings)
     return response
 
@@ -90,8 +60,9 @@ async def http_ai_rewrite(
 @ai_api.post("/completion")
 async def http_ai_completion(
     req: TextCompletionRequest,
-    user_settings: Annotated[SettingsSchema, Depends(settings.get_settings_for_user)],
 ) -> TextCompletionResponse:
+    user_id = "user1"
+    user_settings = settings.get_settings_for_user(user_id)
     response = rewrite.complete_text(req, user_settings=user_settings)
     return response
 
@@ -100,8 +71,9 @@ async def http_ai_completion(
 async def http_ai_chat(
     project_id: str,
     req: ChatRequest,
-    user_settings: Annotated[SettingsSchema, Depends(settings.get_settings_for_user)],
 ) -> ChatResponse:
+    user_id = "user1"
+    user_settings = settings.get_settings_for_user(user_id)
     response = chat.ask_question(
         req, project_id=project_id, user_settings=user_settings
     )
@@ -118,7 +90,11 @@ async def list_references(project_id: str) -> list[Reference]:
     user_id = "user1"
     project_path = projects.get_project_path(user_id, project_id)
     store = storage.JsonStorage(project_path / ".storage" / "references.json")
-    store.load()
+    try:
+        store.load()
+    except FileNotFoundError:
+        # no references have been ingested yet
+        return []
     return store.references
 
 
@@ -222,10 +198,12 @@ async def get_project(project_id: str):
     """
     user_id = "user1"
     project_path = projects.get_project_path(user_id, project_id)
+    project_name = projects.get_project_name(user_id, project_id)
     filepaths = projects.get_project_files(user_id, project_id)
     return {
         "project_id": project_id,
         "project_path": project_path,
+        "project_name": project_name,
         "filepaths": filepaths,
     }
 
@@ -296,6 +274,16 @@ async def read_file(project_id: str, filepath: Path):
             "filepath": filepath,
         }
     return FileResponse(filepath)
+
+
+@filesystem_api.head("/{project_id}/{filepath:path}", status_code=200)
+async def head_file(project_id: str, filepath: Path):
+    user_id = "user1"
+    project_path = projects.get_project_path(user_id, project_id)
+    filepath = project_path / filepath
+
+    if not filepath.exists():
+        raise HTTPException(status_code=404, detail="File not found")
 
 
 @filesystem_api.delete("/{project_id}/{filepath:path}")

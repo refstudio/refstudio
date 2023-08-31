@@ -12,7 +12,7 @@ vi.mock('../../io/filesystem');
 
 const deleteEventName: RefStudioEventName = 'refstudio://explorer/delete';
 
-describe('EventsListener.close', () => {
+describe('EventsListener.delete', () => {
   let store: ReturnType<typeof createStore>;
 
   beforeEach(() => {
