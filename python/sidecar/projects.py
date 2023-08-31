@@ -3,6 +3,7 @@ import shutil
 from pathlib import Path
 
 from sidecar import settings
+from sidecar.typing import FileEntry, FolderEntry, ProjectFileTreeResponse
 
 # Ensure that the server's path storage directory exists.
 Path(settings.WEB_STORAGE_URL).mkdir(parents=True, exist_ok=True)
@@ -106,31 +107,14 @@ def delete_project(user_id: str, project_id: str) -> None:
         pass
 
 
-def get_project_files(user_id: str, project_id: str) -> dict:
+def get_project_files(user_id: str, project_id: str) -> ProjectFileTreeResponse:
     """
     Get the files in a project as a tree structure.
 
     Returns
     -------
-    dict
-        A dictionary of the form:
-        {
-            "project_id": some-id,
-            "project_name": some-name,
-            "project_path": "/some/path",
-            "contents": {
-                "directory_name": [
-                    "file1",
-                    "file2",
-                    "file3",
-                ]
-                "another_directory": [
-                    "file1",
-                    "file2",
-                    "file3",
-                ]
-            }
-        }
+    ProjectFileTreeResponse
+        A tree structure of the files in a project.
     """
     project_path = get_project_path(user_id, project_id)
     project_name = get_project_name(user_id, project_id)
@@ -138,27 +122,51 @@ def get_project_files(user_id: str, project_id: str) -> dict:
     if not project_path.exists():
         raise FileNotFoundError(f"Project {project_id} does not exist")
 
-    contents = {}
+    contents = []
     for obj in project_path.rglob("*"):
-        relpath = str(obj.parent).replace(str(project_path), "")
-
-        if relpath.startswith("/"):
-            relpath = relpath[1:]
+        relpath = obj.relative_to(project_path)
 
         # Skip hidden files and directories
-        if relpath.startswith("."):
+        if relpath.name.startswith(".") or obj.name.startswith("."):
             continue
 
+        # files in subdirectories
         if obj.is_dir():
+            contents.append(create_folder_entry(obj, project_path=project_path))
             continue
 
-        if str(obj.parent) not in contents:
-            contents[relpath] = []
+        # files at the project root
+        if obj.parent.name == project_id:
+            contents.append(create_file_entry(obj, project_path=project_path))
+            continue
 
-        contents[relpath].append(obj.name)
-    return {
-        "project_id": project_id,
-        "project_name": project_name,
-        "project_path": str(project_path),
-        "contents": contents,
-    }
+    return ProjectFileTreeResponse(
+        id=project_id,
+        name=project_name,
+        path=str(project_path),
+        contents=contents,
+    )
+
+
+def create_file_entry(path: Path, project_path: Path) -> FileEntry:
+    return FileEntry(
+        name=path.name,
+        path=str(path.relative_to(project_path)),
+        is_file=path.is_file(),
+        is_folder=path.is_dir(),
+        file_extension=path.suffix,
+    )
+
+
+def create_folder_entry(path: Path, project_path: Path) -> FolderEntry:
+    children = []
+    for obj in path.rglob("*"):
+        if obj.is_file():
+            children.append(create_file_entry(obj, project_path=project_path))
+    return FolderEntry(
+        name=path.name,
+        path=str(path.relative_to(project_path)),
+        is_file=path.is_file(),
+        is_folder=path.is_dir(),
+        children=children,
+    )

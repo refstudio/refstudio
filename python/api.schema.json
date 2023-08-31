@@ -522,6 +522,99 @@
       ],
       "title": "Body_create_file__project_id___filepath__put"
     },
+    "FileEntry": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "is_file": {
+          "type": "boolean",
+          "default": true
+        },
+        "is_folder": {
+          "type": "boolean",
+          "default": false
+        },
+        "file_extension": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "name",
+        "path",
+        "file_extension"
+      ],
+      "title": "FileEntry"
+    },
+    "FolderEntry": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "is_file": {
+          "type": "boolean",
+          "default": false
+        },
+        "is_folder": {
+          "type": "boolean",
+          "default": true
+        },
+        "children": {
+          "items": {
+            "$ref": "#/definitions/FileEntry"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object",
+      "required": [
+        "name",
+        "path",
+        "children"
+      ],
+      "title": "FolderEntry"
+    },
+    "ProjectFileTreeResponse": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "contents": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/FileEntry"
+              },
+              {
+                "$ref": "#/definitions/FolderEntry"
+              }
+            ]
+          },
+          "type": "array"
+        }
+      },
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "path",
+        "contents"
+      ],
+      "title": "ProjectFileTreeResponse"
+    },
     "LoggingSettings": {
       "properties": {
         "enable": {

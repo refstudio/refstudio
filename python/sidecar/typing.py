@@ -206,6 +206,30 @@ class SearchResponse(RefStudioModel):
     results: list[S2SearchResult]
 
 
+class FileEntryBase(RefStudioModel):
+    name: str
+    path: str
+
+
+class FileEntry(FileEntryBase):
+    is_file: bool = True
+    is_folder: bool = False
+    file_extension: str
+
+
+class FolderEntry(FileEntryBase):
+    is_file: bool = False
+    is_folder: bool = True
+    children: list[FileEntry]
+
+
+class ProjectFileTreeResponse(RefStudioModel):
+    id: str
+    name: str
+    path: str
+    contents: list[FileEntry | FolderEntry]
+
+
 class OpenAISettings(RefStudioModel):
     api_key: str = ""
     chat_model: str = "gpt-3.5-turbo"
