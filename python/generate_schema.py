@@ -1,4 +1,10 @@
-"""Generate cli.schema.json, which contains return types for the subcommands."""
+"""Generate OpenAPI and JSONSchema for the HTTP API.
+
+This generates two files:
+
+1. openapi.json, which contains an OpenAPI spec for the entire HTTP API.
+2. api.schema.json, which contains JSONSchema for the request/response types.
+"""
 import json
 
 from fastapi.openapi.utils import get_openapi
