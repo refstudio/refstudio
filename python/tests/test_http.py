@@ -380,7 +380,7 @@ def test_create_project(monkeypatch, tmp_path):
     monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
 
     params = {"project_name": "project1name"}
-    response = project_client.post("/", params=params)
+    response = project_client.post("/", params=params, json={})
 
     project_id = list(response.json().keys())[0]
     assert response.status_code == 200
