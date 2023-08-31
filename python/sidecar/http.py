@@ -7,7 +7,7 @@ import psutil
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse
-from sidecar import chat, ingest, projects, rewrite, search, settings, storage
+from sidecar import chat, ingest, projects, rewrite, settings, storage
 from sidecar.typing import (
     ChatRequest,
     ChatResponse,
@@ -18,8 +18,6 @@ from sidecar.typing import (
     ReferencePatch,
     RewriteRequest,
     RewriteResponse,
-    SearchRequest,
-    SearchResponse,
     SettingsSchema,
     TextCompletionRequest,
     TextCompletionResponse,
@@ -37,14 +35,6 @@ settings_api = FastAPI()  # API for interacting with settings
 
 meta_api = FastAPI()
 """API for monitoring and controling the server"""
-
-
-# Search API
-# --------------
-@search_api.post("/s2")
-async def http_search_s2(req: SearchRequest) -> SearchResponse:
-    response = search.search_s2(req)
-    return response
 
 
 # AI API
@@ -332,4 +322,5 @@ async def get_settings() -> SettingsSchema:
 @settings_api.put("/")
 async def update_settings(req: SettingsSchema) -> SettingsSchema:
     user_id = "user1"
+    return settings.update_settings_for_user(user_id, req)
     return settings.update_settings_for_user(user_id, req)

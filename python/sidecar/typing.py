@@ -13,6 +13,7 @@ except ImportError:
     # Python 3.10 and below
     from strenum import StrEnum
 
+from sidecar.search.schemas import SearchRequest, SearchResponse
 
 load_dotenv()
 
@@ -182,28 +183,6 @@ class ChatResponse(RefStudioModel):
     status: ResponseStatus
     message: str
     choices: list[ChatResponseChoice]
-
-
-class SearchRequest(RefStudioModel):
-    query: str
-    limit: int = 10
-
-
-class S2SearchResult(RefStudioModel):
-    title: str | None = None
-    abstract: str | None = None
-    venue: str | None = None
-    year: int | None = None
-    paperId: str | None = None
-    citationCount: int | None = None
-    openAccessPdf: str | None = None
-    authors: list[str] | None = None
-
-
-class SearchResponse(RefStudioModel):
-    status: ResponseStatus
-    message: str
-    results: list[S2SearchResult]
 
 
 class OpenAISettings(RefStudioModel):
