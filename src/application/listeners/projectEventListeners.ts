@@ -10,6 +10,7 @@ import {
   newSampleProjectAtom,
   openProjectAtom,
 } from '../../atoms/projectState';
+import { emitEvent } from '../../events';
 import { getNewProjectsBaseDir } from '../../io/filesystem';
 import { notifyInfo, notifyWarning } from '../../notifications/notifications';
 import { saveCachedSettings, setCachedSetting } from '../../settings/settingsManager';
@@ -59,8 +60,6 @@ export function useFileProjectNewSampleListener() {
 }
 
 export function useFileProjectOpenListener() {
-  const openProject = useSetAtom(openProjectAtom);
-
   return async () => {
     let projectId: string;
     if (import.meta.env.VITE_IS_WEB) {
@@ -93,10 +92,7 @@ export function useFileProjectOpenListener() {
       }
     }
 
-    const projectToOpen = await readProjectById(projectId);
-    await openProject(projectId, projectToOpen.path, projectToOpen.name);
-    persistActiveProjectInSettings(projectId);
-    notifyInfo('New project open.');
+    emitEvent('refstudio://projects/open', { projectId });
   };
 }
 
@@ -117,4 +113,15 @@ export function useFileProjectCloseListener() {
 function persistActiveProjectInSettings(id: string) {
   setCachedSetting('project.current_directory', id);
   void saveCachedSettings();
+}
+
+export function useOpenProjectListener() {
+  const openProject = useSetAtom(openProjectAtom);
+
+  return async ({ projectId }: { projectId: string }) => {
+    const projectToOpen = await readProjectById(projectId);
+    await openProject(projectId, projectToOpen.path, projectToOpen.name);
+    persistActiveProjectInSettings(projectId);
+    notifyInfo('New project open.');
+  };
 }

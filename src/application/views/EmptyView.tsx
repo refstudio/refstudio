@@ -1,17 +1,8 @@
-import { useAtom, useAtomValue } from 'jotai';
 
-import { isProjectOpenAtom } from '../../atoms/projectState';
-import { welcomeTipDismissedAtom } from '../../atoms/welcomeViewState';
-import { Button } from '../../components/Button';
-import { CloseIcon, OpenIcon } from '../../components/icons';
-import { emitEvent } from '../../events';
 import { cx } from '../../lib/cx';
-import { AddIcon, SampleIcon } from '../components/icons';
 import { Logo } from './Logo';
 
 export function EmptyView() {
-  const isProjectOpen = useAtomValue(isProjectOpenAtom);
-
   return (
     <div
       className={cx(
@@ -21,7 +12,6 @@ export function EmptyView() {
         'cursor-default select-none',
       )}
     >
-      {isProjectOpen ? <div className="w-72" /> : <WelcomeActions />}
       <div className={cx('flex flex-col items-center justify-center gap-[4.5rem]', 'flex-1 px-6 pb-16 pt-0')}>
         <Logo />
         <div className="flex flex-col items-end gap-4">
@@ -33,7 +23,6 @@ export function EmptyView() {
           <EmptyViewShortcut keys={['⌘', 'P']} text="Quick Files" />
         </div>
       </div>
-      <div className="w-72" />
     </div>
   );
 }
@@ -80,56 +69,6 @@ function EmptyViewShortcut({ text, keys }: Shortcut) {
           );
         })}
       </div>
-    </div>
-  );
-}
-
-function WelcomeActions() {
-  const [welcomeTipDismissed, setWelcomeTipDismissed] = useAtom(welcomeTipDismissedAtom);
-
-  return (
-    <div className="flex w-72 flex-col items-stretch gap-10">
-      <div className="flex flex-col items-start gap-4">
-        <h1 className="text-card-txt-primary">Welcome to refstudio</h1>
-        <div className="flex flex-col items-center gap-2 self-stretch">
-          <Button
-            Action={<AddIcon />}
-            text="Create Project"
-            onClick={() => emitEvent('refstudio://menu/file/project/new')}
-          />
-          <Button
-            Action={<OpenIcon />}
-            text="Open Project"
-            type="secondary"
-            onClick={() => emitEvent('refstudio://menu/file/project/open')}
-          />
-        </div>
-      </div>
-      {!welcomeTipDismissed && (
-        <div
-          className={cx(
-            'flex flex-col items-stretch gap-6 p-4',
-            'rounded-default bg-card-bg-secondary',
-            'border-t-[0.25rem] border-t-card-bg-header',
-          )}
-        >
-          <div className="flex items-start gap-2">
-            <h1 className="flex-1 text-card-txt-primary">Tip & Tricks</h1>
-            <div className="text cursor-pointer text-card-ico-primary" onClick={() => setWelcomeTipDismissed(true)}>
-              <CloseIcon />
-            </div>
-          </div>
-          <div className="flex flex-col items-stretch gap-1">
-            <div className="text-xl/6 font-bold text-card-txt-primary">Are you new to RefStudio?</div>
-            <div className="text-card-txt-primary">Learn more by playing with a sample project.</div>
-          </div>
-          <Button
-            Action={<SampleIcon />}
-            text="Open Sample"
-            onClick={() => emitEvent('refstudio://menu/file/project/new/sample')}
-          />
-        </div>
-      )}
     </div>
   );
 }

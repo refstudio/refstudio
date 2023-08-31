@@ -60,3 +60,10 @@ export const ArrowRightIcon = () => (
     </svg>
   </div>
 );
+
+export const ExternalIcon = () => (
+  <svg height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M15.6399 7.0249H12.0179V5.0249H19.0179V12.0249H17.0179V8.4749L12.1039 13.3889L10.6899 11.9749L15.6399 7.0249Z" fill="currentcolor" />
+    <path d="M10.9819 6.97485H4.98193V18.9749H16.9819V12.9749H14.9819V16.9749H6.98193V8.97485H10.9819V6.97485Z" fill="currentcolor" />
+  </svg>
+);
