@@ -6,7 +6,6 @@ import { emitEvent, RefStudioEventName } from '../../../events';
 import { noop } from '../../../lib/noop';
 import { getCachedSetting, OpenAiManner, SettingsSchema } from '../../../settings/settingsManager';
 import { render, setup } from '../../../test/test-utils';
-import { RewriteWidget } from '../../components/RewriteWidget';
 
 const SELECTED_TEXT = 'This is the selected text.';
 const CHOICE_OPTION_1 = 'This is the first choice option.';
@@ -44,18 +43,18 @@ describe('RewriteWidget', () => {
   });
 
   it('should render the selection', () => {
-    render(<RewriteWidget selection={SELECTED_TEXT} onChoiceSelected={noop} />);
+    render(<RewriteOptions selection={SELECTED_TEXT} onChoiceSelected={noop} />);
     expect(screen.getByText(SELECTED_TEXT)).toBeInTheDocument();
   });
 
   it('should display openAI settings by default', () => {
-    render(<RewriteWidget selection={SELECTED_TEXT} onChoiceSelected={noop} />);
+    render(<RewriteOptions selection={SELECTED_TEXT} onChoiceSelected={noop} />);
     expect(screen.getByLabelText('creativity')).toHaveValue(String(mockSettings.openai.temperature));
     expect(screen.getByLabelText('manner')).toHaveValue(mockSettings.openai.manner);
   });
 
   it('should configure openAI settings and call askForRewrite', async () => {
-    const { user } = setup(<RewriteWidget selection={SELECTED_TEXT} onChoiceSelected={noop} />);
+    const { user } = setup(<RewriteOptions selection={SELECTED_TEXT} onChoiceSelected={noop} />);
 
     // https://github.com/testing-library/user-event/issues/871
     // eslint-disable-next-line testing-library/prefer-user-event
@@ -82,7 +81,7 @@ describe('RewriteWidget', () => {
       return { ok: true, choices: [CHOICE_OPTION_1, CHOICE_OPTION_2, CHOICE_OPTION_3] } as AskForRewriteReturn;
     });
 
-    const { user } = setup(<RewriteWidget selection={SELECTED_TEXT} onChoiceSelected={noop} />);
+    const { user } = setup(<RewriteOptions selection={SELECTED_TEXT} onChoiceSelected={noop} />);
 
     await user.click(screen.getByText('REWRITE'));
 
@@ -104,7 +103,7 @@ describe('RewriteWidget', () => {
       return { ok: true, choices: ['A choice option.'] } as AskForRewriteReturn;
     });
 
-    const { user } = setup(<RewriteWidget selection={SELECTED_TEXT} onChoiceSelected={noop} />);
+    const { user } = setup(<RewriteOptions selection={SELECTED_TEXT} onChoiceSelected={noop} />);
 
     await user.click(screen.getByText('REWRITE'));
 
@@ -126,7 +125,7 @@ describe('RewriteWidget', () => {
       return { ok: false, message: 'This is an error message.' } as AskForRewriteReturn;
     });
 
-    const { user } = setup(<RewriteWidget selection={SELECTED_TEXT} onChoiceSelected={noop} />);
+    const { user } = setup(<RewriteOptions selection={SELECTED_TEXT} onChoiceSelected={noop} />);
 
     await user.click(screen.getByText('REWRITE'));
 
@@ -148,7 +147,7 @@ describe('RewriteWidget', () => {
       return { ok: true, choices: [CHOICE_OPTION_1, CHOICE_OPTION_2, CHOICE_OPTION_3] } as AskForRewriteReturn;
     });
 
-    const { user } = setup(<RewriteWidget selection={SELECTED_TEXT} onChoiceSelected={onChoiceSelected} />);
+    const { user } = setup(<RewriteOptions selection={SELECTED_TEXT} onChoiceSelected={onChoiceSelected} />);
 
     await user.click(screen.getByText('REWRITE'));
     resolveFn();

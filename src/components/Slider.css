@@ -1,0 +1,16 @@
+.slider {
+  @apply cursor-pointer appearance-none;
+  @apply h-1 w-full rounded-lg;
+  @apply bg-input-bg-disabled;
+  @apply bg-gradient-to-r from-input-bg-action to-input-bg-action bg-no-repeat;
+}
+
+.slider::-webkit-slider-thumb {
+  @apply appearance-none;
+  @apply h-4 w-4 rounded-2xl;
+  @apply bg-input-bg-action;
+}
+
+.slider::-webkit-slider-runnable-track {
+  @apply appearance-none;
+}

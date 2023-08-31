@@ -60,3 +60,11 @@ export const ArrowRightIcon = () => (
     </svg>
   </div>
 );
+
+export const ArrowLeftIcon = () => (
+  <div className="flex h-6 w-6 shrink-0 items-center justify-center self-center">
+    <svg height="12" viewBox="0 0 8 12" width="8" xmlns="http://www.w3.org/2000/svg">
+      <path d="M7.70996 1.41L3.11996 6L7.70996 10.59L6.28996 12L0.289961 6L6.28996 -6.20702e-08L7.70996 1.41Z" fill="currentcolor" />
+    </svg>
+  </div>
+);

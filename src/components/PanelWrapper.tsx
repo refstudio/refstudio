@@ -19,7 +19,7 @@ export function PanelWrapper({ title, children, actions }: PanelWrapperProps) {
   return (
     <div className="flex h-full flex-col items-start self-stretch bg-side-bar-bg-primary text-side-bar-txt">
       <div className="flex items-start gap-2 self-stretch px-4 py-3">
-        <h1 className="flex flex-1 flex-col justify-center self-stretch">{title}</h1>
+        <h1 className="flex flex-1 flex-col justify-center self-stretch select-none cursor-default">{title}</h1>
         {actions && actions.length > 0 && (
           <div className="flex items-center gap-1">
             {actions.map((action) => (

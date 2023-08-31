@@ -106,7 +106,7 @@ function ChatThreadBlock({ thread }: { thread: ChatThread }) {
 function ChatThreadItemBlock({ text, actor }: { text?: string; actor: 'user' | 'ai' }) {
   return (
     <div
-      className={cx('g-2 flex items-center self-stretch p-4', {
+      className={cx('flex items-center gap-2 self-stretch p-4', {
         'bg-side-bar-bg-secondary': actor === 'ai',
       })}
     >
@@ -130,13 +130,13 @@ function MessageBox({ disabled, value, onChange, onChat, onKeyDown }: MessageBox
   return (
     <div
       className={cx(
-        'g-2 flex items-end justify-end self-stretch p-2',
+        'flex items-end justify-end gap-2 self-stretch p-2',
         'rounded-default border border-solid border-input-border',
       )}
     >
       <textarea
         className={cx(
-          'g-2 flex flex-1 resize-none items-end justify-end p-2 outline-none',
+          'flex flex-1 resize-none items-end justify-end gap-2 p-2 outline-none',
           'text-input-txt-primary placeholder:text-input-txt-placeholder',
           { 'text-input-txt-disabled placeholder:text-input-txt-disabled': disabled },
         )}

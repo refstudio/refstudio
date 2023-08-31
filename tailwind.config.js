@@ -186,11 +186,15 @@ export default {
       borderRadius: {
         default: '0.25rem',
       },
+      transitionProperty: {
+        left: 'left',
+      },
       zIndex: {
         modals: 99999,
         notifications: 88888,
         'drop-zone': 55555,
         'resize-handle': 44444,
+        dropdown: 33333,
       },
     },
   },
