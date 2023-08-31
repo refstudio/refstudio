@@ -1,6 +1,6 @@
 /** Type-safe access to the RefStudio HTTP APIs. */
 
-import { universalDelete, universalGet, universalPatch, universalPost, universalPut } from './api';
+import { universalDelete, universalGet, universalPatch, universalPost } from './api';
 import type { paths } from './api-paths';
 
 type LowerMethod = 'get' | 'post' | 'put' | 'delete' | 'patch';
@@ -97,23 +97,6 @@ export async function apiPost<Path extends PathsForMethod<'post'>>(
   const path = options ? completePath(pathSpec, options) : pathSpec;
   type ResponseType = JsonResponseFor<Path, 'post'>;
   return universalPost<ResponseType>(path, body);
-}
-
-/**
- * Issue a PUT request with a JSON payload to a RefStudio API endpoint.
- *
- * If the endpoint takes path parameters or search parameters, then that will be the second argument.
- * The last argument (2nd or 3rd argument) is the request body.
- */
-export async function apiPut<Path extends PathsForMethod<'put'>>(
-  pathSpec: Path,
-  ...args: [...params: PathArgs<Path, 'put'>, body: JsonRequestBodyFor<Path, 'put'>]
-) {
-  const safeArgs = args as unknown as [params: RouteParameters, body: unknown] | [body: unknown];
-  const [options, body] = safeArgs.length === 2 ? safeArgs : [undefined, ...safeArgs];
-  const path = options ? completePath(pathSpec, options) : pathSpec;
-  type ResponseType = JsonResponseFor<Path, 'post'>;
-  return universalPut<ResponseType>(path, body);
 }
 
 /**
