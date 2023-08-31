@@ -6,9 +6,7 @@ import { Button } from '../../components/Button';
 import { OpenIcon, RefStudioEditorIcon } from '../../components/icons';
 import { emitEvent } from '../../events';
 import { cx } from '../../lib/cx';
-import { noop } from '../../lib/noop';
 import { AddIcon, SampleIcon } from '../components/icons';
-import { ExternalIcon } from '../sidebar/icons';
 
 export function WelcomeView() {
   return (
@@ -66,19 +64,14 @@ function WelcomeTips() {
         <h1 className="flex-1 text-card-txt-primary">Tip & Tricks</h1>
         <div className="flex flex-col items-start gap-2">
           <div className="f text-2xl/6 font-semibold">Are you New to Refstudio?</div>
-          <div>Access our repository or open a sample project to learn more.</div>
+          <div>Learn more by playing with a sample project.</div>
         </div>
       </div>
       <div className="flex flex-row items-start gap-2">
         <div className="shrink">
-          <a className="no-underline" href="https://github.com/refstudio/refstudio" rel="noreferrer" target="_blank">
-            <Button Action={<ExternalIcon />} text="Documentation" onClick={noop} />
-          </a>
-        </div>
-        <div className="shrink">
           <Button
             Action={<SampleIcon />}
-            text="Open Sample"
+            text="Try Sample Project"
             onClick={() => emitEvent('refstudio://menu/file/project/new/sample')}
           />
         </div>
@@ -111,13 +104,15 @@ function ProjectItem({ project }: { project: ProjectInfo }) {
   return (
     <div
       className={cx(
-        'flex cursor-pointer items-center gap-2 p-2 pr-3',
+        'group/project flex cursor-pointer items-center gap-2 p-2 pr-3',
         'rounded-default hover:bg-btn-bg-side-bar-item-hover',
         'text-btn-txt-side-bar-item-primary',
       )}
       onClick={() => emitEvent('refstudio://projects/open', { projectId: project.id })}
     >
-      <RefStudioEditorIcon />
+      <div className="text-btn-ico-side-bar-icon-default group-hover/project:text-btn-ico-side-bar-icon-hover">
+        <RefStudioEditorIcon />
+      </div>
       {project.name}
     </div>
   );
