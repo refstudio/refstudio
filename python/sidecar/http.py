@@ -26,6 +26,8 @@ from sidecar.typing import (
     UpdateStatusResponse,
 )
 
+from python.sidecar.typing import FlatSettingsSchema, FlatSettingsSchemaPatch
+
 load_dotenv()
 
 references_api = FastAPI()  # API for interacting with references
@@ -324,12 +326,12 @@ async def shutdown():
 # Settings API
 # --------------
 @settings_api.get("/")
-async def get_settings() -> SettingsSchema:
+async def get_settings() -> FlatSettingsSchema:
     user_id = "user1"
     return settings.get_settings_for_user(user_id)
 
 
 @settings_api.put("/")
-async def update_settings(req: SettingsSchema) -> SettingsSchema:
+async def update_settings(req: FlatSettingsSchemaPatch) -> FlatSettingsSchema:
     user_id = "user1"
     return settings.update_settings_for_user(user_id, req)

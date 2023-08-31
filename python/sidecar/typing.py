@@ -1,8 +1,8 @@
 from datetime import date
-from typing import Any
+from typing import Any, Optional, Type
 
 from dotenv import load_dotenv
-from pydantic import BaseModel
+from pydantic import BaseModel, create_model
 
 try:
     # introduced in Python 3.11 ...
@@ -15,6 +15,18 @@ except ImportError:
 
 
 load_dotenv()
+
+
+def make_optional(baseclass: Type[BaseModel]) -> Type[BaseModel]:
+    # Extracts the fields and validators from the baseclass and make fields optional
+    fields = baseclass.__fields__
+    validators = {"__validators__": baseclass.__validators__}
+    optional_fields = {
+        key: (Optional[item.type_], None) for key, item in fields.items()
+    }
+    return create_model(
+        f"{baseclass.__name__}Optional", **optional_fields, __validators__=validators
+    )
 
 
 class RefStudioModel(BaseModel):
@@ -233,6 +245,19 @@ class SettingsSchema(RefStudioModel):
     project: ProjectSettings = ProjectSettings()
     openai: OpenAISettings = OpenAISettings()
     sidecar: SidecarSettings = SidecarSettings()
+
+
+class FlatSettingsSchema(RefStudioModel):
+    current_directory: str
+    logging_enabled: bool
+    logging_filepath: str
+    openai_api_key: str
+    openai_chat_model: str
+    openai_manner: RewriteMannerType
+    openai_temperature: float
+
+
+FlatSettingsSchemaPatch = make_optional(FlatSettingsSchema)
 
 
 class CliCommands(RefStudioModel):
