@@ -87,7 +87,7 @@ export function LeftSidePanelWrapper({ disabled }: { disabled?: boolean }) {
         {activePanel === 'Explorer' && <ExplorerPanel />}
         {activePanel === 'References' && <ReferencesPanel />}
       </Panel>
-      <VerticalResizeHandle transparent />
+      {!disabled && <VerticalResizeHandle transparent />}
     </>
   );
 }

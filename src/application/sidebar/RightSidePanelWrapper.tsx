@@ -52,7 +52,7 @@ export function RightSidePanelWrapper({ disabled }: { disabled?: boolean }) {
 
   return (
     <>
-      <VerticalResizeHandle transparent />
+      {!disabled && <VerticalResizeHandle transparent />}
       <Panel collapsible order={3} ref={rightPanelRef} onCollapse={(collapsed) => setIsPanelCollapsed(collapsed)}>
         {activePanel === 'Rewriter' && <RewriterPanel />}
         {activePanel === 'Chatbot' && <ChatbotPanel />}
