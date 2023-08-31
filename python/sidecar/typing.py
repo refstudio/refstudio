@@ -1,8 +1,32 @@
+from copy import deepcopy
 from datetime import date
-from typing import Any, Optional, Type
+from typing import Any, Optional, Tuple, Type
 
 from dotenv import load_dotenv
 from pydantic import BaseModel, create_model
+from pydantic.fields import FieldInfo
+
+
+def partial_model(model: Type[BaseModel]):
+    def make_field_optional(
+        field: FieldInfo, default: Any = None
+    ) -> Tuple[Any, FieldInfo]:
+        new = deepcopy(field)
+        new.default = default
+        new.annotation = Optional[field.annotation]  # type: ignore
+        return new.annotation, new
+
+    return create_model(
+        f"Partial{model.__name__}",
+        __base__=model,
+        __module__=model.__module__,
+        __config__=model.__config__,
+        **{
+            field_name: make_field_optional(field_info)
+            for field_name, field_info in model.__fields__.items()
+        },
+    )
+
 
 try:
     # introduced in Python 3.11 ...
@@ -17,7 +41,7 @@ except ImportError:
 load_dotenv()
 
 
-def make_optional(baseclass: Type[BaseModel]) -> Type[BaseModel]:
+def make_optional(baseclass: Type[BaseModel], new_name: str) -> Type[BaseModel]:
     # Extracts the fields and validators from the baseclass and make fields optional
     fields = baseclass.__fields__
     validators = {"__validators__": baseclass.__validators__}
@@ -25,7 +49,10 @@ def make_optional(baseclass: Type[BaseModel]) -> Type[BaseModel]:
         key: (Optional[item.type_], None) for key, item in fields.items()
     }
     return create_model(
-        f"{baseclass.__name__}Optional", **optional_fields, __validators__=validators
+        new_name,
+        **optional_fields,
+        __validators__=validators,
+        __config__=baseclass.__config__,
     )
 
 
@@ -257,7 +284,9 @@ class FlatSettingsSchema(RefStudioModel):
     openai_temperature: float
 
 
-FlatSettingsSchemaPatch = make_optional(FlatSettingsSchema)
+@partial_model
+class FlatSettingsSchemaPatch(FlatSettingsSchema):
+    pass
 
 
 class CliCommands(RefStudioModel):
