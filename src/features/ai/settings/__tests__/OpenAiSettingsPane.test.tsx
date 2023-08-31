@@ -32,7 +32,12 @@ describe('OpenAiSettingsPane component', () => {
     // Fake settings methods
     vi.mocked(initSettings).mockResolvedValue();
     vi.mocked(saveCachedSettings).mockResolvedValue();
-    vi.mocked(getCachedSetting).mockReturnValue(mockSettings.openai_manner);
+    vi.mocked(getCachedSetting).mockImplementation((key) => {
+      if (key in mockSettings) {
+        return mockSettings[key as keyof typeof mockSettings];
+      }
+      throw new Error('UNEXPECTED CALL FOR KEY ' + key);
+    });
     vi.mocked(setCachedSetting).mockImplementation(noop);
     vi.mocked(getMannerOptions).mockReturnValue(['concise', 'elaborate', 'scholarly']);
   });
@@ -80,16 +85,11 @@ describe('OpenAiSettingsPane component', () => {
 
     // Submit
     await user.click(screen.getByRole('button', { name: /save/i }));
-    expect(vi.mocked(setCachedSetting).mock.calls.length).toBe(1);
-    expect(vi.mocked(setCachedSetting).mock.calls[0]).toStrictEqual([
-      'openai',
-      {
-        api_key: `${mockSettings.openai_api_key}-Updated-1`,
-        chat_model: `${mockSettings.openai_chat_model}-Updated-2`,
-        manner: 'scholarly',
-        temperature: 0.9,
-      },
-    ]);
-    expect(vi.mocked(saveCachedSettings).mock.calls.length).toBe(1);
+    expect(vi.mocked(setCachedSetting)).toHaveBeenCalledTimes(4);
+    expect(vi.mocked(setCachedSetting)).toHaveBeenNthCalledWith(1, 'openai_api_key', 'API KEY-Updated-1');
+    expect(vi.mocked(setCachedSetting)).toHaveBeenNthCalledWith(2, 'openai_chat_model', 'CHAT MODEL-Updated-2');
+    expect(vi.mocked(setCachedSetting)).toHaveBeenNthCalledWith(3, 'openai_manner', 'scholarly');
+    expect(vi.mocked(setCachedSetting)).toHaveBeenNthCalledWith(4, 'openai_temperature', 0.9);
+    expect(vi.mocked(saveCachedSettings)).toHaveBeenCalledTimes(1);
   });
 });
