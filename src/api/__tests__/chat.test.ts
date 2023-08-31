@@ -1,15 +1,15 @@
+import { universalPost } from '../api';
 import { chatWithAI } from '../chat';
-import { callSidecar } from '../sidecar';
 
-vi.mock('../sidecar');
+vi.mock('../api');
 
 describe('chatWithAI', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('should return list of strings with content returned by sidecar', async () => {
-    vi.mocked(callSidecar).mockResolvedValue({
+  it('should return list of strings with content returned by backend API', async () => {
+    vi.mocked(universalPost).mockResolvedValue({
       status: 'ok',
       message: '',
       choices: [
@@ -24,8 +24,8 @@ describe('chatWithAI', () => {
     expect(response).toStrictEqual(['some reply']);
   });
 
-  it('should return list of strings with content returned by sidecar 2', async () => {
-    vi.mocked(callSidecar).mockResolvedValue({
+  it('should return list of strings with content returned by backend API 2', async () => {
+    vi.mocked(universalPost).mockResolvedValue({
       status: 'ok',
       message: '',
       choices: [
@@ -44,14 +44,14 @@ describe('chatWithAI', () => {
     expect(response).toStrictEqual(['some reply', 'Another reply']);
   });
 
-  it('should return empty list, and not call sidecar, if provided text is empty', async () => {
+  it('should return empty list, and not call backend API, if provided text is empty', async () => {
     const response = await chatWithAI('', '');
     expect(response).toStrictEqual([]);
-    expect(callSidecar).not.toHaveBeenCalled();
+    expect(universalPost).not.toHaveBeenCalled();
   });
 
-  it('should return error message reply if exception thrown calling sidecar', async () => {
-    vi.mocked(callSidecar).mockRejectedValue(new Error('Invalid API Key'));
+  it('should return error message reply if exception thrown calling backend API', async () => {
+    vi.mocked(universalPost).mockRejectedValue(new Error('Invalid API Key'));
 
     const response = await chatWithAI('', 'input text');
     expect(response.length).toBe(1);

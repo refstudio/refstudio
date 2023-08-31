@@ -20,149 +20,20 @@ export type Detail = ValidationError[];
  * An enumeration.
  *
  * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "RewriteMannerType".
+ * via the `definition` "IngestStatus".
  */
-export type RewriteMannerType = 'concise' | 'elaborate' | 'scholarly';
+export type IngestStatus = 'processing' | 'failure' | 'complete';
 /**
  * An enumeration.
  *
  * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "IngestStatus".
+ * via the `definition` "RewriteMannerType".
  */
-export type IngestStatus = 'processing' | 'failure' | 'complete';
+export type RewriteMannerType = 'concise' | 'elaborate' | 'scholarly';
 export type File = string;
 
 export interface ApiSchema {
   [k: string]: unknown;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "ChatRequest".
- */
-export interface ChatRequest {
-  text: string;
-  n_choices?: number;
-  temperature?: number;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "ChatResponse".
- */
-export interface ChatResponse {
-  status: ResponseStatus;
-  message: string;
-  choices: ChatResponseChoice[];
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "ChatResponseChoice".
- */
-export interface ChatResponseChoice {
-  index: number;
-  text: string;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "HTTPValidationError".
- */
-export interface HTTPValidationError {
-  detail?: Detail;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "ValidationError".
- */
-export interface ValidationError {
-  loc: Location;
-  msg: Message;
-  type: ErrorType;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "RewriteChoice".
- */
-export interface RewriteChoice {
-  index: number;
-  text: string;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "RewriteRequest".
- */
-export interface RewriteRequest {
-  text: string;
-  manner?: RewriteMannerType & string;
-  n_choices?: number;
-  temperature?: number;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "RewriteResponse".
- */
-export interface RewriteResponse {
-  status: ResponseStatus;
-  message: string;
-  choices: RewriteChoice[];
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "S2SearchResult".
- */
-export interface S2SearchResult {
-  title?: string;
-  abstract?: string;
-  venue?: string;
-  year?: number;
-  paperId?: string;
-  citationCount?: number;
-  openAccessPdf?: string;
-  authors?: string[];
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "SearchRequest".
- */
-export interface SearchRequest {
-  query: string;
-  limit?: number;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "SearchResponse".
- */
-export interface SearchResponse {
-  status: ResponseStatus;
-  message: string;
-  results: S2SearchResult[];
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "TextCompletionChoice".
- */
-export interface TextCompletionChoice {
-  index: number;
-  text: string;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "TextCompletionRequest".
- */
-export interface TextCompletionRequest {
-  text: string;
-  n_choices?: number;
-  temperature?: number;
-  max_tokens?: number;
-  title?: string;
-  abstract?: string;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "TextCompletionResponse".
- */
-export interface TextCompletionResponse {
-  status: ResponseStatus;
-  message: string;
-  choices: TextCompletionChoice[];
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
@@ -200,6 +71,22 @@ export interface DeleteStatusResponse {
   message: string;
 }
 /**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "HTTPValidationError".
+ */
+export interface HTTPValidationError {
+  detail?: Detail;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "ValidationError".
+ */
+export interface ValidationError {
+  loc: Location;
+  msg: Message;
+  type: ErrorType;
+}
+/**
  * A reference for an academic paper / PDF
  *
  * This interface was referenced by `ApiSchema`'s JSON-Schema
@@ -235,6 +122,119 @@ export interface ReferencePatch {
 export interface UpdateStatusResponse {
   status: ResponseStatus;
   message: string;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "ChatRequest".
+ */
+export interface ChatRequest {
+  text: string;
+  n_choices?: number;
+  temperature?: number;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "ChatResponse".
+ */
+export interface ChatResponse {
+  status: ResponseStatus;
+  message: string;
+  choices: ChatResponseChoice[];
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "ChatResponseChoice".
+ */
+export interface ChatResponseChoice {
+  index: number;
+  text: string;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "RewriteChoice".
+ */
+export interface RewriteChoice {
+  index: number;
+  text: string;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "RewriteRequest".
+ */
+export interface RewriteRequest {
+  text: string;
+  manner?: RewriteMannerType & string;
+  n_choices?: number;
+  temperature?: number;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "RewriteResponse".
+ */
+export interface RewriteResponse {
+  status: ResponseStatus;
+  message: string;
+  choices: RewriteChoice[];
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "TextCompletionChoice".
+ */
+export interface TextCompletionChoice {
+  index: number;
+  text: string;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "TextCompletionRequest".
+ */
+export interface TextCompletionRequest {
+  text: string;
+  n_choices?: number;
+  temperature?: number;
+  max_tokens?: number;
+  title?: string;
+  abstract?: string;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "TextCompletionResponse".
+ */
+export interface TextCompletionResponse {
+  status: ResponseStatus;
+  message: string;
+  choices: TextCompletionChoice[];
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "S2SearchResult".
+ */
+export interface S2SearchResult {
+  title?: string;
+  abstract?: string;
+  venue?: string;
+  year?: number;
+  paperId?: string;
+  citationCount?: number;
+  openAccessPdf?: string;
+  authors?: string[];
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "SearchRequest".
+ */
+export interface SearchRequest {
+  query: string;
+  limit?: number;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "SearchResponse".
+ */
+export interface SearchResponse {
+  status: ResponseStatus;
+  message: string;
+  results: S2SearchResult[];
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema

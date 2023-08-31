@@ -1,70 +1,65 @@
 import { REFERENCES } from '../../features/references/__tests__/test-fixtures';
+import { universalPatch } from '../api';
 import { updateReference } from '../ingestion';
-import { callSidecar } from '../sidecar';
-import { ReferenceUpdate, UpdateStatusResponse } from '../types';
+import { UpdateStatusResponse } from '../types';
 
-vi.mock('../sidecar');
+vi.mock('../api');
 vi.mock('../../io/filesystem');
+
+const PROJECT_ID = 'cafe-babe-1234-5678-1234-5678-1234-5678';
 
 describe('ingestion.update', () => {
   afterEach(() => {
     vi.clearAllMocks();
   });
 
-  it('should call sidecar update with patch for (citationKey, title, publishedDate and authors)', async () => {
+  it('should call backend API update with patch for (citationKey, title, publishedDate and authors)', async () => {
     const [ref1] = REFERENCES;
-    vi.mocked(callSidecar).mockResolvedValue({
+    vi.mocked(universalPatch).mockResolvedValue({
       status: 'ok',
       message: '',
     } as UpdateStatusResponse);
 
-    await updateReference(
-      ref1.filename,
-      {
-        citationKey: ref1.citationKey + 'xx',
+    await updateReference(PROJECT_ID, ref1.id, {
+      citationKey: ref1.citationKey + 'xx',
+      title: ref1.title + ' NEW',
+      publishedDate: '2023-07-01',
+      authors: [{ fullName: 'Joe Doe Dundee', lastName: 'Dundee' }],
+    });
+    expect(universalPatch).toHaveBeenCalledTimes(1);
+    expect(universalPatch).toHaveBeenCalledWith(`/api/references/${PROJECT_ID}/${ref1.id}`, {
+      data: {
+        citation_key: 'doe2023xx',
         title: ref1.title + ' NEW',
-        publishedDate: '2023-07-01',
-        authors: [{ fullName: 'Joe Doe Dundee', lastName: 'Dundee' }],
-      },
-      ref1.id,
-    );
-    expect(callSidecar).toHaveBeenCalledTimes(1);
-    expect(callSidecar).toHaveBeenCalledWith<[string, ReferenceUpdate]>('update', {
-      reference_id: ref1.filename,
-      patch: {
-        data: {
-          citation_key: 'doe2023xx',
-          title: ref1.title + ' NEW',
-          published_date: '2023-07-01',
-          authors: [
-            {
-              full_name: 'Joe Doe Dundee',
-              surname: 'Dundee',
-            },
-          ],
-        },
+        published_date: '2023-07-01',
+        authors: [
+          {
+            full_name: 'Joe Doe Dundee',
+            surname: 'Dundee',
+          },
+        ],
       },
     });
   });
 
-  it('should not call sidecar if update patch is empty', async () => {
+  it('should not call backend API if update patch is empty', async () => {
     const [ref1] = REFERENCES;
-    vi.mocked(callSidecar).mockResolvedValue({
+    vi.mocked(universalPatch).mockResolvedValue({
       status: 'ok',
       message: '',
     } as UpdateStatusResponse);
 
-    await updateReference(ref1.filename, {}, ref1.id);
-    expect(vi.mocked(callSidecar).mock.calls).toHaveLength(0);
+    await updateReference(PROJECT_ID, ref1.id, {});
+    expect(vi.mocked(universalPatch).mock.calls).toHaveLength(0);
   });
 
-  it('should throw error if status is error from sidecar call', async () => {
+  it('should throw error if status is error from backend API call', async () => {
     const [ref1] = REFERENCES;
-    vi.mocked(callSidecar).mockResolvedValue({
+    vi.mocked(universalPatch).mockResolvedValue({
       status: 'error',
       message: 'what!',
     } as UpdateStatusResponse);
 
-    await expect(updateReference(ref1.filename, { title: ref1.title + ' updated' }, ref1.id)).rejects.toThrow();
+    await expect(updateReference(PROJECT_ID, ref1.id, { title: ref1.title + ' updated' })).rejects.toThrow();
   });
 });

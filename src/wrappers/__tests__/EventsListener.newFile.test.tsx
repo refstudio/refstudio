@@ -10,7 +10,7 @@ vi.mock('../../events');
 
 const newFileEventName: RefStudioEventName = 'refstudio://menu/file/new';
 
-describe('EventsListener.close', () => {
+describe('EventsListener.newFile', () => {
   let store: ReturnType<typeof createStore>;
 
   beforeEach(() => {

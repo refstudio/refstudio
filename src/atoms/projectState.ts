@@ -1,6 +1,6 @@
 import { Atom, atom } from 'jotai';
 
-import { getSeparator, newProject, openProject, sampleProject, setCurrentProjectId } from '../io/filesystem';
+import { ensureSampleProjectFiles, setCurrentFileSystemProjectId } from '../io/filesystem';
 import { closeAllEditorsAtom } from './editorActions';
 import { refreshFileTreeAtom } from './fileExplorerActions';
 import { clearAllReferencesAtom, loadReferencesAtom } from './referencesState';
@@ -19,47 +19,31 @@ export const isProjectOpenAtom = atom((get) => get(currentProjectPathAtom) !== '
 export const projectPathAtom: Atom<string> = currentProjectPathAtom;
 export const projectIdAtom: Atom<string> = currentProjectIdAtom;
 
-export const openProjectAtom = atom(null, async (_, set, path: string) => {
-  if (!path) {
-    return;
-  }
-
-  // Close current project before create new
-  await set(closeProjectAtom);
-
-  set(currentProjectPathAtom, path);
-  set(currentProjectNameAtom, extractProjectName(path));
-  await openProject(path);
-  await set(loadReferencesAtom);
-  await set(refreshFileTreeAtom);
-});
-
-export const newProjectAtom = atom(null, async (_, set, path: string) => {
-  if (!path) {
-    return;
-  }
+export const newProjectAtom = atom(null, async (_, set, projectId: string, path: string, name: string) => {
   // Close current project before create new
   await set(closeProjectAtom);
 
   // Create empty project
+  setCurrentFileSystemProjectId(projectId);
+  set(currentProjectIdAtom, projectId);
   set(currentProjectPathAtom, path);
-  set(currentProjectNameAtom, extractProjectName(path));
-  await newProject(path);
-  await set(loadReferencesAtom);
+  set(currentProjectNameAtom, name);
+
+  await set(loadReferencesAtom, projectId);
   await set(refreshFileTreeAtom);
 });
 
-export const newSampleProjectAtom = atom(null, async (_, set, path: string) => {
-  if (!path) {
-    return;
-  }
+export const openProjectAtom = atom(null, async (_, set, projectId: string, path: string, name: string) => {
   // Close current project before create new
   await set(closeProjectAtom);
 
   // Create empty project
+  setCurrentFileSystemProjectId(projectId);
+  set(currentProjectIdAtom, projectId);
   set(currentProjectPathAtom, path);
-  set(currentProjectNameAtom, extractProjectName(path));
-  await sampleProject(path);
+  set(currentProjectNameAtom, name);
+
+  await set(loadReferencesAtom, projectId);
   await set(refreshFileTreeAtom);
 });
 
@@ -73,44 +57,18 @@ export const closeProjectAtom = atom(null, async (get, set) => {
   }
 });
 
-// -------------
-// Web
-// -------------
-export const newWebProjectAtom = atom(null, async (_, set, projectId: string, path: string, name: string) => {
-  // Close current project before create new
-  await set(closeProjectAtom);
+export const newSampleProjectAtom = atom(
+  null,
+  async (_, set, projectId: string, projectName: string, projectPath: string) => {
+    // Close current project before create new
+    await set(closeProjectAtom);
 
-  // Create empty project
-  setCurrentProjectId(projectId);
-  set(currentProjectIdAtom, projectId);
-  set(currentProjectPathAtom, path);
-  set(currentProjectNameAtom, name);
-
-  await set(loadReferencesAtom, projectId);
-  await set(refreshFileTreeAtom);
-});
-
-export const openWebProjectAtom = atom(null, async (_, set, projectId: string, path: string, name: string) => {
-  // Close current project before create new
-  await set(closeProjectAtom);
-
-  // Create empty project
-  setCurrentProjectId(projectId);
-  set(currentProjectIdAtom, projectId);
-  set(currentProjectPathAtom, path);
-  set(currentProjectNameAtom, name);
-
-  await set(loadReferencesAtom, projectId);
-  await set(refreshFileTreeAtom);
-});
-
-// #####################################################################################
-// Utilities
-// #####################################################################################
-function extractProjectName(projectPath: string) {
-  const segments = projectPath.split(getSeparator());
-  if (segments.length > 1) {
-    return segments.pop()!.toUpperCase().replace(/-\./g, ' ');
-  }
-  return '';
-}
+    // Open sample project
+    setCurrentFileSystemProjectId(projectId);
+    set(currentProjectIdAtom, projectId);
+    set(currentProjectPathAtom, projectPath);
+    set(currentProjectNameAtom, projectName);
+    await ensureSampleProjectFiles(projectId);
+    await set(refreshFileTreeAtom);
+  },
+);

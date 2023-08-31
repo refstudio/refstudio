@@ -1,6 +1,7 @@
 import { useSetAtom } from 'jotai';
 import { useState } from 'react';
 
+import { readProjectById } from './api/projectsAPI';
 import { useRefStudioServerOnDesktop } from './api/server';
 import { App } from './application/App';
 import { openProjectAtom } from './atoms/projectState';
@@ -40,9 +41,10 @@ export function AppStartup() {
 
         if (isMounted()) {
           setInitialized(true);
-          const projectDir = getCachedSetting('project.current_directory');
-          if (projectDir) {
-            await openProject(projectDir);
+          const projectId = getCachedSetting('project.current_directory'); // TODO: Open project using project ID
+          if (projectId) {
+            const projectInfo = await readProjectById(projectId);
+            await openProject(projectId, projectInfo.path, projectInfo.name);
           }
           notifyInfo('Application Initialized');
         }

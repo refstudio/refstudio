@@ -2,9 +2,8 @@
 import json
 
 from fastapi.openapi.utils import get_openapi
-from starlette.routing import Mount
-
 from sidecar.typing import CliCommands
+from starlette.routing import Mount
 from web import api
 
 if __name__ == "__main__":
