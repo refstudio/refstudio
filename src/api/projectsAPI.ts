@@ -27,13 +27,13 @@ export async function readAllProjects(): Promise<ProjectInfo[]> {
   return Object.keys(projects).map((id) => ({ id, path: projects[id].project_path, name: projects[id].project_name }));
 }
 export async function readProjectById(projectId: string): Promise<ProjectInfo> {
-  const projectInfo = (await apiGetJson('/api/projects/{project_id}', {
+  const projectInfo = await apiGetJson('/api/projects/{project_id}', {
     path: { project_id: projectId },
-  })) as ProjectGetResponse;
+  });
   return {
-    id: projectInfo.project_id,
-    path: projectInfo.project_path,
-    name: projectInfo.project_name,
+    id: projectInfo.id,
+    path: projectInfo.path,
+    name: projectInfo.name,
   };
 }
 

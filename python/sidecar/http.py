@@ -13,8 +13,10 @@ from sidecar.typing import (
     ChatResponse,
     DeleteRequest,
     DeleteStatusResponse,
+    FileEntry,
+    FolderEntry,
     IngestRequest,
-    ProjectFileTreeResponse,
+    ProjectDetails,
     Reference,
     ReferencePatch,
     RewriteRequest,
@@ -193,13 +195,13 @@ async def create_project(project_name: str, project_path: str = None):
 
 
 @project_api.get("/{project_id}")
-async def get_project(project_id: str) -> ProjectFileTreeResponse:
+async def get_project(project_id: str) -> ProjectDetails:
     """
     Returns the project path and a list of files in the project
     """
     user_id = "user1"
     response = projects.get_project_files(user_id, project_id)
-    return response
+    return response.project
 
 
 @project_api.delete("/{project_id}")
@@ -224,10 +226,10 @@ async def delete_project(project_id: str):
 
 
 @project_api.get("/{project_id}/files")
-async def get_project_files(project_id: str) -> ProjectFileTreeResponse:
+async def get_project_files(project_id: str) -> list[FileEntry | FolderEntry]:
     user_id = "user1"
     response = projects.get_project_files(user_id, project_id)
-    return response
+    return response.contents
 
 
 # Filesystem API

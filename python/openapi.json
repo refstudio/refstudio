@@ -153,6 +153,49 @@
         "title": "DeleteStatusResponse",
         "type": "object"
       },
+      "FileEntry": {
+        "properties": {
+          "file_extension": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "path",
+          "file_extension"
+        ],
+        "title": "FileEntry",
+        "type": "object"
+      },
+      "FolderEntry": {
+        "properties": {
+          "children": {
+            "items": {
+              "$ref": "#/components/schemas/FileEntry"
+            },
+            "type": "array"
+          },
+          "name": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "path",
+          "children"
+        ],
+        "title": "FolderEntry",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -214,6 +257,26 @@
           }
         },
         "title": "OpenAISettings",
+        "type": "object"
+      },
+      "ProjectDetails": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "path"
+        ],
+        "title": "ProjectDetails",
         "type": "object"
       },
       "ProjectSettings": {
@@ -1106,7 +1169,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectDetails"
+                }
               }
             },
             "description": "Successful Response"
@@ -1143,7 +1208,20 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/components/schemas/FileEntry"
+                      },
+                      {
+                        "$ref": "#/components/schemas/FolderEntry"
+                      }
+                    ]
+                  },
+                  "title": "Response Get Project Files  Project Id  Files Get",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"

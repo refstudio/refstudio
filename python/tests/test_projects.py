@@ -198,9 +198,11 @@ def test_get_project_files(monkeypatch, tmp_path, setup_project_path_storage):
     response = projects.get_project_files(user_id, project_id)
 
     expected = {
-        "id": project_id,
-        "name": project_name,
-        "path": str(project_path),
+        "project": {
+            "id": project_id,
+            "name": project_name,
+            "path": str(project_path),
+        },
         "contents": [
             {
                 "name": "file1.refstudio",

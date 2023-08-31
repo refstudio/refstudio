@@ -565,7 +565,7 @@
       ],
       "title": "FolderEntry"
     },
-    "ProjectFileTreeResponse": {
+    "ProjectDetails": {
       "properties": {
         "id": {
           "type": "string"
@@ -575,29 +575,15 @@
         },
         "path": {
           "type": "string"
-        },
-        "contents": {
-          "items": {
-            "anyOf": [
-              {
-                "$ref": "#/definitions/FileEntry"
-              },
-              {
-                "$ref": "#/definitions/FolderEntry"
-              }
-            ]
-          },
-          "type": "array"
         }
       },
       "type": "object",
       "required": [
         "id",
         "name",
-        "path",
-        "contents"
+        "path"
       ],
-      "title": "ProjectFileTreeResponse"
+      "title": "ProjectDetails"
     },
     "LoggingSettings": {
       "properties": {

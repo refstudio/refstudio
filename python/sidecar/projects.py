@@ -3,7 +3,12 @@ import shutil
 from pathlib import Path
 
 from sidecar import settings
-from sidecar.typing import FileEntry, FolderEntry, ProjectFileTreeResponse
+from sidecar.typing import (
+    FileEntry,
+    FolderEntry,
+    ProjectDetails,
+    ProjectFileTreeResponse,
+)
 
 # Ensure that the server's path storage directory exists.
 Path(settings.WEB_STORAGE_URL).mkdir(parents=True, exist_ok=True)
@@ -141,9 +146,11 @@ def get_project_files(user_id: str, project_id: str) -> ProjectFileTreeResponse:
             continue
 
     return ProjectFileTreeResponse(
-        id=project_id,
-        name=project_name,
-        path=str(project_path),
+        project=ProjectDetails(
+            id=project_id,
+            name=project_name,
+            path=str(project_path),
+        ),
         contents=contents,
     )
 

@@ -219,10 +219,14 @@ class FolderEntry(FileEntryBase):
     children: list[FileEntry]
 
 
-class ProjectFileTreeResponse(RefStudioModel):
+class ProjectDetails(RefStudioModel):
     id: str
     name: str
     path: str
+
+
+class ProjectFileTreeResponse(RefStudioModel):
+    project: ProjectDetails
     contents: list[FileEntry | FolderEntry]
 
 

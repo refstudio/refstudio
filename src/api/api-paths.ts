@@ -9,10 +9,13 @@ import {
   Chunk,
   DeleteRequest,
   DeleteStatusResponse,
+  FileEntry,
+  FolderEntry,
   HTTPValidationError,
   IngestStatus,
   LoggingSettings,
   OpenAISettings,
+  ProjectDetails,
   ProjectSettings,
   Reference,
   ReferencePatch,
@@ -198,6 +201,18 @@ export interface components {
       message: string;
       status: ResponseStatus;
     };
+    /** FileEntry */
+    FileEntry: {
+      file_extension: string;
+      name: string;
+      path: string;
+    };
+    /** FolderEntry */
+    FolderEntry: {
+      children: FileEntry[];
+      name: string;
+      path: string;
+    };
     /** HTTPValidationError */
     HTTPValidationError: {
       /** Detail */
@@ -226,6 +241,12 @@ export interface components {
       manner?: RewriteMannerType;
       /** @default 0.7 */
       temperature?: number;
+    };
+    /** ProjectDetails */
+    ProjectDetails: {
+      id: string;
+      name: string;
+      path: string;
     };
     /** ProjectSettings */
     ProjectSettings: {
@@ -656,7 +677,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': unknown;
+          'application/json': ProjectDetails;
         };
       };
       /** @description Validation Error */
@@ -703,7 +724,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': unknown;
+          'application/json': (FileEntry | FolderEntry)[];
         };
       };
       /** @description Validation Error */

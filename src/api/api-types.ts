@@ -263,13 +263,12 @@ export interface FolderEntry {
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "ProjectFileTreeResponse".
+ * via the `definition` "ProjectDetails".
  */
-export interface ProjectFileTreeResponse {
+export interface ProjectDetails {
   id: string;
   name: string;
   path: string;
-  contents: (FileEntry | FolderEntry)[];
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema

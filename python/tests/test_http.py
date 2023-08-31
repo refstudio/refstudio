@@ -421,7 +421,6 @@ def test_get_project(monkeypatch, tmp_path):
         "id": project_id,
         "name": project_name,
         "path": str(project_path),
-        "contents": [],
     }
 
 
