@@ -64,7 +64,7 @@ const removeReferenceAtom = atom(null, (get, set, id: string) => {
   set(setReferencesAtom, newReferences);
 });
 
-const UPDATABLE_FIELDS: (keyof ReferenceItem)[] = ['citationKey', 'title', 'publishedDate', 'authors'];
+const UPDATABLE_FIELDS: (keyof ReferenceItem)[] = ['citationKey', 'title', 'publishedDate', 'authors', 'doi'];
 export const updateReferenceAtom = atom(
   null,
   async (get, set, projectId: string, referenceId: string, updatedReference: ReferenceItem) => {

@@ -1,7 +1,8 @@
-import { useAtomValue } from 'jotai';
-import { useMemo } from 'react';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { useCallback, useMemo } from 'react';
 
-import { getDerivedReferenceAtom } from '../../../atoms/referencesState';
+import { projectIdAtom } from '../../../atoms/projectState';
+import { getDerivedReferenceAtom, updateReferenceAtom } from '../../../atoms/referencesState';
 import { EditorIdFor, parseEditorId } from '../../../atoms/types/EditorData';
 import { ReferenceItem } from '../../../types/ReferenceItem';
 import ReferenceDetailsCard from './ReferenceDetailsCard';
@@ -10,12 +11,21 @@ export function ReferenceView({ referenceId }: { referenceId: EditorIdFor<'refer
   const { id } = parseEditorId(referenceId);
   const referenceAtom = useMemo(() => getDerivedReferenceAtom(id), [id]);
   const reference = useAtomValue(referenceAtom);
+  const updateReference = useSetAtom(updateReferenceAtom);
+  const projectId = useAtomValue(projectIdAtom);
+
+  const handleCellValueChanged = useCallback(() => {
+    console.log('UPDATE VALUE');
+    // updateReference(params.data.id, params.data, projectId);
+  }, []);
 
   if (!reference) {
     return null;
   }
 
-  const formatReferenceCard = (referencItem: ReferenceItem): Record<string, string>[] => {
+  console.log(reference);
+
+  const formatReferenceCardData = (referencItem: ReferenceItem): Record<string, string>[] => {
     let authors = '';
     referencItem.authors.forEach((a, index) => {
       authors += (index > 0 ? ', ' : '') + a.fullName;
@@ -25,6 +35,7 @@ export function ReferenceView({ referenceId }: { referenceId: EditorIdFor<'refer
       { 'Citation Key': '[' + referencItem.citationKey + ']' },
       { Title: referencItem.title },
       { Authors: authors },
+      { Doi: referencItem.doi },
     ];
 
     return referenceCard;
@@ -32,8 +43,9 @@ export function ReferenceView({ referenceId }: { referenceId: EditorIdFor<'refer
 
   return (
     <ReferenceDetailsCard
+      referenceUpdateHandler={handleCellValueChanged}
       tableData={{
-        tableBodyContent: formatReferenceCard(reference),
+        tableBodyContent: formatReferenceCardData(reference),
         headerContentArray: ['References'],
         headerColSpan: 2,
       }}

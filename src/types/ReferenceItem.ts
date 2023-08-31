@@ -8,6 +8,7 @@ export interface ReferenceItem {
   title: string;
   status: ReferenceItemStatus;
   authors: Author[];
+  doi: string;
 }
 
 export interface Author {
