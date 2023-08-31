@@ -1,22 +1,42 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { createStore } from 'jotai';
 
+import { askForRewrite, AskForRewriteReturn } from '../../../../api/rewrite';
 import { selectionAtom } from '../../../../atoms/selectionState';
+import { getCachedSetting } from '../../../../settings/settingsManager';
 import { setupWithJotaiProvider } from '../../../../test/test-utils';
-import { RewriteOptions } from '../../../components/RewriteWidget';
+import { RewriteOptionsView } from '../../../components/RewriteOptionsView';
 import { RewriterPanel } from '../RewriterPanel';
 
-vi.mock('../../../components/RewriteWidget');
+vi.mock('../../../../settings/settingsManager');
+vi.mock('../../../../api/rewrite');
 
 describe('RewriterPanel component', () => {
   let store: ReturnType<typeof createStore>;
+  let rewriteResolver: (response: AskForRewriteReturn) => void;
 
   beforeEach(() => {
     store = createStore();
-    vi.mock('../../../components/RewriteWidget', () => {
-      const FakeRewriteWidget = vi.fn(() => null);
-      return { RewriteWidget: FakeRewriteWidget };
+    vi.mock('../../../components/RewriteOptionsView', async (importOriginal) => {
+      const OriginalRewriteOptionsView = (await importOriginal<{ RewriteOptionsView: typeof RewriteOptionsView }>())
+        .RewriteOptionsView;
+      const FakeRewriteOptionsView = vi.fn((...args: Parameters<typeof RewriteOptionsView>) =>
+        OriginalRewriteOptionsView(...args),
+      );
+      return { RewriteOptionsView: FakeRewriteOptionsView };
     });
+    vi.mocked(getCachedSetting).mockReturnValue({
+      api_key: 'API_KEY',
+      chat_model: 'gpt',
+      manner: 'scholarly',
+      temperature: 0.5,
+    });
+    vi.mocked(askForRewrite).mockImplementation(
+      () =>
+        new Promise<AskForRewriteReturn>((resolve) => {
+          rewriteResolver = resolve;
+        }),
+    );
   });
 
   afterEach(() => {
@@ -26,17 +46,33 @@ describe('RewriterPanel component', () => {
   it('should display message on blank selection', () => {
     setupWithJotaiProvider(<RewriterPanel />, store);
     expect(screen.getByText('Select some text in the editor to see it here.')).toBeInTheDocument();
-    expect(RewriteOptions).not.toHaveBeenCalled();
   });
 
-  it('should render RewriteWidget with selection debounded', async () => {
+  it('should render RewriteOptionsView with selection debounced', () => {
     store.set(selectionAtom, 'Some selected text');
 
-    setupWithJotaiProvider(<RewriterPanel debounceMs={1} />, store);
-    await waitFor(() => {
-      expect(RewriteOptions).toHaveBeenCalled();
-    });
+    setupWithJotaiProvider(<RewriterPanel />, store);
+    expect(screen.getByText('Some selected text')).toBeInTheDocument();
+  });
 
-    expect(vi.mocked(RewriteOptions).mock.lastCall![0]).toMatchObject({ selection: 'Some selected text' });
+  it('should show the loading status', async () => {
+    store.set(selectionAtom, 'Some selected text');
+
+    const { user } = setupWithJotaiProvider(<RewriterPanel />, store);
+
+    await user.click(screen.getByText('Rewrite'));
+
+    expect(vi.mocked(RewriteOptionsView).mock.lastCall![0].isFetching).toBe(true);
+  });
+
+  it('should switch to the suggestion screen', async () => {
+    store.set(selectionAtom, 'Some selected text');
+
+    const { user } = setupWithJotaiProvider(<RewriterPanel />, store);
+
+    await user.click(screen.getByText('Rewrite'));
+    rewriteResolver({ ok: true, choices: ['Rewritten suggestion'] });
+
+    expect(await screen.findByText('Rewritten suggestion')).toBeInTheDocument();
   });
 });

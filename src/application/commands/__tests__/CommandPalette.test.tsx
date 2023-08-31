@@ -6,7 +6,7 @@ import { useOpenEditorsCountForPane } from '../../../atoms/hooks/useOpenEditorsC
 import { setReferencesAtom } from '../../../atoms/referencesState';
 import { selectionAtom } from '../../../atoms/selectionState';
 import { emitEvent, RefStudioEventName } from '../../../events';
-import { RewriteOptions } from '../../../features/components/RewriteWidget';
+import { RewriteWidget } from '../../../features/components/RewriteWidget';
 import { REFERENCES } from '../../../features/references/__tests__/test-fixtures';
 import { screen, setupWithJotaiProvider } from '../../../test/test-utils';
 import { CommandPalette } from '../CommandPalette';
@@ -175,7 +175,7 @@ describe('CommandPalette', () => {
     );
 
     expect(screen.queryByText('select some text')).not.toBeInTheDocument();
-    expect(RewriteOptions).toHaveBeenCalled();
-    expect(vi.mocked(RewriteOptions).mock.lastCall![0]).toMatchObject({ selection: 'Some text selected' });
+    expect(RewriteWidget).toHaveBeenCalled();
+    expect(vi.mocked(RewriteWidget).mock.lastCall![0]).toMatchObject({ selection: 'Some text selected' });
   });
 });

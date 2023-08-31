@@ -187,7 +187,7 @@ export default {
         default: '0.25rem',
       },
       transitionProperty: {
-        left: 'left',
+        position: 'top, left, bottom, right',
       },
       zIndex: {
         modals: 99999,
