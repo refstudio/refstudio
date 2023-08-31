@@ -3,8 +3,7 @@ from typing import Any
 
 from dotenv import load_dotenv
 from pydantic import BaseModel
-
-from python.sidecar.pydantic_utils import make_optional
+from sidecar.pydantic_utils import make_optional
 
 try:
     # introduced in Python 3.11 ...

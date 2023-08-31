@@ -13,6 +13,8 @@ from sidecar.typing import (
     ChatResponse,
     DeleteRequest,
     DeleteStatusResponse,
+    FlatSettingsSchema,
+    FlatSettingsSchemaPatch,
     IngestRequest,
     Reference,
     ReferencePatch,
@@ -20,13 +22,10 @@ from sidecar.typing import (
     RewriteResponse,
     SearchRequest,
     SearchResponse,
-    SettingsSchema,
     TextCompletionRequest,
     TextCompletionResponse,
     UpdateStatusResponse,
 )
-
-from python.sidecar.typing import FlatSettingsSchema, FlatSettingsSchemaPatch
 
 load_dotenv()
 
@@ -334,4 +333,5 @@ async def get_settings() -> FlatSettingsSchema:
 @settings_api.put("/")
 async def update_settings(req: FlatSettingsSchemaPatch) -> FlatSettingsSchema:
     user_id = "user1"
+    return settings.update_settings_for_user(user_id, req)
     return settings.update_settings_for_user(user_id, req)

@@ -96,7 +96,7 @@ def get_settings_for_user(user_id: str) -> FlatSettingsSchema:
 
 
 def update_settings_for_user(
-    user_id: str, settings: FlatSettingsSchemaPatch
+    user_id: str, update: FlatSettingsSchemaPatch
 ) -> FlatSettingsSchema:
     """
     Updates a user's settings.json
@@ -109,7 +109,7 @@ def update_settings_for_user(
     response = get_settings_for_user(user_id)
 
     existing = response.dict()
-    existing.update(settings.dict())
+    existing.update({k: v for k, v in update.dict().items() if v is not None})
 
     with open(filepath, "w") as f:
         json.dump(existing, f)

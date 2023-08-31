@@ -76,3 +76,15 @@ def test_update_settings_for_user(monkeypatch, tmp_path, create_settings_json):
 
     # should be updated settings
     assert response.dict() == {**init_settings, "openai_temperature": 100.0}
+
+
+def test_migrate_settings():
+    old_settings = typing.SettingsSchema()
+    old_settings.openai.api_key = "abcd"
+    old_settings.sidecar.logging.enable = True
+    old_settings.project.current_directory = "/var/tmp"
+
+    new_settings = settings.migrate_settings(old_settings.dict())
+    assert new_settings.logging_enabled
+    assert new_settings.openai_api_key == "abcd"
+    assert new_settings.current_directory == "/var/tmp"
