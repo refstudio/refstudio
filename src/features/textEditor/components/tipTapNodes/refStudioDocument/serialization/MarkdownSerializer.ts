@@ -7,7 +7,7 @@ import { ReferenceItem } from '../../../../../../types/ReferenceItem';
 import { NotionBlockNode } from '../../notionBlock/NotionBlockNode';
 import { SerializedReferences, serializeReferences } from './serializeReferences';
 
-interface SerializedDocument {
+export interface SerializedDocument {
   markdownContent: string;
   bibliography?: SerializedReferences;
 }
