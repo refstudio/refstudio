@@ -43,7 +43,7 @@ export function App() {
   );
 
   useEventListener('unhandledrejection', (event) => {
-    notifyError('An error occurred', `Unhandled rejection in promise. Reason: ${event.reason}).`);
+    notifyError('Unhandled rejection in promise', `Reason: ${event.reason}`);
   });
 
   // React to width resize or panelDimensions resize (via setLayout/resize panels)
