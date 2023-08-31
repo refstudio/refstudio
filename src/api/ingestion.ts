@@ -1,6 +1,6 @@
 import { makeUploadPath } from '../io/filesystem';
 import { ReferenceItem } from '../types/ReferenceItem';
-import { universalDelete, universalGet, universalPatch, universalPost } from './api';
+import { universalGet, universalPatch, universalPost } from './api';
 import { DeleteStatusResponse, UpdateStatusResponse } from './api-types';
 import { callSidecar } from './sidecar';
 import { IngestResponse, Reference } from './types';
@@ -29,7 +29,7 @@ export async function runPDFIngestion(projectId: string): Promise<ReferenceItem[
 }
 
 export async function removeReferences(ids: string[], projectId: string) {
-  const status = await universalDelete<DeleteStatusResponse>(`/api/references/${projectId}/bulk_delete`, {
+  const status = await universalPost<DeleteStatusResponse>(`/api/references/${projectId}/bulk_delete`, {
     reference_ids: ids,
   });
   if (status.status !== 'ok') {
