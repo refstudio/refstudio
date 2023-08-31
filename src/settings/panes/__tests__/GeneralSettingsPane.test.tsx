@@ -67,7 +67,9 @@ describe('GeneralSettingsPane component', () => {
 
     // Submit
     await user.click(screen.getByRole('button', { name: /save/i }));
-    expect(setCachedSetting).toBeCalledTimes(1);
+    expect(setCachedSetting).toBeCalledTimes(2);
+    expect(setCachedSetting).toHaveBeenNthCalledWith(1, 'logging_enabled', false);
+    expect(setCachedSetting).toHaveBeenNthCalledWith(2, 'logging_filepath', 'PATH-Updated-2');
     expect(saveCachedSettings).toBeCalledTimes(1);
   });
 });
