@@ -1,17 +1,19 @@
-"""Generate cli.schema.json, which contains return types for the subcommands."""
+"""Generate OpenAPI and JSONSchema for the HTTP API.
+
+This generates two files:
+
+1. openapi.json, which contains an OpenAPI spec for the entire HTTP API.
+2. api.schema.json, which contains JSONSchema for the request/response types.
+"""
 import json
 
 from fastapi.openapi.utils import get_openapi
-from sidecar.typing import CliCommands
 from starlette.routing import Mount
 from web import api
 
 if __name__ == "__main__":
-    cli_schema = json.loads(CliCommands.schema_json())
-    with open("python/cli.schema.json", "w") as out:
-        json.dump(cli_schema, out, indent=2)
-
     combined_schemas = {}
+    combined_paths = {}
     for route in api.routes:
         if not isinstance(route, Mount):
             continue  # must be a built-in route like /docs
@@ -22,6 +24,25 @@ if __name__ == "__main__":
         components = openapi.get("components")
         if components:
             combined_schemas.update(components["schemas"])
+        paths = openapi["paths"]
+        for path, path_spec in paths.items():
+            combined_paths[mount_path + path] = path_spec
+
+    with open("python/openapi.json", "w") as out:
+        json.dump(
+            {
+                "openapi": "3.1.0",
+                "info": {
+                    "title": "RefStudio API",
+                    "version": "0.1",
+                },
+                "paths": combined_paths,
+                "components": {"schemas": combined_schemas},
+            },
+            out,
+            sort_keys=True,
+            indent=2,
+        )
 
     # OpenAPI puts request/response definitions under "/components/schemas", but
     # json2ts wants them under "/definitions".
