@@ -63,14 +63,18 @@ const MainPanelPane = memo(({ paneId }: MainPanelPaneProps) => {
 
   return (
     <div className="flex h-full flex-col" onClick={() => focusPane(paneId)} onFocus={() => focusPane(paneId)}>
-      {isProjectOpen ? <>
-        <div className="grow-0">
-          <OpenEditorsTabPane paneId={paneId} />
-        </div>
-        <div className="flex w-full grow overflow-hidden bg-content-area-bg-primary px-10 pt-10">
-          {activeEditorAtoms ? <MainPaneViewContent activeEditorAtoms={activeEditorAtoms} /> : <EmptyView />}
-        </div>
-      </> : <WelcomeView />}
+      {isProjectOpen ? (
+        <>
+          <div className="grow-0">
+            <OpenEditorsTabPane paneId={paneId} />
+          </div>
+          <div className="flex w-full grow overflow-hidden bg-content-area-bg-primary px-10 pt-10">
+            {activeEditorAtoms ? <MainPaneViewContent activeEditorAtoms={activeEditorAtoms} /> : <EmptyView />}
+          </div>
+        </>
+      ) : (
+        <WelcomeView />
+      )}
     </div>
   );
 });

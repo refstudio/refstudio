@@ -1,4 +1,3 @@
-
 import { useQuery } from '@tanstack/react-query';
 
 import { ProjectInfo, readAllProjects } from '../../api/projectsAPI';
@@ -23,8 +22,8 @@ export function WelcomeView() {
       <div className="flex w-56 flex-col items-stretch">
         <WelcomeActions />
       </div>
-      <div className='self-stretch w-[1px] bg-welcome-border' />
-      <div className='self-stretch flex-1 flex flex-col gap-12'>
+      <div className="w-[1px] self-stretch bg-welcome-border" />
+      <div className="flex flex-1 flex-col gap-12 self-stretch">
         <WelcomeTips />
         <RecentProjectsList />
       </div>
@@ -64,21 +63,18 @@ function WelcomeTips() {
     >
       <div className="flex flex-col items-start gap-4 text-card-txt-primary">
         <h1 className="flex-1 text-card-txt-primary">Tip & Tricks</h1>
-        <div className='flex flex-col items-start gap-2'>
-          <div className='f font-semibold text-2xl/6'>Are you New to Refstudio?</div>
+        <div className="flex flex-col items-start gap-2">
+          <div className="f text-2xl/6 font-semibold">Are you New to Refstudio?</div>
           <div>Access our repository or open a sample project to learn more.</div>
         </div>
       </div>
-      <div className='flex flex-row gap-2 items-start'>
-        <div className='shrink'>
-          <a className='no-underline' href="https://github.com/refstudio/refstudio" rel="noreferrer" target="_blank">
-            <Button
-              Action={<ExternalIcon />}
-              text="Documentation"
-              onClick={noop}
-            /></a>
+      <div className="flex flex-row items-start gap-2">
+        <div className="shrink">
+          <a className="no-underline" href="https://github.com/refstudio/refstudio" rel="noreferrer" target="_blank">
+            <Button Action={<ExternalIcon />} text="Documentation" onClick={noop} />
+          </a>
         </div>
-        <div className='shrink'>
+        <div className="shrink">
           <Button
             Action={<SampleIcon />}
             text="Open Sample"
@@ -91,28 +87,37 @@ function WelcomeTips() {
 }
 
 function RecentProjectsList() {
-  const {
-    data: projects,
-  } = useQuery({ queryKey: ['recent-projects'], queryFn: readAllProjects });
+  const { data: projects } = useQuery({ queryKey: ['recent-projects'], queryFn: readAllProjects });
 
-  return <div className='flex flex-col items-stretch gap-4'>
-    <h1>Recent Projects</h1>
-    {projects && <div className='flex flex-col items-stretch gap-2'>
-      {projects.map((project, index) => <>{index > 0 && <div className='h-[1px] bg-welcome-border' key={index} />}<ProjectItem key={project.id} project={project} /></>)}
-    </div>}
-  </div>;
+  return (
+    <div className="flex flex-col items-stretch gap-4">
+      <h1>Recent Projects</h1>
+      {projects && (
+        <div className="flex flex-col items-stretch gap-2">
+          {projects.map((project, index) => (
+            <>
+              {index > 0 && <div className="h-[1px] bg-welcome-border" key={index} />}
+              <ProjectItem key={project.id} project={project} />
+            </>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 function ProjectItem({ project }: { project: ProjectInfo }) {
-  return <div
-    className={cx(
-      'cursor-pointer flex p-2 pr-3 items-center gap-2',
-      'rounded-default hover:bg-btn-bg-side-bar-item-hover',
-      'text-btn-txt-side-bar-item-primary',
-    )}
-    onClick={() => emitEvent('refstudio://projects/open', { projectId: project.id })}
-  >
-    <RefStudioEditorIcon />
-    {project.name}
-  </div >;
+  return (
+    <div
+      className={cx(
+        'flex cursor-pointer items-center gap-2 p-2 pr-3',
+        'rounded-default hover:bg-btn-bg-side-bar-item-hover',
+        'text-btn-txt-side-bar-item-primary',
+      )}
+      onClick={() => emitEvent('refstudio://projects/open', { projectId: project.id })}
+    >
+      <RefStudioEditorIcon />
+      {project.name}
+    </div>
+  );
 }
