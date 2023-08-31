@@ -334,4 +334,3 @@ async def get_settings() -> FlatSettingsSchema:
 async def update_settings(req: FlatSettingsSchemaPatch) -> FlatSettingsSchema:
     user_id = "user1"
     return settings.update_settings_for_user(user_id, req)
-    return settings.update_settings_for_user(user_id, req)
