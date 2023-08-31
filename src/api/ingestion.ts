@@ -11,6 +11,7 @@ function parsePdfIngestionResponse(references: Reference[]): ReferenceItem[] {
     filepath: makeUploadPath(reference.source_filename),
     filename: reference.source_filename,
     citationKey: reference.citation_key ?? 'unknown',
+    doi: reference.doi ?? 'unknown',
     title: reference.title ?? reference.source_filename.replace('.pdf', ''),
     publishedDate: reference.published_date ?? '',
     abstract: reference.abstract ?? '',
@@ -46,7 +47,7 @@ export async function removeReferences(ids: string[], projectId: string) {
   }
 }
 
-const UPDATABLE_FIELDS: (keyof ReferenceItem)[] = ['citationKey', 'title', 'publishedDate', 'authors'];
+const UPDATABLE_FIELDS: (keyof ReferenceItem)[] = ['citationKey', 'title', 'publishedDate', 'authors', 'doi'];
 function applyPatch(field: keyof ReferenceItem, patch: Partial<ReferenceItem>, getPatch: () => Partial<Reference>) {
   if (UPDATABLE_FIELDS.includes(field) && Object.hasOwn(patch, field)) {
     return getPatch();
@@ -59,6 +60,7 @@ export async function updateReference(projectId: string, referenceId: string, pa
     ...applyPatch('citationKey', patch, () => ({ citation_key: patch.citationKey })),
     ...applyPatch('title', patch, () => ({ title: patch.title })),
     ...applyPatch('publishedDate', patch, () => ({ published_date: patch.publishedDate })),
+    ...applyPatch('doi', patch, () => ({ doi: patch.doi })),
     ...applyPatch('authors', patch, () => ({
       authors: patch.authors!.map((a) => ({ full_name: a.fullName, surname: a.lastName })),
     })),
