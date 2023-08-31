@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { Fragment } from 'react';
 
 import { ProjectInfo, readAllProjects } from '../../api/projectsAPI';
 import { Button } from '../../components/Button';
@@ -95,10 +96,10 @@ function RecentProjectsList() {
       {projects && (
         <div className="flex flex-col items-stretch gap-2 overflow-y-scroll">
           {projects.map((project, index) => (
-            <>
-              {index > 0 && <div className="h-[1px] shrink-0 bg-welcome-border" key={index} />}
-              <ProjectItem key={project.id} project={project} />
-            </>
+            <Fragment key={project.id}>
+              {index > 0 && <div className="h-[1px] shrink-0 bg-welcome-border" />}
+              <ProjectItem project={project} />
+            </Fragment>
           ))}
         </div>
       )}
