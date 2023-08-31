@@ -1,7 +1,7 @@
 /** Type-safe access to the RefStudio HTTP APIs. */
 
 import { universalGet, universalPost } from './api';
-import { paths } from './api-paths';
+import type { paths } from './api-paths';
 
 type LowerMethod = 'get' | 'post' | 'put' | 'delete' | 'patch';
 
