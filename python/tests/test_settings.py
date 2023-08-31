@@ -1,6 +1,6 @@
 import json
-import pytest
 
+import pytest
 from sidecar import settings, typing
 
 
@@ -13,8 +13,8 @@ def create_settings_json(monkeypatch, tmp_path, request):
 
     settings.initialize_settings_for_user(user_id)
 
-    defaults = typing.SettingsSchema()
-    defaults.openai.api_key = "1234"
+    defaults = settings.default_settings()
+    defaults.openai_api_key = "1234"
 
     with open(filepath, "w") as f:
         json.dump(defaults.dict(), f)
@@ -45,7 +45,7 @@ def test_get_settings_for_new_user_should_be_empty(monkeypatch, tmp_path):
     user_id = "user999"
 
     response = settings.get_settings_for_user(user_id)
-    assert response.dict() == typing.SettingsSchema().dict()
+    assert response.dict() == settings.default_settings()
 
     # settings.json should be created
     filepath = settings.make_settings_json_path(user_id)
@@ -57,7 +57,7 @@ def test_get_settings_for_existing_user(monkeypatch, tmp_path, create_settings_j
     user_id = "user1"
 
     response = settings.get_settings_for_user(user_id)
-    assert response.openai.api_key == "1234"
+    assert response.openai_api_key == "1234"
 
 
 def test_update_settings_for_user(monkeypatch, tmp_path, create_settings_json):
@@ -65,15 +65,14 @@ def test_update_settings_for_user(monkeypatch, tmp_path, create_settings_json):
 
     user_id = "user1"
     response = settings.get_settings_for_user(user_id)
+    init_settings = response.dict()
 
-    # should be default settings
-    assert response.dict() != typing.SettingsSchema().dict()
+    # should not be default settings (the fixture updates a field)
+    assert init_settings != settings.default_settings()
 
-    data = response.dict()
-
-    data["openai"] = {"temperature": 100.0}
-    request = typing.SettingsSchema(**data)
-    response = settings.update_settings_for_user(user_id, request)
+    patch = typing.FlatSettingsSchemaPatch()
+    patch.openai_temperature = 100.0
+    response = settings.update_settings_for_user(user_id, patch)
 
     # should be updated settings
-    assert response.dict() == request.dict()
+    assert response.dict() == {**init_settings, "openai_temperature": 100.0}

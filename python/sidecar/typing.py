@@ -232,6 +232,8 @@ class SidecarSettings(RefStudioModel):
 
 
 class SettingsSchema(RefStudioModel):
+    """@deprecated"""
+
     project: ProjectSettings = ProjectSettings()
     openai: OpenAISettings = OpenAISettings()
     sidecar: SidecarSettings = SidecarSettings()

@@ -4,12 +4,11 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
-from sidecar.typing import SettingsSchema
-
-from python.sidecar.typing import (
+from sidecar.typing import (
     FlatSettingsSchema,
     FlatSettingsSchemaPatch,
     RewriteMannerType,
+    SettingsSchema,
 )
 
 load_dotenv()
