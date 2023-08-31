@@ -29,7 +29,6 @@ describe('DebugSettingsPane component', () => {
     // Fake settings methods
     vi.mocked(initSettings).mockResolvedValue();
     vi.mocked(saveCachedSettings).mockResolvedValue();
-    // eslint-disable-next-line
     vi.mocked(getSettings).mockResolvedValue({
       default: mockSettings,
     } as SettingsManagerView<FlatSettingsSchema>);
