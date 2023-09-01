@@ -63,7 +63,7 @@ export function RewriteOptionsView({
             max={0.9}
             min={0.7}
             name="creativity"
-            step={0.05}
+            step={0.01}
             value={options.temperature}
             onChange={(temperature) => onChange({ ...options, temperature })}
           />
