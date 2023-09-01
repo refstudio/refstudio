@@ -1,19 +1,24 @@
 import { atom, useAtom } from 'jotai';
-import { ChangeEventHandler, ReactElement, useMemo } from 'react';
+import { ReactElement, useCallback, useMemo, useState } from 'react';
 
 import { CloseIcon, EditIcon } from '../../../components/icons';
+import { useDebouncedCallback } from '../../../hooks/useDebouncedCallback';
 import { cx } from '../../../lib/cx';
+import { ReferenceItem } from '../../../types/ReferenceItem';
+import { ReferenceDetailsCardRow } from './ReferenceEditorTypes';
 
 export default function ReferenceDetailsCard({
   tableData,
   referenceUpdateHandler,
+  editableReferenceItem,
 }: {
   tableData: {
-    tableBodyContent: Record<string, string>[];
+    tableBodyContent: ReferenceDetailsCardRow[];
     headerContentArray: string[];
     headerColSpan: number;
   };
-  referenceUpdateHandler: ChangeEventHandler<HTMLInputElement>;
+  referenceUpdateHandler: (params: ReferenceItem) => undefined;
+  editableReferenceItem: ReferenceItem;
 }) {
   const referenceCardEditableAtom = useMemo(() => atom(false), []);
   const [editable, setEditable] = useAtom(referenceCardEditableAtom);
@@ -54,18 +59,53 @@ export default function ReferenceDetailsCard({
     );
   };
 
-  const TableDataCell = ({ content, name }: { content: string; name: string }) => (
-    <td className="w-auto p-5">
-      <span className={cx({ hidden: editable }, 'leading-[30px]')}>{content}</span>
-      <input
-        className={cx({ hidden: !editable }, 'w-full border bg-slate-50 px-2 py-0.5')}
-        name={name}
-        type="text"
-        value={content}
-        onChange={referenceUpdateHandler}
-      />
-    </td>
+  interface InputProps {
+    onChange: (value: string, fieldName: string) => void;
+  }
+
+  const updateAtomOnChange = useCallback(
+    (fieldName: string, value: string) => {
+      switch (fieldName) {
+        case 'citationKey':
+          editableReferenceItem.citationKey = value;
+          break;
+        case 'title':
+          editableReferenceItem.title = value;
+          break;
+        case 'doi':
+          editableReferenceItem.doi = value;
+          break;
+      }
+      console.log(fieldName);
+      console.log(value);
+      console.log(editableReferenceItem);
+      referenceUpdateHandler(editableReferenceItem);
+    },
+    [editableReferenceItem, referenceUpdateHandler],
   );
+
+  const TableDataCell = ({ content, id }: { content: string; id: string }) => {
+    const [value, setValue] = useState(content);
+    const debouncedOnChange = useDebouncedCallback(updateAtomOnChange, 200);
+
+    const contentDisplay = id === 'citationKey' ? '[' + content + ']' : content;
+    return (
+      <td className="w-auto p-5">
+        <span className={cx({ hidden: editable }, 'leading-[30px]')}>{contentDisplay}</span>
+        <input
+          className={cx({ hidden: !editable }, 'w-full border bg-slate-50 px-2 py-0.5')}
+          name={id}
+          type="text"
+          value={value}
+          onChange={(evt) => {
+            setValue(evt.target.value);
+            debouncedOnChange(id, evt.target.value);
+          }}
+          // onChange={(e) => debouncedUpdateAtomOnChange(e.target.name, e.target.value)}
+        />
+      </td>
+    );
+  };
 
   const TableHead = ({ headerContent }: { headerContent: { headerContentArray: string[]; headerColSpan: number } }) => (
     <thead>
@@ -77,20 +117,16 @@ export default function ReferenceDetailsCard({
     </thead>
   );
 
-  const TableRow = ({ content, key }: { content: string; key: string }): ReactElement => (
-    <tr key={key}>
-      <TableHeadCell content={key} />
-      <TableDataCell content={content} name={key} />
+  const TableRow = ({ value, title, id }: ReferenceDetailsCardRow): ReactElement => (
+    <tr key={id}>
+      <TableHeadCell content={title} />
+      <TableDataCell content={value} id={id} />
     </tr>
   );
 
-  const TableBody = ({ tableBodyContent }: { tableBodyContent: Record<string, string>[] }) => {
+  const TableBody = ({ tableBodyContent }: { tableBodyContent: ReferenceDetailsCardRow[] }) => {
     const rows: ReactElement[] = [];
-    tableBodyContent.forEach((record) =>
-      Object.entries(record).map((h) => {
-        rows.push(TableRow({ content: h[1], key: h[0] }));
-      }),
-    );
+    tableBodyContent.forEach((rowData) => rows.push(TableRow(rowData)));
     return <tbody className="divide-y">{rows}</tbody>;
   };
 
