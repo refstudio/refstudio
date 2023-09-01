@@ -12,15 +12,15 @@ from tenacity import retry, stop_after_attempt, wait_fixed
 def ask_question(
     request: ChatRequest,
     project_id: str = None,
-    user_settings: typing.SettingsSchema = None,
+    user_settings: typing.FlatSettingsSchema = None,
 ) -> typing.ChatResponse:
     input_text = request.text
     n_choices = request.n_choices
     temperature = request.temperature
 
     if user_settings is not None:
-        openai.api_key = user_settings.openai.api_key
-        model = user_settings.openai.chat_model
+        openai.api_key = user_settings.openai_api_key
+        model = user_settings.openai_chat_model
     else:
         openai.api_key = os.environ.get("OPENAI_API_KEY")
         model = "gpt-3.5-turbo"

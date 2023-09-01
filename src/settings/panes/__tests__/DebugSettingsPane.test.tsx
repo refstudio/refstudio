@@ -1,7 +1,6 @@
-import { SettingsManager } from 'tauri-settings';
-
+import { FlatSettingsSchema } from '../../../api/api-types';
 import { render, screen } from '../../../test/test-utils';
-import { getSettings, initSettings, saveCachedSettings, SettingsSchema } from '../../settingsManager';
+import { getSettings, initSettings, saveCachedSettings, SettingsManagerView } from '../../settingsManager';
 import { PaneConfig } from '../../types';
 import { DebugSettingsPane } from '../DebugSettingsPane';
 import { GeneralSettingsPane } from '../GeneralSettingsPane';
@@ -15,22 +14,14 @@ const panelConfig: PaneConfig = {
   title: 'OPEN AI',
 };
 
-const mockSettings: SettingsSchema = {
-  project: {
-    current_directory: 'app-dir',
-  },
-  openai: {
-    api_key: '',
-    chat_model: 'gpt-3.5-turbo',
-    manner: 'concise',
-    temperature: 0.7,
-  },
-  sidecar: {
-    logging: {
-      enable: true,
-      filepath: '/tmp',
-    },
-  },
+const mockSettings: FlatSettingsSchema = {
+  current_directory: 'app-dir',
+  openai_api_key: '',
+  openai_chat_model: 'gpt-3.5-turbo',
+  openai_manner: 'concise',
+  openai_temperature: 0.7,
+  logging_enabled: true,
+  logging_filepath: '/tmp',
 };
 
 describe('DebugSettingsPane component', () => {
@@ -38,10 +29,9 @@ describe('DebugSettingsPane component', () => {
     // Fake settings methods
     vi.mocked(initSettings).mockResolvedValue();
     vi.mocked(saveCachedSettings).mockResolvedValue();
-    // eslint-disable-next-line
     vi.mocked(getSettings).mockResolvedValue({
       default: mockSettings,
-    } as SettingsManager<SettingsSchema>);
+    } as SettingsManagerView<FlatSettingsSchema>);
   });
 
   afterEach(() => {

@@ -1,0 +1,1491 @@
+{
+  "components": {
+    "schemas": {
+      "Author": {
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "full_name": {
+            "type": "string"
+          },
+          "given_name": {
+            "type": "string"
+          },
+          "surname": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "full_name"
+        ],
+        "title": "Author",
+        "type": "object"
+      },
+      "Body_create_file__project_id___filepath__put": {
+        "properties": {
+          "file": {
+            "format": "binary",
+            "title": "File",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "title": "Body_create_file__project_id___filepath__put",
+        "type": "object"
+      },
+      "ChatRequest": {
+        "properties": {
+          "n_choices": {
+            "default": 1,
+            "type": "integer"
+          },
+          "temperature": {
+            "default": 0.7,
+            "type": "number"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "ChatRequest",
+        "type": "object"
+      },
+      "ChatResponse": {
+        "properties": {
+          "choices": {
+            "items": {
+              "$ref": "#/components/schemas/ChatResponseChoice"
+            },
+            "type": "array"
+          },
+          "message": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ResponseStatus"
+          }
+        },
+        "required": [
+          "status",
+          "message",
+          "choices"
+        ],
+        "title": "ChatResponse",
+        "type": "object"
+      },
+      "ChatResponseChoice": {
+        "properties": {
+          "index": {
+            "type": "integer"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "index",
+          "text"
+        ],
+        "title": "ChatResponseChoice",
+        "type": "object"
+      },
+      "Chunk": {
+        "properties": {
+          "metadata": {
+            "default": {},
+            "type": "object"
+          },
+          "text": {
+            "type": "string"
+          },
+          "vector": {
+            "default": [],
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "Chunk",
+        "type": "object"
+      },
+      "DeleteRequest": {
+        "properties": {
+          "all": {
+            "default": false,
+            "type": "boolean"
+          },
+          "reference_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "reference_ids"
+        ],
+        "title": "DeleteRequest",
+        "type": "object"
+      },
+      "DeleteStatusResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ResponseStatus"
+          }
+        },
+        "required": [
+          "status",
+          "message"
+        ],
+        "title": "DeleteStatusResponse",
+        "type": "object"
+      },
+      "FlatSettingsSchema": {
+        "properties": {
+          "current_directory": {
+            "type": "string"
+          },
+          "logging_enabled": {
+            "type": "boolean"
+          },
+          "logging_filepath": {
+            "type": "string"
+          },
+          "openai_api_key": {
+            "type": "string"
+          },
+          "openai_chat_model": {
+            "type": "string"
+          },
+          "openai_manner": {
+            "$ref": "#/components/schemas/RewriteMannerType"
+          },
+          "openai_temperature": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "current_directory",
+          "logging_enabled",
+          "logging_filepath",
+          "openai_api_key",
+          "openai_chat_model",
+          "openai_manner",
+          "openai_temperature"
+        ],
+        "title": "FlatSettingsSchema",
+        "type": "object"
+      },
+      "FlatSettingsSchemaPatch": {
+        "properties": {
+          "current_directory": {
+            "type": "string"
+          },
+          "logging_enabled": {
+            "type": "boolean"
+          },
+          "logging_filepath": {
+            "type": "string"
+          },
+          "openai_api_key": {
+            "type": "string"
+          },
+          "openai_chat_model": {
+            "type": "string"
+          },
+          "openai_manner": {
+            "$ref": "#/components/schemas/RewriteMannerType"
+          },
+          "openai_temperature": {
+            "type": "number"
+          }
+        },
+        "title": "FlatSettingsSchemaPatch",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "IngestStatus": {
+        "description": "An enumeration.",
+        "enum": [
+          "processing",
+          "failure",
+          "complete"
+        ],
+        "title": "IngestStatus",
+        "type": "string"
+      },
+      "Reference": {
+        "description": "A reference for an academic paper / PDF",
+        "properties": {
+          "abstract": {
+            "type": "string"
+          },
+          "authors": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Author"
+            },
+            "type": "array"
+          },
+          "chunks": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Chunk"
+            },
+            "type": "array"
+          },
+          "citation_key": {
+            "type": "string"
+          },
+          "contents": {
+            "type": "string"
+          },
+          "doi": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "metadata": {
+            "default": {},
+            "type": "object"
+          },
+          "published_date": {
+            "format": "date",
+            "type": "string"
+          },
+          "source_filename": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/IngestStatus"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "source_filename",
+          "status"
+        ],
+        "title": "Reference",
+        "type": "object"
+      },
+      "ReferencePatch": {
+        "description": "ReferencePatch is the input type for updating a Reference's metadata.",
+        "properties": {
+          "data": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "ReferencePatch",
+        "type": "object"
+      },
+      "ResponseStatus": {
+        "description": "An enumeration.",
+        "enum": [
+          "ok",
+          "error"
+        ],
+        "title": "ResponseStatus",
+        "type": "string"
+      },
+      "RewriteChoice": {
+        "properties": {
+          "index": {
+            "type": "integer"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "index",
+          "text"
+        ],
+        "title": "RewriteChoice",
+        "type": "object"
+      },
+      "RewriteMannerType": {
+        "description": "An enumeration.",
+        "enum": [
+          "concise",
+          "elaborate",
+          "scholarly"
+        ],
+        "title": "RewriteMannerType",
+        "type": "string"
+      },
+      "RewriteRequest": {
+        "properties": {
+          "manner": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RewriteMannerType"
+              }
+            ],
+            "default": "concise"
+          },
+          "n_choices": {
+            "default": 1,
+            "type": "integer"
+          },
+          "temperature": {
+            "default": 0.7,
+            "type": "number"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "RewriteRequest",
+        "type": "object"
+      },
+      "RewriteResponse": {
+        "properties": {
+          "choices": {
+            "items": {
+              "$ref": "#/components/schemas/RewriteChoice"
+            },
+            "type": "array"
+          },
+          "message": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ResponseStatus"
+          }
+        },
+        "required": [
+          "status",
+          "message",
+          "choices"
+        ],
+        "title": "RewriteResponse",
+        "type": "object"
+      },
+      "S2SearchResult": {
+        "properties": {
+          "abstract": {
+            "type": "string"
+          },
+          "authors": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "citationCount": {
+            "type": "integer"
+          },
+          "openAccessPdf": {
+            "type": "string"
+          },
+          "paperId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "venue": {
+            "type": "string"
+          },
+          "year": {
+            "type": "integer"
+          }
+        },
+        "title": "S2SearchResult",
+        "type": "object"
+      },
+      "SearchRequest": {
+        "properties": {
+          "limit": {
+            "default": 10,
+            "type": "integer"
+          },
+          "query": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "title": "SearchRequest",
+        "type": "object"
+      },
+      "SearchResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/S2SearchResult"
+            },
+            "type": "array"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ResponseStatus"
+          }
+        },
+        "required": [
+          "status",
+          "message",
+          "results"
+        ],
+        "title": "SearchResponse",
+        "type": "object"
+      },
+      "TextCompletionChoice": {
+        "properties": {
+          "index": {
+            "type": "integer"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "index",
+          "text"
+        ],
+        "title": "TextCompletionChoice",
+        "type": "object"
+      },
+      "TextCompletionRequest": {
+        "properties": {
+          "abstract": {
+            "type": "string"
+          },
+          "max_tokens": {
+            "default": 512,
+            "type": "integer"
+          },
+          "n_choices": {
+            "default": 1,
+            "type": "integer"
+          },
+          "temperature": {
+            "default": 0.7,
+            "type": "number"
+          },
+          "text": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "TextCompletionRequest",
+        "type": "object"
+      },
+      "TextCompletionResponse": {
+        "properties": {
+          "choices": {
+            "items": {
+              "$ref": "#/components/schemas/TextCompletionChoice"
+            },
+            "type": "array"
+          },
+          "message": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ResponseStatus"
+          }
+        },
+        "required": [
+          "status",
+          "message",
+          "choices"
+        ],
+        "title": "TextCompletionResponse",
+        "type": "object"
+      },
+      "UpdateStatusResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ResponseStatus"
+          }
+        },
+        "required": [
+          "status",
+          "message"
+        ],
+        "title": "UpdateStatusResponse",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "RefStudio API",
+    "version": "0.1"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/ai/completion": {
+      "post": {
+        "operationId": "http_ai_completion_completion_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TextCompletionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TextCompletionResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Http Ai Completion"
+      }
+    },
+    "/api/ai/rewrite": {
+      "post": {
+        "operationId": "http_ai_rewrite_rewrite_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RewriteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RewriteResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Http Ai Rewrite"
+      }
+    },
+    "/api/ai/{project_id}/chat": {
+      "post": {
+        "operationId": "http_ai_chat__project_id__chat_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Http Ai Chat"
+      }
+    },
+    "/api/fs/{project_id}/{filepath}": {
+      "delete": {
+        "operationId": "delete_file__project_id___filepath__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "filepath",
+            "required": true,
+            "schema": {
+              "format": "path",
+              "title": "Filepath",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete File"
+      },
+      "get": {
+        "operationId": "read_file__project_id___filepath__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "filepath",
+            "required": true,
+            "schema": {
+              "format": "path",
+              "title": "Filepath",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Read File"
+      },
+      "head": {
+        "operationId": "head_file__project_id___filepath__head",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "filepath",
+            "required": true,
+            "schema": {
+              "format": "path",
+              "title": "Filepath",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Head File"
+      },
+      "put": {
+        "operationId": "create_file__project_id___filepath__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "filepath",
+            "required": true,
+            "schema": {
+              "format": "path",
+              "title": "Filepath",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_create_file__project_id___filepath__put"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create File"
+      }
+    },
+    "/api/meta/shutdown": {
+      "post": {
+        "operationId": "shutdown_shutdown_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Shutdown"
+      }
+    },
+    "/api/meta/status": {
+      "get": {
+        "operationId": "status_status_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Status"
+      }
+    },
+    "/api/projects/": {
+      "get": {
+        "description": "Returns a list of projects for the current user",
+        "operationId": "list_projects__get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Projects"
+      },
+      "post": {
+        "description": "Creates a project directory in the filesystem\n\nParameters\n----------\nproject_name : str\n    The name of the project\nproject_path : str\n    The path to the project directory. Only necessary for Desktop.\n    For web, the project is stored in a private directory on the server.",
+        "operationId": "create_project__post",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "project_name",
+            "required": true,
+            "schema": {
+              "title": "Project Name",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "project_path",
+            "required": false,
+            "schema": {
+              "title": "Project Path",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Project"
+      }
+    },
+    "/api/projects/{project_id}": {
+      "delete": {
+        "description": "Deletes a project directory and all files in it",
+        "operationId": "delete_project__project_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Project"
+      },
+      "get": {
+        "description": "Returns the project path and a list of files in the project",
+        "operationId": "get_project__project_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Project"
+      }
+    },
+    "/api/projects/{project_id}/files": {
+      "get": {
+        "operationId": "get_project_files__project_id__files_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Project Files"
+      }
+    },
+    "/api/references/{project_id}": {
+      "get": {
+        "description": "Returns a list of references for the current user",
+        "operationId": "list_references__project_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Reference"
+                  },
+                  "title": "Response List References  Project Id  Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List References"
+      },
+      "post": {
+        "description": "Ingests references from PDFs in the project uploads directory",
+        "operationId": "ingest_references__project_id__post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Ingest References"
+      }
+    },
+    "/api/references/{project_id}/bulk_delete": {
+      "post": {
+        "operationId": "http_bulk_delete__project_id__bulk_delete_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteStatusResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Http Bulk Delete"
+      }
+    },
+    "/api/references/{project_id}/{reference_id}": {
+      "delete": {
+        "operationId": "http_delete__project_id___reference_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "reference_id",
+            "required": true,
+            "schema": {
+              "title": "Reference Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteStatusResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Http Delete"
+      },
+      "get": {
+        "operationId": "http_get__project_id___reference_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "reference_id",
+            "required": true,
+            "schema": {
+              "title": "Reference Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Reference"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Http Get"
+      },
+      "patch": {
+        "operationId": "http_update__project_id___reference_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "reference_id",
+            "required": true,
+            "schema": {
+              "title": "Reference Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReferencePatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateStatusResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Http Update"
+      }
+    },
+    "/api/search/s2": {
+      "post": {
+        "operationId": "http_search_s2_s2_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Http Search S2"
+      }
+    },
+    "/api/settings/": {
+      "get": {
+        "operationId": "get_settings__get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlatSettingsSchema"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Settings"
+      },
+      "put": {
+        "operationId": "update_settings__put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlatSettingsSchemaPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlatSettingsSchema"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Settings"
+      }
+    }
+  }
+}

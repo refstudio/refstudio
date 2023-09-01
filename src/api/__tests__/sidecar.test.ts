@@ -1,34 +1,21 @@
 import { Command, SpawnOptions } from '@tauri-apps/api/shell';
 
 import { noop } from '../../lib/noop';
-import {
-  getCachedSetting,
-  initSettings,
-  saveCachedSettings,
-  setCachedSetting,
-  SettingsSchema,
-} from '../../settings/settingsManager';
+import { getCachedSetting, initSettings, saveCachedSettings, setCachedSetting } from '../../settings/settingsManager';
+import { FlatSettingsSchema } from '../api-types';
 import { callSidecar } from '../sidecar';
 
 vi.mock('../../settings/settingsManager');
 vi.mock('@tauri-apps/api/shell');
 
-const mockSettings: SettingsSchema = {
-  project: {
-    current_directory: 'PROJECT-DIR',
-  },
-  openai: {
-    api_key: 'API KEY',
-    chat_model: 'CHAT MODEL',
-    manner: 'concise',
-    temperature: 0.7,
-  },
-  sidecar: {
-    logging: {
-      enable: true,
-      filepath: 'PATH',
-    },
-  },
+const mockSettings: FlatSettingsSchema = {
+  current_directory: 'app-dir',
+  openai_api_key: '',
+  openai_chat_model: 'gpt-3.5-turbo',
+  openai_manner: 'concise',
+  openai_temperature: 0.7,
+  logging_enabled: true,
+  logging_filepath: '/tmp',
 };
 
 describe('sidecar', () => {
@@ -37,14 +24,10 @@ describe('sidecar', () => {
     vi.mocked(initSettings).mockResolvedValue();
     vi.mocked(saveCachedSettings).mockResolvedValue();
     vi.mocked(getCachedSetting).mockImplementation((key) => {
-      switch (key) {
-        case 'openai':
-        case 'project':
-        case 'sidecar':
-          return mockSettings[key];
-        default:
-          throw new Error('UNEXPECTED CALL FOR KEY ' + key);
+      if (key in mockSettings) {
+        return mockSettings[key];
       }
+      throw new Error('UNEXPECTED CALL FOR KEY ' + key);
     });
     vi.mocked(setCachedSetting).mockImplementation(noop);
   });
@@ -71,13 +54,13 @@ describe('sidecar', () => {
     expect(Object.keys(env ?? {}).length).toBe(5);
 
     // General
-    expect(env?.PROJECT_DIR).toBe(mockSettings.project.current_directory);
+    expect(env?.PROJECT_DIR).toBe(mockSettings.current_directory);
     // OpenAI
-    expect(env?.OPENAI_API_KEY).toBe(mockSettings.openai.api_key);
-    expect(env?.OPENAI_CHAT_MODEL).toBe(mockSettings.openai.chat_model);
+    expect(env?.OPENAI_API_KEY).toBe(mockSettings.openai_api_key);
+    expect(env?.OPENAI_CHAT_MODEL).toBe(mockSettings.openai_chat_model);
     // Logging
-    expect(env?.SIDECAR_ENABLE_LOGGING).toBe(String(mockSettings.sidecar.logging.enable));
-    expect(env?.SIDECAR_LOG_DIR).toBe(mockSettings.sidecar.logging.filepath);
+    expect(env?.SIDECAR_ENABLE_LOGGING).toBe(String(mockSettings.logging_enabled));
+    expect(env?.SIDECAR_LOG_DIR).toBe(mockSettings.logging_filepath);
   });
 
   it('should throw exception if stderr has content', async () => {

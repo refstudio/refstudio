@@ -74,7 +74,6 @@
     "react-popper": "^2.3.0",
     "react-resizable-panels": "^0.0.51",
     "tailwindcss": "^3.3.2",
-    "tauri-settings": "^0.3.2",
     "tiptap-markdown": "^0.7.2",
     "turndown": "^7.1.2",
     "usehooks-ts": "^2.9.1"
@@ -111,6 +110,7 @@
     "jsdom": "^22.1.0",
     "json-schema-to-typescript": "^13.0.1",
     "knip": "^2.14.3",
+    "openapi-typescript": "^6.5.3",
     "prettier": "^2.8.8",
     "prettier-plugin-tailwindcss": "^0.3.0",
     "typescript": "^4.9.5",
