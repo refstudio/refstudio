@@ -16,7 +16,10 @@ export function RewriterPanel({ debounceMs = 200 }: { debounceMs?: number }) {
   const selection = useAtomValue(selectionAtom);
   const debouncedSelection = useDebounce(selection, debounceMs);
 
-  const openAiSettings = getCachedSetting('openai');
+  const openAiSettings = {
+    manner: getCachedSetting('openai_manner'),
+    temperature: getCachedSetting('openai_temperature'),
+  };
 
   const [rewriteOptions, setRewriteOptions] = useState<Required<RewriteOptions>>({
     nChoices: 3,
