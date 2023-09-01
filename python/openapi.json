@@ -349,6 +349,28 @@
         "title": "ProjectDetailsResponse",
         "type": "object"
       },
+      "ProjectFileTreeResponse": {
+        "properties": {
+          "contents": {
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/FileEntry"
+                },
+                {
+                  "$ref": "#/components/schemas/FolderEntry"
+                }
+              ]
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "contents"
+        ],
+        "title": "ProjectFileTreeResponse",
+        "type": "object"
+      },
       "Reference": {
         "description": "A reference for an academic paper / PDF",
         "properties": {
@@ -1184,18 +1206,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "anyOf": [
-                      {
-                        "$ref": "#/components/schemas/FileEntry"
-                      },
-                      {
-                        "$ref": "#/components/schemas/FolderEntry"
-                      }
-                    ]
-                  },
-                  "title": "Response Get Project Files  Project Id  Files Get",
-                  "type": "array"
+                  "$ref": "#/components/schemas/ProjectFileTreeResponse"
                 }
               }
             },

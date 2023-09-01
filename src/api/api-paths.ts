@@ -19,6 +19,7 @@ import {
   IngestStatus,
   ProjectCreateRequest,
   ProjectDetailsResponse,
+  ProjectFileTreeResponse,
   Reference,
   ReferencePatch,
   ResponseStatus,
@@ -256,6 +257,10 @@ export interface components {
       id: string;
       name: string;
       path: string;
+    };
+    /** ProjectFileTreeResponse */
+    ProjectFileTreeResponse: {
+      contents: (FileEntry | FolderEntry)[];
     };
     /**
      * Reference
@@ -676,7 +681,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': (FileEntry | FolderEntry)[];
+          'application/json': ProjectFileTreeResponse;
         };
       };
       /** @description Validation Error */

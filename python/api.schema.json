@@ -616,6 +616,28 @@
       ],
       "title": "ProjectDetailsResponse"
     },
+    "ProjectFileTreeResponse": {
+      "properties": {
+        "contents": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/FileEntry"
+              },
+              {
+                "$ref": "#/definitions/FolderEntry"
+              }
+            ]
+          },
+          "type": "array"
+        }
+      },
+      "type": "object",
+      "required": [
+        "contents"
+      ],
+      "title": "ProjectFileTreeResponse"
+    },
     "FlatSettingsSchema": {
       "properties": {
         "current_directory": {

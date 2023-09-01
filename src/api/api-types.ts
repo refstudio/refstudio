@@ -287,6 +287,13 @@ export interface ProjectDetailsResponse {
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "ProjectFileTreeResponse".
+ */
+export interface ProjectFileTreeResponse {
+  contents: (FileEntry | FolderEntry)[];
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
  * via the `definition` "FlatSettingsSchema".
  */
 export interface FlatSettingsSchema {

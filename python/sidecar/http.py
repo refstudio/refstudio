@@ -14,14 +14,13 @@ from sidecar.typing import (
     DeleteRequest,
     DeleteStatusResponse,
     EmptyRequest,
-    FileEntry,
     FlatSettingsSchema,
     FlatSettingsSchemaPatch,
-    FolderEntry,
     IngestRequest,
     IngestResponse,
     ProjectCreateRequest,
     ProjectDetailsResponse,
+    ProjectFileTreeResponse,
     Reference,
     ReferencePatch,
     RewriteRequest,
@@ -220,10 +219,9 @@ async def delete_project(project_id: str):
 
 
 @project_api.get("/{project_id}/files")
-async def get_project_files(project_id: str) -> list[FileEntry | FolderEntry]:
+async def get_project_files(project_id: str) -> ProjectFileTreeResponse:
     user_id = "user1"
-    response = projects.get_project_files(user_id, project_id)
-    return response.contents
+    return projects.get_project_files(user_id, project_id)
 
 
 # Filesystem API
