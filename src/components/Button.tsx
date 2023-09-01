@@ -2,31 +2,51 @@ import { cx } from '../lib/cx';
 
 interface ButtonProps {
   Action?: React.ReactElement;
+  actionPosition?: 'left' | 'right';
   className?: string;
   disabled?: boolean;
-  size?: 'M' | 'S';
+  size?: 'S' | 'M';
   text: string;
   type?: 'primary' | 'secondary';
   onClick: () => void;
 }
-export function Button({ Action, className, disabled, size = 'S', text, type = 'primary', onClick }: ButtonProps) {
+export function Button({
+  Action,
+  actionPosition = 'left',
+  className,
+  disabled,
+  size = 'S',
+  text,
+  type = 'primary',
+  onClick,
+}: ButtonProps) {
   return (
     <button
       className={cx(
-        'flex w-full items-center gap-2 rounded-default p-2',
+        'flex w-full items-center gap-2 rounded-default px-2 py-2',
         {
-          'justify-center p-3': size === 'M',
+          'justify-center px-5 py-3': size === 'M',
+        },
+        {
+          'pl-3': !!Action && actionPosition === 'left',
+          'pr-3': !!Action && actionPosition === 'right',
+        },
+        {
           'bg-btn-bg-primary-default text-btn-txt-primary-default': type === 'primary',
-          'bg-btn-bg-secondary-default text-btn-txt-secondary-default': type === 'secondary',
           'bg-btn-bg-primary-disabled text-btn-txt-primary-disabled': disabled && type === 'primary',
+        },
+        {
+          'bg-btn-bg-secondary-default text-btn-txt-secondary-default': type === 'secondary',
           'bg-btn-bg-secondary-disabled text-btn-txt-secondary-disabled': disabled && type === 'secondary',
         },
         className,
       )}
+      disabled={disabled}
       onClick={disabled ? undefined : onClick}
     >
-      {Action}
+      {actionPosition === 'left' && Action}
       {text}
+      {actionPosition === 'right' && Action}
     </button>
   );
 }

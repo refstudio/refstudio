@@ -49,3 +49,29 @@ export const OpenIcon = () => (
     </svg>
   </div>
 );
+
+export function ChevronDownIcon() {
+  return (
+    <div className="flex h-6 w-6 items-center justify-center">
+      <svg height="8" viewBox="0 0 12 8" width="12" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M1.41 0.290039L6 4.88004L10.59 0.290039L12 1.71004L6 7.71004L0 1.71004L1.41 0.290039Z"
+          fill="currentcolor"
+        />
+      </svg>
+    </div>
+  );
+}
+
+export function ChevronUpIcon() {
+  return (
+    <div className="flex h-6 w-6 items-center justify-center">
+      <svg height="8" viewBox="0 0 12 8" width="12" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M10.59 7.71008L6 3.12008L1.41 7.71008L-1.2414e-07 6.29008L6 0.290083L12 6.29008L10.59 7.71008Z"
+          fill="currentcolor"
+        />
+      </svg>
+    </div>
+  );
+}

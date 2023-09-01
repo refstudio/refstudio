@@ -189,6 +189,9 @@ export default {
       borderRadius: {
         default: '0.25rem',
       },
+      transitionProperty: {
+        position: 'top, left, bottom, right',
+      },
       fontFamily: {
         default: ['"Roboto", sans-serif'],
       },
@@ -197,6 +200,7 @@ export default {
         notifications: 88888,
         'drop-zone': 55555,
         'resize-handle': 44444,
+        dropdown: 33333,
         sidebar: 11,
         'sidebar-panel': 10,
       },

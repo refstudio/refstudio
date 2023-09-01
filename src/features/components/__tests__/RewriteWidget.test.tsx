@@ -7,7 +7,7 @@ import { emitEvent, RefStudioEventName } from '../../../events';
 import { noop } from '../../../lib/noop';
 import { getCachedSetting } from '../../../settings/settingsManager';
 import { render, setup } from '../../../test/test-utils';
-import { RewriteWidget } from '../../components/RewriteWidget';
+import { RewriteWidget } from '../RewriteWidget';
 
 const SELECTED_TEXT = 'This is the selected text.';
 const CHOICE_OPTION_1 = 'This is the first choice option.';
