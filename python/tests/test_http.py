@@ -319,8 +319,8 @@ def test_ai_chat_missing_required_request_params(
 def test_search_s2_is_ok(monkeypatch, mock_search_paper):
     monkeypatch.setattr(search.Searcher, "search_func", mock_search_paper)
 
-    request = {"query": "any-query-string-you-like"}
-    response = search_client.post("/s2", json=request)
+    params = {"query": "any-query-string-you-like"}
+    response = search_client.get("/s2", params=params)
 
     assert response.status_code == 200
     assert response.json() == {
@@ -379,8 +379,8 @@ def test_http_list_projects(monkeypatch, tmp_path):
 def test_create_project(monkeypatch, tmp_path):
     monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
 
-    params = {"project_name": "project1name"}
-    response = project_client.post("/", params=params)
+    request = {"project_name": "project1name"}
+    response = project_client.post("/", json=request)
 
     project_id = list(response.json().keys())[0]
     assert response.status_code == 200

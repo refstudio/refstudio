@@ -153,6 +153,12 @@
         "title": "DeleteStatusResponse",
         "type": "object"
       },
+      "EmptyRequest": {
+        "description": "Use this to indicate that a request only accepts an empty object ({})",
+        "properties": {},
+        "title": "EmptyRequest",
+        "type": "object"
+      },
       "FlatSettingsSchema": {
         "properties": {
           "current_directory": {
@@ -229,6 +235,25 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
+      "IngestResponse": {
+        "properties": {
+          "project_name": {
+            "type": "string"
+          },
+          "references": {
+            "items": {
+              "$ref": "#/components/schemas/Reference"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "project_name",
+          "references"
+        ],
+        "title": "IngestResponse",
+        "type": "object"
+      },
       "IngestStatus": {
         "description": "An enumeration.",
         "enum": [
@@ -238,6 +263,21 @@
         ],
         "title": "IngestStatus",
         "type": "string"
+      },
+      "ProjectCreateRequest": {
+        "properties": {
+          "project_name": {
+            "type": "string"
+          },
+          "project_path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "project_name"
+        ],
+        "title": "ProjectCreateRequest",
+        "type": "object"
       },
       "Reference": {
         "description": "A reference for an academic paper / PDF",
@@ -427,22 +467,6 @@
           }
         },
         "title": "S2SearchResult",
-        "type": "object"
-      },
-      "SearchRequest": {
-        "properties": {
-          "limit": {
-            "default": 10,
-            "type": "integer"
-          },
-          "query": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "query"
-        ],
-        "title": "SearchRequest",
         "type": "object"
       },
       "SearchResponse": {
@@ -960,28 +984,18 @@
         "summary": "List Projects"
       },
       "post": {
-        "description": "Creates a project directory in the filesystem\n\nParameters\n----------\nproject_name : str\n    The name of the project\nproject_path : str\n    The path to the project directory. Only necessary for Desktop.\n    For web, the project is stored in a private directory on the server.",
+        "description": "Creates a project, and a directory in the filesystem",
         "operationId": "create_project__post",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "project_name",
-            "required": true,
-            "schema": {
-              "title": "Project Name",
-              "type": "string"
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectCreateRequest"
+              }
             }
           },
-          {
-            "in": "query",
-            "name": "project_path",
-            "required": false,
-            "schema": {
-              "title": "Project Path",
-              "type": "string"
-            }
-          }
-        ],
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
@@ -1173,11 +1187,23 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmptyRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/IngestResponse"
+                }
               }
             },
             "description": "Successful Response"
@@ -1396,18 +1422,28 @@
       }
     },
     "/api/search/s2": {
-      "post": {
-        "operationId": "http_search_s2_s2_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SearchRequest"
-              }
+      "get": {
+        "operationId": "http_search_s2_s2_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "query",
+            "required": true,
+            "schema": {
+              "title": "Query",
+              "type": "string"
             }
           },
-          "required": true
-        },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 10,
+              "title": "Limit"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {

@@ -1,11 +1,10 @@
 from sidecar import search
-from sidecar.typing import SearchRequest
 
 
 def test_search(monkeypatch, mock_search_paper):
     monkeypatch.setattr(search.Searcher, "search_func", mock_search_paper)
 
-    response = search.search_s2(SearchRequest(query="any-query-string-you-like"))
+    response = search.search_s2(query="any-query-string-you-like")
     output = response.dict()
 
     assert len(output["results"]) == 2

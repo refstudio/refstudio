@@ -79,6 +79,12 @@
       ],
       "title": "DeleteStatusResponse"
     },
+    "EmptyRequest": {
+      "properties": {},
+      "type": "object",
+      "title": "EmptyRequest",
+      "description": "Use this to indicate that a request only accepts an empty object ({})"
+    },
     "HTTPValidationError": {
       "properties": {
         "detail": {
@@ -91,6 +97,25 @@
       },
       "type": "object",
       "title": "HTTPValidationError"
+    },
+    "IngestResponse": {
+      "properties": {
+        "project_name": {
+          "type": "string"
+        },
+        "references": {
+          "items": {
+            "$ref": "#/definitions/Reference"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object",
+      "required": [
+        "project_name",
+        "references"
+      ],
+      "title": "IngestResponse"
     },
     "IngestStatus": {
       "type": "string",
@@ -469,22 +494,6 @@
       "type": "object",
       "title": "S2SearchResult"
     },
-    "SearchRequest": {
-      "properties": {
-        "query": {
-          "type": "string"
-        },
-        "limit": {
-          "type": "integer",
-          "default": 10
-        }
-      },
-      "type": "object",
-      "required": [
-        "query"
-      ],
-      "title": "SearchRequest"
-    },
     "SearchResponse": {
       "properties": {
         "status": {
@@ -521,6 +530,21 @@
         "file"
       ],
       "title": "Body_create_file__project_id___filepath__put"
+    },
+    "ProjectCreateRequest": {
+      "properties": {
+        "project_name": {
+          "type": "string"
+        },
+        "project_path": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "project_name"
+      ],
+      "title": "ProjectCreateRequest"
     },
     "FlatSettingsSchema": {
       "properties": {
