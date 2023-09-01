@@ -252,11 +252,45 @@ export interface BodyCreateFile_ProjectId__Filepath_Put {
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "FileEntry".
+ */
+export interface FileEntry {
+  name: string;
+  path: string;
+  file_extension: string;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "FolderEntry".
+ */
+export interface FolderEntry {
+  name: string;
+  path: string;
+  children?: (FileEntry | FolderEntry)[];
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
  * via the `definition` "ProjectCreateRequest".
  */
 export interface ProjectCreateRequest {
   project_name: string;
   project_path?: string;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "ProjectDetailsResponse".
+ */
+export interface ProjectDetailsResponse {
+  id: string;
+  name: string;
+  path: string;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "ProjectFileTreeResponse".
+ */
+export interface ProjectFileTreeResponse {
+  contents: (FileEntry | FolderEntry)[];
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from typing import Any
 
@@ -213,6 +215,29 @@ class SearchResponse(RefStudioModel):
     results: list[S2SearchResult]
 
 
+class FileEntryBase(RefStudioModel):
+    name: str
+    path: str
+
+
+class FileEntry(FileEntryBase):
+    file_extension: str
+
+
+class FolderEntry(FileEntryBase):
+    children: list[FileEntry | FolderEntry] = []
+
+
+class ProjectDetailsResponse(RefStudioModel):
+    id: str
+    name: str
+    path: str
+
+
+class ProjectFileTreeResponse(RefStudioModel):
+    contents: list[FileEntry | FolderEntry]
+
+
 class OpenAISettings(RefStudioModel):
     api_key: str = ""
     chat_model: str = "gpt-3.5-turbo"
@@ -293,3 +318,4 @@ class CliCommands(RefStudioModel):
 
 
 Reference.update_forward_refs()
+FolderEntry.update_forward_refs()

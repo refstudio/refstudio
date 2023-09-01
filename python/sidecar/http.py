@@ -19,6 +19,8 @@ from sidecar.typing import (
     IngestRequest,
     IngestResponse,
     ProjectCreateRequest,
+    ProjectDetailsResponse,
+    ProjectFileTreeResponse,
     Reference,
     ReferencePatch,
     RewriteRequest,
@@ -187,20 +189,12 @@ async def create_project(req: ProjectCreateRequest):
 
 
 @project_api.get("/{project_id}")
-async def get_project(project_id: str):
+async def get_project(project_id: str) -> ProjectDetailsResponse:
     """
-    Returns the project path and a list of files in the project
+    Returns details about a project
     """
     user_id = "user1"
-    project_path = projects.get_project_path(user_id, project_id)
-    project_name = projects.get_project_name(user_id, project_id)
-    filepaths = projects.get_project_files(user_id, project_id)
-    return {
-        "project_id": project_id,
-        "project_path": project_path,
-        "project_name": project_name,
-        "filepaths": filepaths,
-    }
+    return projects.get_project_details(user_id, project_id)
 
 
 @project_api.delete("/{project_id}")
@@ -225,10 +219,9 @@ async def delete_project(project_id: str):
 
 
 @project_api.get("/{project_id}/files")
-async def get_project_files(project_id: str):
+async def get_project_files(project_id: str) -> ProjectFileTreeResponse:
     user_id = "user1"
-    filepaths = projects.get_project_files(user_id, project_id)
-    return filepaths
+    return projects.get_project_files(user_id, project_id)
 
 
 # Filesystem API
@@ -327,5 +320,4 @@ async def get_settings() -> FlatSettingsSchema:
 @settings_api.put("/")
 async def update_settings(req: FlatSettingsSchemaPatch) -> FlatSettingsSchema:
     user_id = "user1"
-    return settings.update_settings_for_user(user_id, req)
     return settings.update_settings_for_user(user_id, req)

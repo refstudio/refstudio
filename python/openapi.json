@@ -159,6 +159,26 @@
         "title": "EmptyRequest",
         "type": "object"
       },
+      "FileEntry": {
+        "properties": {
+          "file_extension": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "path",
+          "file_extension"
+        ],
+        "title": "FileEntry",
+        "type": "object"
+      },
       "FlatSettingsSchema": {
         "properties": {
           "current_directory": {
@@ -222,6 +242,36 @@
         "title": "FlatSettingsSchemaPatch",
         "type": "object"
       },
+      "FolderEntry": {
+        "properties": {
+          "children": {
+            "default": [],
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/FileEntry"
+                },
+                {
+                  "$ref": "#/components/schemas/FolderEntry"
+                }
+              ]
+            },
+            "type": "array"
+          },
+          "name": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "path"
+        ],
+        "title": "FolderEntry",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -277,6 +327,48 @@
           "project_name"
         ],
         "title": "ProjectCreateRequest",
+        "type": "object"
+      },
+      "ProjectDetailsResponse": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "path"
+        ],
+        "title": "ProjectDetailsResponse",
+        "type": "object"
+      },
+      "ProjectFileTreeResponse": {
+        "properties": {
+          "contents": {
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/FileEntry"
+                },
+                {
+                  "$ref": "#/components/schemas/FolderEntry"
+                }
+              ]
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "contents"
+        ],
+        "title": "ProjectFileTreeResponse",
         "type": "object"
       },
       "Reference": {
@@ -1057,7 +1149,7 @@
         "summary": "Delete Project"
       },
       "get": {
-        "description": "Returns the project path and a list of files in the project",
+        "description": "Returns details about a project",
         "operationId": "get_project__project_id__get",
         "parameters": [
           {
@@ -1074,7 +1166,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectDetailsResponse"
+                }
               }
             },
             "description": "Successful Response"
@@ -1111,7 +1205,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectFileTreeResponse"
+                }
               }
             },
             "description": "Successful Response"

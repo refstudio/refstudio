@@ -531,6 +531,56 @@
       ],
       "title": "Body_create_file__project_id___filepath__put"
     },
+    "FileEntry": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "file_extension": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "name",
+        "path",
+        "file_extension"
+      ],
+      "title": "FileEntry"
+    },
+    "FolderEntry": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "children": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/FileEntry"
+              },
+              {
+                "$ref": "#/definitions/FolderEntry"
+              }
+            ]
+          },
+          "type": "array",
+          "default": []
+        }
+      },
+      "type": "object",
+      "required": [
+        "name",
+        "path"
+      ],
+      "title": "FolderEntry"
+    },
     "ProjectCreateRequest": {
       "properties": {
         "project_name": {
@@ -545,6 +595,48 @@
         "project_name"
       ],
       "title": "ProjectCreateRequest"
+    },
+    "ProjectDetailsResponse": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "path"
+      ],
+      "title": "ProjectDetailsResponse"
+    },
+    "ProjectFileTreeResponse": {
+      "properties": {
+        "contents": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/FileEntry"
+              },
+              {
+                "$ref": "#/definitions/FolderEntry"
+              }
+            ]
+          },
+          "type": "array"
+        }
+      },
+      "type": "object",
+      "required": [
+        "contents"
+      ],
+      "title": "ProjectFileTreeResponse"
     },
     "FlatSettingsSchema": {
       "properties": {

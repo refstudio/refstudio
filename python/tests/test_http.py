@@ -418,10 +418,9 @@ def test_get_project(monkeypatch, tmp_path):
 
     assert response.status_code == 200
     assert response.json() == {
-        "project_id": project_id,
-        "project_name": "project1name",
-        "project_path": str(project_path),
-        "filepaths": [],
+        "id": project_id,
+        "name": project_name,
+        "path": str(project_path),
     }
 
 
@@ -479,10 +478,6 @@ def test_create_file(monkeypatch, tmp_path):
 
     # check that the file was created
     assert filepath.exists()
-
-    files_and_subdirs = projects.get_project_files(user_id, project_id)
-    expected = [filepath.parent, filepath]
-    assert sorted(files_and_subdirs) == sorted(expected)
 
 
 def test_read_file(monkeypatch, tmp_path):
@@ -542,10 +537,6 @@ def test_delete_file(monkeypatch, tmp_path):
 
     # check that the file was deleted
     assert not filepath.exists()
-
-    files_and_subdirs = projects.get_project_files(user_id, project_id)
-    expected = [filepath.parent]
-    assert sorted(files_and_subdirs) == sorted(expected)
 
 
 # ruff gets confused here:

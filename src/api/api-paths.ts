@@ -10,12 +10,16 @@ import {
   DeleteRequest,
   DeleteStatusResponse,
   EmptyRequest,
+  FileEntry,
   FlatSettingsSchema,
   FlatSettingsSchemaPatch,
+  FolderEntry,
   HTTPValidationError,
   IngestResponse,
   IngestStatus,
   ProjectCreateRequest,
+  ProjectDetailsResponse,
+  ProjectFileTreeResponse,
   Reference,
   ReferencePatch,
   ResponseStatus,
@@ -83,7 +87,7 @@ export interface paths {
   '/api/projects/{project_id}': {
     /**
      * Get Project
-     * @description Returns the project path and a list of files in the project
+     * @description Returns details about a project
      */
     get: operations['get_project__project_id__get'];
     /**
@@ -194,6 +198,12 @@ export interface components {
      * @description Use this to indicate that a request only accepts an empty object ({})
      */
     EmptyRequest: Record<string, never>;
+    /** FileEntry */
+    FileEntry: {
+      file_extension: string;
+      name: string;
+      path: string;
+    };
     /** FlatSettingsSchema */
     FlatSettingsSchema: {
       current_directory: string;
@@ -213,6 +223,13 @@ export interface components {
       openai_chat_model?: string;
       openai_manner?: RewriteMannerType;
       openai_temperature?: number;
+    };
+    /** FolderEntry */
+    FolderEntry: {
+      /** @default [] */
+      children?: (FileEntry | FolderEntry)[];
+      name: string;
+      path: string;
     };
     /** HTTPValidationError */
     HTTPValidationError: {
@@ -234,6 +251,16 @@ export interface components {
     ProjectCreateRequest: {
       project_name: string;
       project_path?: string;
+    };
+    /** ProjectDetailsResponse */
+    ProjectDetailsResponse: {
+      id: string;
+      name: string;
+      path: string;
+    };
+    /** ProjectFileTreeResponse */
+    ProjectFileTreeResponse: {
+      contents: (FileEntry | FolderEntry)[];
     };
     /**
      * Reference
@@ -595,7 +622,7 @@ export interface operations {
   };
   /**
    * Get Project
-   * @description Returns the project path and a list of files in the project
+   * @description Returns details about a project
    */
   get_project__project_id__get: {
     parameters: {
@@ -607,7 +634,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': unknown;
+          'application/json': ProjectDetailsResponse;
         };
       };
       /** @description Validation Error */
@@ -654,7 +681,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': unknown;
+          'application/json': ProjectFileTreeResponse;
         };
       };
       /** @description Validation Error */
