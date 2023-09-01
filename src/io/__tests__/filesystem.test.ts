@@ -16,6 +16,7 @@ import { FileFileEntry } from '../../atoms/types/FileEntry';
 import {
   deleteFile,
   ensureSampleProjectFiles,
+  getFileNameAndExtension,
   getNewProjectsBaseDir,
   getUploadsDir,
   isInUploadsDir,
@@ -175,6 +176,31 @@ describe('filesystem', () => {
 
     it('should split ref studio path with many segments', () => {
       expect(splitRefStudioPath('some/folder/file.txt')).toStrictEqual(['some', 'folder', 'file.txt']);
+    });
+
+    it('should extract fileName and extension of a file path without extension', () => {
+      expect(getFileNameAndExtension('file')).toStrictEqual({ name: 'file', ext: '' });
+    });
+
+    it('should extract fileName and extension of a file with a single dot', () => {
+      expect(getFileNameAndExtension('file.txt')).toStrictEqual({ name: 'file', ext: 'txt' });
+    });
+
+    it('should extract fileName and extension of a file with a two dots', () => {
+      expect(getFileNameAndExtension('file.extra.txt')).toStrictEqual({ name: 'file.extra', ext: 'txt' });
+    });
+
+    it('should extract fileName and extension of a file path with a two dots', () => {
+      expect(getFileNameAndExtension('some/dir/file.extra.txt')).toStrictEqual({ name: 'file.extra', ext: 'txt' });
+    });
+
+    it('should extract fileName and extension of an empty file path', () => {
+      expect(getFileNameAndExtension('')).toStrictEqual({ name: '', ext: '' });
+    });
+
+    it('should extract dot files (ex: .gitignore) correctly, with an empty extension', () => {
+      expect(getFileNameAndExtension('.gitignore')).toStrictEqual({ name: '.gitignore', ext: '' });
+      expect(getFileNameAndExtension('some/dir/.gitignore')).toStrictEqual({ name: '.gitignore', ext: '' });
     });
   });
 

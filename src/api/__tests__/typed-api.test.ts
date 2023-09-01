@@ -1,5 +1,5 @@
-import { universalGet, universalPost } from '../api';
-import { apiGetJson, apiPost } from '../typed-api';
+import { universalGet } from '../api';
+import { apiGetJson } from '../typed-api';
 
 vi.mock('../api');
 
@@ -17,43 +17,21 @@ describe('Typed API', () => {
     expect(universalGet).toHaveBeenCalledWith('/api/fs/abc/foo/bar.txt', undefined);
   });
 
-  it('should issue POST requests with query parameters', async () => {
-    vi.mocked(universalPost).mockResolvedValueOnce({
-      abc: { project_name: 'abc', project_path: '/path/to/project' },
-    });
-    const response = await apiPost(
-      '/api/projects/',
-      {
-        query: {
-          project_name: 'abc',
-        },
+  it('should issue GET requests with query parameters', async () => {
+    await apiGetJson('/api/search/s2', {
+      query: {
+        query: 'text',
       },
-      // TODO: update request body type for this endpoint
-      {} as unknown as never,
-    );
-    expect(response).toEqual({
-      abc: { project_name: 'abc', project_path: '/path/to/project' },
     });
-    expect(universalPost).toHaveBeenCalledWith('/api/projects/?project_name=abc', {});
+    expect(universalGet).toHaveBeenCalledWith('/api/search/s2?query=text', undefined);
   });
 
   it('should escape query parameters', async () => {
-    vi.mocked(universalPost).mockResolvedValueOnce({
-      'a&b/c': { project_name: 'a&b/c', project_path: '/path/to/project' },
-    });
-    const response = await apiPost(
-      '/api/projects/',
-      {
-        query: {
-          project_name: 'a&b/c',
-        },
+    await apiGetJson('/api/search/s2', {
+      query: {
+        query: 'joe & ana',
       },
-      // TODO: update request body type for this endpoint
-      {} as unknown as never,
-    );
-    expect(response).toEqual({
-      'a&b/c': { project_name: 'a&b/c', project_path: '/path/to/project' },
     });
-    expect(universalPost).toHaveBeenCalledWith('/api/projects/?project_name=a%26b%2Fc', {});
+    expect(universalGet).toHaveBeenCalledWith('/api/search/s2?query=joe+%26+ana', undefined);
   });
 });

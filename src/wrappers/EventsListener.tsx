@@ -5,6 +5,7 @@ import {
   useFileProjectNewListener,
   useFileProjectNewSampleListener,
   useFileProjectOpenListener,
+  useOpenProjectListener,
 } from '../application/listeners/projectEventListeners';
 import {
   activePaneAtom,
@@ -50,6 +51,8 @@ export function EventsListener({ children }: { children?: React.ReactNode }) {
   // References
   useListenEvent('refstudio://references/remove', useRemoveReferencesListener());
   useListenEvent('refstudio://menu/references/export', useExportReferencesListener());
+  // Projects
+  useListenEvent('refstudio://projects/open', useOpenProjectListener());
   // Notifications
   useListenEvent('refstudio://notifications/new', useCreateNotificationListener());
   useListenEvent('refstudio://notifications/clear', useClearNotificationsListener());

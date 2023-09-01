@@ -67,7 +67,7 @@ a {
 body {
   /* This overflow setting prevents the app to display that extra content on scroll (like pull to refresh) */
   @apply h-full w-full overflow-hidden;
-  font-family: 'Roboto', sans-serif;
+  @apply font-default;
   @apply text-base font-normal;
 }
 

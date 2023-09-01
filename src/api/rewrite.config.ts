@@ -1,4 +1,4 @@
-export const REWRITE_MANNER: RewriteOptions['manner'][] = ['concise', 'elaborate', 'scholarly'];
+export const REWRITE_MANNER: Exclude<RewriteOptions['manner'], undefined>[] = ['concise', 'elaborate', 'scholarly'];
 
 export interface RewriteOptions {
   nChoices?: number;

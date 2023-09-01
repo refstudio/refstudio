@@ -71,6 +71,13 @@ export interface DeleteStatusResponse {
   message: string;
 }
 /**
+ * Use this to indicate that a request only accepts an empty object ({})
+ *
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "EmptyRequest".
+ */
+export interface EmptyRequest {}
+/**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
  * via the `definition` "HTTPValidationError".
  */
@@ -85,6 +92,14 @@ export interface ValidationError {
   loc: Location;
   msg: Message;
   type: ErrorType;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "IngestResponse".
+ */
+export interface IngestResponse {
+  project_name: string;
+  references: Reference[];
 }
 /**
  * A reference for an academic paper / PDF
@@ -221,14 +236,6 @@ export interface S2SearchResult {
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "SearchRequest".
- */
-export interface SearchRequest {
-  query: string;
-  limit?: number;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
  * via the `definition` "SearchResponse".
  */
 export interface SearchResponse {
@@ -245,42 +252,69 @@ export interface BodyCreateFile_ProjectId__Filepath_Put {
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "LoggingSettings".
+ * via the `definition` "FileEntry".
  */
-export interface LoggingSettings {
-  enable?: boolean;
-  filepath?: string;
+export interface FileEntry {
+  name: string;
+  path: string;
+  file_extension: string;
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "OpenAISettings".
+ * via the `definition` "FolderEntry".
  */
-export interface OpenAISettings {
-  api_key?: string;
-  chat_model?: string;
-  manner?: RewriteMannerType & string;
-  temperature?: number;
+export interface FolderEntry {
+  name: string;
+  path: string;
+  children?: (FileEntry | FolderEntry)[];
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "ProjectSettings".
+ * via the `definition` "ProjectCreateRequest".
  */
-export interface ProjectSettings {
+export interface ProjectCreateRequest {
+  project_name: string;
+  project_path?: string;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "ProjectDetailsResponse".
+ */
+export interface ProjectDetailsResponse {
+  id: string;
+  name: string;
+  path: string;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "ProjectFileTreeResponse".
+ */
+export interface ProjectFileTreeResponse {
+  contents: (FileEntry | FolderEntry)[];
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "FlatSettingsSchema".
+ */
+export interface FlatSettingsSchema {
+  current_directory: string;
+  logging_enabled: boolean;
+  logging_filepath: string;
+  openai_api_key: string;
+  openai_chat_model: string;
+  openai_manner: RewriteMannerType;
+  openai_temperature: number;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "FlatSettingsSchemaPatch".
+ */
+export interface FlatSettingsSchemaPatch {
   current_directory?: string;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "SettingsSchema".
- */
-export interface SettingsSchema {
-  project?: ProjectSettings;
-  openai?: OpenAISettings;
-  sidecar?: SidecarSettings;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "SidecarSettings".
- */
-export interface SidecarSettings {
-  logging?: LoggingSettings;
+  logging_enabled?: boolean;
+  logging_filepath?: string;
+  openai_api_key?: string;
+  openai_chat_model?: string;
+  openai_manner?: RewriteMannerType;
+  openai_temperature?: number;
 }

@@ -3,6 +3,12 @@ import shutil
 from pathlib import Path
 
 from sidecar import settings
+from sidecar.typing import (
+    FileEntry,
+    FolderEntry,
+    ProjectDetailsResponse,
+    ProjectFileTreeResponse,
+)
 
 # Ensure that the server's path storage directory exists.
 Path(settings.WEB_STORAGE_URL).mkdir(parents=True, exist_ok=True)
@@ -106,7 +112,68 @@ def delete_project(user_id: str, project_id: str) -> None:
         pass
 
 
-def get_project_files(user_id: str, project_id: str) -> list:
+def get_project_details(user_id: str, project_id: str) -> ProjectDetailsResponse:
     project_path = get_project_path(user_id, project_id)
-    filepaths = list(project_path.glob("**/*"))
-    return filepaths
+    project_name = get_project_name(user_id, project_id)
+
+    if not project_path.exists():
+        raise FileNotFoundError(f"Project {project_id} does not exist")
+
+    return ProjectDetailsResponse(
+        id=project_id,
+        name=project_name,
+        path=str(project_path),
+    )
+
+
+def traverse_directory(
+    directory: Path, relative_to: Path, ignore_hidden: bool = True
+) -> list[FileEntry | FolderEntry]:
+    """
+    Traverse a directory recursively and return a list of all files.
+    """
+    contents = []
+    for obj in directory.glob("*"):
+        if ignore_hidden and obj.name.startswith("."):
+            continue
+        if obj.is_dir():
+            contents.append(
+                FolderEntry(
+                    name=obj.name,
+                    path=str(obj.relative_to(relative_to)),
+                    children=traverse_directory(obj, relative_to=relative_to),
+                )
+            )
+        else:
+            contents.append(create_file_entry(obj, relative_to=relative_to))
+    return contents
+
+
+def get_project_files(user_id: str, project_id: str) -> ProjectFileTreeResponse:
+    """
+    Get the files in a project as a tree structure.
+
+    Returns
+    -------
+    ProjectFileTreeResponse
+        A tree structure of the files in a project.
+    """
+    project_path = get_project_path(user_id, project_id)
+
+    if not project_path.exists():
+        raise FileNotFoundError(f"Project {project_id} does not exist")
+
+    contents = traverse_directory(
+        project_path, relative_to=project_path, ignore_hidden=True
+    )
+    return ProjectFileTreeResponse(
+        contents=contents,
+    )
+
+
+def create_file_entry(path: Path, relative_to: Path) -> FileEntry:
+    return FileEntry(
+        name=path.name,
+        path=str(path.relative_to(relative_to)),
+        file_extension=path.suffix,
+    )

@@ -1,39 +1,36 @@
-import { SettingsManager } from 'tauri-settings';
-import { Path, PathValue } from 'tauri-settings/dist/types/dot-notation';
-import { getDotNotation, setDotNotation } from 'tauri-settings/dist/utils/dot-notation';
+import { FlatSettingsSchema, RewriteMannerType } from '../api/api-types';
+import { apiGetJson, apiPut } from '../api/typed-api';
 
-import { universalPut } from '../api/api';
-import type * as apiTypes from '../api/api-types';
-import { apiGetJson } from '../api/typed-api';
-
-export type OpenAiManner = apiTypes.RewriteMannerType;
-export function getMannerOptions(): OpenAiManner[] {
+export function getMannerOptions(): RewriteMannerType[] {
   return ['concise', 'elaborate', 'scholarly'];
 }
-
-// TODO: remove this after we separate the request/response types in the settings API
-type DeepRequired<T> = T extends object ? { [k in keyof T]-?: DeepRequired<T[k]> } : T;
-export type SettingsSchema = DeepRequired<apiTypes.SettingsSchema>;
 
 /**
  * This pulls out just the parts of SettingsManager that are used in the app.
  * This makes it easier to stub in an in-memory equivalent of SettingsManager.
  * This can all go away when we have a settings API.
  */
-export type SettingsManagerView = Pick<
-  SettingsManager<SettingsSchema>,
-  'getCache' | 'setCache' | 'syncCache' | 'default'
->;
+export interface SettingsManagerView<T> {
+  default: T;
+  getCache: <K extends keyof T>(key: K) => T[K];
+  setCache: <K extends keyof T>(key: K, value: T[K]) => T[K];
+  syncCache: () => Promise<T>;
+}
 
-let settingsManager: SettingsManagerView | undefined;
+let settingsManager: SettingsManagerView<FlatSettingsSchema> | undefined;
 
 export async function initSettings() {
-  let settings: SettingsSchema;
+  let settings: FlatSettingsSchema;
   try {
-    settings = (await apiGetJson('/api/settings/')) as SettingsSchema;
+    settings = await apiGetJson('/api/settings/');
 
     console.log('Settings initialized with success with', settings);
-    console.log('openAI', settings.openai);
+    console.log('openAI', {
+      api_key: settings.openai_api_key,
+      chat_model: settings.openai_chat_model,
+      manner: settings.openai_manner,
+      temperature: settings.openai_temperature,
+    });
   } catch (err) {
     console.error('Cannot init settings', err);
     throw new Error('Cannot init settings');
@@ -41,14 +38,13 @@ export async function initSettings() {
 
   settingsManager = {
     default: settings,
-    getCache: (key) => getDotNotation(settings, key)!,
+    getCache: (key) => settings[key],
     setCache: (key, value) => {
-      setDotNotation(settings, key, value);
+      settings[key] = value;
       return value;
     },
     syncCache: async () => {
-      const newSettings = await universalPut<SettingsSchema>('/api/settings/', settings);
-      settings = newSettings;
+      settings = await apiPut('/api/settings/', settings);
       return settings;
     },
   };
@@ -61,11 +57,11 @@ export function getSettings() {
   return settingsManager;
 }
 
-export function getCachedSetting<K extends Path<SettingsSchema>>(key: K): PathValue<SettingsSchema, K> {
+export function getCachedSetting<K extends keyof FlatSettingsSchema>(key: K): FlatSettingsSchema[K] {
   return getSettings().getCache(key);
 }
 
-export function setCachedSetting<K extends Path<SettingsSchema>>(key: K, value: PathValue<SettingsSchema, K>) {
+export function setCachedSetting<K extends keyof FlatSettingsSchema>(key: K, value: FlatSettingsSchema[K]) {
   getSettings().setCache(key, value);
 }
 

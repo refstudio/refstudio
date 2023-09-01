@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from sidecar import projects
+from sidecar.typing import ProjectFileTreeResponse
 
 
 def test_read_project_path_storage_does_not_exist(monkeypatch, tmp_path):
@@ -175,16 +176,76 @@ def test_delete_project_should_delete_project(
     assert projects_dict == {}
 
 
-def test_get_project_files_should_return_list_of_files(
-    monkeypatch, tmp_path, setup_project_path_storage
-):
+def test_get_project_files(monkeypatch, tmp_path, setup_project_path_storage):
     monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
 
     user_id = "user1"
     project_id = "project1"
 
+    # setup project files
     project_path = projects.get_project_path(user_id, project_id)
-    (Path(project_path) / "file1.txt").touch()
 
-    files = projects.get_project_files(user_id, project_id)
-    assert files == [Path(f"{project_path}/file1.txt")]
+    # hidden dirs/files should be ignored
+    (project_path / "file1.refstudio").touch()
+    (project_path / ".ignoreme").touch()
+    (project_path / "uploads").mkdir()
+    (project_path / "uploads" / "file2.pdf").touch()
+    (project_path / ".storage").mkdir()
+    (project_path / ".storage" / "references.json").touch()
+    (project_path / "empty").mkdir()
+    (project_path / "another" / "nested").mkdir(parents=True, exist_ok=True)
+    (project_path / "another" / "file3.pdf").touch()
+    (project_path / "another" / "nested" / "file4.pdf").touch()
+
+    response = projects.get_project_files(user_id, project_id)
+
+    expected = {
+        "contents": [
+            {
+                "name": "file1.refstudio",
+                "path": "file1.refstudio",
+                "file_extension": ".refstudio",
+            },
+            {
+                "name": "uploads",
+                "path": "uploads",
+                "children": [
+                    {
+                        "name": "file2.pdf",
+                        "path": "uploads/file2.pdf",
+                        "file_extension": ".pdf",
+                    }
+                ],
+            },
+            {
+                "name": "empty",
+                "path": "empty",
+                "children": [],
+            },
+            {
+                "name": "another",
+                "path": "another",
+                "children": [
+                    {
+                        "name": "file3.pdf",
+                        "path": "another/file3.pdf",
+                        "file_extension": ".pdf",
+                    },
+                    {
+                        "name": "nested",
+                        "path": "another/nested",
+                        "children": [
+                            {
+                                "name": "file4.pdf",
+                                "path": "another/nested/file4.pdf",
+                                "file_extension": ".pdf",
+                            }
+                        ],
+                    },
+                ],
+            },
+        ],
+    }
+
+    assert isinstance(response, ProjectFileTreeResponse)
+    assert sorted(response.dict()) == sorted(expected)

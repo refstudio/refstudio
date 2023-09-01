@@ -319,8 +319,8 @@ def test_ai_chat_missing_required_request_params(
 def test_search_s2_is_ok(monkeypatch, mock_search_paper):
     monkeypatch.setattr(search.Searcher, "search_func", mock_search_paper)
 
-    request = {"query": "any-query-string-you-like"}
-    response = search_client.post("/s2", json=request)
+    params = {"query": "any-query-string-you-like"}
+    response = search_client.get("/s2", params=params)
 
     assert response.status_code == 200
     assert response.json() == {
@@ -379,8 +379,8 @@ def test_http_list_projects(monkeypatch, tmp_path):
 def test_create_project(monkeypatch, tmp_path):
     monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
 
-    params = {"project_name": "project1name"}
-    response = project_client.post("/", params=params)
+    request = {"project_name": "project1name"}
+    response = project_client.post("/", json=request)
 
     project_id = list(response.json().keys())[0]
     assert response.status_code == 200
@@ -418,10 +418,9 @@ def test_get_project(monkeypatch, tmp_path):
 
     assert response.status_code == 200
     assert response.json() == {
-        "project_id": project_id,
-        "project_name": "project1name",
-        "project_path": str(project_path),
-        "filepaths": [],
+        "id": project_id,
+        "name": project_name,
+        "path": str(project_path),
     }
 
 
@@ -479,10 +478,6 @@ def test_create_file(monkeypatch, tmp_path):
 
     # check that the file was created
     assert filepath.exists()
-
-    files_and_subdirs = projects.get_project_files(user_id, project_id)
-    expected = [filepath.parent, filepath]
-    assert sorted(files_and_subdirs) == sorted(expected)
 
 
 def test_read_file(monkeypatch, tmp_path):
@@ -543,10 +538,6 @@ def test_delete_file(monkeypatch, tmp_path):
     # check that the file was deleted
     assert not filepath.exists()
 
-    files_and_subdirs = projects.get_project_files(user_id, project_id)
-    expected = [filepath.parent]
-    assert sorted(files_and_subdirs) == sorted(expected)
-
 
 # ruff gets confused here:
 # create_settings_json is a pytest fixture
@@ -555,7 +546,7 @@ def test_get_settings(monkeypatch, tmp_path, create_settings_json):  # noqa: F81
 
     response = settings_client.get("/")
     assert response.status_code == 200
-    assert response.json()["openai"]["api_key"] == "1234"
+    assert response.json()["openai_api_key"] == "1234"
 
 
 # ruff gets confused here:
@@ -565,11 +556,9 @@ def test_update_settings(monkeypatch, tmp_path, create_settings_json):  # noqa: 
     user_id = "user1"
 
     response = settings.get_settings_for_user(user_id)
+    assert response.openai_api_key != "test"
 
-    data = response.dict()
-    data["openai"] = {"api_key": "test"}
-
-    response = settings_client.put("/", json=data)
+    response = settings_client.put("/", json={"openai_api_key": "test"})
 
     assert response.status_code == 200
-    assert response.json()["openai"]["api_key"] == "test"
+    assert response.json()["openai_api_key"] == "test"

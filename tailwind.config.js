@@ -48,6 +48,9 @@ export default {
           secondary: 'rgb(var(--grayscale-70) / <alpha-value>)',
           primary: 'rgb(var(--grayscale-80) / <alpha-value>)',
         },
+        'card-ico': {
+          primary: 'rgb(var(--grayscale-80) / <alpha-value>)',
+        },
         'input-txt': {
           disabled: 'rgb(var(--grayscale-60) / <alpha-value>)',
           secondary: 'rgb(var(--grayscale-70) / <alpha-value>)',
@@ -93,9 +96,11 @@ export default {
           inactive: 'rgb(var(--grayscale-30) / <alpha-value>)',
           active: 'rgb(var(--grayscale-10) / <alpha-value>)',
         },
+        'btn-ico-content': 'rgb(var(--grayscale-80) / <alpha-value>)',
         'btn-ico-side-bar-icon': {
           hover: 'rgb(var(--grayscale-70) / <alpha-value>)',
           default: 'rgb(var(--grayscale-60) / <alpha-value>)',
+          disabled: 'rgb(var(--grayscale-40) / <alpha-value>)',
         },
         'input-border': 'rgb(var(--grayscale-20) / <alpha-value>)',
         'input-bg': {
@@ -120,7 +125,10 @@ export default {
           primary: 'rgb(var(--grayscale-10) / <alpha-value>)',
           secondary: 'rgb(var(--grayscale-30) / <alpha-value>)',
         },
-        'side-bar-txt': 'rgb(var(--grayscale-80) / <alpha-value>)',
+        'side-bar-txt': {
+          primary: 'rgb(var(--grayscale-80) / <alpha-value>)',
+          secondary: 'rgb(var(--grayscale-70) / <alpha-value>)',
+        },
         'side-bar-border': 'rgb(var(--grayscale-20) / <alpha-value>)',
         'side-bar-bg': {
           primary: 'rgb(var(--grayscale-00) / <alpha-value>)',
@@ -177,7 +185,7 @@ export default {
           primary: 'rgb(var(--grayscale-80) / <alpha-value>)',
           secondary: 'rgb(var(--grayscale-00) / <alpha-value>)',
         },
-        'shortcuts-border': 'rgb(var(--grayscale-20) / <alpha-value>)',
+        'welcome-border': 'rgb(var(--grayscale-20) / <alpha-value>)',
         'editor-selection': 'rgb(196 220 246 / <alpha-value>)',
       },
       boxShadow: {
@@ -186,11 +194,20 @@ export default {
       borderRadius: {
         default: '0.25rem',
       },
+      transitionProperty: {
+        position: 'top, left, bottom, right',
+      },
+      fontFamily: {
+        default: ['"Roboto", sans-serif'],
+      },
       zIndex: {
         modals: 99999,
         notifications: 88888,
         'drop-zone': 55555,
         'resize-handle': 44444,
+        dropdown: 33333,
+        sidebar: 11,
+        'sidebar-panel': 10,
       },
     },
   },

@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 from datetime import date
 from typing import Any
 
 from dotenv import load_dotenv
 from pydantic import BaseModel
+from sidecar.pydantic_utils import make_optional
 
 try:
     # introduced in Python 3.11 ...
@@ -28,6 +31,12 @@ class RefStudioModel(BaseModel):
         def schema_extra(schema: dict[str, Any]) -> None:
             for prop in schema.get("properties", {}).values():
                 prop.pop("title", None)
+
+
+class EmptyRequest(RefStudioModel):
+    """Use this to indicate that a request only accepts an empty object ({})"""
+
+    pass
 
 
 class ResponseStatus(StrEnum):
@@ -185,6 +194,29 @@ class ChatResponse(RefStudioModel):
     choices: list[ChatResponseChoice]
 
 
+class FileEntryBase(RefStudioModel):
+    name: str
+    path: str
+
+
+class FileEntry(FileEntryBase):
+    file_extension: str
+
+
+class FolderEntry(FileEntryBase):
+    children: list[FileEntry | FolderEntry] = []
+
+
+class ProjectDetailsResponse(RefStudioModel):
+    id: str
+    name: str
+    path: str
+
+
+class ProjectFileTreeResponse(RefStudioModel):
+    contents: list[FileEntry | FolderEntry]
+
+
 class OpenAISettings(RefStudioModel):
     api_key: str = ""
     chat_model: str = "gpt-3.5-turbo"
@@ -193,6 +225,16 @@ class OpenAISettings(RefStudioModel):
     # they should be configurable as part of the API request
     manner: RewriteMannerType = RewriteMannerType.SCHOLARLY
     temperature: float = 0.7
+
+
+class ProjectCreateRequest(RefStudioModel):
+    project_name: str
+    """The name of the project"""
+    project_path: str = None
+    """
+    The path to the project directory. Only necessary for Desktop.
+    For web, the project is stored in a private directory on the server.
+    """
 
 
 class ProjectSettings(RefStudioModel):
@@ -209,9 +251,26 @@ class SidecarSettings(RefStudioModel):
 
 
 class SettingsSchema(RefStudioModel):
+    """@deprecated"""
+
     project: ProjectSettings = ProjectSettings()
     openai: OpenAISettings = OpenAISettings()
     sidecar: SidecarSettings = SidecarSettings()
+
+
+class FlatSettingsSchema(RefStudioModel):
+    current_directory: str
+    logging_enabled: bool
+    logging_filepath: str
+    openai_api_key: str
+    openai_chat_model: str
+    openai_manner: RewriteMannerType
+    openai_temperature: float
+
+
+@make_optional()
+class FlatSettingsSchemaPatch(FlatSettingsSchema):
+    pass
 
 
 class CliCommands(RefStudioModel):
@@ -238,3 +297,4 @@ class CliCommands(RefStudioModel):
 
 
 Reference.update_forward_refs()
+FolderEntry.update_forward_refs()

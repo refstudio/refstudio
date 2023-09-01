@@ -1,8 +1,9 @@
 .side-bar {
-  @apply flex select-none flex-col;
+  @apply z-sidebar flex select-none flex-col bg-side-bar-bg-primary;
 }
 
 .side-bar .icon {
+  @apply cursor-pointer;
   @apply flex h-10 w-10 content-center justify-center gap-2 rounded;
   @apply bg-btn-bg-side-bar-tool-default text-btn-ico-side-bar-tool-default;
 }
@@ -11,6 +12,11 @@
   @apply bg-btn-bg-side-bar-tool-active text-btn-ico-side-bar-tool-active;
 }
 
-.side-bar .icon:hover {
+.side-bar .icon.disabled {
+  @apply cursor-default;
+  @apply bg-btn-bg-side-bar-tool-disabled text-btn-ico-side-bar-tool-disabled;
+}
+
+.side-bar .icon:not(.disabled):hover {
   @apply bg-btn-bg-side-bar-tool-hover text-btn-ico-side-bar-tool-hover;
 }

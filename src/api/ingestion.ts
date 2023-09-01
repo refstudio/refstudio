@@ -1,9 +1,8 @@
 import { makeUploadPath } from '../io/filesystem';
 import { ReferenceItem } from '../types/ReferenceItem';
-import { universalGet, universalPatch, universalPost } from './api';
-import { DeleteStatusResponse, UpdateStatusResponse } from './api-types';
 import { callSidecar } from './sidecar';
-import { IngestResponse, Reference } from './types';
+import { apiGetJson, apiPatch, apiPost } from './typed-api';
+import { Reference } from './types';
 
 function parsePdfIngestionResponse(references: Reference[]): ReferenceItem[] {
   return references.map((reference) => ({
@@ -24,14 +23,24 @@ function parsePdfIngestionResponse(references: Reference[]): ReferenceItem[] {
 }
 
 export async function runPDFIngestion(projectId: string): Promise<ReferenceItem[]> {
-  const ingestResponse = await universalPost<IngestResponse>(`/api/references/${projectId}`);
+  const ingestResponse = await apiPost(
+    '/api/references/{project_id}',
+    {
+      path: { project_id: projectId },
+    },
+    {},
+  );
   return parsePdfIngestionResponse(ingestResponse.references);
 }
 
 export async function removeReferences(ids: string[], projectId: string) {
-  const status = await universalPost<DeleteStatusResponse>(`/api/references/${projectId}/bulk_delete`, {
-    reference_ids: ids,
-  });
+  const status = await apiPost(
+    '/api/references/{project_id}/bulk_delete',
+    { path: { project_id: projectId } },
+    {
+      reference_ids: ids,
+    },
+  );
   if (status.status !== 'ok') {
     throw new Error(status.message);
   }
@@ -59,16 +68,20 @@ export async function updateReference(projectId: string, referenceId: string, pa
     return;
   }
 
-  const status = await universalPatch<UpdateStatusResponse>(`/api/references/${projectId}/${referenceId}`, {
-    data: referencePatch,
-  });
+  const status = await apiPatch(
+    '/api/references/{project_id}/{reference_id}',
+    { path: { project_id: projectId, reference_id: referenceId } },
+    {
+      data: referencePatch,
+    },
+  );
   if (status.status !== 'ok') {
     throw new Error(status.message);
   }
 }
 
 export async function getIngestedReferences(projectId: string): Promise<ReferenceItem[]> {
-  const references = await universalGet<Reference[]>(`/api/references/${projectId}`);
+  const references = await apiGetJson('/api/references/{project_id}', { path: { project_id: projectId } });
   return parsePdfIngestionResponse(references);
 }
 

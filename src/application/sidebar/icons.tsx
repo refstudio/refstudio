@@ -1,3 +1,5 @@
+import { MdKeyboard, MdSettings } from 'react-icons/md';
+
 export const BotIcon = () => (
   <svg className="self-center" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -39,17 +41,6 @@ export const ReferencesIcon = () => (
   </div>
 );
 
-export const ArrowDownIcon = () => (
-  <div className="flex h-6 w-6 shrink-0 items-center justify-center self-center">
-    <svg height="8" viewBox="0 0 12 8" width="12" xmlns="http://www.w3.org/2000/svg">
-      <path
-        d="M1.41 0.290039L6 4.88004L10.59 0.290039L12 1.71004L6 7.71004L0 1.71004L1.41 0.290039Z"
-        fill="currentcolor"
-      />
-    </svg>
-  </div>
-);
-
 export const ArrowRightIcon = () => (
   <div className="flex h-6 w-6 shrink-0 items-center justify-center self-center">
     <svg height="12" viewBox="0 0 8 12" width="8" xmlns="http://www.w3.org/2000/svg">
@@ -60,3 +51,17 @@ export const ArrowRightIcon = () => (
     </svg>
   </div>
 );
+
+export const ArrowLeftIcon = () => (
+  <div className="flex h-6 w-6 shrink-0 items-center justify-center self-center">
+    <svg height="12" viewBox="0 0 8 12" width="8" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M7.70996 1.41L3.11996 6L7.70996 10.59L6.28996 12L0.289961 6L6.28996 -6.20702e-08L7.70996 1.41Z"
+        fill="currentcolor"
+      />
+    </svg>
+  </div>
+);
+
+export const KeyboardIcon = () => <MdKeyboard aria-label="Keybindings" size="24" />;
+export const SettingsIcon = () => <MdSettings aria-label="Settings" size="24" />;

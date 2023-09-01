@@ -13,12 +13,18 @@ from sidecar.typing import (
     ChatResponse,
     DeleteRequest,
     DeleteStatusResponse,
+    EmptyRequest,
+    FlatSettingsSchema,
+    FlatSettingsSchemaPatch,
     IngestRequest,
+    IngestResponse,
+    ProjectCreateRequest,
+    ProjectDetailsResponse,
+    ProjectFileTreeResponse,
     Reference,
     ReferencePatch,
     RewriteRequest,
     RewriteResponse,
-    SettingsSchema,
     TextCompletionRequest,
     TextCompletionResponse,
     UpdateStatusResponse,
@@ -89,7 +95,7 @@ async def list_references(project_id: str) -> list[Reference]:
 
 
 @references_api.post("/{project_id}")
-async def ingest_references(project_id: str):
+async def ingest_references(project_id: str, payload: EmptyRequest) -> IngestResponse:
     """
     Ingests references from PDFs in the project uploads directory
     """
@@ -156,46 +162,30 @@ async def list_projects():
 
 
 @project_api.post("/")
-async def create_project(project_name: str, project_path: str = None):
+async def create_project(req: ProjectCreateRequest):
     """
-    Creates a project directory in the filesystem
-
-    Parameters
-    ----------
-    project_name : str
-        The name of the project
-    project_path : str
-        The path to the project directory. Only necessary for Desktop.
-        For web, the project is stored in a private directory on the server.
+    Creates a project, and a directory in the filesystem
     """
     user_id = "user1"
     project_id = str(uuid4())
     project_path = projects.create_project(
-        user_id, project_id, project_name, project_path
+        user_id, project_id, req.project_name, req.project_path
     )
     return {
         project_id: {
-            "project_name": project_name,
+            "project_name": req.project_name,
             "project_path": project_path,
         }
     }
 
 
 @project_api.get("/{project_id}")
-async def get_project(project_id: str):
+async def get_project(project_id: str) -> ProjectDetailsResponse:
     """
-    Returns the project path and a list of files in the project
+    Returns details about a project
     """
     user_id = "user1"
-    project_path = projects.get_project_path(user_id, project_id)
-    project_name = projects.get_project_name(user_id, project_id)
-    filepaths = projects.get_project_files(user_id, project_id)
-    return {
-        "project_id": project_id,
-        "project_path": project_path,
-        "project_name": project_name,
-        "filepaths": filepaths,
-    }
+    return projects.get_project_details(user_id, project_id)
 
 
 @project_api.delete("/{project_id}")
@@ -220,10 +210,9 @@ async def delete_project(project_id: str):
 
 
 @project_api.get("/{project_id}/files")
-async def get_project_files(project_id: str):
+async def get_project_files(project_id: str) -> ProjectFileTreeResponse:
     user_id = "user1"
-    filepaths = projects.get_project_files(user_id, project_id)
-    return filepaths
+    return projects.get_project_files(user_id, project_id)
 
 
 # Filesystem API
@@ -314,13 +303,13 @@ async def shutdown():
 # Settings API
 # --------------
 @settings_api.get("/")
-async def get_settings() -> SettingsSchema:
+async def get_settings() -> FlatSettingsSchema:
     user_id = "user1"
     return settings.get_settings_for_user(user_id)
 
 
 @settings_api.put("/")
-async def update_settings(req: SettingsSchema) -> SettingsSchema:
+async def update_settings(req: FlatSettingsSchemaPatch) -> FlatSettingsSchema:
     user_id = "user1"
     return settings.update_settings_for_user(user_id, req)
     return settings.update_settings_for_user(user_id, req)
