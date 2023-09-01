@@ -16,7 +16,7 @@ import { cx } from '../../lib/cx';
 import { isNonNullish } from '../../lib/isNonNullish';
 import { FILE_EXPLORER_FILE_MENU_ID } from './fileExplorerContextMenu/FileExplorerFileContextMenu';
 import { useFileExplorerContextMenu } from './fileExplorerContextMenu/useFileExplorerContextMenu';
-import { ArrowDownIcon, ArrowRightIcon } from './icons';
+import { ArrowRightIcon } from './icons';
 
 export function FileExplorer() {
   const rootFileExplorerEntry = useAtomValue(fileExplorerAtom);
@@ -56,7 +56,11 @@ export function FolderNode({ folder }: FolderNodeProps) {
         className={cx('flex cursor-pointer select-none items-start gap-1 self-stretch')}
         onClick={() => setCollapsed((currentState) => !currentState)}
       >
-        <div className="text-btn-ico-side-bar-item">{collapsed ? <ArrowRightIcon /> : <ArrowDownIcon />}</div>
+        <div
+          className={cx('text-btn-ico-side-bar-item transition duration-100 ease-in-out', { 'rotate-90': !collapsed })}
+        >
+          <ArrowRightIcon />
+        </div>
         <h2 className="overflow-hidden overflow-ellipsis whitespace-nowrap">{folder.name}</h2>
       </div>
       {!collapsed && (
