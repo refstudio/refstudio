@@ -1,6 +1,7 @@
 import { screen } from '@testing-library/react';
 import { createStore } from 'jotai';
 
+import { FlatSettingsSchema } from '../../../../api/api-types';
 import { askForRewrite, AskForRewriteReturn } from '../../../../api/rewrite';
 import { selectionAtom } from '../../../../atoms/selectionState';
 import { getCachedSetting } from '../../../../settings/settingsManager';
@@ -10,6 +11,13 @@ import { RewriterPanel } from '../RewriterPanel';
 
 vi.mock('../../../../settings/settingsManager');
 vi.mock('../../../../api/rewrite');
+
+const mockSettings = {
+  openai_chat_model: 'dont-care',
+  openai_api_key: 'dont-care',
+  openai_manner: 'scholarly',
+  openai_temperature: 0.5,
+} satisfies Partial<FlatSettingsSchema>;
 
 describe('RewriterPanel component', () => {
   let store: ReturnType<typeof createStore>;
@@ -25,11 +33,11 @@ describe('RewriterPanel component', () => {
       );
       return { RewriteOptionsView: FakeRewriteOptionsView };
     });
-    vi.mocked(getCachedSetting).mockReturnValue({
-      api_key: 'API_KEY',
-      chat_model: 'gpt',
-      manner: 'scholarly',
-      temperature: 0.5,
+    vi.mocked(getCachedSetting).mockImplementation((key) => {
+      if (key in mockSettings) {
+        return mockSettings[key as keyof typeof mockSettings];
+      }
+      throw new Error('UNEXPECTED CALL FOR KEY ' + key);
     });
     vi.mocked(askForRewrite).mockImplementation(
       () =>
