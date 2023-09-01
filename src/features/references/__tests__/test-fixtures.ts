@@ -8,6 +8,7 @@ export const REFERENCES: ReferenceItem[] = [
     title: 'REF1 A Few Useful Things to Know about Machine Learning',
     citationKey: 'doe2023',
     status: 'complete',
+    doi: '0000',
     authors: [{ fullName: 'Joe Doe', lastName: 'Doe' }],
     publishedDate: '2023-08-15',
   },
@@ -18,6 +19,7 @@ export const REFERENCES: ReferenceItem[] = [
     title: 'REF2 Rules of Machine Learning - Best Practices for ML Engineering',
     citationKey: 'maria',
     status: 'complete',
+    doi: '0000',
     authors: [
       { fullName: 'Joe Doe', lastName: 'Doe' },
       { fullName: 'Ana Maria', lastName: 'Maria' },
