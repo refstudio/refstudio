@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { MdKeyboard, MdSettings } from 'react-icons/md';
 import { ImperativePanelHandle, Panel } from 'react-resizable-panels';
 
 import { VerticalResizeHandle } from '../../components/VerticalResizeHandle';
@@ -10,7 +9,7 @@ import { cx } from '../../lib/cx';
 import { noop } from '../../lib/noop';
 import { SideBar } from '../components/SideBar';
 import { ExplorerPanel } from './ExplorerPanel';
-import { FilesIcon, ReferencesIcon } from './icons';
+import { FilesIcon, KeyboardIcon, ReferencesIcon, SettingsIcon } from './icons';
 
 type PrimarySideBarPanel = 'Explorer' | 'References';
 export function LeftSidePanelWrapper({ disabled }: { disabled?: boolean }) {
@@ -68,17 +67,8 @@ export function LeftSidePanelWrapper({ disabled }: { disabled?: boolean }) {
           'shadow-default': isPanelCollapsed,
         })}
         footerItems={[
-          // TODO: Implement Keybinds screen
-          {
-            label: 'Keybinds',
-            Icon: <MdKeyboard aria-label="Keybindings" size="24" />,
-            onClick: noop,
-          },
-          {
-            label: 'Settings',
-            Icon: <MdSettings aria-label="Settings" size="24" />,
-            onClick: openSettings,
-          },
+          { label: 'Keybinds', Icon: <KeyboardIcon />, onClick: noop }, // TODO: Implement Keybinds screen
+          { label: 'Settings', Icon: <SettingsIcon />, onClick: openSettings },
         ]}
         items={[
           { disabled, pane: 'Explorer', Icon: <FilesIcon /> },
