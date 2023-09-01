@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from typing import Any
 
@@ -216,17 +218,16 @@ class FileEntry(FileEntryBase):
 
 
 class FolderEntry(FileEntryBase):
-    children: list[FileEntry]
+    children: list[FileEntry | FolderEntry] = []
 
 
-class ProjectDetails(RefStudioModel):
+class ProjectDetailsResponse(RefStudioModel):
     id: str
     name: str
     path: str
 
 
 class ProjectFileTreeResponse(RefStudioModel):
-    project: ProjectDetails
     contents: list[FileEntry | FolderEntry]
 
 
@@ -283,3 +284,4 @@ class CliCommands(RefStudioModel):
 
 
 Reference.update_forward_refs()
+FolderEntry.update_forward_refs()

@@ -184,35 +184,27 @@ def test_get_project_files(monkeypatch, tmp_path, setup_project_path_storage):
 
     # setup project files
     project_path = projects.get_project_path(user_id, project_id)
-    project_name = projects.get_project_name(user_id, project_id)
 
     # hidden dirs/files should be ignored
-    (Path(project_path) / "file1.refstudio").touch()
-    (Path(project_path) / ".ignoreme").touch()
-    project_path.joinpath("uploads").mkdir()
-    (Path(project_path) / "uploads" / "file2.pdf").touch()
-    project_path.joinpath(".storage").mkdir()
-    (Path(project_path) / ".storage" / "references.json").touch()
-    project_path.joinpath("empty").mkdir()
+    (project_path / "file1.refstudio").touch()
+    (project_path / ".ignoreme").touch()
+    (project_path / "uploads").mkdir()
+    (project_path / "uploads" / "file2.pdf").touch()
+    (project_path / ".storage").mkdir()
+    (project_path / ".storage" / "references.json").touch()
+    (project_path / "empty").mkdir()
+    (project_path / "another" / "nested").mkdir(parents=True, exist_ok=True)
+    (project_path / "another" / "file3.pdf").touch()
+    (project_path / "another" / "nested" / "file4.pdf").touch()
 
     response = projects.get_project_files(user_id, project_id)
 
     expected = {
-        "project": {
-            "id": project_id,
-            "name": project_name,
-            "path": str(project_path),
-        },
         "contents": [
             {
                 "name": "file1.refstudio",
                 "path": "file1.refstudio",
                 "file_extension": ".refstudio",
-            },
-            {
-                "name": "empty",
-                "path": "empty",
-                "children": [],
             },
             {
                 "name": "uploads",
@@ -223,6 +215,33 @@ def test_get_project_files(monkeypatch, tmp_path, setup_project_path_storage):
                         "path": "uploads/file2.pdf",
                         "file_extension": ".pdf",
                     }
+                ],
+            },
+            {
+                "name": "empty",
+                "path": "empty",
+                "children": [],
+            },
+            {
+                "name": "another",
+                "path": "another",
+                "children": [
+                    {
+                        "name": "file3.pdf",
+                        "path": "another/file3.pdf",
+                        "file_extension": ".pdf",
+                    },
+                    {
+                        "name": "nested",
+                        "path": "another/nested",
+                        "children": [
+                            {
+                                "name": "file4.pdf",
+                                "path": "another/nested/file4.pdf",
+                                "file_extension": ".pdf",
+                            }
+                        ],
+                    },
                 ],
             },
         ],

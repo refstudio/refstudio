@@ -16,7 +16,7 @@ from sidecar.typing import (
     FileEntry,
     FolderEntry,
     IngestRequest,
-    ProjectDetails,
+    ProjectDetailsResponse,
     Reference,
     ReferencePatch,
     RewriteRequest,
@@ -195,13 +195,12 @@ async def create_project(project_name: str, project_path: str = None):
 
 
 @project_api.get("/{project_id}")
-async def get_project(project_id: str) -> ProjectDetails:
+async def get_project(project_id: str) -> ProjectDetailsResponse:
     """
-    Returns the project path and a list of files in the project
+    Returns details about a project
     """
     user_id = "user1"
-    response = projects.get_project_files(user_id, project_id)
-    return response.project
+    return projects.get_project_details(user_id, project_id)
 
 
 @project_api.delete("/{project_id}")
