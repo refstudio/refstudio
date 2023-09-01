@@ -15,6 +15,7 @@ import {
   HTTPValidationError,
   IngestResponse,
   IngestStatus,
+  ProjectCreateRequest,
   Reference,
   ReferencePatch,
   ResponseStatus,
@@ -76,15 +77,7 @@ export interface paths {
     get: operations['list_projects__get'];
     /**
      * Create Project
-     * @description Creates a project directory in the filesystem
-     *
-     * Parameters
-     * ----------
-     * project_name : str
-     *     The name of the project
-     * project_path : str
-     *     The path to the project directory. Only necessary for Desktop.
-     *     For web, the project is stored in a private directory on the server.
+     * @description Creates a project, and a directory in the filesystem
      */
     post: operations['create_project__post'];
   };
@@ -238,6 +231,11 @@ export interface components {
      * @enum {string}
      */
     IngestStatus: 'processing' | 'failure' | 'complete';
+    /** ProjectCreateRequest */
+    ProjectCreateRequest: {
+      project_name: string;
+      project_path?: string;
+    };
     /**
      * Reference
      * @description A reference for an academic paper / PDF
@@ -579,26 +577,12 @@ export interface operations {
   };
   /**
    * Create Project
-   * @description Creates a project directory in the filesystem
-   *
-   * Parameters
-   * ----------
-   * project_name : str
-   *     The name of the project
-   * project_path : str
-   *     The path to the project directory. Only necessary for Desktop.
-   *     For web, the project is stored in a private directory on the server.
+   * @description Creates a project, and a directory in the filesystem
    */
   create_project__post: {
-    parameters: {
-      query: {
-        project_name: string;
-        project_path?: string;
-      };
-    };
     requestBody: {
       content: {
-        'application/json': EmptyRequest;
+        'application/json': ProjectCreateRequest;
       };
     };
     responses: {

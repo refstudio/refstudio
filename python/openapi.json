@@ -264,6 +264,21 @@
         "title": "IngestStatus",
         "type": "string"
       },
+      "ProjectCreateRequest": {
+        "properties": {
+          "project_name": {
+            "type": "string"
+          },
+          "project_path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "project_name"
+        ],
+        "title": "ProjectCreateRequest",
+        "type": "object"
+      },
       "Reference": {
         "description": "A reference for an academic paper / PDF",
         "properties": {
@@ -985,33 +1000,13 @@
         "summary": "List Projects"
       },
       "post": {
-        "description": "Creates a project directory in the filesystem\n\nParameters\n----------\nproject_name : str\n    The name of the project\nproject_path : str\n    The path to the project directory. Only necessary for Desktop.\n    For web, the project is stored in a private directory on the server.",
+        "description": "Creates a project, and a directory in the filesystem",
         "operationId": "create_project__post",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "project_name",
-            "required": true,
-            "schema": {
-              "title": "Project Name",
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "project_path",
-            "required": false,
-            "schema": {
-              "title": "Project Path",
-              "type": "string"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/EmptyRequest"
+                "$ref": "#/components/schemas/ProjectCreateRequest"
               }
             }
           },

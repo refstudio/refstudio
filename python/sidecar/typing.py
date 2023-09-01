@@ -223,6 +223,16 @@ class OpenAISettings(RefStudioModel):
     temperature: float = 0.7
 
 
+class ProjectCreateRequest(RefStudioModel):
+    project_name: str
+    """The name of the project"""
+    project_path: str = None
+    """
+    The path to the project directory. Only necessary for Desktop.
+    For web, the project is stored in a private directory on the server.
+    """
+
+
 class ProjectSettings(RefStudioModel):
     current_directory: str = ""
 

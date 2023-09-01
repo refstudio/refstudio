@@ -18,6 +18,7 @@ from sidecar.typing import (
     FlatSettingsSchemaPatch,
     IngestRequest,
     IngestResponse,
+    ProjectCreateRequest,
     Reference,
     ReferencePatch,
     RewriteRequest,
@@ -169,28 +170,18 @@ async def list_projects():
 
 
 @project_api.post("/")
-async def create_project(
-    payload: EmptyRequest, project_name: str, project_path: str = None
-):
+async def create_project(req: ProjectCreateRequest):
     """
-    Creates a project directory in the filesystem
-
-    Parameters
-    ----------
-    project_name : str
-        The name of the project
-    project_path : str
-        The path to the project directory. Only necessary for Desktop.
-        For web, the project is stored in a private directory on the server.
+    Creates a project, and a directory in the filesystem
     """
     user_id = "user1"
     project_id = str(uuid4())
     project_path = projects.create_project(
-        user_id, project_id, project_name, project_path
+        user_id, project_id, req.project_name, req.project_path
     )
     return {
         project_id: {
-            "project_name": project_name,
+            "project_name": req.project_name,
             "project_path": project_path,
         }
     }

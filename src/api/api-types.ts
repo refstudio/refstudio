@@ -260,6 +260,14 @@ export interface BodyCreateFile_ProjectId__Filepath_Put {
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "ProjectCreateRequest".
+ */
+export interface ProjectCreateRequest {
+  project_name: string;
+  project_path?: string;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
  * via the `definition` "FlatSettingsSchema".
  */
 export interface FlatSettingsSchema {

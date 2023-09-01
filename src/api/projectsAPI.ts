@@ -38,11 +38,10 @@ export async function readProjectById(projectId: string): Promise<ProjectInfo> {
 }
 
 export async function createRemoteProject(projectName: string, projectPath?: string): Promise<ProjectInfo> {
-  const payload = (await apiPost(
-    '/api/projects/',
-    { query: { project_name: projectName, project_path: projectPath } },
-    {},
-  )) as ProjectPostResponse;
+  const payload = (await apiPost('/api/projects/', {
+    project_name: projectName,
+    project_path: projectPath,
+  })) as ProjectPostResponse;
 
   const projectId = Object.keys(payload)[0];
   const { project_path, project_name } = payload[projectId];

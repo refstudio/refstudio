@@ -547,6 +547,21 @@
       ],
       "title": "Body_create_file__project_id___filepath__put"
     },
+    "ProjectCreateRequest": {
+      "properties": {
+        "project_name": {
+          "type": "string"
+        },
+        "project_path": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "project_name"
+      ],
+      "title": "ProjectCreateRequest"
+    },
     "FlatSettingsSchema": {
       "properties": {
         "current_directory": {
