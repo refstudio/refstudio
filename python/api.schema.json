@@ -494,22 +494,6 @@
       "type": "object",
       "title": "S2SearchResult"
     },
-    "SearchRequest": {
-      "properties": {
-        "query": {
-          "type": "string"
-        },
-        "limit": {
-          "type": "integer",
-          "default": 10
-        }
-      },
-      "type": "object",
-      "required": [
-        "query"
-      ],
-      "title": "SearchRequest"
-    },
     "SearchResponse": {
       "properties": {
         "status": {

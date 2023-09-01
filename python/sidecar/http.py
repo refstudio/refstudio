@@ -23,7 +23,6 @@ from sidecar.typing import (
     ReferencePatch,
     RewriteRequest,
     RewriteResponse,
-    SearchRequest,
     SearchResponse,
     TextCompletionRequest,
     TextCompletionResponse,
@@ -45,9 +44,9 @@ meta_api = FastAPI()
 
 # Search API
 # --------------
-@search_api.post("/s2")
-async def http_search_s2(req: SearchRequest) -> SearchResponse:
-    response = search.search_s2(req)
+@search_api.get("/s2")
+async def http_search_s2(query: str, limit=10) -> SearchResponse:
+    response = search.search_s2(query, limit)
     return response
 
 

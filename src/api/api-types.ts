@@ -236,14 +236,6 @@ export interface S2SearchResult {
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "SearchRequest".
- */
-export interface SearchRequest {
-  query: string;
-  limit?: number;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
  * via the `definition` "SearchResponse".
  */
 export interface SearchResponse {

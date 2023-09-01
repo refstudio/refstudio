@@ -24,7 +24,6 @@ import {
   RewriteRequest,
   RewriteResponse,
   S2SearchResult,
-  SearchRequest,
   SearchResponse,
   TextCompletionChoice,
   TextCompletionRequest,
@@ -123,7 +122,7 @@ export interface paths {
   };
   '/api/search/s2': {
     /** Http Search S2 */
-    post: operations['http_search_s2_s2_post'];
+    get: operations['http_search_s2_s2_get'];
   };
   '/api/settings/': {
     /** Get Settings */
@@ -308,12 +307,6 @@ export interface components {
       title?: string;
       venue?: string;
       year?: number;
-    };
-    /** SearchRequest */
-    SearchRequest: {
-      /** @default 10 */
-      limit?: number;
-      query: string;
     };
     /** SearchResponse */
     SearchResponse: {
@@ -829,10 +822,11 @@ export interface operations {
     };
   };
   /** Http Search S2 */
-  http_search_s2_s2_post: {
-    requestBody: {
-      content: {
-        'application/json': SearchRequest;
+  http_search_s2_s2_get: {
+    parameters: {
+      query: {
+        query: string;
+        limit?: unknown;
       };
     };
     responses: {
