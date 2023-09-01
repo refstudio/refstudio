@@ -84,8 +84,10 @@ export function TipTapEditor({ editorContent, editorId, isActive, saveFileInMemo
     const mdSerializer = new MarkdownSerializer(editor, references);
     const { id: filePath } = parseEditorId(editorId);
 
-    void saveAsMarkdown(mdSerializer, filePath);
-    void refreshFileTree();
+    void saveAsMarkdown(mdSerializer, filePath).then(() => {
+      // We need to make sure the files were saved before refreshing the file tree.
+      void refreshFileTree();
+    });
   }, [editor, editorId, isActive, references, refreshFileTree]);
 
   useListenEvent('refstudio://ai/suggestion/insert', insertContent);
@@ -107,30 +109,24 @@ export function TipTapEditor({ editorContent, editorId, isActive, saveFileInMemo
   );
 }
 
-export async function saveAsMarkdown(markdownSerializer: MarkdownSerializer, exportedFilePath: string) {
+export async function saveAsMarkdown(markdownSerializer: MarkdownSerializer, filePath: string) {
   try {
-    const markdownFileNameAndExt = getFileNameAndExtension(exportedFilePath);
-    if (!markdownFileNameAndExt.name) {
+    const { name: fileName } = getFileNameAndExtension(filePath);
+    if (!fileName) {
       notifyWarning('Could not save markdown file');
       return;
     }
 
-    const markdownFileName = `${markdownFileNameAndExt.name}.md`;
+    const markdownFileName = `${fileName}.md`;
     const markdownFilePath = makeExportsPath(markdownFileName);
+    const serializedContent = markdownSerializer.serialize(fileName);
+    await writeFileContent(markdownFilePath, serializedContent.markdownContent);
 
-    const serializedContent = markdownSerializer.serialize(markdownFileNameAndExt.name);
-
-    if (!serializedContent.bibliography) {
-      return writeFileContent(markdownFilePath, serializedContent.markdownContent);
+    if (serializedContent.bibliography) {
+      const bibliographyFileName = `${fileName}.${serializedContent.bibliography.extension}`;
+      const bibliographyFilePath = makeExportsPath(bibliographyFileName);
+      await writeFileContent(bibliographyFilePath, serializedContent.bibliography.textContent);
     }
-
-    const bibliographyFileName = `${markdownFileNameAndExt.name}.${serializedContent.bibliography.extension}`;
-    const bibliographyFilePath = makeExportsPath(bibliographyFileName);
-
-    return Promise.all([
-      writeFileContent(markdownFilePath, serializedContent.markdownContent),
-      writeFileContent(bibliographyFilePath, serializedContent.bibliography.textContent),
-    ]);
   } catch (err) {
     console.error('Error', err);
   }
