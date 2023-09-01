@@ -83,7 +83,7 @@ export function makeExportsPath(filename: string) {
 // FileSystem project ID
 //  - This is needed to make calls to the backend API for a specific project
 // #####################################################################################
-export let currentProjectId = '';
+let currentProjectId = '';
 export function setCurrentFileSystemProjectId(projectId: string) {
   currentProjectId = projectId;
 }
