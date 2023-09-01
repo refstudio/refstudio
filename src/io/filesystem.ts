@@ -13,7 +13,6 @@ import {
 } from '../api/projectsAPI';
 import { EditorContent } from '../atoms/types/EditorContent';
 import { FileEntry, FileFileEntry } from '../atoms/types/FileEntry';
-import { MarkdownSerializer } from '../features/textEditor/components/tipTapNodes/refStudioDocument/serialization/MarkdownSerializer';
 import { serializeReferences } from '../features/textEditor/components/tipTapNodes/refStudioDocument/serialization/serializeReferences';
 import { notifyError } from '../notifications/notifications';
 import { ReferenceItem } from '../types/ReferenceItem';
@@ -52,10 +51,6 @@ export function getUploadsDir() {
   return UPLOADS_DIR;
 }
 
-export function getExportsDir() {
-  return EXPORTS_DIR;
-}
-
 export function makeUploadPath(filename: string) {
   return `${getUploadsDir()}${sep}${filename}`;
 }
@@ -71,6 +66,17 @@ export async function uploadFiles(systemFiles: File[]) {
     await writeProjectBinaryFile(currentProjectId, relativePath, bytes);
   }
   return Array.from(systemFiles).map((file) => file.name);
+}
+
+// #####################################################################################
+// EXPORTS
+// #####################################################################################
+export function getExportsDir() {
+  return EXPORTS_DIR;
+}
+
+export function makeExportsPath(filename: string) {
+  return `${getExportsDir()}${sep}${filename}`;
 }
 
 // #####################################################################################
@@ -138,6 +144,19 @@ async function convertTauriFileEntryToFileEntry(entry: TauriFileEntry): Promise<
 // some/refstudio/absolute/path/file.txt -> ["some", "refstudio", "absolute", "path", "file.txt"]
 export function splitRefStudioPath(filePath: string): string[] {
   return filePath.split(sep);
+}
+
+export function getFileNameAndExtension(filePath: string): { name: string; ext: string } {
+  const fileName = filePath.slice(filePath.lastIndexOf(sep) + 1);
+  if (fileName.startsWith('.')) {
+    return { name: fileName, ext: '' };
+  }
+
+  const dotIndex = fileName.lastIndexOf('.');
+  if (dotIndex === -1) {
+    return { name: fileName, ext: '' };
+  }
+  return { name: fileName.slice(0, dotIndex), ext: fileName.slice(dotIndex + 1) };
 }
 
 // #####################################################################################
@@ -228,66 +247,6 @@ export async function exportReferences(references: ReferenceItem[]) {
     });
     if (filePath) {
       return writeProjectTextFile(currentProjectId, filePath, serializedReferences.textContent);
-    }
-  } catch (err) {
-    console.error('Error', err);
-  }
-}
-
-export async function saveAsMarkdown(markdownSerializer: MarkdownSerializer, exportedFilePath: string) {
-  if (import.meta.env.VITE_IS_WEB) {
-    throw new Error('Not implemented');
-  }
-
-  try {
-    const exportsDir = getExportsDir();
-
-    const splittedPath = exportedFilePath.split(sep);
-    const fileName = splittedPath.pop();
-    if (!fileName) {
-      return;
-    }
-    let markdownFileName: string;
-    if (fileName.includes('.')) {
-      const splittedFileName = fileName.split('.');
-      splittedFileName.pop();
-      markdownFileName = `${splittedFileName.join('.')}.md`;
-    } else {
-      markdownFileName = `${fileName}.md`;
-    }
-
-    const markdownFilePath = [exportsDir, markdownFileName].join(sep);
-
-    const filePath = await save({
-      title: 'Export file as Markdown',
-      defaultPath: markdownFilePath,
-      filters: [{ name: 'Markdown', extensions: ['md'] }],
-    });
-
-    if (filePath) {
-      const filePathParts = filePath.split(sep);
-      const newFileName = filePathParts.pop();
-      if (newFileName) {
-        const newFileNameParts = newFileName.split('.');
-        const newFileNameWithoutExtension =
-          newFileNameParts.length > 1 ? newFileNameParts.slice(0, -1).join('.') : newFileName;
-
-        const serializedContent = markdownSerializer.serialize(newFileNameWithoutExtension);
-
-        if (!serializedContent.bibliography) {
-          return writeProjectTextFile(currentProjectId, filePath, serializedContent.markdownContent);
-        }
-
-        const bibliographyFilePath = [
-          ...filePathParts,
-          `${newFileNameWithoutExtension}.${serializedContent.bibliography.extension}`,
-        ].join(sep);
-
-        return Promise.all([
-          writeProjectTextFile(currentProjectId, filePath, serializedContent.markdownContent),
-          writeProjectTextFile(currentProjectId, bibliographyFilePath, serializedContent.bibliography.textContent),
-        ]);
-      }
     }
   } catch (err) {
     console.error('Error', err);

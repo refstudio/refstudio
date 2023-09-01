@@ -4,6 +4,7 @@ import { Editor, EditorContent, JSONContent } from '@tiptap/react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback, useEffect, useState } from 'react';
 
+import { refreshFileTreeAtom } from '../../../atoms/fileExplorerActions';
 import { getReferencesAtom } from '../../../atoms/referencesState';
 import { selectionAtom } from '../../../atoms/selectionState';
 import { EditorContent as EditorContentType } from '../../../atoms/types/EditorContent';
@@ -11,7 +12,7 @@ import { EditorId, parseEditorId } from '../../../atoms/types/EditorData';
 import { Spinner } from '../../../components/Spinner';
 import { emitEvent } from '../../../events';
 import { useListenEvent } from '../../../hooks/useListenEvent';
-import { saveAsMarkdown } from '../../../io/filesystem';
+import { saveAsMarkdown } from '../saveAsMarkdown';
 import { MenuBar } from './MenuBar';
 import { EDITOR_EXTENSIONS, transformPasted } from './tipTapEditorConfigs';
 import { MarkdownSerializer } from './tipTapNodes/refStudioDocument/serialization/MarkdownSerializer';
@@ -29,6 +30,7 @@ export function TipTapEditor({ editorContent, editorId, isActive, saveFileInMemo
   const setSelection = useSetAtom(selectionAtom);
 
   const references = useAtomValue(getReferencesAtom);
+  const refreshFileTree = useSetAtom(refreshFileTreeAtom);
 
   useEffect(() => {
     const newEditor = new Editor({
@@ -81,8 +83,10 @@ export function TipTapEditor({ editorContent, editorId, isActive, saveFileInMemo
     const mdSerializer = new MarkdownSerializer(editor, references);
     const { id: filePath } = parseEditorId(editorId);
 
-    void saveAsMarkdown(mdSerializer, filePath);
-  }, [editor, editorId, isActive, references]);
+    void saveAsMarkdown(mdSerializer, filePath)
+      // We need to make sure the files were saved before refreshing the file tree.
+      .then(refreshFileTree);
+  }, [editor, editorId, isActive, references, refreshFileTree]);
 
   useListenEvent('refstudio://ai/suggestion/insert', insertContent);
   useListenEvent('refstudio://menu/file/markdown', saveContentAsMarkdown);
