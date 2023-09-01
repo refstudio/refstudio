@@ -63,7 +63,10 @@ export function LeftSidePanelWrapper({ disabled }: { disabled?: boolean }) {
     <>
       <SideBar
         activePane={isPanelCollapsed ? null : activePanel}
-        className={cx({ 'border-r border-r-side-bar-border': !isPanelCollapsed })}
+        className={cx({
+          'border-r border-r-side-bar-border': !isPanelCollapsed,
+          'shadow-default': isPanelCollapsed,
+        })}
         footerItems={[
           // TODO: Implement Keybinds screen
           {
@@ -83,7 +86,13 @@ export function LeftSidePanelWrapper({ disabled }: { disabled?: boolean }) {
         ]}
         onItemClick={handleSideBarClick}
       />
-      <Panel collapsible order={1} ref={leftPanelRef} onCollapse={(collapsed) => setIsPanelCollapsed(collapsed)}>
+      <Panel
+        className="z-sidebar-panel shadow-default"
+        collapsible
+        order={1}
+        ref={leftPanelRef}
+        onCollapse={(collapsed) => setIsPanelCollapsed(collapsed)}
+      >
         {activePanel === 'Explorer' && <ExplorerPanel />}
         {activePanel === 'References' && <ReferencesPanel />}
       </Panel>

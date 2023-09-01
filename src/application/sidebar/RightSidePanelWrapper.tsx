@@ -53,13 +53,22 @@ export function RightSidePanelWrapper({ disabled }: { disabled?: boolean }) {
   return (
     <>
       {!disabled && <VerticalResizeHandle transparent />}
-      <Panel collapsible order={3} ref={rightPanelRef} onCollapse={(collapsed) => setIsPanelCollapsed(collapsed)}>
+      <Panel
+        className="z-sidebar-panel shadow-default"
+        collapsible
+        order={3}
+        ref={rightPanelRef}
+        onCollapse={(collapsed) => setIsPanelCollapsed(collapsed)}
+      >
         {activePanel === 'Rewriter' && <RewriterPanel />}
         {activePanel === 'Chatbot' && <ChatbotPanel />}
       </Panel>
       <SideBar
         activePane={isPanelCollapsed ? null : activePanel}
-        className={cx({ 'border-l border-l-side-bar-border': !isPanelCollapsed })}
+        className={cx({
+          'border-l border-l-side-bar-border': !isPanelCollapsed,
+          'shadow-default': isPanelCollapsed,
+        })}
         items={[
           { disabled, pane: 'Rewriter', Icon: <PenIcon /> },
           { disabled, pane: 'Chatbot', Icon: <BotIcon /> },

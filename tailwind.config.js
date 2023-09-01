@@ -197,6 +197,8 @@ export default {
         notifications: 88888,
         'drop-zone': 55555,
         'resize-handle': 44444,
+        sidebar: 11,
+        'sidebar-panel': 10,
       },
     },
   },

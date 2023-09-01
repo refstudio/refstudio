@@ -6,6 +6,7 @@ const config: KnipConfig = {
   ignore: [
     'src/api/types.ts',
     'src/api/api-types.ts',
+    'src/api/api-paths.ts',
     'src/vite-env.d.ts',
     'src/**/__mocks__/*.ts',
     'src/declarations/*.d.ts',
@@ -13,6 +14,8 @@ const config: KnipConfig = {
   ignoreBinaries: ['poetry'],
   ignoreExportsUsedInFile: true,
   ignoreDependencies: [
+    // Used in scripts/codegen.sh
+    'openapi-typescript',
     // referenced in vite.config.ts (`provider: 'c8'`)
     '@vitest/coverage-c8',
     // referenced in scripts/codegen.sh
