@@ -9,10 +9,13 @@ import {
   Chunk,
   DeleteRequest,
   DeleteStatusResponse,
+  EmptyRequest,
   FlatSettingsSchema,
   FlatSettingsSchemaPatch,
   HTTPValidationError,
+  IngestResponse,
   IngestStatus,
+  ProjectCreateRequest,
   Reference,
   ReferencePatch,
   ResponseStatus,
@@ -21,7 +24,6 @@ import {
   RewriteRequest,
   RewriteResponse,
   S2SearchResult,
-  SearchRequest,
   SearchResponse,
   TextCompletionChoice,
   TextCompletionRequest,
@@ -74,15 +76,7 @@ export interface paths {
     get: operations['list_projects__get'];
     /**
      * Create Project
-     * @description Creates a project directory in the filesystem
-     *
-     * Parameters
-     * ----------
-     * project_name : str
-     *     The name of the project
-     * project_path : str
-     *     The path to the project directory. Only necessary for Desktop.
-     *     For web, the project is stored in a private directory on the server.
+     * @description Creates a project, and a directory in the filesystem
      */
     post: operations['create_project__post'];
   };
@@ -128,7 +122,7 @@ export interface paths {
   };
   '/api/search/s2': {
     /** Http Search S2 */
-    post: operations['http_search_s2_s2_post'];
+    get: operations['http_search_s2_s2_get'];
   };
   '/api/settings/': {
     /** Get Settings */
@@ -195,6 +189,11 @@ export interface components {
       message: string;
       status: ResponseStatus;
     };
+    /**
+     * EmptyRequest
+     * @description Use this to indicate that a request only accepts an empty object ({})
+     */
+    EmptyRequest: Record<string, never>;
     /** FlatSettingsSchema */
     FlatSettingsSchema: {
       current_directory: string;
@@ -220,12 +219,22 @@ export interface components {
       /** Detail */
       detail?: ValidationError[];
     };
+    /** IngestResponse */
+    IngestResponse: {
+      project_name: string;
+      references: Reference[];
+    };
     /**
      * IngestStatus
      * @description An enumeration.
      * @enum {string}
      */
     IngestStatus: 'processing' | 'failure' | 'complete';
+    /** ProjectCreateRequest */
+    ProjectCreateRequest: {
+      project_name: string;
+      project_path?: string;
+    };
     /**
      * Reference
      * @description A reference for an academic paper / PDF
@@ -298,12 +307,6 @@ export interface components {
       title?: string;
       venue?: string;
       year?: number;
-    };
-    /** SearchRequest */
-    SearchRequest: {
-      /** @default 10 */
-      limit?: number;
-      query: string;
     };
     /** SearchResponse */
     SearchResponse: {
@@ -567,21 +570,12 @@ export interface operations {
   };
   /**
    * Create Project
-   * @description Creates a project directory in the filesystem
-   *
-   * Parameters
-   * ----------
-   * project_name : str
-   *     The name of the project
-   * project_path : str
-   *     The path to the project directory. Only necessary for Desktop.
-   *     For web, the project is stored in a private directory on the server.
+   * @description Creates a project, and a directory in the filesystem
    */
   create_project__post: {
-    parameters: {
-      query: {
-        project_name: string;
-        project_path?: string;
+    requestBody: {
+      content: {
+        'application/json': ProjectCreateRequest;
       };
     };
     responses: {
@@ -706,11 +700,16 @@ export interface operations {
         project_id: string;
       };
     };
+    requestBody: {
+      content: {
+        'application/json': EmptyRequest;
+      };
+    };
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': unknown;
+          'application/json': IngestResponse;
         };
       };
       /** @description Validation Error */
@@ -823,10 +822,11 @@ export interface operations {
     };
   };
   /** Http Search S2 */
-  http_search_s2_s2_post: {
-    requestBody: {
-      content: {
-        'application/json': SearchRequest;
+  http_search_s2_s2_get: {
+    parameters: {
+      query: {
+        query: string;
+        limit?: unknown;
       };
     };
     responses: {

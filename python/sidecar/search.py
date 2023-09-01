@@ -8,7 +8,7 @@ import logging
 from semanticscholar import SemanticScholar
 
 from .stopwords import stopwords
-from .typing import ResponseStatus, S2SearchResult, SearchRequest, SearchResponse
+from .typing import ResponseStatus, S2SearchResult, SearchResponse
 
 logger = logging.getLogger(__name__)
 
@@ -103,9 +103,7 @@ class Searcher:
         )
 
 
-def search_s2(request: SearchRequest):
-    query = request.query
-    limit = request.limit
+def search_s2(query: str, limit: int = 10) -> SearchResponse:
     searcher = Searcher()
     response = searcher.search_func(query, limit=limit)
     return response
