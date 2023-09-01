@@ -59,10 +59,6 @@ export default function ReferenceDetailsCard({
     );
   };
 
-  interface InputProps {
-    onChange: (value: string, fieldName: string) => void;
-  }
-
   const updateAtomOnChange = useCallback(
     (fieldName: string, value: string) => {
       switch (fieldName) {
@@ -76,9 +72,6 @@ export default function ReferenceDetailsCard({
           editableReferenceItem.doi = value;
           break;
       }
-      console.log(fieldName);
-      console.log(value);
-      console.log(editableReferenceItem);
       referenceUpdateHandler(editableReferenceItem);
     },
     [editableReferenceItem, referenceUpdateHandler],
@@ -101,7 +94,6 @@ export default function ReferenceDetailsCard({
             setValue(evt.target.value);
             debouncedOnChange(id, evt.target.value);
           }}
-          // onChange={(e) => debouncedUpdateAtomOnChange(e.target.name, e.target.value)}
         />
       </td>
     );
