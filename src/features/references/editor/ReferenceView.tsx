@@ -6,6 +6,7 @@ import { getDerivedReferenceAtom, updateReferenceAtom } from '../../../atoms/ref
 import { EditorIdFor, parseEditorId } from '../../../atoms/types/EditorData';
 import { ReferenceItem } from '../../../types/ReferenceItem';
 import ReferenceDetailsCard from './ReferenceDetailsCard';
+import { ReferenceDetailsCardRow } from './ReferenceEditorTypes';
 
 export function ReferenceView({ referenceId }: { referenceId: EditorIdFor<'reference'> }) {
   const { id } = parseEditorId(referenceId);
@@ -14,35 +15,54 @@ export function ReferenceView({ referenceId }: { referenceId: EditorIdFor<'refer
   const updateReference = useSetAtom(updateReferenceAtom);
   const projectId = useAtomValue(projectIdAtom);
 
-  const handleCellValueChanged = useCallback(() => {
-    console.log('UPDATE VALUE');
-    // updateReference(params.data.id, params.data, projectId);
-  }, []);
+  const handleCellValueChanged = useCallback(
+    (params: ReferenceItem) => void updateReference(projectId, params.id, params),
+    [updateReference, projectId],
+  );
 
   if (!reference) {
     return null;
   }
 
-  console.log(reference);
-
-  const formatReferenceCardData = (referencItem: ReferenceItem): Record<string, string>[] => {
+  const formatReferenceCardData = (referencItem: ReferenceItem): ReferenceDetailsCardRow[] => {
     let authors = '';
     referencItem.authors.forEach((a, index) => {
       authors += (index > 0 ? ', ' : '') + a.fullName;
     });
 
-    const referenceCard: Record<string, string>[] = [
-      { 'Citation Key': '[' + referencItem.citationKey + ']' },
-      { Title: referencItem.title },
-      { Authors: authors },
-      { Doi: referencItem.doi },
+    const referenceCard: ReferenceDetailsCardRow[] = [
+      {
+        id: 'citationKey',
+        title: 'Citation Key',
+        value: referencItem.citationKey,
+      },
+      {
+        id: 'title',
+        title: 'Title',
+        value: referencItem.title,
+      },
+      {
+        id: 'authors',
+        title: 'Authors',
+        value: authors,
+      },
+      {
+        id: 'doi',
+        title: 'Doi',
+        value: referencItem.doi,
+      },
     ];
 
     return referenceCard;
   };
 
+  const cloneEditableReferenceItem = <T extends object>(source: T): T => ({
+    ...source,
+  });
+
   return (
     <ReferenceDetailsCard
+      editableReferenceItem={cloneEditableReferenceItem(reference)}
       referenceUpdateHandler={handleCellValueChanged}
       tableData={{
         tableBodyContent: formatReferenceCardData(reference),
