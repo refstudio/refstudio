@@ -145,7 +145,7 @@ def traverse_directory(
                 )
             )
         else:
-            contents.append(create_file_entry(obj, relative_to=directory))
+            contents.append(create_file_entry(obj, relative_to=relative_to))
     return contents
 
 
