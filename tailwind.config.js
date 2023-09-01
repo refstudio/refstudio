@@ -191,6 +191,7 @@ export default {
       },
       transitionProperty: {
         position: 'top, left, bottom, right',
+      },
       fontFamily: {
         default: ['"Roboto", sans-serif'],
       },
