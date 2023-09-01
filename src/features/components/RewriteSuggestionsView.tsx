@@ -15,7 +15,7 @@ export function RewriteSuggestionsView({ className, suggestions, onGoBack }: Rew
 
   return (
     <div className={cx('flex h-full w-full flex-col items-stretch gap-6 p-4 pt-2', className)}>
-      <div className="flex flex-1 flex-col items-stretch gap-2 overflow-scroll">
+      <div className="flex flex-1 flex-col items-stretch gap-2 overflow-hidden">
         <div className="flex select-none items-start gap-1 text-btn-ico-side-bar-icon-hover">
           <h2 className="flex-1 text-side-bar-txt">Pick Variation</h2>
           <div
@@ -29,7 +29,7 @@ export function RewriteSuggestionsView({ className, suggestions, onGoBack }: Rew
             <ArrowRightIcon />
           </div>
         </div>
-        <div className="flex items-start justify-between rounded-default bg-input-bg-disabled p-4">
+        <div className="flex items-start justify-between overflow-auto rounded-default bg-input-bg-disabled p-4">
           {suggestions[index]}
         </div>
       </div>
