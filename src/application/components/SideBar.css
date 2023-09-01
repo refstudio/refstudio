@@ -1,5 +1,5 @@
 .side-bar {
-  @apply flex select-none flex-col;
+  @apply z-sidebar flex select-none flex-col bg-side-bar-bg-primary;
 }
 
 .side-bar .icon {
