@@ -1,6 +1,6 @@
 from rank_bm25 import BM25Plus
-from sidecar.storage import JsonStorage
-from sidecar.typing import Chunk
+from sidecar.references.schemas import Chunk
+from sidecar.references.storage import JsonStorage
 
 
 class BM25Ranker:

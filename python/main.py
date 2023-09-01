@@ -1,11 +1,33 @@
 import inspect
 import json
+from argparse import ArgumentParser
 
-from sidecar import cli
 from sidecar.typing import CliCommands
 
+
+def get_arg_parser():
+    parser = ArgumentParser(description="CLI for Python sidecar")
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+    )
+    parser.add_argument(
+        "command",
+        # To add a new Sidecar command, add it to the CliCommands class.
+        choices=[*inspect.signature(CliCommands).parameters.keys()],
+    )
+    parser.add_argument(
+        "param_json",
+        type=str,
+        nargs="?",
+        default="null",
+        help="Command argument as JSON. Expected schema depends on the command.",
+    )
+    return parser
+
+
 if __name__ == "__main__":
-    parser = cli.get_arg_parser()
+    parser = get_arg_parser()
     args = parser.parse_args()
 
     if args.debug:
@@ -29,4 +51,5 @@ if __name__ == "__main__":
         serve(host="0.0.0.0", port=1487)
 
     else:
+        raise NotImplementedError(f"Command {args.command} is not implemented.")
         raise NotImplementedError(f"Command {args.command} is not implemented.")

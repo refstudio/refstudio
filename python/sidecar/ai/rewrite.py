@@ -229,6 +229,3 @@ class Rewriter:
             {"role": "user", "content": text},
         ]
         return messages
-            {"role": "user", "content": text},
-        ]
-        return messages
