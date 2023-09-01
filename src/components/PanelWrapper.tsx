@@ -17,7 +17,7 @@ interface PanelWrapperProps {
 }
 export function PanelWrapper({ title, children, actions }: PanelWrapperProps) {
   return (
-    <div className="flex h-full flex-col items-start self-stretch bg-side-bar-bg-primary text-side-bar-txt">
+    <div className="text-side-bar-txt flex h-full flex-col items-start self-stretch bg-side-bar-bg-primary">
       <div className="flex items-start gap-2 self-stretch px-4 py-3">
         <h1 className="flex flex-1 cursor-default select-none flex-col justify-center self-stretch">{title}</h1>
         {actions && actions.length > 0 && (
@@ -28,10 +28,10 @@ export function PanelWrapper({ title, children, actions }: PanelWrapperProps) {
                 className={cx(
                   'flex h-8 w-8 flex-col items-center justify-center rounded-default',
                   'bg-btn-bg-side-bar-icon-default',
-                  'text-btn-ico-side-bar-tool-default',
+                  'text-btn-ico-side-bar-icon-default',
                   {
-                    'hover:bg-btn-bg-side-bar-icon-hover hover:text-btn-ico-side-bar-tool-hover': !action.disabled,
-                    'bg-btn-bg-side-bar-tool-disabled text-btn-ico-tool-disabled': action.disabled,
+                    'hover:bg-btn-bg-side-bar-icon-hover hover:text-btn-ico-side-bar-icon-hover': !action.disabled,
+                    'bg-btn-bg-side-bar-tool-disabled text-btn-ico-side-bar-icon-disabled': action.disabled,
                   },
                 )}
                 disabled={action.disabled}

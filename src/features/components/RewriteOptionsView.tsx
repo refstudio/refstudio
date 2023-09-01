@@ -25,7 +25,7 @@ export function RewriteOptionsView({
 }: RewriteOptionsViewProps) {
   return (
     <div className={cx('flex h-full w-full flex-col items-start p-4 pt-2', className)}>
-      <div className="flex flex-1 flex-col items-start gap-6 self-stretch overflow-scroll text-side-bar-txt">
+      <div className="text-side-bar-txt flex flex-1 flex-col items-start gap-6 self-stretch overflow-scroll">
         <div className="flex flex-col items-start gap-2 self-stretch">
           <h2 className="cursor-default select-none">Text Selection</h2>
           <div

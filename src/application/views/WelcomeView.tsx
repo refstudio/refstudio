@@ -104,13 +104,13 @@ function ProjectItem({ project }: { project: ProjectInfo }) {
   return (
     <div
       className={cx(
-        'group/project flex cursor-pointer items-center gap-2 p-2 pr-3',
+        'flex cursor-pointer items-center gap-2 p-2 pr-3',
         'rounded-default hover:bg-btn-bg-side-bar-item-hover',
         'text-btn-txt-side-bar-item-primary',
       )}
       onClick={() => emitEvent('refstudio://projects/open', { projectId: project.id })}
     >
-      <div className="text-btn-ico-side-bar-icon-default group-hover/project:text-btn-ico-side-bar-icon-hover">
+      <div className="text-btn-ico-content">
         <RefStudioEditorIcon />
       </div>
       {project.name}

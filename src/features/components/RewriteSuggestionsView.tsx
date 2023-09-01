@@ -16,8 +16,8 @@ export function RewriteSuggestionsView({ className, suggestions, onGoBack }: Rew
   return (
     <div className={cx('flex h-full w-full flex-col items-stretch gap-6 p-4 pt-2', className)}>
       <div className="flex flex-1 flex-col items-stretch gap-2 overflow-hidden">
-        <div className="flex select-none items-start gap-1 text-btn-ico-side-bar-icon-hover">
-          <h2 className="flex-1 text-side-bar-txt">Pick Variation</h2>
+        <div className="flex select-none items-start gap-1 text-side-bar-txt-secondary">
+          <h2 className="text-side-bar-txt flex-1">Pick Variation</h2>
           <div
             className="cursor-pointer"
             onClick={() => setIndex((suggestions.length + index - 1) % suggestions.length)}
