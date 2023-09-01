@@ -3,6 +3,7 @@ from typing import Any
 
 from dotenv import load_dotenv
 from pydantic import BaseModel
+from sidecar.pydantic_utils import make_optional
 
 try:
     # introduced in Python 3.11 ...
@@ -236,9 +237,26 @@ class SidecarSettings(RefStudioModel):
 
 
 class SettingsSchema(RefStudioModel):
+    """@deprecated"""
+
     project: ProjectSettings = ProjectSettings()
     openai: OpenAISettings = OpenAISettings()
     sidecar: SidecarSettings = SidecarSettings()
+
+
+class FlatSettingsSchema(RefStudioModel):
+    current_directory: str
+    logging_enabled: bool
+    logging_filepath: str
+    openai_api_key: str
+    openai_chat_model: str
+    openai_manner: RewriteMannerType
+    openai_temperature: float
+
+
+@make_optional()
+class FlatSettingsSchemaPatch(FlatSettingsSchema):
+    pass
 
 
 class CliCommands(RefStudioModel):

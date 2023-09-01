@@ -159,6 +159,69 @@
         "title": "EmptyRequest",
         "type": "object"
       },
+      "FlatSettingsSchema": {
+        "properties": {
+          "current_directory": {
+            "type": "string"
+          },
+          "logging_enabled": {
+            "type": "boolean"
+          },
+          "logging_filepath": {
+            "type": "string"
+          },
+          "openai_api_key": {
+            "type": "string"
+          },
+          "openai_chat_model": {
+            "type": "string"
+          },
+          "openai_manner": {
+            "$ref": "#/components/schemas/RewriteMannerType"
+          },
+          "openai_temperature": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "current_directory",
+          "logging_enabled",
+          "logging_filepath",
+          "openai_api_key",
+          "openai_chat_model",
+          "openai_manner",
+          "openai_temperature"
+        ],
+        "title": "FlatSettingsSchema",
+        "type": "object"
+      },
+      "FlatSettingsSchemaPatch": {
+        "properties": {
+          "current_directory": {
+            "type": "string"
+          },
+          "logging_enabled": {
+            "type": "boolean"
+          },
+          "logging_filepath": {
+            "type": "string"
+          },
+          "openai_api_key": {
+            "type": "string"
+          },
+          "openai_chat_model": {
+            "type": "string"
+          },
+          "openai_manner": {
+            "$ref": "#/components/schemas/RewriteMannerType"
+          },
+          "openai_temperature": {
+            "type": "number"
+          }
+        },
+        "title": "FlatSettingsSchemaPatch",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -200,56 +263,6 @@
         ],
         "title": "IngestStatus",
         "type": "string"
-      },
-      "LoggingSettings": {
-        "properties": {
-          "enable": {
-            "default": false,
-            "type": "boolean"
-          },
-          "filepath": {
-            "default": "/tmp/refstudio-sidecar.log",
-            "type": "string"
-          }
-        },
-        "title": "LoggingSettings",
-        "type": "object"
-      },
-      "OpenAISettings": {
-        "properties": {
-          "api_key": {
-            "default": "",
-            "type": "string"
-          },
-          "chat_model": {
-            "default": "gpt-3.5-turbo",
-            "type": "string"
-          },
-          "manner": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/RewriteMannerType"
-              }
-            ],
-            "default": "scholarly"
-          },
-          "temperature": {
-            "default": 0.7,
-            "type": "number"
-          }
-        },
-        "title": "OpenAISettings",
-        "type": "object"
-      },
-      "ProjectSettings": {
-        "properties": {
-          "current_directory": {
-            "default": "",
-            "type": "string"
-          }
-        },
-        "title": "ProjectSettings",
-        "type": "object"
       },
       "Reference": {
         "description": "A reference for an academic paper / PDF",
@@ -478,65 +491,6 @@
           "results"
         ],
         "title": "SearchResponse",
-        "type": "object"
-      },
-      "SettingsSchema": {
-        "properties": {
-          "openai": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/OpenAISettings"
-              }
-            ],
-            "default": {
-              "api_key": "",
-              "chat_model": "gpt-3.5-turbo",
-              "manner": "scholarly",
-              "temperature": 0.7
-            }
-          },
-          "project": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ProjectSettings"
-              }
-            ],
-            "default": {
-              "current_directory": ""
-            }
-          },
-          "sidecar": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/SidecarSettings"
-              }
-            ],
-            "default": {
-              "logging": {
-                "enable": false,
-                "filepath": "/tmp/refstudio-sidecar.log"
-              }
-            }
-          }
-        },
-        "title": "SettingsSchema",
-        "type": "object"
-      },
-      "SidecarSettings": {
-        "properties": {
-          "logging": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/LoggingSettings"
-              }
-            ],
-            "default": {
-              "enable": false,
-              "filepath": "/tmp/refstudio-sidecar.log"
-            }
-          }
-        },
-        "title": "SidecarSettings",
         "type": "object"
       },
       "TextCompletionChoice": {
@@ -1534,7 +1488,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SettingsSchema"
+                  "$ref": "#/components/schemas/FlatSettingsSchema"
                 }
               }
             },
@@ -1549,7 +1503,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SettingsSchema"
+                "$ref": "#/components/schemas/FlatSettingsSchemaPatch"
               }
             }
           },
@@ -1560,7 +1514,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SettingsSchema"
+                  "$ref": "#/components/schemas/FlatSettingsSchema"
                 }
               }
             },

@@ -10,12 +10,11 @@ import {
   DeleteRequest,
   DeleteStatusResponse,
   EmptyRequest,
+  FlatSettingsSchema,
+  FlatSettingsSchemaPatch,
   HTTPValidationError,
   IngestResponse,
   IngestStatus,
-  LoggingSettings,
-  OpenAISettings,
-  ProjectSettings,
   Reference,
   ReferencePatch,
   ResponseStatus,
@@ -26,8 +25,6 @@ import {
   S2SearchResult,
   SearchRequest,
   SearchResponse,
-  SettingsSchema,
-  SidecarSettings,
   TextCompletionChoice,
   TextCompletionRequest,
   TextCompletionResponse,
@@ -205,6 +202,26 @@ export interface components {
      * @description Use this to indicate that a request only accepts an empty object ({})
      */
     EmptyRequest: Record<string, never>;
+    /** FlatSettingsSchema */
+    FlatSettingsSchema: {
+      current_directory: string;
+      logging_enabled: boolean;
+      logging_filepath: string;
+      openai_api_key: string;
+      openai_chat_model: string;
+      openai_manner: RewriteMannerType;
+      openai_temperature: number;
+    };
+    /** FlatSettingsSchemaPatch */
+    FlatSettingsSchemaPatch: {
+      current_directory?: string;
+      logging_enabled?: boolean;
+      logging_filepath?: string;
+      openai_api_key?: string;
+      openai_chat_model?: string;
+      openai_manner?: RewriteMannerType;
+      openai_temperature?: number;
+    };
     /** HTTPValidationError */
     HTTPValidationError: {
       /** Detail */
@@ -221,29 +238,6 @@ export interface components {
      * @enum {string}
      */
     IngestStatus: 'processing' | 'failure' | 'complete';
-    /** LoggingSettings */
-    LoggingSettings: {
-      /** @default false */
-      enable?: boolean;
-      /** @default /tmp/refstudio-sidecar.log */
-      filepath?: string;
-    };
-    /** OpenAISettings */
-    OpenAISettings: {
-      /** @default */
-      api_key?: string;
-      /** @default gpt-3.5-turbo */
-      chat_model?: string;
-      /** @default scholarly */
-      manner?: RewriteMannerType;
-      /** @default 0.7 */
-      temperature?: number;
-    };
-    /** ProjectSettings */
-    ProjectSettings: {
-      /** @default */
-      current_directory?: string;
-    };
     /**
      * Reference
      * @description A reference for an academic paper / PDF
@@ -328,43 +322,6 @@ export interface components {
       message: string;
       results: S2SearchResult[];
       status: ResponseStatus;
-    };
-    /** SettingsSchema */
-    SettingsSchema: {
-      /**
-       * @default {
-       *   "api_key": "",
-       *   "chat_model": "gpt-3.5-turbo",
-       *   "manner": "scholarly",
-       *   "temperature": 0.7
-       * }
-       */
-      openai?: OpenAISettings;
-      /**
-       * @default {
-       *   "current_directory": ""
-       * }
-       */
-      project?: ProjectSettings;
-      /**
-       * @default {
-       *   "logging": {
-       *     "enable": false,
-       *     "filepath": "/tmp/refstudio-sidecar.log"
-       *   }
-       * }
-       */
-      sidecar?: SidecarSettings;
-    };
-    /** SidecarSettings */
-    SidecarSettings: {
-      /**
-       * @default {
-       *   "enable": false,
-       *   "filepath": "/tmp/refstudio-sidecar.log"
-       * }
-       */
-      logging?: LoggingSettings;
     };
     /** TextCompletionChoice */
     TextCompletionChoice: {
@@ -915,7 +872,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': SettingsSchema;
+          'application/json': FlatSettingsSchema;
         };
       };
     };
@@ -924,14 +881,14 @@ export interface operations {
   update_settings__put: {
     requestBody: {
       content: {
-        'application/json': SettingsSchema;
+        'application/json': FlatSettingsSchemaPatch;
       };
     };
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': SettingsSchema;
+          'application/json': FlatSettingsSchema;
         };
       };
       /** @description Validation Error */

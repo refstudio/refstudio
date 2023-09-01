@@ -1,15 +1,26 @@
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 
+import { FlatSettingsSchema } from '../../api/api-types';
 import { getCachedSetting, getSettings, saveCachedSettings, setCachedSetting } from '../settingsManager';
 import { SettingsPane, SettingsPaneProps } from './SettingsPane';
 
+type LoggingSettings = Pick<FlatSettingsSchema, 'logging_enabled' | 'logging_filepath'>;
+
+function getLoggingSettingsCached(): LoggingSettings {
+  return {
+    logging_enabled: getCachedSetting('logging_enabled'),
+    logging_filepath: getCachedSetting('logging_filepath'),
+  };
+}
+
 export function GeneralSettingsPane({ config }: SettingsPaneProps) {
-  const [sidecarLoggingSettings, setSidecarLoggingSettings] = useState(getCachedSetting('sidecar.logging'));
+  const [sidecarLoggingSettings, setSidecarLoggingSettings] = useState(getLoggingSettingsCached());
 
   const saveMutation = useMutation({
-    mutationFn: async (data: { sidecarLogging: typeof sidecarLoggingSettings }) => {
-      setCachedSetting('sidecar.logging', data.sidecarLogging);
+    mutationFn: async (data: { sidecarLogging: LoggingSettings }) => {
+      setCachedSetting('logging_enabled', data.sidecarLogging.logging_enabled);
+      setCachedSetting('logging_filepath', data.sidecarLogging.logging_filepath);
       await saveCachedSettings();
       return getSettings();
     },
@@ -20,7 +31,7 @@ export function GeneralSettingsPane({ config }: SettingsPaneProps) {
     saveMutation.mutate({ sidecarLogging: sidecarLoggingSettings });
   };
 
-  const isDirty = JSON.stringify(sidecarLoggingSettings) !== JSON.stringify(getCachedSetting('sidecar.logging'));
+  const isDirty = JSON.stringify(sidecarLoggingSettings) !== JSON.stringify(getLoggingSettingsCached());
 
   return (
     <SettingsPane config={config} header={config.title}>
@@ -32,12 +43,12 @@ export function GeneralSettingsPane({ config }: SettingsPaneProps) {
               Active
             </label>
             <input
-              checked={sidecarLoggingSettings.enable}
+              checked={sidecarLoggingSettings.logging_enabled}
               className="w-full border px-2 py-0.5"
               id="active"
               type="checkbox"
               onChange={(e) =>
-                setSidecarLoggingSettings({ ...sidecarLoggingSettings, enable: e.currentTarget.checked })
+                setSidecarLoggingSettings({ ...sidecarLoggingSettings, logging_enabled: e.currentTarget.checked })
               }
             />
           </div>
@@ -48,13 +59,14 @@ export function GeneralSettingsPane({ config }: SettingsPaneProps) {
             <input
               className="w-full border bg-slate-50 px-2 py-0.5"
               id="path"
-              value={sidecarLoggingSettings.filepath}
+              value={sidecarLoggingSettings.logging_filepath}
               onChange={(e) =>
-                setSidecarLoggingSettings({ ...sidecarLoggingSettings, filepath: e.currentTarget.value })
+                setSidecarLoggingSettings({ ...sidecarLoggingSettings, logging_filepath: e.currentTarget.value })
               }
             />
             <p className="text-xs text-gray-500">
-              The log filename can be located in <code>{sidecarLoggingSettings.filepath}/refstudio-sidecar.log</code>.
+              The log filename can be located in{' '}
+              <code>{sidecarLoggingSettings.logging_filepath}/refstudio-sidecar.log</code>.
             </p>
           </div>
         </fieldset>

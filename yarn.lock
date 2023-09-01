@@ -6838,7 +6838,6 @@ __metadata:
     react-popper: ^2.3.0
     react-resizable-panels: ^0.0.51
     tailwindcss: ^3.3.2
-    tauri-settings: ^0.3.2
     tiptap-markdown: ^0.7.2
     turndown: ^7.1.2
     typescript: ^4.9.5
@@ -7533,13 +7532,6 @@ __metadata:
     mkdirp: ^1.0.3
     yallist: ^4.0.0
   checksum: f23832fceeba7578bf31907aac744ae21e74a66f4a17a9e94507acf460e48f6db598c7023882db33bab75b80e027c21f276d405e4a0322d58f51c7088d428268
-  languageName: node
-  linkType: hard
-
-"tauri-settings@npm:^0.3.2":
-  version: 0.3.2
-  resolution: "tauri-settings@npm:0.3.2"
-  checksum: 9c108deaad1a18ed9f1bd4262602efdae6d4d0a18f7eb0859c64f30f9247816a4cc463a731e601dd521670d8090387bbad5bee6fc28f9db0a21d9a620b2d04be
   languageName: node
   linkType: hard
 
