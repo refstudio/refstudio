@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { MdKeyboard, MdSettings } from 'react-icons/md';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ImperativePanelHandle, Panel } from 'react-resizable-panels';
 
 import { VerticalResizeHandle } from '../../components/VerticalResizeHandle';
@@ -10,63 +9,70 @@ import { cx } from '../../lib/cx';
 import { noop } from '../../lib/noop';
 import { SideBar } from '../components/SideBar';
 import { ExplorerPanel } from './ExplorerPanel';
-import { FilesIcon, ReferencesIcon } from './icons';
+import { FilesIcon, KeyboardIcon, ReferencesIcon, SettingsIcon } from './icons';
 
-type PrimarySideBarPane = 'Explorer' | 'References';
-export function LeftSidePanelWrapper() {
-  const leftPanelRef = React.useRef<ImperativePanelHandle>(null);
-  const [primaryPaneCollapsed, setPrimaryPaneCollapsed] = useState(false);
-  const [primaryPane, setPrimaryPane] = useState<PrimarySideBarPane>('Explorer');
+type PrimarySideBarPanel = 'Explorer' | 'References';
+export function LeftSidePanelWrapper({ disabled }: { disabled?: boolean }) {
+  const leftPanelRef = useRef<ImperativePanelHandle>(null);
+  const [isPanelCollapsed, setIsPanelCollapsed] = useState(disabled);
+  const [activePanel, setActivePanel] = useState<PrimarySideBarPanel>('Explorer');
 
-  const handleSideBarClick = (selectedPane: PrimarySideBarPane) => {
-    if (selectedPane === primaryPane) {
-      // Toggle collapsing
-      setPrimaryPaneCollapsed(!primaryPaneCollapsed);
-    } else {
-      // Always open the sidebar
-      setPrimaryPaneCollapsed(false);
-    }
-    setPrimaryPane(selectedPane);
-  };
+  const handleSideBarClick = useCallback(
+    (clickedPane: PrimarySideBarPanel) => {
+      if (!disabled) {
+        if (clickedPane === activePanel) {
+          // Toggle collapsing
+          setIsPanelCollapsed((currentPaneState) => !currentPaneState);
+        } else {
+          // Always open the sidebar
+          setIsPanelCollapsed(false);
+        }
+        setActivePanel(clickedPane);
+      }
+    },
+    [activePanel, disabled],
+  );
 
   // Configure keyboard shortcuts to open/close side panel
   useRefStudioHotkeys(['meta+1'], () => handleSideBarClick('Explorer'));
   useRefStudioHotkeys(['meta+2'], () => handleSideBarClick('References'));
 
-  React.useEffect(() => {
-    if (primaryPaneCollapsed) {
+  useEffect(() => {
+    if (isPanelCollapsed) {
       leftPanelRef.current?.collapse();
     } else {
       leftPanelRef.current?.expand();
     }
-  }, [leftPanelRef, primaryPaneCollapsed]);
+  }, [leftPanelRef, isPanelCollapsed]);
 
-  const openSettings = React.useCallback(() => emitEvent('refstudio://menu/settings'), []);
+  useEffect(() => {
+    if (disabled) {
+      // Close the panel when disabled
+      setIsPanelCollapsed(true);
+    } else {
+      // Open the defaut panel (Explorer) when enabled
+      setIsPanelCollapsed(false);
+      setActivePanel('Explorer');
+    }
+  }, [disabled]);
+
+  const openSettings = useCallback(() => emitEvent('refstudio://menu/settings'), []);
 
   return (
     <>
       <SideBar
-        activePane={primaryPaneCollapsed ? null : primaryPane}
+        activePane={isPanelCollapsed ? null : activePanel}
         className={cx({
-          'border-r border-r-side-bar-border': !primaryPaneCollapsed,
-          'shadow-default': primaryPaneCollapsed,
+          'border-r border-r-side-bar-border': !isPanelCollapsed,
+          'shadow-default': isPanelCollapsed,
         })}
         footerItems={[
-          // TODO: Implement Keybinds screen
-          {
-            label: 'Keybinds',
-            Icon: <MdKeyboard aria-label="Keybindings" size="24" />,
-            onClick: noop,
-          },
-          {
-            label: 'Settings',
-            Icon: <MdSettings aria-label="Settings" size="24" />,
-            onClick: openSettings,
-          },
+          { label: 'Keybinds', Icon: <KeyboardIcon />, onClick: noop }, // TODO: Implement Keybinds screen
+          { label: 'Settings', Icon: <SettingsIcon />, onClick: openSettings },
         ]}
         items={[
-          { pane: 'Explorer', Icon: <FilesIcon /> },
-          { pane: 'References', Icon: <ReferencesIcon /> },
+          { disabled, pane: 'Explorer', Icon: <FilesIcon /> },
+          { disabled, pane: 'References', Icon: <ReferencesIcon /> },
         ]}
         onItemClick={handleSideBarClick}
       />
@@ -75,12 +81,12 @@ export function LeftSidePanelWrapper() {
         collapsible
         order={1}
         ref={leftPanelRef}
-        onCollapse={(collapsed) => setPrimaryPaneCollapsed(collapsed)}
+        onCollapse={(collapsed) => setIsPanelCollapsed(collapsed)}
       >
-        {primaryPane === 'Explorer' && <ExplorerPanel />}
-        {primaryPane === 'References' && <ReferencesPanel />}
+        {activePanel === 'Explorer' && <ExplorerPanel />}
+        {activePanel === 'References' && <ReferencesPanel />}
       </Panel>
-      <VerticalResizeHandle transparent />
+      {!disabled && <VerticalResizeHandle transparent />}
     </>
   );
 }

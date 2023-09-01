@@ -1,3 +1,5 @@
+import { MdKeyboard, MdSettings } from 'react-icons/md';
+
 export const BotIcon = () => (
   <svg className="self-center" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -49,3 +51,6 @@ export const ArrowRightIcon = () => (
     </svg>
   </div>
 );
+
+export const KeyboardIcon = () => <MdKeyboard aria-label="Keybindings" size="24" />;
+export const SettingsIcon = () => <MdSettings aria-label="Settings" size="24" />;

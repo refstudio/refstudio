@@ -5,6 +5,7 @@ import { Panel, PanelGroup } from 'react-resizable-panels';
 import { useActiveEditorContentAtomsForPane } from '../../atoms/hooks/useActiveEditorContentAtomsForPane';
 import { useOpenEditorsCountForPane } from '../../atoms/hooks/useOpenEditorsCountForPane';
 import { focusPaneAtom } from '../../atoms/paneActions';
+import { isProjectOpenAtom } from '../../atoms/projectState';
 import { EditorContentAtoms } from '../../atoms/types/EditorContentAtoms';
 import { PaneId } from '../../atoms/types/PaneGroup';
 import { Spinner } from '../../components/Spinner';
@@ -15,6 +16,7 @@ import { ReferenceView } from '../../features/references/editor/ReferenceView';
 import { TipTapView } from '../../features/textEditor/editor/TipTapView';
 import { useDebouncedCallback } from '../../hooks/useDebouncedCallback';
 import { assertNever } from '../../lib/assertNever';
+import { EmptyView } from '../views/EmptyView';
 import { PdfViewer } from '../views/PdfViewer';
 import { TextView } from '../views/TextView';
 import { WelcomeView } from '../views/WelcomeView';
@@ -55,17 +57,24 @@ interface MainPanelPaneProps {
 
 const MainPanelPane = memo(({ paneId }: MainPanelPaneProps) => {
   const activeEditorAtoms = useActiveEditorContentAtomsForPane(paneId);
+  const isProjectOpen = useAtomValue(isProjectOpenAtom);
 
   const focusPane = useSetAtom(focusPaneAtom);
 
   return (
     <div className="flex h-full flex-col" onClick={() => focusPane(paneId)} onFocus={() => focusPane(paneId)}>
-      <div className="grow-0">
-        <OpenEditorsTabPane paneId={paneId} />
-      </div>
-      <div className="flex w-full grow overflow-hidden bg-content-area-bg-primary px-10 pt-10">
-        {activeEditorAtoms ? <MainPaneViewContent activeEditorAtoms={activeEditorAtoms} /> : <WelcomeView />}
-      </div>
+      {isProjectOpen ? (
+        <>
+          <div className="grow-0">
+            <OpenEditorsTabPane paneId={paneId} />
+          </div>
+          <div className="flex w-full grow overflow-hidden bg-content-area-bg-primary px-10 pt-10">
+            {activeEditorAtoms ? <MainPaneViewContent activeEditorAtoms={activeEditorAtoms} /> : <EmptyView />}
+          </div>
+        </>
+      ) : (
+        <WelcomeView />
+      )}
     </div>
   );
 });
