@@ -195,6 +195,8 @@ export default {
         'drop-zone': 55555,
         'resize-handle': 44444,
         dropdown: 33333,
+        sidebar: 11,
+        'sidebar-panel': 10,
       },
     },
   },
