@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 
+import { FlatSettingsSchema, RewriteMannerType } from '../../../api/api-types';
 import { JSONDebug, JSONDebugContainer } from '../../../components/JSONDebug';
 import { PasswordInput } from '../../../components/PasswordInput';
 import { SettingsPane, SettingsPaneProps } from '../../../settings/panes/SettingsPane';
@@ -8,17 +9,35 @@ import {
   getCachedSetting,
   getMannerOptions,
   getSettings,
-  OpenAiManner,
   saveCachedSettings,
   setCachedSetting,
 } from '../../../settings/settingsManager';
 
+interface OpenAISettings {
+  api_key: FlatSettingsSchema['openai_api_key'];
+  chat_model: FlatSettingsSchema['openai_chat_model'];
+  manner: FlatSettingsSchema['openai_manner'];
+  temperature: FlatSettingsSchema['openai_temperature'];
+}
+
+function getOpenAISettingsCached(): OpenAISettings {
+  return {
+    api_key: getCachedSetting('openai_api_key'),
+    chat_model: getCachedSetting('openai_chat_model'),
+    manner: getCachedSetting('openai_manner'),
+    temperature: getCachedSetting('openai_temperature'),
+  };
+}
+
 export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
-  const [paneSettings, setPaneSettings] = useState(getCachedSetting('openai'));
+  const [paneSettings, setPaneSettings] = useState(getOpenAISettingsCached());
 
   const saveMutation = useMutation({
     mutationFn: async (value: typeof paneSettings) => {
-      setCachedSetting('openai', value);
+      setCachedSetting('openai_api_key', value.api_key);
+      setCachedSetting('openai_chat_model', value.chat_model);
+      setCachedSetting('openai_manner', value.manner);
+      setCachedSetting('openai_temperature', value.temperature);
       await saveCachedSettings();
       return getSettings();
     },
@@ -29,7 +48,7 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
     saveMutation.mutate(paneSettings);
   };
 
-  const isDirty = JSON.stringify(paneSettings) !== JSON.stringify(getCachedSetting('openai'));
+  const isDirty = JSON.stringify(paneSettings) !== JSON.stringify(getOpenAISettingsCached());
 
   return (
     <SettingsPane
@@ -67,7 +86,7 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
               id="manner"
               name="manner"
               value={paneSettings.manner}
-              onChange={(e) => setPaneSettings({ ...paneSettings, manner: e.currentTarget.value as OpenAiManner })}
+              onChange={(e) => setPaneSettings({ ...paneSettings, manner: e.currentTarget.value as RewriteMannerType })}
             >
               {getMannerOptions().map((m) => (
                 <option key={m} value={m}>
