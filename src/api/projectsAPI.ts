@@ -2,6 +2,7 @@ import { FileEntry as TauriFileEntry } from '@tauri-apps/api/fs';
 
 import { isNonNullish } from '../lib/isNonNullish';
 import { universalGet, universalHead, universalPutFile } from './api';
+import { ProjectDetailsResponse } from './api-types';
 import { apiDelete, apiGetJson, apiPost } from './typed-api';
 
 export interface ProjectInfo {
@@ -28,9 +29,9 @@ export async function readAllProjects(): Promise<ProjectInfo[]> {
   return Object.keys(projects).map((id) => ({ id, path: projects[id].project_path, name: projects[id].project_name }));
 }
 export async function readProjectById(projectId: string): Promise<ProjectInfo> {
-  const projectInfo = await apiGetJson('/api/projects/{project_id}', {
+  const projectInfo = (await apiGetJson('/api/projects/{project_id}', {
     path: { project_id: projectId },
-  });
+  })) as ProjectDetailsResponse;
   return {
     id: projectInfo.id,
     path: projectInfo.path,
