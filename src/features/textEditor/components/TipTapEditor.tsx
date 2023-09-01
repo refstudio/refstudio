@@ -83,10 +83,9 @@ export function TipTapEditor({ editorContent, editorId, isActive, saveFileInMemo
     const mdSerializer = new MarkdownSerializer(editor, references);
     const { id: filePath } = parseEditorId(editorId);
 
-    void saveAsMarkdown(mdSerializer, filePath).then(() => {
+    void saveAsMarkdown(mdSerializer, filePath)
       // We need to make sure the files were saved before refreshing the file tree.
-      void refreshFileTree();
-    });
+      .then(refreshFileTree);
   }, [editor, editorId, isActive, references, refreshFileTree]);
 
   useListenEvent('refstudio://ai/suggestion/insert', insertContent);

@@ -148,6 +148,10 @@ export function splitRefStudioPath(filePath: string): string[] {
 
 export function getFileNameAndExtension(filePath: string): { name: string; ext: string } {
   const fileName = filePath.slice(filePath.lastIndexOf(sep) + 1);
+  if (fileName.startsWith('.')) {
+    return { name: fileName, ext: '' };
+  }
+
   const dotIndex = fileName.lastIndexOf('.');
   if (dotIndex === -1) {
     return { name: fileName, ext: '' };
