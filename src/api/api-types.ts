@@ -297,6 +297,7 @@ export interface ProjectFileTreeResponse {
  * via the `definition` "FlatSettingsSchema".
  */
 export interface FlatSettingsSchema {
+  active_project_id: string;
   current_directory: string;
   logging_enabled: boolean;
   logging_filepath: string;
@@ -310,6 +311,7 @@ export interface FlatSettingsSchema {
  * via the `definition` "FlatSettingsSchemaPatch".
  */
 export interface FlatSettingsSchemaPatch {
+  active_project_id?: string;
   current_directory?: string;
   logging_enabled?: boolean;
   logging_filepath?: string;
