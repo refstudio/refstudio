@@ -1,10 +1,11 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 
+import { FlatSettingsSchema, RewriteMannerType } from '../../../api/api-types';
 import { askForRewrite, AskForRewriteReturn } from '../../../api/rewrite';
 import { RewriteOptions } from '../../../api/rewrite.config';
 import { emitEvent, RefStudioEventName } from '../../../events';
 import { noop } from '../../../lib/noop';
-import { getCachedSetting, OpenAiManner, SettingsSchema } from '../../../settings/settingsManager';
+import { getCachedSetting } from '../../../settings/settingsManager';
 import { render, setup } from '../../../test/test-utils';
 import { RewriteWidget } from '../RewriteWidget';
 
@@ -18,24 +19,20 @@ vi.mock('../../../api/rewrite');
 vi.mock('../../../settings/settingsManager');
 vi.mock('../../../events');
 
-const mockSettings: Pick<SettingsSchema, 'openai'> = {
-  openai: {
-    chat_model: 'dont-care',
-    api_key: 'dont-care',
-    manner: 'elaborate',
-    temperature: 0.75,
-  },
-};
+const mockSettings = {
+  openai_chat_model: 'dont-care',
+  openai_api_key: 'dont-care',
+  openai_manner: 'elaborate',
+  openai_temperature: 0.75,
+} satisfies Partial<FlatSettingsSchema>;
 
 describe('RewriteWidget', () => {
   beforeEach(() => {
     vi.mocked(getCachedSetting).mockImplementation((key) => {
-      switch (key) {
-        case 'openai':
-          return mockSettings[key];
-        default:
-          throw new Error('UNEXPECTED CALL FOR KEY ' + key);
+      if (key in mockSettings) {
+        return mockSettings[key as keyof typeof mockSettings];
       }
+      throw new Error('UNEXPECTED CALL FOR KEY ' + key);
     });
   });
 
@@ -50,8 +47,8 @@ describe('RewriteWidget', () => {
 
   it('should display openAI settings by default', () => {
     render(<RewriteWidget selection={SELECTED_TEXT} onChoiceSelected={noop} />);
-    expect(screen.getByLabelText('creativity')).toHaveValue(String(mockSettings.openai.temperature));
-    expect(screen.getByLabelText('manner')).toHaveValue(mockSettings.openai.manner);
+    expect(screen.getByLabelText('creativity')).toHaveValue(String(mockSettings.openai_temperature));
+    expect(screen.getByLabelText('manner')).toHaveValue(mockSettings.openai_manner);
   });
 
   it('should configure openAI settings and call askForRewrite', async () => {
@@ -60,7 +57,7 @@ describe('RewriteWidget', () => {
     // https://github.com/testing-library/user-event/issues/871
     // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.change(screen.getByLabelText('creativity'), { target: { value: 0.85 } });
-    await user.selectOptions(screen.getByLabelText('manner'), 'scholarly' as OpenAiManner);
+    await user.selectOptions(screen.getByLabelText('manner'), 'scholarly' as RewriteMannerType);
 
     await user.click(screen.getByText('REWRITE'));
 

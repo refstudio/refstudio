@@ -41,10 +41,15 @@ export default defineConfig(async () => ({
       all: true,
       include: ['src/**'],
       exclude: [
+        // Generated code
         'src/**/types.ts',
-        'src/**/__tests__/**',
+        'src/**/api-paths.ts',
+        'src/**/api-types.ts',
         'src/**/types/**.ts',
+        // Tests
+        'src/**/__tests__/**',
         'src/**/*.test.{ts,tsx}',
+        // Type declarations
         'src/**/*.d.ts',
       ],
     },

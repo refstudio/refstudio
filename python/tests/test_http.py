@@ -555,7 +555,7 @@ def test_get_settings(monkeypatch, tmp_path, create_settings_json):  # noqa: F81
 
     response = settings_client.get("/")
     assert response.status_code == 200
-    assert response.json()["openai"]["api_key"] == "1234"
+    assert response.json()["openai_api_key"] == "1234"
 
 
 # ruff gets confused here:
@@ -565,11 +565,9 @@ def test_update_settings(monkeypatch, tmp_path, create_settings_json):  # noqa: 
     user_id = "user1"
 
     response = settings.get_settings_for_user(user_id)
+    assert response.openai_api_key != "test"
 
-    data = response.dict()
-    data["openai"] = {"api_key": "test"}
-
-    response = settings_client.put("/", json=data)
+    response = settings_client.put("/", json={"openai_api_key": "test"})
 
     assert response.status_code == 200
-    assert response.json()["openai"]["api_key"] == "test"
+    assert response.json()["openai_api_key"] == "test"

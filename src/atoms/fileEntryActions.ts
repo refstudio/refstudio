@@ -68,7 +68,7 @@ export const createFileAtom = atom(null, (get, set) => {
 });
 
 function generateFileName(existingFileNames: Set<string>) {
-  const nameFromIndex = (index: number) => `Untitled-${index}`;
+  const nameFromIndex = (index: number) => `Untitled-${index}.refstudio`;
   let i = 1;
   while (existingFileNames.has(nameFromIndex(i))) {
     i++;

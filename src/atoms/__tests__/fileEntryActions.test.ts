@@ -39,12 +39,12 @@ describe('fileEntryActions', () => {
 
     const leftPaneActiveEditorId = runHookWithJotaiProvider(() => useActiveEditorIdForPane('LEFT'), store).current;
     expect(leftPaneActiveEditorId).not.toBeNull();
-    expect(leftPaneActiveEditorId).toMatchInlineSnapshot('"refstudio://refstudio/Untitled-1"');
+    expect(leftPaneActiveEditorId).toMatchInlineSnapshot('"refstudio://refstudio/Untitled-1.refstudio"');
   });
 
   it('should create a file with the first available name', async () => {
     const createFile = runSetAtomHook(createFileAtom, store);
-    vi.mocked(readAllProjectFiles).mockResolvedValueOnce([makeFile('Untitled-1')]);
+    vi.mocked(readAllProjectFiles).mockResolvedValueOnce([makeFile('Untitled-1.refstudio')]);
     await store.set(refreshFileTreeAtom);
 
     act(() => {
@@ -54,7 +54,7 @@ describe('fileEntryActions', () => {
 
     const leftPaneActiveEditorId = runHookWithJotaiProvider(() => useActiveEditorIdForPane('LEFT'), store).current;
     expect(leftPaneActiveEditorId).not.toBeNull();
-    expect(leftPaneActiveEditorId).toMatchInlineSnapshot('"refstudio://refstudio/Untitled-3"');
+    expect(leftPaneActiveEditorId).toMatchInlineSnapshot('"refstudio://refstudio/Untitled-3.refstudio"');
   });
 
   it('should delete the file', async () => {

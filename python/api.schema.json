@@ -522,114 +522,68 @@
       ],
       "title": "Body_create_file__project_id___filepath__put"
     },
-    "LoggingSettings": {
-      "properties": {
-        "enable": {
-          "type": "boolean",
-          "default": false
-        },
-        "filepath": {
-          "type": "string",
-          "default": "/tmp/refstudio-sidecar.log"
-        }
-      },
-      "type": "object",
-      "title": "LoggingSettings"
-    },
-    "OpenAISettings": {
-      "properties": {
-        "api_key": {
-          "type": "string",
-          "default": ""
-        },
-        "chat_model": {
-          "type": "string",
-          "default": "gpt-3.5-turbo"
-        },
-        "manner": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/RewriteMannerType"
-            }
-          ],
-          "default": "scholarly"
-        },
-        "temperature": {
-          "type": "number",
-          "default": 0.7
-        }
-      },
-      "type": "object",
-      "title": "OpenAISettings"
-    },
-    "ProjectSettings": {
+    "FlatSettingsSchema": {
       "properties": {
         "current_directory": {
-          "type": "string",
-          "default": ""
-        }
-      },
-      "type": "object",
-      "title": "ProjectSettings"
-    },
-    "SettingsSchema": {
-      "properties": {
-        "project": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/ProjectSettings"
-            }
-          ],
-          "default": {
-            "current_directory": ""
-          }
+          "type": "string"
         },
-        "openai": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/OpenAISettings"
-            }
-          ],
-          "default": {
-            "api_key": "",
-            "chat_model": "gpt-3.5-turbo",
-            "manner": "scholarly",
-            "temperature": 0.7
-          }
+        "logging_enabled": {
+          "type": "boolean"
         },
-        "sidecar": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/SidecarSettings"
-            }
-          ],
-          "default": {
-            "logging": {
-              "enable": false,
-              "filepath": "/tmp/refstudio-sidecar.log"
-            }
-          }
+        "logging_filepath": {
+          "type": "string"
+        },
+        "openai_api_key": {
+          "type": "string"
+        },
+        "openai_chat_model": {
+          "type": "string"
+        },
+        "openai_manner": {
+          "$ref": "#/definitions/RewriteMannerType"
+        },
+        "openai_temperature": {
+          "type": "number"
         }
       },
       "type": "object",
-      "title": "SettingsSchema"
+      "required": [
+        "current_directory",
+        "logging_enabled",
+        "logging_filepath",
+        "openai_api_key",
+        "openai_chat_model",
+        "openai_manner",
+        "openai_temperature"
+      ],
+      "title": "FlatSettingsSchema"
     },
-    "SidecarSettings": {
+    "FlatSettingsSchemaPatch": {
       "properties": {
-        "logging": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/LoggingSettings"
-            }
-          ],
-          "default": {
-            "enable": false,
-            "filepath": "/tmp/refstudio-sidecar.log"
-          }
+        "current_directory": {
+          "type": "string"
+        },
+        "logging_enabled": {
+          "type": "boolean"
+        },
+        "logging_filepath": {
+          "type": "string"
+        },
+        "openai_api_key": {
+          "type": "string"
+        },
+        "openai_chat_model": {
+          "type": "string"
+        },
+        "openai_manner": {
+          "$ref": "#/definitions/RewriteMannerType"
+        },
+        "openai_temperature": {
+          "type": "number"
         }
       },
       "type": "object",
-      "title": "SidecarSettings"
+      "title": "FlatSettingsSchemaPatch"
     }
   }
 }
