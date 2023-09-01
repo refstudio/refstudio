@@ -43,4 +43,3 @@ export const renameFile = vi.fn();
 // Export Operations: references, markdown
 // #####################################################################################
 export const exportReferences = vi.fn();
-export const saveAsMarkdown = vi.fn();
