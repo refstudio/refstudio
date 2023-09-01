@@ -87,7 +87,6 @@ function InfoTooltip() {
       <div id="info-icon">
         <InfoIcon />
       </div>
-      {/* TODO: Get copy for tooltip */}
       <Tooltip anchorSelect="#info-icon" clickable>
         <div>
           Higher creativity results
@@ -95,7 +94,11 @@ function InfoTooltip() {
           in less repetitive text.
           <br />
           Learn more{' '}
-          <a href="https://stackoverflow.com/questions/58764619/why-should-we-use-temperature-in-softmax/63471046#63471046">
+          <a
+            href="https://stackoverflow.com/questions/58764619/why-should-we-use-temperature-in-softmax/63471046#63471046"
+            rel="noreferrer"
+            target="_blank"
+          >
             here
           </a>
           .
