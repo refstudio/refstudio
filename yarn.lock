@@ -619,6 +619,32 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@floating-ui/core@npm:^1.4.1":
+  version: 1.4.1
+  resolution: "@floating-ui/core@npm:1.4.1"
+  dependencies:
+    "@floating-ui/utils": ^0.1.1
+  checksum: be4ab864fe17eeba5e205bd554c264b9a4895a57c573661bbf638357fa3108677fed7ba3269ec15b4da90e29274c9b626d5a15414e8d1fe691e210d02a03695c
+  languageName: node
+  linkType: hard
+
+"@floating-ui/dom@npm:^1.0.0":
+  version: 1.5.1
+  resolution: "@floating-ui/dom@npm:1.5.1"
+  dependencies:
+    "@floating-ui/core": ^1.4.1
+    "@floating-ui/utils": ^0.1.1
+  checksum: ddb509030978536ba7b321cf8c764ae9d0142a3b1fefb7e6bc050a5de7e825e12131fa5089009edabf7c125fb274886da211a5220fe17a71d875a7a96eb1386c
+  languageName: node
+  linkType: hard
+
+"@floating-ui/utils@npm:^0.1.1":
+  version: 0.1.1
+  resolution: "@floating-ui/utils@npm:0.1.1"
+  checksum: 548acdda7902f45b0afbe34e2e7f4cbff0696b95bad8c039f80936519de24ef2ec20e79902825b7815294b37f51a7c52ee86288b0688869a57cc229a164d86b4
+  languageName: node
+  linkType: hard
+
 "@humanwhocodes/config-array@npm:^0.11.10":
   version: 0.11.10
   resolution: "@humanwhocodes/config-array@npm:0.11.10"
@@ -2637,7 +2663,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"classnames@npm:^2.3.2":
+"classnames@npm:^2.3.0, classnames@npm:^2.3.2":
   version: 2.3.2
   resolution: "classnames@npm:2.3.2"
   checksum: 2c62199789618d95545c872787137262e741f9db13328e216b093eea91c85ef2bfb152c1f9e63027204e2559a006a92eb74147d46c800a9f96297ae1d9f96f4e
@@ -6705,6 +6731,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-tooltip@npm:^5.21.1":
+  version: 5.21.1
+  resolution: "react-tooltip@npm:5.21.1"
+  dependencies:
+    "@floating-ui/dom": ^1.0.0
+    classnames: ^2.3.0
+  peerDependencies:
+    react: ">=16.14.0"
+    react-dom: ">=16.14.0"
+  checksum: 44fbe22169eecc12b32e401460997c3b26bae96f70c527260ad41b5015c2ead37b8f713e01737be2fb748ffbb7b6ee8c461a9f46b064c36e6b39a542aab1b852
+  languageName: node
+  linkType: hard
+
 "react@npm:^18.2.0":
   version: 18.2.0
   resolution: "react@npm:18.2.0"
@@ -6837,8 +6876,8 @@ __metadata:
     react-pdf: ^6.2.2
     react-popper: ^2.3.0
     react-resizable-panels: ^0.0.51
+    react-tooltip: ^5.21.1
     tailwindcss: ^3.3.2
-    tauri-settings: ^0.3.2
     tiptap-markdown: ^0.7.2
     turndown: ^7.1.2
     typescript: ^4.9.5
@@ -7533,13 +7572,6 @@ __metadata:
     mkdirp: ^1.0.3
     yallist: ^4.0.0
   checksum: f23832fceeba7578bf31907aac744ae21e74a66f4a17a9e94507acf460e48f6db598c7023882db33bab75b80e027c21f276d405e4a0322d58f51c7088d428268
-  languageName: node
-  linkType: hard
-
-"tauri-settings@npm:^0.3.2":
-  version: 0.3.2
-  resolution: "tauri-settings@npm:0.3.2"
-  checksum: 9c108deaad1a18ed9f1bd4262602efdae6d4d0a18f7eb0859c64f30f9247816a4cc463a731e601dd521670d8090387bbad5bee6fc28f9db0a21d9a620b2d04be
   languageName: node
   linkType: hard
 

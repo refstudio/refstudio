@@ -9,14 +9,16 @@ import {
   Chunk,
   DeleteRequest,
   DeleteStatusResponse,
+  EmptyRequest,
   FileEntry,
+  FlatSettingsSchema,
+  FlatSettingsSchemaPatch,
   FolderEntry,
   HTTPValidationError,
+  IngestResponse,
   IngestStatus,
-  LoggingSettings,
-  OpenAISettings,
-  ProjectDetails,
-  ProjectSettings,
+  ProjectCreateRequest,
+  ProjectDetailsResponse,
   Reference,
   ReferencePatch,
   ResponseStatus,
@@ -25,10 +27,7 @@ import {
   RewriteRequest,
   RewriteResponse,
   S2SearchResult,
-  SearchRequest,
   SearchResponse,
-  SettingsSchema,
-  SidecarSettings,
   TextCompletionChoice,
   TextCompletionRequest,
   TextCompletionResponse,
@@ -80,22 +79,14 @@ export interface paths {
     get: operations['list_projects__get'];
     /**
      * Create Project
-     * @description Creates a project directory in the filesystem
-     *
-     * Parameters
-     * ----------
-     * project_name : str
-     *     The name of the project
-     * project_path : str
-     *     The path to the project directory. Only necessary for Desktop.
-     *     For web, the project is stored in a private directory on the server.
+     * @description Creates a project, and a directory in the filesystem
      */
     post: operations['create_project__post'];
   };
   '/api/projects/{project_id}': {
     /**
      * Get Project
-     * @description Returns the project path and a list of files in the project
+     * @description Returns details about a project
      */
     get: operations['get_project__project_id__get'];
     /**
@@ -134,7 +125,7 @@ export interface paths {
   };
   '/api/search/s2': {
     /** Http Search S2 */
-    post: operations['http_search_s2_s2_post'];
+    get: operations['http_search_s2_s2_get'];
   };
   '/api/settings/': {
     /** Get Settings */
@@ -201,15 +192,41 @@ export interface components {
       message: string;
       status: ResponseStatus;
     };
+    /**
+     * EmptyRequest
+     * @description Use this to indicate that a request only accepts an empty object ({})
+     */
+    EmptyRequest: Record<string, never>;
     /** FileEntry */
     FileEntry: {
       file_extension: string;
       name: string;
       path: string;
     };
+    /** FlatSettingsSchema */
+    FlatSettingsSchema: {
+      current_directory: string;
+      logging_enabled: boolean;
+      logging_filepath: string;
+      openai_api_key: string;
+      openai_chat_model: string;
+      openai_manner: RewriteMannerType;
+      openai_temperature: number;
+    };
+    /** FlatSettingsSchemaPatch */
+    FlatSettingsSchemaPatch: {
+      current_directory?: string;
+      logging_enabled?: boolean;
+      logging_filepath?: string;
+      openai_api_key?: string;
+      openai_chat_model?: string;
+      openai_manner?: RewriteMannerType;
+      openai_temperature?: number;
+    };
     /** FolderEntry */
     FolderEntry: {
-      children: FileEntry[];
+      /** @default [] */
+      children?: (FileEntry | FolderEntry)[];
       name: string;
       path: string;
     };
@@ -218,40 +235,27 @@ export interface components {
       /** Detail */
       detail?: ValidationError[];
     };
+    /** IngestResponse */
+    IngestResponse: {
+      project_name: string;
+      references: Reference[];
+    };
     /**
      * IngestStatus
      * @description An enumeration.
      * @enum {string}
      */
     IngestStatus: 'processing' | 'failure' | 'complete';
-    /** LoggingSettings */
-    LoggingSettings: {
-      /** @default false */
-      enable?: boolean;
-      /** @default /tmp/refstudio-sidecar.log */
-      filepath?: string;
+    /** ProjectCreateRequest */
+    ProjectCreateRequest: {
+      project_name: string;
+      project_path?: string;
     };
-    /** OpenAISettings */
-    OpenAISettings: {
-      /** @default */
-      api_key?: string;
-      /** @default gpt-3.5-turbo */
-      chat_model?: string;
-      /** @default scholarly */
-      manner?: RewriteMannerType;
-      /** @default 0.7 */
-      temperature?: number;
-    };
-    /** ProjectDetails */
-    ProjectDetails: {
+    /** ProjectDetailsResponse */
+    ProjectDetailsResponse: {
       id: string;
       name: string;
       path: string;
-    };
-    /** ProjectSettings */
-    ProjectSettings: {
-      /** @default */
-      current_directory?: string;
     };
     /**
      * Reference
@@ -326,54 +330,11 @@ export interface components {
       venue?: string;
       year?: number;
     };
-    /** SearchRequest */
-    SearchRequest: {
-      /** @default 10 */
-      limit?: number;
-      query: string;
-    };
     /** SearchResponse */
     SearchResponse: {
       message: string;
       results: S2SearchResult[];
       status: ResponseStatus;
-    };
-    /** SettingsSchema */
-    SettingsSchema: {
-      /**
-       * @default {
-       *   "api_key": "",
-       *   "chat_model": "gpt-3.5-turbo",
-       *   "manner": "scholarly",
-       *   "temperature": 0.7
-       * }
-       */
-      openai?: OpenAISettings;
-      /**
-       * @default {
-       *   "current_directory": ""
-       * }
-       */
-      project?: ProjectSettings;
-      /**
-       * @default {
-       *   "logging": {
-       *     "enable": false,
-       *     "filepath": "/tmp/refstudio-sidecar.log"
-       *   }
-       * }
-       */
-      sidecar?: SidecarSettings;
-    };
-    /** SidecarSettings */
-    SidecarSettings: {
-      /**
-       * @default {
-       *   "enable": false,
-       *   "filepath": "/tmp/refstudio-sidecar.log"
-       * }
-       */
-      logging?: LoggingSettings;
     };
     /** TextCompletionChoice */
     TextCompletionChoice: {
@@ -631,21 +592,12 @@ export interface operations {
   };
   /**
    * Create Project
-   * @description Creates a project directory in the filesystem
-   *
-   * Parameters
-   * ----------
-   * project_name : str
-   *     The name of the project
-   * project_path : str
-   *     The path to the project directory. Only necessary for Desktop.
-   *     For web, the project is stored in a private directory on the server.
+   * @description Creates a project, and a directory in the filesystem
    */
   create_project__post: {
-    parameters: {
-      query: {
-        project_name: string;
-        project_path?: string;
+    requestBody: {
+      content: {
+        'application/json': ProjectCreateRequest;
       };
     };
     responses: {
@@ -665,7 +617,7 @@ export interface operations {
   };
   /**
    * Get Project
-   * @description Returns the project path and a list of files in the project
+   * @description Returns details about a project
    */
   get_project__project_id__get: {
     parameters: {
@@ -677,7 +629,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': ProjectDetails;
+          'application/json': ProjectDetailsResponse;
         };
       };
       /** @description Validation Error */
@@ -770,11 +722,16 @@ export interface operations {
         project_id: string;
       };
     };
+    requestBody: {
+      content: {
+        'application/json': EmptyRequest;
+      };
+    };
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': unknown;
+          'application/json': IngestResponse;
         };
       };
       /** @description Validation Error */
@@ -887,10 +844,11 @@ export interface operations {
     };
   };
   /** Http Search S2 */
-  http_search_s2_s2_post: {
-    requestBody: {
-      content: {
-        'application/json': SearchRequest;
+  http_search_s2_s2_get: {
+    parameters: {
+      query: {
+        query: string;
+        limit?: unknown;
       };
     };
     responses: {
@@ -914,7 +872,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': SettingsSchema;
+          'application/json': FlatSettingsSchema;
         };
       };
     };
@@ -923,14 +881,14 @@ export interface operations {
   update_settings__put: {
     requestBody: {
       content: {
-        'application/json': SettingsSchema;
+        'application/json': FlatSettingsSchemaPatch;
       };
     };
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': SettingsSchema;
+          'application/json': FlatSettingsSchema;
         };
       };
       /** @description Validation Error */

@@ -13,17 +13,20 @@ from sidecar.typing import (
     ChatResponse,
     DeleteRequest,
     DeleteStatusResponse,
+    EmptyRequest,
     FileEntry,
+    FlatSettingsSchema,
+    FlatSettingsSchemaPatch,
     FolderEntry,
     IngestRequest,
+    IngestResponse,
+    ProjectCreateRequest,
     ProjectDetailsResponse,
     Reference,
     ReferencePatch,
     RewriteRequest,
     RewriteResponse,
-    SearchRequest,
     SearchResponse,
-    SettingsSchema,
     TextCompletionRequest,
     TextCompletionResponse,
     UpdateStatusResponse,
@@ -44,9 +47,9 @@ meta_api = FastAPI()
 
 # Search API
 # --------------
-@search_api.post("/s2")
-async def http_search_s2(req: SearchRequest) -> SearchResponse:
-    response = search.search_s2(req)
+@search_api.get("/s2")
+async def http_search_s2(query: str, limit=10) -> SearchResponse:
+    response = search.search_s2(query, limit)
     return response
 
 
@@ -102,7 +105,7 @@ async def list_references(project_id: str) -> list[Reference]:
 
 
 @references_api.post("/{project_id}")
-async def ingest_references(project_id: str):
+async def ingest_references(project_id: str, payload: EmptyRequest) -> IngestResponse:
     """
     Ingests references from PDFs in the project uploads directory
     """
@@ -169,26 +172,18 @@ async def list_projects():
 
 
 @project_api.post("/")
-async def create_project(project_name: str, project_path: str = None):
+async def create_project(req: ProjectCreateRequest):
     """
-    Creates a project directory in the filesystem
-
-    Parameters
-    ----------
-    project_name : str
-        The name of the project
-    project_path : str
-        The path to the project directory. Only necessary for Desktop.
-        For web, the project is stored in a private directory on the server.
+    Creates a project, and a directory in the filesystem
     """
     user_id = "user1"
     project_id = str(uuid4())
     project_path = projects.create_project(
-        user_id, project_id, project_name, project_path
+        user_id, project_id, req.project_name, req.project_path
     )
     return {
         project_id: {
-            "project_name": project_name,
+            "project_name": req.project_name,
             "project_path": project_path,
         }
     }
@@ -319,12 +314,12 @@ async def shutdown():
 # Settings API
 # --------------
 @settings_api.get("/")
-async def get_settings() -> SettingsSchema:
+async def get_settings() -> FlatSettingsSchema:
     user_id = "user1"
     return settings.get_settings_for_user(user_id)
 
 
 @settings_api.put("/")
-async def update_settings(req: SettingsSchema) -> SettingsSchema:
+async def update_settings(req: FlatSettingsSchemaPatch) -> FlatSettingsSchema:
     user_id = "user1"
     return settings.update_settings_for_user(user_id, req)

@@ -13,15 +13,15 @@ from sidecar.typing import (
 from tenacity import retry, stop_after_attempt, wait_fixed
 
 
-def rewrite(arg: RewriteRequest, user_settings: typing.SettingsSchema = None):
+def rewrite(arg: RewriteRequest, user_settings: typing.FlatSettingsSchema = None):
     text = arg.text
     manner = arg.manner
     n_choices = arg.n_choices
     temperature = arg.temperature
 
     if user_settings is not None:
-        openai.api_key = user_settings.openai.api_key
-        model = user_settings.openai.chat_model
+        openai.api_key = user_settings.openai_api_key
+        model = user_settings.openai_chat_model
     else:
         openai.api_key = os.environ.get("OPENAI_API_KEY")
         model = "gpt-3.5-turbo"
@@ -57,11 +57,11 @@ def rewrite(arg: RewriteRequest, user_settings: typing.SettingsSchema = None):
 
 
 def complete_text(
-    request: TextCompletionRequest, user_settings: typing.SettingsSchema = None
+    request: TextCompletionRequest, user_settings: typing.FlatSettingsSchema = None
 ):
     if user_settings is not None:
-        openai.api_key = user_settings.openai.api_key
-        model = user_settings.openai.chat_model
+        openai.api_key = user_settings.openai_api_key
+        model = user_settings.openai_chat_model
     else:
         openai.api_key = os.environ.get("OPENAI_API_KEY")
         model = "gpt-3.5-turbo"

@@ -153,6 +153,12 @@
         "title": "DeleteStatusResponse",
         "type": "object"
       },
+      "EmptyRequest": {
+        "description": "Use this to indicate that a request only accepts an empty object ({})",
+        "properties": {},
+        "title": "EmptyRequest",
+        "type": "object"
+      },
       "FileEntry": {
         "properties": {
           "file_extension": {
@@ -173,11 +179,82 @@
         "title": "FileEntry",
         "type": "object"
       },
+      "FlatSettingsSchema": {
+        "properties": {
+          "current_directory": {
+            "type": "string"
+          },
+          "logging_enabled": {
+            "type": "boolean"
+          },
+          "logging_filepath": {
+            "type": "string"
+          },
+          "openai_api_key": {
+            "type": "string"
+          },
+          "openai_chat_model": {
+            "type": "string"
+          },
+          "openai_manner": {
+            "$ref": "#/components/schemas/RewriteMannerType"
+          },
+          "openai_temperature": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "current_directory",
+          "logging_enabled",
+          "logging_filepath",
+          "openai_api_key",
+          "openai_chat_model",
+          "openai_manner",
+          "openai_temperature"
+        ],
+        "title": "FlatSettingsSchema",
+        "type": "object"
+      },
+      "FlatSettingsSchemaPatch": {
+        "properties": {
+          "current_directory": {
+            "type": "string"
+          },
+          "logging_enabled": {
+            "type": "boolean"
+          },
+          "logging_filepath": {
+            "type": "string"
+          },
+          "openai_api_key": {
+            "type": "string"
+          },
+          "openai_chat_model": {
+            "type": "string"
+          },
+          "openai_manner": {
+            "$ref": "#/components/schemas/RewriteMannerType"
+          },
+          "openai_temperature": {
+            "type": "number"
+          }
+        },
+        "title": "FlatSettingsSchemaPatch",
+        "type": "object"
+      },
       "FolderEntry": {
         "properties": {
           "children": {
+            "default": [],
             "items": {
-              "$ref": "#/components/schemas/FileEntry"
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/FileEntry"
+                },
+                {
+                  "$ref": "#/components/schemas/FolderEntry"
+                }
+              ]
             },
             "type": "array"
           },
@@ -190,8 +267,7 @@
         },
         "required": [
           "name",
-          "path",
-          "children"
+          "path"
         ],
         "title": "FolderEntry",
         "type": "object"
@@ -209,6 +285,25 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
+      "IngestResponse": {
+        "properties": {
+          "project_name": {
+            "type": "string"
+          },
+          "references": {
+            "items": {
+              "$ref": "#/components/schemas/Reference"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "project_name",
+          "references"
+        ],
+        "title": "IngestResponse",
+        "type": "object"
+      },
       "IngestStatus": {
         "description": "An enumeration.",
         "enum": [
@@ -219,47 +314,22 @@
         "title": "IngestStatus",
         "type": "string"
       },
-      "LoggingSettings": {
+      "ProjectCreateRequest": {
         "properties": {
-          "enable": {
-            "default": false,
-            "type": "boolean"
+          "project_name": {
+            "type": "string"
           },
-          "filepath": {
-            "default": "/tmp/refstudio-sidecar.log",
+          "project_path": {
             "type": "string"
           }
         },
-        "title": "LoggingSettings",
+        "required": [
+          "project_name"
+        ],
+        "title": "ProjectCreateRequest",
         "type": "object"
       },
-      "OpenAISettings": {
-        "properties": {
-          "api_key": {
-            "default": "",
-            "type": "string"
-          },
-          "chat_model": {
-            "default": "gpt-3.5-turbo",
-            "type": "string"
-          },
-          "manner": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/RewriteMannerType"
-              }
-            ],
-            "default": "scholarly"
-          },
-          "temperature": {
-            "default": 0.7,
-            "type": "number"
-          }
-        },
-        "title": "OpenAISettings",
-        "type": "object"
-      },
-      "ProjectDetails": {
+      "ProjectDetailsResponse": {
         "properties": {
           "id": {
             "type": "string"
@@ -276,17 +346,7 @@
           "name",
           "path"
         ],
-        "title": "ProjectDetails",
-        "type": "object"
-      },
-      "ProjectSettings": {
-        "properties": {
-          "current_directory": {
-            "default": "",
-            "type": "string"
-          }
-        },
-        "title": "ProjectSettings",
+        "title": "ProjectDetailsResponse",
         "type": "object"
       },
       "Reference": {
@@ -479,22 +539,6 @@
         "title": "S2SearchResult",
         "type": "object"
       },
-      "SearchRequest": {
-        "properties": {
-          "limit": {
-            "default": 10,
-            "type": "integer"
-          },
-          "query": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "query"
-        ],
-        "title": "SearchRequest",
-        "type": "object"
-      },
       "SearchResponse": {
         "properties": {
           "message": {
@@ -516,65 +560,6 @@
           "results"
         ],
         "title": "SearchResponse",
-        "type": "object"
-      },
-      "SettingsSchema": {
-        "properties": {
-          "openai": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/OpenAISettings"
-              }
-            ],
-            "default": {
-              "api_key": "",
-              "chat_model": "gpt-3.5-turbo",
-              "manner": "scholarly",
-              "temperature": 0.7
-            }
-          },
-          "project": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ProjectSettings"
-              }
-            ],
-            "default": {
-              "current_directory": ""
-            }
-          },
-          "sidecar": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/SidecarSettings"
-              }
-            ],
-            "default": {
-              "logging": {
-                "enable": false,
-                "filepath": "/tmp/refstudio-sidecar.log"
-              }
-            }
-          }
-        },
-        "title": "SettingsSchema",
-        "type": "object"
-      },
-      "SidecarSettings": {
-        "properties": {
-          "logging": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/LoggingSettings"
-              }
-            ],
-            "default": {
-              "enable": false,
-              "filepath": "/tmp/refstudio-sidecar.log"
-            }
-          }
-        },
-        "title": "SidecarSettings",
         "type": "object"
       },
       "TextCompletionChoice": {
@@ -1069,28 +1054,18 @@
         "summary": "List Projects"
       },
       "post": {
-        "description": "Creates a project directory in the filesystem\n\nParameters\n----------\nproject_name : str\n    The name of the project\nproject_path : str\n    The path to the project directory. Only necessary for Desktop.\n    For web, the project is stored in a private directory on the server.",
+        "description": "Creates a project, and a directory in the filesystem",
         "operationId": "create_project__post",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "project_name",
-            "required": true,
-            "schema": {
-              "title": "Project Name",
-              "type": "string"
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectCreateRequest"
+              }
             }
           },
-          {
-            "in": "query",
-            "name": "project_path",
-            "required": false,
-            "schema": {
-              "title": "Project Path",
-              "type": "string"
-            }
-          }
-        ],
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
@@ -1152,7 +1127,7 @@
         "summary": "Delete Project"
       },
       "get": {
-        "description": "Returns the project path and a list of files in the project",
+        "description": "Returns details about a project",
         "operationId": "get_project__project_id__get",
         "parameters": [
           {
@@ -1170,7 +1145,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProjectDetails"
+                  "$ref": "#/components/schemas/ProjectDetailsResponse"
                 }
               }
             },
@@ -1297,11 +1272,23 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmptyRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/IngestResponse"
+                }
               }
             },
             "description": "Successful Response"
@@ -1520,18 +1507,28 @@
       }
     },
     "/api/search/s2": {
-      "post": {
-        "operationId": "http_search_s2_s2_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SearchRequest"
-              }
+      "get": {
+        "operationId": "http_search_s2_s2_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "query",
+            "required": true,
+            "schema": {
+              "title": "Query",
+              "type": "string"
             }
           },
-          "required": true
-        },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 10,
+              "title": "Limit"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -1565,7 +1562,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SettingsSchema"
+                  "$ref": "#/components/schemas/FlatSettingsSchema"
                 }
               }
             },
@@ -1580,7 +1577,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SettingsSchema"
+                "$ref": "#/components/schemas/FlatSettingsSchemaPatch"
               }
             }
           },
@@ -1591,7 +1588,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SettingsSchema"
+                  "$ref": "#/components/schemas/FlatSettingsSchema"
                 }
               }
             },

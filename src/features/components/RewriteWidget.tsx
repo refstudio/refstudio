@@ -17,7 +17,10 @@ export function RewriteWidget({
   className?: string;
   onChoiceSelected?: (choice: string) => void;
 }) {
-  const openAiSettings = getCachedSetting('openai');
+  const openAiSettings = {
+    manner: getCachedSetting('openai_manner'),
+    temperature: getCachedSetting('openai_temperature'),
+  };
 
   const [rewriteOptions, setRewriteOptions] = useState<RewriteOptions>({
     nChoices: 3,

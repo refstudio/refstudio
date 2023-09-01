@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ImperativePanelHandle, Panel } from 'react-resizable-panels';
 
 import { VerticalResizeHandle } from '../../components/VerticalResizeHandle';
@@ -9,48 +9,69 @@ import { cx } from '../../lib/cx';
 import { SideBar } from '../components/SideBar';
 import { BotIcon, PenIcon } from './icons';
 
-type SecondarySideBarPane = 'Rewriter' | 'Chatbot';
-export function RightSidePanelWrapper() {
-  const rightPanelRef = React.useRef<ImperativePanelHandle>(null);
-  const [secondaryPaneCollapsed, setSecondaryPaneCollapsed] = useState(true);
-  const [secondaryPane, setSecondaryPane] = useState<SecondarySideBarPane>('Rewriter');
+type SecondarySideBarPanel = 'Rewriter' | 'Chatbot';
+export function RightSidePanelWrapper({ disabled }: { disabled?: boolean }) {
+  const rightPanelRef = useRef<ImperativePanelHandle>(null);
+  const [isPanelCollapsed, setIsPanelCollapsed] = useState(true);
+  const [activePanel, setActivePanel] = useState<SecondarySideBarPanel>('Rewriter');
 
-  const handleSideBarClick = (selectedPane: SecondarySideBarPane) => {
-    if (selectedPane === secondaryPane) {
-      // Toggle collapsing
-      setSecondaryPaneCollapsed(!secondaryPaneCollapsed);
-    } else {
-      // Always open the sidebar
-      setSecondaryPaneCollapsed(false);
-    }
-    setSecondaryPane(selectedPane);
-  };
+  const handleSideBarClick = useCallback(
+    (clickedPanel: SecondarySideBarPanel) => {
+      if (!disabled) {
+        if (clickedPanel === activePanel) {
+          // Toggle collapsing
+          setIsPanelCollapsed((currentPaneState) => !currentPaneState);
+        } else {
+          // Always open the sidebar
+          setIsPanelCollapsed(false);
+        }
+        setActivePanel(clickedPanel);
+      }
+    },
+    [activePanel, disabled],
+  );
 
   // Configure keyboard shortcuts to open/close side panel
   useRefStudioHotkeys(['meta+9'], () => handleSideBarClick('Rewriter'));
   useRefStudioHotkeys(['meta+0'], () => handleSideBarClick('Chatbot'));
 
-  React.useEffect(() => {
-    if (secondaryPaneCollapsed) {
+  useEffect(() => {
+    if (isPanelCollapsed) {
       rightPanelRef.current?.collapse();
     } else {
       rightPanelRef.current?.expand();
     }
-  }, [rightPanelRef, secondaryPaneCollapsed]);
+  }, [rightPanelRef, isPanelCollapsed]);
+
+  useEffect(() => {
+    if (disabled) {
+      // Close the panel when disabled
+      setIsPanelCollapsed(true);
+    }
+  }, [disabled]);
 
   return (
     <>
-      <VerticalResizeHandle transparent />
-      <Panel collapsible order={3} ref={rightPanelRef} onCollapse={(collapsed) => setSecondaryPaneCollapsed(collapsed)}>
-        {secondaryPane === 'Rewriter' && <RewriterPanel />}
-        {secondaryPane === 'Chatbot' && <ChatbotPanel />}
+      {!disabled && <VerticalResizeHandle transparent />}
+      <Panel
+        className="z-sidebar-panel shadow-default"
+        collapsible
+        order={3}
+        ref={rightPanelRef}
+        onCollapse={(collapsed) => setIsPanelCollapsed(collapsed)}
+      >
+        {activePanel === 'Rewriter' && <RewriterPanel />}
+        {activePanel === 'Chatbot' && <ChatbotPanel />}
       </Panel>
       <SideBar
-        activePane={secondaryPaneCollapsed ? null : secondaryPane}
-        className={cx({ 'border-l border-l-side-bar-border': !secondaryPaneCollapsed })}
+        activePane={isPanelCollapsed ? null : activePanel}
+        className={cx({
+          'border-l border-l-side-bar-border': !isPanelCollapsed,
+          'shadow-default': isPanelCollapsed,
+        })}
         items={[
-          { pane: 'Rewriter', Icon: <PenIcon /> },
-          { pane: 'Chatbot', Icon: <BotIcon /> },
+          { disabled, pane: 'Rewriter', Icon: <PenIcon /> },
+          { disabled, pane: 'Chatbot', Icon: <BotIcon /> },
         ]}
         onItemClick={handleSideBarClick}
       />

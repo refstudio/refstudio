@@ -19,7 +19,7 @@ describe('ingestion.ingest', () => {
 
     await runPDFIngestion(PROJECT_ID);
     expect(universalPost).toHaveBeenCalledTimes(1);
-    expect(universalPost).toHaveBeenCalledWith(`/api/references/${PROJECT_ID}`);
+    expect(universalPost).toHaveBeenCalledWith(`/api/references/${PROJECT_ID}`, {});
   });
 
   it('Should map empty IngestResponse[] to empty ReferenceItem[]', async () => {
