@@ -9,12 +9,19 @@ from uuid import uuid4
 import grobid_tei_xml
 from dotenv import load_dotenv
 from grobid_client.grobid_client import GrobidClient, ServerUnavailableException
-
-from sidecar import shared, typing
-
-from .settings import REFERENCES_JSON_PATH, UPLOADS_DIR, logger
-from .storage import JsonStorage
-from .typing import Author, IngestRequest, IngestResponse, Reference
+from sidecar import shared
+from sidecar.config import REFERENCES_JSON_PATH, UPLOADS_DIR, logger
+from sidecar.references.schemas import (
+    Author,
+    IngestRequest,
+    IngestResponse,
+    IngestStatus,
+    IngestStatusResponse,
+    Reference,
+    ReferenceStatus,
+)
+from sidecar.references.storage import JsonStorage
+from sidecar.typing import ResponseStatus
 
 load_dotenv()
 logger = logger.getChild(__name__)
@@ -349,7 +356,7 @@ class PDFIngestion:
                 Reference(
                     id=str(uuid4()),
                     source_filename=source_pdf,
-                    status=typing.IngestStatus.FAILURE,
+                    status=IngestStatus.FAILURE,
                     citation_key="untitled",
                     contents=full_text,
                 )
@@ -468,7 +475,7 @@ class PDFIngestion:
             ref = Reference(
                 id=str(uuid4()),
                 source_filename=source_pdf,
-                status=typing.IngestStatus.COMPLETE,
+                status=IngestStatus.COMPLETE,
                 title=header.get("title"),
                 authors=header.get("authors"),
                 doi=header.get("doi"),
@@ -532,18 +539,18 @@ class IngestStatusFetcher:
 
     def _emit_ingest_status_response(
         self,
-        response_status: typing.ResponseStatus,
-        reference_statuses: list[typing.ReferenceStatus],
+        response_status: ResponseStatus,
+        reference_statuses: list[ReferenceStatus],
     ):
         """
         Emits IngestStatusResponse as json to stdout and exits.
         """
-        response = typing.IngestStatusResponse(
+        response = IngestStatusResponse(
             status=response_status, reference_statuses=reference_statuses
         )
         return response
 
-    def _handle_missing_references_json(self) -> list[typing.ReferenceStatus]:
+    def _handle_missing_references_json(self) -> list[ReferenceStatus]:
         """
         Handles scenario where `references.json` does not exist.
 
@@ -553,13 +560,13 @@ class IngestStatusFetcher:
         statuses = []
         for filepath in self.uploads:
             statuses.append(
-                typing.ReferenceStatus(
-                    source_filename=filepath.name, status=typing.IngestStatus.PROCESSING
+                ReferenceStatus(
+                    source_filename=filepath.name, status=IngestStatus.PROCESSING
                 )
             )
         return statuses
 
-    def _compare_uploads_against_references_json(self) -> list[typing.ReferenceStatus]:
+    def _compare_uploads_against_references_json(self) -> list[ReferenceStatus]:
         """
         Compares files in `uploads` directory against References stored
         in `references.json` to determine ingestion status.
@@ -573,12 +580,12 @@ class IngestStatusFetcher:
             if filepath.name in references:
                 ref = references[filepath.name]
 
-                status = typing.ReferenceStatus(
+                status = ReferenceStatus(
                     source_filename=ref.source_filename, status=ref.status
                 )
             else:
-                status = typing.ReferenceStatus(
-                    source_filename=filepath.name, status=typing.IngestStatus.PROCESSING
+                status = ReferenceStatus(
+                    source_filename=filepath.name, status=IngestStatus.PROCESSING
                 )
             statuses.append(status)
         return statuses
@@ -590,18 +597,18 @@ class IngestStatusFetcher:
             logger.warning(e)
             statuses = self._handle_missing_references_json()
             response = self._emit_ingest_status_response(
-                response_status=typing.ResponseStatus.OK, reference_statuses=statuses
+                response_status=ResponseStatus.OK, reference_statuses=statuses
             )
             return response
         except Exception as e:
             logger.error(f"Error loading references.json: {e}")
             response = self._emit_ingest_status_response(
-                response_status=typing.ResponseStatus.ERROR, reference_statuses=[]
+                response_status=ResponseStatus.ERROR, reference_statuses=[]
             )
             return response
 
         statuses = self._compare_uploads_against_references_json()
         response = self._emit_ingest_status_response(
-            response_status=typing.ResponseStatus.OK, reference_statuses=statuses
+            response_status=ResponseStatus.OK, reference_statuses=statuses
         )
         return response

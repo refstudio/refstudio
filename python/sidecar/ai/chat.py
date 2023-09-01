@@ -1,19 +1,23 @@
 import os
 
 import openai
-from sidecar import projects, prompts, settings, typing
-from sidecar.ranker import BM25Ranker
-from sidecar.settings import logger
-from sidecar.storage import JsonStorage
-from sidecar.typing import ChatRequest, ChatResponse, ChatResponseChoice
+from sidecar import config
+from sidecar.ai.prompts import create_prompt_for_chat, prepare_chunks_for_prompt
+from sidecar.ai.ranker import BM25Ranker
+from sidecar.ai.schemas import ChatRequest, ChatResponse, ChatResponseChoice
+from sidecar.config import logger
+from sidecar.projects.service import get_project_path
+from sidecar.references.storage import JsonStorage
+from sidecar.settings.schemas import FlatSettingsSchema
+from sidecar.typing import ResponseStatus
 from tenacity import retry, stop_after_attempt, wait_fixed
 
 
 def ask_question(
     request: ChatRequest,
     project_id: str = None,
-    user_settings: typing.FlatSettingsSchema = None,
-) -> typing.ChatResponse:
+    user_settings: FlatSettingsSchema = None,
+) -> ChatResponse:
     input_text = request.text
     n_choices = request.n_choices
     temperature = request.temperature
@@ -28,11 +32,11 @@ def ask_question(
     logger.info(f"Calling chat with the following parameters: {request.dict()}")
 
     if project_id:
-        project_path = projects.get_project_path(user_id="user1", project_id=project_id)
+        project_path = get_project_path(user_id="user1", project_id=project_id)
         filepath = project_path / ".storage" / "references.json"
         storage = JsonStorage(filepath=filepath)
     else:
-        storage = JsonStorage(filepath=settings.REFERENCES_JSON_PATH)
+        storage = JsonStorage(filepath=config.REFERENCES_JSON_PATH)
 
     logger.info(f"Loading documents from storage: {storage.filepath}")
     storage.load()
@@ -46,7 +50,7 @@ def ask_question(
     except Exception as e:
         logger.error(e)
         response = ChatResponse(
-            status=typing.ResponseStatus.ERROR,
+            status=ResponseStatus.ERROR,
             message=str(e),
             choices=[],
         )
@@ -54,7 +58,7 @@ def ask_question(
 
     logger.info(f"Returning {len(choices)} chat response choices to client: {choices}")
     response = ChatResponse(
-        status=typing.ResponseStatus.OK,
+        status=ResponseStatus.OK,
         message="",
         choices=[r.dict() for r in choices],
     )
@@ -109,10 +113,8 @@ class Chat:
         logger.info("Fetching 5 most relevant document chunks from storage")
         docs = self.get_relevant_documents()
         logger.info("Creating input prompt for chat API")
-        context_str = prompts.prepare_chunks_for_prompt(chunks=docs)
-        prompt = prompts.create_prompt_for_chat(
-            query=self.input_text, context=context_str
-        )
+        context_str = prepare_chunks_for_prompt(chunks=docs)
+        prompt = create_prompt_for_chat(query=self.input_text, context=context_str)
         messages = self.prepare_messages_for_chat(text=prompt)
         response = self.call_model(
             messages=messages, n_choices=n_choices, temperature=temperature

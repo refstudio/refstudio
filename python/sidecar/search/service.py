@@ -7,7 +7,7 @@ import logging
 
 from semanticscholar import SemanticScholar
 from sidecar.search.constants import stopwords
-from sidecar.search.schemas import S2SearchResult, SearchRequest, SearchResponse
+from sidecar.search.schemas import S2SearchResult, SearchResponse
 from sidecar.typing import ResponseStatus
 
 logger = logging.getLogger(__name__)

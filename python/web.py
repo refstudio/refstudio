@@ -1,17 +1,24 @@
 import uvicorn
 from fastapi import FastAPI
 from sidecar import http
+
+# from sidecar.ai import router as ai_router
+from sidecar.filesystem import router as filesystem_route
+from sidecar.projects import router as projects_router
+from sidecar.references import router as references_router
 from sidecar.search import router as search_router
+from sidecar.settings import router as settings_router
 
 api = FastAPI()
-api.mount("/api/references", http.references_api, name="references")
-api.mount("/api/ai", http.ai_api, name="ai")
-api.mount("/api/fs", http.filesystem_api, name="filesystem")
-api.mount("/api/projects", http.project_api, name="projects")
 api.mount("/api/meta", http.meta_api, name="meta")
-api.mount("/api/settings", http.settings_api, name="settings")
+# api.include_router(ai_router.router)
+api.include_router(filesystem_route.router)
+api.include_router(references_router.router)
+api.include_router(projects_router.router)
 api.include_router(search_router.router)
+api.include_router(settings_router.router)
 
 
 def serve(host: str, port: int):
+    uvicorn.run(api, host=host, port=port, reload=False)
     uvicorn.run(api, host=host, port=port, reload=False)

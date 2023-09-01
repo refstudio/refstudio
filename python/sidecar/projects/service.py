@@ -2,8 +2,8 @@ import json
 import shutil
 from pathlib import Path
 
-from sidecar import settings
-from sidecar.typing import (
+from sidecar.config import WEB_STORAGE_URL
+from sidecar.projects.schemas import (
     FileEntry,
     FolderEntry,
     ProjectDetailsResponse,
@@ -11,16 +11,16 @@ from sidecar.typing import (
 )
 
 # Ensure that the server's path storage directory exists.
-Path(settings.WEB_STORAGE_URL).mkdir(parents=True, exist_ok=True)
+Path(WEB_STORAGE_URL).mkdir(parents=True, exist_ok=True)
 
 
 def make_projects_json_path(user_id: str) -> Path:
-    filepath = Path(settings.WEB_STORAGE_URL / user_id / "projects.json")
+    filepath = Path(WEB_STORAGE_URL / user_id / "projects.json")
     return filepath
 
 
 def make_project_path(user_id: str, project_id: str) -> Path:
-    filepath = Path(settings.WEB_STORAGE_URL / user_id / project_id)
+    filepath = Path(WEB_STORAGE_URL / user_id / project_id)
     return filepath
 
 

@@ -1,8 +1,8 @@
-from sidecar import typing
-from sidecar.typing import Chunk, TextCompletionRequest
+from sidecar.ai.schemas import RewriteMannerType, TextCompletionRequest
+from sidecar.references.schemas import Chunk
 
 
-def create_prompt_for_rewrite(text: str, manner: typing.RewriteMannerType) -> str:
+def create_prompt_for_rewrite(text: str, manner: RewriteMannerType) -> str:
     prompt = (
         f"Please rewrite the following text in a more {manner} manner. "
         "Do not make up facts.\n"

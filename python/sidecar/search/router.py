@@ -10,5 +10,5 @@ router = APIRouter(
 
 @router.post("/s2")
 async def http_search_s2(req: SearchRequest) -> SearchResponse:
-    response = service.search_s2(req)
+    response = service.search_s2(query=req.query, limit=req.limit)
     return response
