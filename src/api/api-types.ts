@@ -71,6 +71,13 @@ export interface DeleteStatusResponse {
   message: string;
 }
 /**
+ * Use this to indicate that a request only accepts an empty object ({})
+ *
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "EmptyRequest".
+ */
+export interface EmptyRequest {}
+/**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
  * via the `definition` "HTTPValidationError".
  */
@@ -85,6 +92,14 @@ export interface ValidationError {
   loc: Location;
   msg: Message;
   type: ErrorType;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "IngestResponse".
+ */
+export interface IngestResponse {
+  project_name: string;
+  references: Reference[];
 }
 /**
  * A reference for an academic paper / PDF
@@ -221,14 +236,6 @@ export interface S2SearchResult {
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "SearchRequest".
- */
-export interface SearchRequest {
-  query: string;
-  limit?: number;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
  * via the `definition` "SearchResponse".
  */
 export interface SearchResponse {
@@ -242,6 +249,14 @@ export interface SearchResponse {
  */
 export interface BodyCreateFile_ProjectId__Filepath_Put {
   file: File;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "ProjectCreateRequest".
+ */
+export interface ProjectCreateRequest {
+  project_name: string;
+  project_path?: string;
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema

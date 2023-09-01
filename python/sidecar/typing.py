@@ -30,6 +30,12 @@ class RefStudioModel(BaseModel):
                 prop.pop("title", None)
 
 
+class EmptyRequest(RefStudioModel):
+    """Use this to indicate that a request only accepts an empty object ({})"""
+
+    pass
+
+
 class ResponseStatus(StrEnum):
     OK = "ok"
     ERROR = "error"
@@ -215,6 +221,16 @@ class OpenAISettings(RefStudioModel):
     # they should be configurable as part of the API request
     manner: RewriteMannerType = RewriteMannerType.SCHOLARLY
     temperature: float = 0.7
+
+
+class ProjectCreateRequest(RefStudioModel):
+    project_name: str
+    """The name of the project"""
+    project_path: str = None
+    """
+    The path to the project directory. Only necessary for Desktop.
+    For web, the project is stored in a private directory on the server.
+    """
 
 
 class ProjectSettings(RefStudioModel):

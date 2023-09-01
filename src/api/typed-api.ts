@@ -1,6 +1,6 @@
 /** Type-safe access to the RefStudio HTTP APIs. */
 
-import { universalGet, universalPost, universalPut } from './api';
+import { universalDelete, universalGet, universalPatch, universalPost, universalPut } from './api';
 import type { paths } from './api-paths';
 
 type LowerMethod = 'get' | 'post' | 'put' | 'delete' | 'patch';
@@ -97,6 +97,38 @@ export async function apiPost<Path extends PathsForMethod<'post'>>(
   const path = options ? completePath(pathSpec, options) : pathSpec;
   type ResponseType = JsonResponseFor<Path, 'post'>;
   return universalPost<ResponseType>(path, body);
+}
+
+/**
+ * Issue a PATCH request with a JSON payload to a RefStudio API endpoint.
+ *
+ * If the endpoint takes path parameters or search parameters, then that will be the second argument.
+ * The last argument (2nd or 3rd argument) is the request body.
+ */
+export async function apiPatch<Path extends PathsForMethod<'patch'>>(
+  pathSpec: Path,
+  ...args: [...params: PathArgs<Path, 'patch'>, body: JsonRequestBodyFor<Path, 'patch'>]
+) {
+  const safeArgs = args as unknown as [params: RouteParameters, body: unknown] | [body: unknown];
+  const [options, body] = safeArgs.length === 2 ? safeArgs : [undefined, ...safeArgs];
+  const path = options ? completePath(pathSpec, options) : pathSpec;
+  type ResponseType = JsonResponseFor<Path, 'patch'>;
+  return universalPatch<ResponseType>(path, body);
+}
+
+/**
+ * Issue a DELETE request to a RefStudio API endpoint.
+ *
+ * If the endpoint has path parameters or allows search parameters, then this will take a second argument.
+ */
+export async function apiDelete<Path extends PathsForMethod<'delete'>>(
+  pathSpec: Path,
+  ...args: PathArgs<Path, 'delete'>
+) {
+  const options = (args as unknown[])[0] as RouteParameters | undefined;
+  const path = options ? completePath(pathSpec, options) : pathSpec;
+  type ResponseType = JsonResponseFor<Path, 'delete'>;
+  return universalDelete<ResponseType>(path, undefined);
 }
 
 /**

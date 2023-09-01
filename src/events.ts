@@ -40,6 +40,8 @@ interface RefStudioEvents {
   'refstudio://ai/suggestion/insert': { text: string };
   // Layout actions
   'refstudio://layout/update': undefined;
+  // Project actions
+  'refstudio://projects/open': { projectId: string };
 }
 
 export type RefStudioEventName = keyof RefStudioEvents;
