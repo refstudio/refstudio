@@ -35,21 +35,25 @@ export function ReferenceView({ referenceId }: { referenceId: EditorIdFor<'refer
         id: 'citationKey',
         title: 'Citation Key',
         value: referencItem.citationKey,
+        editable: true,
       },
       {
         id: 'title',
         title: 'Title',
         value: referencItem.title,
+        editable: true,
       },
       {
         id: 'authors',
         title: 'Authors',
         value: authors,
+        editable: false,
       },
       {
         id: 'doi',
         title: 'Doi',
         value: referencItem.doi,
+        editable: true,
       },
     ];
 
@@ -63,12 +67,12 @@ export function ReferenceView({ referenceId }: { referenceId: EditorIdFor<'refer
   return (
     <ReferenceDetailsCard
       editableReferenceItem={cloneEditableReferenceItem(reference)}
-      referenceUpdateHandler={handleCellValueChanged}
       tableData={{
         tableBodyContent: formatReferenceCardData(reference),
         headerContentArray: ['References'],
         headerColSpan: 2,
       }}
+      updateReference={handleCellValueChanged}
     />
   );
 }
