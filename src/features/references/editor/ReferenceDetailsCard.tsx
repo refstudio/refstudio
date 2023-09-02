@@ -1,5 +1,4 @@
-import { atom, useAtom } from 'jotai';
-import { ReactElement, useCallback, useMemo, useState } from 'react';
+import { ReactElement, useCallback, useState } from 'react';
 
 import { CloseIcon, EditIcon } from '../../../components/icons';
 import { useDebouncedCallback } from '../../../hooks/useDebouncedCallback';
@@ -9,7 +8,7 @@ import { ReferenceDetailsCardRow } from './ReferenceEditorTypes';
 
 export default function ReferenceDetailsCard({
   tableData,
-  referenceUpdateHandler,
+  updateReference,
   editableReferenceItem,
 }: {
   tableData: {
@@ -17,19 +16,23 @@ export default function ReferenceDetailsCard({
     headerContentArray: string[];
     headerColSpan: number;
   };
-  referenceUpdateHandler: (params: ReferenceItem) => undefined;
+  updateReference: (params: ReferenceItem) => void;
   editableReferenceItem: ReferenceItem;
 }) {
-  const referenceCardEditableAtom = useMemo(() => atom(false), []);
-  const [editable, setEditable] = useAtom(referenceCardEditableAtom);
+  const [editing, setEditing] = useState(false);
+
+  const TableHead = ({ headerContent }: { headerContent: { headerContentArray: string[]; headerColSpan: number } }) => (
+    <thead>
+      <tr>
+        {headerContent.headerContentArray.map((h) => (
+          <TableHeadCell colSpan={headerContent.headerColSpan} content={h} header={true} key={h} />
+        ))}
+      </tr>
+    </thead>
+  );
 
   const TableHeadCell = ({ content, colSpan, header }: { content: string; colSpan?: number; header?: boolean }) => {
     const colSpanString = { ['colSpan']: colSpan };
-    const editIcon: ReactElement | null = header ? EditIcon() : null;
-    const closeIcon: ReactElement | null = header ? CloseIcon() : null;
-    const toggleEditable = () => {
-      setEditable(editable ? false : true);
-    };
 
     return (
       <th
@@ -38,28 +41,76 @@ export default function ReferenceDetailsCard({
           { 'w-1/6 p-6': !header },
           'text-sm uppercase',
         )}
+        key={content}
         {...colSpanString}
       >
         {content}
-        <button
-          className={cx({ hidden: editable }, 'float-right hover:text-cyan-100')}
-          title="Edit Reference"
-          onClick={toggleEditable}
-        >
-          {editIcon}
-        </button>
-        <button
-          className={cx({ hidden: !editable }, 'float-right hover:text-cyan-100')}
-          title="Finished Edit Reference"
-          onClick={toggleEditable}
-        >
-          {closeIcon}
-        </button>
+        {IconButtons(header)}
       </th>
     );
   };
 
-  const updateAtomOnChange = useCallback(
+  const IconButtons = (header: boolean | undefined): ReactElement[] => {
+    if (header) {
+      return [
+        IconButton({ hiddenWhenEditing: true, icon: EditIcon(), title: 'Edit Reference' }),
+        IconButton({ hiddenWhenEditing: false, icon: CloseIcon(), title: 'Finished Editing Reference' }),
+      ];
+    } else {
+      return [];
+    }
+  };
+
+  const IconButton = ({
+    hiddenWhenEditing,
+    title,
+    icon,
+  }: {
+    hiddenWhenEditing: boolean;
+    title: string;
+    icon: ReactElement;
+  }) => {
+    const hiddenClass = hiddenWhenEditing ? { hidden: editing } : { hidden: !editing };
+
+    return (
+      <button
+        className={cx(hiddenClass, 'float-right hover:text-cyan-100')}
+        key={title}
+        title={title}
+        onClick={() => {
+          setEditing(!editing);
+        }}
+      >
+        {icon}
+      </button>
+    );
+  };
+
+  const TableBody = ({ tableBodyContent }: { tableBodyContent: ReferenceDetailsCardRow[] }) => {
+    const rows: ReactElement[] = tableBodyContent.map((rowData) => TableRow(rowData));
+    return <tbody className="divide-y">{rows}</tbody>;
+  };
+
+  const TableRow = ({ editable, value, title, id }: ReferenceDetailsCardRow): ReactElement => (
+    <tr key={id}>
+      <TableHeadCell content={title} />
+      <TableDataCell content={value} editable={editable} id={id} />
+    </tr>
+  );
+
+  const TableDataCell = ({ content, editable, id }: { content: string; editable: boolean; id: string }) => {
+    const contentDisplay = id === 'citationKey' ? '[' + content + ']' : content;
+    const input = DataTextInput(content, editable, id);
+    const contentHideClass = editable ? { hidden: editing } : '';
+    return (
+      <td className="w-auto p-5">
+        <span className={cx(contentHideClass, 'leading-[30px]')}>{contentDisplay}</span>
+        {input}
+      </td>
+    );
+  };
+
+  const referenceUpdateOnChangeHandler = useCallback(
     (fieldName: string, value: string) => {
       switch (fieldName) {
         case 'citationKey':
@@ -72,54 +123,31 @@ export default function ReferenceDetailsCard({
           editableReferenceItem.doi = value;
           break;
       }
-      referenceUpdateHandler(editableReferenceItem);
+      updateReference(editableReferenceItem);
     },
-    [editableReferenceItem, referenceUpdateHandler],
+    [editableReferenceItem, updateReference],
   );
 
-  const TableDataCell = ({ content, id }: { content: string; id: string }) => {
+  const DataTextInput = (content: string, editable: boolean, id: string): ReactElement | [] => {
     const [value, setValue] = useState(content);
-    const debouncedOnChange = useDebouncedCallback(updateAtomOnChange, 200);
+    const debouncedOnChange = useDebouncedCallback(referenceUpdateOnChangeHandler, 500);
 
-    const contentDisplay = id === 'citationKey' ? '[' + content + ']' : content;
+    if (!editable) {
+      return [];
+    }
+
     return (
-      <td className="w-auto p-5">
-        <span className={cx({ hidden: editable }, 'leading-[30px]')}>{contentDisplay}</span>
-        <input
-          className={cx({ hidden: !editable }, 'w-full border bg-slate-50 px-2 py-0.5')}
-          name={id}
-          type="text"
-          value={value}
-          onChange={(evt) => {
-            setValue(evt.target.value);
-            debouncedOnChange(id, evt.target.value);
-          }}
-        />
-      </td>
+      <input
+        className={cx({ hidden: !editing }, 'w-full border bg-slate-50 px-2 py-0.5')}
+        name={id}
+        type="text"
+        value={value}
+        onChange={(evt) => {
+          setValue(evt.target.value);
+          debouncedOnChange(id, evt.target.value);
+        }}
+      />
     );
-  };
-
-  const TableHead = ({ headerContent }: { headerContent: { headerContentArray: string[]; headerColSpan: number } }) => (
-    <thead>
-      <tr>
-        {headerContent.headerContentArray.map((h) => (
-          <TableHeadCell colSpan={headerContent.headerColSpan} content={h} header={true} key={h} />
-        ))}
-      </tr>
-    </thead>
-  );
-
-  const TableRow = ({ value, title, id }: ReferenceDetailsCardRow): ReactElement => (
-    <tr key={id}>
-      <TableHeadCell content={title} />
-      <TableDataCell content={value} id={id} />
-    </tr>
-  );
-
-  const TableBody = ({ tableBodyContent }: { tableBodyContent: ReferenceDetailsCardRow[] }) => {
-    const rows: ReactElement[] = [];
-    tableBodyContent.forEach((rowData) => rows.push(TableRow(rowData)));
-    return <tbody className="divide-y">{rows}</tbody>;
   };
 
   return (
