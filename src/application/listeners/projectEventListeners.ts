@@ -115,9 +115,8 @@ export function useFileProjectCloseListener() {
   };
 }
 
-// TODO: This method needs to be refactored to have use a project id instead of a path
 function persistActiveProjectInSettings(id: string) {
-  setCachedSetting('current_directory', id);
+  setCachedSetting('active_project_id', id);
   void saveCachedSettings();
 }
 
