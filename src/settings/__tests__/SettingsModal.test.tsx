@@ -8,7 +8,6 @@ import {
   setCachedSetting,
 } from '../settingsManager';
 import { SettingsModal } from '../SettingsModal';
-import { SettingsPaneId } from '../types';
 
 vi.mock('../settingsManager');
 vi.mock('../../events');
@@ -34,8 +33,8 @@ describe('SettingsModal component', () => {
 
   it('should render 3 settings panels with open={true}', () => {
     render(<SettingsModal open onClose={noop} />);
-    expect(screen.getByRole('menuitem', { name: 'General' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Open AI' })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Logging' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Config' })).toBeInTheDocument();
   });
 
@@ -44,19 +43,19 @@ describe('SettingsModal component', () => {
     const spyClose = vi.fn();
     render(<SettingsModal open onClose={spyClose} />);
     await user.click(screen.getByTitle('close'));
-    expect(screen.queryByRole('menuitem', { name: 'General' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: 'Logging' })).not.toBeInTheDocument();
     expect(spyClose).toBeCalled();
   });
 
-  it('should render General panel by default', () => {
+  it('should render "Open AI" panel by default', () => {
     render(<SettingsModal open onClose={noop} />);
-    expect(screen.getByTestId('project-general' as SettingsPaneId)).toBeInTheDocument();
+    expect(screen.getByTestId('project-openai')).toBeInTheDocument();
   });
 
-  it('should toggle to "Open AI" panel from sidebar', async () => {
+  it('should toggle to "Logging" panel from sidebar', async () => {
     const user = userEvent.setup();
     render(<SettingsModal open onClose={noop} />);
-    await user.click(screen.getByText('Open AI'));
-    expect(screen.getByTestId('project-openai' as SettingsPaneId)).toBeInTheDocument();
+    await user.click(screen.getByText('Logging'));
+    expect(screen.getByTestId('project-logging')).toBeInTheDocument();
   });
 });

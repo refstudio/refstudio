@@ -116,7 +116,12 @@ export function SelectedRadioIcon() {
   return (
     <div className="flex h-6 w-6 items-center justify-center">
       <svg height="16" viewBox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg">
-        <path clipRule="evenodd" d="M2 0C0.895431 0 0 0.895431 0 2V14C0 15.1046 0.895431 16 2 16H14C15.1046 16 16 15.1046 16 14V2C16 0.895431 15.1046 0 14 0H2ZM2 8.06784L3.41421 6.65363L6.56425 9.80366L13 3.36791L14.4142 4.78213L6.56425 12.6321L2 8.06784Z" fill="currentcolor" fillRule="evenodd" />
+        <path
+          clipRule="evenodd"
+          d="M2 0C0.895431 0 0 0.895431 0 2V14C0 15.1046 0.895431 16 2 16H14C15.1046 16 16 15.1046 16 14V2C16 0.895431 15.1046 0 14 0H2ZM2 8.06784L3.41421 6.65363L6.56425 9.80366L13 3.36791L14.4142 4.78213L6.56425 12.6321L2 8.06784Z"
+          fill="currentcolor"
+          fillRule="evenodd"
+        />
       </svg>
     </div>
   );

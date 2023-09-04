@@ -28,6 +28,11 @@ function getOpenAISettingsCached(): OpenAISettings {
   };
 }
 
+export const API_KEY_TEST_ID = 'api-key';
+export const CHAT_MODEL_TEST_ID = 'chat-model';
+export const REWRITE_MANNER_TEST_ID = 'rewrite-manner';
+export const REWRITE_TEMPERATURE_TEST_ID = 'rewrite-temperature';
+
 export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
   const [paneSettings, setPaneSettings] = useState(getOpenAISettingsCached());
 
@@ -55,6 +60,7 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
       <div className="flex flex-col items-start gap-2">
         <h2 className="t text-modal-txt-primary">API Key</h2>
         <Input
+          data-testid={API_KEY_TEST_ID}
           type="password"
           value={paneSettings.api_key}
           onChange={(api_key) => setPaneSettings({ ...paneSettings, api_key })}
@@ -66,6 +72,7 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
           <ChatModelTooltip />
         </div>
         <Input
+          data-testid={CHAT_MODEL_TEST_ID}
           value={paneSettings.chat_model}
           onChange={(chat_model) => setPaneSettings({ ...paneSettings, chat_model })}
         />
@@ -74,6 +81,7 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
         <h2 className="t text-modal-txt-primary">Speech Type</h2>
         <Dropdown
           aria-label="manner"
+          data-testid={REWRITE_MANNER_TEST_ID}
           options={REWRITE_MANNER.map((manner) => ({
             name: manner.charAt(0).toUpperCase() + manner.slice(1),
             value: manner,
@@ -94,6 +102,7 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
         </div>
         <Slider
           className="w-full"
+          data-testid={REWRITE_TEMPERATURE_TEST_ID}
           max={0.9}
           min={0.7}
           name="creativity"

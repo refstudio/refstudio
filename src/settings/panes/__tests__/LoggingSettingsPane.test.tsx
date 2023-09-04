@@ -1,9 +1,9 @@
 import { FlatSettingsSchema } from '../../../api/api-types';
 import { noop } from '../../../lib/noop';
-import { render, screen, userEvent } from '../../../test/test-utils';
+import { render, screen, userEvent, within } from '../../../test/test-utils';
 import { getCachedSetting, initSettings, saveCachedSettings, setCachedSetting } from '../../settingsManager';
 import { PaneConfig } from '../../types';
-import { LoggingSettingsPane } from '../LoggingSettingsPane';
+import { LOGGING_ACTIVE_TEST_ID, LOGGING_FILEPATH_TEST_ID, LoggingSettingsPane } from '../LoggingSettingsPane';
 
 vi.mock('../../settingsManager');
 vi.mock('../../../events');
@@ -48,8 +48,10 @@ describe('GeneralSettingsPane component', () => {
     render(<LoggingSettingsPane config={panelConfig} />);
 
     expect(getCachedSettingMock.mock.calls.length).toBeGreaterThan(0);
-    expect(screen.getByLabelText('Active')).toBeChecked();
-    expect(screen.getByLabelText('Path')).toHaveValue(mockSettings.logging_filepath);
+    expect(within(screen.getByTestId(LOGGING_ACTIVE_TEST_ID)).getByRole('checkbox')).toBeChecked();
+    expect(within(screen.getByTestId(LOGGING_FILEPATH_TEST_ID)).getByRole('input')).toHaveValue(
+      mockSettings.logging_filepath,
+    );
   });
 
   it('should save (setCached, flush) with edited values on save', async () => {
@@ -59,10 +61,12 @@ describe('GeneralSettingsPane component', () => {
     expect(screen.getByRole('button', { name: /save/i })).toBeDisabled();
 
     // Type
-    await user.click(screen.getByLabelText('Active'));
-    await user.type(screen.getByLabelText('Path'), '-Updated-2');
-    expect(screen.getByLabelText('Active')).not.toBeChecked();
-    expect(screen.getByLabelText('Path')).toHaveValue(`${mockSettings.logging_filepath}-Updated-2`);
+    await user.click(screen.getByTestId(LOGGING_ACTIVE_TEST_ID));
+    await user.type(screen.getByTestId(LOGGING_FILEPATH_TEST_ID), '-Updated-2');
+    expect(within(screen.getByTestId(LOGGING_ACTIVE_TEST_ID)).getByRole('checkbox')).not.toBeChecked();
+    expect(within(screen.getByTestId(LOGGING_FILEPATH_TEST_ID)).getByRole('input')).toHaveValue(
+      `${mockSettings.logging_filepath}-Updated-2`,
+    );
     expect(screen.getByRole('button', { name: /save/i })).toBeEnabled();
 
     // Submit

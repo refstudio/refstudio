@@ -11,9 +11,9 @@ interface SliderProps {
   value: number;
   onChange: (newValue: number) => void;
 }
-export function Slider({ className, max, min, name, step, value, onChange }: SliderProps) {
+export function Slider({ className, max, min, name, step, value, onChange, ...rest }: SliderProps) {
   return (
-    <div className={cx('flex items-center py-2', className)}>
+    <div className={cx('flex items-center py-2', className)} {...rest}>
       <input
         aria-label={name}
         aria-valuemax={max}

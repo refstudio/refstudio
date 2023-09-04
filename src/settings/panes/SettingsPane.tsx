@@ -41,19 +41,21 @@ export function SettingsPane({
         <h1 className="text-modal-txt-secondary">{header}</h1>
         <div className="flex flex-col items-stretch gap-6 overflow-scroll">{children}</div>
       </div>
-      {!!onSave && <div className="flex justify-end">
-        <div className="shrink">
-          <Button
-            disabled={!isDirty}
-            size="M"
-            text={isSaved ? 'Saved!' : 'Save'}
-            onClick={() => {
-              setSaved(true);
-              onSave();
-            }}
-          />
+      {!!onSave && (
+        <div className="flex justify-end">
+          <div className="shrink">
+            <Button
+              disabled={!isDirty}
+              size="M"
+              text={isSaved ? 'Saved!' : 'Save'}
+              onClick={() => {
+                setSaved(true);
+                onSave();
+              }}
+            />
+          </div>
         </div>
-      </div>}
+      )}
     </div>
   );
 }

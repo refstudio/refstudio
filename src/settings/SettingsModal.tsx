@@ -50,7 +50,6 @@ const SETTINGS_PANES: SettingsPanesConfig[] = [
 export function SettingsModal({ open, onClose: onClose }: { open: boolean; onClose: () => void }) {
   const [pane, selectPane] = useState<PaneConfig>(SETTINGS_PANES[0].panes[0]);
 
-
   useRefStudioHotkeys(['escape'], () => {
     if (open) {
       onClose();
@@ -85,7 +84,9 @@ export function SettingsModal({ open, onClose: onClose }: { open: boolean; onClo
         >
           {SETTINGS_PANES.filter((s) => !s.hidden).map((paneSection) => (
             <div className={cx('flex flex-col gap-2', { 'mt-auto': paneSection.bottom })} key={paneSection.section}>
-              <h1 className="text-modal-txt-primary px-2">{paneSection.section}</h1>
+              <h1 className="px-2 text-modal-txt-primary" role="menuitem">
+                {paneSection.section}
+              </h1>
               {paneSection.panes.map((paneConfig) => (
                 <SettingsMenuItem
                   activePane={pane}

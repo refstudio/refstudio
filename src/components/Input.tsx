@@ -9,7 +9,7 @@ interface InputProps {
   value: string;
   onChange: (newValue: string) => void;
 }
-export function Input({ disabled, type = 'text', value, onChange }: InputProps) {
+export function Input({ disabled, type = 'text', value, onChange, ...rest }: InputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [hidden, setHidden] = useState(type === 'password');
   const [active, setActive] = useState(false);
@@ -29,6 +29,7 @@ export function Input({ disabled, type = 'text', value, onChange }: InputProps) 
       )}
       onClick={() => inputRef.current?.focus()}
       onFocus={() => inputRef.current?.focus()}
+      {...rest}
     >
       <input
         aria-disabled={disabled}
@@ -38,6 +39,7 @@ export function Input({ disabled, type = 'text', value, onChange }: InputProps) 
         })}
         disabled={disabled}
         ref={inputRef}
+        role="input"
         type={hidden ? 'password' : 'text'}
         value={value}
         onBlur={() => setActive(false)}
