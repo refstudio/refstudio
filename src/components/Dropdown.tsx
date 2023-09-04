@@ -47,8 +47,8 @@ export function Dropdown<T extends string>({ disabled, options, value, onChange 
             'text-input-txt-disabled': disabled,
           },
           {
-            'border-input-border': !open,
-            'border-input-bg-action': !disabled && open,
+            'border-input-border-default': !open,
+            'border-input-border-active': !disabled && open,
           },
         )}
         onClick={() => !disabled && setOpen(!open)}
@@ -63,7 +63,7 @@ export function Dropdown<T extends string>({ disabled, options, value, onChange 
           <div
             className={cx(
               'absolute z-dropdown flex w-full flex-col items-stretch gap-2 p-2',
-              'rounded-default border border-solid border-input-border bg-input-bg-default',
+              'rounded-default border border-solid border-input-border-default bg-input-bg-default',
             )}
           >
             {options.map((option) => {
