@@ -93,12 +93,7 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
       <div className="flex flex-col items-start gap-2" ref={tooltipContainerRef}>
         <div className="flex items-start gap-1 self-stretch">
           <h2>Creativity Level</h2>
-          {tooltipContainerRef.current && (
-            <CreativityInfoTooltip
-              id="settings-creativity-tooltip"
-              maxWidth={tooltipContainerRef.current.clientWidth}
-            />
-          )}
+          <CreativityInfoTooltip id="settings-creativity-tooltip" maxWidth={tooltipContainerRef.current?.clientWidth} />
         </div>
         <Slider
           className="w-full"
