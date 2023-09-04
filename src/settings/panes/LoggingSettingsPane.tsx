@@ -2,6 +2,8 @@ import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 
 import { FlatSettingsSchema } from '../../api/api-types';
+import { Input } from '../../components/Input';
+import { Radio } from '../../components/Radio';
 import { getCachedSetting, getSettings, saveCachedSettings, setCachedSetting } from '../settingsManager';
 import { SettingsPane, SettingsPaneProps } from './SettingsPane';
 
@@ -26,56 +28,33 @@ export function LoggingSettingsPane({ config }: SettingsPaneProps) {
     },
   });
 
-  const handleSaveSettings = (evt: React.FormEvent<HTMLFormElement>) => {
-    evt.preventDefault();
+  const handleSaveSettings = () => {
     saveMutation.mutate({ sidecarLogging: sidecarLoggingSettings });
   };
 
   const isDirty = JSON.stringify(sidecarLoggingSettings) !== JSON.stringify(getLoggingSettingsCached());
 
   return (
-    <SettingsPane config={config} header={config.title}>
-      <form className="mt-10" onSubmit={handleSaveSettings}>
-        <fieldset className="space-y-4">
-          <h3>Sidecar Logging</h3>
-          <div className="space-y-2">
-            <label className="font-semibold" htmlFor="active">
-              Active
-            </label>
-            <input
-              checked={sidecarLoggingSettings.logging_enabled}
-              className="w-full border px-2 py-0.5"
-              id="active"
-              type="checkbox"
-              onChange={(e) =>
-                setSidecarLoggingSettings({ ...sidecarLoggingSettings, logging_enabled: e.currentTarget.checked })
-              }
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="font-semibold" htmlFor="path">
-              Path
-            </label>
-            <input
-              className="w-full border bg-slate-50 px-2 py-0.5"
-              id="path"
-              value={sidecarLoggingSettings.logging_filepath}
-              onChange={(e) =>
-                setSidecarLoggingSettings({ ...sidecarLoggingSettings, logging_filepath: e.currentTarget.value })
-              }
-            />
-            <p className="text-xs text-gray-500">
-              The log filename can be located in{' '}
-              <code>{sidecarLoggingSettings.logging_filepath}/refstudio-sidecar.log</code>.
-            </p>
-          </div>
-        </fieldset>
-        <fieldset className="mt-10 flex justify-end">
-          {saveMutation.isSuccess && <span className="px-2 text-primary">Saved!</span>}
-          {saveMutation.isError && <span className="px-2 text-red-300">{String(saveMutation.error)}</span>}
-          <input className="btn-primary" disabled={!isDirty || saveMutation.isLoading} type="submit" value="SAVE" />
-        </fieldset>
-      </form>
+    <SettingsPane config={config} header={config.title} isDirty={isDirty} onSave={handleSaveSettings}>
+      <div className="flex flex-col items-start gap-2">
+        <h2 className="t text-modal-txt-primary">Sidecar Logging</h2>
+        <Radio
+          checked={sidecarLoggingSettings.logging_enabled}
+          onChange={(logging_enabled) => setSidecarLoggingSettings({ ...sidecarLoggingSettings, logging_enabled })}
+        />
+      </div>
+      <div className="flex flex-col items-start gap-2">
+        <h2 className="text-modal-txt-primary">Path</h2>
+        <Input
+          value={sidecarLoggingSettings.logging_filepath}
+          onChange={(logging_filepath) =>
+            setSidecarLoggingSettings({ ...sidecarLoggingSettings, logging_filepath })
+          }
+        />
+        <div className='text-modal-txt-secondary'>The log filename is{' '}
+          <code>{sidecarLoggingSettings.logging_filepath}/refstudio-sidecar.log</code>.
+        </div>
+      </div>
     </SettingsPane>
   );
 }

@@ -191,6 +191,7 @@ export default {
         },
         'welcome-border': 'rgb(var(--grayscale-20) / <alpha-value>)',
         'editor-selection': 'rgb(196 220 246 / <alpha-value>)',
+        'radio-active': 'rgb(--primary-50 / <alpha-value>)',
       },
       boxShadow: {
         default: '0px 0px 24px 0px rgba(0, 0, 0, 0.04)',

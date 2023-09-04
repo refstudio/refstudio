@@ -101,37 +101,6 @@ export function SettingsModal({ open, onClose: onClose }: { open: boolean; onClo
         <div className="flex-1 bg-modal-bg-primary">
           <pane.Pane config={pane} />
         </div>
-        {/* <div className="flex h-full flex-row">
-          <div className="flex w-52 flex-col space-y-10 bg-slate-100 p-6">
-            {SETTINGS_PANES.filter((s) => !s.hidden).map((paneSection) => (
-              <div
-                className={cx('space-y-1', { '!mt-auto': paneSection.bottom })}
-                key={paneSection.section}
-                role="menu"
-              >
-                <strong className="uppercase">{paneSection.section}</strong>
-                {paneSection.panes.map((paneConfig) => (
-                  <SettingsMenuItem
-                    activePane={pane}
-                    key={paneConfig.id}
-                    pane={paneConfig}
-                    text={paneConfig.title}
-                    onClick={selectPane}
-                  />
-                ))}
-              </div>
-            ))}
-          </div>
-          <div className="relative h-full w-full overflow-auto p-6">
-            <VscClose
-              className="absolute right-2 top-2 cursor-pointer rounded-lg p-1 hover:bg-slate-200"
-              size={30}
-              title="close"
-              onClick={onCloseClick}
-            />
-            <pane.Pane config={pane} />
-          </div>
-        </div> */}
       </div>
     </div>
   );

@@ -7,19 +7,27 @@ export interface SettingsPaneProps {
   config: PaneConfig;
 }
 
+interface SavableSettingsPaneProps {
+  config: PaneConfig;
+  header: string;
+  children: React.ReactNode;
+  isDirty: boolean;
+  onSave: () => void;
+}
+interface UnsavableSettingsPaneProps {
+  config: PaneConfig;
+  header: string;
+  children: React.ReactNode;
+  isDirty?: undefined;
+  onSave?: undefined;
+}
 export function SettingsPane({
   config,
   header,
   children,
   isDirty,
   onSave,
-}: {
-  config: PaneConfig;
-  header: string;
-  children: React.ReactNode;
-  isDirty: boolean;
-  onSave: () => void;
-}) {
+}: SavableSettingsPaneProps | UnsavableSettingsPaneProps) {
   const [isSaved, setSaved] = useState(false);
   useEffect(() => {
     if (isDirty) {
@@ -33,7 +41,7 @@ export function SettingsPane({
         <h1 className="text-modal-txt-secondary">{header}</h1>
         <div className="flex flex-col items-stretch gap-6 overflow-scroll">{children}</div>
       </div>
-      <div className="flex justify-end">
+      {!!onSave && <div className="flex justify-end">
         <div className="shrink">
           <Button
             disabled={!isDirty}
@@ -45,7 +53,7 @@ export function SettingsPane({
             }}
           />
         </div>
-      </div>
+      </div>}
     </div>
   );
 }

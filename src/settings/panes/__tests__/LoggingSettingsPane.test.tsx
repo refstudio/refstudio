@@ -9,7 +9,7 @@ vi.mock('../../settingsManager');
 vi.mock('../../../events');
 
 const panelConfig: PaneConfig = {
-  id: 'project-general',
+  id: 'project-logging',
   Pane: LoggingSettingsPane,
   title: 'OPEN AI',
 };
