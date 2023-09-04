@@ -9,6 +9,7 @@ vi.mock('../../settings/settingsManager');
 vi.mock('@tauri-apps/api/shell');
 
 const mockSettings: FlatSettingsSchema = {
+  active_project_id: '123',
   current_directory: 'app-dir',
   openai_api_key: '',
   openai_chat_model: 'gpt-3.5-turbo',
