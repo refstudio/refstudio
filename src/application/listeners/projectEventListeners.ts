@@ -5,6 +5,7 @@ import { createRemoteProject, ProjectInfo, readAllProjects, readProjectById } fr
 import { createFileAtom } from '../../atoms/fileEntryActions';
 import {
   closeProjectAtom,
+  createProjectModalAtoms,
   isProjectOpenAtom,
   newProjectAtom,
   newSampleProjectAtom,
@@ -20,11 +21,16 @@ export const SAMPLE_PROJECT_NAME = 'RefStudio Sample';
 export function useFileProjectNewListener() {
   const newProject = useSetAtom(newProjectAtom);
   const createFile = useSetAtom(createFileAtom);
+  const showCreateProjectModal = useSetAtom(createProjectModalAtoms.showAtom);
 
   return async () => {
     let projectInfo: ProjectInfo;
     if (import.meta.env.VITE_IS_WEB) {
-      const projectName = 'Project Web'; // TODO: Open a custom dialog to ask the project name
+      const projectName = await showCreateProjectModal();
+      if (!projectName) {
+        notifyInfo('User canceled operation to create new project');
+        return;
+      }
       projectInfo = await createRemoteProject(projectName);
     } else {
       const newProjectPath = await save({ defaultPath: await getNewProjectsBaseDir() });

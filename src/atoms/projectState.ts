@@ -1,6 +1,7 @@
 import { Atom, atom } from 'jotai';
 
 import { ensureSampleProjectFiles, setCurrentFileSystemProjectId } from '../io/filesystem';
+import { createModalAtoms } from './core/createModalAtoms';
 import { closeAllEditorsAtom } from './editorActions';
 import { refreshFileTreeAtom } from './fileExplorerActions';
 import { clearAllReferencesAtom, loadReferencesAtom } from './referencesState';
@@ -19,6 +20,8 @@ export const isProjectOpenAtom = atom((get) => get(currentProjectPathAtom) !== '
 export const projectPathAtom: Atom<string> = currentProjectPathAtom;
 export const projectNameAtom: Atom<string> = currentProjectNameAtom;
 export const projectIdAtom: Atom<string> = currentProjectIdAtom;
+
+export const createProjectModalAtoms = createModalAtoms<string>();
 
 export const newProjectAtom = atom(null, async (_, set, projectId: string, path: string, name: string) => {
   // Close current project before create new
