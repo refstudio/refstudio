@@ -3,14 +3,14 @@ import { noop } from '../../../lib/noop';
 import { render, screen, userEvent } from '../../../test/test-utils';
 import { getCachedSetting, initSettings, saveCachedSettings, setCachedSetting } from '../../settingsManager';
 import { PaneConfig } from '../../types';
-import { GeneralSettingsPane } from '../GeneralSettingsPane';
+import { LoggingSettingsPane } from '../LoggingSettingsPane';
 
 vi.mock('../../settingsManager');
 vi.mock('../../../events');
 
 const panelConfig: PaneConfig = {
   id: 'project-general',
-  Pane: GeneralSettingsPane,
+  Pane: LoggingSettingsPane,
   title: 'OPEN AI',
 };
 
@@ -39,13 +39,13 @@ describe('GeneralSettingsPane component', () => {
   });
 
   it('should render the component', () => {
-    render(<GeneralSettingsPane config={panelConfig} />);
+    render(<LoggingSettingsPane config={panelConfig} />);
     expect(screen.getByTestId(panelConfig.id)).toBeInTheDocument();
   });
 
   it('should render existing settings value', () => {
     const getCachedSettingMock = vi.mocked(getCachedSetting);
-    render(<GeneralSettingsPane config={panelConfig} />);
+    render(<LoggingSettingsPane config={panelConfig} />);
 
     expect(getCachedSettingMock.mock.calls.length).toBeGreaterThan(0);
     expect(screen.getByLabelText('Active')).toBeChecked();
@@ -54,7 +54,7 @@ describe('GeneralSettingsPane component', () => {
 
   it('should save (setCached, flush) with edited values on save', async () => {
     const user = userEvent.setup();
-    render(<GeneralSettingsPane config={panelConfig} />);
+    render(<LoggingSettingsPane config={panelConfig} />);
 
     expect(screen.getByRole('button', { name: /save/i })).toBeDisabled();
 

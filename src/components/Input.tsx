@@ -14,40 +14,41 @@ export function Input({ disabled, type = 'text', value, onChange }: InputProps) 
   const [hidden, setHidden] = useState(type === 'password');
   const [active, setActive] = useState(false);
 
-  return <div
-    className={cx(
-      'cursor-text',
-      'flex w-full h-full p-3 pl-4 justify-between items-start box-border',
-      'rounded-default border border-solid',
-      {
-        'bg-input-bg-default': !disabled,
-        'border-input-border-disabled bg-input-bg-disabled': disabled,
-        'border-input-border-default': !active && !disabled,
-        'border-input-border-active': active,
-      },
-    )}
-    onClick={() => inputRef.current?.focus()}
-    onFocus={() => inputRef.current?.focus()}
-  >
-    <input
-      aria-disabled={disabled}
+  return (
+    <div
       className={cx(
-        'w-full h-full outline-none bg-transparent',
+        'cursor-text',
+        'box-border flex h-full w-full items-start justify-between p-3 pl-4',
+        'rounded-default border border-solid',
         {
-          'text-input-txt-primary': !disabled,
-          'text-input-txt-disabled': disabled,
+          'bg-input-bg-default': !disabled,
+          'border-input-border-disabled bg-input-bg-disabled': disabled,
+          'border-input-border-default': !active && !disabled,
+          'border-input-border-active': active,
         },
       )}
-      disabled={disabled}
-      ref={inputRef}
-      type={hidden ? 'password' : 'text'}
-      value={value}
-      onBlur={() => setActive(false)}
-      onChange={(evt) => onChange(evt.target.value)}
-      onFocus={() => setActive(true)}
-    />
-    {!disabled && type === 'password' && <div className='text-input-ico-placeholder cursor-pointer' onClick={() => setHidden(!hidden)}>
-      {hidden ? <NotVisibleIcon /> : <VisibleIcon />}
-    </div>}
-  </div>;
+      onClick={() => inputRef.current?.focus()}
+      onFocus={() => inputRef.current?.focus()}
+    >
+      <input
+        aria-disabled={disabled}
+        className={cx('h-full w-full bg-transparent outline-none', {
+          'text-input-txt-primary': !disabled,
+          'text-input-txt-disabled': disabled,
+        })}
+        disabled={disabled}
+        ref={inputRef}
+        type={hidden ? 'password' : 'text'}
+        value={value}
+        onBlur={() => setActive(false)}
+        onChange={(evt) => onChange(evt.target.value)}
+        onFocus={() => setActive(true)}
+      />
+      {!disabled && type === 'password' && (
+        <div className="cursor-pointer text-input-ico-placeholder" onClick={() => setHidden(!hidden)}>
+          {hidden ? <NotVisibleIcon /> : <VisibleIcon />}
+        </div>
+      )}
+    </div>
+  );
 }

@@ -3,14 +3,14 @@ import { render, screen } from '../../../test/test-utils';
 import { getSettings, initSettings, saveCachedSettings, SettingsManagerView } from '../../settingsManager';
 import { PaneConfig } from '../../types';
 import { DebugSettingsPane } from '../DebugSettingsPane';
-import { GeneralSettingsPane } from '../GeneralSettingsPane';
+import { LoggingSettingsPane } from '../LoggingSettingsPane';
 
 vi.mock('../../settingsManager');
 vi.mock('../../../events');
 
 const panelConfig: PaneConfig = {
   id: 'project-general',
-  Pane: GeneralSettingsPane,
+  Pane: LoggingSettingsPane,
   title: 'OPEN AI',
 };
 

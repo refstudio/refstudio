@@ -1,3 +1,6 @@
+import { useEffect, useState } from 'react';
+
+import { Button } from '../../components/Button';
 import { PaneConfig } from '../types';
 
 export interface SettingsPaneProps {
@@ -7,22 +10,42 @@ export interface SettingsPaneProps {
 export function SettingsPane({
   config,
   header,
-  description = '',
   children,
+  isDirty,
+  onSave,
 }: {
   config: PaneConfig;
   header: string;
-  description?: string;
   children: React.ReactNode;
+  isDirty: boolean;
+  onSave: () => void;
 }) {
-  return (
-    <div data-testid={config.id}>
-      <div className="mb-6">
-        <strong className="block border-b-2 border-b-slate-200 pb-1 text-2xl">{header}</strong>
-        <p className="text-sm text-slate-500">{description}</p>
-      </div>
+  const [isSaved, setSaved] = useState(false);
+  useEffect(() => {
+    if (isDirty) {
+      setSaved(false);
+    }
+  }, [isDirty]);
 
-      {children}
+  return (
+    <div className="flex h-full w-full flex-col items-stretch justify-between p-6" data-testid={config.id}>
+      <div className="flex flex-col items-stretch gap-6 overflow-hidden">
+        <h1 className="text-modal-txt-secondary">{header}</h1>
+        <div className="flex flex-col items-stretch gap-6 overflow-scroll">{children}</div>
+      </div>
+      <div className="flex justify-end">
+        <div className="shrink">
+          <Button
+            disabled={!isDirty}
+            size="M"
+            text={isSaved ? 'Saved!' : 'Save'}
+            onClick={() => {
+              setSaved(true);
+              onSave();
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 }

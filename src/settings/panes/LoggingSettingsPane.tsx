@@ -14,7 +14,7 @@ function getLoggingSettingsCached(): LoggingSettings {
   };
 }
 
-export function GeneralSettingsPane({ config }: SettingsPaneProps) {
+export function LoggingSettingsPane({ config }: SettingsPaneProps) {
   const [sidecarLoggingSettings, setSidecarLoggingSettings] = useState(getLoggingSettingsCached());
 
   const saveMutation = useMutation({

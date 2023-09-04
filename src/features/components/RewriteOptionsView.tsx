@@ -1,11 +1,12 @@
-import { Tooltip } from 'react-tooltip';
+import { useRef } from 'react';
 
 import { REWRITE_MANNER, RewriteOptions } from '../../api/rewrite.config';
 import { Button } from '../../components/Button';
 import { Dropdown } from '../../components/Dropdown';
 import { Slider } from '../../components/Slider';
 import { cx } from '../../lib/cx';
-import { InfoIcon, SpinnerIcon } from './icons';
+import { CreativityInfoTooltip } from './CreativityInfoTooltip';
+import { SpinnerIcon } from './icons';
 
 interface RewriteOptionsViewProps {
   className?: string;
@@ -23,6 +24,8 @@ export function RewriteOptionsView({
   onChange,
   rewriteSelection,
 }: RewriteOptionsViewProps) {
+  const tooltipContainerRef = useRef<HTMLDivElement>(null);
+
   return (
     <div className={cx('flex h-full w-full flex-col items-start p-4 pt-2', className)}>
       <div className="text-side-bar-txt flex flex-1 flex-col items-start gap-6 self-stretch overflow-scroll">
@@ -53,10 +56,18 @@ export function RewriteOptionsView({
             onChange={(manner: (typeof REWRITE_MANNER)[number]) => onChange({ ...options, manner })}
           />
         </div>
-        <div className="flex cursor-default select-none flex-col items-start gap-2 self-stretch">
+        <div
+          className="flex cursor-default select-none flex-col items-start gap-2 self-stretch"
+          ref={tooltipContainerRef}
+        >
           <div className="flex items-start gap-1 self-stretch">
             <h2>Creativity Level</h2>
-            <InfoTooltip />
+            {tooltipContainerRef.current && (
+              <CreativityInfoTooltip
+                id="rewrite-options-creativity-tooltip"
+                maxWidth={tooltipContainerRef.current.clientWidth - 8}
+              />
+            )}
           </div>
           <Slider
             className="w-full"
@@ -77,33 +88,6 @@ export function RewriteOptionsView({
         text="Rewrite"
         onClick={() => !isFetching && rewriteSelection()}
       />
-    </div>
-  );
-}
-
-function InfoTooltip() {
-  return (
-    <div className="text-btn-ico-tool-active">
-      <div id="info-icon">
-        <InfoIcon />
-      </div>
-      <Tooltip anchorSelect="#info-icon" clickable>
-        <div>
-          Higher creativity results
-          <br />
-          in less repetitive text.
-          <br />
-          Learn more{' '}
-          <a
-            href="https://stackoverflow.com/questions/58764619/why-should-we-use-temperature-in-softmax/63471046#63471046"
-            rel="noreferrer"
-            target="_blank"
-          >
-            here
-          </a>
-          .
-        </div>
-      </Tooltip>
     </div>
   );
 }
