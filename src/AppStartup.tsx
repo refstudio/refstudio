@@ -41,7 +41,7 @@ export function AppStartup() {
 
         if (isMounted()) {
           setInitialized(true);
-          const projectId = getCachedSetting('current_directory'); // TODO: Open project using project ID
+          const projectId = getCachedSetting('active_project_id');
           if (projectId) {
             const projectInfo = await readProjectById(projectId);
             await openProject(projectId, projectInfo.path, projectInfo.name);
