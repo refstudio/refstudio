@@ -131,7 +131,7 @@ function MessageBox({ disabled, value, onChange, onChat, onKeyDown }: MessageBox
     <div
       className={cx(
         'flex items-end justify-end gap-2 self-stretch p-2',
-        'rounded-default border border-solid border-input-border',
+        'rounded-default border border-solid border-input-border-default',
       )}
     >
       <textarea

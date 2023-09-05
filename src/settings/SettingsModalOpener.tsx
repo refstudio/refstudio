@@ -12,5 +12,5 @@ export function SettingsModalOpener() {
     return null;
   }
 
-  return <SettingsModal open={open} onCloseClick={() => setOpen(false)} />;
+  return <SettingsModal open={open} onClose={() => setOpen(false)} />;
 }

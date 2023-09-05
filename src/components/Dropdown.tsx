@@ -9,7 +9,7 @@ interface DropdownProps<T> {
   value?: T;
   onChange: (newValue: T) => void;
 }
-export function Dropdown<T extends string>({ disabled, options, value, onChange }: DropdownProps<T>) {
+export function Dropdown<T extends string>({ disabled, options, value, onChange, ...rest }: DropdownProps<T>) {
   const [open, setOpen] = useState(false);
   const handleClick = useCallback(
     (option: T) => {
@@ -32,8 +32,25 @@ export function Dropdown<T extends string>({ disabled, options, value, onChange 
     return 'Invalid value';
   }, [options, value]);
 
+  const getOptionName = (option: T | { name: string }) => (typeof option === 'string' ? option : option.name);
+  const getOptionValue = (option: T | { value: T }) => (typeof option === 'string' ? option : option.value);
+
   return (
-    <div className="flex w-full select-none flex-col items-stretch gap-1">
+    <div className="flex w-full select-none flex-col items-stretch gap-1" {...rest}>
+      <select
+        className="hidden"
+        role="select"
+        value={value}
+        onChange={(evt) => {
+          onChange(evt.target.value as T);
+        }}
+      >
+        {options.map((option) => (
+          <option key={getOptionValue(option)} value={getOptionValue(option)}>
+            {getOptionName(option)}
+          </option>
+        ))}
+      </select>
       <div
         className={cx(
           'flex items-start justify-between rounded-default border border-solid p-3 pl-4',
@@ -47,8 +64,8 @@ export function Dropdown<T extends string>({ disabled, options, value, onChange 
             'text-input-txt-disabled': disabled,
           },
           {
-            'border-input-border': !open,
-            'border-input-bg-action': !disabled && open,
+            'border-input-border-default': !open,
+            'border-input-border-active': !disabled && open,
           },
         )}
         onClick={() => !disabled && setOpen(!open)}
@@ -63,12 +80,12 @@ export function Dropdown<T extends string>({ disabled, options, value, onChange 
           <div
             className={cx(
               'absolute z-dropdown flex w-full flex-col items-stretch gap-2 p-2',
-              'rounded-default border border-solid border-input-border bg-input-bg-default',
+              'rounded-default border border-solid border-input-border-default bg-input-bg-default',
             )}
           >
             {options.map((option) => {
-              const name = typeof option === 'string' ? option : option.name;
-              const val = typeof option === 'string' ? option : option.value;
+              const name = getOptionName(option);
+              const val = getOptionValue(option);
               return (
                 <div
                   className={cx(

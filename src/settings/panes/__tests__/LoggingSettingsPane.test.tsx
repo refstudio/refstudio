@@ -1,16 +1,16 @@
 import { FlatSettingsSchema } from '../../../api/api-types';
 import { noop } from '../../../lib/noop';
-import { render, screen, userEvent } from '../../../test/test-utils';
+import { render, screen, userEvent, within } from '../../../test/test-utils';
 import { getCachedSetting, initSettings, saveCachedSettings, setCachedSetting } from '../../settingsManager';
 import { PaneConfig } from '../../types';
-import { GeneralSettingsPane } from '../GeneralSettingsPane';
+import { LOGGING_ACTIVE_TEST_ID, LOGGING_FILEPATH_TEST_ID, LoggingSettingsPane } from '../LoggingSettingsPane';
 
 vi.mock('../../settingsManager');
 vi.mock('../../../events');
 
 const panelConfig: PaneConfig = {
-  id: 'project-general',
-  Pane: GeneralSettingsPane,
+  id: 'project-logging',
+  Pane: LoggingSettingsPane,
   title: 'OPEN AI',
 };
 
@@ -39,30 +39,34 @@ describe('GeneralSettingsPane component', () => {
   });
 
   it('should render the component', () => {
-    render(<GeneralSettingsPane config={panelConfig} />);
+    render(<LoggingSettingsPane config={panelConfig} />);
     expect(screen.getByTestId(panelConfig.id)).toBeInTheDocument();
   });
 
   it('should render existing settings value', () => {
     const getCachedSettingMock = vi.mocked(getCachedSetting);
-    render(<GeneralSettingsPane config={panelConfig} />);
+    render(<LoggingSettingsPane config={panelConfig} />);
 
     expect(getCachedSettingMock.mock.calls.length).toBeGreaterThan(0);
-    expect(screen.getByLabelText('Active')).toBeChecked();
-    expect(screen.getByLabelText('Path')).toHaveValue(mockSettings.logging_filepath);
+    expect(within(screen.getByTestId(LOGGING_ACTIVE_TEST_ID)).getByRole('checkbox')).toBeChecked();
+    expect(within(screen.getByTestId(LOGGING_FILEPATH_TEST_ID)).getByRole('input')).toHaveValue(
+      mockSettings.logging_filepath,
+    );
   });
 
   it('should save (setCached, flush) with edited values on save', async () => {
     const user = userEvent.setup();
-    render(<GeneralSettingsPane config={panelConfig} />);
+    render(<LoggingSettingsPane config={panelConfig} />);
 
     expect(screen.getByRole('button', { name: /save/i })).toBeDisabled();
 
     // Type
-    await user.click(screen.getByLabelText('Active'));
-    await user.type(screen.getByLabelText('Path'), '-Updated-2');
-    expect(screen.getByLabelText('Active')).not.toBeChecked();
-    expect(screen.getByLabelText('Path')).toHaveValue(`${mockSettings.logging_filepath}-Updated-2`);
+    await user.click(screen.getByTestId(LOGGING_ACTIVE_TEST_ID));
+    await user.type(screen.getByTestId(LOGGING_FILEPATH_TEST_ID), '-Updated-2');
+    expect(within(screen.getByTestId(LOGGING_ACTIVE_TEST_ID)).getByRole('checkbox')).not.toBeChecked();
+    expect(within(screen.getByTestId(LOGGING_FILEPATH_TEST_ID)).getByRole('input')).toHaveValue(
+      `${mockSettings.logging_filepath}-Updated-2`,
+    );
     expect(screen.getByRole('button', { name: /save/i })).toBeEnabled();
 
     // Submit

@@ -1,17 +1,16 @@
 import { useMutation } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { FlatSettingsSchema, RewriteMannerType } from '../../../api/api-types';
+import { REWRITE_MANNER } from '../../../api/rewrite.config';
+import { Dropdown } from '../../../components/Dropdown';
+import { Input } from '../../../components/Input';
 import { JSONDebug, JSONDebugContainer } from '../../../components/JSONDebug';
-import { PasswordInput } from '../../../components/PasswordInput';
+import { Slider } from '../../../components/Slider';
 import { SettingsPane, SettingsPaneProps } from '../../../settings/panes/SettingsPane';
-import {
-  getCachedSetting,
-  getMannerOptions,
-  getSettings,
-  saveCachedSettings,
-  setCachedSetting,
-} from '../../../settings/settingsManager';
+import { getCachedSetting, getSettings, saveCachedSettings, setCachedSetting } from '../../../settings/settingsManager';
+import { CreativityInfoTooltip } from '../../components/CreativityInfoTooltip';
+import { InfoIcon } from '../../components/icons';
 
 interface OpenAISettings {
   api_key: FlatSettingsSchema['openai_api_key'];
@@ -29,6 +28,11 @@ function getOpenAISettingsCached(): OpenAISettings {
   };
 }
 
+export const API_KEY_TEST_ID = 'api-key';
+export const CHAT_MODEL_TEST_ID = 'chat-model';
+export const REWRITE_MANNER_TEST_ID = 'rewrite-manner';
+export const REWRITE_TEMPERATURE_TEST_ID = 'rewrite-temperature';
+
 export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
   const [paneSettings, setPaneSettings] = useState(getOpenAISettingsCached());
 
@@ -43,84 +47,81 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
     },
   });
 
-  const handleSaveSettings = (evt: React.FormEvent<HTMLFormElement>) => {
-    evt.preventDefault();
+  const handleSaveSettings = () => {
     saveMutation.mutate(paneSettings);
   };
 
   const isDirty = JSON.stringify(paneSettings) !== JSON.stringify(getOpenAISettingsCached());
 
+  const tooltipContainerRef = useRef<HTMLDivElement>(null);
+
   return (
-    <SettingsPane
-      config={config}
-      description="You need to configure the API to use the rewrite and chat operations."
-      header={config.title}
-    >
-      <form className="mt-10" data-testid="openai-settings-form" onSubmit={handleSaveSettings}>
-        <fieldset className="space-y-4">
-          <div>
-            <label htmlFor="apiKey">API Key</label>
-            <PasswordInput
-              className="w-full border bg-slate-50 px-2 py-0.5"
-              data-testid="apiKey"
-              id="apiKey"
-              name="apiKey"
-              value={paneSettings.api_key}
-              onChange={(e) => setPaneSettings({ ...paneSettings, api_key: e.currentTarget.value })}
-            />
-          </div>
-          <div>
-            <label htmlFor="chatModel">Chat Model</label>
-            <input
-              className="w-full border bg-slate-50 px-2 py-0.5"
-              id="chatModel"
-              name="chatModel"
-              value={paneSettings.chat_model}
-              onChange={(e) => setPaneSettings({ ...paneSettings, chat_model: e.currentTarget.value })}
-            />
-          </div>
-          <div>
-            <label htmlFor="manner">Manner</label>
-            <select
-              className="w-full border bg-slate-50 px-2 py-0.5"
-              id="manner"
-              name="manner"
-              value={paneSettings.manner}
-              onChange={(e) => setPaneSettings({ ...paneSettings, manner: e.currentTarget.value as RewriteMannerType })}
-            >
-              {getMannerOptions().map((m) => (
-                <option key={m} value={m}>
-                  {m}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label htmlFor="temperature">Creativity (temperature)</label>
-            <input
-              className="w-full border bg-slate-50 px-2 py-0.5"
-              id="temperature"
-              max={0.9}
-              min={0.7}
-              name="temperature"
-              step={0.01}
-              type="range"
-              value={paneSettings.temperature}
-              onChange={(e) => setPaneSettings({ ...paneSettings, temperature: parseFloat(e.currentTarget.value) })}
-            />
-          </div>
-        </fieldset>
-        <fieldset className="mt-10 flex items-center justify-end">
-          {saveMutation.isSuccess && <span className="px-2 text-primary">Saved!</span>}
-          {saveMutation.isError && <span className="px-2 text-red-300">{String(saveMutation.error)}</span>}
-          <input className="btn-primary" disabled={!isDirty || saveMutation.isLoading} type="submit" value="SAVE" />
-        </fieldset>
-      </form>
+    <SettingsPane config={config} header={config.title} isDirty={isDirty} onSave={handleSaveSettings}>
+      <div className="flex flex-col items-start gap-2">
+        <h2 className="t text-modal-txt-primary">API Key</h2>
+        <Input
+          data-testid={API_KEY_TEST_ID}
+          type="password"
+          value={paneSettings.api_key}
+          onChange={(api_key) => setPaneSettings({ ...paneSettings, api_key })}
+        />
+      </div>
+      <div className="flex flex-col items-start gap-2">
+        <div className="flex flex-row gap-1">
+          <h2 className="t text-modal-txt-primary">Chat Model</h2>
+          <ChatModelTooltip />
+        </div>
+        <Input
+          data-testid={CHAT_MODEL_TEST_ID}
+          value={paneSettings.chat_model}
+          onChange={(chat_model) => setPaneSettings({ ...paneSettings, chat_model })}
+        />
+      </div>
+      <div className="flex flex-col items-start gap-2">
+        <h2 className="t text-modal-txt-primary">Speech Type</h2>
+        <Dropdown
+          aria-label="manner"
+          data-testid={REWRITE_MANNER_TEST_ID}
+          options={REWRITE_MANNER.map((manner) => ({
+            name: manner.charAt(0).toUpperCase() + manner.slice(1),
+            value: manner,
+          }))}
+          value={paneSettings.manner}
+          onChange={(manner: RewriteMannerType) => setPaneSettings({ ...paneSettings, manner })}
+        />
+      </div>
+      <div className="flex flex-col items-start gap-2" ref={tooltipContainerRef}>
+        <div className="flex items-start gap-1 self-stretch">
+          <h2>Creativity Level</h2>
+          <CreativityInfoTooltip id="settings-creativity-tooltip" maxWidth={tooltipContainerRef.current?.clientWidth} />
+        </div>
+        <Slider
+          data-testid={REWRITE_TEMPERATURE_TEST_ID}
+          fluid
+          max={0.9}
+          min={0.7}
+          name="creativity"
+          step={0.01}
+          value={paneSettings.temperature}
+          onChange={(temperature) => setPaneSettings({ ...paneSettings, temperature })}
+        />
+      </div>
 
       <JSONDebugContainer className="mt-28">
         <JSONDebug header="paneSettings" maskedKeys={['apiKey']} value={paneSettings} />
         <JSONDebug header="API call result" maskedKeys={['apiKey']} value={saveMutation.data} />
       </JSONDebugContainer>
     </SettingsPane>
+  );
+}
+
+function ChatModelTooltip() {
+  return (
+    <div className="text-btn-ico-tool-active">
+      <div id="chat-tooltip">
+        <InfoIcon />
+      </div>
+      {/* TODO: <Tooltip anchorSelect="#chat-tooltip" /> */}
+    </div>
   );
 }

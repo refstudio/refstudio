@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { VscClose } from 'react-icons/vsc';
 
+import { Modal } from '../components/Modal';
 import { OpenAiSettingsPane } from '../features/ai/settings/OpenAiSettingsPane';
 import { cx } from '../lib/cx';
 import { DebugSettingsPane } from './panes/DebugSettingsPane';
-import { GeneralSettingsPane } from './panes/GeneralSettingsPane';
+import { LoggingSettingsPane } from './panes/LoggingSettingsPane';
 import { PaneConfig, SettingsPanesConfig } from './types';
 
 const SETTINGS_PANES: SettingsPanesConfig[] = [
@@ -22,14 +22,14 @@ const SETTINGS_PANES: SettingsPanesConfig[] = [
     section: 'Project',
     panes: [
       {
-        id: 'project-general',
-        title: 'General',
-        Pane: GeneralSettingsPane,
-      },
-      {
         id: 'project-openai',
         title: 'Open AI',
         Pane: OpenAiSettingsPane,
+      },
+      {
+        id: 'project-logging',
+        title: 'Logging',
+        Pane: LoggingSettingsPane,
       },
     ],
   },
@@ -47,58 +47,38 @@ const SETTINGS_PANES: SettingsPanesConfig[] = [
   },
 ];
 
-export function SettingsModal({ open, onCloseClick }: { open: boolean; onCloseClick: () => void }) {
-  const [pane, selectPane] = useState<PaneConfig>(
-    SETTINGS_PANES.flatMap((e) => e.panes).find((p) => p.id === 'project-general')!,
-  );
-
-  if (!open) {
-    return null;
-  }
+export function SettingsModal({ open, onClose: onClose }: { open: boolean; onClose: () => void }) {
+  const [pane, selectPane] = useState<PaneConfig>(SETTINGS_PANES[0].panes[0]);
 
   return (
-    <div className="fixed left-0 top-0 z-modals flex h-screen w-screen items-center justify-center">
-      <div className="pointer-events-none absolute left-0 top-0 h-full w-full bg-slate-400/60" />
+    <Modal className="h-[37.5rem] w-[50rem]" open={open} onClose={onClose}>
       <div
         className={cx(
-          'relative h-[calc(100vh-300px)] w-[1150px] max-w-[calc(100vw-100px)] overflow-hidden',
-          'rounded-xl border-none border-slate-500 bg-white shadow-xl shadow-slate-500',
-          '',
+          'flex w-40 shrink-0 flex-col items-stretch gap-2 bg-modal-bg-secondary px-2 py-6',
+          'cursor-default select-none',
         )}
       >
-        <div className="flex h-full flex-row">
-          <div className="flex w-52 flex-col space-y-10 bg-slate-100 p-6">
-            {SETTINGS_PANES.filter((s) => !s.hidden).map((paneSection) => (
-              <div
-                className={cx('space-y-1', { '!mt-auto': paneSection.bottom })}
-                key={paneSection.section}
-                role="menu"
-              >
-                <strong className="uppercase">{paneSection.section}</strong>
-                {paneSection.panes.map((paneConfig) => (
-                  <SettingsMenuItem
-                    activePane={pane}
-                    key={paneConfig.id}
-                    pane={paneConfig}
-                    text={paneConfig.title}
-                    onClick={selectPane}
-                  />
-                ))}
-              </div>
+        {SETTINGS_PANES.filter((s) => !s.hidden).map((paneSection) => (
+          <div className={cx('flex flex-col gap-2', { 'mt-auto': paneSection.bottom })} key={paneSection.section}>
+            <h1 className="px-2 text-modal-txt-primary" role="menuitem">
+              {paneSection.section}
+            </h1>
+            {paneSection.panes.map((paneConfig) => (
+              <SettingsMenuItem
+                activePane={pane}
+                key={paneConfig.id}
+                pane={paneConfig}
+                text={paneConfig.title}
+                onClick={selectPane}
+              />
             ))}
           </div>
-          <div className="relative h-full w-full overflow-auto p-6">
-            <VscClose
-              className="absolute right-2 top-2 cursor-pointer rounded-lg p-1 hover:bg-slate-200"
-              size={30}
-              title="close"
-              onClick={onCloseClick}
-            />
-            <pane.Pane config={pane} />
-          </div>
-        </div>
+        ))}
       </div>
-    </div>
+      <div className="flex-1 bg-modal-bg-primary">
+        <pane.Pane config={pane} />
+      </div>
+    </Modal>
   );
 }
 
@@ -116,13 +96,14 @@ function SettingsMenuItem({
   const active = pane === activePane;
   return (
     <div
-      className={cx('-mx-6 cursor-pointer px-6 py-1 hover:font-semibold', {
-        'bg-slate-200 font-semibold': active, //
+      className={cx('flex cursor-pointer items-center gap-1 rounded-default px-2 py-1', {
+        'bg-btn-bg-side-bar-item-active': active,
+        'hover:bg-btn-bg-side-bar-item-hover': !active,
       })}
       role="menuitem"
       onClick={() => onClick(pane)}
     >
-      {text}
+      <div className="line-clamp-1 flex-1 overflow-ellipsis text-btn-txt-side-bar-item-primary">{text}</div>
     </div>
   );
 }

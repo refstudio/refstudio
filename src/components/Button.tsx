@@ -19,6 +19,7 @@ export function Button({
   text,
   type = 'primary',
   onClick,
+  ...rest
 }: ButtonProps) {
   return (
     <button
@@ -42,7 +43,9 @@ export function Button({
         className,
       )}
       disabled={disabled}
+      role="button"
       onClick={disabled ? undefined : onClick}
+      {...rest}
     >
       {actionPosition === 'left' && Action}
       {text}

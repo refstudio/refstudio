@@ -1,4 +1,4 @@
-import { FlatSettingsSchema, RewriteMannerType } from '../../../../api/api-types';
+import { FlatSettingsSchema } from '../../../../api/api-types';
 import { noop } from '../../../../lib/noop';
 import {
   getCachedSetting,
@@ -8,8 +8,14 @@ import {
   setCachedSetting,
 } from '../../../../settings/settingsManager';
 import { PaneConfig } from '../../../../settings/types';
-import { fireEvent, render, screen, userEvent } from '../../../../test/test-utils';
-import { OpenAiSettingsPane } from '../OpenAiSettingsPane';
+import { fireEvent, render, screen, userEvent, within } from '../../../../test/test-utils';
+import {
+  API_KEY_TEST_ID,
+  CHAT_MODEL_TEST_ID,
+  OpenAiSettingsPane,
+  REWRITE_MANNER_TEST_ID,
+  REWRITE_TEMPERATURE_TEST_ID,
+} from '../OpenAiSettingsPane';
 
 vi.mock('../../../../settings/settingsManager');
 vi.mock('../../../../events');
@@ -55,32 +61,40 @@ describe('OpenAiSettingsPane component', () => {
     render(<OpenAiSettingsPane config={panelConfig} />);
 
     expect(getCachedSetting).toHaveBeenCalled();
-    expect(screen.getByTestId('openai-settings-form')).toHaveFormValues({
-      apiKey: mockSettings.openai_api_key,
-      chatModel: mockSettings.openai_chat_model,
-      manner: mockSettings.openai_manner,
-      temperature: String(mockSettings.openai_temperature),
-    });
+    expect(within(screen.getByTestId(API_KEY_TEST_ID)).getByRole('input')).toHaveValue(mockSettings.openai_api_key);
+    expect(within(screen.getByTestId(CHAT_MODEL_TEST_ID)).getByRole('input')).toHaveValue(
+      mockSettings.openai_chat_model,
+    );
+    expect(within(screen.getByTestId(REWRITE_MANNER_TEST_ID)).getByRole('select')).toHaveValue(
+      mockSettings.openai_manner,
+    );
+    expect(within(screen.getByTestId(REWRITE_TEMPERATURE_TEST_ID)).getByRole('slider')).toHaveValue(
+      `${mockSettings.openai_temperature}`,
+    );
   });
 
   it('should save (setCached, flush) with edited values on save', async () => {
     const user = userEvent.setup();
     render(<OpenAiSettingsPane config={panelConfig} />);
 
-    expect(screen.getByLabelText('API Key')).toHaveValue('API KEY');
+    expect(within(screen.getByTestId(API_KEY_TEST_ID)).getByRole('input')).toHaveValue('API KEY');
     expect(screen.getByRole('button', { name: /save/i })).toBeDisabled();
 
     // Type
-    await user.type(screen.getByLabelText('API Key'), '-Updated-1');
-    await user.type(screen.getByLabelText('Chat Model'), '-Updated-2');
-    await user.selectOptions(screen.getByLabelText('Manner'), 'scholarly' as RewriteMannerType);
-    const range = screen.getByLabelText('Creativity (temperature)');
+    await user.type(screen.getByTestId(API_KEY_TEST_ID), '-Updated-1');
+    await user.type(screen.getByTestId(CHAT_MODEL_TEST_ID), '-Updated-2');
+    await user.selectOptions(within(screen.getByTestId(REWRITE_MANNER_TEST_ID)).getByRole('select'), 'scholarly');
+    const range = within(screen.getByTestId(REWRITE_TEMPERATURE_TEST_ID)).getByRole('slider');
     // https://github.com/testing-library/user-event/issues/871
     // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.change(range, { target: { value: 0.9 } });
 
-    expect(screen.getByLabelText('API Key')).toHaveValue(`${mockSettings.openai_api_key}-Updated-1`);
-    expect(screen.getByLabelText('Chat Model')).toHaveValue(`${mockSettings.openai_chat_model}-Updated-2`);
+    expect(within(screen.getByTestId(API_KEY_TEST_ID)).getByRole('input')).toHaveValue(
+      `${mockSettings.openai_api_key}-Updated-1`,
+    );
+    expect(within(screen.getByTestId(CHAT_MODEL_TEST_ID)).getByRole('input')).toHaveValue(
+      `${mockSettings.openai_chat_model}-Updated-2`,
+    );
     expect(screen.getByRole('button', { name: /save/i })).toBeEnabled();
 
     // Submit
