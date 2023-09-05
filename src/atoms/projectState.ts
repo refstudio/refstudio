@@ -34,9 +34,7 @@ export const newProjectAtom = atom(null, async (_, set, projectId: string, path:
   set(currentProjectNameAtom, name);
 
   await set(loadReferencesAtom, projectId);
-  if (false) {
-    await set(refreshFileTreeAtom);
-  }
+  await set(refreshFileTreeAtom);
 });
 
 export const openProjectAtom = atom(null, async (_, set, projectId: string, path: string, name: string) => {

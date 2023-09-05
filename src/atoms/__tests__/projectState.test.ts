@@ -1,36 +1,47 @@
 import { atom, createStore } from 'jotai';
 
 import { setCurrentFileSystemProjectId } from '../../io/filesystem';
+import { closeAllEditorsAtom } from '../editorActions';
+import { refreshFileTreeAtom } from '../fileExplorerActions';
 import { closeProjectAtom, isProjectOpenAtom, newProjectAtom, projectNameAtom } from '../projectState';
-import { loadReferencesAtom } from '../referencesState';
+import { clearAllReferencesAtom, loadReferencesAtom } from '../referencesState';
 
 vi.mock('../../io/filesystem');
 
-// vi.mock('../editorActions', () => ({
-//   closeAllEditorsAtom: makeDebugAtom('closeAllEditorsAtom'),
-// }));
-
-// vi.mock('../referencesState', () => ({
-//   loadReferencesAtom: makeDebugAtom('loadReferencesAtom'),
-//   // clearAllReferencesAtom: makeDebugAtom('clearAllReferencesAtom'),
-// }));
-
-vi.mock('../referencesState', () => {
+vi.mock('../editorActions', () => {
   const fn = vi.fn();
   return {
-    loadReferencesAtom: atom(
+    closeAllEditorsAtom: atom(
       () => fn,
-      (_, __, ...args) => {
-        fn(...args);
-      },
+      (_, __, ...args) => void fn(...args),
     ),
   };
 });
-//   // clearAllReferencesAtom: makeDebugAtom('clearAllReferencesAtom'),
 
-// vi.mock('../fileExplorerActions', () => ({
-//   refreshFileTreeAtom: makeDebugAtom('refreshFileTreeAtom'),
-// }));
+vi.mock('../referencesState', () => {
+  const loadReferencesAtomFn = vi.fn();
+  const clearAllReferencesAtomFn = vi.fn();
+  return {
+    loadReferencesAtom: atom(
+      () => loadReferencesAtomFn,
+      (_, __, ...args) => void loadReferencesAtomFn(...args),
+    ),
+    clearAllReferencesAtom: atom(
+      () => clearAllReferencesAtomFn,
+      (_, __, ...args) => void clearAllReferencesAtomFn(...args),
+    ),
+  };
+});
+
+vi.mock('../fileExplorerActions', () => {
+  const fn = vi.fn();
+  return {
+    refreshFileTreeAtom: atom(
+      () => fn,
+      (_, __, ...args) => void fn(...args),
+    ),
+  };
+});
 
 describe('projectState', () => {
   let store: ReturnType<typeof createStore>;
@@ -47,15 +58,14 @@ describe('projectState', () => {
     expect(store.get(isProjectOpenAtom)).toBeFalsy();
   });
 
-  it.only('should set project id, load references and refresh files, when new project is created', async () => {
+  it('should set project id, load references and refresh files, when new project is created', async () => {
     await store.set(newProjectAtom, 'project-id', 'project-path', 'project-name');
     expect(store.get(isProjectOpenAtom)).toBeTruthy();
     expect(store.get(projectNameAtom)).toBe('project-name');
     expect(setCurrentFileSystemProjectId).toHaveBeenCalledWith('project-id');
+
     expect(store.get(loadReferencesAtom)).toHaveBeenCalledWith('project-id');
-    // expect(getDebugAtomSpy('loadReferencesAtom')).toHaveBeenCalledWith('project-id', 10);
-    // expect(loadReferencesAtom).toBe(1);
-    // expect(getDebugAtomSpy('refreshFileTreeAtom')).toHaveBeenCalled();
+    expect(store.get(refreshFileTreeAtom)).toHaveBeenCalledWith();
   });
 
   it('should close open project', async () => {
@@ -71,8 +81,8 @@ describe('projectState', () => {
   it('should close all open editors and clear all references on close', async () => {
     await store.set(newProjectAtom, 'project-id', 'project-path', 'project-name');
     await store.set(closeProjectAtom);
-    expect(getDebugAtomParams('closeAllEditorsAtom')).toHaveBeenCalled();
-    expect(getDebugAtomParams('clearAllReferencesAtom')).toHaveBeenCalled();
-    expect(getDebugAtomParams('refreshFileTreeAtom')).toHaveBeenCalled();
+    expect(store.get(closeAllEditorsAtom)).toHaveBeenCalled();
+    expect(store.get(clearAllReferencesAtom)).toHaveBeenCalled();
+    expect(store.get(refreshFileTreeAtom)).toHaveBeenCalled();
   });
 });
