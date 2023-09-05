@@ -1,6 +1,7 @@
-import { atom, createStore } from 'jotai';
+import { createStore } from 'jotai';
 
 import { setCurrentFileSystemProjectId } from '../../io/filesystem';
+import { DebugAtomModuleType } from '../debugAtom';
 import { closeAllEditorsAtom } from '../editorActions';
 import { refreshFileTreeAtom } from '../fileExplorerActions';
 import { closeProjectAtom, isProjectOpenAtom, newProjectAtom, projectNameAtom } from '../projectState';
@@ -8,38 +9,25 @@ import { clearAllReferencesAtom, loadReferencesAtom } from '../referencesState';
 
 vi.mock('../../io/filesystem');
 
-vi.mock('../editorActions', () => {
-  const fn = vi.fn();
+vi.mock('../editorActions', async () => {
+  const { debugAtom } = await vi.importActual<DebugAtomModuleType>('../debugAtom');
   return {
-    closeAllEditorsAtom: atom(
-      () => fn,
-      (_, __, ...args) => void fn(...args),
-    ),
+    closeAllEditorsAtom: debugAtom(),
   };
 });
 
-vi.mock('../referencesState', () => {
-  const loadReferencesAtomFn = vi.fn();
-  const clearAllReferencesAtomFn = vi.fn();
+vi.mock('../referencesState', async () => {
+  const { debugAtom } = await vi.importActual<DebugAtomModuleType>('../debugAtom');
   return {
-    loadReferencesAtom: atom(
-      () => loadReferencesAtomFn,
-      (_, __, ...args) => void loadReferencesAtomFn(...args),
-    ),
-    clearAllReferencesAtom: atom(
-      () => clearAllReferencesAtomFn,
-      (_, __, ...args) => void clearAllReferencesAtomFn(...args),
-    ),
+    loadReferencesAtom: debugAtom(),
+    clearAllReferencesAtom: debugAtom(),
   };
 });
 
-vi.mock('../fileExplorerActions', () => {
-  const fn = vi.fn();
+vi.mock('../fileExplorerActions', async () => {
+  const { debugAtom } = await vi.importActual<DebugAtomModuleType>('../debugAtom');
   return {
-    refreshFileTreeAtom: atom(
-      () => fn,
-      (_, __, ...args) => void fn(...args),
-    ),
+    refreshFileTreeAtom: debugAtom(),
   };
 });
 
