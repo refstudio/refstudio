@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
+import { Modal } from '../components/Modal';
 import { OpenAiSettingsPane } from '../features/ai/settings/OpenAiSettingsPane';
-import { useRefStudioHotkeys } from '../hooks/useRefStudioHotkeys';
 import { cx } from '../lib/cx';
 import { DebugSettingsPane } from './panes/DebugSettingsPane';
 import { LoggingSettingsPane } from './panes/LoggingSettingsPane';
@@ -50,60 +50,35 @@ const SETTINGS_PANES: SettingsPanesConfig[] = [
 export function SettingsModal({ open, onClose: onClose }: { open: boolean; onClose: () => void }) {
   const [pane, selectPane] = useState<PaneConfig>(SETTINGS_PANES[0].panes[0]);
 
-  useRefStudioHotkeys(['escape'], () => {
-    if (open) {
-      onClose();
-    }
-  });
-
-  if (!open) {
-    return null;
-  }
-
   return (
-    <div
-      className={cx(
-        'cursor-default select-none',
-        'fixed left-0 top-0 z-modals flex h-screen w-screen items-center justify-center',
-        'bg-modal-bg-overlay bg-opacity-[0.32]',
-      )}
-      onClick={onClose}
-    >
+    <Modal className="h-[37.5rem] w-[50rem]" open={open} onClose={onClose}>
       <div
-        className={cx('flex h-[37.5rem] w-[50rem] items-stretch overflow-hidden', 'rounded-modal shadow-default')}
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-        }}
+        className={cx(
+          'flex w-40 shrink-0 flex-col items-stretch gap-2 bg-modal-bg-secondary px-2 py-6',
+          'cursor-default select-none',
+        )}
       >
-        <div
-          className={cx(
-            'flex w-40 shrink-0 flex-col items-stretch gap-2 bg-modal-bg-secondary px-2 py-6',
-            'cursor-default select-none',
-          )}
-        >
-          {SETTINGS_PANES.filter((s) => !s.hidden).map((paneSection) => (
-            <div className={cx('flex flex-col gap-2', { 'mt-auto': paneSection.bottom })} key={paneSection.section}>
-              <h1 className="px-2 text-modal-txt-primary" role="menuitem">
-                {paneSection.section}
-              </h1>
-              {paneSection.panes.map((paneConfig) => (
-                <SettingsMenuItem
-                  activePane={pane}
-                  key={paneConfig.id}
-                  pane={paneConfig}
-                  text={paneConfig.title}
-                  onClick={selectPane}
-                />
-              ))}
-            </div>
-          ))}
-        </div>
-        <div className="flex-1 bg-modal-bg-primary">
-          <pane.Pane config={pane} />
-        </div>
+        {SETTINGS_PANES.filter((s) => !s.hidden).map((paneSection) => (
+          <div className={cx('flex flex-col gap-2', { 'mt-auto': paneSection.bottom })} key={paneSection.section}>
+            <h1 className="px-2 text-modal-txt-primary" role="menuitem">
+              {paneSection.section}
+            </h1>
+            {paneSection.panes.map((paneConfig) => (
+              <SettingsMenuItem
+                activePane={pane}
+                key={paneConfig.id}
+                pane={paneConfig}
+                text={paneConfig.title}
+                onClick={selectPane}
+              />
+            ))}
+          </div>
+        ))}
       </div>
-    </div>
+      <div className="flex-1 bg-modal-bg-primary">
+        <pane.Pane config={pane} />
+      </div>
+    </Modal>
   );
 }
 
