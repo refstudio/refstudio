@@ -2,6 +2,7 @@ import { open, save } from '@tauri-apps/api/dialog';
 import { useAtomValue, useSetAtom } from 'jotai';
 
 import { createRemoteProject, ProjectInfo, readAllProjects, readProjectById } from '../../api/projectsAPI';
+import { CreateModalResult } from '../../atoms/core/createModalAtoms';
 import { createFileAtom } from '../../atoms/fileEntryActions';
 import {
   closeProjectAtom,
@@ -24,24 +25,13 @@ export function useFileProjectNewListener() {
   const openCreateProjectModal = useSetAtom(createProjectModalAtoms.openAtom);
 
   return async () => {
-    let projectInfo: ProjectInfo;
-    if (import.meta.env.VITE_IS_WEB) {
-      const modalResult = await openCreateProjectModal();
+    const projectInfo = import.meta.env.VITE_IS_WEB
+      ? await makeNewProjectforWeb(() => openCreateProjectModal())
+      : await makeNewProjectForDesktop();
 
-      await openCreateProjectModal();
-      if (modalResult.status === 'dismissed') {
-        notifyInfo('User canceled operation to create new project');
-        return;
-      }
-      projectInfo = await createRemoteProject(modalResult.value);
-    } else {
-      const newProjectPath = await save({ defaultPath: await getNewProjectsBaseDir() });
-      if (typeof newProjectPath !== 'string') {
-        notifyInfo('User canceled operation to create new project');
-        return;
-      }
-      const projectName = newProjectPath.split('/').pop() ?? 'Project';
-      projectInfo = await createRemoteProject(projectName, newProjectPath);
+    if (!projectInfo) {
+      notifyInfo('User canceled operation to create new project');
+      return;
     }
 
     await newProject(projectInfo.id, projectInfo.path, projectInfo.name);
@@ -131,4 +121,31 @@ export function useOpenProjectListener() {
     persistActiveProjectInSettings(projectId);
     notifyInfo('New project open.');
   };
+}
+
+/**
+ * ######################################################
+ *
+ * UTILITY FUNCTIONS to create/open new projects
+ *
+ * ######################################################
+ */
+async function makeNewProjectforWeb(
+  modalCreator: () => Promise<CreateModalResult<string>>,
+): Promise<ProjectInfo | undefined> {
+  const modalResult = await modalCreator();
+  if (modalResult.status === 'dismissed') {
+    return;
+  } else {
+    return createRemoteProject(modalResult.value);
+  }
+}
+
+async function makeNewProjectForDesktop(): Promise<ProjectInfo | undefined> {
+  const newProjectPath = await save({ defaultPath: await getNewProjectsBaseDir() });
+  if (typeof newProjectPath !== 'string') {
+    return;
+  }
+  const projectName = newProjectPath.split('/').pop() ?? 'Project';
+  return createRemoteProject(projectName, newProjectPath);
 }

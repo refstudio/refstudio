@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
 
-type CreateModalResult<T> = { status: 'closed'; value: T } | { status: 'dismissed' };
+export type CreateModalResult<T> = { status: 'closed'; value: T } | { status: 'dismissed' };
 /**
  * Utility to create atoms to control the visibility of a modal that is typesafe in the modal result type.
  *
