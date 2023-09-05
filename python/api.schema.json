@@ -640,6 +640,9 @@
     },
     "FlatSettingsSchema": {
       "properties": {
+        "active_project_id": {
+          "type": "string"
+        },
         "current_directory": {
           "type": "string"
         },
@@ -664,6 +667,7 @@
       },
       "type": "object",
       "required": [
+        "active_project_id",
         "current_directory",
         "logging_enabled",
         "logging_filepath",
@@ -676,6 +680,9 @@
     },
     "FlatSettingsSchemaPatch": {
       "properties": {
+        "active_project_id": {
+          "type": "string"
+        },
         "current_directory": {
           "type": "string"
         },

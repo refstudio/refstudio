@@ -134,21 +134,19 @@ yarn test:watch:ui
 
 ## Reset
 
-To reset your local environment you should following these steps:
+To **completely** reset your local environment you should following these steps:
 
-* run `./scripts/reset_uploads.sh` to reset the references backend and uploads
+* run `./scripts/reset_refstudio.sh` (also available via `yarn reset:storage`)
 * run `yarn install && poetry install && yarn python` to make sure both the FE and BE are up-to-date
-* run `yarn tauri:dev` to run the app
-* upload new reference PDFs
+* run `yarn tauri:dev` (or `yarn web:api` and `yarn web:app`) to run the app
+* run the application and create a new project
+* (extra) you might also need to remove the [application's local storage cache](https://developer.chrome.com/docs/devtools/storage/localstorage/) for browser and Tauri browser
 
-Project state is persisted in the Tauri [`appDataDir`][appDataDir], typically `~/Library/Application\ Support/studio.ref.desktop`.
-To completely reset app state, quit the RefStudio app and remove this directory:
-
-```bash
-mv ~/Library/Application\ Support/studio.ref.desktop /tmp/
-```
-
-[appDataDir]: https://tauri.app/v1/api/js/path#appdatadir
+Notes:
+* Project state is persisted in the backend storage folder that defaults to `/tmp/web-storage-url`
+* The `reset_refstudio.sh` reset script will remove the folder `user1` from the backend storage folder
+* The reset script will backup the `user1/settings.json` to `user1.settings.json.bak`
+* You can use the env `WEB_STORAGE_URL` if the folder is located in a diferent folder (ex: `WEB_STORAGE_URL=/some/path reset_refstudio.sh`)
 
 ## Versioning
 
