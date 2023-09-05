@@ -70,7 +70,7 @@ export function RewriteOptionsView({
             )}
           </div>
           <Slider
-            className="w-full"
+            fluid
             max={0.9}
             min={0.7}
             name="creativity"

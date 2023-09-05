@@ -96,8 +96,8 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
           <CreativityInfoTooltip id="settings-creativity-tooltip" maxWidth={tooltipContainerRef.current?.clientWidth} />
         </div>
         <Slider
-          className="w-full"
           data-testid={REWRITE_TEMPERATURE_TEST_ID}
+          fluid
           max={0.9}
           min={0.7}
           name="creativity"

@@ -3,7 +3,7 @@ import './Slider.css';
 import { cx } from '../lib/cx';
 
 interface SliderProps {
-  className?: string;
+  fluid?: boolean;
   max: number;
   min: number;
   name: string;
@@ -11,9 +11,9 @@ interface SliderProps {
   value: number;
   onChange: (newValue: number) => void;
 }
-export function Slider({ className, max, min, name, step, value, onChange, ...rest }: SliderProps) {
+export function Slider({ fluid, max, min, name, step, value, onChange, ...rest }: SliderProps) {
   return (
-    <div className={cx('flex items-center py-2', className)} {...rest}>
+    <div className={cx('flex items-center py-2', { 'w-full': fluid })} {...rest}>
       <input
         aria-label={name}
         aria-valuemax={max}
