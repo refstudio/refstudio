@@ -111,15 +111,10 @@
 }
 
 .node-notionBlock + .node-notionBlock {
-  @apply mt-6;
+  @apply mt-2;
 }
 
 /* Add space between a parent notion block and its first child */
 .node-notionBlock .node-notionBlock:first-of-type {
-  @apply mt-2;
-}
-
-/* Space between sibling list items */
-.node-notionBlock:has(> * > .list-item) + .node-notionBlock:has(> * > .list-item) {
   @apply mt-2;
 }
