@@ -1,5 +1,6 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
+import { autoFocus as autoFocusInput } from '../lib/autoFocusAndSelect';
 import { cx } from '../lib/cx';
 import { NotVisibleIcon, VisibleIcon } from './icons';
 
@@ -7,12 +8,19 @@ interface InputProps {
   disabled?: boolean;
   type?: 'text' | 'password';
   value: string;
+  autoFocus?: boolean;
   onChange: (newValue: string) => void;
 }
-export function Input({ disabled, type = 'text', value, onChange, ...rest }: InputProps) {
+export function Input({ disabled, type = 'text', autoFocus = false, value, onChange, ...rest }: InputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [hidden, setHidden] = useState(type === 'password');
   const [active, setActive] = useState(false);
+
+  useEffect(() => {
+    if (autoFocus && inputRef.current) {
+      autoFocusInput(inputRef.current);
+    }
+  }, [autoFocus, inputRef]);
 
   return (
     <div
@@ -28,7 +36,6 @@ export function Input({ disabled, type = 'text', value, onChange, ...rest }: Inp
         },
       )}
       onClick={() => inputRef.current?.focus()}
-      onFocus={() => inputRef.current?.focus()}
       {...rest}
     >
       <input
