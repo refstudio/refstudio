@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from sidecar.search import service
-from sidecar.search.schemas import SearchRequest, SearchResponse
+from sidecar.search.schemas import SearchResponse
 
 router = APIRouter(
     prefix="/search",
