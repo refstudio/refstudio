@@ -1,9 +1,12 @@
+import json
 from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
+from sidecar import config
 from sidecar.api import api
 from sidecar.projects import service as projects_service
+from sidecar.settings import service as settings_service
 
 
 @pytest.fixture
@@ -43,6 +46,27 @@ def setup_project_with_uploads(monkeypatch, tmp_path, fixtures_dir):
             f"/{project_id}/{filename}",
             files={"file": ("test.pdf", f, "application/pdf")},
         )
+
+
+@pytest.fixture
+def create_settings_json(monkeypatch, tmp_path, request):
+    monkeypatch.setattr(config, "WEB_STORAGE_URL", tmp_path)
+
+    user_id = "user1"
+    filepath = settings_service.make_settings_json_path(user_id)
+
+    settings_service.initialize_settings_for_user(user_id)
+
+    defaults = settings_service.default_settings()
+    defaults.openai_api_key = "1234"
+
+    with open(filepath, "w") as f:
+        json.dump(defaults.dict(), f)
+
+    def teardown():
+        filepath.unlink()
+
+    request.addfinalizer(teardown)
 
 
 @pytest.fixture
