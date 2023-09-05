@@ -2,9 +2,11 @@ import { open, save } from '@tauri-apps/api/dialog';
 import { useAtomValue, useSetAtom } from 'jotai';
 
 import { createRemoteProject, ProjectInfo, readAllProjects, readProjectById } from '../../api/projectsAPI';
+import { CreateModalResult } from '../../atoms/core/createModalAtoms';
 import { createFileAtom } from '../../atoms/fileEntryActions';
 import {
   closeProjectAtom,
+  createProjectModalAtoms,
   isProjectOpenAtom,
   newProjectAtom,
   newSampleProjectAtom,
@@ -20,20 +22,16 @@ export const SAMPLE_PROJECT_NAME = 'RefStudio Sample';
 export function useFileProjectNewListener() {
   const newProject = useSetAtom(newProjectAtom);
   const createFile = useSetAtom(createFileAtom);
+  const openCreateProjectModal = useSetAtom(createProjectModalAtoms.openAtom);
 
   return async () => {
-    let projectInfo: ProjectInfo;
-    if (import.meta.env.VITE_IS_WEB) {
-      const projectName = 'Project Web'; // TODO: Open a custom dialog to ask the project name
-      projectInfo = await createRemoteProject(projectName);
-    } else {
-      const newProjectPath = await save({ defaultPath: await getNewProjectsBaseDir() });
-      if (typeof newProjectPath !== 'string') {
-        notifyInfo('User canceled operation to create new project');
-        return;
-      }
-      const projectName = newProjectPath.split('/').pop() ?? 'Project';
-      projectInfo = await createRemoteProject(projectName, newProjectPath);
+    const projectInfo = import.meta.env.VITE_IS_WEB
+      ? await makeNewProjectforWeb(() => openCreateProjectModal())
+      : await makeNewProjectForDesktop();
+
+    if (!projectInfo) {
+      notifyInfo('User canceled operation to create new project');
+      return;
     }
 
     await newProject(projectInfo.id, projectInfo.path, projectInfo.name);
@@ -123,4 +121,31 @@ export function useOpenProjectListener() {
     persistActiveProjectInSettings(projectId);
     notifyInfo('New project open.');
   };
+}
+
+/**
+ * ######################################################
+ *
+ * UTILITY FUNCTIONS to create/open new projects
+ *
+ * ######################################################
+ */
+async function makeNewProjectforWeb(
+  modalCreator: () => Promise<CreateModalResult<string>>,
+): Promise<ProjectInfo | undefined> {
+  const modalResult = await modalCreator();
+  if (modalResult.status === 'dismissed') {
+    return;
+  } else {
+    return createRemoteProject(modalResult.value);
+  }
+}
+
+async function makeNewProjectForDesktop(): Promise<ProjectInfo | undefined> {
+  const newProjectPath = await save({ defaultPath: await getNewProjectsBaseDir() });
+  if (typeof newProjectPath !== 'string') {
+    return;
+  }
+  const projectName = newProjectPath.split('/').pop() ?? 'Project';
+  return createRemoteProject(projectName, newProjectPath);
 }

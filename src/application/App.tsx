@@ -17,6 +17,7 @@ import { ContextMenus } from '../wrappers/ContextMenus';
 import { EventsListener } from '../wrappers/EventsListener';
 import { CommandPalette } from './commands/CommandPalette';
 import { MainPanel } from './components/MainPanel';
+import { CreateProjectModal } from './CreateProjectModal';
 import { LeftSidePanelWrapper } from './sidebar/LeftSidePanelWrapper';
 import { RightSidePanelWrapper } from './sidebar/RightSidePanelWrapper';
 import { WebMenuShortcuts } from './WebMenuShortcuts';
@@ -89,7 +90,17 @@ export function App() {
           </ContextMenus>
         </ApplicationFrame>
         <SettingsModalOpener />
+        <ProjectModals />
       </ReferencesDropZone>
     </EventsListener>
+  );
+}
+
+function ProjectModals() {
+  return (
+    <>
+      <CreateProjectModal />
+      {/* <OpenProjectModal /> */}
+    </>
   );
 }

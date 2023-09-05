@@ -1,3 +1,5 @@
+import { MouseEventHandler } from 'react';
+
 import { cx } from '../lib/cx';
 
 interface ButtonProps {
@@ -9,7 +11,8 @@ interface ButtonProps {
   size?: 'S' | 'M';
   text: string;
   type?: 'primary' | 'secondary';
-  onClick: () => void;
+  submit?: boolean;
+  onClick?: MouseEventHandler<HTMLButtonElement>;
 }
 export function Button({
   Action,
@@ -20,6 +23,7 @@ export function Button({
   size = 'S',
   text,
   type = 'primary',
+  submit = false,
   onClick,
   ...rest
 }: ButtonProps) {
@@ -49,6 +53,7 @@ export function Button({
       )}
       disabled={disabled}
       role="button"
+      type={submit ? 'submit' : 'button'}
       onClick={disabled ? undefined : onClick}
       {...rest}
     >
