@@ -21,17 +21,19 @@ export const SAMPLE_PROJECT_NAME = 'RefStudio Sample';
 export function useFileProjectNewListener() {
   const newProject = useSetAtom(newProjectAtom);
   const createFile = useSetAtom(createFileAtom);
-  const showCreateProjectModal = useSetAtom(createProjectModalAtoms.showAtom);
+  const openCreateProjectModal = useSetAtom(createProjectModalAtoms.openAtom);
 
   return async () => {
     let projectInfo: ProjectInfo;
     if (import.meta.env.VITE_IS_WEB) {
-      const projectName = await showCreateProjectModal();
-      if (!projectName) {
+      const modalResult = await openCreateProjectModal();
+
+      await openCreateProjectModal();
+      if (modalResult.status === 'dismissed') {
         notifyInfo('User canceled operation to create new project');
         return;
       }
-      projectInfo = await createRemoteProject(projectName);
+      projectInfo = await createRemoteProject(modalResult.value);
     } else {
       const newProjectPath = await save({ defaultPath: await getNewProjectsBaseDir() });
       if (typeof newProjectPath !== 'string') {

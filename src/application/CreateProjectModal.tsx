@@ -1,5 +1,5 @@
 import { useAtomValue, useSetAtom } from 'jotai';
-import { FormEventHandler, MouseEventHandler, useState } from 'react';
+import { FormEventHandler, useState } from 'react';
 
 import { createProjectModalAtoms } from '../atoms/projectState';
 import { Button } from '../components/Button';
@@ -11,21 +11,16 @@ export function CreateProjectModal() {
 
   const isVisible = useAtomValue(createProjectModalAtoms.visibleAtom);
   const closeModal = useSetAtom(createProjectModalAtoms.closeAtom);
+  const dismissModal = useSetAtom(createProjectModalAtoms.dismissAtom);
 
   const cleanupName = (_name: string) => _name.replace(/[^a-zA-Z0-9-_ ]/g, '');
 
   const handleFormSubmit: FormEventHandler = (e) => {
     e.preventDefault();
-    e.stopPropagation();
     if (!name) {
       return;
     }
     closeModal(name.trim());
-  };
-  const handleOnCancel: MouseEventHandler<HTMLButtonElement> = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    closeModal(null);
   };
 
   if (!isVisible) {
@@ -55,7 +50,7 @@ export function CreateProjectModal() {
             />
             <div className="flex items-center justify-end gap-2">
               <Button disabled={cleanupName(name).length === 0} submit text="Create" type="primary" />
-              <Button text="Cancel" type="secondary" onClick={handleOnCancel} />
+              <Button text="Cancel" type="secondary" onClick={dismissModal} />
             </div>
           </form>
         </div>
