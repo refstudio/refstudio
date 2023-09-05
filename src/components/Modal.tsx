@@ -24,18 +24,20 @@ export function Modal({ children, className, open, onClose }: ModalProps) {
     return null;
   }
 
-  return <div
-    className={cx(
-      'cursor-default select-none',
-      'fixed left-0 top-0 z-modals flex h-screen w-screen items-center justify-center',
-      'bg-modal-bg-overlay bg-opacity-[0.32]',
-    )}
-  >
+  return (
     <div
-      className={cx('flex items-stretch overflow-hidden', 'rounded-modal shadow-default', className)}
-      ref={modalRef}
+      className={cx(
+        'cursor-default select-none',
+        'fixed left-0 top-0 z-modals flex h-screen w-screen items-center justify-center',
+        'bg-modal-bg-overlay bg-opacity-[0.32]',
+      )}
     >
-      {children}
+      <div
+        className={cx('flex items-stretch overflow-hidden', 'rounded-modal shadow-default', className)}
+        ref={modalRef}
+      >
+        {children}
+      </div>
     </div>
-  </div>;
+  );
 }
