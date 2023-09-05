@@ -17,7 +17,7 @@ export function SearchBar({ placeholder, onChange }: SearchBarProps) {
     <div
       className={cx(
         'flex items-start gap-2 self-stretch rounded-default',
-        'cursor-text border border-solid border-input-border p-3',
+        'cursor-text border border-solid border-input-border-default p-3',
       )}
       onClick={() => {
         inputRef.current?.focus();

@@ -30,8 +30,8 @@ describe('SettingsModalOpener component', () => {
     const mockData = mockListenEvent();
 
     render(<SettingsModalOpener />);
-    expect(screen.queryByRole('menuitem', { name: 'General' })).not.toBeInTheDocument();
     expect(screen.queryByRole('menuitem', { name: 'Open AI' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: 'Logging' })).not.toBeInTheDocument();
     expect(screen.queryByRole('menuitem', { name: 'Config' })).not.toBeInTheDocument();
 
     expect(mockData.registeredEventNames).toContain('refstudio://menu/settings');
@@ -39,8 +39,8 @@ describe('SettingsModalOpener component', () => {
     // Trigger the settings event to open the modal
     act(() => mockData.trigger('refstudio://menu/settings'));
 
-    expect(screen.getByRole('menuitem', { name: 'General' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Open AI' })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Logging' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Config' })).toBeInTheDocument();
   });
 
@@ -48,15 +48,15 @@ describe('SettingsModalOpener component', () => {
     const mockData = mockListenEvent();
 
     render(<SettingsModalOpener />);
-    expect(screen.queryByRole('menuitem', { name: 'General' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: 'Logging' })).not.toBeInTheDocument();
     expect(mockData.registeredEventNames).toContain('refstudio://menu/settings');
 
     // Open
     act(() => mockData.trigger('refstudio://menu/settings'));
-    expect(screen.getByRole('menuitem', { name: 'General' })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Logging' })).toBeInTheDocument();
 
     // Close
     act(() => mockData.trigger('refstudio://menu/settings'));
-    expect(screen.queryByRole('menuitem', { name: 'General' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: 'Logging' })).not.toBeInTheDocument();
   });
 });

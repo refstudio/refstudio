@@ -23,6 +23,7 @@ export function Button({
   type = 'primary',
   submit = false,
   onClick,
+  ...rest
 }: ButtonProps) {
   return (
     <button
@@ -46,8 +47,10 @@ export function Button({
         className,
       )}
       disabled={disabled}
+      role="button"
       type={submit ? 'submit' : 'button'}
       onClick={disabled ? undefined : onClick}
+      {...rest}
     >
       {actionPosition === 'left' && Action}
       {text}

@@ -3,17 +3,26 @@ import { useSetAtom } from 'jotai';
 import { selectEditorInPaneAtom } from '../../atoms/editorActions';
 import { useActiveEditorIdForPane } from '../../atoms/hooks/useActiveEditorIdForPane';
 import { useOpenEditorsDataForPane } from '../../atoms/hooks/useOpenEditorsDataForPane';
+import { EditorContentType } from '../../atoms/types/EditorContent';
 import { parseEditorId } from '../../atoms/types/EditorData';
 import { PaneId } from '../../atoms/types/PaneGroup';
-import { RefStudioEditorIcon } from '../../components/icons';
 import { TabPane } from '../../components/TabPane';
 import { TabPaneTabContextMenuProps } from '../../components/TabPaneTabContextMenu';
 import { emitEvent } from '../../events';
+import { PdfEditorIcon, RefStudioEditorIcon } from './icons';
+
+const EDITOR_ICONS: Record<EditorContentType, () => React.ReactElement | undefined> = {
+  refstudio: RefStudioEditorIcon,
+  pdf: PdfEditorIcon,
+  text: () => undefined,
+  json: () => undefined,
+  references: () => undefined,
+  reference: () => undefined,
+};
 
 interface OpenEditorsTabPaneProps {
   paneId: PaneId;
 }
-
 export function OpenEditorsTabPane({ paneId }: OpenEditorsTabPaneProps) {
   const openEditorsData = useOpenEditorsDataForPane(paneId);
   const activeEditorId = useActiveEditorIdForPane(paneId);
@@ -26,7 +35,7 @@ export function OpenEditorsTabPane({ paneId }: OpenEditorsTabPaneProps) {
       text: editorData.title,
       value: editorData.id,
       isDirty: editorData.isDirty,
-      Icon: type === 'refstudio' ? <RefStudioEditorIcon /> : undefined,
+      Icon: EDITOR_ICONS[type](),
       ctxProps: {
         editorId: editorData.id,
         paneId,
