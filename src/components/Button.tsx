@@ -5,6 +5,7 @@ interface ButtonProps {
   actionPosition?: 'left' | 'right';
   className?: string;
   disabled?: boolean;
+  fluid?: boolean;
   size?: 'S' | 'M';
   text: string;
   type?: 'primary' | 'secondary';
@@ -15,6 +16,7 @@ export function Button({
   actionPosition = 'left',
   className,
   disabled,
+  fluid,
   size = 'S',
   text,
   type = 'primary',
@@ -24,7 +26,10 @@ export function Button({
   return (
     <button
       className={cx(
-        'flex w-full items-center gap-2 rounded-default px-2 py-2',
+        'flex items-center gap-2 rounded-default px-2 py-2',
+        {
+          'w-full': fluid,
+        },
         {
           'justify-center px-5 py-3': size === 'M',
         },

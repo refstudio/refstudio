@@ -37,11 +37,13 @@ function WelcomeActions() {
       <div className="flex flex-col items-center gap-2 self-stretch">
         <Button
           Action={<AddIcon />}
+          fluid
           text="Create Project"
           onClick={() => emitEvent('refstudio://menu/file/project/new')}
         />
         <Button
           Action={<OpenIcon />}
+          fluid
           text="Open Project"
           type="secondary"
           onClick={() => emitEvent('refstudio://menu/file/project/open')}
@@ -68,13 +70,11 @@ function WelcomeTips() {
         </div>
       </div>
       <div className="flex flex-row items-start gap-2">
-        <div className="shrink">
-          <Button
-            Action={<SampleIcon />}
-            text="Try Sample Project"
-            onClick={() => emitEvent('refstudio://menu/file/project/new/sample')}
-          />
-        </div>
+        <Button
+          Action={<SampleIcon />}
+          text="Try Sample Project"
+          onClick={() => emitEvent('refstudio://menu/file/project/new/sample')}
+        />
       </div>
     </div>
   );

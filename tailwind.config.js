@@ -138,6 +138,7 @@ export default {
           primary: 'rgb(var(--grayscale-00) / <alpha-value>)',
           secondary: 'rgb(var(--grayscale-20) / <alpha-value>)',
         },
+        'side-bar-ico-empty': 'rgb(var(--grayscale-40) / <alpha-value>)',
         'card-txt-header': 'rgb(var(--grayscale-00) / <alpha-value>)',
         'card-border-header': 'rgb(var(--primary-90) / <alpha-value>)',
         'card-border': {
