@@ -47,7 +47,7 @@ export function Button({
       )}
       disabled={disabled}
       type={submit ? 'submit' : 'button'}
-      onClick={disabled || !onClick ? undefined : onClick}
+      onClick={disabled ? undefined : onClick}
     >
       {actionPosition === 'left' && Action}
       {text}
