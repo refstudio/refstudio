@@ -6,6 +6,7 @@ import { getDerivedReferenceAtom, updateReferenceAtom } from '../../../atoms/ref
 import { EditorIdFor, parseEditorId } from '../../../atoms/types/EditorData';
 import { ReferenceItem } from '../../../types/ReferenceItem';
 import ReferenceDetailsCard from './ReferenceDetailsCard';
+import { TableDataContext } from './ReferenceDetailsCard.Context';
 import { ReferenceDetailsCardRow } from './ReferenceEditorTypes';
 
 export function ReferenceView({ referenceId }: { referenceId: EditorIdFor<'reference'> }) {
@@ -65,14 +66,17 @@ export function ReferenceView({ referenceId }: { referenceId: EditorIdFor<'refer
   });
 
   return (
-    <ReferenceDetailsCard
-      editableReferenceItem={cloneEditableReferenceItem(reference)}
-      tableData={{
+    <TableDataContext.Provider
+      value={{
         tableBodyContent: formatReferenceCardData(reference),
         headerContentArray: ['References'],
         headerColSpan: 2,
       }}
-      updateReference={handleCellValueChanged}
-    />
+    >
+      <ReferenceDetailsCard
+        editableReferenceItem={cloneEditableReferenceItem(reference)}
+        handleCellValueChanged={handleCellValueChanged}
+      />
+    </TableDataContext.Provider>
   );
 }
