@@ -2,8 +2,8 @@ from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
-from sidecar import projects
 from sidecar.api import api
+from sidecar.projects import service as projects_service
 
 
 @pytest.fixture
@@ -16,8 +16,8 @@ def setup_project_path_storage(monkeypatch, tmp_path):
     user_id = "user1"
     project_id = "project1"
     project_name = "project1name"
-    monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
-    projects.create_project(user_id, project_id, project_name)
+    monkeypatch.setattr(projects_service, "WEB_STORAGE_URL", tmp_path)
+    projects_service.create_project(user_id, project_id, project_name)
     return user_id, project_id
 
 
@@ -26,10 +26,10 @@ def setup_project_with_uploads(monkeypatch, tmp_path, fixtures_dir):
     user_id = "user1"
     project_id = "project1"
     project_name = "project1name"
-    monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
+    monkeypatch.setattr(projects_service, "WEB_STORAGE_URL", tmp_path)
 
-    projects.create_project(user_id, project_id, project_name)
-    project_path = projects.get_project_path(user_id, project_id)
+    projects_service.create_project(user_id, project_id, project_name)
+    project_path = projects_service.get_project_path(user_id, project_id)
 
     client = TestClient(api)
     client.post(f"/fs/{project_id}/uploads", files={"file": ("file1.txt", "content")})
