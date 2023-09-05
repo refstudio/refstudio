@@ -3,10 +3,10 @@ import { Fragment } from 'react';
 
 import { ProjectInfo, readAllProjects } from '../../api/projectsAPI';
 import { Button } from '../../components/Button';
-import { OpenIcon, RefStudioEditorIcon } from '../../components/icons';
+import { OpenIcon } from '../../components/icons';
 import { emitEvent } from '../../events';
 import { cx } from '../../lib/cx';
-import { AddIcon, SampleIcon } from '../components/icons';
+import { AddIcon, RefStudioEditorIcon, SampleIcon } from '../components/icons';
 
 export function WelcomeView() {
   return (
