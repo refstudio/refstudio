@@ -1,12 +1,14 @@
 import { createStore } from 'jotai';
 
-import { createProjectModalAtoms } from '../projectState';
+import { createModalAtoms } from '../createModalAtoms';
 
-describe('projectState.createModal', () => {
+describe('createModalAtoms.string', () => {
   let store: ReturnType<typeof createStore>;
+  let createProjectModalAtoms: ReturnType<typeof createModalAtoms<string>>;
 
   beforeEach(() => {
     store = createStore();
+    createProjectModalAtoms = createModalAtoms<string>();
   });
 
   afterEach(() => {
