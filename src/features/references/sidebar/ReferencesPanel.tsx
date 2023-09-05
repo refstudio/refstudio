@@ -73,14 +73,14 @@ export function ReferencesPanel() {
       ]}
       title="References"
     >
-      <div className="flex flex-1 flex-col items-start gap-4 self-stretch p-4 pt-2">
-        <SearchBar placeholder="Filter author/title..." onChange={handleFilterChanged} />
-        <ReferencesList
-          references={visibleReferences}
-          onAuthorClicked={handleAuthorClicked}
-          onRefClicked={handleRefClicked}
-        />
-      </div>
+        <div className="flex flex-1 flex-col items-start gap-4 self-stretch overflow-hidden p-4 pt-2">
+          <SearchBar placeholder="Filter author/title..." onChange={handleFilterChanged} />
+          <ReferencesList
+            references={visibleReferences}
+            onAuthorClicked={handleAuthorClicked}
+            onRefClicked={handleRefClicked}
+          />
+        </div>
     </PanelWrapper>
   );
 }
