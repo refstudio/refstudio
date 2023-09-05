@@ -1,11 +1,9 @@
-from pathlib import Path
-
-from sidecar import storage, typing
-from sidecar.typing import Author, Chunk, Reference
+from sidecar.references import storage
+from sidecar.references.schemas import Author, Chunk, Reference, ReferencePatch
 
 
-def test_json_storage_load():
-    fp = Path(__file__).parent.joinpath("fixtures/data/references.json")
+def test_json_storage_load(fixtures_dir):
+    fp = f"{fixtures_dir}/data/references.json"
     jstore = storage.JsonStorage(filepath=fp)
     jstore.load()
 
@@ -33,8 +31,8 @@ def test_json_storage_load():
             assert isinstance(chunk, Chunk)
 
 
-def test_json_storage_update(monkeypatch, tmp_path):
-    fp = Path(__file__).parent.joinpath("fixtures/data/references.json")
+def test_json_storage_update(monkeypatch, tmp_path, fixtures_dir):
+    fp = f"{fixtures_dir}/data/references.json"
     jstore = storage.JsonStorage(filepath=fp)
     jstore.load()
 
@@ -48,7 +46,7 @@ def test_json_storage_update(monkeypatch, tmp_path):
     # test: update for `source_filename` that does not exist
     # expect: no References are changed and json response in stdout = ERROR
 
-    patch = typing.ReferencePatch(data={"citation_key": "should-not-change"})
+    patch = ReferencePatch(data={"citation_key": "should-not-change"})
 
     response = jstore.update("id-does-not-exist", patch)
 
@@ -72,7 +70,7 @@ def test_json_storage_update(monkeypatch, tmp_path):
     # create the ReferenceUpdate object for input
     ref = jstore.references[0]
 
-    patch = typing.ReferencePatch(data={"citation_key": "reda2023"})
+    patch = ReferencePatch(data={"citation_key": "reda2023"})
 
     response = jstore.update(ref.id, patch)
     output = response.dict()
@@ -100,8 +98,8 @@ def test_json_storage_update(monkeypatch, tmp_path):
     assert len(jstore.references[1].chunks) == 6
 
 
-def test_storage_delete_references(monkeypatch, tmp_path):
-    fp = Path(__file__).parent.joinpath("fixtures/data/references.json")
+def test_storage_delete_references(monkeypatch, tmp_path, fixtures_dir):
+    fp = f"{fixtures_dir}/data/references.json"
     jstore = storage.JsonStorage(filepath=fp)
     jstore.load()
 

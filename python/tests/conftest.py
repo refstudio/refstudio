@@ -49,6 +49,27 @@ def setup_project_with_uploads(monkeypatch, tmp_path, fixtures_dir):
 
 
 @pytest.fixture
+def setup_uploaded_reference_pdfs(monkeypatch, tmp_path, fixtures_dir):
+    monkeypatch.setattr(config, "WEB_STORAGE_URL", tmp_path)
+
+    # create a project
+    user_id = "user1"
+    project_id = "project1"
+    _ = projects_service.create_project(user_id, project_id)
+
+    # create a file
+    filename = "uploads/test.pdf"
+
+    client = TestClient(api)
+
+    with open(f"{fixtures_dir}/pdf/test.pdf", "rb") as f:
+        _ = client.put(
+            f"/fs/{project_id}/{filename}",
+            files={"file": ("test.pdf", f, "application/pdf")},
+        )
+
+
+@pytest.fixture
 def create_settings_json(monkeypatch, tmp_path, request):
     monkeypatch.setattr(config, "WEB_STORAGE_URL", tmp_path)
 

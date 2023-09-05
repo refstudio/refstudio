@@ -1,57 +1,39 @@
 from pathlib import Path
 
-import pytest
 from fastapi.testclient import TestClient
-from sidecar import http, projects
+from sidecar import config
+from sidecar.api import api
+from sidecar.projects.service import create_project
+from sidecar.references.storage import JsonStorage
 
-from .test_ingest import FIXTURES_DIR, _copy_fixture_to_temp_dir
+from ..helpers import _copy_fixture_to_temp_dir
 
-references_client = TestClient(http.references_api)
-filesystem_client = TestClient(http.filesystem_api)
-
-
-@pytest.fixture
-def setup_uploaded_reference_pdfs(monkeypatch, tmp_path):
-    monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
-
-    # create a project
-    user_id = "user1"
-    project_id = "project1"
-    _ = projects.create_project(user_id, project_id)
-
-    # create a file
-    filename = "uploads/test.pdf"
-
-    with open(f"{FIXTURES_DIR}/pdf/test.pdf", "rb") as f:
-        _ = filesystem_client.put(
-            f"/{project_id}/{filename}",
-            files={"file": ("test.pdf", f, "application/pdf")},
-        )
+client = TestClient(api)
 
 
 def test_list_references_should_return_empty_list(monkeypatch, tmp_path):
     user_id = "user1"
     project_id = "project1"
 
-    monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
-    _ = projects.create_project(user_id, project_id, project_name="foo")
+    monkeypatch.setattr(config, "WEB_STORAGE_URL", tmp_path)
+    _ = create_project(user_id, project_id, project_name="foo")
 
     # .storage/references.json does not exist as no references have been ingested
-    response = references_client.get(f"/{project_id}")
+    response = client.get(f"/references/{project_id}")
     assert response.status_code == 200
     assert len(response.json()) == 0
 
 
-def test_list_references_should_return_references(monkeypatch, tmp_path):
+def test_list_references_should_return_references(monkeypatch, tmp_path, fixtures_dir):
     user_id = "user1"
     project_id = "project1"
 
-    monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
-    project_path = projects.create_project(user_id, project_id, project_name="foo")
+    monkeypatch.setattr(config, "WEB_STORAGE_URL", tmp_path)
+    project_path = create_project(user_id, project_id, project_name="foo")
     mocked_path = project_path / ".storage" / "references.json"
 
     # copy references.json to mocked storage path
-    test_file = "fixtures/data/references.json"
+    test_file = f"{fixtures_dir}/data/references.json"
     path_to_test_file = Path(__file__).parent.joinpath(test_file)
 
     _copy_fixture_to_temp_dir(path_to_test_file, mocked_path)
@@ -59,22 +41,22 @@ def test_list_references_should_return_references(monkeypatch, tmp_path):
     jstore = JsonStorage(filepath=mocked_path)
     jstore.load()
 
-    response = references_client.get(f"/{project_id}")
+    response = client.get(f"/references/{project_id}")
     assert response.status_code == 200
     assert len(response.json()) == len(jstore.references)
     assert len(response.json()) != 0
 
 
-def test_get_reference(monkeypatch, tmp_path):
+def test_get_reference(monkeypatch, tmp_path, fixtures_dir):
     user_id = "user1"
     project_id = "project1"
 
-    monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
-    project_path = projects.create_project(user_id, project_id, project_name="foo")
+    monkeypatch.setattr(config, "WEB_STORAGE_URL", tmp_path)
+    project_path = create_project(user_id, project_id, project_name="foo")
     mocked_path = project_path / ".storage" / "references.json"
 
     # copy references.json to mocked storage path
-    test_file = "fixtures/data/references.json"
+    test_file = f"{fixtures_dir}/data/references.json"
     path_to_test_file = Path(__file__).parent.joinpath(test_file)
 
     _copy_fixture_to_temp_dir(path_to_test_file, mocked_path)
@@ -85,21 +67,21 @@ def test_get_reference(monkeypatch, tmp_path):
     # get the first reference
     ref = jstore.references[0]
 
-    response = references_client.get(f"/{project_id}/{ref.id}")
+    response = client.get(f"/references/{project_id}/{ref.id}")
     assert response.status_code == 200
     assert response.json() == ref.dict()
 
 
-def test_references_update(monkeypatch, tmp_path):
+def test_references_update(monkeypatch, tmp_path, fixtures_dir):
     user_id = "user1"
     project_id = "project1"
 
-    monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
-    project_path = projects.create_project(user_id, project_id, project_name="foo")
+    monkeypatch.setattr(config, "WEB_STORAGE_URL", tmp_path)
+    project_path = create_project(user_id, project_id, project_name="foo")
     mocked_path = project_path / ".storage" / "references.json"
 
     # copy references.json to mocked storage path
-    test_file = "fixtures/data/references.json"
+    test_file = f"{fixtures_dir}/data/references.json"
     path_to_test_file = Path(__file__).parent.joinpath(test_file)
 
     _copy_fixture_to_temp_dir(path_to_test_file, mocked_path)
@@ -113,7 +95,7 @@ def test_references_update(monkeypatch, tmp_path):
     assert ref.citation_key is None
 
     patch = {"data": {"citation_key": "reda2023"}}
-    response = references_client.patch(f"/{project_id}/{ref.id}", json=patch)
+    response = client.patch(f"/references/{project_id}/{ref.id}", json=patch)
 
     assert response.status_code == 200
     assert response.json()["status"] == "ok"
@@ -126,16 +108,16 @@ def test_references_update(monkeypatch, tmp_path):
     assert jstore.references[0].citation_key == "reda2023"
 
 
-def test_references_bulk_delete(monkeypatch, tmp_path):
+def test_references_bulk_delete(monkeypatch, tmp_path, fixtures_dir):
     user_id = "user1"
     project_id = "project1"
 
-    monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
-    project_path = projects.create_project(user_id, project_id, project_name="foo")
+    monkeypatch.setattr(config, "WEB_STORAGE_URL", tmp_path)
+    project_path = create_project(user_id, project_id, project_name="foo")
     mocked_path = project_path / ".storage" / "references.json"
 
     # copy references.json to mocked storage path
-    test_file = "fixtures/data/references.json"
+    test_file = f"{fixtures_dir}/data/references.json"
     path_to_test_file = Path(__file__).parent.joinpath(test_file)
 
     _copy_fixture_to_temp_dir(path_to_test_file, mocked_path)
@@ -148,7 +130,7 @@ def test_references_bulk_delete(monkeypatch, tmp_path):
     ids = [ref.id for ref in jstore.references]
     request = {"reference_ids": ids}
 
-    response = references_client.post(f"/{project_id}/bulk_delete", json=request)
+    response = client.post(f"/references/{project_id}/bulk_delete", json=request)
 
     assert response.status_code == 200
     assert response.json() == {

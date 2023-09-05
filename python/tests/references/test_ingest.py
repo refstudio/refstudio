@@ -4,10 +4,9 @@ from datetime import date
 from pathlib import Path
 from uuid import uuid4
 
-from sidecar import ingest, settings, storage, typing
-from sidecar.typing import Author, IngestRequest, Reference
-
-FIXTURES_DIR = Path(__file__).parent.joinpath("fixtures")
+from sidecar import config
+from sidecar.references import ingest, storage
+from sidecar.references.schemas import Author, IngestRequest, IngestStatus, Reference
 
 
 def _copy_fixture_to_temp_dir(source_path: Path, write_path: Path) -> None:
@@ -25,25 +24,27 @@ def _copy_fixture_to_temp_dir(source_path: Path, write_path: Path) -> None:
         f.write(file_bytes)
 
 
-def test_run_ingest(monkeypatch, tmp_path):
+def test_run_ingest(monkeypatch, tmp_path, fixtures_dir):
     # directories where ingest will write files
     staging_dir = tmp_path.joinpath(".staging")
     grobid_output_dir = tmp_path.joinpath(".grobid")
     json_storage_dir = tmp_path.joinpath(".storage")
 
     # copy test PDFs to temp dir
-    for pdf in FIXTURES_DIR.joinpath("pdf").glob("*.pdf"):
+    path = Path(f"{fixtures_dir}/pdf/")
+    for pdf in path.glob("*.pdf"):
         write_path = tmp_path.joinpath("uploads", pdf.name)
         _copy_fixture_to_temp_dir(pdf, write_path)
 
-    monkeypatch.setattr(settings, "UPLOADS_DIR", tmp_path.joinpath("uploads"))
+    monkeypatch.setattr(config, "UPLOADS_DIR", tmp_path.joinpath("uploads"))
 
     # grobid server takes an input directory of PDFs
     # if grobid successfully parses the file, it creates a {pdfname}.tei.xml file
     # if grobid fails to parse the file, it creates a {pdfname}_{errorcode}.txt file
     # mock this by copying the test xml to the output directory
     def mock_grobid_client_process(*args, **kwargs):
-        for file_ in FIXTURES_DIR.joinpath("xml").glob("*"):
+        path = Path(f"{fixtures_dir}/xml/")
+        for file_ in path.glob("*"):
             write_path = grobid_output_dir.joinpath(file_.name)
             _copy_fixture_to_temp_dir(file_, write_path)
 
@@ -219,7 +220,7 @@ def test_ingest_add_citation_keys(monkeypatch, tmp_path):
         Reference(
             id=str(uuid4()),
             source_filename="test.pdf",
-            status=typing.IngestStatus.PROCESSING,
+            status=IngestStatus.PROCESSING,
             authors=[Author(full_name="Kathy Jones")],
             published_date=date(2021, 1, 1),
             citation_key="jones2021",
@@ -227,7 +228,7 @@ def test_ingest_add_citation_keys(monkeypatch, tmp_path):
         Reference(
             id=str(uuid4()),
             source_filename="test.pdf",
-            status=typing.IngestStatus.PROCESSING,
+            status=IngestStatus.PROCESSING,
             authors=[Author(full_name="Kathy Jones")],
             published_date=date(2021, 1, 1),
             citation_key="jones2021a",
@@ -235,20 +236,20 @@ def test_ingest_add_citation_keys(monkeypatch, tmp_path):
         Reference(
             id=str(uuid4()),
             source_filename="test.pdf",
-            status=typing.IngestStatus.PROCESSING,
+            status=IngestStatus.PROCESSING,
             authors=[Author(full_name="John Smith")],
             citation_key="smith",
         ),
         Reference(
             id=str(uuid4()),
             source_filename="test.pdf",
-            status=typing.IngestStatus.PROCESSING,
+            status=IngestStatus.PROCESSING,
             citation_key="untitled",
         ),
         Reference(
             id=str(uuid4()),
             source_filename="test.pdf",
-            status=typing.IngestStatus.PROCESSING,
+            status=IngestStatus.PROCESSING,
             citation_key="untitled1",
         ),
     ]
@@ -256,20 +257,20 @@ def test_ingest_add_citation_keys(monkeypatch, tmp_path):
         Reference(
             id=str(uuid4()),
             source_filename="test.pdf",
-            status=typing.IngestStatus.PROCESSING,
+            status=IngestStatus.PROCESSING,
             authors=[Author(full_name="Kathy Jones")],
             published_date=date(2021, 1, 1),
         ),
         Reference(
             id=str(uuid4()),
             source_filename="test.pdf",
-            status=typing.IngestStatus.PROCESSING,
+            status=IngestStatus.PROCESSING,
             authors=[Author(full_name="John Smith")],
         ),
         Reference(
             id=str(uuid4),
             source_filename="test.pdf",
-            status=typing.IngestStatus.PROCESSING,
+            status=IngestStatus.PROCESSING,
         ),
     ]
     monkeypatch.setattr(ingestion, "references", existing_refs)
@@ -280,8 +281,9 @@ def test_ingest_add_citation_keys(monkeypatch, tmp_path):
     assert new_keys == sorted(["jones2021b", "smitha", "untitled2"])
 
 
-def test_ingest_get_statuses(monkeypatch):
-    ingest.UPLOADS_DIR = FIXTURES_DIR.joinpath("pdf")
+def test_ingest_get_statuses(monkeypatch, fixtures_dir):
+    monkeypatch.setattr(ingest, "UPLOADS_DIR", Path(f"{fixtures_dir}/pdf"))
+    # ingest.UPLOADS_DIR = f"{fixtures_dir}/pdf"
 
     # test: JsonStorage path does not exist
     # expect: all `uploads` are in process
@@ -303,12 +305,12 @@ def test_ingest_get_statuses(monkeypatch):
         Reference(
             id=str(uuid4()),
             source_filename="completed.pdf",
-            status=typing.IngestStatus.COMPLETE,
+            status=IngestStatus.COMPLETE,
         ),
         Reference(
             id=str(uuid4()),
             source_filename="failed.pdf",
-            status=typing.IngestStatus.FAILURE,
+            status=IngestStatus.FAILURE,
         ),
     ]
     mock_uploads = [
