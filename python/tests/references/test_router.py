@@ -3,7 +3,7 @@ from pathlib import Path
 from fastapi.testclient import TestClient
 from sidecar import config
 from sidecar.api import api
-from sidecar.projects.service import create_project
+from sidecar.projects.service import create_project, delete_project
 from sidecar.references.storage import JsonStorage
 
 from ..helpers import _copy_fixture_to_temp_dir
@@ -16,6 +16,9 @@ def test_list_references_should_return_empty_list(monkeypatch, tmp_path):
     project_id = "project1"
 
     monkeypatch.setattr(config, "WEB_STORAGE_URL", tmp_path)
+
+    # make sure we start with an empty project
+    _ = delete_project(user_id, project_id)
     _ = create_project(user_id, project_id, project_name="foo")
 
     # .storage/references.json does not exist as no references have been ingested
