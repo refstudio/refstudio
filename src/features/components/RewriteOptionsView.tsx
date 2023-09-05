@@ -84,6 +84,7 @@ export function RewriteOptionsView({
         Action={isFetching ? <SpinnerIcon /> : undefined}
         actionPosition="right"
         disabled={selection.length === 0}
+        fluid
         size="M"
         text="Rewrite"
         onClick={() => !isFetching && rewriteSelection()}

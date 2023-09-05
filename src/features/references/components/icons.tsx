@@ -18,3 +18,14 @@ export const ExportIcon = () => (
     </svg>
   </div>
 );
+
+export const DragAndDropIcon = () => (
+  <div className="flex h-12 w-12 shrink-0 items-center justify-center">
+    <svg height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M10 6H6V10H10V6ZM38 14H42V26H38V18H18V38H26V42H14V14H38ZM14 6H18V10H14V6ZM10 14H6V18H10V14ZM6 22H10V26H6V22ZM10 30H6V34H10V30ZM22 6H26V10H22V6ZM34 6H30V10H34V6ZM30 34V30H42V34H38V38H34V42H30V34ZM38 38V42H42V38H38Z"
+        fill="currentcolor"
+      />
+    </svg>
+  </div>
+);
