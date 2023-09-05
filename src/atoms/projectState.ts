@@ -54,9 +54,13 @@ export const openProjectAtom = atom(null, async (_, set, projectId: string, path
 export const closeProjectAtom = atom(null, async (get, set) => {
   const isOpen = get(isProjectOpenAtom);
   if (isOpen) {
+    setCurrentFileSystemProjectId('');
+    set(currentProjectIdAtom, '');
+    set(currentProjectPathAtom, '');
+    set(currentProjectNameAtom, '');
+
     set(closeAllEditorsAtom);
     set(clearAllReferencesAtom);
-    set(currentProjectPathAtom, '');
     await set(refreshFileTreeAtom);
   }
 });
