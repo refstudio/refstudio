@@ -2,11 +2,10 @@ from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
-from sidecar import http, projects, search
+from sidecar import http, projects
 
 from .test_ingest import FIXTURES_DIR, _copy_fixture_to_temp_dir
 
-search_client = TestClient(http.search_api)
 references_client = TestClient(http.references_api)
 filesystem_client = TestClient(http.filesystem_api)
 
@@ -163,38 +162,3 @@ def test_references_bulk_delete(monkeypatch, tmp_path):
 
     # ensure that the reference was deleted
     assert len(jstore.references) == 0
-
-
-def test_search_s2_is_ok(monkeypatch, mock_search_paper):
-    monkeypatch.setattr(search.Searcher, "search_func", mock_search_paper)
-
-    params = {"query": "any-query-string-you-like"}
-    response = search_client.get("/s2", params=params)
-
-    assert response.status_code == 200
-    assert response.json() == {
-        "status": "ok",
-        "message": "",
-        "results": [
-            {
-                "title": "Sample Paper Title",
-                "abstract": "Sample Abstract",
-                "venue": "Sample Venue",
-                "year": 2021,
-                "paperId": "sample-id-1",
-                "citationCount": 10,
-                "openAccessPdf": "https://sample1.pdf",
-                "authors": ["author1", "author2", "author3"],
-            },
-            {
-                "title": "Sample Paper Title 2",
-                "abstract": "Sample Abstract 2",
-                "venue": "Sample Venue 2",
-                "year": 2022,
-                "paperId": "sample-id-2",
-                "citationCount": 20,
-                "openAccessPdf": "https://sample2.pdf",
-                "authors": ["author1", "author2", "author3"],
-            },
-        ],
-    }

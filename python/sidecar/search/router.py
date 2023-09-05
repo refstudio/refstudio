@@ -8,7 +8,7 @@ router = APIRouter(
 )
 
 
-@router.post("/s2")
-async def http_search_s2(req: SearchRequest) -> SearchResponse:
-    response = service.search_s2(query=req.query, limit=req.limit)
+@router.get("/s2")
+async def http_search_s2(query: str, limit: int = 10) -> SearchResponse:
+    response = service.search_s2(query=query, limit=limit)
     return response

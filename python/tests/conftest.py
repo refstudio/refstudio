@@ -107,7 +107,8 @@ def mock_call_model_is_error(*args, **kwargs):
 
 @pytest.fixture
 def mock_search_paper(*args, **kwargs):
-    from sidecar.typing import ResponseStatus, S2SearchResult, SearchResponse
+    from sidecar.search.schemas import S2SearchResult, SearchResponse
+    from sidecar.typing import ResponseStatus
 
     def mock_search_paper_response(*args, **kwargs):
         response = SearchResponse(
