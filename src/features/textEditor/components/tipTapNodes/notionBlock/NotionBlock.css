@@ -119,14 +119,7 @@
   @apply mt-2;
 }
 
-/* No space between sibling unordered list items */
-.node-notionBlock:has(.content > div > .unordered-list-item)
-  + .node-notionBlock:has(.content > div > .unordered-list-item) {
-  @apply mt-0;
-}
-
-/* No space between sibling ordered list items */
-.node-notionBlock:has(.content > div > .ordered-list-item)
-  + .node-notionBlock:has(.content > div > .ordered-list-item) {
-  @apply mt-0;
+/* Space between sibling list items */
+.node-notionBlock:has(> * > .list-item) + .node-notionBlock:has(> * > .list-item) {
+  @apply mt-2;
 }
