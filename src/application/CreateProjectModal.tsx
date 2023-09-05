@@ -3,8 +3,8 @@ import { FormEventHandler, useState } from 'react';
 
 import { createProjectModalAtoms } from '../atoms/projectState';
 import { Button } from '../components/Button';
-import { autoFocus } from '../lib/autoFocusAndSelect';
-import { cx } from '../lib/cx';
+import { Input } from '../components/Input';
+import { Modal } from '../components/Modal';
 
 export function CreateProjectModal() {
   const [name, setName] = useState('');
@@ -28,33 +28,17 @@ export function CreateProjectModal() {
   }
 
   return (
-    <div className="fixed left-0 top-0 z-modals flex h-screen w-screen items-center justify-center">
-      <div className="pointer-events-none absolute left-0 top-0 h-full w-full bg-slate-400/60" />
-      <div
-        className={cx(
-          'relative w-[1150px] max-w-[calc(30vw-100px)] overflow-hidden',
-          'rounded-xl border-none border-slate-500 bg-white shadow-xl shadow-slate-500',
-          '',
-        )}
-      >
+    <Modal className="w-[1150px] max-w-[calc(30vw-100px)]" open={isVisible} onClose={() => dismissModal()}>
+      <div className="flex w-full flex-col  bg-white">
         <div className="border-b-2 p-2 font-bold">Project Name</div>
         <div className="p-2">
           <p>What is the name you want to use for this project?</p>
           <form className="flex gap-2 p-2" onSubmit={handleFormSubmit}>
-            <input
-              className="w-full border border-solid border-black p-2"
-              ref={autoFocus}
-              type="text"
-              value={name}
-              onChange={(e) => setName(cleanupName(e.target.value))}
-            />
-            <div className="flex items-center justify-end gap-2">
-              <Button disabled={cleanupName(name).length === 0} submit text="Create" type="primary" />
-              <Button text="Cancel" type="secondary" onClick={dismissModal} />
-            </div>
+            <Input autoFocus type="text" value={name} onChange={(value) => setName(cleanupName(value))} />
+            <Button className="w-auto" disabled={cleanupName(name).length === 0} submit text="Create" type="primary" />
           </form>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }
