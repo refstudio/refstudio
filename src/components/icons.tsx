@@ -62,7 +62,6 @@ export function ChevronUpIcon() {
     </div>
   );
 }
-
 export function NotVisibleIcon() {
   return (
     <div className="flex h-6 w-6 items-center justify-center">
