@@ -4,10 +4,10 @@ import { selectEditorInPaneAtom } from '../../atoms/editorActions';
 import { useActiveEditorIdForPane } from '../../atoms/hooks/useActiveEditorIdForPane';
 import { useOpenEditorsDataForPane } from '../../atoms/hooks/useOpenEditorsDataForPane';
 import { EditorContentType } from '../../atoms/types/EditorContent';
-import { parseEditorId } from '../../atoms/types/EditorData';
+import { EditorId, parseEditorId } from '../../atoms/types/EditorData';
 import { PaneId } from '../../atoms/types/PaneGroup';
-import { TabPane } from '../../components/TabPane';
-import { TabPaneTabContextMenuProps } from '../../components/TabPaneTabContextMenu';
+import { TabPane, TabPaneProps } from '../../components/TabPane';
+import { TABPANE_TAB_MENU_ID } from '../../components/TabPaneTabContextMenu';
 import { emitEvent } from '../../events';
 import { PdfEditorIcon, RefStudioEditorIcon } from './icons';
 
@@ -29,17 +29,20 @@ export function OpenEditorsTabPane({ paneId }: OpenEditorsTabPaneProps) {
 
   const selectFileInPane = useSetAtom(selectEditorInPaneAtom);
 
-  const items = openEditorsData.map((editorData) => {
+  const items = openEditorsData.map<TabPaneProps<EditorId>['items'][number]>((editorData) => {
     const { type } = parseEditorId(editorData.id);
     return {
       text: editorData.title,
       value: editorData.id,
       isDirty: editorData.isDirty,
       Icon: EDITOR_ICONS[type](),
-      ctxProps: {
-        editorId: editorData.id,
-        paneId,
-      } as TabPaneTabContextMenuProps,
+      contextMenu: {
+        menuId: TABPANE_TAB_MENU_ID,
+        ctxProps: {
+          editorId: editorData.id,
+          paneId,
+        },
+      },
     };
   });
 
