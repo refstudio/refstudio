@@ -104,6 +104,10 @@ export async function ensureSampleProjectFiles(projectId: string) {
 }
 
 export async function readAllProjectFiles() {
+  if (!currentProjectId) {
+    return [];
+  }
+
   console.log('reading file structure from web');
   const entries = await readProjectFiles(currentProjectId);
   return Promise.all(entries.map(convertTauriFileEntryToFileEntry));
