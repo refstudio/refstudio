@@ -1,6 +1,6 @@
-import type { FileEntry as TauriFileEntry } from '@tauri-apps/api/fs';
 import { JSONContent } from '@tiptap/core';
 
+import { FileEntry as ApiFileEntry, FolderEntry as ApiFolderEntry } from '../api/api-types';
 import {
   deleteProjectFile,
   readProjectBinaryFile,
@@ -108,35 +108,31 @@ export async function readAllProjectFiles() {
   }
 
   console.log('reading file structure from web');
-  const entries = await readProjectFiles(currentProjectId);
-  return Promise.all(entries.map(convertTauriFileEntryToFileEntry));
+  const projectFiles = await readProjectFiles(currentProjectId);
+  return Promise.all(projectFiles.contents.map(apiFileToOutput));
 }
 
-async function convertTauriFileEntryToFileEntry(entry: TauriFileEntry): Promise<FileEntry> {
-  const isFolder = !!entry.children;
-  const name = entry.name ?? '';
-  const isDotfile = name.startsWith('.');
-  const refStudioPath = entry.path;
-
-  if (isFolder) {
+function apiFileToOutput(entry: ApiFileEntry | ApiFolderEntry): FileEntry {
+  if ('children' in entry) {
     return {
-      name,
-      path: refStudioPath,
-      isFolder,
-      isFile: !isFolder,
-      isDotfile,
-      children: await Promise.all(entry.children!.map(convertTauriFileEntryToFileEntry)),
+      isFile: false,
+      isFolder: true,
+      name: entry.name,
+      path: entry.path,
+      isDotfile: entry.name.startsWith('.'),
+      children: (entry.children ?? []).map(apiFileToOutput),
+    };
+  } else if ('file_extension' in entry) {
+    return {
+      isFile: true,
+      isFolder: false,
+      name: entry.name,
+      path: entry.path,
+      fileExtension: entry.file_extension,
+      isDotfile: entry.name.startsWith('.'),
     };
   } else {
-    const nameParts = name.split('.');
-    return {
-      name,
-      path: refStudioPath,
-      fileExtension: nameParts.length > 1 ? nameParts[nameParts.length - 1].toLowerCase() : '',
-      isFolder,
-      isDotfile,
-      isFile: !isFolder,
-    };
+    throw new Error('Invalid file entry');
   }
 }
 
