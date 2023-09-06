@@ -35,6 +35,7 @@ class SettingsSchema(RefStudioModel):
 
 
 class FlatSettingsSchema(RefStudioModel):
+    active_project_id: str
     current_directory: str
     logging_enabled: bool
     logging_filepath: str
