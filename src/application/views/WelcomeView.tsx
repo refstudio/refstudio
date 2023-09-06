@@ -1,19 +1,21 @@
-import { useQuery } from '@tanstack/react-query';
-import { Fragment } from 'react';
+import { useAtomValue } from 'jotai';
 
-import { ProjectInfo, readAllProjects } from '../../api/projectsAPI';
+import { allProjectsAtom } from '../../atoms/projectState';
 import { Button } from '../../components/Button';
 import { OpenIcon } from '../../components/icons';
 import { emitEvent } from '../../events';
 import { cx } from '../../lib/cx';
-import { AddIcon, RefStudioEditorIcon, SampleIcon } from '../components/icons';
+import { AddIcon, EmptyStateIcon, SampleIcon } from '../components/icons';
+import { ProjectsList } from '../components/ProjectsList';
 
 export function WelcomeView() {
+  const projects = useAtomValue(allProjectsAtom);
+
   return (
     <div
       className={cx(
         'h-full w-full p-10',
-        'flex flex-row items-start gap-10',
+        'flex flex-row items-stretch gap-10',
         'bg-content-area-bg-primary',
         'cursor-default select-none',
       )}
@@ -21,10 +23,38 @@ export function WelcomeView() {
       <div className="flex w-56 flex-col items-stretch">
         <WelcomeActions />
       </div>
-      <div className="w-[1px] self-stretch bg-welcome-border" />
-      <div className="flex flex-1 flex-col gap-12 self-stretch">
-        <WelcomeTips />
-        <RecentProjectsList />
+      <div className="w-[1px] bg-welcome-border" />
+      {projects.length > 0 ? (
+        <div className="flex flex-1 flex-col gap-12">
+          <WelcomeTips />
+          <ProjectsList projects={projects} />
+        </div>
+      ) : (
+        <EmptyWelcomeView />
+      )}
+    </div>
+  );
+}
+
+function EmptyWelcomeView() {
+  return (
+    <div className="flex flex-1 cursor-default select-none flex-col items-center justify-center gap-6">
+      <div className="text-empty-state-ico-empty">
+        <EmptyStateIcon />
+      </div>
+      <div className="flex flex-col items-center justify-center gap-2 self-stretch">
+        <div className="text-xl/6 font-semibold text-side-bar-txt-primary">Get Started</div>
+        <div className="text-side-bar-txt-secondary">Create new projects to see them here.</div>
+      </div>
+      <div className="flex w-64 flex-col items-center justify-center gap-2">
+        <Button fluid size="M" text="Create Project" onClick={() => emitEvent('refstudio://menu/file/project/new')} />
+        <Button
+          fluid
+          size="M"
+          text="Try Sample Project"
+          type="secondary"
+          onClick={() => emitEvent('refstudio://menu/file/project/new/sample')}
+        />
       </div>
     </div>
   );
@@ -76,44 +106,6 @@ function WelcomeTips() {
           onClick={() => emitEvent('refstudio://menu/file/project/new/sample')}
         />
       </div>
-    </div>
-  );
-}
-
-function RecentProjectsList() {
-  const { data: projects } = useQuery({ queryKey: ['recent-projects'], queryFn: readAllProjects });
-
-  return (
-    <div className="flex flex-col items-stretch gap-4 overflow-y-hidden">
-      <h1>Recent Projects</h1>
-      {projects && (
-        <div className="flex flex-col items-stretch gap-2 overflow-y-scroll">
-          {projects.map((project, index) => (
-            <Fragment key={project.id}>
-              {index > 0 && <div className="h-[1px] shrink-0 bg-welcome-border" />}
-              <ProjectItem project={project} />
-            </Fragment>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function ProjectItem({ project }: { project: ProjectInfo }) {
-  return (
-    <div
-      className={cx(
-        'flex cursor-pointer items-center gap-2 p-2 pr-3',
-        'rounded-default hover:bg-btn-bg-side-bar-item-hover',
-        'text-btn-txt-side-bar-item-primary',
-      )}
-      onClick={() => emitEvent('refstudio://projects/open', { projectId: project.id })}
-    >
-      <div className="text-btn-ico-content">
-        <RefStudioEditorIcon />
-      </div>
-      {project.name}
     </div>
   );
 }

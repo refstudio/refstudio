@@ -1,10 +1,10 @@
 import { useSetAtom } from 'jotai';
 import { useState } from 'react';
 
-import { readProjectById } from './api/projectsAPI';
+import { readAllProjects, readProjectById } from './api/projectsAPI';
 import { useRefStudioServerOnDesktop } from './api/server';
 import { App } from './application/App';
-import { openProjectAtom } from './atoms/projectState';
+import { allProjectsAtom, openProjectAtom } from './atoms/projectState';
 import { useAsyncEffect } from './hooks/useAsyncEffect';
 import { noop } from './lib/noop';
 import { notifyErr, notifyInfo } from './notifications/notifications';
@@ -20,6 +20,7 @@ if (import.meta.env.DEV) {
 export function AppStartup() {
   const [initialized, setInitialized] = useState(false);
   const openProject = useSetAtom(openProjectAtom);
+  const setAllProjects = useSetAtom(allProjectsAtom);
 
   const isServerRunning = useRefStudioServerOnDesktop();
   console.log('isServerRunning=', isServerRunning);
@@ -37,10 +38,13 @@ export function AppStartup() {
 
         notifyInfo('Application Startup');
         await initSettings();
+        const projects = await readAllProjects();
+
         await invoke('close_splashscreen');
 
         if (isMounted()) {
           setInitialized(true);
+          setAllProjects(projects);
           const projectId = getCachedSetting('active_project_id');
           if (projectId) {
             const projectInfo = await readProjectById(projectId);
