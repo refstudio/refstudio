@@ -31,6 +31,7 @@ function ProjectItem({ project, onClick }: { project: ProjectInfo; onClick: () =
         'rounded-default hover:bg-btn-bg-side-bar-item-hover',
         'text-btn-txt-side-bar-item-primary',
       )}
+      role="menuitem"
       onClick={onClick}
     >
       <div className="text-btn-ico-content">
