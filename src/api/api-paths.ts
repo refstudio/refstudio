@@ -206,6 +206,7 @@ export interface components {
     };
     /** FlatSettingsSchema */
     FlatSettingsSchema: {
+      active_project_id: string;
       current_directory: string;
       logging_enabled: boolean;
       logging_filepath: string;
@@ -216,6 +217,7 @@ export interface components {
     };
     /** FlatSettingsSchemaPatch */
     FlatSettingsSchemaPatch: {
+      active_project_id?: string;
       current_directory?: string;
       logging_enabled?: boolean;
       logging_filepath?: string;
