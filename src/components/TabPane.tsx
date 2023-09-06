@@ -15,7 +15,7 @@ export interface TabPaneItem<K extends string> {
   };
 }
 
-export interface TabPaneProps<K extends string> {
+interface TabPaneProps<K extends string> {
   items: TabPaneItem<K>[];
   value: K | null;
   onClick?: (value: K) => void;

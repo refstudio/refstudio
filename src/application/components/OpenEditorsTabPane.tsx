@@ -6,7 +6,7 @@ import { useOpenEditorsDataForPane } from '../../atoms/hooks/useOpenEditorsDataF
 import { EditorContentType } from '../../atoms/types/EditorContent';
 import { EditorId, parseEditorId } from '../../atoms/types/EditorData';
 import { PaneId } from '../../atoms/types/PaneGroup';
-import { TabPane, TabPaneProps } from '../../components/TabPane';
+import { TabPane, TabPaneItem } from '../../components/TabPane';
 import { TABPANE_TAB_MENU_ID } from '../../components/TabPaneTabContextMenu';
 import { emitEvent } from '../../events';
 import { PdfEditorIcon, RefStudioEditorIcon } from './icons';
@@ -29,7 +29,7 @@ export function OpenEditorsTabPane({ paneId }: OpenEditorsTabPaneProps) {
 
   const selectFileInPane = useSetAtom(selectEditorInPaneAtom);
 
-  const items = openEditorsData.map<TabPaneProps<EditorId>['items'][number]>((editorData) => {
+  const items = openEditorsData.map<TabPaneItem<EditorId>>((editorData) => {
     const { type } = parseEditorId(editorData.id);
     return {
       text: editorData.title,
