@@ -4,7 +4,10 @@ import os
 import psutil
 from fastapi import APIRouter
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/meta",
+    tags=["meta"],
+)
 
 
 @router.get("/status")
