@@ -188,7 +188,7 @@ export default function ReferenceDetailsCard({
       case 'title':
         return theReference.title;
       case 'doi':
-        return theReference.title;
+        return theReference.doi;
       default:
         return '';
     }
