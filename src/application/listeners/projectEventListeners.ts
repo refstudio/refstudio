@@ -49,6 +49,8 @@ export function useFileProjectNewListener() {
 export function useFileProjectNewSampleListener() {
   const sampleProject = useSetAtom(newSampleProjectAtom);
   const createFile = useSetAtom(createFileAtom);
+  const setAllProjects = useSetAtom(allProjectsAtom);
+
   return async () => {
     const projects = await readAllProjects();
     let project = projects.find((p) => p.name === SAMPLE_PROJECT_NAME);
@@ -59,6 +61,9 @@ export function useFileProjectNewSampleListener() {
     createFile();
     notifyInfo('Sample project opened with success');
     persistActiveProjectInSettings(project.id);
+
+    // Update allProjectsAtom
+    setAllProjects(await readAllProjects());
   };
 }
 

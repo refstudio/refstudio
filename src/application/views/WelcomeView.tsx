@@ -44,7 +44,7 @@ export function WelcomeView() {
           <EmptyWelcomeView />
         )}
       </div>
-    </div >
+    </div>
   );
 }
 
