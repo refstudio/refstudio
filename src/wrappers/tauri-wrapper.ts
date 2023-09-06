@@ -17,7 +17,6 @@ export const invoke = import.meta.env.VITE_IS_WEB ? invokeStub : tauriInvoke;
 
 // @tauri-apps/api/path
 export const desktopDir = import.meta.env.VITE_IS_WEB ? stubPath.desktopDir : tauriPath.desktopDir;
-export const join = import.meta.env.VITE_IS_WEB ? stubPath.join : tauriPath.join;
 export const sep = import.meta.env.VITE_IS_WEB ? stubPath.sep : tauriPath.sep;
 
 // @tauri-apps/api/event

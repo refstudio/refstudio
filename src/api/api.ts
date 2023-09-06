@@ -90,7 +90,6 @@ async function makeWebRequest<ResponsePayload = unknown, RequestPayload = unknow
   payload: RequestPayload | undefined,
   responseParser: ResponseParser,
 ) {
-  console.log(`WEB FETCH REQUEST: ${method} ${path}`);
   const headers: HeadersInit =
     payload instanceof FormData
       ? {}

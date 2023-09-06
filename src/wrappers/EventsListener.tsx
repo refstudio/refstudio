@@ -10,6 +10,7 @@ import {
 import {
   activePaneAtom,
   closeAllEditorsAtom,
+  closeEditorFromAllPanesAtom,
   closeEditorFromPaneAtom,
   moveEditorToPaneAtom,
 } from '../atoms/editorActions';
@@ -18,6 +19,7 @@ import { fileExplorerEntryPathBeingRenamed } from '../atoms/fileExplorerActions'
 import { useActiveEditorContentAtoms } from '../atoms/hooks/useActiveEditorContentAtoms';
 import { projectIdAtom } from '../atoms/projectState';
 import { getReferencesAtom, removeReferencesAtom } from '../atoms/referencesState';
+import { buildEditorIdFromPath } from '../atoms/types/EditorData';
 import { PaneEditorId } from '../atoms/types/PaneGroup';
 import { emitEvent, RefStudioEventPayload } from '../events';
 import { useListenEvent } from '../hooks/useListenEvent';
@@ -113,7 +115,16 @@ function useRemoveReferencesListener() {
 
 function useExportReferencesListener() {
   const references = useAtomValue(getReferencesAtom);
-  return () => void exportReferences(references);
+  const closeEditorFromAllPanes = useSetAtom(closeEditorFromAllPanesAtom);
+  const openFilePath = useSetAtom(openFilePathAtom);
+  return async () => {
+    const exportedFilePath = await exportReferences(references);
+    if (exportedFilePath) {
+      const editorId = buildEditorIdFromPath(exportedFilePath);
+      closeEditorFromAllPanes(editorId);
+      openFilePath(exportedFilePath);
+    }
+  };
 }
 
 function useDeleteFileListener() {
