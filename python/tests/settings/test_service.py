@@ -28,6 +28,10 @@ def test_get_settings_for_new_user_should_be_empty(monkeypatch, tmp_path):
 
     # New user should have default settings
     user_id = "user999"
+    filepath = make_settings_json_path(user_id)
+
+    if filepath.exists():
+        filepath.unlink()
 
     response = get_settings_for_user(user_id)
     assert response.dict() == default_settings()
@@ -35,6 +39,9 @@ def test_get_settings_for_new_user_should_be_empty(monkeypatch, tmp_path):
     # settings.json should be created
     filepath = make_settings_json_path(user_id)
     assert filepath.exists()
+
+    if filepath.exists():
+        filepath.unlink()
 
 
 def test_get_settings_for_existing_user(monkeypatch, tmp_path, create_settings_json):
