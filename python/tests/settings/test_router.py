@@ -11,7 +11,7 @@ client = TestClient(api)
 def test_get_settings(monkeypatch, tmp_path, create_settings_json):  # noqa: F811
     monkeypatch.setattr(config, "WEB_STORAGE_URL", tmp_path)
 
-    response = client.get("/settings")
+    response = client.get("/api/settings")
     assert response.status_code == 200
     assert response.json()["openai_api_key"] == "1234"
 
@@ -25,7 +25,7 @@ def test_update_settings(monkeypatch, tmp_path, create_settings_json):  # noqa: 
     response = get_settings_for_user(user_id)
     assert response.openai_api_key != "test"
 
-    response = client.put("/settings", json={"openai_api_key": "test"})
+    response = client.put("/api/settings", json={"openai_api_key": "test"})
 
     assert response.status_code == 200
     assert response.json()["openai_api_key"] == "test"

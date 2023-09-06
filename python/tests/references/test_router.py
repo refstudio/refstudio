@@ -22,7 +22,7 @@ def test_list_references_should_return_empty_list(monkeypatch, tmp_path):
     _ = create_project(user_id, project_id, project_name="foo")
 
     # .storage/references.json does not exist as no references have been ingested
-    response = client.get(f"/references/{project_id}")
+    response = client.get(f"/api/references/{project_id}")
     assert response.status_code == 200
     assert len(response.json()) == 0
 
@@ -44,7 +44,7 @@ def test_list_references_should_return_references(monkeypatch, tmp_path, fixture
     jstore = JsonStorage(filepath=mocked_path)
     jstore.load()
 
-    response = client.get(f"/references/{project_id}")
+    response = client.get(f"/api/references/{project_id}")
     assert response.status_code == 200
     assert len(response.json()) == len(jstore.references)
     assert len(response.json()) != 0
@@ -70,7 +70,7 @@ def test_get_reference(monkeypatch, tmp_path, fixtures_dir):
     # get the first reference
     ref = jstore.references[0]
 
-    response = client.get(f"/references/{project_id}/{ref.id}")
+    response = client.get(f"/api/references/{project_id}/{ref.id}")
     assert response.status_code == 200
     assert response.json() == ref.dict()
 
@@ -98,7 +98,7 @@ def test_references_update(monkeypatch, tmp_path, fixtures_dir):
     assert ref.citation_key is None
 
     patch = {"data": {"citation_key": "reda2023"}}
-    response = client.patch(f"/references/{project_id}/{ref.id}", json=patch)
+    response = client.patch(f"/api/references/{project_id}/{ref.id}", json=patch)
 
     assert response.status_code == 200
     assert response.json()["status"] == "ok"
@@ -133,7 +133,7 @@ def test_references_bulk_delete(monkeypatch, tmp_path, fixtures_dir):
     ids = [ref.id for ref in jstore.references]
     request = {"reference_ids": ids}
 
-    response = client.post(f"/references/{project_id}/bulk_delete", json=request)
+    response = client.post(f"/api/references/{project_id}/bulk_delete", json=request)
 
     assert response.status_code == 200
     assert response.json() == {

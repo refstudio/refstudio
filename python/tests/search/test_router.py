@@ -9,7 +9,7 @@ def test_search_s2_is_ok(monkeypatch, mock_search_paper):
     monkeypatch.setattr(Searcher, "search_func", mock_search_paper)
 
     params = {"query": "any-query-string-you-like"}
-    response = client.get("/search/s2", params=params)
+    response = client.get("/api/search/s2", params=params)
 
     assert response.status_code == 200
     assert response.json() == {

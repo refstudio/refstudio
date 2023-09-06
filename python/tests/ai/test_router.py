@@ -17,7 +17,7 @@ def test_ai_rewrite_is_ok(monkeypatch, mock_call_model_is_ok):
 
     params = {"user_id": "user1"}
     request = {"text": "This is a test"}
-    response = client.post("/ai/rewrite", params=params, json=request)
+    response = client.post("/api/ai/rewrite", params=params, json=request)
 
     assert response.status_code == 200
     assert response.json() == {
@@ -37,7 +37,7 @@ def test_ai_rewrite_missing_required_request_params(monkeypatch, mock_call_model
 
     params = {"user_id": "user1"}
     request = {"missing": "This is an invalid request"}
-    response = client.post("/ai/rewrite", params=params, json=request)
+    response = client.post("/api/ai/rewrite", params=params, json=request)
 
     assert response.status_code == 422
     assert response.json() == {
@@ -56,7 +56,7 @@ def test_ai_completion_is_ok(monkeypatch, mock_call_model_is_ok):
 
     params = {"user_id": "user1"}
     request = {"text": "This is a test"}
-    response = client.post("/ai/completion", params=params, json=request)
+    response = client.post("/api/ai/completion", params=params, json=request)
 
     assert response.status_code == 200
     assert response.json() == {
@@ -78,7 +78,7 @@ def test_ai_completion_missing_required_request_params(
 
     params = {"user_id": "user1"}
     request = {"missing": "This is an invalid request"}
-    response = client.post("/ai/completion", params=params, json=request)
+    response = client.post("/api/ai/completion", params=params, json=request)
 
     assert response.status_code == 422
     assert response.json() == {
@@ -110,7 +110,7 @@ def test_ai_chat_is_ok(monkeypatch, mock_call_model_is_ok, tmp_path, fixtures_di
 
     params = {"user_id": user_id}
     request = {"text": "This is a test"}
-    response = client.post(f"/ai/{project_id}/chat", params=params, json=request)
+    response = client.post(f"/api/ai/{project_id}/chat", params=params, json=request)
 
     assert response.status_code == 200
     assert response.json() == {
@@ -141,7 +141,7 @@ def test_ai_chat_missing_required_request_params(
     project_id = "project1"
     params = {"user_id": "user1"}
     request = {"missing": "This is an invalid request"}
-    response = client.post(f"/ai/{project_id}/chat", params=params, json=request)
+    response = client.post(f"/api/ai/{project_id}/chat", params=params, json=request)
 
     assert response.status_code == 422
     assert response.json() == {

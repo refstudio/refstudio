@@ -21,7 +21,7 @@ def test_create_file(monkeypatch, tmp_path, fixtures_dir):
 
     with open(f"{fixtures_dir}/pdf/grobid-fails.pdf", "rb") as f:
         response = client.put(
-            f"/fs/{project_id}/{filename}",
+            f"/api/fs/{project_id}/{filename}",
             files={"file": ("grobid-fails.pdf", f, "application/pdf")},
         )
 
@@ -51,12 +51,12 @@ def test_read_file(monkeypatch, tmp_path, fixtures_dir):
 
     with open(f"{fixtures_dir}/pdf/grobid-fails.pdf", "rb") as f:
         response = client.put(
-            f"/fs/{project_id}/{filename}",
+            f"/api/fs/{project_id}/{filename}",
             files={"file": ("grobid-fails.pdf", f, "application/pdf")},
         )
 
     # read the file
-    response = client.get(f"/fs/{project_id}/{filename}")
+    response = client.get(f"/api/fs/{project_id}/{filename}")
 
     assert response.status_code == 200
     assert response.content == filepath.read_bytes()
@@ -77,12 +77,12 @@ def test_delete_file(monkeypatch, tmp_path, fixtures_dir):
 
     with open(f"{fixtures_dir}/pdf/grobid-fails.pdf", "rb") as f:
         response = client.put(
-            f"/fs/{project_id}/{filename}",
+            f"/api/fs/{project_id}/{filename}",
             files={"file": ("grobid-fails.pdf", f, "application/pdf")},
         )
 
     # delete the file
-    response = client.delete(f"/fs/{project_id}/{filename}")
+    response = client.delete(f"/api/fs/{project_id}/{filename}")
 
     assert response.status_code == 200
     assert response.json() == {

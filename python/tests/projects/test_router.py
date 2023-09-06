@@ -14,14 +14,14 @@ def test_http_list_projects(monkeypatch, tmp_path):
     project_id = "project1"
     project_name = "project1name"
 
-    response = client.get("/projects")
+    response = client.get("/api/projects")
 
     assert response.status_code == 200
     assert response.json() == {}
 
     service.create_project(user_id, project_id, project_name)
 
-    response = client.get("/projects")
+    response = client.get("/api/projects")
     assert response.status_code == 200
     expected = {
         project_id: {
@@ -36,7 +36,7 @@ def test_create_project(monkeypatch, tmp_path):
     monkeypatch.setattr(service, "WEB_STORAGE_URL", tmp_path)
 
     request = {"project_name": "project1name"}
-    response = client.post("/projects", json=request)
+    response = client.post("/api/projects", json=request)
 
     project_id = list(response.json().keys())[0]
     assert response.status_code == 200
@@ -70,7 +70,7 @@ def test_get_project(monkeypatch, tmp_path):
     project_path = service.create_project(user_id, project_id, project_name)
 
     # get the project
-    response = client.get(f"/projects/{project_id}")
+    response = client.get(f"/api/projects/{project_id}")
 
     assert response.status_code == 200
     assert response.json() == {
@@ -90,7 +90,7 @@ def test_delete_project(monkeypatch, tmp_path):
     project_path = service.create_project(user_id, project_id, project_name)
 
     # delete the project
-    response = client.delete(f"/projects/{project_id}")
+    response = client.delete(f"/api/projects/{project_id}")
 
     assert response.status_code == 200
     assert response.json() == {
