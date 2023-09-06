@@ -24,20 +24,6 @@ export const projectIdAtom: Atom<string> = currentProjectIdAtom;
 export const createProjectModalAtoms = createModalAtoms<string>();
 export const selectProjectModalAtoms = createModalAtoms<string>();
 
-export const newProjectAtom = atom(null, async (_, set, projectId: string, path: string, name: string) => {
-  // Close current project before create new
-  await set(closeProjectAtom);
-
-  // Create empty project
-  setCurrentFileSystemProjectId(projectId);
-  set(currentProjectIdAtom, projectId);
-  set(currentProjectPathAtom, path);
-  set(currentProjectNameAtom, name);
-
-  await set(loadReferencesAtom, projectId);
-  await set(refreshFileTreeAtom);
-});
-
 export const openProjectAtom = atom(null, async (_, set, projectId: string, path: string, name: string) => {
   // Close current project before create new
   await set(closeProjectAtom);

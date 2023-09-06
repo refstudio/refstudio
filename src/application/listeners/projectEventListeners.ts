@@ -8,7 +8,6 @@ import {
   closeProjectAtom,
   createProjectModalAtoms,
   isProjectOpenAtom,
-  newProjectAtom,
   newSampleProjectAtom,
   openProjectAtom,
   selectProjectModalAtoms,
@@ -21,7 +20,7 @@ import { saveCachedSettings, setCachedSetting } from '../../settings/settingsMan
 export const SAMPLE_PROJECT_NAME = 'RefStudio Sample';
 
 export function useFileProjectNewListener() {
-  const newProject = useSetAtom(newProjectAtom);
+  const openProject = useSetAtom(openProjectAtom);
   const createFile = useSetAtom(createFileAtom);
   const openCreateProjectModal = useSetAtom(createProjectModalAtoms.openAtom);
 
@@ -35,7 +34,7 @@ export function useFileProjectNewListener() {
       return;
     }
 
-    await newProject(projectInfo.id, projectInfo.path, projectInfo.name);
+    await openProject(projectInfo.id, projectInfo.path, projectInfo.name);
     createFile();
     notifyInfo('New project created with success');
     persistActiveProjectInSettings(projectInfo.id);
