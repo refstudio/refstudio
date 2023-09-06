@@ -1,4 +1,4 @@
-import { open, save } from '@tauri-apps/api/dialog';
+import { save } from '@tauri-apps/api/dialog';
 import { useAtomValue, useSetAtom } from 'jotai';
 
 import { createRemoteProject, ProjectInfo, readAllProjects, readProjectById } from '../../api/projectsAPI';
@@ -11,10 +11,11 @@ import {
   newProjectAtom,
   newSampleProjectAtom,
   openProjectAtom,
+  selectProjectModalAtoms,
 } from '../../atoms/projectState';
 import { emitEvent } from '../../events';
 import { getNewProjectsBaseDir } from '../../io/filesystem';
-import { notifyInfo, notifyWarning } from '../../notifications/notifications';
+import { notifyInfo } from '../../notifications/notifications';
 import { saveCachedSettings, setCachedSetting } from '../../settings/settingsManager';
 
 export const SAMPLE_PROJECT_NAME = 'RefStudio Sample';
@@ -58,38 +59,14 @@ export function useFileProjectNewSampleListener() {
 }
 
 export function useFileProjectOpenListener() {
+  const openSelectProjectModal = useSetAtom(selectProjectModalAtoms.openAtom);
   return async () => {
-    let projectId: string;
-    if (import.meta.env.VITE_IS_WEB) {
-      // TODO: Open a custom dialog with all projects to select one
-      // For now, opens the first project found
-      const projects = await readAllProjects();
-      if (projects.length === 0) {
-        throw new Error('No projects found');
-      }
-      projectId = projects[0].id;
-    } else {
-      const selectedPath = await open({
-        directory: true,
-        multiple: false,
-        defaultPath: await getNewProjectsBaseDir(),
-        title: 'Open RefStudio project',
-      });
-
-      if (typeof selectedPath === 'string') {
-        const projects = await readAllProjects();
-        const projectWithSamePath = projects.find((project) => project.path === selectedPath);
-        if (!projectWithSamePath) {
-          notifyWarning('You need to open a project that was previously created with RefStudio.');
-          return;
-        }
-        projectId = projectWithSamePath.id;
-      } else {
-        notifyInfo('User canceled operation to open new project');
-        return;
-      }
+    const modalResult = await openSelectProjectModal();
+    if (modalResult.status === 'dismissed') {
+      notifyInfo('User canceled operation to open new project');
+      return;
     }
-
+    const projectId = modalResult.value;
     emitEvent('refstudio://projects/open', { projectId });
   };
 }

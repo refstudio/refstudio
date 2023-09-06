@@ -22,6 +22,7 @@ export const projectNameAtom: Atom<string> = currentProjectNameAtom;
 export const projectIdAtom: Atom<string> = currentProjectIdAtom;
 
 export const createProjectModalAtoms = createModalAtoms<string>();
+export const selectProjectModalAtoms = createModalAtoms<string>();
 
 export const newProjectAtom = atom(null, async (_, set, projectId: string, path: string, name: string) => {
   // Close current project before create new
