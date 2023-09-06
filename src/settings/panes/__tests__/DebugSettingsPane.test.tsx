@@ -16,7 +16,6 @@ const panelConfig: PaneConfig = {
 
 const mockSettings: FlatSettingsSchema = {
   active_project_id: 'project-id',
-  current_directory: 'app-dir',
   openai_api_key: '',
   openai_chat_model: 'gpt-3.5-turbo',
   openai_manner: 'concise',

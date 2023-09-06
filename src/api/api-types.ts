@@ -125,7 +125,6 @@ export interface FileEntry {
  */
 export interface FlatSettingsSchema {
   active_project_id: string;
-  current_directory: string;
   logging_enabled: boolean;
   logging_filepath: string;
   openai_api_key: string;
@@ -139,7 +138,6 @@ export interface FlatSettingsSchema {
  */
 export interface FlatSettingsSchemaPatch {
   active_project_id?: string;
-  current_directory?: string;
   logging_enabled?: boolean;
   logging_filepath?: string;
   openai_api_key?: string;

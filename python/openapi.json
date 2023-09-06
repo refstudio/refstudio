@@ -184,9 +184,6 @@
           "active_project_id": {
             "type": "string"
           },
-          "current_directory": {
-            "type": "string"
-          },
           "logging_enabled": {
             "type": "boolean"
           },
@@ -208,7 +205,6 @@
         },
         "required": [
           "active_project_id",
-          "current_directory",
           "logging_enabled",
           "logging_filepath",
           "openai_api_key",
@@ -222,9 +218,6 @@
       "FlatSettingsSchemaPatch": {
         "properties": {
           "active_project_id": {
-            "type": "string"
-          },
-          "current_directory": {
             "type": "string"
           },
           "logging_enabled": {

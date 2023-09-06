@@ -10,7 +10,6 @@ vi.mock('@tauri-apps/api/shell');
 
 const mockSettings: FlatSettingsSchema = {
   active_project_id: '123',
-  current_directory: 'app-dir',
   openai_api_key: '',
   openai_chat_model: 'gpt-3.5-turbo',
   openai_manner: 'concise',
@@ -52,10 +51,8 @@ describe('sidecar', () => {
     await callSidecar('chat', { text: 'Hello chatbot!' });
 
     expect(vi.mocked(getCachedSetting).mock.calls.length).toBeGreaterThan(0);
-    expect(Object.keys(env ?? {}).length).toBe(5);
+    expect(Object.keys(env ?? {}).length).toBe(4);
 
-    // General
-    expect(env?.PROJECT_DIR).toBe(mockSettings.current_directory);
     // OpenAI
     expect(env?.OPENAI_API_KEY).toBe(mockSettings.openai_api_key);
     expect(env?.OPENAI_CHAT_MODEL).toBe(mockSettings.openai_chat_model);

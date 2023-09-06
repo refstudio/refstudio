@@ -10,8 +10,6 @@ export async function callSidecar<T extends keyof CliCommands>(
   arg: CliCommands[T][0],
 ): Promise<CliCommands[T][1]> {
   const env: Record<string, string> = {
-    // Paths
-    PROJECT_DIR: getCachedSetting('current_directory'),
     // Open AI
     OPENAI_API_KEY: getCachedSetting('openai_api_key'),
     OPENAI_CHAT_MODEL: getCachedSetting('openai_chat_model'),

@@ -74,9 +74,7 @@ def test_migrate_settings():
     old_settings = schemas.SettingsSchema()
     old_settings.openai.api_key = "abcd"
     old_settings.sidecar.logging.enable = True
-    old_settings.project.current_directory = "/var/tmp"
 
     new_settings = migrate_settings(old_settings.dict())
     assert new_settings.logging_enabled
     assert new_settings.openai_api_key == "abcd"
-    assert new_settings.current_directory == "/var/tmp"
