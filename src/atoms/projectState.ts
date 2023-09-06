@@ -1,5 +1,6 @@
 import { Atom, atom } from 'jotai';
 
+import { ProjectInfo } from '../api/projectsAPI';
 import { ensureSampleProjectFiles, setCurrentFileSystemProjectId } from '../io/filesystem';
 import { createModalAtoms } from './core/createModalAtoms';
 import { closeAllEditorsAtom } from './editorActions';
@@ -20,6 +21,8 @@ export const isProjectOpenAtom = atom((get) => get(currentProjectPathAtom) !== '
 export const projectPathAtom: Atom<string> = currentProjectPathAtom;
 export const projectNameAtom: Atom<string> = currentProjectNameAtom;
 export const projectIdAtom: Atom<string> = currentProjectIdAtom;
+
+export const allProjectsAtom = atom<ProjectInfo[]>([]);
 
 export const createProjectModalAtoms = createModalAtoms<string>();
 
