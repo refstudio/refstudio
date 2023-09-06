@@ -12,7 +12,7 @@ export function SelectProjectModal() {
   const dismissModal = useSetAtom(selectProjectModalAtoms.dismissAtom);
 
   return (
-    <Modal className="max-h-[50vh] w-[1150px] max-w-[calc(40vw-100px)]" open={isVisible} onClose={() => dismissModal()}>
+    <Modal className="max-h-[50vh] w-[1150px] max-w-[calc(40vw-100px)]" open={isVisible} onClose={dismissModal}>
       <div className="flex w-full flex-col bg-white">
         <div className="border-b-2 p-2 font-bold">Select one project to open</div>
         <div className="overflow-auto p-2">

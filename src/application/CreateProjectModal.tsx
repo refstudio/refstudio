@@ -28,7 +28,7 @@ export function CreateProjectModal() {
   }
 
   return (
-    <Modal className="w-[1150px] max-w-[calc(30vw-100px)]" open={isVisible} onClose={() => dismissModal()}>
+    <Modal className="w-[1150px] max-w-[calc(30vw-100px)]" open={isVisible} onClose={dismissModal}>
       <div className="flex w-full flex-col bg-white">
         <div className="border-b-2 p-2 font-bold">Project Name</div>
         <div className="p-2">
