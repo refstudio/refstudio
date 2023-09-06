@@ -4,7 +4,7 @@ import { setCurrentFileSystemProjectId } from '../../io/filesystem';
 import { DebugAtomModuleType } from '../debugAtom';
 import { closeAllEditorsAtom } from '../editorActions';
 import { refreshFileTreeAtom } from '../fileExplorerActions';
-import { closeProjectAtom, isProjectOpenAtom, newProjectAtom, projectNameAtom } from '../projectState';
+import { closeProjectAtom, isProjectOpenAtom, openProjectAtom, projectNameAtom } from '../projectState';
 import { clearAllReferencesAtom, loadReferencesAtom } from '../referencesState';
 
 vi.mock('../../io/filesystem');
@@ -42,12 +42,8 @@ describe('projectState', () => {
     vi.clearAllMocks();
   });
 
-  it('should start with project closed', () => {
-    expect(store.get(isProjectOpenAtom)).toBeFalsy();
-  });
-
-  it('should set project id, load references and refresh files, when new project is created', async () => {
-    await store.set(newProjectAtom, 'project-id', 'project-path', 'project-name');
+  it('should set project id, load references and refresh files, when new project is open', async () => {
+    await store.set(openProjectAtom, 'project-id', 'project-path', 'project-name');
     expect(store.get(isProjectOpenAtom)).toBeTruthy();
     expect(store.get(projectNameAtom)).toBe('project-name');
     expect(setCurrentFileSystemProjectId).toHaveBeenCalledWith('project-id');
@@ -57,7 +53,7 @@ describe('projectState', () => {
   });
 
   it('should close open project', async () => {
-    await store.set(newProjectAtom, 'project-id', 'project-path', 'project-name');
+    await store.set(openProjectAtom, 'project-id', 'project-path', 'project-name');
     expect(store.get(isProjectOpenAtom)).toBeTruthy();
 
     await store.set(closeProjectAtom);
@@ -67,7 +63,7 @@ describe('projectState', () => {
   });
 
   it('should close all open editors and clear all references on close', async () => {
-    await store.set(newProjectAtom, 'project-id', 'project-path', 'project-name');
+    await store.set(openProjectAtom, 'project-id', 'project-path', 'project-name');
     await store.set(closeProjectAtom);
     expect(store.get(closeAllEditorsAtom)).toHaveBeenCalled();
     expect(store.get(clearAllReferencesAtom)).toHaveBeenCalled();

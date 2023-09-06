@@ -17,6 +17,11 @@ describe('ProjectsList', () => {
     });
   });
 
+  it('should render an empty list of projects', () => {
+    render(<ProjectsList projects={[]} onProjectClick={noop} />);
+    expect(screen.queryByRole('menuitem')).not.toBeInTheDocument();
+  });
+
   it('should call handler with the project clicked on', async () => {
     const fn = vi.fn();
     const { user } = setup(<ProjectsList projects={PROJECTS} onProjectClick={fn} />);
@@ -25,5 +30,10 @@ describe('ProjectsList', () => {
 
     expect(fn).toHaveBeenCalledTimes(1);
     expect(fn).toHaveBeenCalledWith(PROJECTS[1]);
+  });
+
+  it('should render the configured header', () => {
+    render(<ProjectsList header="Recent Projects" projects={[]} onProjectClick={noop} />);
+    expect(screen.getByText('Recent Projects')).toBeInTheDocument();
   });
 });

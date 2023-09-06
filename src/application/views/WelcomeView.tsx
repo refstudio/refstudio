@@ -34,6 +34,7 @@ export function WelcomeView() {
             <div className="w-[1px] bg-welcome-border" />
             <div className="flex flex-1 flex-col gap-12">
               <ProjectsList
+                header="Recent Projects"
                 projects={projects}
                 onProjectClick={(project) => emitEvent('refstudio://projects/open', { projectId: project.id })}
               />
@@ -43,7 +44,7 @@ export function WelcomeView() {
           <EmptyWelcomeView />
         )}
       </div>
-    </div>
+    </div >
   );
 }
 

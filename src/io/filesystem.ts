@@ -1,4 +1,3 @@
-import { save } from '@tauri-apps/api/dialog';
 import type { FileEntry as TauriFileEntry } from '@tauri-apps/api/fs';
 import { JSONContent } from '@tiptap/core';
 
@@ -14,9 +13,9 @@ import {
 import { EditorContent } from '../atoms/types/EditorContent';
 import { FileEntry, FileFileEntry } from '../atoms/types/FileEntry';
 import { serializeReferences } from '../features/textEditor/components/tipTapNodes/refStudioDocument/serialization/serializeReferences';
-import { notifyError } from '../notifications/notifications';
+import { notifyError, notifyInfo } from '../notifications/notifications';
 import { ReferenceItem } from '../types/ReferenceItem';
-import { desktopDir, join, sep } from '../wrappers/tauri-wrapper';
+import { desktopDir, sep } from '../wrappers/tauri-wrapper';
 import { FILE2_CONTENT, FILE3_CONTENT, INITIAL_CONTENT } from './filesystem.sample-content';
 
 const UPLOADS_DIR = 'uploads';
@@ -104,6 +103,10 @@ export async function ensureSampleProjectFiles(projectId: string) {
 }
 
 export async function readAllProjectFiles() {
+  if (!currentProjectId) {
+    return [];
+  }
+
   console.log('reading file structure from web');
   const entries = await readProjectFiles(currentProjectId);
   return Promise.all(entries.map(convertTauriFileEntryToFileEntry));
@@ -226,28 +229,15 @@ export async function renameFile(relativePath: string, newRelativePath: string):
 type RenameFileResult = Promise<{ success: false } | { success: true; newPath: string }>;
 
 // #####################################################################################
-// Export Operations: references, markdown
+// Export Operations: references
 // #####################################################################################
 export async function exportReferences(references: ReferenceItem[]) {
-  if (import.meta.env.VITE_IS_WEB) {
-    throw new Error('Not implemented');
-  }
-
   try {
-    const exportsDir = getExportsDir();
-
     const serializedReferences = serializeReferences(references);
-
-    const defaultPath = await join(exportsDir, `references.${serializedReferences.extension}`);
-
-    const filePath = await save({
-      title: 'Export References',
-      defaultPath,
-      filters: [{ name: serializedReferences.extension, extensions: [serializedReferences.extension] }],
-    });
-    if (filePath) {
-      return writeProjectTextFile(currentProjectId, filePath, serializedReferences.textContent);
-    }
+    const exportPath = makeExportsPath(`references.${serializedReferences.extension}`);
+    await writeFileContent(exportPath, serializedReferences.textContent);
+    notifyInfo('References exported', `Exported ${references.length} references to ${exportPath}`);
+    return exportPath;
   } catch (err) {
     console.error('Error', err);
   }
