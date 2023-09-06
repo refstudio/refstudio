@@ -6,7 +6,7 @@ import { RefStudioEditorIcon } from './icons';
 
 interface ProjectsListProps {
   projects: ProjectInfo[];
-  onProjectClick: (projectId: ProjectInfo) => void;
+  onProjectClick: (project: ProjectInfo) => void;
 }
 export function ProjectsList({ projects, onProjectClick }: ProjectsListProps) {
   return (

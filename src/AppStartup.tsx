@@ -38,16 +38,19 @@ export function AppStartup() {
 
         notifyInfo('Application Startup');
         await initSettings();
-        const projects = await readAllProjects();
+
+        const projectId = getCachedSetting('active_project_id');
+        const [projectInfo, projects] = await Promise.all([
+          projectId ? await readProjectById(projectId) : null,
+          readAllProjects(),
+        ]);
 
         await invoke('close_splashscreen');
 
         if (isMounted()) {
           setInitialized(true);
           setAllProjects(projects);
-          const projectId = getCachedSetting('active_project_id');
-          if (projectId) {
-            const projectInfo = await readProjectById(projectId);
+          if (projectInfo) {
             await openProject(projectId, projectInfo.path, projectInfo.name);
           }
           notifyInfo('Application Initialized');
