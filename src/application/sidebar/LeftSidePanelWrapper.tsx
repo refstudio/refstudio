@@ -81,7 +81,15 @@ export function LeftSidePanelWrapper({ disabled }: { disabled?: boolean }) {
         collapsible
         order={1}
         ref={leftPanelRef}
-        onCollapse={(collapsed) => setIsPanelCollapsed(collapsed)}
+        onCollapse={(collapsed) => {
+          if (!disabled) {
+            setIsPanelCollapsed(collapsed);
+          } else if (!collapsed) {
+            // When the sidebar is disabled, the panel should be collapsed
+            // If the panel tries to update its state (because of layout stored in local storage), we prevent the update
+            leftPanelRef.current?.collapse();
+          }
+        }}
       >
         {activePanel === 'Explorer' && <ExplorerPanel />}
         {activePanel === 'References' && <ReferencesPanel />}

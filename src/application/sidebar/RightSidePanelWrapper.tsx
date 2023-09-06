@@ -58,7 +58,15 @@ export function RightSidePanelWrapper({ disabled }: { disabled?: boolean }) {
         collapsible
         order={3}
         ref={rightPanelRef}
-        onCollapse={(collapsed) => setIsPanelCollapsed(collapsed)}
+        onCollapse={(collapsed) => {
+          if (!disabled) {
+            setIsPanelCollapsed(collapsed);
+          } else if (!collapsed) {
+            // When the sidebar is disabled, the panel should be collapsed
+            // If the panel tries to update its state (because of layout stored in local storage), we prevent the update
+            rightPanelRef.current?.collapse();
+          }
+        }}
       >
         {activePanel === 'Rewriter' && <RewriterPanel />}
         {activePanel === 'Chatbot' && <ChatbotPanel />}
