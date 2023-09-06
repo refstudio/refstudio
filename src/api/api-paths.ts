@@ -2,7 +2,7 @@
 /* eslint-disable */
 import {
   Author,
-  BodyCreateFile_ProjectId__Filepath_Put,
+  BodyCreateFileApiFs_ProjectId__Filepath_Put,
   ChatRequest,
   ChatResponse,
   ChatResponseChoice,
@@ -44,95 +44,95 @@ import {
 export interface paths {
   '/api/ai/{project_id}/chat': {
     /** Http Ai Chat */
-    post: operations['http_ai_chat__project_id__chat_post'];
+    post: operations['http_ai_chat_api_ai__project_id__chat_post'];
   };
   '/api/ai/completion': {
     /** Http Ai Completion */
-    post: operations['http_ai_completion_completion_post'];
+    post: operations['http_ai_completion_api_ai_completion_post'];
   };
   '/api/ai/rewrite': {
     /** Http Ai Rewrite */
-    post: operations['http_ai_rewrite_rewrite_post'];
+    post: operations['http_ai_rewrite_api_ai_rewrite_post'];
   };
   '/api/fs/{project_id}/{filepath}': {
     /** Read File */
-    get: operations['read_file__project_id___filepath__get'];
+    get: operations['read_file_api_fs__project_id___filepath__get'];
     /** Create File */
-    put: operations['create_file__project_id___filepath__put'];
+    put: operations['create_file_api_fs__project_id___filepath__put'];
     /** Delete File */
-    delete: operations['delete_file__project_id___filepath__delete'];
+    delete: operations['delete_file_api_fs__project_id___filepath__delete'];
     /** Head File */
-    head: operations['head_file__project_id___filepath__head'];
+    head: operations['head_file_api_fs__project_id___filepath__head'];
   };
   '/api/meta/shutdown': {
     /** Shutdown */
-    post: operations['shutdown_shutdown_post'];
+    post: operations['shutdown_api_meta_shutdown_post'];
   };
   '/api/meta/status': {
     /** Status */
-    get: operations['status_status_get'];
+    get: operations['status_api_meta_status_get'];
   };
   '/api/projects/': {
     /**
      * List Projects
      * @description Returns a list of projects for the current user
      */
-    get: operations['list_projects__get'];
+    get: operations['list_projects_api_projects__get'];
     /**
      * Create Project
      * @description Creates a project, and a directory in the filesystem
      */
-    post: operations['create_project__post'];
+    post: operations['create_project_api_projects__post'];
   };
   '/api/projects/{project_id}': {
     /**
      * Get Project
      * @description Returns details about a project
      */
-    get: operations['get_project__project_id__get'];
+    get: operations['get_project_api_projects__project_id__get'];
     /**
      * Delete Project
      * @description Deletes a project directory and all files in it
      */
-    delete: operations['delete_project__project_id__delete'];
+    delete: operations['delete_project_api_projects__project_id__delete'];
   };
   '/api/projects/{project_id}/files': {
     /** Get Project Files */
-    get: operations['get_project_files__project_id__files_get'];
+    get: operations['get_project_files_api_projects__project_id__files_get'];
   };
   '/api/references/{project_id}': {
     /**
      * List References
      * @description Returns a list of references for the current user
      */
-    get: operations['list_references__project_id__get'];
+    get: operations['list_references_api_references__project_id__get'];
     /**
      * Ingest References
      * @description Ingests references from PDFs in the project uploads directory
      */
-    post: operations['ingest_references__project_id__post'];
+    post: operations['ingest_references_api_references__project_id__post'];
   };
   '/api/references/{project_id}/{reference_id}': {
     /** Http Get */
-    get: operations['http_get__project_id___reference_id__get'];
+    get: operations['http_get_api_references__project_id___reference_id__get'];
     /** Http Delete */
-    delete: operations['http_delete__project_id___reference_id__delete'];
+    delete: operations['http_delete_api_references__project_id___reference_id__delete'];
     /** Http Update */
-    patch: operations['http_update__project_id___reference_id__patch'];
+    patch: operations['http_update_api_references__project_id___reference_id__patch'];
   };
   '/api/references/{project_id}/bulk_delete': {
     /** Http Bulk Delete */
-    post: operations['http_bulk_delete__project_id__bulk_delete_post'];
+    post: operations['http_bulk_delete_api_references__project_id__bulk_delete_post'];
   };
   '/api/search/s2': {
     /** Http Search S2 */
-    get: operations['http_search_s2_s2_get'];
+    get: operations['http_search_s2_api_search_s2_get'];
   };
   '/api/settings/': {
     /** Get Settings */
-    get: operations['get_settings__get'];
+    get: operations['get_settings_api_settings__get'];
     /** Update Settings */
-    put: operations['update_settings__put'];
+    put: operations['update_settings_api_settings__put'];
   };
 }
 
@@ -147,8 +147,8 @@ export interface components {
       given_name?: string;
       surname?: string;
     };
-    /** Body_create_file__project_id___filepath__put */
-    Body_create_file__project_id___filepath__put: {
+    /** Body_create_file_api_fs__project_id___filepath__put */
+    Body_create_file_api_fs__project_id___filepath__put: {
       /**
        * File
        * Format: binary
@@ -392,7 +392,7 @@ export type external = Record<string, never>;
 
 export interface operations {
   /** Http Ai Chat */
-  http_ai_chat__project_id__chat_post: {
+  http_ai_chat_api_ai__project_id__chat_post: {
     parameters: {
       path: {
         project_id: string;
@@ -419,7 +419,7 @@ export interface operations {
     };
   };
   /** Http Ai Completion */
-  http_ai_completion_completion_post: {
+  http_ai_completion_api_ai_completion_post: {
     requestBody: {
       content: {
         'application/json': TextCompletionRequest;
@@ -441,7 +441,7 @@ export interface operations {
     };
   };
   /** Http Ai Rewrite */
-  http_ai_rewrite_rewrite_post: {
+  http_ai_rewrite_api_ai_rewrite_post: {
     requestBody: {
       content: {
         'application/json': RewriteRequest;
@@ -463,7 +463,7 @@ export interface operations {
     };
   };
   /** Read File */
-  read_file__project_id___filepath__get: {
+  read_file_api_fs__project_id___filepath__get: {
     parameters: {
       path: {
         project_id: string;
@@ -486,7 +486,7 @@ export interface operations {
     };
   };
   /** Create File */
-  create_file__project_id___filepath__put: {
+  create_file_api_fs__project_id___filepath__put: {
     parameters: {
       path: {
         project_id: string;
@@ -495,7 +495,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'multipart/form-data': BodyCreateFile_ProjectId__Filepath_Put;
+        'multipart/form-data': BodyCreateFileApiFs_ProjectId__Filepath_Put;
       };
     };
     responses: {
@@ -514,7 +514,7 @@ export interface operations {
     };
   };
   /** Delete File */
-  delete_file__project_id___filepath__delete: {
+  delete_file_api_fs__project_id___filepath__delete: {
     parameters: {
       path: {
         project_id: string;
@@ -537,7 +537,7 @@ export interface operations {
     };
   };
   /** Head File */
-  head_file__project_id___filepath__head: {
+  head_file_api_fs__project_id___filepath__head: {
     parameters: {
       path: {
         project_id: string;
@@ -560,7 +560,7 @@ export interface operations {
     };
   };
   /** Shutdown */
-  shutdown_shutdown_post: {
+  shutdown_api_meta_shutdown_post: {
     responses: {
       /** @description Successful Response */
       200: {
@@ -571,7 +571,7 @@ export interface operations {
     };
   };
   /** Status */
-  status_status_get: {
+  status_api_meta_status_get: {
     responses: {
       /** @description Successful Response */
       200: {
@@ -585,7 +585,7 @@ export interface operations {
    * List Projects
    * @description Returns a list of projects for the current user
    */
-  list_projects__get: {
+  list_projects_api_projects__get: {
     responses: {
       /** @description Successful Response */
       200: {
@@ -599,7 +599,7 @@ export interface operations {
    * Create Project
    * @description Creates a project, and a directory in the filesystem
    */
-  create_project__post: {
+  create_project_api_projects__post: {
     requestBody: {
       content: {
         'application/json': ProjectCreateRequest;
@@ -624,7 +624,7 @@ export interface operations {
    * Get Project
    * @description Returns details about a project
    */
-  get_project__project_id__get: {
+  get_project_api_projects__project_id__get: {
     parameters: {
       path: {
         project_id: string;
@@ -649,7 +649,7 @@ export interface operations {
    * Delete Project
    * @description Deletes a project directory and all files in it
    */
-  delete_project__project_id__delete: {
+  delete_project_api_projects__project_id__delete: {
     parameters: {
       path: {
         project_id: string;
@@ -671,7 +671,7 @@ export interface operations {
     };
   };
   /** Get Project Files */
-  get_project_files__project_id__files_get: {
+  get_project_files_api_projects__project_id__files_get: {
     parameters: {
       path: {
         project_id: string;
@@ -696,7 +696,7 @@ export interface operations {
    * List References
    * @description Returns a list of references for the current user
    */
-  list_references__project_id__get: {
+  list_references_api_references__project_id__get: {
     parameters: {
       path: {
         project_id: string;
@@ -721,7 +721,7 @@ export interface operations {
    * Ingest References
    * @description Ingests references from PDFs in the project uploads directory
    */
-  ingest_references__project_id__post: {
+  ingest_references_api_references__project_id__post: {
     parameters: {
       path: {
         project_id: string;
@@ -748,7 +748,7 @@ export interface operations {
     };
   };
   /** Http Get */
-  http_get__project_id___reference_id__get: {
+  http_get_api_references__project_id___reference_id__get: {
     parameters: {
       path: {
         project_id: string;
@@ -771,7 +771,7 @@ export interface operations {
     };
   };
   /** Http Delete */
-  http_delete__project_id___reference_id__delete: {
+  http_delete_api_references__project_id___reference_id__delete: {
     parameters: {
       path: {
         project_id: string;
@@ -794,7 +794,7 @@ export interface operations {
     };
   };
   /** Http Update */
-  http_update__project_id___reference_id__patch: {
+  http_update_api_references__project_id___reference_id__patch: {
     parameters: {
       path: {
         project_id: string;
@@ -822,7 +822,7 @@ export interface operations {
     };
   };
   /** Http Bulk Delete */
-  http_bulk_delete__project_id__bulk_delete_post: {
+  http_bulk_delete_api_references__project_id__bulk_delete_post: {
     parameters: {
       path: {
         project_id: string;
@@ -849,11 +849,11 @@ export interface operations {
     };
   };
   /** Http Search S2 */
-  http_search_s2_s2_get: {
+  http_search_s2_api_search_s2_get: {
     parameters: {
       query: {
         query: string;
-        limit?: unknown;
+        limit?: number;
       };
     };
     responses: {
@@ -872,7 +872,7 @@ export interface operations {
     };
   };
   /** Get Settings */
-  get_settings__get: {
+  get_settings_api_settings__get: {
     responses: {
       /** @description Successful Response */
       200: {
@@ -883,7 +883,7 @@ export interface operations {
     };
   };
   /** Update Settings */
-  update_settings__put: {
+  update_settings_api_settings__put: {
     requestBody: {
       content: {
         'application/json': FlatSettingsSchemaPatch;

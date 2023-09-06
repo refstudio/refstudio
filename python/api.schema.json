@@ -21,6 +21,79 @@
       ],
       "title": "Author"
     },
+    "Body_create_file_api_fs__project_id___filepath__put": {
+      "properties": {
+        "file": {
+          "type": "string",
+          "format": "binary",
+          "title": "File"
+        }
+      },
+      "type": "object",
+      "required": [
+        "file"
+      ],
+      "title": "Body_create_file_api_fs__project_id___filepath__put"
+    },
+    "ChatRequest": {
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "n_choices": {
+          "type": "integer",
+          "default": 1
+        },
+        "temperature": {
+          "type": "number",
+          "default": 0.7
+        }
+      },
+      "type": "object",
+      "required": [
+        "text"
+      ],
+      "title": "ChatRequest"
+    },
+    "ChatResponse": {
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string"
+        },
+        "choices": {
+          "items": {
+            "$ref": "#/definitions/ChatResponseChoice"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object",
+      "required": [
+        "status",
+        "message",
+        "choices"
+      ],
+      "title": "ChatResponse"
+    },
+    "ChatResponseChoice": {
+      "properties": {
+        "index": {
+          "type": "integer"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "index",
+        "text"
+      ],
+      "title": "ChatResponseChoice"
+    },
     "Chunk": {
       "properties": {
         "text": {
@@ -85,6 +158,119 @@
       "title": "EmptyRequest",
       "description": "Use this to indicate that a request only accepts an empty object ({})"
     },
+    "FileEntry": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "file_extension": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "name",
+        "path",
+        "file_extension"
+      ],
+      "title": "FileEntry"
+    },
+    "FlatSettingsSchema": {
+      "properties": {
+        "current_directory": {
+          "type": "string"
+        },
+        "logging_enabled": {
+          "type": "boolean"
+        },
+        "logging_filepath": {
+          "type": "string"
+        },
+        "openai_api_key": {
+          "type": "string"
+        },
+        "openai_chat_model": {
+          "type": "string"
+        },
+        "openai_manner": {
+          "$ref": "#/definitions/RewriteMannerType"
+        },
+        "openai_temperature": {
+          "type": "number"
+        }
+      },
+      "type": "object",
+      "required": [
+        "current_directory",
+        "logging_enabled",
+        "logging_filepath",
+        "openai_api_key",
+        "openai_chat_model",
+        "openai_manner",
+        "openai_temperature"
+      ],
+      "title": "FlatSettingsSchema"
+    },
+    "FlatSettingsSchemaPatch": {
+      "properties": {
+        "current_directory": {
+          "type": "string"
+        },
+        "logging_enabled": {
+          "type": "boolean"
+        },
+        "logging_filepath": {
+          "type": "string"
+        },
+        "openai_api_key": {
+          "type": "string"
+        },
+        "openai_chat_model": {
+          "type": "string"
+        },
+        "openai_manner": {
+          "$ref": "#/definitions/RewriteMannerType"
+        },
+        "openai_temperature": {
+          "type": "number"
+        }
+      },
+      "type": "object",
+      "title": "FlatSettingsSchemaPatch"
+    },
+    "FolderEntry": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "children": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/FileEntry"
+              },
+              {
+                "$ref": "#/definitions/FolderEntry"
+              }
+            ]
+          },
+          "type": "array",
+          "default": []
+        }
+      },
+      "type": "object",
+      "required": [
+        "name",
+        "path"
+      ],
+      "title": "FolderEntry"
+    },
     "HTTPValidationError": {
       "properties": {
         "detail": {
@@ -126,6 +312,63 @@
       ],
       "title": "IngestStatus",
       "description": "An enumeration."
+    },
+    "ProjectCreateRequest": {
+      "properties": {
+        "project_name": {
+          "type": "string"
+        },
+        "project_path": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "project_name"
+      ],
+      "title": "ProjectCreateRequest"
+    },
+    "ProjectDetailsResponse": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "path"
+      ],
+      "title": "ProjectDetailsResponse"
+    },
+    "ProjectFileTreeResponse": {
+      "properties": {
+        "contents": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/FileEntry"
+              },
+              {
+                "$ref": "#/definitions/FolderEntry"
+              }
+            ]
+          },
+          "type": "array"
+        }
+      },
+      "type": "object",
+      "required": [
+        "contents"
+      ],
+      "title": "ProjectFileTreeResponse"
     },
     "Reference": {
       "properties": {
@@ -207,114 +450,6 @@
       "title": "ResponseStatus",
       "description": "An enumeration."
     },
-    "UpdateStatusResponse": {
-      "properties": {
-        "status": {
-          "$ref": "#/definitions/ResponseStatus"
-        },
-        "message": {
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "required": [
-        "status",
-        "message"
-      ],
-      "title": "UpdateStatusResponse"
-    },
-    "ValidationError": {
-      "properties": {
-        "loc": {
-          "items": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "integer"
-              }
-            ]
-          },
-          "type": "array",
-          "title": "Location"
-        },
-        "msg": {
-          "type": "string",
-          "title": "Message"
-        },
-        "type": {
-          "type": "string",
-          "title": "Error Type"
-        }
-      },
-      "type": "object",
-      "required": [
-        "loc",
-        "msg",
-        "type"
-      ],
-      "title": "ValidationError"
-    },
-    "ChatRequest": {
-      "properties": {
-        "text": {
-          "type": "string"
-        },
-        "n_choices": {
-          "type": "integer",
-          "default": 1
-        },
-        "temperature": {
-          "type": "number",
-          "default": 0.7
-        }
-      },
-      "type": "object",
-      "required": [
-        "text"
-      ],
-      "title": "ChatRequest"
-    },
-    "ChatResponse": {
-      "properties": {
-        "status": {
-          "$ref": "#/definitions/ResponseStatus"
-        },
-        "message": {
-          "type": "string"
-        },
-        "choices": {
-          "items": {
-            "$ref": "#/definitions/ChatResponseChoice"
-          },
-          "type": "array"
-        }
-      },
-      "type": "object",
-      "required": [
-        "status",
-        "message",
-        "choices"
-      ],
-      "title": "ChatResponse"
-    },
-    "ChatResponseChoice": {
-      "properties": {
-        "index": {
-          "type": "integer"
-        },
-        "text": {
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "required": [
-        "index",
-        "text"
-      ],
-      "title": "ChatResponseChoice"
-    },
     "RewriteChoice": {
       "properties": {
         "index": {
@@ -392,6 +527,62 @@
       ],
       "title": "RewriteResponse"
     },
+    "S2SearchResult": {
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "abstract": {
+          "type": "string"
+        },
+        "venue": {
+          "type": "string"
+        },
+        "year": {
+          "type": "integer"
+        },
+        "paperId": {
+          "type": "string"
+        },
+        "citationCount": {
+          "type": "integer"
+        },
+        "openAccessPdf": {
+          "type": "string"
+        },
+        "authors": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object",
+      "title": "S2SearchResult"
+    },
+    "SearchResponse": {
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string"
+        },
+        "results": {
+          "items": {
+            "$ref": "#/definitions/S2SearchResult"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object",
+      "required": [
+        "status",
+        "message",
+        "results"
+      ],
+      "title": "SearchResponse"
+    },
     "TextCompletionChoice": {
       "properties": {
         "index": {
@@ -461,245 +652,54 @@
       ],
       "title": "TextCompletionResponse"
     },
-    "S2SearchResult": {
-      "properties": {
-        "title": {
-          "type": "string"
-        },
-        "abstract": {
-          "type": "string"
-        },
-        "venue": {
-          "type": "string"
-        },
-        "year": {
-          "type": "integer"
-        },
-        "paperId": {
-          "type": "string"
-        },
-        "citationCount": {
-          "type": "integer"
-        },
-        "openAccessPdf": {
-          "type": "string"
-        },
-        "authors": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        }
-      },
-      "type": "object",
-      "title": "S2SearchResult"
-    },
-    "SearchResponse": {
+    "UpdateStatusResponse": {
       "properties": {
         "status": {
           "$ref": "#/definitions/ResponseStatus"
         },
         "message": {
           "type": "string"
-        },
-        "results": {
-          "items": {
-            "$ref": "#/definitions/S2SearchResult"
-          },
-          "type": "array"
         }
       },
       "type": "object",
       "required": [
         "status",
-        "message",
-        "results"
+        "message"
       ],
-      "title": "SearchResponse"
+      "title": "UpdateStatusResponse"
     },
-    "Body_create_file__project_id___filepath__put": {
+    "ValidationError": {
       "properties": {
-        "file": {
-          "type": "string",
-          "format": "binary",
-          "title": "File"
-        }
-      },
-      "type": "object",
-      "required": [
-        "file"
-      ],
-      "title": "Body_create_file__project_id___filepath__put"
-    },
-    "FileEntry": {
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        },
-        "file_extension": {
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "required": [
-        "name",
-        "path",
-        "file_extension"
-      ],
-      "title": "FileEntry"
-    },
-    "FolderEntry": {
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        },
-        "children": {
+        "loc": {
           "items": {
             "anyOf": [
               {
-                "$ref": "#/definitions/FileEntry"
+                "type": "string"
               },
               {
-                "$ref": "#/definitions/FolderEntry"
+                "type": "integer"
               }
             ]
           },
           "type": "array",
-          "default": []
+          "title": "Location"
+        },
+        "msg": {
+          "type": "string",
+          "title": "Message"
+        },
+        "type": {
+          "type": "string",
+          "title": "Error Type"
         }
       },
       "type": "object",
       "required": [
-        "name",
-        "path"
+        "loc",
+        "msg",
+        "type"
       ],
-      "title": "FolderEntry"
-    },
-    "ProjectCreateRequest": {
-      "properties": {
-        "project_name": {
-          "type": "string"
-        },
-        "project_path": {
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "required": [
-        "project_name"
-      ],
-      "title": "ProjectCreateRequest"
-    },
-    "ProjectDetailsResponse": {
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "required": [
-        "id",
-        "name",
-        "path"
-      ],
-      "title": "ProjectDetailsResponse"
-    },
-    "ProjectFileTreeResponse": {
-      "properties": {
-        "contents": {
-          "items": {
-            "anyOf": [
-              {
-                "$ref": "#/definitions/FileEntry"
-              },
-              {
-                "$ref": "#/definitions/FolderEntry"
-              }
-            ]
-          },
-          "type": "array"
-        }
-      },
-      "type": "object",
-      "required": [
-        "contents"
-      ],
-      "title": "ProjectFileTreeResponse"
-    },
-    "FlatSettingsSchema": {
-      "properties": {
-        "current_directory": {
-          "type": "string"
-        },
-        "logging_enabled": {
-          "type": "boolean"
-        },
-        "logging_filepath": {
-          "type": "string"
-        },
-        "openai_api_key": {
-          "type": "string"
-        },
-        "openai_chat_model": {
-          "type": "string"
-        },
-        "openai_manner": {
-          "$ref": "#/definitions/RewriteMannerType"
-        },
-        "openai_temperature": {
-          "type": "number"
-        }
-      },
-      "type": "object",
-      "required": [
-        "current_directory",
-        "logging_enabled",
-        "logging_filepath",
-        "openai_api_key",
-        "openai_chat_model",
-        "openai_manner",
-        "openai_temperature"
-      ],
-      "title": "FlatSettingsSchema"
-    },
-    "FlatSettingsSchemaPatch": {
-      "properties": {
-        "current_directory": {
-          "type": "string"
-        },
-        "logging_enabled": {
-          "type": "boolean"
-        },
-        "logging_filepath": {
-          "type": "string"
-        },
-        "openai_api_key": {
-          "type": "string"
-        },
-        "openai_chat_model": {
-          "type": "string"
-        },
-        "openai_manner": {
-          "$ref": "#/definitions/RewriteMannerType"
-        },
-        "openai_temperature": {
-          "type": "number"
-        }
-      },
-      "type": "object",
-      "title": "FlatSettingsSchemaPatch"
+      "title": "ValidationError"
     }
   }
 }

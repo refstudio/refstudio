@@ -6,48 +6,41 @@ This generates two files:
 2. api.schema.json, which contains JSONSchema for the request/response types.
 """
 import json
+from pathlib import Path
 
-from fastapi.openapi.utils import get_openapi
-from starlette.routing import Mount
-from web import api
+from fastapi import FastAPI
+from sidecar.api import api
+
+
+def create_openapi_schema(app: FastAPI):
+    return app.openapi()
+
+
+def create_json_schema(app: FastAPI):
+    """
+    Create a JSONSchema for the request/response types. This is used by
+    json2ts to generate TypeScript types.
+
+    Notes
+    -----
+    OpenAPI puts request/response definitions under "/components/schemas", but
+    json2ts wants them under "/definitions".
+    """
+    openapi = app.openapi()
+    output_schema = json.dumps(openapi["components"]["schemas"], indent=2)
+    output_schema = output_schema.replace("#/components/schemas/", "#/definitions/")
+    return json.loads(output_schema)
+
 
 if __name__ == "__main__":
-    combined_schemas = {}
-    combined_paths = {}
-    for route in api.routes:
-        if not isinstance(route, Mount):
-            continue  # must be a built-in route like /docs
-        mount_path = route.path
-        openapi = get_openapi(
-            title=f"refstudio{mount_path}", version="0.1", routes=route.app.routes
-        )
-        components = openapi.get("components")
-        if components:
-            combined_schemas.update(components["schemas"])
-        paths = openapi["paths"]
-        for path, path_spec in paths.items():
-            combined_paths[mount_path + path] = path_spec
+    openapi_schema = create_openapi_schema(api)
 
-    with open("python/openapi.json", "w") as out:
-        json.dump(
-            {
-                "openapi": "3.1.0",
-                "info": {
-                    "title": "RefStudio API",
-                    "version": "0.1",
-                },
-                "paths": combined_paths,
-                "components": {"schemas": combined_schemas},
-            },
-            out,
-            sort_keys=True,
-            indent=2,
-        )
+    filepath = Path(__file__).parent / "openapi.json"
+    with open(filepath, "w") as out:
+        json.dump(openapi_schema, out, sort_keys=True, indent=2)
 
-    # OpenAPI puts request/response definitions under "/components/schemas", but
-    # json2ts wants them under "/definitions".
-    output_schema = json.dumps(combined_schemas)
-    output_schema = output_schema.replace("#/components/schemas/", "#/definitions/")
-    schema = json.loads(output_schema)
-    with open("python/api.schema.json", "w") as out:
-        json.dump({"definitions": schema}, out, indent=2)
+    json_schema = create_json_schema(api)
+
+    filepath = Path(__file__).parent / "api.schema.json"
+    with open(filepath, "w") as out:
+        json.dump({"definitions": json_schema}, out, indent=2)
