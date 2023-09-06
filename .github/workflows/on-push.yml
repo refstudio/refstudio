@@ -143,3 +143,24 @@ jobs:
         uses: ./.github/actions/setup-python
       - name: Codegen
         run: yarn codegen
+
+  build:
+    name: Build Python binary
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['macos-latest', 'windows-latest']
+      
+      steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.10
+    
+      - run: yarn python
+      - uses: actions/upload-artifact@v3
+        with:
+          name: python-binary ${{ matrix.os }}
+          path: src/bin/python/*
+          if-no-files-found: error
