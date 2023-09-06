@@ -17,10 +17,9 @@ export function CreateProjectModal() {
 
   const handleFormSubmit: FormEventHandler = (e) => {
     e.preventDefault();
-    if (!name) {
-      return;
+    if (name) {
+      closeModal(name.trim());
     }
-    closeModal(name.trim());
   };
 
   if (!isVisible) {
@@ -28,13 +27,19 @@ export function CreateProjectModal() {
   }
 
   return (
-    <Modal className="w-[1150px] max-w-[calc(30vw-100px)]" open={isVisible} onClose={() => dismissModal()}>
-      <div className="flex w-full flex-col  bg-white">
+    <Modal className="w-[1150px] max-w-[calc(30vw-100px)]" open={isVisible} onClose={dismissModal}>
+      <div className="flex w-full flex-col bg-white">
         <div className="border-b-2 p-2 font-bold">Project Name</div>
         <div className="p-2">
           <p>What is the name you want to use for this project?</p>
           <form className="flex gap-2 p-2" onSubmit={handleFormSubmit}>
-            <Input autoFocus type="text" value={name} onChange={(value) => setName(cleanupName(value))} />
+            <Input
+              autoFocus
+              data-testid="project-name-input"
+              type="text"
+              value={name}
+              onChange={(value) => setName(cleanupName(value))}
+            />
             <Button className="w-auto" disabled={cleanupName(name).length === 0} submit text="Create" type="primary" />
           </form>
         </div>

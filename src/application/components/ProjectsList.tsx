@@ -5,13 +5,14 @@ import { cx } from '../../lib/cx';
 import { RefStudioEditorIcon } from './icons';
 
 interface ProjectsListProps {
+  header?: string;
   projects: ProjectInfo[];
   onProjectClick: (project: ProjectInfo) => void;
 }
-export function ProjectsList({ projects, onProjectClick }: ProjectsListProps) {
+export function ProjectsList({ header, projects, onProjectClick }: ProjectsListProps) {
   return (
     <div className="flex flex-col items-stretch gap-4 overflow-y-hidden">
-      <h1>Recent Projects</h1>
+      {header && <h1>{header}</h1>}
       <div className="flex flex-col items-stretch gap-2 overflow-y-scroll">
         {projects.map((project, index) => (
           <Fragment key={project.id}>
