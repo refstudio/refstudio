@@ -28,8 +28,9 @@ export function WelcomeView() {
         <div className="flex flex-1 flex-col gap-12">
           <WelcomeTips />
           <ProjectsList
+            header="Recent Projects"
             projects={projects}
-            onProjectClick={(project) => () => emitEvent('refstudio://projects/open', { projectId: project.id })}
+            onProjectClick={(project) => emitEvent('refstudio://projects/open', { projectId: project.id })}
           />
         </div>
       ) : (

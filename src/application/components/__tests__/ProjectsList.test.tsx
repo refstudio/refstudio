@@ -9,7 +9,7 @@ describe('ProjectsList', () => {
   });
 
   it('should render the list of projects', () => {
-    render(<ProjectsList projects={PROJECTS} onProjectClick={noop} />);
+    render(<ProjectsList header="Recent Projects" projects={PROJECTS} onProjectClick={noop} />);
 
     expect(screen.getAllByRole('menuitem')).toHaveLength(PROJECTS.length);
     PROJECTS.forEach((project) => {
@@ -19,7 +19,7 @@ describe('ProjectsList', () => {
 
   it('should call handler with the project clicked on', async () => {
     const fn = vi.fn();
-    const { user } = setup(<ProjectsList projects={PROJECTS} onProjectClick={fn} />);
+    const { user } = setup(<ProjectsList header="Recent Projects" projects={PROJECTS} onProjectClick={fn} />);
 
     await user.click(screen.getByText(PROJECTS[1].name));
 
