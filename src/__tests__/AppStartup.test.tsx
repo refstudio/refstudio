@@ -16,6 +16,9 @@ vi.mock('../application/App', () => {
 vi.mock('../api/server', () => ({
   useRefStudioServerOnDesktop: () => true,
 }));
+vi.mock('../api/projectsAPI', () => ({
+  readAllProjects: () => Promise.resolve([]),
+}));
 
 describe('AppStartup', () => {
   afterEach(() => {
