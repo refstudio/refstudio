@@ -1,4 +1,4 @@
-import { runPDFIngestion } from '../../../../api/ingestion';
+import { runPDFIngestion } from '../../../../api/referencesAPI';
 import { runGetAtomHook } from '../../../../atoms/__tests__/test-utils';
 import { getReferencesAtom, referencesSyncInProgressAtom } from '../../../../atoms/referencesState';
 import { listenEvent } from '../../../../events';

@@ -1,6 +1,6 @@
 import { createStore } from 'jotai';
 
-import { updateReference } from '../../api/ingestion';
+import { updateReference } from '../../api/referencesAPI';
 import { REFERENCES } from '../../features/references/__tests__/test-fixtures';
 import { ReferenceItem } from '../../types/ReferenceItem';
 import { getDerivedReferenceAtom, setReferencesAtom, updateReferenceAtom } from '../referencesState';

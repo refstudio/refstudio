@@ -1,8 +1,7 @@
 import { makeUploadPath } from '../io/filesystem';
 import { ReferenceItem } from '../types/ReferenceItem';
-import { callSidecar } from './sidecar';
+import { Reference } from './api-types';
 import { apiGetJson, apiPatch, apiPost } from './typed-api';
-import { Reference } from './types';
 
 function parsePdfIngestionResponse(references: Reference[]): ReferenceItem[] {
   return references.map((reference) => ({
@@ -23,13 +22,7 @@ function parsePdfIngestionResponse(references: Reference[]): ReferenceItem[] {
 }
 
 export async function runPDFIngestion(projectId: string): Promise<ReferenceItem[]> {
-  const ingestResponse = await apiPost(
-    '/api/references/{project_id}',
-    {
-      path: { project_id: projectId },
-    },
-    {},
-  );
+  const ingestResponse = await apiPost('/api/references/{project_id}', { path: { project_id: projectId } }, {});
   return parsePdfIngestionResponse(ingestResponse.references);
 }
 
@@ -83,15 +76,4 @@ export async function updateReference(projectId: string, referenceId: string, pa
 export async function getIngestedReferences(projectId: string): Promise<ReferenceItem[]> {
   const references = await apiGetJson('/api/references/{project_id}', { path: { project_id: projectId } });
   return parsePdfIngestionResponse(references);
-}
-
-export async function getIngestionStatus() {
-  const response = await callSidecar('ingest_status', null);
-  return {
-    status: response.status,
-    references: response.reference_statuses.map((refStatus) => ({
-      filename: refStatus.source_filename,
-      status: refStatus.status,
-    })),
-  };
 }

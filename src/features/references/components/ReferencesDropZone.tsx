@@ -3,7 +3,7 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { createRef, useState } from 'react';
 import { VscFilePdf } from 'react-icons/vsc';
 
-import { runPDFIngestion } from '../../../api/ingestion';
+import { runPDFIngestion } from '../../../api/referencesAPI';
 import { refreshFileTreeAtom } from '../../../atoms/fileExplorerActions';
 import { projectIdAtom } from '../../../atoms/projectState';
 import { referencesSyncInProgressAtom, setReferencesAtom } from '../../../atoms/referencesState';

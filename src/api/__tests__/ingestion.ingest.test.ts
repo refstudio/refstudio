@@ -1,5 +1,5 @@
 import { universalPost } from '../api';
-import { runPDFIngestion } from '../ingestion';
+import { runPDFIngestion } from '../referencesAPI';
 
 vi.mock('../api');
 vi.mock('../../io/filesystem');

@@ -1,6 +1,6 @@
 import { createStore } from 'jotai';
 
-import { getIngestedReferences } from '../../api/ingestion';
+import { getIngestedReferences } from '../../api/referencesAPI';
 import { REFERENCES } from '../../features/references/__tests__/test-fixtures';
 import {
   areReferencesLoadedAtom,

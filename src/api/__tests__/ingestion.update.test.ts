@@ -1,7 +1,7 @@
 import { REFERENCES } from '../../features/references/__tests__/test-fixtures';
 import { universalPatch } from '../api';
-import { updateReference } from '../ingestion';
-import { UpdateStatusResponse } from '../types';
+import { UpdateStatusResponse } from '../api-types';
+import { updateReference } from '../referencesAPI';
 
 vi.mock('../api');
 vi.mock('../../io/filesystem');

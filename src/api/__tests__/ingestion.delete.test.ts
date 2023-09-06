@@ -1,6 +1,6 @@
 import { universalPost } from '../api';
-import { removeReferences } from '../ingestion';
-import { DeleteStatusResponse } from '../types';
+import { DeleteStatusResponse } from '../api-types';
+import { removeReferences } from '../referencesAPI';
 
 vi.mock('../api');
 vi.mock('../../io/filesystem');

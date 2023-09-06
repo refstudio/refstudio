@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
 
-import { getIngestedReferences, removeReferences, updateReference } from '../api/ingestion';
+import { getIngestedReferences, removeReferences, updateReference } from '../api/referencesAPI';
 import { deleteFile } from '../io/filesystem';
 import { isNonNullish } from '../lib/isNonNullish';
 import { ReferenceItem } from '../types/ReferenceItem';
