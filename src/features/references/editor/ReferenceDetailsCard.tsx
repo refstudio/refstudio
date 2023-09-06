@@ -2,7 +2,7 @@ import { createContext, Dispatch, ReactElement, SetStateAction, useCallback, use
 
 import { CloseIcon, EditIcon } from '../../../components/icons';
 import { cx } from '../../../lib/cx';
-import { Author, ReferenceItem } from '../../../types/ReferenceItem';
+import { ReferenceItem } from '../../../types/ReferenceItem';
 
 interface IEditingContext {
   editing: boolean;
@@ -49,16 +49,12 @@ const TableDataCell = ({
   id,
   onChangeHandler,
 }: {
-  content: string | Author[] | undefined;
+  content: string;
   editable: boolean;
   id: string;
   onChangeHandler: CallableFunction;
 }) => {
   const { editing } = useContext(EditingContext);
-
-  if (typeof content !== 'string') {
-    return;
-  }
 
   const contentDisplay = id === 'citationKey' ? '[' + content + ']' : content;
 
@@ -185,7 +181,18 @@ export default function ReferenceDetailsCard({
     },
   };
 
-  const getProperty = <T, K extends keyof T>(o: T, propertyName: K): T[K] => o[propertyName]; // o[propertyName] is of type T[K]
+  const getOnlyEditableStringProperty = (theReference: ReferenceItem, key: string): string => {
+    switch (key) {
+      case 'citationKey':
+        return theReference.citationKey;
+      case 'title':
+        return theReference.title;
+      case 'doi':
+        return theReference.title;
+      default:
+        return '';
+    }
+  };
 
   const returnFormatedAuthorsString = (theReference: ReferenceItem) => {
     let authorsString = '';
@@ -219,7 +226,7 @@ export default function ReferenceDetailsCard({
             const content =
               key === 'authors'
                 ? returnFormatedAuthorsString(reference)
-                : getProperty(reference, key as keyof ReferenceItem);
+                : getOnlyEditableStringProperty(reference, key as keyof ReferenceItem);
             return (
               <tr key={'row' + key + new Date().getTime().toString()}>
                 <TableHeadCell content={rowData.title} />
