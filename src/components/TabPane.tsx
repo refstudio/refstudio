@@ -3,19 +3,25 @@ import { useContextMenu } from 'react-contexify';
 
 import { cx } from '../lib/cx';
 import { TabCloseButton } from './TabCloseButton';
-import { TABPANE_TAB_MENU_ID } from './TabPaneTabContextMenu';
 
-export function TabPane<K extends string>({
-  items,
-  value,
-  onClick,
-  onCloseClick,
-}: {
-  items: { text: string; value: K; ctxProps?: unknown; isDirty?: boolean; Icon?: React.ReactElement }[];
+export interface TabPaneItem<K extends string> {
+  text: string;
+  value: K;
+  isDirty?: boolean;
+  Icon?: React.ReactElement;
+  contextMenu?: {
+    menuId: string;
+    ctxProps: unknown;
+  };
+}
+
+interface TabPaneProps<K extends string> {
+  items: TabPaneItem<K>[];
   value: K | null;
-  onClick(value: K): void;
-  onCloseClick(value: K): void;
-}) {
+  onClick?: (value: K) => void;
+  onCloseClick?: (value: K) => void;
+}
+export function TabPane<K extends string>({ items, value, onClick, onCloseClick }: TabPaneProps<K>) {
   const activeIndex = useMemo(() => items.findIndex((item) => item.value === value), [items, value]);
 
   return (
@@ -25,7 +31,6 @@ export function TabPane<K extends string>({
     >
       {items.map((item, index) => (
         <TabItem
-          Icon={item.Icon}
           active={activeIndex === index}
           className={cx({
             'border-l border-l-top-bar-border': index > 0,
@@ -33,12 +38,10 @@ export function TabPane<K extends string>({
             'rounded-bl-default border-l-0': activeIndex === index - 1,
             'rounded-br-default': activeIndex === index + 1,
           })}
-          content={item.text}
-          ctxProps={item.ctxProps}
-          isDirty={item.isDirty}
           key={item.value}
-          onClick={() => onClick(item.value)}
-          onCloseClick={() => onCloseClick(item.value)}
+          {...item}
+          onClick={onClick && (() => onClick(item.value))}
+          onCloseClick={onCloseClick && (() => onCloseClick(item.value))}
         />
       ))}
       {items.length > 0 && (
@@ -54,23 +57,26 @@ export function TabPane<K extends string>({
 
 interface TabItemProps {
   active: boolean;
-  ctxProps: unknown;
-  content: React.ReactNode;
+  contextMenu?: {
+    menuId: string;
+    ctxProps: unknown;
+  };
+  text: React.ReactNode;
   className?: string;
   isDirty?: boolean;
   Icon?: React.ReactElement;
-  onClick: () => void;
-  onCloseClick: () => void;
+  onClick?: () => void;
+  onCloseClick?: () => void;
 }
-export function TabItem({ active, content, isDirty, className, ctxProps, Icon, onClick, onCloseClick }: TabItemProps) {
-  const { show } = useContextMenu({ id: TABPANE_TAB_MENU_ID, props: ctxProps });
+export function TabItem({ active, isDirty, className, contextMenu, Icon, text, onClick, onCloseClick }: TabItemProps) {
+  const { show } = useContextMenu();
 
   return (
     <div
       aria-selected={active}
       className={cx(
         'min-w-32 flex max-w-[11.5rem] items-center gap-2 p-2',
-        'cursor-pointer select-none',
+        'cursor-default select-none',
         'group',
         {
           'bg-top-bar-bg-inactive hover:bg-top-bar-bg-active': !active,
@@ -80,14 +86,20 @@ export function TabItem({ active, content, isDirty, className, ctxProps, Icon, o
           'text-btn-ico-top-bar-active': active,
           'text-btn-ico-top-bar-inactive': !active,
         },
+        {
+          'cursor-pointer': !!onClick,
+        },
         className,
       )}
       role="tab"
-      onClick={(e) => {
-        e.preventDefault();
-        onClick();
-      }}
-      onContextMenu={(e) => show({ event: e })}
+      onClick={
+        onClick &&
+        ((e) => {
+          e.preventDefault();
+          onClick();
+        })
+      }
+      onContextMenu={contextMenu && ((e) => show({ event: e, id: contextMenu.menuId, props: contextMenu.ctxProps }))}
     >
       {Icon}
       <span
@@ -96,9 +108,9 @@ export function TabItem({ active, content, isDirty, className, ctxProps, Icon, o
           'text-btn-txt-top-bar-inactive': !active,
         })}
       >
-        {content}
+        {text}
       </span>
-      <TabCloseButton isDirty={isDirty} onClick={onCloseClick} />
+      {onCloseClick ? <TabCloseButton isDirty={isDirty} onClick={onCloseClick} /> : <div className="w-1" />}
     </div>
   );
 }

@@ -17,7 +17,11 @@ export function ReferencesList({
   };
 
   return (
-    <ul className="flex flex-col items-start gap-2 self-stretch" data-testid={ReferencesList.name} role="list">
+    <ul
+      className="flex flex-col items-start gap-2 self-stretch overflow-y-auto"
+      data-testid={ReferencesList.name}
+      role="list"
+    >
       {references.map((reference) => (
         <li
           className={cx(

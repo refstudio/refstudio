@@ -1,30 +1,77 @@
-import { useQuery } from '@tanstack/react-query';
-import { Fragment } from 'react';
+import { useAtomValue } from 'jotai';
 
-import { ProjectInfo, readAllProjects } from '../../api/projectsAPI';
+import { allProjectsAtom } from '../../atoms/projectState';
 import { Button } from '../../components/Button';
-import { OpenIcon, RefStudioEditorIcon } from '../../components/icons';
+import { OpenIcon } from '../../components/icons';
+import { TabPane } from '../../components/TabPane';
 import { emitEvent } from '../../events';
-import { cx } from '../../lib/cx';
-import { AddIcon, SampleIcon } from '../components/icons';
+import { AddIcon, EmptyStateIcon, WelcomeIcon } from '../components/icons';
+import { ProjectsList } from '../components/ProjectsList';
 
 export function WelcomeView() {
+  const projects = useAtomValue(allProjectsAtom);
+
   return (
-    <div
-      className={cx(
-        'h-full w-full p-10',
-        'flex flex-row items-start gap-10',
-        'bg-content-area-bg-primary',
-        'cursor-default select-none',
-      )}
-    >
-      <div className="flex w-56 flex-col items-stretch">
-        <WelcomeActions />
+    <div className="flex h-full w-full flex-1 flex-col items-stretch">
+      <div>
+        <TabPane
+          items={[
+            {
+              text: 'Welcome',
+              value: 'welcome',
+              Icon: <WelcomeIcon />,
+            },
+          ]}
+          value="welcome"
+        />
       </div>
-      <div className="w-[1px] self-stretch bg-welcome-border" />
-      <div className="flex flex-1 flex-col gap-12 self-stretch">
-        <WelcomeTips />
-        <RecentProjectsList />
+      <div className="flex flex-1 gap-10 bg-content-area-bg-primary p-10">
+        {projects.length > 0 ? (
+          <>
+            <div className="flex w-56 flex-col items-stretch">
+              <WelcomeActions />
+            </div>
+            <div className="w-[1px] bg-welcome-border" />
+            <div className="flex flex-1 flex-col gap-12">
+              <ProjectsList
+                header="Recent Projects"
+                projects={projects}
+                onProjectClick={(project) => emitEvent('refstudio://projects/open', { projectId: project.id })}
+              />
+            </div>
+          </>
+        ) : (
+          <EmptyWelcomeView />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function EmptyWelcomeView() {
+  return (
+    <div className="flex flex-1 cursor-default select-none flex-col items-center justify-center gap-6">
+      <div className="text-empty-state-ico-empty">
+        <EmptyStateIcon />
+      </div>
+      <div className="flex flex-col items-center justify-center gap-2 self-stretch">
+        <div className="text-xl/6 font-semibold text-side-bar-txt-primary">Get Started</div>
+        <div className="text-side-bar-txt-secondary">Create a new project or try a sample one.</div>
+      </div>
+      <div className="flex w-64 flex-col items-center justify-center gap-2">
+        <Button
+          fluid
+          size="M"
+          text="Create First Project"
+          onClick={() => emitEvent('refstudio://menu/file/project/new')}
+        />
+        <Button
+          fluid
+          size="M"
+          text="Try Sample Project"
+          type="secondary"
+          onClick={() => emitEvent('refstudio://menu/file/project/new/sample')}
+        />
       </div>
     </div>
   );
@@ -37,83 +84,18 @@ function WelcomeActions() {
       <div className="flex flex-col items-center gap-2 self-stretch">
         <Button
           Action={<AddIcon />}
+          fluid
           text="Create Project"
           onClick={() => emitEvent('refstudio://menu/file/project/new')}
         />
         <Button
           Action={<OpenIcon />}
+          fluid
           text="Open Project"
           type="secondary"
           onClick={() => emitEvent('refstudio://menu/file/project/open')}
         />
       </div>
-    </div>
-  );
-}
-
-function WelcomeTips() {
-  return (
-    <div
-      className={cx(
-        'flex flex-col items-stretch gap-6 p-6 pt-5',
-        'rounded-default bg-card-bg-secondary',
-        'border-t-8 border-t-card-bg-header',
-      )}
-    >
-      <div className="flex flex-col items-start gap-4 text-card-txt-primary">
-        <h1 className="flex-1 text-card-txt-primary">Tip & Tricks</h1>
-        <div className="flex flex-col items-start gap-2">
-          <div className="f text-2xl/6 font-semibold">Are you New to Refstudio?</div>
-          <div>Learn more by playing with a sample project.</div>
-        </div>
-      </div>
-      <div className="flex flex-row items-start gap-2">
-        <div className="shrink">
-          <Button
-            Action={<SampleIcon />}
-            text="Try Sample Project"
-            onClick={() => emitEvent('refstudio://menu/file/project/new/sample')}
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function RecentProjectsList() {
-  const { data: projects } = useQuery({ queryKey: ['recent-projects'], queryFn: readAllProjects });
-
-  return (
-    <div className="flex flex-col items-stretch gap-4 overflow-y-hidden">
-      <h1>Recent Projects</h1>
-      {projects && (
-        <div className="flex flex-col items-stretch gap-2 overflow-y-scroll">
-          {projects.map((project, index) => (
-            <Fragment key={project.id}>
-              {index > 0 && <div className="h-[1px] shrink-0 bg-welcome-border" />}
-              <ProjectItem project={project} />
-            </Fragment>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function ProjectItem({ project }: { project: ProjectInfo }) {
-  return (
-    <div
-      className={cx(
-        'flex cursor-pointer items-center gap-2 p-2 pr-3',
-        'rounded-default hover:bg-btn-bg-side-bar-item-hover',
-        'text-btn-txt-side-bar-item-primary',
-      )}
-      onClick={() => emitEvent('refstudio://projects/open', { projectId: project.id })}
-    >
-      <div className="text-btn-ico-content">
-        <RefStudioEditorIcon />
-      </div>
-      {project.name}
     </div>
   );
 }

@@ -31,10 +31,22 @@ describe('ReferencesPanel', () => {
     expect(vi.mocked(emitEvent)).toBeCalledWith<[RefStudioEventName]>('refstudio://menu/references/open');
   });
 
+  it('should display empty No Reference when the list is empty', () => {
+    setupWithJotaiProvider(<ReferencesPanel />);
+
+    expect(screen.getByText('No References')).toBeInTheDocument();
+  });
+
+  it('should trigger refstudio://menu/references/upload on click', async () => {
+    const { user } = setupWithJotaiProvider(<ReferencesPanel />);
+    await user.click(screen.getByText('Browse Reference'));
+    expect(vi.mocked(emitEvent)).toBeCalledWith<[RefStudioEventName]>('refstudio://menu/references/upload');
+  });
+
   it('should display ReferencesList with references', () => {
     setupWithJotaiProvider(<ReferencesPanel />, store);
 
-    expect(screen.queryByText(/welcome to your refstudio references library/i)).not.toBeInTheDocument();
+    expect(screen.queryByText('No References')).not.toBeInTheDocument();
     expect(screen.getByText(ref1.title)).toBeInTheDocument();
     expect(screen.getByText(ref2.title)).toBeInTheDocument();
   });

@@ -1,51 +1,56 @@
-import { open, save } from '@tauri-apps/api/dialog';
+import { save } from '@tauri-apps/api/dialog';
 import { useAtomValue, useSetAtom } from 'jotai';
 
 import { createRemoteProject, ProjectInfo, readAllProjects, readProjectById } from '../../api/projectsAPI';
+import { CreateModalResult } from '../../atoms/core/createModalAtoms';
 import { createFileAtom } from '../../atoms/fileEntryActions';
 import {
+  allProjectsAtom,
   closeProjectAtom,
+  createProjectModalAtoms,
   isProjectOpenAtom,
-  newProjectAtom,
   newSampleProjectAtom,
   openProjectAtom,
+  selectProjectModalAtoms,
 } from '../../atoms/projectState';
 import { emitEvent } from '../../events';
 import { getNewProjectsBaseDir } from '../../io/filesystem';
-import { notifyInfo, notifyWarning } from '../../notifications/notifications';
+import { notifyInfo } from '../../notifications/notifications';
 import { saveCachedSettings, setCachedSetting } from '../../settings/settingsManager';
 
 export const SAMPLE_PROJECT_NAME = 'RefStudio Sample';
 
 export function useFileProjectNewListener() {
-  const newProject = useSetAtom(newProjectAtom);
+  const openProject = useSetAtom(openProjectAtom);
   const createFile = useSetAtom(createFileAtom);
+  const setAllProjects = useSetAtom(allProjectsAtom);
+  const openCreateProjectModal = useSetAtom(createProjectModalAtoms.openAtom);
 
   return async () => {
-    let projectInfo: ProjectInfo;
-    if (import.meta.env.VITE_IS_WEB) {
-      const projectName = 'Project Web'; // TODO: Open a custom dialog to ask the project name
-      projectInfo = await createRemoteProject(projectName);
-    } else {
-      const newProjectPath = await save({ defaultPath: await getNewProjectsBaseDir() });
-      if (typeof newProjectPath !== 'string') {
-        notifyInfo('User canceled operation to create new project');
-        return;
-      }
-      const projectName = newProjectPath.split('/').pop() ?? 'Project';
-      projectInfo = await createRemoteProject(projectName, newProjectPath);
+    const projectInfo = import.meta.env.VITE_IS_WEB
+      ? await makeNewProjectforWeb(() => openCreateProjectModal())
+      : await makeNewProjectForDesktop();
+
+    if (!projectInfo) {
+      notifyInfo('User canceled operation to create new project');
+      return;
     }
 
-    await newProject(projectInfo.id, projectInfo.path, projectInfo.name);
+    await openProject(projectInfo.id, projectInfo.path, projectInfo.name);
     createFile();
     notifyInfo('New project created with success');
     persistActiveProjectInSettings(projectInfo.id);
+
+    // Update allProjectsAtom
+    setAllProjects(await readAllProjects());
   };
 }
 
 export function useFileProjectNewSampleListener() {
   const sampleProject = useSetAtom(newSampleProjectAtom);
   const createFile = useSetAtom(createFileAtom);
+  const setAllProjects = useSetAtom(allProjectsAtom);
+
   return async () => {
     const projects = await readAllProjects();
     let project = projects.find((p) => p.name === SAMPLE_PROJECT_NAME);
@@ -56,42 +61,21 @@ export function useFileProjectNewSampleListener() {
     createFile();
     notifyInfo('Sample project opened with success');
     persistActiveProjectInSettings(project.id);
+
+    // Update allProjectsAtom
+    setAllProjects(await readAllProjects());
   };
 }
 
 export function useFileProjectOpenListener() {
+  const openSelectProjectModal = useSetAtom(selectProjectModalAtoms.openAtom);
   return async () => {
-    let projectId: string;
-    if (import.meta.env.VITE_IS_WEB) {
-      // TODO: Open a custom dialog with all projects to select one
-      // For now, opens the first project found
-      const projects = await readAllProjects();
-      if (projects.length === 0) {
-        throw new Error('No projects found');
-      }
-      projectId = projects[0].id;
-    } else {
-      const selectedPath = await open({
-        directory: true,
-        multiple: false,
-        defaultPath: await getNewProjectsBaseDir(),
-        title: 'Open RefStudio project',
-      });
-
-      if (typeof selectedPath === 'string') {
-        const projects = await readAllProjects();
-        const projectWithSamePath = projects.find((project) => project.path === selectedPath);
-        if (!projectWithSamePath) {
-          notifyWarning('You need to open a project that was previously created with RefStudio.');
-          return;
-        }
-        projectId = projectWithSamePath.id;
-      } else {
-        notifyInfo('User canceled operation to open new project');
-        return;
-      }
+    const modalResult = await openSelectProjectModal();
+    if (modalResult.status === 'dismissed') {
+      notifyInfo('User canceled operation to open new project');
+      return;
     }
-
+    const projectId = modalResult.value;
     emitEvent('refstudio://projects/open', { projectId });
   };
 }
@@ -109,9 +93,8 @@ export function useFileProjectCloseListener() {
   };
 }
 
-// TODO: This method needs to be refactored to have use a project id instead of a path
 function persistActiveProjectInSettings(id: string) {
-  setCachedSetting('current_directory', id);
+  setCachedSetting('active_project_id', id);
   void saveCachedSettings();
 }
 
@@ -124,4 +107,31 @@ export function useOpenProjectListener() {
     persistActiveProjectInSettings(projectId);
     notifyInfo('New project open.');
   };
+}
+
+/**
+ * ######################################################
+ *
+ * UTILITY FUNCTIONS to create/open new projects
+ *
+ * ######################################################
+ */
+async function makeNewProjectforWeb(
+  modalCreator: () => Promise<CreateModalResult<string>>,
+): Promise<ProjectInfo | undefined> {
+  const modalResult = await modalCreator();
+  if (modalResult.status === 'dismissed') {
+    return;
+  } else {
+    return createRemoteProject(modalResult.value);
+  }
+}
+
+async function makeNewProjectForDesktop(): Promise<ProjectInfo | undefined> {
+  const newProjectPath = await save({ defaultPath: await getNewProjectsBaseDir() });
+  if (typeof newProjectPath !== 'string') {
+    return;
+  }
+  const projectName = newProjectPath.split('/').pop() ?? 'Project';
+  return createRemoteProject(projectName, newProjectPath);
 }

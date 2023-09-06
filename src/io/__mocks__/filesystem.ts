@@ -11,6 +11,10 @@ function join(...segments: string[]) {
 export const getNewProjectsBaseDir = vi.fn(() => '/usr/name/desktop');
 export const getSeparator = vi.fn(() => '/');
 
+// FileSystem project ID
+// #####################################################################################
+export const setCurrentFileSystemProjectId = vi.fn();
+
 // #####################################################################################
 // UPLOADS
 // #####################################################################################

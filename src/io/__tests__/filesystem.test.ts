@@ -164,6 +164,13 @@ describe('filesystem', () => {
         isFolder: false,
       });
     });
+
+    it('should not call projectAPI if no project is open, and return []', async () => {
+      setCurrentFileSystemProjectId('');
+      const files = await readAllProjectFiles();
+      expect(readProjectFiles).not.toHaveBeenCalled();
+      expect(files).toHaveLength(0);
+    });
   });
 
   // #####################################################################################

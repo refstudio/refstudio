@@ -41,8 +41,8 @@ export default {
         'modal-bg': {
           secondary: 'rgb(var(--grayscale-10) / <alpha-value>)',
           primary: 'rgb(var(--grayscale-00) / <alpha-value>)',
+          overlay: 'rgb(var(--grayscale-60) / <alpha-value>)',
         },
-        'modal-bg-overlay': 'rgb(var(--undefined) / <alpha-value>)',
         'card-txt': {
           tertiary: 'rgb(var(--grayscale-60) / <alpha-value>)',
           secondary: 'rgb(var(--grayscale-70) / <alpha-value>)',
@@ -102,7 +102,11 @@ export default {
           default: 'rgb(var(--grayscale-60) / <alpha-value>)',
           disabled: 'rgb(var(--grayscale-40) / <alpha-value>)',
         },
-        'input-border': 'rgb(var(--grayscale-20) / <alpha-value>)',
+        'input-border': {
+          active: 'rgb(var(--primary-50) / <alpha-value>)',
+          disabled: 'rgb(var(--grayscale-20) / <alpha-value>)',
+          default: 'rgb(var(--grayscale-20) / <alpha-value>)',
+        },
         'input-bg': {
           disabled: 'rgb(var(--grayscale-20) / <alpha-value>)',
           default: 'rgb(var(--grayscale-00) / <alpha-value>)',
@@ -134,6 +138,7 @@ export default {
           primary: 'rgb(var(--grayscale-00) / <alpha-value>)',
           secondary: 'rgb(var(--grayscale-20) / <alpha-value>)',
         },
+        'side-bar-ico-empty': 'rgb(var(--grayscale-40) / <alpha-value>)',
         'card-txt-header': 'rgb(var(--grayscale-00) / <alpha-value>)',
         'card-border-header': 'rgb(var(--primary-90) / <alpha-value>)',
         'card-border': {
@@ -187,12 +192,15 @@ export default {
         },
         'welcome-border': 'rgb(var(--grayscale-20) / <alpha-value>)',
         'editor-selection': 'rgb(196 220 246 / <alpha-value>)',
+        'radio-active': 'rgb(--primary-50 / <alpha-value>)',
+        'empty-state-ico-empty': 'rgb(var(--grayscale-40) / <alpha-value>)',
       },
       boxShadow: {
         default: '0px 0px 24px 0px rgba(0, 0, 0, 0.04)',
       },
       borderRadius: {
         default: '0.25rem',
+        modal: '0.5rem',
       },
       transitionProperty: {
         position: 'top, left, bottom, right',

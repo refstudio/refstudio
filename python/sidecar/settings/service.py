@@ -17,6 +17,7 @@ def make_settings_json_path(user_id: str) -> Path:
 
 def default_settings() -> FlatSettingsSchema:
     return FlatSettingsSchema(
+        active_project_id="",
         current_directory="",
         logging_enabled=False,
         logging_filepath="/tmp/refstudio-sidecar.log",
@@ -44,6 +45,7 @@ def migrate_settings(old_settings: dict) -> FlatSettingsSchema:
         sidecar=old_settings.get("sidecar"),
     )
     return FlatSettingsSchema(
+        active_project_id="",
         current_directory=old_schema.project.current_directory,
         logging_enabled=old_schema.sidecar.logging.enable,
         logging_filepath=old_schema.sidecar.logging.filepath,
