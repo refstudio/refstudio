@@ -5,6 +5,7 @@ import { createRemoteProject, ProjectInfo, readAllProjects, readProjectById } fr
 import { CreateModalResult } from '../../atoms/core/createModalAtoms';
 import { createFileAtom } from '../../atoms/fileEntryActions';
 import {
+  allProjectsAtom,
   closeProjectAtom,
   createProjectModalAtoms,
   isProjectOpenAtom,
@@ -22,6 +23,7 @@ export const SAMPLE_PROJECT_NAME = 'RefStudio Sample';
 export function useFileProjectNewListener() {
   const openProject = useSetAtom(openProjectAtom);
   const createFile = useSetAtom(createFileAtom);
+  const setAllProjects = useSetAtom(allProjectsAtom);
   const openCreateProjectModal = useSetAtom(createProjectModalAtoms.openAtom);
 
   return async () => {
@@ -38,6 +40,9 @@ export function useFileProjectNewListener() {
     createFile();
     notifyInfo('New project created with success');
     persistActiveProjectInSettings(projectInfo.id);
+
+    // Update allProjectsAtom
+    setAllProjects(await readAllProjects());
   };
 }
 
