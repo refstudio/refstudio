@@ -1,11 +1,14 @@
 import { Fragment } from 'react';
 
 import { ProjectInfo } from '../../api/projectsAPI';
-import { emitEvent } from '../../events';
 import { cx } from '../../lib/cx';
 import { RefStudioEditorIcon } from './icons';
 
-export function ProjectsList({ projects }: { projects: ProjectInfo[] }) {
+interface ProjectsListProps {
+  projects: ProjectInfo[];
+  onProjectClick: (projectId: ProjectInfo) => void;
+}
+export function ProjectsList({ projects, onProjectClick }: ProjectsListProps) {
   return (
     <div className="flex flex-col items-stretch gap-4 overflow-y-hidden">
       <h1>Recent Projects</h1>
@@ -13,14 +16,14 @@ export function ProjectsList({ projects }: { projects: ProjectInfo[] }) {
         {projects.map((project, index) => (
           <Fragment key={project.id}>
             {index > 0 && <div className="h-[1px] shrink-0 bg-welcome-border" />}
-            <ProjectItem project={project} />
+            <ProjectItem project={project} onClick={() => onProjectClick(project)} />
           </Fragment>
         ))}
       </div>
     </div>
   );
 }
-function ProjectItem({ project }: { project: ProjectInfo }) {
+function ProjectItem({ project, onClick }: { project: ProjectInfo; onClick: () => void }) {
   return (
     <div
       className={cx(
@@ -28,7 +31,7 @@ function ProjectItem({ project }: { project: ProjectInfo }) {
         'rounded-default hover:bg-btn-bg-side-bar-item-hover',
         'text-btn-txt-side-bar-item-primary',
       )}
-      onClick={() => emitEvent('refstudio://projects/open', { projectId: project.id })}
+      onClick={onClick}
     >
       <div className="text-btn-ico-content">
         <RefStudioEditorIcon />

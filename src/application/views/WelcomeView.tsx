@@ -27,7 +27,10 @@ export function WelcomeView() {
       {projects.length > 0 ? (
         <div className="flex flex-1 flex-col gap-12">
           <WelcomeTips />
-          <ProjectsList projects={projects} />
+          <ProjectsList
+            projects={projects}
+            onProjectClick={(project) => () => emitEvent('refstudio://projects/open', { projectId: project.id })}
+          />
         </div>
       ) : (
         <EmptyWelcomeView />
