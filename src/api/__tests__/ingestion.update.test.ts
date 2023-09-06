@@ -1,7 +1,7 @@
 import { REFERENCES } from '../../features/references/__tests__/test-fixtures';
 import { universalPatch } from '../api';
 import { UpdateStatusResponse } from '../api-types';
-import { updateReference } from '../referencesAPI';
+import { updateProjectReference } from '../referencesAPI';
 
 vi.mock('../api');
 vi.mock('../../io/filesystem');
@@ -20,7 +20,7 @@ describe('ingestion.update', () => {
       message: '',
     } as UpdateStatusResponse);
 
-    await updateReference(PROJECT_ID, ref1.id, {
+    await updateProjectReference(PROJECT_ID, ref1.id, {
       citationKey: ref1.citationKey + 'xx',
       title: ref1.title + ' NEW',
       publishedDate: '2023-07-01',
@@ -49,7 +49,7 @@ describe('ingestion.update', () => {
       message: '',
     } as UpdateStatusResponse);
 
-    await updateReference(PROJECT_ID, ref1.id, {});
+    await updateProjectReference(PROJECT_ID, ref1.id, {});
     expect(vi.mocked(universalPatch).mock.calls).toHaveLength(0);
   });
 
@@ -60,6 +60,6 @@ describe('ingestion.update', () => {
       message: 'what!',
     } as UpdateStatusResponse);
 
-    await expect(updateReference(PROJECT_ID, ref1.id, { title: ref1.title + ' updated' })).rejects.toThrow();
+    await expect(updateProjectReference(PROJECT_ID, ref1.id, { title: ref1.title + ' updated' })).rejects.toThrow();
   });
 });

@@ -10,7 +10,7 @@ import { REFERENCES } from '../../__tests__/test-fixtures';
 import { ReferencesFooterItems } from '../ReferencesFooterItems';
 
 vi.mock('../../../../events');
-vi.mock('../../../../api/ingestion');
+vi.mock('../../../../api/referencesAPI');
 
 describe('ReferencesFooterItems component', () => {
   afterEach(() => {

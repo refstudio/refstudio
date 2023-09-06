@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
 
-import { getIngestedReferences, removeReferences, updateReference } from '../api/referencesAPI';
+import { getProjectReferences, removeProjectReferences, updateProjectReference } from '../api/referencesAPI';
 import { deleteFile } from '../io/filesystem';
 import { isNonNullish } from '../lib/isNonNullish';
 import { ReferenceItem } from '../types/ReferenceItem';
@@ -48,7 +48,7 @@ const referencesLoadedAtom = atom<boolean | null>(null);
 
 export const loadReferencesAtom = atom(null, async (_get, set, projectId: string) => {
   set(referencesLoadedAtom, false);
-  const initialReferences = await getIngestedReferences(projectId);
+  const initialReferences = await getProjectReferences(projectId);
   set(setReferencesAtom, initialReferences);
   set(referencesLoadedAtom, true);
 });
@@ -88,7 +88,7 @@ export const updateReferenceAtom = atom(
     }
 
     // Call backend (patch of updatable fields)
-    await updateReference(projectId, reference.id, patch);
+    await updateProjectReference(projectId, reference.id, patch);
 
     // Update local atoms
     const references = get(getReferencesAtom);
@@ -122,9 +122,9 @@ export const removeReferencesAtom = atom(null, async (get, set, ids: string[], p
   });
 
   // Remove references from BE
-  await removeReferences(
-    referencesToRemove.map((ref) => ref.id),
+  await removeProjectReferences(
     projectId,
+    referencesToRemove.map((ref) => ref.id),
   );
 
   // Remove files from filesystem
