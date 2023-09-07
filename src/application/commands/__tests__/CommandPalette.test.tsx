@@ -1,7 +1,9 @@
 import { createStore } from 'jotai';
 import { MenuProvider } from 'kmenu';
 
+import { makeFile } from '../../../atoms/__tests__/test-fixtures';
 import { runHookWithJotaiProvider } from '../../../atoms/__tests__/test-utils';
+import { openFileEntryAtom } from '../../../atoms/fileEntryActions';
 import { useOpenEditorsCountForPane } from '../../../atoms/hooks/useOpenEditorsCountForPane';
 import { setReferencesAtom } from '../../../atoms/referencesState';
 import { selectionAtom } from '../../../atoms/selectionState';
@@ -14,6 +16,7 @@ import { INDEX_FILES, INDEX_MAIN, INDEX_REFERENCES, INDEX_REWRITE_WIDGET } from 
 
 vi.mock('../../../events');
 vi.mock('../../../features/components/RewriteWidget');
+vi.mock('../../../io/filesystem');
 
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),
@@ -69,15 +72,17 @@ describe('CommandPalette', () => {
   });
 
   it.each<{ text: string; event: RefStudioEventName }>([
+    // AI
+    // TODO: { text: 'Talk with references...', event: 'refstudio://menu/file/new' },
     // file
     { text: 'New File', event: 'refstudio://menu/file/new' },
     { text: 'Save', event: 'refstudio://menu/file/save' },
     { text: 'Save File as Markdown', event: 'refstudio://menu/file/markdown' },
     // project
-    { text: 'New Project', event: 'refstudio://menu/file/project/new' },
-    { text: 'Open Project', event: 'refstudio://menu/file/project/open' },
-    { text: 'Close Project', event: 'refstudio://menu/file/project/close' },
-    { text: 'Open Sample Project', event: 'refstudio://menu/file/project/new/sample' },
+    { text: 'New project...', event: 'refstudio://menu/file/project/new' },
+    { text: 'Open project...', event: 'refstudio://menu/file/project/open' },
+    { text: 'Close current project', event: 'refstudio://menu/file/project/close' },
+    { text: 'Open sample project...', event: 'refstudio://menu/file/project/new/sample' },
     // References
     { text: 'Show References', event: 'refstudio://menu/references/open' },
     { text: 'Upload References', event: 'refstudio://menu/references/upload' },
@@ -96,7 +101,6 @@ describe('CommandPalette', () => {
   });
 
   it.each<{ text: string; index: number }>([
-    { text: 'Rewrite selection...', index: INDEX_REWRITE_WIDGET },
     { text: 'Quick Files...', index: INDEX_FILES },
     { text: 'Find References...', index: INDEX_REFERENCES },
   ])('Should open menu $index on $text', async ({ text, index }) => {
@@ -110,6 +114,85 @@ describe('CommandPalette', () => {
 
     await user.click(screen.getByText(text));
     expect(onOpen).toHaveBeenLastCalledWith(index);
+  });
+
+  it('should hide rewrite option', () => {
+    setupWithJotaiProvider(
+      <MenuProvider config={{ animationDuration: 0 }}>
+        <CommandPalette index={INDEX_MAIN} />
+      </MenuProvider>,
+      store,
+    );
+
+    expect(screen.queryByText('Rewrite selection...')).not.toBeInTheDocument();
+  });
+
+  it('should show rewrite option when selection is not empty', () => {
+    store.set(selectionAtom, 'selected text');
+
+    setupWithJotaiProvider(
+      <MenuProvider config={{ animationDuration: 0 }}>
+        <CommandPalette index={INDEX_MAIN} />
+      </MenuProvider>,
+      store,
+    );
+
+    expect(screen.getByText('Rewrite selection...')).toBeInTheDocument();
+  });
+
+  it(`should open menu ${INDEX_REWRITE_WIDGET} on Rewrite selection...`, async () => {
+    store.set(selectionAtom, 'selected text');
+    const onOpen = vi.fn();
+    const { user } = setupWithJotaiProvider(
+      <MenuProvider config={{ animationDuration: 0 }}>
+        <CommandPalette index={INDEX_MAIN} onOpen={onOpen} />
+      </MenuProvider>,
+      store,
+    );
+
+    await user.click(screen.getByText('Rewrite selection...'));
+    expect(onOpen).toHaveBeenLastCalledWith(INDEX_REWRITE_WIDGET);
+  });
+
+  it('should hide completion option', () => {
+    setupWithJotaiProvider(
+      <MenuProvider config={{ animationDuration: 0 }}>
+        <CommandPalette index={INDEX_MAIN} />
+      </MenuProvider>,
+      store,
+    );
+
+    expect(screen.queryByText('Complete phrase for me...')).not.toBeInTheDocument();
+  });
+
+  it('should show completion option when a RefStudio editor is active', () => {
+    store.set(openFileEntryAtom, makeFile('test.refstudio'));
+
+    setupWithJotaiProvider(
+      <MenuProvider config={{ animationDuration: 0 }}>
+        <CommandPalette index={INDEX_MAIN} />
+      </MenuProvider>,
+      store,
+    );
+
+    expect(screen.getByText('Complete phrase for me...')).toBeInTheDocument();
+  });
+
+  // TODO:
+  it.skip(`should emit event ${''} for action Complete phrase for me...`, async () => {
+    store.set(openFileEntryAtom, makeFile('test.refstudio'));
+
+    const { user } = setupWithJotaiProvider(
+      <MenuProvider config={{ animationDuration: 0 }}>
+        <CommandPalette index={INDEX_MAIN} />
+      </MenuProvider>,
+      store,
+    );
+
+    await user.click(screen.getByText('Complete phrase for me...'));
+
+    expect(emitEvent).toHaveBeenCalledTimes(1);
+    expect(emitEvent).toHaveBeenCalledWith('');
   });
 
   it('should display second menu', () => {
@@ -136,7 +219,7 @@ describe('CommandPalette', () => {
       store,
     );
 
-    await user.type(screen.getByPlaceholderText('Search commands'), char);
+    await user.type(screen.getByPlaceholderText('Search commands or actions...'), char);
     expect(onOpen).toHaveBeenLastCalledWith(index);
   });
 
