@@ -6,19 +6,7 @@ runs:
     with:
       node-version: 'lts/*'
       cache: 'yarn'
-  - name: Get yarn cache directory path
-    id: yarn-cache-dir-path
-    run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
-    shell: 'bash'
-  - name: Load cached dependencies
-    id: cached-yarn-dependencies
-    uses: actions/cache@v3
-    with:
-      path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-      key: yarn-cache-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
-  - name: Install dependencies
-    if: steps.cached-yarn-dependencies.outputs.cache-hit != 'true'
-    run: yarn install --immutable
+  - run: yarn install --immutable
     shell: 'bash'
     env:
       YARN_ENABLE_SCRIPTS: 0
