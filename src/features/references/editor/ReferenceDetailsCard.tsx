@@ -2,7 +2,7 @@ import { createContext, Dispatch, ReactElement, SetStateAction, useCallback, use
 
 import { CloseIcon, EditIcon } from '../../../components/icons';
 import { cx } from '../../../lib/cx';
-import { ReferenceItem } from '../../../types/ReferenceItem';
+import { Author, ReferenceItem } from '../../../types/ReferenceItem';
 
 interface IEditingContext {
   editing: boolean;
@@ -15,6 +15,26 @@ const EditingContext = createContext<IEditingContext>({
     console.log('seting edtiting');
   },
 });
+
+const returnFormatedAuthorsString = (authorsArray: Author[]): string => {
+  let authorsString = '';
+  authorsArray.forEach((a, index) => {
+    authorsString += (index > 0 ? ', ' : '') + a.fullName;
+  });
+  return authorsString;
+};
+
+const getContentString = (content: string | Author[] | undefined, id: string): string => {
+  if (typeof content == 'undefined') {
+    return '';
+  } else if (typeof content != 'string' && id === 'authors') {
+    return returnFormatedAuthorsString(content);
+  } else if (id === 'citationKey') {
+    return '[' + content.toString() + ']';
+  } else {
+    return content.toString();
+  }
+};
 
 const DataTextInput = ({
   content,
@@ -44,33 +64,57 @@ const DataTextInput = ({
 };
 
 const TableDataCell = ({
-  content,
-  editable,
+  contentData,
   id,
   onChangeHandler,
+  editable,
 }: {
-  content: string;
-  editable: boolean;
+  contentData: string | Author[] | undefined;
   id: string;
   onChangeHandler: CallableFunction;
+  editable: boolean;
 }) => {
   const { editing } = useContext(EditingContext);
 
-  const contentDisplay = id === 'citationKey' ? '[' + content + ']' : content;
+  if (!contentData) {
+    return;
+  }
 
   if (!editing || !editable) {
-    return (
-      <td className="w-auto p-5">
-        <span className="leading-[30px]">{contentDisplay}</span>
-      </td>
-    );
+    return <UnEditableTableDataCell contentData={contentData} id={id} />;
   } else {
-    return (
-      <td className="w-auto p-5">
-        <DataTextInput content={content} id={id} onChangeHandler={onChangeHandler} />
-      </td>
-    );
+    return <EditableTableDataCell contentData={contentData} id={id} onChangeHandler={onChangeHandler} />;
   }
+};
+
+const EditableTableDataCell = ({
+  contentData,
+  id,
+  onChangeHandler,
+}: {
+  contentData: string | Author[];
+  id: string;
+  onChangeHandler: CallableFunction;
+}) => {
+  if (typeof contentData !== 'string') {
+    return;
+  }
+
+  return (
+    <td className="w-auto p-5">
+      <DataTextInput content={contentData} id={id} onChangeHandler={onChangeHandler} />
+    </td>
+  );
+};
+
+const UnEditableTableDataCell = ({ contentData, id }: { contentData: string | Author[]; id: string }) => {
+  const contentString = getContentString(contentData, id);
+
+  return (
+    <td className="w-auto p-5">
+      <span className="leading-[30px]">{contentString}</span>
+    </td>
+  );
 };
 
 const TableHeadCell = ({ content, colSpan, header }: { content: string; colSpan?: number; header?: boolean }) => {
@@ -194,14 +238,6 @@ export default function ReferenceDetailsCard({
     }
   };
 
-  const returnFormatedAuthorsString = (theReference: ReferenceItem) => {
-    let authorsString = '';
-    theReference.authors.forEach((a, index) => {
-      authorsString += (index > 0 ? ', ' : '') + a.fullName;
-    });
-    return authorsString;
-  };
-
   return (
     <EditingContext.Provider value={{ editing, setEditing }}>
       <table
@@ -223,15 +259,12 @@ export default function ReferenceDetailsCard({
           {Object.entries(referenceDetailsCardFormat).map((row) => {
             const key = row[0];
             const rowData = row[1];
-            const content =
-              key === 'authors'
-                ? returnFormatedAuthorsString(reference)
-                : getOnlyEditableStringProperty(reference, key as keyof ReferenceItem);
+            const contentData = reference[key as keyof ReferenceItem];
             return (
               <tr key={'row' + key + new Date().getTime().toString()}>
                 <TableHeadCell content={rowData.title} />
                 <TableDataCell
-                  content={content}
+                  contentData={contentData}
                   editable={rowData.editable}
                   id={key}
                   onChangeHandler={referenceChanged}
