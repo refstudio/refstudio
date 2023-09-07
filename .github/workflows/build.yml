@@ -33,9 +33,9 @@ jobs:
       with:
         python-version: "3.10"
   
-    - run: yarn python
+    - run: poetry run pyinstaller --noconfirm --distpath src-tauri/bin/python python/main.py
     - uses: actions/upload-artifact@v3
       with:
         name: python-binary
-        path: src/bin/python/*
+        path: src-tauri/bin/python/*
         if-no-files-found: error
