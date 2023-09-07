@@ -66,6 +66,7 @@ function parsePdfIngestionResponse(references: Reference[]): ReferenceItem[] {
     publishedDate: reference.published_date ?? '',
     abstract: reference.abstract ?? '',
     status: reference.status,
+    doi: reference.doi ?? '',
     authors: (reference.authors ?? []).map((author) => ({
       fullName: author.full_name,
       lastName: author.surname ?? author.full_name.split(' ').pop() ?? '',
