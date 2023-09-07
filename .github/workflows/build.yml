@@ -21,7 +21,7 @@ jobs:
   
   build:
     name: Build Python binary
-    needs: [setup-js, setup-python]
+    needs: [setup-python]
     runs-on: ubuntu-latest
     # strategy:
     #   fail-fast: false
