@@ -4,7 +4,9 @@ from pathlib import Path
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse
+from sidecar.filesystem.schemas import CreateFileResponse, DeleteFileResponse
 from sidecar.projects.service import get_project_path
+from sidecar.typing import ResponseStatus
 
 router = APIRouter(
     prefix="/fs",
@@ -13,7 +15,9 @@ router = APIRouter(
 
 
 @router.put("/{project_id}/{filepath:path}")
-async def create_file(project_id: str, filepath: Path, file: UploadFile = File(...)):
+async def create_file(
+    project_id: str, filepath: Path, file: UploadFile = File(...)
+) -> CreateFileResponse:
     user_id = "user1"
     project_path = get_project_path(user_id, project_id)
     filepath = project_path / filepath
@@ -25,28 +29,27 @@ async def create_file(project_id: str, filepath: Path, file: UploadFile = File(.
         with open(filepath, "wb") as f:
             shutil.copyfileobj(file.file, f)
     except Exception as e:
-        print(e)
-    finally:
+        response = CreateFileResponse(
+            status=ResponseStatus.ERROR,
+            message=f"Error uploading file: {e}",
+        )
         file.file.close()
-    return {
-        "status": "success",
-        "message": "File uploaded",
-        "filepath": filepath,
-    }
+        return response
+
+    response = CreateFileResponse(
+        status=ResponseStatus.OK,
+        message="File uploaded",
+        filepath=str(filepath),
+    )
+    file.file.close()
+    return response
 
 
 @router.get("/{project_id}/{filepath:path}")
-async def read_file(project_id: str, filepath: Path):
+async def read_file(project_id: str, filepath: Path) -> FileResponse:
     user_id = "user1"
     project_path = get_project_path(user_id, project_id)
     filepath = project_path / filepath
-
-    if not filepath.exists():
-        return {
-            "status": "error",
-            "message": "File not found",
-            "filepath": filepath,
-        }
     return FileResponse(filepath)
 
 
@@ -61,20 +64,20 @@ async def head_file(project_id: str, filepath: Path):
 
 
 @router.delete("/{project_id}/{filepath:path}")
-async def delete_file(project_id: str, filepath: Path):
+async def delete_file(project_id: str, filepath: Path) -> DeleteFileResponse:
     user_id = "user1"
     project_path = get_project_path(user_id, project_id)
     filepath = project_path / filepath
     try:
         os.remove(filepath)
     except Exception as e:
-        return {
-            "status": "error",
-            "message": f"Error deleting file: {e}",
-            "filepath": filepath,
-        }
-    return {
-        "status": "success",
-        "message": "File deleted",
-        "filepath": filepath,
-    }
+        return DeleteFileResponse(
+            status=ResponseStatus.ERROR,
+            message=f"Error deleting file: {e}",
+            filepath=str(filepath),
+        )
+    return DeleteFileResponse(
+        status=ResponseStatus.OK,
+        message="File deleted",
+        filepath=str(filepath),
+    )
