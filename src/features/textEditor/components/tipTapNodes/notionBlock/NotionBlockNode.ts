@@ -144,7 +144,7 @@ export const NotionBlockNode = Node.create({
 
   addInputRules: () => [
     createNotionBlockInputRule(/^> $/, 'collapsible'),
-    createNotionBlockInputRule(/^- $/, 'unorderedList'),
+    createNotionBlockInputRule(/^[-*] $/, 'unorderedList'),
     createNotionBlockInputRule(/^(\d+|\w+)\. $/, 'orderedList'),
   ],
 
