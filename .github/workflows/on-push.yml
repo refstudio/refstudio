@@ -84,9 +84,7 @@ jobs:
       - name: Setup Python
         uses: ./.github/actions/setup-python
       - name: PyLint
-        run: |
-          source .venv/bin/activate
-          ruff check ./python
+        run: poetry run ruff check ./python
 
   pytest:
     needs: setup-python
@@ -97,9 +95,7 @@ jobs:
       - name: Setup Python
         uses: ./.github/actions/setup-python
       - name: Run tests
-        run: |
-          source .venv/bin/activate
-          pytest python/tests --cov=python --cov-report=xml
+        run: poetry run pytest python/tests --cov=python --cov-report=xml
       - name: Upload python coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
