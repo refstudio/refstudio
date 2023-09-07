@@ -1,4 +1,4 @@
-import { runPDFIngestion } from '../../../../api/ingestion';
+import { runProjectIngestion } from '../../../../api/referencesAPI';
 import { runGetAtomHook } from '../../../../atoms/__tests__/test-utils';
 import { getReferencesAtom, referencesSyncInProgressAtom } from '../../../../atoms/referencesState';
 import { listenEvent } from '../../../../events';
@@ -10,7 +10,7 @@ import { ReferencesDropZone } from '../ReferencesDropZone';
 
 vi.mock('../../../../events');
 vi.mock('../../../../io/filesystem');
-vi.mock('../../../../api/ingestion');
+vi.mock('../../../../api/referencesAPI');
 
 describe('ReferencesDropZone', () => {
   beforeEach(() => {
@@ -75,7 +75,7 @@ describe('ReferencesDropZone', () => {
 
   it('should start ingestion on PDF upload', async () => {
     vi.mocked(listenEvent).mockResolvedValue(noop);
-    vi.mocked(runPDFIngestion).mockResolvedValue([REFERENCES[0]]);
+    vi.mocked(runProjectIngestion).mockResolvedValue([REFERENCES[0]]);
 
     const { store } = setupWithJotaiProvider(<ReferencesDropZone>APP</ReferencesDropZone>);
     const syncInProgress = runGetAtomHook(referencesSyncInProgressAtom, store);
@@ -107,7 +107,7 @@ describe('ReferencesDropZone', () => {
     });
 
     await waitFor(() => {
-      expect(runPDFIngestion).toBeCalled();
+      expect(runProjectIngestion).toBeCalled();
     });
 
     expect(references.current).toHaveLength(1);

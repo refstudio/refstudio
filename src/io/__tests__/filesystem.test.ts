@@ -1,6 +1,6 @@
-import { FileEntry as TauriFileEntry } from '@tauri-apps/api/fs';
 import { desktopDir, join } from '@tauri-apps/api/path';
 
+import { FileEntry, FolderEntry } from '../../api/api-types';
 import {
   deleteProjectFile,
   existsProjectFile,
@@ -117,17 +117,23 @@ describe('filesystem', () => {
     });
 
     it('should read all project files empty if none exists', async () => {
-      vi.mocked(readProjectFiles).mockResolvedValue([]);
+      vi.mocked(readProjectFiles).mockResolvedValue({ contents: [] });
       const files = await readAllProjectFiles();
       expect(files).toHaveLength(0);
     });
 
-    const makeFileEntry = (path: string, name: string, children?: TauriFileEntry[]) =>
-      ({
-        path: path + name,
-        name,
-        children,
-      } as TauriFileEntry);
+    const makeFileEntry = (path: string, name: string, children?: (FileEntry | FolderEntry)[]) =>
+      children
+        ? ({
+            path: path + name,
+            name,
+            children,
+          } as FolderEntry)
+        : ({
+            path: path + name,
+            name,
+            file_extension: name.split('.').pop() ?? '',
+          } as FileEntry);
 
     it('should read project structure', async () => {
       let fileA;
@@ -141,13 +147,13 @@ describe('filesystem', () => {
           makeFileEntry('/', 'file E.pdf'), //
         ]), //
       ];
-      vi.mocked(readProjectFiles).mockResolvedValue(FILES);
+      vi.mocked(readProjectFiles).mockResolvedValue({ contents: FILES });
 
       const files = await readAllProjectFiles();
       expect(files).toHaveLength(files.length);
       expect(files[0]).toStrictEqual<FileFileEntry>({
-        path: '/' + fileA.name!,
-        name: fileA.name!,
+        path: '/' + fileA.name,
+        name: fileA.name,
         fileExtension: 'txt',
         isDotfile: false,
         isFile: true,
@@ -156,8 +162,8 @@ describe('filesystem', () => {
       // Uploads folder
       expect(files[2].isFolder && files[2].children).toHaveLength(3);
       expect(files[2].isFolder && files[2].children[1]).toStrictEqual<FileFileEntry>({
-        path: '/' + fileD.name!,
-        name: fileD.name!,
+        path: '/' + fileD.name,
+        name: fileD.name,
         fileExtension: 'pdf',
         isDotfile: false,
         isFile: true,

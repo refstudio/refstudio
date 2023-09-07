@@ -36,7 +36,7 @@ export function useFileProjectNewListener() {
       return;
     }
 
-    await openProject(projectInfo.id, projectInfo.path, projectInfo.name);
+    await openProject(projectInfo.id, projectInfo.name);
     createFile();
     notifyInfo('New project created with success');
     persistActiveProjectInSettings(projectInfo.id);
@@ -57,7 +57,7 @@ export function useFileProjectNewSampleListener() {
     if (!project) {
       project = await createRemoteProject('RefStudio Sample');
     }
-    await sampleProject(project.id, project.name, project.path);
+    await sampleProject(project.id, project.name);
     createFile();
     notifyInfo('Sample project opened with success');
     persistActiveProjectInSettings(project.id);
@@ -103,7 +103,7 @@ export function useOpenProjectListener() {
 
   return async ({ projectId }: { projectId: string }) => {
     const projectToOpen = await readProjectById(projectId);
-    await openProject(projectId, projectToOpen.path, projectToOpen.name);
+    await openProject(projectId, projectToOpen.name);
     persistActiveProjectInSettings(projectId);
     notifyInfo('New project open.');
   };

@@ -1,16 +1,12 @@
-import { FileEntry as TauriFileEntry } from '@tauri-apps/api/fs';
-
 import { universalGet, universalHead, universalPutFile } from './api';
-import { FileEntry, FolderEntry } from './api-types';
 import { apiDelete, apiGetJson, apiPost } from './typed-api';
 
 export interface ProjectInfo {
   id: string;
-  path: string;
   name: string;
 }
 
-type ProjectsResponse = Record<string, { project_name: string; project_path: string }>;
+type ProjectsResponse = Record<string, { project_name: string }>;
 type ProjectPostResponse = ProjectsResponse;
 
 // ########################################################################################
@@ -18,31 +14,41 @@ type ProjectPostResponse = ProjectsResponse;
 // ########################################################################################
 export async function readAllProjects(): Promise<ProjectInfo[]> {
   const projects = (await apiGetJson('/api/projects/')) as ProjectsResponse;
-  return Object.keys(projects).map((id) => ({ id, path: projects[id].project_path, name: projects[id].project_name }));
+  return Object.keys(projects).map((id) => ({ id, name: projects[id].project_name }));
 }
+
 export async function readProjectById(projectId: string): Promise<ProjectInfo> {
   const projectInfo = await apiGetJson('/api/projects/{project_id}', {
     path: { project_id: projectId },
   });
   return {
     id: projectInfo.id,
-    path: projectInfo.path,
     name: projectInfo.name,
   };
 }
 
+/**
+ * Creates a project in the server.
+ *
+ * @param projectName the name of the project
+ * @param projectPath the path of the project, when running in the desktop
+ * @returns the project info
+ */
 export async function createRemoteProject(projectName: string, projectPath?: string): Promise<ProjectInfo> {
   const payload = (await apiPost('/api/projects/', {
     project_name: projectName,
     project_path: projectPath,
   })) as ProjectPostResponse;
 
+  if (projectPath && import.meta.env.VITE_IS_WEB) {
+    throw new Error('Cannot set the project path when running in the browser.');
+  }
+
   const projectId = Object.keys(payload)[0];
-  const { project_path, project_name } = payload[projectId];
+  const { project_name } = payload[projectId];
 
   return {
     id: projectId,
-    path: project_path,
     name: project_name,
   };
 }
@@ -50,23 +56,8 @@ export async function createRemoteProject(projectName: string, projectPath?: str
 // ########################################################################################
 // PROJECT FILE STRUCTURE
 // ########################################################################################
-export async function readProjectFiles(projectId: string): Promise<TauriFileEntry[]> {
-  const projectFiles = await apiGetJson('/api/projects/{project_id}/files', { path: { project_id: projectId } });
-  return projectFiles.contents.map(apiFileToOutput);
-}
-
-function apiFileToOutput(value: FileEntry | FolderEntry): TauriFileEntry {
-  if ('children' in value && Array.isArray(value.children)) {
-    return {
-      name: value.name,
-      path: value.path,
-      children: value.children.map(apiFileToOutput),
-    };
-  }
-  return {
-    name: value.name,
-    path: value.path,
-  };
+export async function readProjectFiles(projectId: string) {
+  return apiGetJson('/api/projects/{project_id}/files', { path: { project_id: projectId } });
 }
 
 // ########################################################################################

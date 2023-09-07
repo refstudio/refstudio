@@ -5,6 +5,7 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
+export type File = string;
 /**
  * An enumeration.
  *
@@ -12,6 +13,13 @@
  * via the `definition` "ResponseStatus".
  */
 export type ResponseStatus = 'ok' | 'error';
+/**
+ * An enumeration.
+ *
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "RewriteMannerType".
+ */
+export type RewriteMannerType = 'concise' | 'elaborate' | 'scholarly';
 export type Location = (string | number)[];
 export type Message = string;
 export type ErrorType = string;
@@ -23,14 +31,6 @@ export type Detail = ValidationError[];
  * via the `definition` "IngestStatus".
  */
 export type IngestStatus = 'processing' | 'failure' | 'complete';
-/**
- * An enumeration.
- *
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "RewriteMannerType".
- */
-export type RewriteMannerType = 'concise' | 'elaborate' | 'scholarly';
-export type File = string;
 
 export interface ApiSchema {
   [k: string]: unknown;
@@ -44,6 +44,39 @@ export interface Author {
   given_name?: string;
   surname?: string;
   email?: string;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "Body_create_file_api_fs__project_id___filepath__put".
+ */
+export interface BodyCreateFileApiFs_ProjectId__Filepath_Put {
+  file: File;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "ChatRequest".
+ */
+export interface ChatRequest {
+  text: string;
+  n_choices?: number;
+  temperature?: number;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "ChatResponse".
+ */
+export interface ChatResponse {
+  status: ResponseStatus;
+  message: string;
+  choices: ChatResponseChoice[];
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "ChatResponseChoice".
+ */
+export interface ChatResponseChoice {
+  index: number;
+  text: string;
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
@@ -77,6 +110,50 @@ export interface DeleteStatusResponse {
  * via the `definition` "EmptyRequest".
  */
 export interface EmptyRequest {}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "FileEntry".
+ */
+export interface FileEntry {
+  name: string;
+  path: string;
+  file_extension: string;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "FlatSettingsSchema".
+ */
+export interface FlatSettingsSchema {
+  active_project_id: string;
+  logging_enabled: boolean;
+  logging_filepath: string;
+  openai_api_key: string;
+  openai_chat_model: string;
+  openai_manner: RewriteMannerType;
+  openai_temperature: number;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "FlatSettingsSchemaPatch".
+ */
+export interface FlatSettingsSchemaPatch {
+  active_project_id?: string;
+  logging_enabled?: boolean;
+  logging_filepath?: string;
+  openai_api_key?: string;
+  openai_chat_model?: string;
+  openai_manner?: RewriteMannerType;
+  openai_temperature?: number;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "FolderEntry".
+ */
+export interface FolderEntry {
+  name: string;
+  path: string;
+  children?: (FileEntry | FolderEntry)[];
+}
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
  * via the `definition` "HTTPValidationError".
@@ -122,6 +199,30 @@ export interface Reference {
   metadata?: {};
 }
 /**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "ProjectCreateRequest".
+ */
+export interface ProjectCreateRequest {
+  project_name: string;
+  project_path?: string;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "ProjectDetailsResponse".
+ */
+export interface ProjectDetailsResponse {
+  id: string;
+  name: string;
+  path: string;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "ProjectFileTreeResponse".
+ */
+export interface ProjectFileTreeResponse {
+  contents: (FileEntry | FolderEntry)[];
+}
+/**
  * ReferencePatch is the input type for updating a Reference's metadata.
  *
  * This interface was referenced by `ApiSchema`'s JSON-Schema
@@ -129,40 +230,6 @@ export interface Reference {
  */
 export interface ReferencePatch {
   data: {};
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "UpdateStatusResponse".
- */
-export interface UpdateStatusResponse {
-  status: ResponseStatus;
-  message: string;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "ChatRequest".
- */
-export interface ChatRequest {
-  text: string;
-  n_choices?: number;
-  temperature?: number;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "ChatResponse".
- */
-export interface ChatResponse {
-  status: ResponseStatus;
-  message: string;
-  choices: ChatResponseChoice[];
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "ChatResponseChoice".
- */
-export interface ChatResponseChoice {
-  index: number;
-  text: string;
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
@@ -190,6 +257,29 @@ export interface RewriteResponse {
   status: ResponseStatus;
   message: string;
   choices: RewriteChoice[];
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "S2SearchResult".
+ */
+export interface S2SearchResult {
+  title?: string;
+  abstract?: string;
+  venue?: string;
+  year?: number;
+  paperId?: string;
+  citationCount?: number;
+  openAccessPdf?: string;
+  authors?: string[];
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "SearchResponse".
+ */
+export interface SearchResponse {
+  status: ResponseStatus;
+  message: string;
+  results: S2SearchResult[];
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
@@ -222,101 +312,9 @@ export interface TextCompletionResponse {
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "S2SearchResult".
+ * via the `definition` "UpdateStatusResponse".
  */
-export interface S2SearchResult {
-  title?: string;
-  abstract?: string;
-  venue?: string;
-  year?: number;
-  paperId?: string;
-  citationCount?: number;
-  openAccessPdf?: string;
-  authors?: string[];
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "SearchResponse".
- */
-export interface SearchResponse {
+export interface UpdateStatusResponse {
   status: ResponseStatus;
   message: string;
-  results: S2SearchResult[];
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "Body_create_file__project_id___filepath__put".
- */
-export interface BodyCreateFile_ProjectId__Filepath_Put {
-  file: File;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "FileEntry".
- */
-export interface FileEntry {
-  name: string;
-  path: string;
-  file_extension: string;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "FolderEntry".
- */
-export interface FolderEntry {
-  name: string;
-  path: string;
-  children?: (FileEntry | FolderEntry)[];
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "ProjectCreateRequest".
- */
-export interface ProjectCreateRequest {
-  project_name: string;
-  project_path?: string;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "ProjectDetailsResponse".
- */
-export interface ProjectDetailsResponse {
-  id: string;
-  name: string;
-  path: string;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "ProjectFileTreeResponse".
- */
-export interface ProjectFileTreeResponse {
-  contents: (FileEntry | FolderEntry)[];
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "FlatSettingsSchema".
- */
-export interface FlatSettingsSchema {
-  active_project_id: string;
-  current_directory: string;
-  logging_enabled: boolean;
-  logging_filepath: string;
-  openai_api_key: string;
-  openai_chat_model: string;
-  openai_manner: RewriteMannerType;
-  openai_temperature: number;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "FlatSettingsSchemaPatch".
- */
-export interface FlatSettingsSchemaPatch {
-  active_project_id?: string;
-  current_directory?: string;
-  logging_enabled?: boolean;
-  logging_filepath?: string;
-  openai_api_key?: string;
-  openai_chat_model?: string;
-  openai_manner?: RewriteMannerType;
-  openai_temperature?: number;
 }
