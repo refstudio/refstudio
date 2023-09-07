@@ -75,14 +75,11 @@ export function TipTapEditor({ editorContent, editorId, isActive, saveFileInMemo
     [editor, isActive],
   );
 
-  const suggestSentenceCompletion = useCallback(
-    () => {
-      if (isActive) {
-        editor?.chain().focus().command(sentenceCompletionCommand).run();
-      }
-    },
-    [editor, isActive],
-  );
+  const suggestSentenceCompletion = useCallback(() => {
+    if (isActive) {
+      editor?.chain().focus().command(sentenceCompletionCommand).run();
+    }
+  }, [editor, isActive]);
 
   const saveContentAsMarkdown = useCallback(() => {
     if (!isActive || !editor) {
