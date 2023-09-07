@@ -65,7 +65,7 @@ export function MainCommandMenu({ index }: { index: number }) {
     aiCommands.push({
       icon: <MagicIcon />,
       text: 'Complete phrase for me...',
-      // TODO: perform: () => setOpen(INDEX_REWRITE_WIDGET, true),
+      perform: () => emitEvent('refstudio://ai/suggestion/suggest'),
     });
   }
 

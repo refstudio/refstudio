@@ -39,6 +39,7 @@ interface RefStudioEvents {
   'refstudio://notifications/popup/open': { type?: NotificationItemType };
   'refstudio://notifications/popup/close': undefined;
   // Ai actions
+  'refstudio://ai/suggestion/suggest': undefined;
   'refstudio://ai/suggestion/insert': { text: string };
   // Layout actions
   'refstudio://layout/update': undefined;
