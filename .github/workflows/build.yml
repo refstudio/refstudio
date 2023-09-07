@@ -17,10 +17,19 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
     - uses: ./.github/actions/setup-node
+
+  setup-python:
+    name: Setup Python
+    runs-on: ubuntu-latest
+      steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Setup Python
+      uses: ./.github/actions/setup-python
   
   build:
     name: Build Python binary
-    needs: setup-js
+    needs: [setup-js, setup-python]
     runs-on: ubuntu-latest
     # strategy:
     #   fail-fast: false
