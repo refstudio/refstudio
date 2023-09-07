@@ -4,7 +4,6 @@ const config: KnipConfig = {
   entry: ['src/main.tsx', 'src/splash.tsx'],
   project: ['src/**/*.ts', 'src/**/*.tsx'],
   ignore: [
-    'src/api/types.ts',
     'src/api/api-types.ts',
     'src/api/api-paths.ts',
     'src/vite-env.d.ts',

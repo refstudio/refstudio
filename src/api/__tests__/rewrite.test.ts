@@ -1,8 +1,8 @@
 import { notifyErr, notifyError } from '../../notifications/notifications';
 import { universalPost } from '../api';
+import { RewriteRequest, RewriteResponse } from '../api-types';
 import { askForRewrite, AskForRewriteReturn } from '../rewrite';
 import { DEFAULT_OPTIONS } from '../rewrite.config';
-import { RewriteRequest, RewriteResponse } from '../types';
 
 vi.mock('../api');
 vi.mock('../../notifications/notifications');
