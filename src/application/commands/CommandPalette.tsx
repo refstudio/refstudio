@@ -1,30 +1,29 @@
 import './CommandPalette.css';
 
+import { useAtomValue } from 'jotai';
 import { Command, CommandMenu, CommandWrapper, useCommands, useKmenu } from 'kmenu';
 import { useEffect } from 'react';
 import {
   VscBell,
-  VscClose,
-  VscEmptyWindow,
-  VscExtensions,
   VscFiles,
   VscGear,
   VscLayoutSidebarLeft,
   VscLayoutSidebarRight,
-  VscLibrary,
   VscMarkdown,
   VscNewFile,
-  VscNewFolder,
   VscSave,
-  VscSearch,
-  VscSymbolString,
 } from 'react-icons/vsc';
 
 import { useActiveEditorId } from '../../atoms/hooks/useActiveEditorId';
+import { selectionAtom } from '../../atoms/selectionState';
+import { parseEditorId } from '../../atoms/types/EditorData';
+import { CloseIcon, OpenIcon, SearchIcon } from '../../components/icons';
 import { emitEvent } from '../../events';
 import { RewriteCommandWidgetMenu } from '../../features/ai/commands/RewriteCommandWidgetMenu';
 import { ReferencesCommandMenu } from '../../features/references/commands/ReferencesCommandMenu';
 import { useRefStudioHotkeys } from '../../hooks/useRefStudioHotkeys';
+import { AddIcon, MagicIcon, SampleIcon } from '../components/icons';
+import { BotIcon, PenIcon, ReferencesIcon } from '../sidebar/icons';
 import { INDEX_FILES, INDEX_MAIN, INDEX_REFERENCES, INDEX_REWRITE_WIDGET } from './CommandPaletteConfigs';
 import { FilesCommandMenu } from './FilesCommandMenu';
 
@@ -60,33 +59,52 @@ export function CommandPalette({ index, onOpen }: { index?: number; onOpen?: (in
 export function MainCommandMenu({ index }: { index: number }) {
   const { setOpen } = useKmenu();
   const activeEditorId = useActiveEditorId();
+  const selection = useAtomValue(selectionAtom);
+
+  const aiCommands = [];
+
+  if (activeEditorId && parseEditorId(activeEditorId).type === 'refstudio') {
+    aiCommands.push({
+      icon: <MagicIcon />,
+      text: 'Complete phrase for me...',
+      // TODO: perform: () => setOpen(INDEX_REWRITE_WIDGET, true),
+    });
+  }
+
+  if (selection.length > 0) {
+    aiCommands.push({
+      icon: <PenIcon />,
+      text: 'Rewrite selection...',
+      perform: () => setOpen(INDEX_REWRITE_WIDGET, true),
+    });
+  }
+
+  aiCommands.push({
+    icon: <BotIcon />,
+    text: 'Talk with references...',
+    // TODO: perform: () => setOpen(INDEX_REWRITE_WIDGET, true),
+  });
 
   const main: Command[] = [
     {
       category: 'AI',
-      commands: [
-        {
-          icon: <VscSymbolString />,
-          text: 'Rewrite selection...',
-          perform: () => setOpen(INDEX_REWRITE_WIDGET, true),
-        },
-      ],
+      commands: aiCommands,
     },
     {
       category: 'References',
       commands: [
         {
-          icon: <VscSearch />,
+          icon: <SearchIcon />,
           text: 'Find References...',
           perform: () => setOpen(INDEX_REFERENCES, true),
         },
         {
-          icon: <VscLibrary />,
+          icon: <ReferencesIcon />,
           text: 'Show References',
           perform: () => emitEvent('refstudio://menu/references/open'),
         },
         {
-          icon: <VscNewFile />,
+          icon: <AddIcon />,
           text: 'Upload References',
           perform: () => emitEvent('refstudio://menu/references/upload'),
         },
@@ -111,23 +129,23 @@ export function MainCommandMenu({ index }: { index: number }) {
           perform: () => emitEvent('refstudio://menu/file/markdown'),
         },
         {
-          icon: <VscNewFolder />,
-          text: 'New Project',
+          icon: <AddIcon />,
+          text: 'New project...',
           perform: () => emitEvent('refstudio://menu/file/project/new'),
         },
         {
-          icon: <VscEmptyWindow />,
-          text: 'Open Project',
+          icon: <OpenIcon />,
+          text: 'Open project...',
           perform: () => emitEvent('refstudio://menu/file/project/open'),
         },
         {
-          icon: <VscClose />,
-          text: 'Close Project',
+          icon: <CloseIcon />,
+          text: 'Close current project',
           perform: () => emitEvent('refstudio://menu/file/project/close'),
         },
         {
-          icon: <VscExtensions />,
-          text: 'Open Sample Project',
+          icon: <SampleIcon />,
+          text: 'Open sample project...',
           perform: () => emitEvent('refstudio://menu/file/project/new/sample'),
         },
       ],
@@ -160,12 +178,12 @@ export function MainCommandMenu({ index }: { index: number }) {
           },
         },
         {
-          icon: <VscClose />,
+          icon: <CloseIcon />,
           text: 'Close Editor',
           perform: () => emitEvent('refstudio://menu/file/close'),
         },
         {
-          icon: <VscClose />,
+          icon: <CloseIcon />,
           text: 'Close All Editors',
           perform: () => emitEvent('refstudio://menu/file/close/all'),
         },
@@ -193,5 +211,5 @@ export function MainCommandMenu({ index }: { index: number }) {
 
   const [mainCommands] = useCommands(main);
 
-  return <CommandMenu commands={mainCommands} crumbs={[]} index={index} placeholder="Search commands" />;
+  return <CommandMenu commands={mainCommands} crumbs={[]} index={index} placeholder="Search commands or actions..." />;
 }
