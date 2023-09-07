@@ -38,12 +38,12 @@ jobs:
       
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/setup-python@v4
-      with:
-        python-version: "3.10"
+    # - uses: actions/setup-python@v4
+    #   with:
+    #     python-version: "3.10"
   
-    - run: pip install pyinstaller
-    - run: pyinstaller --noconfirm --distpath src-tauri/bin/python python/main.py
+    # - run: pip install pyinstaller
+    - run: poetry run pyinstaller --noconfirm --distpath src-tauri/bin/python python/main.py
     - uses: actions/upload-artifact@v3
       with:
         name: python-binary
