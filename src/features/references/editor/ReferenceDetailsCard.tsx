@@ -69,18 +69,14 @@ const TableDataCell = ({
   onChangeHandler,
   editable,
 }: {
-  contentData: string | Author[] | undefined;
+  contentData: string | Author[];
   id: string;
   onChangeHandler: CallableFunction;
   editable: boolean;
 }) => {
   const { editing } = useContext(EditingContext);
 
-  if (!contentData) {
-    return;
-  }
-
-  if (!editing || !editable) {
+  if (!editing || !editable || typeof contentData != 'string') {
     return <UnEditableTableDataCell contentData={contentData} id={id} />;
   } else {
     return <EditableTableDataCell contentData={contentData} id={id} onChangeHandler={onChangeHandler} />;
@@ -92,20 +88,14 @@ const EditableTableDataCell = ({
   id,
   onChangeHandler,
 }: {
-  contentData: string | Author[];
+  contentData: string;
   id: string;
   onChangeHandler: CallableFunction;
-}) => {
-  if (typeof contentData !== 'string') {
-    return;
-  }
-
-  return (
-    <td className="w-auto p-5">
-      <DataTextInput content={contentData} id={id} onChangeHandler={onChangeHandler} />
-    </td>
-  );
-};
+}) => (
+  <td className="w-auto p-5">
+    <DataTextInput content={contentData} id={id} onChangeHandler={onChangeHandler} />
+  </td>
+);
 
 const UnEditableTableDataCell = ({ contentData, id }: { contentData: string | Author[]; id: string }) => {
   const contentString = getContentString(contentData, id);
@@ -225,19 +215,6 @@ export default function ReferenceDetailsCard({
     },
   };
 
-  const getOnlyEditableStringProperty = (theReference: ReferenceItem, key: string): string => {
-    switch (key) {
-      case 'citationKey':
-        return theReference.citationKey;
-      case 'title':
-        return theReference.title;
-      case 'doi':
-        return theReference.doi;
-      default:
-        return '';
-    }
-  };
-
   return (
     <EditingContext.Provider value={{ editing, setEditing }}>
       <table
@@ -260,6 +237,11 @@ export default function ReferenceDetailsCard({
             const key = row[0];
             const rowData = row[1];
             const contentData = reference[key as keyof ReferenceItem];
+
+            if (!contentData) {
+              return;
+            }
+
             return (
               <tr key={'row' + key + new Date().getTime().toString()}>
                 <TableHeadCell content={rowData.title} />
