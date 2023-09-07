@@ -1,7 +1,4 @@
-import { FileEntry as TauriFileEntry } from '@tauri-apps/api/fs';
-
 import { universalGet, universalHead, universalPutFile } from './api';
-import { FileEntry, FolderEntry } from './api-types';
 import { apiDelete, apiGetJson, apiPost } from './typed-api';
 
 export interface ProjectInfo {
@@ -20,6 +17,7 @@ export async function readAllProjects(): Promise<ProjectInfo[]> {
   const projects = (await apiGetJson('/api/projects/')) as ProjectsResponse;
   return Object.keys(projects).map((id) => ({ id, path: projects[id].project_path, name: projects[id].project_name }));
 }
+
 export async function readProjectById(projectId: string): Promise<ProjectInfo> {
   const projectInfo = await apiGetJson('/api/projects/{project_id}', {
     path: { project_id: projectId },
@@ -50,23 +48,8 @@ export async function createRemoteProject(projectName: string, projectPath?: str
 // ########################################################################################
 // PROJECT FILE STRUCTURE
 // ########################################################################################
-export async function readProjectFiles(projectId: string): Promise<TauriFileEntry[]> {
-  const projectFiles = await apiGetJson('/api/projects/{project_id}/files', { path: { project_id: projectId } });
-  return projectFiles.contents.map(apiFileToOutput);
-}
-
-function apiFileToOutput(value: FileEntry | FolderEntry): TauriFileEntry {
-  if ('children' in value && Array.isArray(value.children)) {
-    return {
-      name: value.name,
-      path: value.path,
-      children: value.children.map(apiFileToOutput),
-    };
-  }
-  return {
-    name: value.name,
-    path: value.path,
-  };
+export async function readProjectFiles(projectId: string) {
+  return apiGetJson('/api/projects/{project_id}/files', { path: { project_id: projectId } });
 }
 
 // ########################################################################################
