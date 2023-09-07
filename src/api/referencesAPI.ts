@@ -26,6 +26,7 @@ export async function updateProjectReference(projectId: string, referenceId: str
     ...applyPatch('citationKey', patch, () => ({ citation_key: patch.citationKey })),
     ...applyPatch('title', patch, () => ({ title: patch.title })),
     ...applyPatch('publishedDate', patch, () => ({ published_date: patch.publishedDate })),
+    ...applyPatch('doi', patch, () => ({ doi: patch.doi })),
     ...applyPatch('authors', patch, () => ({
       authors: patch.authors!.map((a) => ({ full_name: a.fullName, surname: a.lastName })),
     })),
@@ -74,7 +75,7 @@ function parsePdfIngestionResponse(references: Reference[]): ReferenceItem[] {
   }));
 }
 
-const UPDATABLE_FIELDS: (keyof ReferenceItem)[] = ['citationKey', 'title', 'publishedDate', 'authors'];
+const UPDATABLE_FIELDS: (keyof ReferenceItem)[] = ['citationKey', 'title', 'publishedDate', 'authors', 'doi'];
 function applyPatch(field: keyof ReferenceItem, patch: Partial<ReferenceItem>, getPatch: () => Partial<Reference>) {
   if (UPDATABLE_FIELDS.includes(field) && Object.hasOwn(patch, field)) {
     return getPatch();
