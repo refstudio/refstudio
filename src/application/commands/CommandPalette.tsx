@@ -19,12 +19,11 @@ import { selectionAtom } from '../../atoms/selectionState';
 import { parseEditorId } from '../../atoms/types/EditorData';
 import { CloseIcon, OpenIcon, SearchIcon } from '../../components/icons';
 import { emitEvent } from '../../events';
-import { RewriteCommandWidgetMenu } from '../../features/ai/commands/RewriteCommandWidgetMenu';
 import { ReferencesCommandMenu } from '../../features/references/commands/ReferencesCommandMenu';
 import { useRefStudioHotkeys } from '../../hooks/useRefStudioHotkeys';
 import { AddIcon, MagicIcon, SampleIcon } from '../components/icons';
 import { BotIcon, PenIcon, ReferencesIcon } from '../sidebar/icons';
-import { INDEX_FILES, INDEX_MAIN, INDEX_REFERENCES, INDEX_REWRITE_WIDGET } from './CommandPaletteConfigs';
+import { INDEX_FILES, INDEX_MAIN, INDEX_REFERENCES } from './CommandPaletteConfigs';
 import { FilesCommandMenu } from './FilesCommandMenu';
 
 export function CommandPalette({ index, onOpen }: { index?: number; onOpen?: (index: number) => void }) {
@@ -50,7 +49,6 @@ export function CommandPalette({ index, onOpen }: { index?: number; onOpen?: (in
         <MainCommandMenu index={INDEX_MAIN} />
         <ReferencesCommandMenu index={INDEX_REFERENCES} />
         <FilesCommandMenu index={INDEX_FILES} />
-        <RewriteCommandWidgetMenu index={INDEX_REWRITE_WIDGET} />
       </CommandWrapper>
     </div>
   );
@@ -75,14 +73,14 @@ export function MainCommandMenu({ index }: { index: number }) {
     aiCommands.push({
       icon: <PenIcon />,
       text: 'Rewrite selection...',
-      perform: () => setOpen(INDEX_REWRITE_WIDGET, true),
+      perform: () => emitEvent('refstudio://sidebars/open', { panel: 'Rewriter' }),
     });
   }
 
   aiCommands.push({
     icon: <BotIcon />,
     text: 'Talk with references...',
-    // TODO: perform: () => setOpen(INDEX_REWRITE_WIDGET, true),
+    perform: () => emitEvent('refstudio://sidebars/open', { panel: 'Chatbot' }),
   });
 
   const main: Command[] = [
