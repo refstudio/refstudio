@@ -9,6 +9,7 @@ runs:
   - name: Get yarn cache directory path
     id: yarn-cache-dir-path
     run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+    shell: 'bash'
   - name: Load cached dependencies
     id: cached-yarn-dependencies
     uses: actions/cache@v3
