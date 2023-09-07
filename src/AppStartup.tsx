@@ -51,7 +51,7 @@ export function AppStartup() {
           setInitialized(true);
           setAllProjects(projects);
           if (projectInfo) {
-            await openProject(projectId, projectInfo.path, projectInfo.name);
+            await openProject(projectId, projectInfo.name);
           }
           notifyInfo('Application Initialized');
         }
