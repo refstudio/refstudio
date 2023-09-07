@@ -2,14 +2,10 @@ from datetime import date, datetime
 from pathlib import Path
 from uuid import uuid4
 
-from sidecar import settings, shared, typing
-from sidecar.typing import Author, Reference
+from sidecar import config, shared
+from sidecar.references.schemas import Author, Reference
 
-from .test_ingest import _copy_fixture_to_temp_dir
-
-
-def test_get_word_count():
-    assert shared.get_word_count("Hello World") == 2
+from .helpers import _copy_fixture_to_temp_dir
 
 
 def test_parse_date():
@@ -132,7 +128,7 @@ def test_chunk_reference(monkeypatch, tmp_path):
 
     # mock uploads directory
     _copy_fixture_to_temp_dir(filepath, tmp_path.joinpath("test.pdf"))
-    monkeypatch.setattr(settings, "UPLOADS_DIR", tmp_path)
+    monkeypatch.setattr(config, "UPLOADS_DIR", tmp_path)
 
     reference = Reference(
         id=str(uuid4()),
@@ -148,76 +144,3 @@ def test_chunk_reference(monkeypatch, tmp_path):
         assert chunk.text is not None
         assert chunk.metadata != {}
         assert chunk.metadata["page_num"] is not None
-
-
-def test_trim_completion_prefix_from_choices():
-    # test 1: prefix is a single sentence and response includes part of the sentence
-    test_prefix = "This is a prefix and we have "
-    choices = [
-        typing.TextCompletionChoice(
-            index=0, text="This is a prefix and we have inserted some text."
-        ),
-        typing.TextCompletionChoice(
-            index=1, text="This is a prefix and we have added some text."
-        ),
-        typing.TextCompletionChoice(index=2, text="updated some text."),
-    ]
-    trimmed_choices = shared.trim_completion_prefix_from_choices(test_prefix, choices)
-    assert len(trimmed_choices) == 3
-    assert trimmed_choices[0].text == "inserted some text."
-    assert trimmed_choices[1].text == "added some text."
-    assert trimmed_choices[2].text == "updated some text."
-
-    # test 2: prefix is many sentences and response includes part of the last sentence
-    test_prefix = (
-        "This is a very long prefix. But we only append to the last piece. "
-        "The last piece is "
-    )
-    choices = [
-        typing.TextCompletionChoice(
-            index=0, text="The last piece is part of the prefix."
-        ),
-        typing.TextCompletionChoice(
-            index=1, text="The last piece is part of the test."
-        ),
-        typing.TextCompletionChoice(index=2, text="something else."),
-    ]
-    trimmed_choices = shared.trim_completion_prefix_from_choices(test_prefix, choices)
-    assert len(trimmed_choices) == 3
-    assert trimmed_choices[0].text == "part of the prefix."
-    assert trimmed_choices[1].text == "part of the test."
-    assert trimmed_choices[2].text == "something else."
-
-    # test 3: prefix is many sentences and response includes the entire prefix
-    test_prefix = (
-        "This is a very long prefix. But we only append to the last piece. "
-        "The last piece is "
-    )
-    choices = [
-        typing.TextCompletionChoice(
-            index=0,
-            text=(
-                "This is a very long prefix. But we only append to the last piece. "
-                "The last piece is part of the prefix."
-            ),
-        ),
-        typing.TextCompletionChoice(
-            index=1,
-            text=(
-                "This is a very long prefix. But we only append to the last piece. "
-                "The last piece is part of the test."
-            ),
-        ),
-        typing.TextCompletionChoice(
-            index=2,
-            text=(
-                "This is a very long prefix. But we only append to the last piece. "
-                "The last piece is something else."
-            ),
-        ),
-    ]
-    trimmed_choices = shared.trim_completion_prefix_from_choices(test_prefix, choices)
-    assert len(trimmed_choices) == 3
-    assert trimmed_choices[0].text == "part of the prefix."
-    assert trimmed_choices[1].text == "part of the test."
-    assert trimmed_choices[2].text == "something else."

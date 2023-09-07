@@ -15,7 +15,6 @@ const panelConfig: PaneConfig = {
 };
 
 const mockSettings = {
-  current_directory: 'APP-DATA-DIR',
   logging_enabled: true,
   logging_filepath: 'PATH',
 } satisfies Partial<FlatSettingsSchema>;
