@@ -3,7 +3,7 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { createRef, useState } from 'react';
 import { VscFilePdf } from 'react-icons/vsc';
 
-import { runPDFIngestion } from '../../../api/ingestion';
+import { runProjectIngestion } from '../../../api/referencesAPI';
 import { refreshFileTreeAtom } from '../../../atoms/fileExplorerActions';
 import { projectIdAtom } from '../../../atoms/projectState';
 import { referencesSyncInProgressAtom, setReferencesAtom } from '../../../atoms/referencesState';
@@ -28,7 +28,7 @@ export function ReferencesDropZone({ children }: { children: React.ReactNode }) 
 
   const ingestMutation = useMutation({
     mutationKey: [projectId],
-    mutationFn: () => runPDFIngestion(projectId),
+    mutationFn: () => runProjectIngestion(projectId),
     onSuccess: (updatedReferences) => {
       setReferences(updatedReferences);
       setSyncInProgress(false);

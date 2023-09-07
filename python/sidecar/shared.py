@@ -1,21 +1,15 @@
 import os
-import re
 import sys
 from datetime import datetime
 from pathlib import Path
 from typing import List
 
 import pypdf
-from sidecar import settings
-
-from .settings import logger
-from .typing import Author, Chunk, Reference, TextCompletionChoice
+from sidecar import config
+from sidecar.config import logger
+from sidecar.references.schemas import Author, Chunk, Reference
 
 logger = logger.getChild(__name__)
-
-
-def get_word_count(text: str) -> int:
-    return len(text.strip().split(" "))
 
 
 def remove_file(filepath: str) -> None:
@@ -26,55 +20,6 @@ def remove_file(filepath: str) -> None:
         os.remove(filepath)
     except OSError:
         pass
-
-
-def trim_completion_prefix_from_choices(
-    prefix: str, choices: List[TextCompletionChoice]
-) -> List[TextCompletionChoice]:
-    """
-    Trim a text completion prefix from a list of text completion choices.
-
-    Parameters
-    ----------
-    prefix : str
-        The prefix to trim from the text completion choices.
-    choices : List[TextCompletionChoice]
-        The text completion choices to trim the prefix from.
-
-    Returns
-    -------
-    List[TextCompletionChoice]
-        The text completion choices with the prefix trimmed.
-
-    Examples
-    --------
-    >>> prefix = "This is a prefix and "
-    >>> choices = [
-    ...     TextCompletionChoice(index=0, text="This is a prefix and more text."),
-    ...     TextCompletionChoice(index=1, text="This is a prefix and other text."),
-    ...     TextCompletionChoice(index=2, text="some text."),
-    ... ]
-    >>> trimmed_choices = trim_completion_prefix_from_choices(prefix, choices)
-    >>> trimmed_choices[0].text
-    'more text.'
-    >>> trimmed_choices[1].text
-    'other text.'
-    >>> trimmed_choices[2].text
-    'some text.'
-    """
-    # split prefix into sentences
-    sentence_splitter_regex = r"(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s"
-    prefix_sentences = re.split(sentence_splitter_regex, prefix)
-
-    # and remove any sentences from the prompt that were included in the responses
-    for choice in choices:
-        for sentence in prefix_sentences:
-            if choice.text.strip().startswith(sentence.strip()):
-                choice.text = choice.text[len(sentence) :].strip()
-
-            if "[MASK]" in choice.text:
-                choice.text = choice.text.replace("[MASK]", "")
-    return choices
 
 
 def parse_date(date_str: str) -> datetime:
@@ -214,7 +159,7 @@ def chunk_reference(
     List[Chunk]
     """
     if not filepath:
-        filepath = Path(settings.UPLOADS_DIR).joinpath(ref.source_filename)
+        filepath = Path(config.UPLOADS_DIR).joinpath(ref.source_filename)
 
     try:
         reader = pypdf.PdfReader(filepath)

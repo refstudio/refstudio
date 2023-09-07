@@ -9,7 +9,7 @@
     "reset:storage": "./scripts/reset_refstudio.sh",
     "dev": "vite",
     "web:dev": "VITE_PORT=1421 VITE_IS_WEB=true vite",
-    "web:api": "cd python; poetry run uvicorn web:api --reload",
+    "web:api": "cd python; poetry run uvicorn sidecar.api:api --reload",
     "build": "tsc && vite build",
     "codegen": "bash scripts/codegen.sh",
     "check": "yarn prettier:check && yarn pylint:check && yarn lint:check && yarn ts:check && yarn knip:check",
