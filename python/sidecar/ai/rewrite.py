@@ -2,6 +2,7 @@ import os
 import re
 
 import openai
+import litellm
 from sidecar.ai.prompts import (
     create_prompt_for_rewrite,
     create_prompt_for_text_completion,
@@ -213,7 +214,7 @@ class Rewriter:
         logger.info(
             f"Calling OpenAI chat API with the following input message(s): {messages}"
         )
-        response = openai.ChatCompletion.create(
+        response = litellm.completion(
             model=self.model,
             messages=messages,
             n=self.n_choices,  # number of completions to generate
