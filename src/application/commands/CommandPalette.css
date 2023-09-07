@@ -94,6 +94,7 @@
 }
 
 .command-palette .info_wrapper > svg {
+  @apply h-6 w-6;
   @apply fill-btn-ico-modal-item-default;
 }
 
