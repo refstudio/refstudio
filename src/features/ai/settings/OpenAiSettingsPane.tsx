@@ -76,6 +76,23 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
           value={paneSettings.chat_model}
           onChange={(chat_model) => setPaneSettings({ ...paneSettings, chat_model })}
         />
+        <p className="text-xs text-muted">
+          <strong>Tip:</strong> Use{' '}
+          <output
+            className="cursor-pointer border-b-[1px] border-dashed border-muted font-mono"
+            onClick={() => setPaneSettings({ ...paneSettings, chat_model: 'gpt-3.5-turbo' })}
+          >
+            gpt-3.5-turbo
+          </output>{' '}
+          for OpenAI, or{' '}
+          <output
+            className="cursor-pointer border-b-[1px] border-dashed border-muted font-mono"
+            onClick={() => setPaneSettings({ ...paneSettings, chat_model: 'llama2' })}
+          >
+            llama2
+          </output>{' '}
+          for local LLM via ollama.
+        </p>
       </div>
       <div className="flex flex-col items-start gap-2">
         <h2 className="t text-modal-txt-primary">Speech Type</h2>
