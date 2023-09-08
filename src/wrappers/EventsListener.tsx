@@ -54,7 +54,7 @@ export function EventsListener({ children }: { children?: React.ReactNode }) {
   useListenEvent('refstudio://references/remove', useRemoveReferencesListener());
   useListenEvent('refstudio://menu/references/export', useExportReferencesListener());
   // Projects
-  useListenEvent('refstudio://projects/open', useOpenProjectListener()); //
+  useListenEvent('refstudio://projects/open', useOpenProjectListener());
   // Notifications
   useListenEvent('refstudio://notifications/new', useCreateNotificationListener());
   useListenEvent('refstudio://notifications/clear', useClearNotificationsListener());
