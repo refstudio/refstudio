@@ -62,14 +62,14 @@ window.HTMLElement.prototype.scrollIntoView = vi.fn();
 
 type Event = {
   [K in RefStudioEventName]: RefStudioEventPayload<K> extends undefined
-  ? {
-    name: K;
-    payload?: undefined;
-  }
-  : {
-    name: K;
-    payload: RefStudioEventPayload<K> | ((context: Context) => RefStudioEventPayload<K>);
-  };
+    ? {
+        name: K;
+        payload?: undefined;
+      }
+    : {
+        name: K;
+        payload: RefStudioEventPayload<K> | ((context: Context) => RefStudioEventPayload<K>);
+      };
 }[RefStudioEventName];
 
 interface BaseAction {
