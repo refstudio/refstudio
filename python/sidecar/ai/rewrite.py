@@ -1,6 +1,7 @@
 import os
 import re
 
+import litellm
 import openai
 from sidecar.ai.prompts import (
     create_prompt_for_rewrite,
@@ -70,7 +71,7 @@ def trim_completion_prefix_from_choices(
     return choices
 
 
-def rewrite(arg: RewriteRequest, user_settings: FlatSettingsSchema = None):
+async def rewrite(arg: RewriteRequest, user_settings: FlatSettingsSchema = None):
     text = arg.text
     manner = arg.manner
     n_choices = arg.n_choices
@@ -94,7 +95,7 @@ def rewrite(arg: RewriteRequest, user_settings: FlatSettingsSchema = None):
     chat = Rewriter(prompt, n_choices, temperature, max_tokens, model)
 
     try:
-        choices = chat.get_response(response_type=RewriteChoice)
+        choices = await chat.get_response(response_type=RewriteChoice)
     except Exception as e:
         logger.error(e)
         response = RewriteResponse(
@@ -190,9 +191,9 @@ class Rewriter:
         self.max_tokens = max_tokens
         self.model = model
 
-    def get_response(self, response_type: TextSuggestionChoice):
+    async def get_response(self, response_type: TextSuggestionChoice):
         messages = self.prepare_messages_for_chat(self.prompt)
-        response = self.call_model(messages)
+        response = await self.call_model(messages)
         response = self.prepare_choices_for_client(
             response, response_type=response_type
         )
@@ -209,23 +210,44 @@ class Rewriter:
         ]
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(1))
-    def call_model(self, messages: list):
+    async def call_model(self, messages: list):
         logger.info(
-            f"Calling OpenAI chat API with the following input message(s): {messages}"
+            f"Calling {self.model} chat API with the following input message(s): {messages}"
         )
-        response = openai.ChatCompletion.create(
-            model=self.model,
-            messages=messages,
-            n=self.n_choices,  # number of completions to generate
-            temperature=self.temperature,
-            # maximum number of tokens to generate (1 word ~= 1.33 tokens)
-            max_tokens=self.max_tokens,
-        )
-        logger.info(f"Received response from OpenAI chat API: {response}")
-        return response
+        if self.model == "gpt-3.5-turbo":
+            response = openai.ChatCompletion.create(
+                model=self.model,
+                messages=messages,
+                n=self.n_choices,  # number of completions to generate
+                temperature=self.temperature,
+                # maximum number of tokens to generate (1 word ~= 1.33 tokens)
+                max_tokens=self.max_tokens,
+            )
+            logger.info(f"Received response from OpenAI chat API: {response}")
+            return response
+        elif self.model == "llama2":
+            response = litellm.completion(
+                model=self.model,
+                messages=messages,
+                n=self.n_choices,  # number of completions to generate
+                temperature=self.temperature,
+                # maximum number of tokens to generate (1 word ~= 1.33 tokens)
+                max_tokens=self.max_tokens,
+                api_base="http://localhost:11434",
+                custom_llm_provider="ollama",
+            )
+            full_response = await self.get_litellm_response(response)
+            logger.info(f"Received response from Ollama chat API: {full_response}")
+            return full_response
 
     def prepare_messages_for_chat(self, text: str) -> list:
         messages = [
             {"role": "user", "content": text},
         ]
         return messages
+
+    async def get_litellm_response(self, generator):
+        response = ""
+        async for elem in generator:
+            response += elem["choices"][0]["delta"]["content"]
+        return {"choices": [{"index": 0, "message": {"content": response}}]}

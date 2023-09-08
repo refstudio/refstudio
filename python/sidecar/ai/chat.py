@@ -1,5 +1,6 @@
 import os
 
+import litellm
 import openai
 from sidecar import config
 from sidecar.ai.prompts import create_prompt_for_chat, prepare_chunks_for_prompt
@@ -87,7 +88,7 @@ class Chat:
         logger.info(
             f"Calling OpenAI chat API with the following input message(s): {messages}"
         )
-        response = openai.ChatCompletion.create(
+        response = litellm.completion(
             model=self.model,
             messages=messages,
             n=n_choices,  # number of completions to generate

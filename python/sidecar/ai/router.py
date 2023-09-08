@@ -1,3 +1,4 @@
+import litellm
 from fastapi import APIRouter
 from sidecar.ai.chat import ask_question
 from sidecar.ai.rewrite import complete_text, rewrite
@@ -21,7 +22,7 @@ router = APIRouter(
 async def http_ai_rewrite(req: RewriteRequest) -> RewriteResponse:
     user_id = "user1"
     user_settings = get_settings_for_user(user_id)
-    response = rewrite(req, user_settings=user_settings)
+    response = await rewrite(req, user_settings=user_settings)
     return response
 
 
