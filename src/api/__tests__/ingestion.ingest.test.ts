@@ -1,5 +1,5 @@
 import { universalPost } from '../api';
-import { runPDFIngestion } from '../ingestion';
+import { runProjectIngestion } from '../referencesAPI';
 
 vi.mock('../api');
 vi.mock('../../io/filesystem');
@@ -17,7 +17,7 @@ describe('ingestion.ingest', () => {
       references: [],
     });
 
-    await runPDFIngestion(PROJECT_ID);
+    await runProjectIngestion(PROJECT_ID);
     expect(universalPost).toHaveBeenCalledTimes(1);
     expect(universalPost).toHaveBeenCalledWith(`/api/references/${PROJECT_ID}`, {});
   });
@@ -28,7 +28,7 @@ describe('ingestion.ingest', () => {
       references: [],
     });
 
-    const response = await runPDFIngestion(PROJECT_ID);
+    const response = await runProjectIngestion(PROJECT_ID);
     expect(response).toStrictEqual([]);
   });
 
@@ -44,7 +44,7 @@ describe('ingestion.ingest', () => {
       ],
     });
 
-    const response = await runPDFIngestion(PROJECT_ID);
+    const response = await runProjectIngestion(PROJECT_ID);
     expect(response).toHaveLength(1);
     expect(response[0].id).toBe('45722618-c4fb-4ae1-9230-7fc19a7219ed');
     expect(response[0].filename).toBe('file.pdf');
@@ -73,7 +73,7 @@ describe('ingestion.ingest', () => {
       ],
     });
 
-    const response = await runPDFIngestion(PROJECT_ID);
+    const response = await runProjectIngestion(PROJECT_ID);
     expect(response).toHaveLength(1);
     expect(response[0].authors).toStrictEqual([
       {

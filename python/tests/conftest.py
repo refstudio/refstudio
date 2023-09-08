@@ -1,8 +1,17 @@
+import json
+from pathlib import Path
+
 import pytest
 from fastapi.testclient import TestClient
+from sidecar import config
+from sidecar.api import api
+from sidecar.projects import service as projects_service
+from sidecar.settings import service as settings_service
 
-from sidecar import projects, http
-from .test_ingest import FIXTURES_DIR
+
+@pytest.fixture
+def fixtures_dir():
+    return Path(__file__).parent / "fixtures"
 
 
 @pytest.fixture
@@ -10,33 +19,75 @@ def setup_project_path_storage(monkeypatch, tmp_path):
     user_id = "user1"
     project_id = "project1"
     project_name = "project1name"
-    monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
-    projects.create_project(user_id, project_id, project_name)
+    monkeypatch.setattr(projects_service, "WEB_STORAGE_URL", tmp_path)
+    projects_service.create_project(user_id, project_id, project_name)
     return user_id, project_id
 
 
 @pytest.fixture
-def setup_project_with_uploads(monkeypatch, tmp_path):
+def setup_project_with_uploads(monkeypatch, tmp_path, fixtures_dir):
     user_id = "user1"
     project_id = "project1"
     project_name = "project1name"
-    monkeypatch.setattr(projects.settings, "WEB_STORAGE_URL", tmp_path)
+    monkeypatch.setattr(projects_service, "WEB_STORAGE_URL", tmp_path)
 
-    projects.create_project(user_id, project_id, project_name)
-    project_path = projects.get_project_path(user_id, project_id)
+    projects_service.create_project(user_id, project_id, project_name)
+    project_path = projects_service.get_project_path(user_id, project_id)
 
-    client = TestClient(http.filesystem_api)
-    client.post(f"/{project_id}/uploads", files={"file": ("file1.txt", "content")})
+    client = TestClient(api)
+    client.post(f"/fs/{project_id}/uploads", files={"file": ("file1.txt", "content")})
 
     # create a file
     filename = "uploads/test.pdf"
     project_path / filename
 
-    with open(f"{FIXTURES_DIR}/pdf/test.pdf", "rb") as f:
+    with open(f"{fixtures_dir}/pdf/test.pdf", "rb") as f:
         _ = client.put(
             f"/{project_id}/{filename}",
             files={"file": ("test.pdf", f, "application/pdf")},
         )
+
+
+@pytest.fixture
+def setup_uploaded_reference_pdfs(monkeypatch, tmp_path, fixtures_dir):
+    monkeypatch.setattr(config, "WEB_STORAGE_URL", tmp_path)
+
+    # create a project
+    user_id = "user1"
+    project_id = "project1"
+    _ = projects_service.create_project(user_id, project_id)
+
+    # create a file
+    filename = "uploads/test.pdf"
+
+    client = TestClient(api)
+
+    with open(f"{fixtures_dir}/pdf/test.pdf", "rb") as f:
+        _ = client.put(
+            f"/fs/{project_id}/{filename}",
+            files={"file": ("test.pdf", f, "application/pdf")},
+        )
+
+
+@pytest.fixture
+def create_settings_json(monkeypatch, tmp_path, request):
+    monkeypatch.setattr(config, "WEB_STORAGE_URL", tmp_path)
+
+    user_id = "user1"
+    filepath = settings_service.make_settings_json_path(user_id)
+
+    settings_service.initialize_settings_for_user(user_id)
+
+    defaults = settings_service.default_settings()
+    defaults.openai_api_key = "1234"
+
+    with open(filepath, "w") as f:
+        json.dump(defaults.dict(), f)
+
+    def teardown():
+        filepath.unlink()
+
+    request.addfinalizer(teardown)
 
 
 @pytest.fixture
@@ -77,7 +128,8 @@ def mock_call_model_is_error(*args, **kwargs):
 
 @pytest.fixture
 def mock_search_paper(*args, **kwargs):
-    from sidecar.typing import ResponseStatus, S2SearchResult, SearchResponse
+    from sidecar.search.schemas import S2SearchResult, SearchResponse
+    from sidecar.typing import ResponseStatus
 
     def mock_search_paper_response(*args, **kwargs):
         response = SearchResponse(

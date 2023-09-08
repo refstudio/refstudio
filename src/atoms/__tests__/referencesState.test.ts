@@ -1,6 +1,6 @@
 import { createStore } from 'jotai';
 
-import { getIngestedReferences } from '../../api/ingestion';
+import { getProjectReferences } from '../../api/referencesAPI';
 import { REFERENCES } from '../../features/references/__tests__/test-fixtures';
 import {
   areReferencesLoadedAtom,
@@ -10,7 +10,7 @@ import {
   setReferencesAtom,
 } from '../referencesState';
 
-vi.mock('../../api/ingestion');
+vi.mock('../../api/referencesAPI');
 
 describe('referencesState', () => {
   let store: ReturnType<typeof createStore>;
@@ -32,10 +32,10 @@ describe('referencesState', () => {
   });
 
   it('should load ingested references into store', async () => {
-    vi.mocked(getIngestedReferences).mockResolvedValue(REFERENCES);
+    vi.mocked(getProjectReferences).mockResolvedValue(REFERENCES);
     await store.set(loadReferencesAtom, 'project-id');
-    expect(getIngestedReferences).toHaveBeenCalled();
-    expect(getIngestedReferences).toHaveBeenCalledWith('project-id');
+    expect(getProjectReferences).toHaveBeenCalled();
+    expect(getProjectReferences).toHaveBeenCalledWith('project-id');
     expect(store.get(areReferencesLoadedAtom)).toBeTruthy();
     expect(store.get(getReferencesAtom)).toHaveLength(REFERENCES.length);
   });

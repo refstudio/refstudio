@@ -1,6 +1,6 @@
 import { universalPost } from '../api';
-import { removeReferences } from '../ingestion';
-import { DeleteStatusResponse } from '../types';
+import { DeleteStatusResponse } from '../api-types';
+import { removeProjectReferences } from '../referencesAPI';
 
 vi.mock('../api');
 vi.mock('../../io/filesystem');
@@ -16,7 +16,7 @@ describe('ingestion.delete', () => {
     } as DeleteStatusResponse);
 
     const referenceIds = ['45722618-c4fb-4ae1-9230-7fc19a7219ed', '45722618-c4fb-4ae1-9230-7fc19a7219ed'];
-    const result = await removeReferences(referenceIds, 'project-id');
+    const result = await removeProjectReferences('project-id', referenceIds);
     expect(universalPost).toHaveBeenCalledTimes(1);
     expect(universalPost).toHaveBeenCalledWith('/api/references/project-id/bulk_delete', {
       reference_ids: referenceIds,
@@ -30,6 +30,6 @@ describe('ingestion.delete', () => {
       message: 'error message',
     } as DeleteStatusResponse);
 
-    await expect(removeReferences([], 'project-id')).rejects.toThrow();
+    await expect(removeProjectReferences('project-id', [])).rejects.toThrow();
   });
 });
