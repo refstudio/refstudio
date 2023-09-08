@@ -1,3 +1,4 @@
+import asyncio
 import os
 import re
 
@@ -214,34 +215,22 @@ class Rewriter:
         logger.info(
             f"Calling {self.model} chat API with the following input message(s): {messages}"
         )
+        response = await litellm.acompletion(
+            model=self.model,
+            messages=messages,
+            n=self.n_choices,  # number of completions to generate
+            temperature=self.temperature,
+            # maximum number of tokens to generate (1 word ~= 1.33 tokens)
+            max_tokens=self.max_tokens,
+            api_base="http://localhost:11434" if self.model == "llama2" else None,
+            custom_llm_provider="ollama" if self.model == "llama2" else None,
+        )
+
         if self.model == "llama2":
-            response = await litellm.acompletion(
-                model=self.model,
-                messages=messages,
-                n=self.n_choices,  # number of completions to generate
-                temperature=self.temperature,
-                # maximum number of tokens to generate (1 word ~= 1.33 tokens)
-                max_tokens=self.max_tokens,
-                api_base="http://localhost:11434",
-                custom_llm_provider="ollama",
-            )
-            # return response
-            full_response = await self.get_litellm_response(response)
-            logger.info(
-                f"Received response from {self.model} chat API: {full_response}"
-            )
-            return full_response
-        else:
-            response = litellm.completion(
-                model=self.model,
-                messages=messages,
-                n=self.n_choices,  # number of completions to generate
-                temperature=self.temperature,
-                # maximum number of tokens to generate (1 word ~= 1.33 tokens)
-                max_tokens=self.max_tokens,
-            )
-            logger.info(f"Received response from {self.model} chat API: {response}")
-            return response
+            response = await self.unwrap_response(response)
+
+        logger.info(f"Received response from {self.model} chat API: {response}")
+        return response
 
     def prepare_messages_for_chat(self, text: str) -> list:
         messages = [
@@ -249,7 +238,7 @@ class Rewriter:
         ]
         return messages
 
-    async def get_litellm_response(self, generator):
+    async def unwrap_response(self, generator):
         response = ""
         async for elem in generator:
             response += elem["choices"][0]["delta"]["content"]
