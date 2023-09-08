@@ -14,7 +14,7 @@ export function ReferenceView({ referenceId }: { referenceId: EditorIdFor<'refer
   const updateReference = useSetAtom(updateReferenceAtom);
   const projectId = useAtomValue(projectIdAtom);
 
-  const handleReferenceChanged = useCallback(
+  const handleReferenceChange = useCallback(
     (params: ReferenceItem) => void updateReference(projectId, params.id, params),
     [updateReference, projectId],
   );
@@ -23,5 +23,5 @@ export function ReferenceView({ referenceId }: { referenceId: EditorIdFor<'refer
     return null;
   }
 
-  return <ReferenceDetailsCard handleReferenceChanged={handleReferenceChanged} reference={reference} />;
+  return <ReferenceDetailsCard handleReferenceChange={handleReferenceChange} reference={reference} />;
 }

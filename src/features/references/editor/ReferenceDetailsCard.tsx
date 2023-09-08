@@ -1,34 +1,15 @@
-import { createContext, Dispatch, ReactElement, SetStateAction, useCallback, useContext, useState } from 'react';
+import { ReactElement, useCallback, useState } from 'react';
 
 import { CloseIcon, EditIcon } from '../../../components/icons';
 import { cx } from '../../../lib/cx';
 import { Author, ReferenceItem } from '../../../types/ReferenceItem';
+import { authorsFormatter } from './grid/formatters';
 
-interface IEditingContext {
-  editing: boolean;
-  setEditing: Dispatch<SetStateAction<boolean>>;
-}
-
-const EditingContext = createContext<IEditingContext>({
-  editing: false,
-  setEditing: () => {
-    console.log('seting edtiting');
-  },
-});
-
-const returnFormatedAuthorsString = (authorsArray: Author[]): string => {
-  let authorsString = '';
-  authorsArray.forEach((a, index) => {
-    authorsString += (index > 0 ? ', ' : '') + a.fullName;
-  });
-  return authorsString;
-};
-
-const getContentString = (content: string | Author[] | undefined, id: string): string => {
+const getContentString = (id: string, content?: string | Author[]): string => {
   if (typeof content == 'undefined') {
     return '';
   } else if (typeof content != 'string' && id === 'authors') {
-    return returnFormatedAuthorsString(content);
+    return authorsFormatter({ value: content });
   } else if (id === 'citationKey') {
     return '[' + content.toString() + ']';
   } else {
@@ -68,14 +49,14 @@ const TableDataCell = ({
   id,
   onChangeHandler,
   editable,
+  editing,
 }: {
   contentData: string | Author[];
   id: string;
   onChangeHandler: CallableFunction;
   editable: boolean;
+  editing: boolean;
 }) => {
-  const { editing } = useContext(EditingContext);
-
   if (!editing || !editable || typeof contentData != 'string') {
     return <UnEditableTableDataCell contentData={contentData} id={id} />;
   } else {
@@ -98,7 +79,7 @@ const EditableTableDataCell = ({
 );
 
 const UnEditableTableDataCell = ({ contentData, id }: { contentData: string | Author[]; id: string }) => {
-  const contentString = getContentString(contentData, id);
+  const contentString = getContentString(id, contentData);
 
   return (
     <td className="w-auto p-5">
@@ -107,7 +88,19 @@ const UnEditableTableDataCell = ({ contentData, id }: { contentData: string | Au
   );
 };
 
-const TableHeadCell = ({ content, colSpan, header }: { content: string; colSpan?: number; header?: boolean }) => {
+const TableHeadCell = ({
+  content,
+  colSpan,
+  header,
+  editing,
+  setEditing,
+}: {
+  content: string;
+  colSpan?: number;
+  header?: boolean;
+  editing?: boolean;
+  setEditing?: CallableFunction;
+}) => {
   const colSpanString = { ['colSpan']: colSpan };
 
   return (
@@ -121,19 +114,25 @@ const TableHeadCell = ({ content, colSpan, header }: { content: string; colSpan?
       {...colSpanString}
     >
       {content}
-      {IconButtons(header)}
+      {IconButtons(header, editing, setEditing)}
     </th>
   );
 };
 
-const IconButtons = (header: boolean | undefined): ReactElement[] => {
-  if (header) {
-    return [
-      IconButton({ hiddenWhenEditing: true, icon: EditIcon(), title: 'Edit Reference' }),
-      IconButton({ hiddenWhenEditing: false, icon: CloseIcon(), title: 'Finished Editing Reference' }),
-    ];
-  } else {
+const IconButtons = (header?: boolean, editing?: boolean, setEditing?: CallableFunction): ReactElement[] => {
+  if (!header || editing === undefined || setEditing === undefined) {
     return [];
+  } else {
+    return [
+      IconButton({ hiddenWhenEditing: true, icon: EditIcon(), title: 'Edit Reference', editing, setEditing }),
+      IconButton({
+        hiddenWhenEditing: false,
+        icon: CloseIcon(),
+        title: 'Finished Editing Reference',
+        editing,
+        setEditing,
+      }),
+    ];
   }
 };
 
@@ -141,12 +140,15 @@ const IconButton = ({
   hiddenWhenEditing,
   title,
   icon,
+  editing,
+  setEditing,
 }: {
   hiddenWhenEditing: boolean;
   title: string;
   icon: ReactElement;
+  editing: boolean;
+  setEditing: CallableFunction;
 }) => {
-  const { editing, setEditing } = useContext(EditingContext);
   const hiddenClass = hiddenWhenEditing ? { hidden: editing } : { hidden: !editing };
 
   return (
@@ -165,21 +167,21 @@ const IconButton = ({
 
 export default function ReferenceDetailsCard({
   reference,
-  handleReferenceChanged,
+  handleReferenceChange,
 }: {
   reference: ReferenceItem;
-  handleReferenceChanged: (params: ReferenceItem) => void;
+  handleReferenceChange: (params: ReferenceItem) => void;
 }) {
   const [editing, setEditing] = useState(false);
   const cloneReferenceItem = <T extends object>(source: T): T => ({
     ...source,
   });
 
-  const updatedReference = cloneReferenceItem(reference);
-
   // We have to use a copy of the reference for updating purposes, otherwise UpdateReferencesAtom sees no changes and doesn't update
-  const referenceChanged = useCallback(
+  const recordChangesAndHandleReferenceChange = useCallback(
     (fieldName: string, value: string) => {
+      const updatedReference = cloneReferenceItem(reference);
+
       switch (fieldName) {
         case 'citationKey':
           updatedReference.citationKey = value;
@@ -191,9 +193,9 @@ export default function ReferenceDetailsCard({
           updatedReference.doi = value;
           break;
       }
-      handleReferenceChanged(updatedReference);
+      handleReferenceChange(updatedReference);
     },
-    [updatedReference, handleReferenceChanged],
+    [reference, handleReferenceChange],
   );
 
   const referenceDetailsCardFormat = {
@@ -216,46 +218,39 @@ export default function ReferenceDetailsCard({
   };
 
   return (
-    <EditingContext.Provider value={{ editing, setEditing }}>
-      <table
-        className={cx(
-          'm-2 h-max w-full ',
-          'border-collapse',
-          'bg-card-bg-primary',
-          'text-left',
-          'rounded',
-          'text-card-txt-primary',
-        )}
-      >
-        <thead>
-          <tr>
-            <TableHeadCell colSpan={2} content="References" header={true} />
-          </tr>
-        </thead>
-        <tbody className="divide-y">
-          {Object.entries(referenceDetailsCardFormat).map((row) => {
-            const key = row[0];
-            const rowData = row[1];
-            const contentData = reference[key as keyof ReferenceItem];
+    <table
+      className={cx(
+        'm-2 h-max w-full ',
+        'border-collapse',
+        'bg-card-bg-primary',
+        'text-left',
+        'rounded',
+        'text-card-txt-primary',
+      )}
+    >
+      <thead>
+        <tr>
+          <TableHeadCell colSpan={2} content="References" editing={editing} header={true} setEditing={setEditing} />
+        </tr>
+      </thead>
+      <tbody className="divide-y">
+        {Object.entries(referenceDetailsCardFormat).map(([key, rowData]) => {
+          const contentData = reference[key as keyof ReferenceItem];
 
-            if (!contentData) {
-              return;
-            }
-
-            return (
-              <tr key={'row' + key + new Date().getTime().toString()}>
-                <TableHeadCell content={rowData.title} />
-                <TableDataCell
-                  contentData={contentData}
-                  editable={rowData.editable}
-                  id={key}
-                  onChangeHandler={referenceChanged}
-                />
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </EditingContext.Provider>
+          return (
+            <tr key={key}>
+              <TableHeadCell content={rowData.title} />
+              <TableDataCell
+                contentData={contentData ?? ''}
+                editable={rowData.editable}
+                editing={editing}
+                id={key}
+                onChangeHandler={recordChangesAndHandleReferenceChange}
+              />
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
   );
 }

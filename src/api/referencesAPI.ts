@@ -75,7 +75,7 @@ function parsePdfIngestionResponse(references: Reference[]): ReferenceItem[] {
   }));
 }
 
-const UPDATABLE_FIELDS: (keyof ReferenceItem)[] = ['citationKey', 'title', 'publishedDate', 'authors', 'doi'];
+export const UPDATABLE_FIELDS: (keyof ReferenceItem)[] = ['citationKey', 'title', 'publishedDate', 'authors', 'doi'];
 function applyPatch(field: keyof ReferenceItem, patch: Partial<ReferenceItem>, getPatch: () => Partial<Reference>) {
   if (UPDATABLE_FIELDS.includes(field) && Object.hasOwn(patch, field)) {
     return getPatch();
