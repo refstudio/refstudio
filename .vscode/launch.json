@@ -10,7 +10,7 @@
         "request": "launch",
         "module": "uvicorn",
         "cwd": "${workspaceFolder}/python",
-        "args": ["web:api", "--reload"],
+        "args": ["sidecar.api:api", "--reload"],
         "justMyCode": true
       }
     ]

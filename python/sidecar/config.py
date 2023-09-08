@@ -24,4 +24,4 @@ formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(messag
 handler.setFormatter(formatter)
 
 logger.addHandler(handler)
-logger.disabled = os.environ.get("SIDECAR_ENABLE_LOGGING", "false").lower() == "true"
+logger.disabled = os.environ.get("SIDECAR_ENABLE_LOGGING", "false").lower() != "true"
