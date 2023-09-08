@@ -1,13 +1,19 @@
-from sidecar.typing import RefStudioModel, ResponseStatus
+from __future__ import annotations
+
+from sidecar.typing import RefStudioModel
 
 
-class CreateFileResponse(RefStudioModel):
-    status: ResponseStatus
-    message: str
-    filepath: str | None = None
+class FileEntryBase(RefStudioModel):
+    name: str
+    path: str
 
 
-class DeleteFileResponse(RefStudioModel):
-    status: ResponseStatus
-    message: str
-    filepath: str | None = None
+class FileEntry(FileEntryBase):
+    file_extension: str
+
+
+class FolderEntry(FileEntryBase):
+    children: list[FileEntry | FolderEntry] = []
+
+
+FolderEntry.update_forward_refs()

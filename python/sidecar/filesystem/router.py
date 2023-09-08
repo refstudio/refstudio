@@ -4,9 +4,8 @@ from pathlib import Path
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse
-from sidecar.filesystem.schemas import CreateFileResponse, DeleteFileResponse
 from sidecar.projects.service import get_project_path
-from sidecar.typing import ResponseStatus
+from sidecar.typing import ResponseStatus, StatusResponse
 
 router = APIRouter(
     prefix="/fs",
@@ -17,7 +16,7 @@ router = APIRouter(
 @router.put("/{project_id}/{filepath:path}")
 async def create_file(
     project_id: str, filepath: Path, file: UploadFile = File(...)
-) -> CreateFileResponse:
+) -> StatusResponse:
     user_id = "user1"
     project_path = get_project_path(user_id, project_id)
     filepath = project_path / filepath
@@ -29,18 +28,13 @@ async def create_file(
         with open(filepath, "wb") as f:
             shutil.copyfileobj(file.file, f)
     except Exception as e:
-        response = CreateFileResponse(
-            status=ResponseStatus.ERROR,
-            message=f"Error uploading file: {e}",
+        response = StatusResponse(
+            status=ResponseStatus.ERROR, message=f"Error uploading file: {e}"
         )
         file.file.close()
         return response
 
-    response = CreateFileResponse(
-        status=ResponseStatus.OK,
-        message="File uploaded",
-        filepath=str(filepath),
-    )
+    response = StatusResponse(status=ResponseStatus.OK)
     file.file.close()
     return response
 
@@ -64,20 +58,14 @@ async def head_file(project_id: str, filepath: Path) -> None:
 
 
 @router.delete("/{project_id}/{filepath:path}")
-async def delete_file(project_id: str, filepath: Path) -> DeleteFileResponse:
+async def delete_file(project_id: str, filepath: Path) -> StatusResponse:
     user_id = "user1"
     project_path = get_project_path(user_id, project_id)
     filepath = project_path / filepath
     try:
         os.remove(filepath)
     except Exception as e:
-        return DeleteFileResponse(
-            status=ResponseStatus.ERROR,
-            message=f"Error deleting file: {e}",
-            filepath=str(filepath),
+        return StatusResponse(
+            status=ResponseStatus.ERROR, message=f"Error deleting file: {e}"
         )
-    return DeleteFileResponse(
-        status=ResponseStatus.OK,
-        message="File deleted",
-        filepath=str(filepath),
-    )
+    return StatusResponse(status=ResponseStatus.OK)

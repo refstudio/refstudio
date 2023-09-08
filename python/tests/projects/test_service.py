@@ -4,22 +4,21 @@ from sidecar.projects import service
 from sidecar.projects.schemas import ProjectFileTreeResponse
 
 
-def test_read_project_path_storage_does_not_exist(monkeypatch, tmp_path):
+def test_read_project_storage_does_not_exist(monkeypatch, tmp_path):
     monkeypatch.setattr(service, "WEB_STORAGE_URL", tmp_path)
 
     user_id = "user1"
-    stored_projects = service.read_project_path_storage(user_id)
+    stored_projects = service.read_project_storage(user_id)
     assert stored_projects.dict() == {"projects": {}}
 
 
-def test_read_project_path_storage_exists(
-    monkeypatch, tmp_path, setup_project_path_storage
-):
+def test_read_project_storage_exists(monkeypatch, tmp_path, setup_project_storage):
     user_id = "user1"
-    stored_projects = service.read_project_path_storage(user_id)
+    stored_projects = service.read_project_storage(user_id)
     expected = {
         "projects": {
             "project1": {
+                "id": "project1",
                 "name": "project1name",
                 "path": str(tmp_path / user_id / "project1"),
             }
@@ -28,7 +27,7 @@ def test_read_project_path_storage_exists(
     assert stored_projects.dict() == expected
 
 
-def test_update_project_path_storage_should_be_created(monkeypatch, tmp_path):
+def test_update_project_storage_should_be_created(monkeypatch, tmp_path):
     monkeypatch.setattr(service, "WEB_STORAGE_URL", tmp_path)
 
     user_id = "user1"
@@ -37,11 +36,12 @@ def test_update_project_path_storage_should_be_created(monkeypatch, tmp_path):
     project_path = tmp_path / user_id / project_id
     project_path.mkdir(parents=True, exist_ok=True)
 
-    service.update_project_path_storage(user_id, project_id, project_name, project_path)
+    service.update_project_storage(user_id, project_id, project_name, project_path)
 
-    stored_projects = service.read_project_path_storage(user_id)
+    stored_projects = service.read_project_storage(user_id)
     expected = {
         "project1": {
+            "id": project_id,
             "name": project_name,
             "path": str(project_path),
         }
@@ -49,8 +49,8 @@ def test_update_project_path_storage_should_be_created(monkeypatch, tmp_path):
     assert stored_projects.dict()["projects"] == expected
 
 
-def test_update_project_path_storage_should_be_appended_to(
-    monkeypatch, tmp_path, setup_project_path_storage
+def test_update_project_storage_should_be_appended_to(
+    monkeypatch, tmp_path, setup_project_storage
 ):
     user_id = "user1"
     project_id = "project2"
@@ -58,16 +58,18 @@ def test_update_project_path_storage_should_be_appended_to(
     project_path = tmp_path / user_id / project_id
     project_path.mkdir(parents=True, exist_ok=True)
 
-    service.update_project_path_storage(user_id, project_id, project_name, project_path)
+    service.update_project_storage(user_id, project_id, project_name, project_path)
 
-    stored_projects = service.read_project_path_storage(user_id)
+    stored_projects = service.read_project_storage(user_id)
     assert stored_projects.dict() == {
         "projects": {
             "project1": {
+                "id": "project1",
                 "name": "project1name",
                 "path": str(tmp_path / user_id / "project1"),
             },
             "project2": {
+                "id": "project2",
                 "name": project_name,
                 "path": str(project_path),
             },
@@ -75,9 +77,7 @@ def test_update_project_path_storage_should_be_appended_to(
     }
 
 
-def test_get_project_path_for_project_that_does_not_exist(
-    tmp_path, setup_project_path_storage
-):
+def test_get_project_for_project_that_does_not_exist(tmp_path, setup_project_storage):
     user_id = "user1"
     project_id = "project999"
     try:
@@ -86,7 +86,7 @@ def test_get_project_path_for_project_that_does_not_exist(
         assert True
 
 
-def test_get_project_path_for_project_that_exists(tmp_path, setup_project_path_storage):
+def test_get_project_for_project_that_exists(tmp_path, setup_project_storage):
     user_id = "user1"
     project_id = "project1"
 
@@ -94,26 +94,27 @@ def test_get_project_path_for_project_that_exists(tmp_path, setup_project_path_s
     assert path == Path(tmp_path / user_id / project_id)
 
 
-def test_create_project_should_create_project_path(monkeypatch, tmp_path):
+def test_create_project_should_create_project(monkeypatch, tmp_path):
     monkeypatch.setattr(service, "WEB_STORAGE_URL", tmp_path)
 
     user_id = "user1"
     project_id = "project1"
     project_name = "project1name"
 
-    project_item = service.create_project(user_id, project_id, project_name)
+    project = service.create_project(user_id, project_id, project_name)
 
     # correct path should be returned
-    assert project_item.path == str(tmp_path / user_id / project_id)
-    assert Path(project_item.path).exists()
+    assert project.path == str(tmp_path / user_id / project_id)
+    assert Path(project.path).exists()
 
     # project path should be stored in project storage
-    stored_projects = service.read_project_path_storage(user_id)
+    stored_projects = service.read_project_storage(user_id)
     expected = {
         "projects": {
             "project1": {
+                "id": "project1",
                 "name": project_name,
-                "path": project_item.path,
+                "path": project.path,
             }
         }
     }
@@ -131,19 +132,20 @@ def test_create_project_should_create_provided_project_path(monkeypatch, tmp_pat
     # if the path doesn't actually exist, `create_project` will raise an exception
     filepath.mkdir(parents=True, exist_ok=True)
 
-    project_item = service.create_project(
+    project = service.create_project(
         user_id, project_id, project_name, project_path=filepath
     )
 
     # correct path should be returned
-    assert project_item.path == str(filepath)
-    assert Path(project_item.path).exists()
+    assert project.path == str(filepath)
+    assert Path(project.path).exists()
 
     # project path should be stored in project storage
-    stored_projects = service.read_project_path_storage(user_id)
+    stored_projects = service.read_project_storage(user_id)
     expected = {
         "projects": {
             "project1": {
+                "id": "project1",
                 "name": project_name,
                 "path": str(filepath),
             }
@@ -167,7 +169,7 @@ def test_delete_project_should_raise_exception_if_project_does_not_exist(
 
 
 def test_delete_project_should_delete_project(
-    monkeypatch, tmp_path, setup_project_path_storage
+    monkeypatch, tmp_path, setup_project_storage
 ):
     monkeypatch.setattr(service, "WEB_STORAGE_URL", tmp_path)
 
@@ -176,11 +178,11 @@ def test_delete_project_should_delete_project(
 
     service.delete_project(user_id, project_id)
 
-    stored_projects = service.read_project_path_storage(user_id)
+    stored_projects = service.read_project_storage(user_id)
     assert stored_projects.dict() == {"projects": {}}
 
 
-def test_get_project_files(monkeypatch, tmp_path, setup_project_path_storage):
+def test_get_project_files(monkeypatch, tmp_path, setup_project_storage):
     monkeypatch.setattr(service, "WEB_STORAGE_URL", tmp_path)
 
     user_id = "user1"

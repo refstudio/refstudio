@@ -28,11 +28,7 @@ def test_create_file(monkeypatch, tmp_path, fixtures_dir):
         )
 
     assert response.status_code == 200
-    assert response.json() == {
-        "status": "ok",
-        "message": "File uploaded",
-        "filepath": str(filepath),
-    }
+    assert response.json() == {"status": "ok", "message": ""}
 
     # check that the file was created
     assert filepath.exists()
@@ -87,11 +83,7 @@ def test_delete_file(monkeypatch, tmp_path, fixtures_dir):
     response = client.delete(f"/api/fs/{project_id}/{filename}")
 
     assert response.status_code == 200
-    assert response.json() == {
-        "status": "ok",
-        "message": "File deleted",
-        "filepath": str(filepath),
-    }
+    assert response.json() == {"status": "ok", "message": ""}
 
     # check that the file was deleted
     assert not filepath.exists()

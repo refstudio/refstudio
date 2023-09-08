@@ -37,6 +37,7 @@ class ResponseStatus(StrEnum):
 
 class StatusResponse(RefStudioModel):
     status: ResponseStatus
+    message: str = ""
 
 
 class CliCommands(RefStudioModel):

@@ -1,25 +1,27 @@
-from __future__ import annotations
-
-from sidecar.typing import RefStudioModel, ResponseStatus
-
-
-class FileEntryBase(RefStudioModel):
-    name: str
-    path: str
+from sidecar.filesystem.schemas import FileEntry, FolderEntry
+from sidecar.typing import RefStudioModel
 
 
-class FileEntry(FileEntryBase):
-    file_extension: str
-
-
-class FolderEntry(FileEntryBase):
-    children: list[FileEntry | FolderEntry] = []
-
-
-class ProjectDetailsResponse(RefStudioModel):
+class ProjectBase(RefStudioModel):
     id: str
     name: str
+
+
+class Project(ProjectBase):
     path: str
+
+
+class ProjectStore(RefStudioModel):
+    projects: dict[str, Project]
+
+
+class ProjectDetailsResponse(ProjectBase):
+    # simple pass for now, but we'll eventually extend this
+    pass
+
+
+class ProjectListResponse(RefStudioModel):
+    projects: list[ProjectBase]
 
 
 class ProjectFileTreeResponse(RefStudioModel):
@@ -34,27 +36,3 @@ class ProjectCreateRequest(RefStudioModel):
     The path to the project directory. Only necessary for Desktop.
     For web, the project is stored in a private directory on the server.
     """
-
-
-class ProjectCreateResponse(RefStudioModel):
-    id: str
-    name: str
-    path: str
-
-
-class ProjectDeleteResponse(RefStudioModel):
-    status: ResponseStatus
-    message: str
-    project_id: str
-
-
-class ProjectStorageItem(RefStudioModel):
-    name: str
-    path: str
-
-
-class ProjectStorageResponse(RefStudioModel):
-    projects: dict[str, ProjectStorageItem]
-
-
-FolderEntry.update_forward_refs()
