@@ -28,12 +28,12 @@ export function useActionsCommands(openPanel: (panelIndex: number) => void): Com
     },
     ...(isProjectOpen
       ? [
-        {
-          icon: <CloseIcon />,
-          text: 'Close current project',
-          perform: () => emitEvent('refstudio://menu/file/project/close'),
-        },
-      ]
+          {
+            icon: <CloseIcon />,
+            text: 'Close current project',
+            perform: () => emitEvent('refstudio://menu/file/project/close'),
+          },
+        ]
       : []),
     {
       icon: <SampleIcon />,

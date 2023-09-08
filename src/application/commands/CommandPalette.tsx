@@ -50,17 +50,10 @@ export function MainCommandMenu({ index }: { index: number }) {
   const fileCommands = useFileCommands();
   const actionsCommands = useActionsCommands(openPanel);
 
-  const main: Command[] = useMemo(() => [
-    ...aiCommands,
-    ...referencesCommands,
-    ...fileCommands,
-    ...actionsCommands,
-  ], [
-    aiCommands,
-    referencesCommands,
-    fileCommands,
-    actionsCommands,
-  ]);
+  const main: Command[] = useMemo(
+    () => [...aiCommands, ...referencesCommands, ...fileCommands, ...actionsCommands],
+    [aiCommands, referencesCommands, fileCommands, actionsCommands],
+  );
 
   const [mainCommands] = useCommands(main);
 
