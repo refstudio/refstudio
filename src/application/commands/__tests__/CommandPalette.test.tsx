@@ -1,21 +1,50 @@
-import { createStore } from 'jotai';
+import { atom, createStore } from 'jotai';
 import { MenuProvider } from 'kmenu';
 
-import { makeFile } from '../../../atoms/__tests__/test-fixtures';
-import { activePaneIdAtom } from '../../../atoms/core/activePane';
-import { moveEditorToPaneAtom, openReferencesAtom } from '../../../atoms/editorActions';
-import { openFileEntryAtom } from '../../../atoms/fileEntryActions';
-import { closeProjectAtom, currentProjectIdAtom } from '../../../atoms/projectState';
-import { setReferencesAtom } from '../../../atoms/referencesState';
+import { paneGroupAtom } from '../../../atoms/core/paneGroup';
+import { focusPaneAtom } from '../../../atoms/paneActions';
+import { isProjectOpenAtom } from '../../../atoms/projectState';
 import { buildEditorId, EditorId } from '../../../atoms/types/EditorData';
+import { PaneGroupState, PaneId } from '../../../atoms/types/PaneGroup';
 import { emitEvent, RefStudioEventName, RefStudioEventPayload } from '../../../events';
-import { REFERENCES } from '../../../features/references/__tests__/test-fixtures';
 import { screen, setupWithJotaiProvider } from '../../../test/test-utils';
 import { CommandPalette } from '../CommandPalette';
 import { INDEX_FILES, INDEX_MAIN, INDEX_REFERENCES } from '../CommandPaletteConfigs';
 
+interface Context {
+  activeEditorId: EditorId;
+  activePaneId: PaneId;
+  isEditorOpen: boolean;
+  isProjectOpen: boolean;
+  paneGroup: PaneGroupState;
+}
+
+let context = vi.hoisted(() => ({} as Context));
+
+const DEFAULT_CONTEXT: Context = {
+  activeEditorId: buildEditorId('refstudio', 'test.refstudio'),
+  activePaneId: 'LEFT',
+  isEditorOpen: false,
+  isProjectOpen: true,
+  paneGroup: { LEFT: { openEditorIds: [] }, RIGHT: { openEditorIds: [] } },
+};
+
 vi.mock('../../../events');
-vi.mock('../../../io/filesystem');
+vi.mock('../../../atoms/projectState', async (importOriginal) => {
+  const mod = await importOriginal<Record<string, unknown>>();
+  return {
+    ...mod,
+    isProjectOpenAtom: atom(() => context.isProjectOpen),
+  };
+});
+
+vi.mock('../../../atoms/core/paneGroup', async (importOriginal) => {
+  const mod = await importOriginal<Record<string, unknown>>();
+  return {
+    ...mod,
+    paneGroupAtom: atom(() => context.paneGroup),
+  };
+});
 
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),
@@ -33,14 +62,14 @@ window.HTMLElement.prototype.scrollIntoView = vi.fn();
 
 type Event = {
   [K in RefStudioEventName]: RefStudioEventPayload<K> extends undefined
-    ? {
-        name: K;
-        payload?: undefined;
-      }
-    : {
-        name: K;
-        payload: RefStudioEventPayload<K> | ((context: { editorId: EditorId }) => RefStudioEventPayload<K>);
-      };
+  ? {
+    name: K;
+    payload?: undefined;
+  }
+  : {
+    name: K;
+    payload: RefStudioEventPayload<K> | ((context: Context) => RefStudioEventPayload<K>);
+  };
 }[RefStudioEventName];
 
 interface BaseAction {
@@ -58,9 +87,10 @@ interface MenuAction extends BaseAction {
 }
 
 type Action = EventAction | MenuAction;
+
 interface TestCase {
   name: string;
-  beforeEach?: () => void | Promise<void>;
+  contextOverrides?: Partial<Context>;
   actions: string[];
 }
 
@@ -93,8 +123,8 @@ const ACTIONS: Record<string, Action> = {
     type: 'event',
     event: {
       name: 'refstudio://editors/move',
-      payload: ({ editorId }: { editorId: EditorId }) => ({
-        fromPaneEditorId: { editorId, paneId: 'RIGHT' },
+      payload: ({ activeEditorId }: Context) => ({
+        fromPaneEditorId: { editorId: activeEditorId, paneId: 'RIGHT' },
         toPaneId: 'LEFT',
       }),
     },
@@ -103,8 +133,8 @@ const ACTIONS: Record<string, Action> = {
     type: 'event',
     event: {
       name: 'refstudio://editors/move',
-      payload: ({ editorId }: { editorId: EditorId }) => ({
-        fromPaneEditorId: { editorId, paneId: 'LEFT' },
+      payload: ({ activeEditorId }) => ({
+        fromPaneEditorId: { editorId: activeEditorId, paneId: 'LEFT' },
         toPaneId: 'RIGHT',
       }),
     },
@@ -116,12 +146,10 @@ const ACTIONS: Record<string, Action> = {
 
 describe('CommandPalette', () => {
   let store: ReturnType<typeof createStore>;
-  let editorId: EditorId;
 
   beforeEach(() => {
+    context = { ...DEFAULT_CONTEXT };
     store = createStore();
-    store.set(setReferencesAtom, REFERENCES);
-    store.set(currentProjectIdAtom, 'project-id');
   });
 
   afterEach(() => {
@@ -129,6 +157,8 @@ describe('CommandPalette', () => {
   });
 
   it('should be hidden', () => {
+    expect(isProjectOpenAtom).toBeDefined();
+    expect(paneGroupAtom).toBeDefined();
     setupWithJotaiProvider(
       <MenuProvider config={{ animationDuration: 0 }}>
         <CommandPalette />
@@ -154,8 +184,8 @@ describe('CommandPalette', () => {
   describe.each<TestCase>([
     {
       name: 'No project open',
-      beforeEach: async () => {
-        await store.set(closeProjectAtom);
+      contextOverrides: {
+        isProjectOpen: false,
       },
       actions: ['New project...', 'Open project...', 'Open sample project...'],
     },
@@ -176,9 +206,9 @@ describe('CommandPalette', () => {
     },
     {
       name: 'Non-RefStudio editor open on the left',
-      beforeEach: () => {
-        store.set(openReferencesAtom);
-        editorId = buildEditorId('references');
+      contextOverrides: {
+        activeEditorId: buildEditorId('pdf', 'test.pdf'),
+        isEditorOpen: true,
       },
       actions: [
         'Talk with references...',
@@ -198,9 +228,10 @@ describe('CommandPalette', () => {
     },
     {
       name: 'Non-RefStudio editor open on the right',
-      beforeEach: () => {
-        store.set(openFileEntryAtom, makeFile('test.pdf'));
-        editorId = buildEditorId('pdf', 'test.pdf');
+      contextOverrides: {
+        activeEditorId: buildEditorId('pdf', 'test.pdf'),
+        activePaneId: 'RIGHT',
+        isEditorOpen: true,
       },
       actions: [
         'Talk with references...',
@@ -220,9 +251,9 @@ describe('CommandPalette', () => {
     },
     {
       name: 'RefStudio editor open on the left',
-      beforeEach: () => {
-        store.set(openFileEntryAtom, makeFile('test.refstudio'));
-        editorId = buildEditorId('refstudio', 'test.refstudio');
+      contextOverrides: {
+        activeEditorId: buildEditorId('refstudio', 'test.refstudio'),
+        isEditorOpen: true,
       },
       actions: [
         'Complete phrase for me...',
@@ -246,11 +277,10 @@ describe('CommandPalette', () => {
     },
     {
       name: 'RefStudio editor open on the right',
-      beforeEach: () => {
-        store.set(openFileEntryAtom, makeFile('test.refstudio'));
-        editorId = buildEditorId('refstudio', 'test.refstudio');
-        store.set(moveEditorToPaneAtom, { editorId, fromPaneId: 'LEFT', toPaneId: 'RIGHT' });
-        console.log(store.get(activePaneIdAtom));
+      contextOverrides: {
+        activeEditorId: buildEditorId('refstudio', 'test.refstudio'),
+        activePaneId: 'RIGHT',
+        isEditorOpen: true,
       },
       actions: [
         'Complete phrase for me...',
@@ -272,10 +302,20 @@ describe('CommandPalette', () => {
         'Quick Files...',
       ],
     },
-  ])('$name', (testCase) => {
-    if (testCase.beforeEach) {
-      beforeEach(testCase.beforeEach);
-    }
+  ])('$name', ({ actions, contextOverrides }) => {
+    beforeEach(() => {
+      const testContext = { ...DEFAULT_CONTEXT, ...(contextOverrides ?? {}) };
+      store.set(focusPaneAtom, testContext.activePaneId);
+
+      if (testContext.isEditorOpen) {
+        testContext.paneGroup[testContext.activePaneId] = {
+          openEditorIds: [testContext.activeEditorId],
+          activeEditorId: testContext.activeEditorId,
+        };
+      }
+
+      context = testContext;
+    });
 
     it('should display correct options', () => {
       setupWithJotaiProvider(
@@ -285,13 +325,13 @@ describe('CommandPalette', () => {
         store,
       );
 
-      expect(screen.getAllByRole('option')).toHaveLength(testCase.actions.length);
-      testCase.actions.forEach((action) => {
+      expect(screen.getAllByRole('option')).toHaveLength(actions.length);
+      actions.forEach((action) => {
         expect(screen.getByText(action)).toBeInTheDocument();
       });
     });
 
-    it.each<string>(testCase.actions)('should correctly trigger action for %s', async (action) => {
+    it.each<string>(actions)('should correctly trigger action for %s', async (action) => {
       const onOpen = vi.fn();
 
       const { user } = setupWithJotaiProvider(
@@ -307,7 +347,7 @@ describe('CommandPalette', () => {
 
       if ('event' in actionData) {
         const args = actionData.event.payload;
-        const expectedPayload = typeof args === 'function' ? args({ editorId }) : args;
+        const expectedPayload = typeof args === 'function' ? args(context) : args;
         const expectedPayloads = [actionData.event.name, ...(expectedPayload === undefined ? [] : [expectedPayload])];
         expect(emitEvent).toHaveBeenCalledTimes(1);
         expect(emitEvent).toHaveBeenCalledWith(...expectedPayloads);
