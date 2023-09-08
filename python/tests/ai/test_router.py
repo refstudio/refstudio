@@ -99,8 +99,8 @@ def test_ai_chat_is_ok(monkeypatch, mock_call_model_is_ok, tmp_path, fixtures_di
     project_id = "project1"
 
     monkeypatch.setattr(config, "WEB_STORAGE_URL", tmp_path)
-    project_path = create_project(user_id, project_id, project_name="foo")
-    mocked_path = project_path / ".storage" / "references.json"
+    project = create_project(user_id, project_id, project_name="foo")
+    mocked_path = Path(project.path) / ".storage" / "references.json"
 
     # copy references.json to mocked storage path
     test_file = f"{fixtures_dir}/data/references.json"

@@ -118,6 +118,44 @@
         "title": "Chunk",
         "type": "object"
       },
+      "CreateFileResponse": {
+        "properties": {
+          "filepath": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ResponseStatus"
+          }
+        },
+        "required": [
+          "status",
+          "message"
+        ],
+        "title": "CreateFileResponse",
+        "type": "object"
+      },
+      "DeleteFileResponse": {
+        "properties": {
+          "filepath": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ResponseStatus"
+          }
+        },
+        "required": [
+          "status",
+          "message"
+        ],
+        "title": "DeleteFileResponse",
+        "type": "object"
+      },
       "DeleteRequest": {
         "properties": {
           "all": {
@@ -329,6 +367,46 @@
         "title": "ProjectCreateRequest",
         "type": "object"
       },
+      "ProjectCreateResponse": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "path"
+        ],
+        "title": "ProjectCreateResponse",
+        "type": "object"
+      },
+      "ProjectDeleteResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "project_id": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ResponseStatus"
+          }
+        },
+        "required": [
+          "status",
+          "message",
+          "project_id"
+        ],
+        "title": "ProjectDeleteResponse",
+        "type": "object"
+      },
       "ProjectDetailsResponse": {
         "properties": {
           "id": {
@@ -369,6 +447,37 @@
           "contents"
         ],
         "title": "ProjectFileTreeResponse",
+        "type": "object"
+      },
+      "ProjectStorageItem": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "path"
+        ],
+        "title": "ProjectStorageItem",
+        "type": "object"
+      },
+      "ProjectStorageResponse": {
+        "properties": {
+          "projects": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ProjectStorageItem"
+            },
+            "type": "object"
+          }
+        },
+        "required": [
+          "projects"
+        ],
+        "title": "ProjectStorageResponse",
         "type": "object"
       },
       "Reference": {
@@ -582,6 +691,18 @@
           "results"
         ],
         "title": "SearchResponse",
+        "type": "object"
+      },
+      "StatusResponse": {
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/ResponseStatus"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "StatusResponse",
         "type": "object"
       },
       "TextCompletionChoice": {
@@ -872,7 +993,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteFileResponse"
+                }
               }
             },
             "description": "Successful Response"
@@ -1026,7 +1149,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/CreateFileResponse"
+                }
               }
             },
             "description": "Successful Response"
@@ -1074,7 +1199,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/StatusResponse"
+                }
               }
             },
             "description": "Successful Response"
@@ -1094,7 +1221,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectStorageResponse"
+                }
               }
             },
             "description": "Successful Response"
@@ -1122,7 +1251,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectCreateResponse"
+                }
               }
             },
             "description": "Successful Response"
@@ -1163,7 +1294,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectDeleteResponse"
+                }
               }
             },
             "description": "Successful Response"

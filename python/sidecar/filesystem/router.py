@@ -54,7 +54,7 @@ async def read_file(project_id: str, filepath: Path) -> FileResponse:
 
 
 @router.head("/{project_id}/{filepath:path}", status_code=200)
-async def head_file(project_id: str, filepath: Path):
+async def head_file(project_id: str, filepath: Path) -> None:
     user_id = "user1"
     project_path = get_project_path(user_id, project_id)
     filepath = project_path / filepath

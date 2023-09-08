@@ -8,6 +8,8 @@ from sidecar.projects.schemas import (
     FolderEntry,
     ProjectDetailsResponse,
     ProjectFileTreeResponse,
+    ProjectStorageItem,
+    ProjectStorageResponse,
 )
 
 # Ensure that the server's path storage directory exists.
@@ -31,7 +33,7 @@ def initialize_projects_json_storage(user_id: str) -> None:
         json.dump({}, f)
 
 
-def read_project_path_storage(user_id: str) -> dict[str, str]:
+def read_project_path_storage(user_id: str) -> ProjectStorageResponse:
     filepath = make_projects_json_path(user_id)
 
     if not filepath.exists():
@@ -39,12 +41,12 @@ def read_project_path_storage(user_id: str) -> dict[str, str]:
 
     with open(filepath, "r") as f:
         data = json.load(f)
-    return data
+    return ProjectStorageResponse(projects=data)
 
 
 def update_project_path_storage(
     user_id: str, project_id: str, project_name: str, project_path: str
-) -> dict[str, str]:
+) -> ProjectStorageResponse:
     """
     Updates the path storage file, which is responsible for mapping a project id
     to the corresponding filepath for storing project files.
@@ -54,13 +56,13 @@ def update_project_path_storage(
     if not filepath.exists():
         initialize_projects_json_storage(user_id)
 
-    data = read_project_path_storage(user_id)
+    stored_projects = read_project_path_storage(user_id)
+    data = stored_projects.dict()["projects"]
 
     with open(filepath, "w") as f:
-        data[project_id] = str(project_path)
         data[project_id] = {
-            "project_name": project_name,
-            "project_path": str(project_path),
+            "name": project_name,
+            "path": str(project_path),
         }
         json.dump(data, f, indent=2)
 
@@ -68,18 +70,20 @@ def update_project_path_storage(
 
 
 def get_project_path(user_id: str, project_id: str) -> Path:
-    data = read_project_path_storage(user_id)
-    return Path(data[project_id]["project_path"])
+    stored_projects = read_project_path_storage(user_id)
+    data = stored_projects.dict()["projects"]
+    return Path(data[project_id]["path"])
 
 
 def get_project_name(user_id: str, project_id: str) -> str:
-    data = read_project_path_storage(user_id)
-    return data[project_id]["project_name"]
+    stored_projects = read_project_path_storage(user_id)
+    data = stored_projects.dict()["projects"]
+    return data[project_id]["name"]
 
 
 def create_project(
     user_id: str, project_id: str, project_name: str, project_path: str = None
-) -> Path:
+) -> ProjectStorageItem:
     if project_path:
         server_path = project_path
         Path(server_path).mkdir(parents=True, exist_ok=True)
@@ -87,16 +91,16 @@ def create_project(
         server_path = make_project_path(user_id, project_id)
         server_path.mkdir(parents=True, exist_ok=True)
 
-    # project_id => project_path
-    _ = update_project_path_storage(
+    project_storage = update_project_path_storage(
         user_id, project_id, project_name, project_path=server_path
     )
-    return server_path
+    return project_storage.projects[project_id]
 
 
 def delete_project(user_id: str, project_id: str) -> None:
     filepath = make_projects_json_path(user_id)
-    data = read_project_path_storage(user_id)
+    stored_projects = read_project_path_storage(user_id)
+    data = stored_projects.dict()["projects"]
 
     if project_id not in data:
         raise KeyError(f"Project {project_id} does not exist")

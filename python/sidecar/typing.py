@@ -35,6 +35,10 @@ class ResponseStatus(StrEnum):
     ERROR = "error"
 
 
+class StatusResponse(RefStudioModel):
+    status: ResponseStatus
+
+
 class CliCommands(RefStudioModel):
     serve: tuple[None, None]
     """Start an HTTP server"""

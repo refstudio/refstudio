@@ -32,8 +32,8 @@ def test_list_references_should_return_references(monkeypatch, tmp_path, fixture
     project_id = "project1"
 
     monkeypatch.setattr(config, "WEB_STORAGE_URL", tmp_path)
-    project_path = create_project(user_id, project_id, project_name="foo")
-    mocked_path = project_path / ".storage" / "references.json"
+    project = create_project(user_id, project_id, project_name="foo")
+    mocked_path = Path(project.path) / ".storage" / "references.json"
 
     # copy references.json to mocked storage path
     test_file = f"{fixtures_dir}/data/references.json"
@@ -55,8 +55,8 @@ def test_get_reference(monkeypatch, tmp_path, fixtures_dir):
     project_id = "project1"
 
     monkeypatch.setattr(config, "WEB_STORAGE_URL", tmp_path)
-    project_path = create_project(user_id, project_id, project_name="foo")
-    mocked_path = project_path / ".storage" / "references.json"
+    project = create_project(user_id, project_id, project_name="foo")
+    mocked_path = Path(project.path) / ".storage" / "references.json"
 
     # copy references.json to mocked storage path
     test_file = f"{fixtures_dir}/data/references.json"
@@ -80,8 +80,8 @@ def test_references_update(monkeypatch, tmp_path, fixtures_dir):
     project_id = "project1"
 
     monkeypatch.setattr(config, "WEB_STORAGE_URL", tmp_path)
-    project_path = create_project(user_id, project_id, project_name="foo")
-    mocked_path = project_path / ".storage" / "references.json"
+    project = create_project(user_id, project_id, project_name="foo")
+    mocked_path = Path(project.path) / ".storage" / "references.json"
 
     # copy references.json to mocked storage path
     test_file = f"{fixtures_dir}/data/references.json"
@@ -116,8 +116,8 @@ def test_references_bulk_delete(monkeypatch, tmp_path, fixtures_dir):
     project_id = "project1"
 
     monkeypatch.setattr(config, "WEB_STORAGE_URL", tmp_path)
-    project_path = create_project(user_id, project_id, project_name="foo")
-    mocked_path = project_path / ".storage" / "references.json"
+    project = create_project(user_id, project_id, project_name="foo")
+    mocked_path = Path(project.path) / ".storage" / "references.json"
 
     # copy references.json to mocked storage path
     test_file = f"{fixtures_dir}/data/references.json"

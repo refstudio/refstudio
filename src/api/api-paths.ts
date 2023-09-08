@@ -7,6 +7,8 @@ import {
   ChatResponse,
   ChatResponseChoice,
   Chunk,
+  CreateFileResponse,
+  DeleteFileResponse,
   DeleteRequest,
   DeleteStatusResponse,
   EmptyRequest,
@@ -18,8 +20,12 @@ import {
   IngestResponse,
   IngestStatus,
   ProjectCreateRequest,
+  ProjectCreateResponse,
+  ProjectDeleteResponse,
   ProjectDetailsResponse,
   ProjectFileTreeResponse,
+  ProjectStorageItem,
+  ProjectStorageResponse,
   Reference,
   ReferencePatch,
   ResponseStatus,
@@ -29,6 +35,7 @@ import {
   RewriteResponse,
   S2SearchResult,
   SearchResponse,
+  StatusResponse,
   TextCompletionChoice,
   TextCompletionRequest,
   TextCompletionResponse,
@@ -182,6 +189,18 @@ export interface components {
       /** @default [] */
       vector?: number[];
     };
+    /** CreateFileResponse */
+    CreateFileResponse: {
+      filepath?: string;
+      message: string;
+      status: ResponseStatus;
+    };
+    /** DeleteFileResponse */
+    DeleteFileResponse: {
+      filepath?: string;
+      message: string;
+      status: ResponseStatus;
+    };
     /** DeleteRequest */
     DeleteRequest: {
       /** @default false */
@@ -252,6 +271,18 @@ export interface components {
       project_name: string;
       project_path?: string;
     };
+    /** ProjectCreateResponse */
+    ProjectCreateResponse: {
+      id: string;
+      name: string;
+      path: string;
+    };
+    /** ProjectDeleteResponse */
+    ProjectDeleteResponse: {
+      message: string;
+      project_id: string;
+      status: ResponseStatus;
+    };
     /** ProjectDetailsResponse */
     ProjectDetailsResponse: {
       id: string;
@@ -261,6 +292,17 @@ export interface components {
     /** ProjectFileTreeResponse */
     ProjectFileTreeResponse: {
       contents: (FileEntry | FolderEntry)[];
+    };
+    /** ProjectStorageItem */
+    ProjectStorageItem: {
+      name: string;
+      path: string;
+    };
+    /** ProjectStorageResponse */
+    ProjectStorageResponse: {
+      projects: {
+        [key: string]: ProjectStorageItem;
+      };
     };
     /**
      * Reference
@@ -339,6 +381,10 @@ export interface components {
     SearchResponse: {
       message: string;
       results: S2SearchResult[];
+      status: ResponseStatus;
+    };
+    /** StatusResponse */
+    StatusResponse: {
       status: ResponseStatus;
     };
     /** TextCompletionChoice */
@@ -502,7 +548,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': unknown;
+          'application/json': CreateFileResponse;
         };
       };
       /** @description Validation Error */
@@ -525,7 +571,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': unknown;
+          'application/json': DeleteFileResponse;
         };
       };
       /** @description Validation Error */
@@ -576,7 +622,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': unknown;
+          'application/json': StatusResponse;
         };
       };
     };
@@ -590,7 +636,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': unknown;
+          'application/json': ProjectStorageResponse;
         };
       };
     };
@@ -609,7 +655,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': unknown;
+          'application/json': ProjectCreateResponse;
         };
       };
       /** @description Validation Error */
@@ -659,7 +705,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': unknown;
+          'application/json': ProjectDeleteResponse;
         };
       };
       /** @description Validation Error */

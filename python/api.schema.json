@@ -117,6 +117,44 @@
       ],
       "title": "Chunk"
     },
+    "CreateFileResponse": {
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string"
+        },
+        "filepath": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "status",
+        "message"
+      ],
+      "title": "CreateFileResponse"
+    },
+    "DeleteFileResponse": {
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string"
+        },
+        "filepath": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "status",
+        "message"
+      ],
+      "title": "DeleteFileResponse"
+    },
     "DeleteRequest": {
       "properties": {
         "reference_ids": {
@@ -328,6 +366,46 @@
       ],
       "title": "ProjectCreateRequest"
     },
+    "ProjectCreateResponse": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "path"
+      ],
+      "title": "ProjectCreateResponse"
+    },
+    "ProjectDeleteResponse": {
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string"
+        },
+        "project_id": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "status",
+        "message",
+        "project_id"
+      ],
+      "title": "ProjectDeleteResponse"
+    },
     "ProjectDetailsResponse": {
       "properties": {
         "id": {
@@ -369,6 +447,37 @@
         "contents"
       ],
       "title": "ProjectFileTreeResponse"
+    },
+    "ProjectStorageItem": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "name",
+        "path"
+      ],
+      "title": "ProjectStorageItem"
+    },
+    "ProjectStorageResponse": {
+      "properties": {
+        "projects": {
+          "additionalProperties": {
+            "$ref": "#/definitions/ProjectStorageItem"
+          },
+          "type": "object"
+        }
+      },
+      "type": "object",
+      "required": [
+        "projects"
+      ],
+      "title": "ProjectStorageResponse"
     },
     "Reference": {
       "properties": {
@@ -582,6 +691,18 @@
         "results"
       ],
       "title": "SearchResponse"
+    },
+    "StatusResponse": {
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        }
+      },
+      "type": "object",
+      "required": [
+        "status"
+      ],
+      "title": "StatusResponse"
     },
     "TextCompletionChoice": {
       "properties": {

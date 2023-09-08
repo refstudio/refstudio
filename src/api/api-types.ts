@@ -89,6 +89,24 @@ export interface Chunk {
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "CreateFileResponse".
+ */
+export interface CreateFileResponse {
+  status: ResponseStatus;
+  message: string;
+  filepath?: string;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "DeleteFileResponse".
+ */
+export interface DeleteFileResponse {
+  status: ResponseStatus;
+  message: string;
+  filepath?: string;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
  * via the `definition` "DeleteRequest".
  */
 export interface DeleteRequest {
@@ -208,6 +226,24 @@ export interface ProjectCreateRequest {
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "ProjectCreateResponse".
+ */
+export interface ProjectCreateResponse {
+  id: string;
+  name: string;
+  path: string;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "ProjectDeleteResponse".
+ */
+export interface ProjectDeleteResponse {
+  status: ResponseStatus;
+  message: string;
+  project_id: string;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
  * via the `definition` "ProjectDetailsResponse".
  */
 export interface ProjectDetailsResponse {
@@ -221,6 +257,23 @@ export interface ProjectDetailsResponse {
  */
 export interface ProjectFileTreeResponse {
   contents: (FileEntry | FolderEntry)[];
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "ProjectStorageItem".
+ */
+export interface ProjectStorageItem {
+  name: string;
+  path: string;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "ProjectStorageResponse".
+ */
+export interface ProjectStorageResponse {
+  projects: {
+    [k: string]: ProjectStorageItem;
+  };
 }
 /**
  * ReferencePatch is the input type for updating a Reference's metadata.
@@ -280,6 +333,13 @@ export interface SearchResponse {
   status: ResponseStatus;
   message: string;
   results: S2SearchResult[];
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "StatusResponse".
+ */
+export interface StatusResponse {
+  status: ResponseStatus;
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema

@@ -1,3 +1,4 @@
+from pathlib import Path
 from uuid import UUID
 
 from fastapi.testclient import TestClient
@@ -17,16 +18,18 @@ def test_http_list_projects(monkeypatch, tmp_path):
     response = client.get("/api/projects")
 
     assert response.status_code == 200
-    assert response.json() == {}
+    assert response.json() == {"projects": {}}
 
     service.create_project(user_id, project_id, project_name)
 
     response = client.get("/api/projects")
     assert response.status_code == 200
     expected = {
-        project_id: {
-            "project_name": project_name,
-            "project_path": str(tmp_path / user_id / project_id),
+        "projects": {
+            project_id: {
+                "name": project_name,
+                "path": str(tmp_path / user_id / project_id),
+            }
         }
     }
     assert response.json() == expected
@@ -35,29 +38,28 @@ def test_http_list_projects(monkeypatch, tmp_path):
 def test_create_project(monkeypatch, tmp_path):
     monkeypatch.setattr(service, "WEB_STORAGE_URL", tmp_path)
 
-    request = {"project_name": "project1name"}
+    user_id = "user1"
+    project_name = "project1name"
+
+    request = {"project_name": project_name}
     response = client.post("/api/projects", json=request)
 
-    project_id = list(response.json().keys())[0]
+    project_id = response.json()["id"]
+    project_path = response.json()["path"]
+
     assert response.status_code == 200
     assert response.json() == {
-        project_id: {
-            "project_name": "project1name",
-            "project_path": str(tmp_path / "user1" / project_id),
-        }
+        "id": project_id,
+        "name": project_name,
+        "path": str(tmp_path / user_id / project_path),
     }
+    assert Path(project_path).exists()
 
     # should create project with random uuid4
     assert isinstance(UUID(project_id), UUID)
 
-    # should create project in user's home directory
-    user_id = "user1"
-    project_path = tmp_path / user_id / project_id
-    assert response.json()[project_id]["project_path"] == str(project_path)
-    assert project_path.exists()
-
     storage = service.read_project_path_storage(user_id)
-    assert project_id in storage
+    assert project_id in storage.dict()["projects"]
 
 
 def test_get_project(monkeypatch, tmp_path):
@@ -67,7 +69,7 @@ def test_get_project(monkeypatch, tmp_path):
     user_id = "user1"
     project_id = "project1"
     project_name = "project1name"
-    project_path = service.create_project(user_id, project_id, project_name)
+    project = service.create_project(user_id, project_id, project_name)
 
     # get the project
     response = client.get(f"/api/projects/{project_id}")
@@ -76,7 +78,7 @@ def test_get_project(monkeypatch, tmp_path):
     assert response.json() == {
         "id": project_id,
         "name": project_name,
-        "path": str(project_path),
+        "path": project.path,
     }
 
 
@@ -87,20 +89,20 @@ def test_delete_project(monkeypatch, tmp_path):
     user_id = "user1"
     project_id = "project1"
     project_name = "project1name"
-    project_path = service.create_project(user_id, project_id, project_name)
+    project = service.create_project(user_id, project_id, project_name)
 
     # delete the project
     response = client.delete(f"/api/projects/{project_id}")
 
     assert response.status_code == 200
     assert response.json() == {
-        "status": "success",
+        "status": "ok",
         "message": "Project deleted",
         "project_id": project_id,
     }
 
     # check that the project was deleted
-    assert not project_path.exists()
+    assert not Path(project.path).exists()
 
     storage = service.read_project_path_storage(user_id)
     assert project_id not in storage
