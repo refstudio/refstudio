@@ -214,19 +214,8 @@ class Rewriter:
         logger.info(
             f"Calling {self.model} chat API with the following input message(s): {messages}"
         )
-        if self.model == "gpt-3.5-turbo":
-            response = openai.ChatCompletion.create(
-                model=self.model,
-                messages=messages,
-                n=self.n_choices,  # number of completions to generate
-                temperature=self.temperature,
-                # maximum number of tokens to generate (1 word ~= 1.33 tokens)
-                max_tokens=self.max_tokens,
-            )
-            logger.info(f"Received response from OpenAI chat API: {response}")
-            return response
-        elif self.model == "llama2":
-            response = litellm.completion(
+        if self.model == "llama2":
+            response = await litellm.acompletion(
                 model=self.model,
                 messages=messages,
                 n=self.n_choices,  # number of completions to generate
@@ -236,9 +225,23 @@ class Rewriter:
                 api_base="http://localhost:11434",
                 custom_llm_provider="ollama",
             )
+            # return response
             full_response = await self.get_litellm_response(response)
-            logger.info(f"Received response from Ollama chat API: {full_response}")
+            logger.info(
+                f"Received response from {self.model} chat API: {full_response}"
+            )
             return full_response
+        else:
+            response = litellm.completion(
+                model=self.model,
+                messages=messages,
+                n=self.n_choices,  # number of completions to generate
+                temperature=self.temperature,
+                # maximum number of tokens to generate (1 word ~= 1.33 tokens)
+                max_tokens=self.max_tokens,
+            )
+            logger.info(f"Received response from {self.model} chat API: {response}")
+            return response
 
     def prepare_messages_for_chat(self, text: str) -> list:
         messages = [
