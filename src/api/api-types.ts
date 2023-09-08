@@ -89,24 +89,6 @@ export interface Chunk {
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "CreateFileResponse".
- */
-export interface CreateFileResponse {
-  status: ResponseStatus;
-  message: string;
-  filepath?: string;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "DeleteFileResponse".
- */
-export interface DeleteFileResponse {
-  status: ResponseStatus;
-  message: string;
-  filepath?: string;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
  * via the `definition` "DeleteRequest".
  */
 export interface DeleteRequest {
@@ -218,6 +200,14 @@ export interface Reference {
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "ProjectBase".
+ */
+export interface ProjectBase {
+  id: string;
+  name: string;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
  * via the `definition` "ProjectCreateRequest".
  */
 export interface ProjectCreateRequest {
@@ -226,30 +216,11 @@ export interface ProjectCreateRequest {
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "ProjectCreateResponse".
- */
-export interface ProjectCreateResponse {
-  id: string;
-  name: string;
-  path: string;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "ProjectDeleteResponse".
- */
-export interface ProjectDeleteResponse {
-  status: ResponseStatus;
-  message: string;
-  project_id: string;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
  * via the `definition` "ProjectDetailsResponse".
  */
 export interface ProjectDetailsResponse {
   id: string;
   name: string;
-  path: string;
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
@@ -260,20 +231,10 @@ export interface ProjectFileTreeResponse {
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "ProjectStorageItem".
+ * via the `definition` "ProjectListResponse".
  */
-export interface ProjectStorageItem {
-  name: string;
-  path: string;
-}
-/**
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "ProjectStorageResponse".
- */
-export interface ProjectStorageResponse {
-  projects: {
-    [k: string]: ProjectStorageItem;
-  };
+export interface ProjectListResponse {
+  projects: ProjectBase[];
 }
 /**
  * ReferencePatch is the input type for updating a Reference's metadata.
@@ -340,6 +301,7 @@ export interface SearchResponse {
  */
 export interface StatusResponse {
   status: ResponseStatus;
+  message?: string;
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema

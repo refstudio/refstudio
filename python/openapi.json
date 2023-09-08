@@ -118,44 +118,6 @@
         "title": "Chunk",
         "type": "object"
       },
-      "CreateFileResponse": {
-        "properties": {
-          "filepath": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          },
-          "status": {
-            "$ref": "#/components/schemas/ResponseStatus"
-          }
-        },
-        "required": [
-          "status",
-          "message"
-        ],
-        "title": "CreateFileResponse",
-        "type": "object"
-      },
-      "DeleteFileResponse": {
-        "properties": {
-          "filepath": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          },
-          "status": {
-            "$ref": "#/components/schemas/ResponseStatus"
-          }
-        },
-        "required": [
-          "status",
-          "message"
-        ],
-        "title": "DeleteFileResponse",
-        "type": "object"
-      },
       "DeleteRequest": {
         "properties": {
           "all": {
@@ -352,6 +314,22 @@
         "title": "IngestStatus",
         "type": "string"
       },
+      "ProjectBase": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "ProjectBase",
+        "type": "object"
+      },
       "ProjectCreateRequest": {
         "properties": {
           "project_name": {
@@ -367,46 +345,6 @@
         "title": "ProjectCreateRequest",
         "type": "object"
       },
-      "ProjectCreateResponse": {
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "path": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "name",
-          "path"
-        ],
-        "title": "ProjectCreateResponse",
-        "type": "object"
-      },
-      "ProjectDeleteResponse": {
-        "properties": {
-          "message": {
-            "type": "string"
-          },
-          "project_id": {
-            "type": "string"
-          },
-          "status": {
-            "$ref": "#/components/schemas/ResponseStatus"
-          }
-        },
-        "required": [
-          "status",
-          "message",
-          "project_id"
-        ],
-        "title": "ProjectDeleteResponse",
-        "type": "object"
-      },
       "ProjectDetailsResponse": {
         "properties": {
           "id": {
@@ -414,15 +352,11 @@
           },
           "name": {
             "type": "string"
-          },
-          "path": {
-            "type": "string"
           }
         },
         "required": [
           "id",
-          "name",
-          "path"
+          "name"
         ],
         "title": "ProjectDetailsResponse",
         "type": "object"
@@ -449,35 +383,19 @@
         "title": "ProjectFileTreeResponse",
         "type": "object"
       },
-      "ProjectStorageItem": {
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "path": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "name",
-          "path"
-        ],
-        "title": "ProjectStorageItem",
-        "type": "object"
-      },
-      "ProjectStorageResponse": {
+      "ProjectListResponse": {
         "properties": {
           "projects": {
-            "additionalProperties": {
-              "$ref": "#/components/schemas/ProjectStorageItem"
+            "items": {
+              "$ref": "#/components/schemas/ProjectBase"
             },
-            "type": "object"
+            "type": "array"
           }
         },
         "required": [
           "projects"
         ],
-        "title": "ProjectStorageResponse",
+        "title": "ProjectListResponse",
         "type": "object"
       },
       "Reference": {
@@ -695,6 +613,10 @@
       },
       "StatusResponse": {
         "properties": {
+          "message": {
+            "default": "",
+            "type": "string"
+          },
           "status": {
             "$ref": "#/components/schemas/ResponseStatus"
           }
@@ -994,7 +916,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DeleteFileResponse"
+                  "$ref": "#/components/schemas/StatusResponse"
                 }
               }
             },
@@ -1150,7 +1072,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreateFileResponse"
+                  "$ref": "#/components/schemas/StatusResponse"
                 }
               }
             },
@@ -1222,7 +1144,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProjectStorageResponse"
+                  "$ref": "#/components/schemas/ProjectListResponse"
                 }
               }
             },
@@ -1252,7 +1174,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProjectCreateResponse"
+                  "$ref": "#/components/schemas/ProjectBase"
                 }
               }
             },
@@ -1295,7 +1217,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProjectDeleteResponse"
+                  "$ref": "#/components/schemas/StatusResponse"
                 }
               }
             },

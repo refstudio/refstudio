@@ -7,8 +7,6 @@ import {
   ChatResponse,
   ChatResponseChoice,
   Chunk,
-  CreateFileResponse,
-  DeleteFileResponse,
   DeleteRequest,
   DeleteStatusResponse,
   EmptyRequest,
@@ -19,13 +17,11 @@ import {
   HTTPValidationError,
   IngestResponse,
   IngestStatus,
+  ProjectBase,
   ProjectCreateRequest,
-  ProjectCreateResponse,
-  ProjectDeleteResponse,
   ProjectDetailsResponse,
   ProjectFileTreeResponse,
-  ProjectStorageItem,
-  ProjectStorageResponse,
+  ProjectListResponse,
   Reference,
   ReferencePatch,
   ResponseStatus,
@@ -189,18 +185,6 @@ export interface components {
       /** @default [] */
       vector?: number[];
     };
-    /** CreateFileResponse */
-    CreateFileResponse: {
-      filepath?: string;
-      message: string;
-      status: ResponseStatus;
-    };
-    /** DeleteFileResponse */
-    DeleteFileResponse: {
-      filepath?: string;
-      message: string;
-      status: ResponseStatus;
-    };
     /** DeleteRequest */
     DeleteRequest: {
       /** @default false */
@@ -266,43 +250,28 @@ export interface components {
      * @enum {string}
      */
     IngestStatus: 'processing' | 'failure' | 'complete';
+    /** ProjectBase */
+    ProjectBase: {
+      id: string;
+      name: string;
+    };
     /** ProjectCreateRequest */
     ProjectCreateRequest: {
       project_name: string;
       project_path?: string;
     };
-    /** ProjectCreateResponse */
-    ProjectCreateResponse: {
-      id: string;
-      name: string;
-      path: string;
-    };
-    /** ProjectDeleteResponse */
-    ProjectDeleteResponse: {
-      message: string;
-      project_id: string;
-      status: ResponseStatus;
-    };
     /** ProjectDetailsResponse */
     ProjectDetailsResponse: {
       id: string;
       name: string;
-      path: string;
     };
     /** ProjectFileTreeResponse */
     ProjectFileTreeResponse: {
       contents: (FileEntry | FolderEntry)[];
     };
-    /** ProjectStorageItem */
-    ProjectStorageItem: {
-      name: string;
-      path: string;
-    };
-    /** ProjectStorageResponse */
-    ProjectStorageResponse: {
-      projects: {
-        [key: string]: ProjectStorageItem;
-      };
+    /** ProjectListResponse */
+    ProjectListResponse: {
+      projects: ProjectBase[];
     };
     /**
      * Reference
@@ -385,6 +354,8 @@ export interface components {
     };
     /** StatusResponse */
     StatusResponse: {
+      /** @default */
+      message?: string;
       status: ResponseStatus;
     };
     /** TextCompletionChoice */
@@ -548,7 +519,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': CreateFileResponse;
+          'application/json': StatusResponse;
         };
       };
       /** @description Validation Error */
@@ -571,7 +542,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': DeleteFileResponse;
+          'application/json': StatusResponse;
         };
       };
       /** @description Validation Error */
@@ -636,7 +607,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': ProjectStorageResponse;
+          'application/json': ProjectListResponse;
         };
       };
     };
@@ -655,7 +626,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': ProjectCreateResponse;
+          'application/json': ProjectBase;
         };
       };
       /** @description Validation Error */
@@ -705,7 +676,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': ProjectDeleteResponse;
+          'application/json': StatusResponse;
         };
       };
       /** @description Validation Error */

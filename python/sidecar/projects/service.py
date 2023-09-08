@@ -6,8 +6,6 @@ from sidecar.config import WEB_STORAGE_URL
 from sidecar.filesystem.service import traverse_directory
 from sidecar.projects.schemas import (
     Project,
-    ProjectBase,
-    ProjectDetailsResponse,
     ProjectFileTreeResponse,
     ProjectStore,
 )

@@ -117,44 +117,6 @@
       ],
       "title": "Chunk"
     },
-    "CreateFileResponse": {
-      "properties": {
-        "status": {
-          "$ref": "#/definitions/ResponseStatus"
-        },
-        "message": {
-          "type": "string"
-        },
-        "filepath": {
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "required": [
-        "status",
-        "message"
-      ],
-      "title": "CreateFileResponse"
-    },
-    "DeleteFileResponse": {
-      "properties": {
-        "status": {
-          "$ref": "#/definitions/ResponseStatus"
-        },
-        "message": {
-          "type": "string"
-        },
-        "filepath": {
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "required": [
-        "status",
-        "message"
-      ],
-      "title": "DeleteFileResponse"
-    },
     "DeleteRequest": {
       "properties": {
         "reference_ids": {
@@ -351,6 +313,22 @@
       "title": "IngestStatus",
       "description": "An enumeration."
     },
+    "ProjectBase": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "id",
+        "name"
+      ],
+      "title": "ProjectBase"
+    },
     "ProjectCreateRequest": {
       "properties": {
         "project_name": {
@@ -366,46 +344,6 @@
       ],
       "title": "ProjectCreateRequest"
     },
-    "ProjectCreateResponse": {
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "required": [
-        "id",
-        "name",
-        "path"
-      ],
-      "title": "ProjectCreateResponse"
-    },
-    "ProjectDeleteResponse": {
-      "properties": {
-        "status": {
-          "$ref": "#/definitions/ResponseStatus"
-        },
-        "message": {
-          "type": "string"
-        },
-        "project_id": {
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "required": [
-        "status",
-        "message",
-        "project_id"
-      ],
-      "title": "ProjectDeleteResponse"
-    },
     "ProjectDetailsResponse": {
       "properties": {
         "id": {
@@ -413,16 +351,12 @@
         },
         "name": {
           "type": "string"
-        },
-        "path": {
-          "type": "string"
         }
       },
       "type": "object",
       "required": [
         "id",
-        "name",
-        "path"
+        "name"
       ],
       "title": "ProjectDetailsResponse"
     },
@@ -448,36 +382,20 @@
       ],
       "title": "ProjectFileTreeResponse"
     },
-    "ProjectStorageItem": {
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "required": [
-        "name",
-        "path"
-      ],
-      "title": "ProjectStorageItem"
-    },
-    "ProjectStorageResponse": {
+    "ProjectListResponse": {
       "properties": {
         "projects": {
-          "additionalProperties": {
-            "$ref": "#/definitions/ProjectStorageItem"
+          "items": {
+            "$ref": "#/definitions/ProjectBase"
           },
-          "type": "object"
+          "type": "array"
         }
       },
       "type": "object",
       "required": [
         "projects"
       ],
-      "title": "ProjectStorageResponse"
+      "title": "ProjectListResponse"
     },
     "Reference": {
       "properties": {
@@ -696,6 +614,10 @@
       "properties": {
         "status": {
           "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string",
+          "default": ""
         }
       },
       "type": "object",
