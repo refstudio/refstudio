@@ -10,38 +10,49 @@ on:
     #   - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
 jobs:
-  setup-python:
-    name: Setup Python
+  linux:
+    name: Build Linux
     runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-    - name: Setup Python
-      uses: ./.github/actions/setup-python
-  
-  build:
-    name: Build Python binary
-    needs: [setup-python]
-    runs-on: ubuntu-latest
-    # strategy:
-    #   fail-fast: false
-    #   matrix:
-    #     os: ['macos-latest', 'windows-latest']
-      
     steps:
     - uses: actions/checkout@v3
     - name: Setup Python
       uses: ./.github/actions/setup-python
-  
-    - run: poetry run pyinstaller --noconfirm --distpath src-tauri/bin/python python/main.py
+    - name: Setup Rust
+      uses: ./github/actions/setup-rust
+    - name: Set target-triple env var
+      run: echo "TARGET_TRIPLE=$(rustc -vV | grep host | cut -d ' ' -f 2)" >> $GITHUB_ENV
+
+    # test
+    - name: Echo target-triple
+      run: echo $TARGET_TRIPLE
+    
+    - name: Build Python binary
+      run: poetry run pyinstaller --noconfirm --distpath src-tauri/bin/python python/main.py
+
+    - name: Add target-triple suffix to binary
+      run: mv src-tauri/bin/python/main/main src-tauri/bin/python/main/main-$TARGET_TRIPLE
+    
+    - uses: actions/upload-artifact@v3
+      with:
+        name: python-binary-$TARGET_TRIPLE
+        path: src-tauri/bin/python/*
+        if-no-files-found: error
+
+  # mac:
+  #   name: Build Mac
+  #   runs-on: macos-latest
+  #   steps:
+  #   - uses: actions/checkout@v3
+  #   - name: Setup Python
+  #     uses: ./.github/actions/setup-python
+  #   - name: Build Python binary
+  #     run: poetry run pyinstaller --noconfirm --distpath src-tauri/bin/python python/main.py
+  #   - uses: actions/upload-artifact@v3
+  #     with:
+  #       name: python-binary-mac
+  #       path: src-tauri/bin/python/*
+  #       if-no-files-found: error
 
     # verify it works
     # - run: ./src-tauri/bin/python/main/main serve
     # - run: curl http://localhost:1487/api/meta/status
-
-    # upload artifact
-    - uses: actions/upload-artifact@v3
-      with:
-        name: python-binary
-        path: src-tauri/bin/python/*
-        if-no-files-found: error
