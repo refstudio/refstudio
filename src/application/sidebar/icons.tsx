@@ -63,5 +63,13 @@ export const ArrowLeftIcon = () => (
   </div>
 );
 
+export const ExplorerArrowDownIcon = () => (
+  <div className="inline-flex h-6 w-6 flex-col items-center justify-center">
+    <svg height="6" viewBox="0 0 10 6" width="10" xmlns="http://www.w3.org/2000/svg">
+      <path d="M1.175 0L5 3.71159L8.825 0L10 1.14825L5 6L0 1.14825L1.175 0Z" fill="currentcolor" />
+    </svg>
+  </div>
+);
+
 export const KeyboardIcon = () => <MdKeyboard aria-label="Keybindings" size="24" />;
 export const SettingsIcon = () => <MdSettings aria-label="Settings" size="24" />;
