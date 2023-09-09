@@ -75,6 +75,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          args: --target $TARGET_TRIPLE --verbose
           releaseId: ${{ needs.create-release.outputs.release_id }}
   
   publish-release:
