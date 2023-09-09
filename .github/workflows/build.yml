@@ -10,34 +10,34 @@ on:
     #   - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
 jobs:
-  create-release:
-    permissions:
-      contents: write
-    runs-on: ubuntu-latest
-    outputs:
-      release_id: ${{ steps.create-release.outputs.id }}
+  # create-release:
+  #   permissions:
+  #     contents: write
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     release_id: ${{ steps.create-release.outputs.id }}
     
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-      - name: Create release
-        id: create-release
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const { data } = await github.rest.repos.createRelease({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              tag_name: context.ref,
-              name: 'Release ' + context.ref,
-              body: 'This is a test release to download and install Ref Studio',
-              draft: true,
-              prerelease: false
-            })
-            return data.id
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/setup-node@v3
+  #     - name: Create release
+  #       id: create-release
+  #       uses: actions/github-script@v6
+  #       with:
+  #         script: |
+  #           const { data } = await github.rest.repos.createRelease({
+  #             owner: context.repo.owner,
+  #             repo: context.repo.repo,
+  #             tag_name: context.ref,
+  #             name: 'Release ' + context.ref,
+  #             body: 'This is a test release to download and install Ref Studio',
+  #             draft: true,
+  #             prerelease: false
+  #           })
+  #           return data.id
     
   build-tauri:
-    needs: create-release
+    # needs: create-release
     permissions:
       contents: write
     strategy:
@@ -85,29 +85,34 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           args: --verbose --target ${{ matrix.target }}
-          releaseId: ${{ needs.create-release.outputs.release_id }}
+          tagName: app-v__VERSION__${{ matrix.target }}
+          releaseName: 'App v___VERSION__${{ matrix.target }}'
+          releaseBody: 'This is a test release to download and install Ref Studio'
+          releaseDraft: true
+          prerelease: false
+          # releaseId: ${{ needs.create-release.outputs.release_id }}
   
-  publish-release:
-    permissions:
-      contents: write
-    runs-on: ubuntu-latest
-    needs: [create-release, build-tauri]
-    steps:
-      - name: publish release
-        id: publish-release
-        uses: actions/github-script@v6
-        env:
-          release_id: ${{ needs.create-release.outputs.release_id }}
-        with:
-          script: |
-            github.rest.repos.updateRelease({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              release_id: process.env.release_id,
-              name: 'refstudio',
-              draft: true,
-              prerelease: false
-            })
+  # publish-release:
+  #   permissions:
+  #     contents: write
+  #   runs-on: ubuntu-latest
+  #   needs: [create-release, build-tauri]
+  #   steps:
+  #     - name: publish release
+  #       id: publish-release
+  #       uses: actions/github-script@v6
+  #       env:
+  #         release_id: ${{ needs.create-release.outputs.release_id }}
+  #       with:
+  #         script: |
+  #           github.rest.repos.updateRelease({
+  #             owner: context.repo.owner,
+  #             repo: context.repo.repo,
+  #             release_id: process.env.release_id,
+  #             name: 'refstudio',
+  #             draft: true,
+  #             prerelease: false
+  #           })
       
 
   # mac:
