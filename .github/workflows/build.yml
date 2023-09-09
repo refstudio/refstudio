@@ -80,6 +80,11 @@ jobs:
           poetry run pyinstaller --noconfirm --distpath src-tauri/bin/python python/main.py
           mv src-tauri/bin/python/main/main src-tauri/bin/python/main/main-${{ matrix.target }}
 
+      - name: Verify Python binary
+        run: |
+          ./src-tauri/bin/python/main/main-${{ matrix.target }} serve
+          curl -s http://localhost:1487/api/meta/status
+
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
