@@ -80,9 +80,11 @@ jobs:
           poetry run pyinstaller --noconfirm --distpath src-tauri/bin/python python/main.py
           mv src-tauri/bin/python/main/main src-tauri/bin/python/main/main-${{ matrix.target }}
 
+      # start server in the background
       - name: Start Python binary
-        run: ./src-tauri/bin/python/main/main-${{ matrix.target }} serve
+        run: ./src-tauri/bin/python/main/main-${{ matrix.target }} serve &
       
+      # verify the server is running
       - name: Verify Python binary
         run: sleep 3 && curl -s http://localhost:1487/api/meta/status
 
