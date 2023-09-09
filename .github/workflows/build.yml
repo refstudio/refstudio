@@ -43,8 +43,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ubuntu-latest]
-    runs-on: ${{ matrix.platform }}
+        include:
+          - name: Linx-x86_64
+            target: x86_64-unknown-linux-gnu
+            runner: ubuntu-latest
+          # - name: macOS-Apple
+          #   target: aarch64-apple-darwin
+          #   runner: macos-latest
+          # - name: macOS-Intel
+          #   target: x86_64-apple-darwin
+          #   runner: macos-latest
+    runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v3
       - name: Setup JS
@@ -54,28 +63,28 @@ jobs:
       - name: Setup Rust
         uses: ./.github/actions/setup-rust
       - name: Install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-latest'
+        if: matrix.runner == 'ubuntu-latest'
         run: |
           sudo apt-get update
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
       
-      - name: Set target-triple env var
-        run: echo "TARGET_TRIPLE=$(rustc -vV | grep host | cut -d ' ' -f 2)" >> $GITHUB_ENV
+      # - name: Set target-triple env var
+      #   run: echo "TARGET_TRIPLE=$(rustc -vV | grep host | cut -d ' ' -f 2)" >> $GITHUB_ENV
 
-      # test
-      - name: Echo target-triple
-        run: echo $TARGET_TRIPLE
+      # # test
+      # - name: Echo target-triple
+      #   run: echo $TARGET_TRIPLE
       
       - name: Create Python binary
         run: |
           poetry run pyinstaller --noconfirm --distpath src-tauri/bin/python python/main.py
-          mv src-tauri/bin/python/main/main src-tauri/bin/python/main/main-$TARGET_TRIPLE
+          mv src-tauri/bin/python/main/main src-tauri/bin/python/main/main-${{ matrix.target }}
 
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          args: --target $TARGET_TRIPLE --verbose
+          args: --verbose --target ${{ matrix.target }}
           releaseId: ${{ needs.create-release.outputs.release_id }}
   
   publish-release:
