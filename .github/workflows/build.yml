@@ -81,14 +81,16 @@ jobs:
           mv src-tauri/bin/python/main/main src-tauri/bin/python/main/main-${{ matrix.target }}
 
       # start server in the background and verify it's working
-      - name: Start Python binary
+      - name: Start Python binary and verify
         run: |
           ./src-tauri/bin/python/main/main-${{ matrix.target }} serve &
+          sleep 10
+          curl -s http://127.0.0.1:8000/api/meta/status
       
-      - name: Verify Python binary
-        run: |
-          sleep 5
-          curl -s http://0.0.0.0:1487/api/meta/status
+      # - name: Verify Python binary
+      #   run: |
+      #     sleep 5
+      #     curl -s http://0.0.0.0:1487/api/meta/status
       
       - uses: tauri-apps/tauri-action@v0
         env:
