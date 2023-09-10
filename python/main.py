@@ -48,7 +48,7 @@ if __name__ == "__main__":
     if args.command == "serve":
         from sidecar.api import serve
 
-        serve(host="127.0.0.1", port=8000)
+        serve(host="0.0.0.0", port=1487)
 
     else:
         raise NotImplementedError(f"Command {args.command} is not implemented.")

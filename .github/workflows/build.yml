@@ -78,25 +78,20 @@ jobs:
       - name: Create Python binary
         run: |
           poetry run pyinstaller --noconfirm --distpath src-tauri/bin/python python/main.py
-          mv src-tauri/bin/python/main/main src-tauri/bin/python/main/main-${{ matrix.target }}
 
       # start server in the background and verify it's working
+      # the binary takes time to start up, so we need to wait a bit
       - name: Start Python binary and verify
         run: |
-          ./src-tauri/bin/python/main/main-${{ matrix.target }} serve &
+          ./src-tauri/bin/python/main/main serve &
           sleep 30
-          curl -s http://127.0.0.1:8000/api/meta/status
-      
-      # - name: Verify Python binary
-      #   run: |
-      #     sleep 5
-      #     curl -s http://0.0.0.0:1487/api/meta/status
+          curl -s http://0.0.0.0:1487/api/meta/status
       
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          args: --verbose --target ${{ matrix.target }}
+          args: --verbose --debug --target ${{ matrix.target }}
           tagName: app-v__VERSION__${{ matrix.target }}
           releaseName: 'App v___VERSION__${{ matrix.target }}'
           releaseBody: 'This is a test release to download and install Ref Studio'
@@ -125,49 +120,3 @@ jobs:
   #             draft: true,
   #             prerelease: false
   #           })
-      
-
-  # mac:
-  #   name: Build MacOS
-  #   runs-on: macos-latest
-  #   steps:
-
-  #   - name: Set target-triple env var
-  #     run: echo "TARGET_TRIPLE=$(rustc -vV | grep host | cut -d ' ' -f 2)" >> $GITHUB_ENV
-
-  #   # test
-  #   - name: Echo target-triple
-  #     run: echo $TARGET_TRIPLE
-    
-  #   - name: Build Python binary
-  #     run: poetry run pyinstaller --noconfirm --distpath src-tauri/bin/python python/main.py
-
-  #   - name: Add target-triple suffix to binary
-  #     run: mv src-tauri/bin/python/main/main src-tauri/bin/python/main/main-$TARGET_TRIPLE
-    
-
-    
-    
-  #   - uses: tauri-apps/tauri-action@v0
-  #     env:
-  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #     with:
-  #       version: 0.0.1-beta.5
-  #       os: macos
-  #       arch: x64
-  #       asset: src-tauri/bin/python/main/main-$TARGET_TRIPLE
-  #       asset-name: python-binary-macos
-  #       asset-content-type: application/octet-stream
-  #       releaseDraft: true
-  #       prerelease: false
-  #       overwrite: true
-    
-    # - uses: actions/upload-artifact@v3
-    #   with:
-    #     name: python-binary-macos
-    #     path: src-tauri/bin/python/*
-    #     if-no-files-found: error
-
-    # verify it works
-    # - run: ./src-tauri/bin/python/main/main serve
-    # - run: curl http://localhost:1487/api/meta/status

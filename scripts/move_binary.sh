@@ -8,11 +8,7 @@ if [ -z "$TARGET" ]; then
     exit 1
 fi
 
-SOURCE_PATH="src-tauri/bin/python/main"
-TARGET_PATH="src-tauri/bin/python/main-$TARGET"
+# SOURCE_PATH="src-tauri/bin/python/main/main"
+# TARGET_PATH="src-tauri/bin/python/main/main-$TARGET"
 
-mkdir -p $TARGET_PATH
-cp -r $SOURCE_PATH/* $TARGET_PATH/.
-echo "Moved python binaries to $TARGET_PATH"
-
-rm -rf $SOURCE_PATH
+# mv $SOURCE_PATH $TARGET_PATH
