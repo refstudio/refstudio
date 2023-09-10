@@ -91,7 +91,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          args: --verbose --debug --target ${{ matrix.target }}
+          args: --verbose --target ${{ matrix.target }}
           tagName: app-v__VERSION__${{ matrix.target }}
           releaseName: 'App v___VERSION__${{ matrix.target }}'
           releaseBody: 'This is a test release to download and install Ref Studio'
