@@ -68,14 +68,15 @@
         "height": 800,
         "maximized": true,
         "fileDropEnabled": false,
-        "visible": false
+        "visible": true
       },
       {
         "width": 640,
         "height": 400,
         "decorations": false,
         "url": "splashscreen.html",
-        "label": "splashscreen"
+        "label": "splashscreen",
+        "visible": false
       }
     ]
   }

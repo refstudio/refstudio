@@ -5,15 +5,13 @@ import { Provider } from 'jotai';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
-import { AppStartup } from './AppStartup';
-
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <Provider>
       <QueryClientProvider client={queryClient}>
-        <AppStartup />
+        <div>Hello Tauri!</div>
       </QueryClientProvider>
     </Provider>
   </React.StrictMode>,
