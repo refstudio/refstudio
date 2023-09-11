@@ -1,5 +1,6 @@
 import './index.css';
 
+import { listen } from '@tauri-apps/api/event';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
@@ -12,3 +13,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     </div>
   </React.StrictMode>,
 );
+
+void listen('server-logs', (event) => {
+  console.log('SERVER LOGS: ', event.payload);
+});

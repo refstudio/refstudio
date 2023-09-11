@@ -1,5 +1,7 @@
 /** Code for managing the connection the RefStudio server. This is only relevant for desktop. */
 
+import { message } from '@tauri-apps/api/dialog';
+import { emit } from '@tauri-apps/api/event';
 import { fetch as tauriFetch } from '@tauri-apps/api/http';
 import { Child, ChildProcess, Command as TauriCommand } from '@tauri-apps/api/shell';
 import React from 'react';
@@ -31,20 +33,24 @@ async function startServer(servingCallback: () => void) {
   const command = new TauriCommand('call-sidecar', ['serve']);
   command.stderr.addListener('data', (line) => {
     console.log('server stderr', line);
+    void emit('server-logs', line);
     if (line.includes('running on http')) {
       console.log('matched the magic words');
       servingCallback();
     }
   });
   command.stdout.addListener('data', (line) => {
+    void emit('server-logs', line);
     console.log('server stdout', line);
   });
   command.addListener('close', (data: Pick<ChildProcess, 'code' | 'signal'>) => {
+    void emit('server-logs', 'server closed, restarting');
     console.warn('server closed, restarting', data.code, data.signal);
     serverProcess = null;
     void getOrStartServer(noop);
   });
   command.addListener('error', (data) => {
+    void emit('server-logs', 'server crashed, restarting');
     console.error('server crashed, restarting', data);
     serverProcess = null;
     void getOrStartServer(noop);
@@ -132,6 +138,7 @@ export function useRefStudioServerOnDesktop() {
       });
     })().catch((e) => {
       void message(String(e), { title: 'ERROR', type: 'error' });
+      void emit('server-logs', 'STARTUP ERROR: ' + String(e));
       console.error(e);
     });
   }, [isServerRunning]);
