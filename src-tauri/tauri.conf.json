@@ -16,6 +16,7 @@
       "dialog": {
         "open": true,
         "ask": true,
+        "message": true,
         "save": true
       },
       "path": {

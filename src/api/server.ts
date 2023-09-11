@@ -131,6 +131,7 @@ export function useRefStudioServerOnDesktop() {
         setIsServerRunning(true);
       });
     })().catch((e) => {
+      void message(String(e), { title: 'ERROR', type: 'error' });
       console.error(e);
     });
   }, [isServerRunning]);
