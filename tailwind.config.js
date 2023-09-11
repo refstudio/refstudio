@@ -194,6 +194,10 @@ export default {
         'editor-selection': 'rgb(196 220 246 / <alpha-value>)',
         'radio-active': 'rgb(--primary-50 / <alpha-value>)',
         'empty-state-ico-empty': 'rgb(var(--grayscale-40) / <alpha-value>)',
+        'pop-up-message': {
+          txt: 'rgb(var(--grayscale-00) / <alpha-value>)',
+          bg: 'rgb(var(--grayscale-80) / <alpha-value>)',
+        },
       },
       boxShadow: {
         default: '0px 0px 24px 0px rgba(0, 0, 0, 0.04)',
@@ -212,8 +216,9 @@ export default {
         modals: 99999,
         notifications: 88888,
         'drop-zone': 55555,
-        'resize-handle': 44444,
-        dropdown: 33333,
+        tooltip: 44444,
+        'resize-handle': 33333,
+        dropdown: 22222,
         sidebar: 11,
         'sidebar-panel': 10,
       },
