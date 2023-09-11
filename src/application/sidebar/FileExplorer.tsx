@@ -8,7 +8,7 @@ import {
 } from '../../atoms/fileExplorerActions';
 import { useActiveEditorIdForPane } from '../../atoms/hooks/useActiveEditorIdForPane';
 import { parseEditorId } from '../../atoms/types/EditorData';
-import { FileExplorerFileEntry, FileExplorerFolderEntry } from '../../atoms/types/FileExplorerEntry';
+import { FileExplorerEntry, FileExplorerFileEntry, FileExplorerFolderEntry } from '../../atoms/types/FileExplorerEntry';
 import { FileNameInput } from '../../components/FileNameInput';
 import { emitEvent } from '../../events';
 import { useAsyncEffect } from '../../hooks/useAsyncEffect';
@@ -19,51 +19,76 @@ import { useFileExplorerContextMenu } from './fileExplorerContextMenu/useFileExp
 import { ExplorerArrowDownIcon } from './icons';
 
 export function FileExplorer({ projectName }: { projectName: string }) {
+  const [collapsed, setCollapsed] = useState(false);
+
   const rootFileExplorerEntry = useAtomValue(fileExplorerAtom);
   const projectFileEntries = useAtomValue(rootFileExplorerEntry.childrenAtom);
-
   const refreshFileTree = useSetAtom(refreshFileTreeAtom);
 
   useAsyncEffect(refreshFileTree);
 
   return (
     <>
-      <ProjectExplorerContainer projectName={projectName}>
-        {projectFileEntries.map((fileEntry) =>
-          fileEntry.isFolder ? (
-            <FolderNode folder={fileEntry} key={fileEntry.path} />
-          ) : (
-            <FileNode
-              existingFileNames={projectFileEntries.map((file) => file.name)}
-              file={fileEntry}
-              key={fileEntry.path}
-            />
-          ),
-        )}
-      </ProjectExplorerContainer>
+      <div className="flex select-none flex-col items-start gap-1 self-stretch overflow-y-auto overflow-x-hidden">
+        <ProjectExplorerHeader
+          collapsed={collapsed}
+          projectName={projectName}
+          onClick={() => setCollapsed(!collapsed)}
+        />
+        <ProjectExplorerEntries collapsed={collapsed} projectFileEntries={projectFileEntries} />
+      </div>
     </>
   );
 }
 
-function ProjectExplorerContainer({ projectName, children }: { projectName: string; children: React.ReactNode }) {
-  const [collapsed, setCollapsed] = useState(false);
+function ProjectExplorerHeader({
+  projectName,
+  collapsed,
+  onClick,
+}: {
+  projectName: string;
+  collapsed: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <div className="flex w-full cursor-pointer items-center" onClick={onClick}>
+      <div
+        className={cx('text-btn-ico-side-bar-item transition duration-100 ease-in-out', {
+          '-rotate-90': collapsed,
+        })}
+      >
+        <ExplorerArrowDownIcon />
+      </div>
+      <span className="font-semibold">{projectName}</span>
+    </div>
+  );
+}
+
+function ProjectExplorerEntries({
+  collapsed,
+  projectFileEntries,
+}: {
+  collapsed: boolean;
+  projectFileEntries: FileExplorerEntry[];
+}) {
+  if (collapsed) {
+    return null;
+  }
 
   return (
-    <>
-      <div className="flex select-none flex-col items-start gap-1 self-stretch overflow-y-auto overflow-x-hidden">
-        <div className="flex w-full cursor-pointer items-center" onClick={() => setCollapsed(!collapsed)}>
-          <div
-            className={cx('text-btn-ico-side-bar-item transition duration-100 ease-in-out', {
-              '-rotate-90': collapsed,
-            })}
-          >
-            <ExplorerArrowDownIcon />
-          </div>
-          <span className="font-semibold">{projectName}</span>
-        </div>
-        {!collapsed && <div className="flex flex-col items-start gap-1 self-stretch pl-6">{children}</div>}
-      </div>
-    </>
+    <div className="flex flex-col items-start gap-1 self-stretch pl-6">
+      {projectFileEntries.map((fileEntry) =>
+        fileEntry.isFolder ? (
+          <FolderNode folder={fileEntry} key={fileEntry.path} />
+        ) : (
+          <FileNode
+            existingFileNames={projectFileEntries.map((file) => file.name)}
+            file={fileEntry}
+            key={fileEntry.path}
+          />
+        ),
+      )}
+    </div>
   );
 }
 
@@ -89,17 +114,7 @@ export function FolderNode({ folder }: FolderNodeProps) {
         <h2 className="overflow-hidden overflow-ellipsis whitespace-nowrap">{folder.name}</h2>
       </div>
       {/* CHILDREN NODES */}
-      {!collapsed && (
-        <div className="flex flex-col items-start gap-1 self-stretch pl-6">
-          {childrenEntries.map((child) =>
-            child.isFolder ? (
-              <FolderNode folder={child} key={child.path} />
-            ) : (
-              <FileNode existingFileNames={childrenEntries.map((file) => file.name)} file={child} key={child.path} />
-            ),
-          )}
-        </div>
-      )}
+      <ProjectExplorerEntries collapsed={collapsed} projectFileEntries={childrenEntries} />
     </div>
   );
 }
