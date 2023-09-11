@@ -1,9 +1,9 @@
 from pathlib import Path
 
 from fastapi.testclient import TestClient
-from sidecar import config
 from sidecar.api import api
-from sidecar.projects.service import create_project, delete_project
+from sidecar.projects import service as projects_service
+from sidecar.projects.service import create_project
 from sidecar.references.storage import JsonStorage
 
 from ..helpers import _copy_fixture_to_temp_dir
@@ -15,10 +15,8 @@ def test_list_references_should_return_empty_list(monkeypatch, tmp_path):
     user_id = "user1"
     project_id = "project1"
 
-    monkeypatch.setattr(config, "WEB_STORAGE_URL", tmp_path)
+    monkeypatch.setattr(projects_service, "WEB_STORAGE_URL", tmp_path)
 
-    # make sure we start with an empty project
-    _ = delete_project(user_id, project_id)
     _ = create_project(user_id, project_id, project_name="foo")
 
     # .storage/references.json does not exist as no references have been ingested
@@ -31,9 +29,9 @@ def test_list_references_should_return_references(monkeypatch, tmp_path, fixture
     user_id = "user1"
     project_id = "project1"
 
-    monkeypatch.setattr(config, "WEB_STORAGE_URL", tmp_path)
-    project_path = create_project(user_id, project_id, project_name="foo")
-    mocked_path = project_path / ".storage" / "references.json"
+    monkeypatch.setattr(projects_service, "WEB_STORAGE_URL", tmp_path)
+    project = create_project(user_id, project_id, project_name="foo")
+    mocked_path = Path(project.path) / ".storage" / "references.json"
 
     # copy references.json to mocked storage path
     test_file = f"{fixtures_dir}/data/references.json"
@@ -54,9 +52,9 @@ def test_get_reference(monkeypatch, tmp_path, fixtures_dir):
     user_id = "user1"
     project_id = "project1"
 
-    monkeypatch.setattr(config, "WEB_STORAGE_URL", tmp_path)
-    project_path = create_project(user_id, project_id, project_name="foo")
-    mocked_path = project_path / ".storage" / "references.json"
+    monkeypatch.setattr(projects_service, "WEB_STORAGE_URL", tmp_path)
+    project = create_project(user_id, project_id, project_name="foo")
+    mocked_path = Path(project.path) / ".storage" / "references.json"
 
     # copy references.json to mocked storage path
     test_file = f"{fixtures_dir}/data/references.json"
@@ -79,9 +77,9 @@ def test_references_update(monkeypatch, tmp_path, fixtures_dir):
     user_id = "user1"
     project_id = "project1"
 
-    monkeypatch.setattr(config, "WEB_STORAGE_URL", tmp_path)
-    project_path = create_project(user_id, project_id, project_name="foo")
-    mocked_path = project_path / ".storage" / "references.json"
+    monkeypatch.setattr(projects_service, "WEB_STORAGE_URL", tmp_path)
+    project = create_project(user_id, project_id, project_name="foo")
+    mocked_path = Path(project.path) / ".storage" / "references.json"
 
     # copy references.json to mocked storage path
     test_file = f"{fixtures_dir}/data/references.json"
@@ -115,9 +113,9 @@ def test_references_bulk_delete(monkeypatch, tmp_path, fixtures_dir):
     user_id = "user1"
     project_id = "project1"
 
-    monkeypatch.setattr(config, "WEB_STORAGE_URL", tmp_path)
-    project_path = create_project(user_id, project_id, project_name="foo")
-    mocked_path = project_path / ".storage" / "references.json"
+    monkeypatch.setattr(projects_service, "WEB_STORAGE_URL", tmp_path)
+    project = create_project(user_id, project_id, project_name="foo")
+    mocked_path = Path(project.path) / ".storage" / "references.json"
 
     # copy references.json to mocked storage path
     test_file = f"{fixtures_dir}/data/references.json"

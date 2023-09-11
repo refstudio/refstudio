@@ -7,14 +7,7 @@ runs:
     with:
       python-version: "3.11"
     id: setup-python
-  - name: Load cached Poetry installation
-    id: cached-poetry
-    uses: actions/cache@v3
-    with:
-      path: ~/.local
-      key: poetry-cache-${{ hashFiles('.github/actions/setup-python/action.yml') }}
   - name: Install Poetry
-    if: steps.cached-poetry.outputs.cache-hit != 'true'
     uses: snok/install-poetry@v1
     with:
       virtualenvs-create: true

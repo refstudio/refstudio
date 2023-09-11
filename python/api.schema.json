@@ -313,6 +313,22 @@
       "title": "IngestStatus",
       "description": "An enumeration."
     },
+    "ProjectBase": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "id",
+        "name"
+      ],
+      "title": "ProjectBase"
+    },
     "ProjectCreateRequest": {
       "properties": {
         "project_name": {
@@ -335,16 +351,12 @@
         },
         "name": {
           "type": "string"
-        },
-        "path": {
-          "type": "string"
         }
       },
       "type": "object",
       "required": [
         "id",
-        "name",
-        "path"
+        "name"
       ],
       "title": "ProjectDetailsResponse"
     },
@@ -369,6 +381,21 @@
         "contents"
       ],
       "title": "ProjectFileTreeResponse"
+    },
+    "ProjectListResponse": {
+      "properties": {
+        "projects": {
+          "items": {
+            "$ref": "#/definitions/ProjectBase"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object",
+      "required": [
+        "projects"
+      ],
+      "title": "ProjectListResponse"
     },
     "Reference": {
       "properties": {
@@ -582,6 +609,22 @@
         "results"
       ],
       "title": "SearchResponse"
+    },
+    "StatusResponse": {
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "message": {
+          "type": "string",
+          "default": ""
+        }
+      },
+      "type": "object",
+      "required": [
+        "status"
+      ],
+      "title": "StatusResponse"
     },
     "TextCompletionChoice": {
       "properties": {

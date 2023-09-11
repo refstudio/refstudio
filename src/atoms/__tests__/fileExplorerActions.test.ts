@@ -34,9 +34,9 @@ describe('fileExplorerActions', () => {
 
     expect(stringifyFileExplorerState(fileExplorer, store)).toMatchInlineSnapshot(`
       "
+      Root File.txt
       > Root folder
         Nested File.pdf
-      Root File.txt
       "
     `);
   });
@@ -47,18 +47,18 @@ describe('fileExplorerActions', () => {
     await act(() => refreshFileTree.current());
 
     const fileExplorer = store.get(fileExplorerAtom);
-    const [folder] = store.get(fileExplorer.childrenAtom) as [FileExplorerFolderEntry];
-
-    expect(folder.isFolder).toBe(true);
+    const folder = store
+      .get(fileExplorer.childrenAtom)
+      .find((entry): entry is FileExplorerFolderEntry => entry.isFolder)!;
 
     const toggleCollapsed = runSetAtomHook(folder.collapsedAtom, store);
     act(() => toggleCollapsed.current(false));
 
     expect(stringifyFileExplorerState(fileExplorer, store)).toMatchInlineSnapshot(`
       "
+      Root File.txt
       v Root folder
         Nested File.pdf
-      Root File.txt
       "
     `);
   });
@@ -79,23 +79,23 @@ describe('fileExplorerActions', () => {
     await act(() => refreshFileTree.current());
 
     const fileExplorer = store.get(fileExplorerAtom);
-    const [folder] = store.get(fileExplorer.childrenAtom) as [FileExplorerFolderEntry];
-
-    expect(folder.isFolder).toBe(true);
+    const folder = store
+      .get(fileExplorer.childrenAtom)
+      .find((entry): entry is FileExplorerFolderEntry => entry.isFolder)!;
 
     const setCollapsed = runSetAtomHook(folder.collapsedAtom, store);
     act(() => setCollapsed.current(false));
     expect(stringifyFileExplorerState(fileExplorer, store)).toMatchInlineSnapshot(`
       "
+      Root file 1.txt
+      Root file 2.txt
       v Root folder 1
-        > Nested folder
         Nested File 1.pdf
+        > Nested folder
       > Root folder 2
         Nested File 2.pdf
       > Root folder 3
         Nested File 3.pdf
-      Root file 1.txt
-      Root file 2.txt
       "
     `);
 
@@ -111,15 +111,15 @@ describe('fileExplorerActions', () => {
     await act(() => refreshFileTree.current());
     expect(stringifyFileExplorerState(fileExplorer, store)).toMatchInlineSnapshot(`
       "
+      Root file 1.txt
+      Root file 3.txt
       v Root folder 1
-        > Nested folder
         Nested File 5.pdf
+        > Nested folder
       > Root folder 2
         Nested File 2.pdf
       > Root folder 4
         Nested File 4.pdf
-      Root file 1.txt
-      Root file 3.txt
       "
     `);
   });

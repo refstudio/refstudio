@@ -5,12 +5,6 @@
 @layer base {
   :root {
     /* https://tailwindcss.com/docs/customizing-colors#using-css-variables */
-    --color-primary: 151deg 54% 69%;
-    --color-primary-hover: 152deg 54% 48%;
-    --color-secondary: 193deg 37% 69%;
-    --color-secondary-hover: 193deg 37% 48%;
-    --color-muted: 218deg 11% 65%;
-    --color-error: 0deg 84% 60%;
     --grayscale-00: 255 255 255;
     --grayscale-10: 249 250 252;
     --grayscale-20: 239 241 244;
@@ -24,19 +18,18 @@
     --primary-10: 220 234 250;
     --primary-50: 36 62 93;
     --primary-90: 29 51 77;
+    --semantic-error-10: 255 232 230;
+    --semantic-error-50: 219 40 40;
+    --semantic-warning-10: 255 248 219;
+    --semantic-warning-50: 181 129 5;
+    --semantic-success-10: 229 249 231;
+    --semantic-success-50: 30 188 48;
+    --semantic-info-10: 225 247 247;
+    --semantic-info-50: 17 155 173;
   }
 }
 
 @layer components {
-  .btn-primary {
-    @apply cursor-pointer rounded-xl bg-primary;
-    @apply px-4 py-0.5;
-    @apply hover:bg-primary-hover hover:text-white;
-  }
-  .btn-primary[disabled] {
-    @apply pointer-events-none opacity-50;
-  }
-
   /* Displays a box (top right) with a debug note */
   .debug-widget {
     @apply relative before:absolute before:right-4 before:top-4 before:hidden before:bg-yellow-100 before:p-2 hover:before:block hover:before:content-['Just_for_Debug!'];

@@ -22,3 +22,19 @@ export function useFileExplorerContextMenu(id: string, props: FileExplorerContex
 
   return show;
 }
+
+export function useFileExplorerOptionalContextMenu(id?: string) {
+  const { show: originalShow } = useContextMenu({ id: id ?? '' });
+
+  const show = useCallback(
+    (e: TriggerEvent) => {
+      if (id) {
+        e.stopPropagation();
+        originalShow({ event: e });
+      }
+    },
+    [id, originalShow],
+  );
+
+  return show;
+}

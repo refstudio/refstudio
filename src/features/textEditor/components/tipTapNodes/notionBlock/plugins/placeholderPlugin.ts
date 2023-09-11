@@ -20,7 +20,7 @@ export const placeholderPlugin = new Plugin({
           () => {
             const t = document.createElement('span');
             t.innerHTML = 'You can start writing here';
-            t.style.color = 'hsl(var(--color-muted))';
+            t.style.color = 'rgb(var(--grayscale-60))';
             return t;
           },
           { side: 1 },

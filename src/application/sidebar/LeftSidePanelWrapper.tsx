@@ -4,6 +4,7 @@ import { ImperativePanelHandle, Panel } from 'react-resizable-panels';
 import { VerticalResizeHandle } from '../../components/VerticalResizeHandle';
 import { emitEvent } from '../../events';
 import { ReferencesPanel } from '../../features/references/sidebar/ReferencesPanel';
+import { useListenEvent } from '../../hooks/useListenEvent';
 import { useRefStudioHotkeys } from '../../hooks/useRefStudioHotkeys';
 import { cx } from '../../lib/cx';
 import { noop } from '../../lib/noop';
@@ -11,7 +12,7 @@ import { SideBar } from '../components/SideBar';
 import { ExplorerPanel } from './ExplorerPanel';
 import { FilesIcon, KeyboardIcon, ReferencesIcon, SettingsIcon } from './icons';
 
-type PrimarySideBarPanel = 'Explorer' | 'References';
+export type PrimarySideBarPanel = 'Explorer' | 'References';
 export function LeftSidePanelWrapper({ disabled }: { disabled?: boolean }) {
   const leftPanelRef = useRef<ImperativePanelHandle>(null);
   const [isPanelCollapsed, setIsPanelCollapsed] = useState(disabled);
@@ -49,12 +50,18 @@ export function LeftSidePanelWrapper({ disabled }: { disabled?: boolean }) {
     if (disabled) {
       // Close the panel when disabled
       setIsPanelCollapsed(true);
-    } else {
-      // Open the defaut panel (Explorer) when enabled
-      setIsPanelCollapsed(false);
-      setActivePanel('Explorer');
     }
   }, [disabled]);
+
+  useListenEvent('refstudio://sidebars/open', ({ panel }) => {
+    if (disabled) {
+      return;
+    }
+    if (panel === 'Explorer' || panel === 'References') {
+      setActivePanel(panel);
+      setIsPanelCollapsed(false);
+    }
+  });
 
   const openSettings = useCallback(() => emitEvent('refstudio://menu/settings'), []);
 

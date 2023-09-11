@@ -28,9 +28,18 @@ if [ -f "$WEB_STORAGE_URL/user1/settings.json" ]; then
     cp "$WEB_STORAGE_URL/user1/settings.json" "$WEB_STORAGE_URL/user1.settings.json.bak"
 fi
 
+# Create a time-based random ID
+CURRENT_DATE_TIME=$(date +%Y-%m-%d_%H-%M-%S)
+
+# Copy all files from the user1 folder to a temporary location and inform the user about the action
+cp -r "$WEB_STORAGE_URL/user1" "$WEB_STORAGE_URL/user1-$CURRENT_DATE_TIME"
+echo ""
+echo "user1 folder backed up to $WEB_STORAGE_URL/user1.$CURRENT_DATE_TIME"
+
 # Remove all files from the user1 folder
 rm -rf "$WEB_STORAGE_URL/user1"
 
 # Inform the user that the operation was successful for the WEB_STORAGE_URL folder
 echo ""
 echo "RefStudio reset successfully for the $WEB_STORAGE_URL folder"
+

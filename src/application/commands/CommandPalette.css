@@ -6,6 +6,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   overflow: hidden;
   position: fixed;
   top: 0;
@@ -14,17 +15,19 @@
   width: 100vw;
   height: 100vh;
   user-select: none;
+  @apply !bg-modal-bg-overlay;
+  @apply !bg-opacity-overlay;
 }
 
 .command-palette .dialog {
   padding: 0.5rem;
-  width: 640px;
   transition: 0.1s ease 0s;
   will-change: height;
-  position: fixed;
-  border-style: solid;
-  background-color: red;
-  top: 20%;
+  top: auto;
+  @apply flex flex-col;
+  @apply !bg-modal-bg-primary;
+  @apply h-[37.5rem] w-[40rem];
+  @apply rounded-modal shadow-default;
 }
 
 .command-palette .crumbs {
@@ -49,6 +52,8 @@
   width: 100%;
   outline: 0;
   font-family: inherit;
+  @apply placeholder:text-modal-txt-placeholder;
+  @apply border-b border-b-modal-border;
 }
 
 /** Hide the searchbar if the placeholder is empty **/
@@ -64,78 +69,49 @@
   overflow-y: auto;
   overflow-x: hidden;
   flex-direction: column;
+  align-items: stretch;
   width: 100%;
-  transition: height 0.1s ease 0s;
-  will-change: height;
+  @apply !h-full gap-6 p-4;
+}
+
+/* Category container */
+.command-palette .command_wrapper > div {
+  @apply flex flex-col items-stretch;
+  @apply gap-2 text-modal-txt-secondary;
 }
 
 .command-palette .command {
-  @apply flex items-center justify-between;
+  @apply flex items-stretch;
+  @apply text-lg no-underline;
   @apply relative;
-  @apply cursor-pointer text-lg no-underline;
-  @apply min-h-[20px] py-1;
 
   transition: 0.1s linear;
 }
 
-.command-palette .shortcuts > kbd {
-  padding: 3px 6px;
-  border-radius: 3px;
-  font-size: 14px;
-  margin-right: 7px;
-  font-family: monospace;
-}
-
-.command-palette .shortcuts {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: fit-content;
-}
-
 .command-palette .info_wrapper {
-  display: flex;
-  align-items: center;
-  position: relative;
-  width: 100%;
-  height: 100%;
-  margin-left: 20px;
+  @apply flex items-center gap-2 p-1;
+  @apply text-btn-txt-modal-item-default;
 }
 
 .command-palette .info_wrapper > svg {
-  width: 20px;
-  height: 20px;
-  margin-right: 12px;
+  @apply h-6 w-6;
+  @apply fill-btn-ico-modal-item-default;
 }
 
 .command-palette .category_header {
-  margin: 5px 0 10px 10px;
-  @apply mx-1 my-1;
-  font-size: 14px;
-  @apply text-xs;
+  @apply text-sm/6 font-bold;
+  @apply uppercase;
 }
 
 .command-palette .selected {
   @apply absolute h-full w-full;
-  @apply py-1;
-  @apply rounded-lg;
+  @apply rounded-default bg-btn-bg-modal-item-hover;
 }
 
-.command-palette .command_text {
-  max-width: 90%;
-  width: fit-content;
-  margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 16px;
+.command-palette .selected + .info_wrapper {
+  @apply text-btn-txt-modal-item-active;
 }
 
-.command-palette .scroll_ref {
-  margin-top: 20px;
-}
-
-@media only screen and (max-width: 700px) {
-  .command-palette .dialog {
-    width: 90%;
-  }
+.command-palette .selected + .info_wrapper > svg {
+  @apply fill-btn-ico-modal-item-active;
 }

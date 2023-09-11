@@ -1,5 +1,7 @@
 import type { EventCallback } from '@tauri-apps/api/event';
 
+import { PrimarySideBarPanel } from './application/sidebar/LeftSidePanelWrapper';
+import { SecondarySideBarPanel } from './application/sidebar/RightSidePanelWrapper';
 import { PaneEditorId, PaneId } from './atoms/types/PaneGroup';
 import { NotificationItemType } from './notifications/types';
 import { emit, listen } from './wrappers/tauri-wrapper';
@@ -37,11 +39,16 @@ interface RefStudioEvents {
   'refstudio://notifications/popup/open': { type?: NotificationItemType };
   'refstudio://notifications/popup/close': undefined;
   // Ai actions
+  'refstudio://ai/suggestion/suggest': undefined;
   'refstudio://ai/suggestion/insert': { text: string };
   // Layout actions
   'refstudio://layout/update': undefined;
   // Project actions
   'refstudio://projects/open': { projectId: string };
+  // Sidebars
+  'refstudio://sidebars/open': {
+    panel: PrimarySideBarPanel | SecondarySideBarPanel;
+  };
 }
 
 export type RefStudioEventName = keyof RefStudioEvents;

@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { Tooltip } from 'react-tooltip';
 
 import { ArrowLeftIcon, ArrowRightIcon } from '../../application/sidebar/icons';
 import { Button } from '../../components/Button';
 import { emitEvent } from '../../events';
 import { cx } from '../../lib/cx';
+import { CopyIcon } from './icons';
 
 interface RewriteSuggestionsViewProps {
   className?: string;
@@ -29,8 +31,9 @@ export function RewriteSuggestionsView({ className, suggestions, onGoBack }: Rew
             <ArrowRightIcon />
           </div>
         </div>
-        <div className="flex items-start justify-between overflow-auto rounded-default bg-input-bg-disabled p-4">
-          {suggestions[index]}
+        <div className="flex flex-col items-end justify-end gap-4 rounded bg-input-bg-disabled p-4">
+          <div className="overflow-y-auto">{suggestions[index]}</div>
+          <CopyButton copiedTooltip="Variant copied" text={suggestions[index]} />
         </div>
       </div>
       <div className="flex flex-col items-stretch gap-2">
@@ -42,5 +45,43 @@ export function RewriteSuggestionsView({ className, suggestions, onGoBack }: Rew
         <Button size="M" text="Back" type="secondary" onClick={onGoBack} />
       </div>
     </div>
+  );
+}
+
+function CopyButton({ copiedTooltip, text }: { copiedTooltip: string; text: string }) {
+  const [isTooltipOpen, setTooltipOpen] = useState(false);
+
+  return (
+    <>
+      <button
+        className="text-side-bar-ico-default"
+        id="copy-button"
+        onClick={() => {
+          void navigator.clipboard.writeText(text).then(() => {
+            setTooltipOpen(true);
+            setTimeout(() => {
+              setTooltipOpen(false);
+            }, 2000);
+          });
+        }}
+      >
+        <CopyIcon />
+      </button>
+      <Tooltip
+        anchorSelect="#copy-button"
+        className={cx('z-tooltip flex flex-col items-stretch rounded bg-pop-up-message-bg px-2 py-1', {
+          '!visible !opacity-100 !transition-all !duration-0': isTooltipOpen,
+          '!invisible !opacity-0 !transition-tooltip !duration-200 !ease-linear': !isTooltipOpen,
+        })}
+        classNameArrow="w-2 h-2 rotate-45"
+        delayHide={200}
+        disableStyleInjection
+        isOpen={true}
+        opacity={100}
+        place="bottom"
+      >
+        <div className="text-pop-up-message-txt">{copiedTooltip}</div>
+      </Tooltip>
+    </>
   );
 }

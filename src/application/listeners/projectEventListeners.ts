@@ -37,6 +37,7 @@ export function useFileProjectNewListener() {
     }
 
     await openProject(projectInfo.id, projectInfo.name);
+    emitEvent('refstudio://sidebars/open', { panel: 'Explorer' });
     createFile();
     notifyInfo('New project created with success');
     persistActiveProjectInSettings(projectInfo.id);
@@ -58,6 +59,8 @@ export function useFileProjectNewSampleListener() {
       project = await createRemoteProject('RefStudio Sample');
     }
     await sampleProject(project.id, project.name);
+    emitEvent('refstudio://sidebars/open', { panel: 'Explorer' });
+
     createFile();
     notifyInfo('Sample project opened with success');
     persistActiveProjectInSettings(project.id);
@@ -105,6 +108,7 @@ export function useOpenProjectListener() {
     const projectToOpen = await readProjectById(projectId);
     await openProject(projectId, projectToOpen.name);
     persistActiveProjectInSettings(projectId);
+    emitEvent('refstudio://sidebars/open', { panel: 'Explorer' });
     notifyInfo('New project open.');
   };
 }

@@ -23,7 +23,7 @@ def default_settings() -> FlatSettingsSchema:
         openai_api_key="",
         openai_chat_model="gpt-3.5-turbo",
         openai_manner=RewriteMannerType.SCHOLARLY,
-        openai_temperature=0.7,
+        openai_temperature=0.8,
     )
 
 
