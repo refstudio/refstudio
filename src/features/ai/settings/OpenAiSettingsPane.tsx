@@ -68,7 +68,7 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
       </div>
       <div className="flex flex-col items-start gap-2">
         <div className="flex flex-row gap-1">
-          <h2 className="t text-modal-txt-primary">Chat Model</h2>
+          <h2 className="text-modal-txt-primary">Chat Model</h2>
           <ChatModelTooltip />
         </div>
         <Input
@@ -78,7 +78,7 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
         />
       </div>
       <div className="flex flex-col items-start gap-2">
-        <h2 className="t text-modal-txt-primary">Speech Type</h2>
+        <h2 className="text-modal-txt-primary">Speech Type</h2>
         <Dropdown
           aria-label="manner"
           data-testid={REWRITE_MANNER_TEST_ID}

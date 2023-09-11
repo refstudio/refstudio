@@ -64,8 +64,8 @@ export function RewriteWidget({
   return (
     <div className={cx('flex flex-col gap-4 px-4', className)}>
       <div className="flex flex-col">
-        <div className="border border-b-0 border-primary bg-slate-50 p-4">{selection}</div>
-        <div className="flex w-full flex-wrap items-center justify-between gap-2 rounded-b-xl border border-t border-primary bg-primary/50 ">
+        <div className="border-primary border border-b-0 bg-slate-50 p-4">{selection}</div>
+        <div className="border-primary bg-primary/50 flex w-full flex-wrap items-center justify-between gap-2 rounded-b-xl border border-t ">
           <div className="flex items-center gap-1 whitespace-nowrap">
             <select
               aria-label="manner"
@@ -110,23 +110,23 @@ export function RewriteWidget({
       {!isFetching && !!error && <span className="bg-red-50 p-4">{String(error)}</span>}
       {!isFetching && rewrite?.ok === false && <span className="bg-red-50 p-4">{rewrite.message}</span>}
       {rewrite?.ok && (
-        <div className="flex flex-col rounded-xl rounded-t-none border-primary bg-primary/50">
+        <div className="border-primary bg-primary/50 flex flex-col rounded-xl rounded-t-none">
           <div className="m-1 flex items-center justify-between p-2">
             <div>
               <strong>Rewrite Choices</strong>
-              <small className="block text-muted">
+              <small className="text-muted block">
                 Showing rewrite option {selectedChoiceIndex + 1} of {rewrite.choices.length}.
               </small>
             </div>
-            <div className="flex items-center gap-1 text-primary-hover">
+            <div className="text-primary-hover flex items-center gap-1">
               <VscChevronLeft
-                className="cursor-pointer border border-primary hover:bg-primary-hover hover:text-primary"
+                className="border-primary hover:bg-primary-hover hover:text-primary cursor-pointer border"
                 size={20}
                 title="previous choice"
                 onClick={() => setSelectedChoiceIndex(decRotate(selectedChoiceIndex, rewrite.choices))}
               />
               <VscChevronRight
-                className="cursor-pointer border border-primary hover:bg-primary-hover hover:text-primary"
+                className="border-primary hover:bg-primary-hover hover:text-primary cursor-pointer border"
                 size={20}
                 title="next choice"
                 onClick={() => setSelectedChoiceIndex(incRotate(selectedChoiceIndex, rewrite.choices))}

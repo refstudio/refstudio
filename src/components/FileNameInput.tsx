@@ -45,8 +45,9 @@ export function FileNameInput({ fileName, isNameValid, onCancel, onSubmit }: Fil
 
   return (
     <input
-      className={cx('w-full border border-blue-400 outline-none', {
-        'border-red-600': !isValueValid,
+      className={cx('w-full rounded border border-solid p-1 pl-2 outline-none', {
+        'border-input-border-active': isValueValid,
+        'border-input-border-error': !isValueValid,
       })}
       ref={focusAndSelect}
       role="textbox"
