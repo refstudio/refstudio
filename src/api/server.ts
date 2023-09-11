@@ -1,6 +1,5 @@
 /** Code for managing the connection the RefStudio server. This is only relevant for desktop. */
 
-import { message } from '@tauri-apps/api/dialog';
 import { emit } from '@tauri-apps/api/event';
 import { fetch as tauriFetch } from '@tauri-apps/api/http';
 import { Child, ChildProcess, Command as TauriCommand } from '@tauri-apps/api/shell';
@@ -137,7 +136,7 @@ export function useRefStudioServerOnDesktop() {
         setIsServerRunning(true);
       });
     })().catch((e) => {
-      void message(String(e), { title: 'ERROR', type: 'error' });
+      // void showMessage(String(e), { title: 'ERROR', type: 'error' });
       void emit('server-logs', 'STARTUP ERROR: ' + String(e));
       console.error(e);
     });
