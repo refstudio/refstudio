@@ -29,13 +29,18 @@ describe('FileExplorer', () => {
     vi.clearAllMocks();
   });
 
+  it('should render the project name', async () => {
+    render(<FileExplorer projectName="Project Name" />);
+    expect(await screen.findByText('Project Name')).toBeInTheDocument();
+  });
+
   it('should render a file', async () => {
-    render(<FileExplorer />);
+    render(<FileExplorer projectName="Project" />);
     expect(await screen.findByText(fileEntry.name)).toBeInTheDocument();
   });
 
   it('should call onFileClick with file path', async () => {
-    const { user } = setup(<FileExplorer />);
+    const { user } = setup(<FileExplorer projectName="Project Name" />);
 
     await user.click(await screen.findByText(fileEntry.name));
 
@@ -50,7 +55,7 @@ describe('FileExplorer', () => {
     const folder = makeFolder('Folder', [file]);
     vi.mocked(readAllProjectFiles).mockResolvedValue([folder]);
 
-    const { user } = setup(<FileExplorer />);
+    const { user } = setup(<FileExplorer projectName="Project Name" />);
     expect(await screen.findByText(folder.name)).toBeInTheDocument();
 
     // Folder is collapsed by default
@@ -67,7 +72,7 @@ describe('FileExplorer', () => {
     });
 
     it('should render an input when file is being renamed', async () => {
-      setupWithJotaiProvider(<FileExplorer />, store);
+      setupWithJotaiProvider(<FileExplorer projectName="Project Name" />, store);
 
       const inputElement = await screen.findByRole('textbox');
       expect(inputElement).toBeInTheDocument();
@@ -75,7 +80,7 @@ describe('FileExplorer', () => {
     });
 
     it(`should emit ${renameEventName} when submitting the new name`, async () => {
-      const { user } = setupWithJotaiProvider(<FileExplorer />, store);
+      const { user } = setupWithJotaiProvider(<FileExplorer projectName="Project Name" />, store);
 
       expect(await screen.findByRole('textbox')).toBeInTheDocument();
       await user.keyboard('File 2{Enter}');
@@ -89,7 +94,7 @@ describe('FileExplorer', () => {
       const file2 = makeFile('File 2.pdf');
       vi.mocked(readAllProjectFiles).mockResolvedValue([fileEntry, file2]);
 
-      const { user } = setupWithJotaiProvider(<FileExplorer />, store);
+      const { user } = setupWithJotaiProvider(<FileExplorer projectName="Project Name" />, store);
 
       expect(await screen.findByRole('textbox')).toBeInTheDocument();
       await user.keyboard('File 2{Enter}');
@@ -97,7 +102,7 @@ describe('FileExplorer', () => {
     });
 
     it(`should not emit ${renameEventName} when the name starts with a '.'`, async () => {
-      const { user } = setupWithJotaiProvider(<FileExplorer />, store);
+      const { user } = setupWithJotaiProvider(<FileExplorer projectName="Project Name" />, store);
 
       expect(await screen.findByRole('textbox')).toBeInTheDocument();
       await user.keyboard('.File 2{Enter}');
@@ -105,7 +110,7 @@ describe('FileExplorer', () => {
     });
 
     it(`should not emit ${renameEventName} when the name starts with a '.'`, async () => {
-      const { user } = setupWithJotaiProvider(<FileExplorer />, store);
+      const { user } = setupWithJotaiProvider(<FileExplorer projectName="Project Name" />, store);
 
       expect(await screen.findByRole('textbox')).toBeInTheDocument();
       await user.keyboard('.File 2{Enter}');
@@ -113,7 +118,7 @@ describe('FileExplorer', () => {
     });
 
     it(`should not emit ${renameEventName} when the name contains with a '/'`, async () => {
-      const { user } = setupWithJotaiProvider(<FileExplorer />, store);
+      const { user } = setupWithJotaiProvider(<FileExplorer projectName="Project Name" />, store);
 
       expect(await screen.findByRole('textbox')).toBeInTheDocument();
       await user.keyboard('invalid/name{Enter}');
@@ -121,7 +126,7 @@ describe('FileExplorer', () => {
     });
 
     it('should remove the input element when pressing Escape', async () => {
-      const { user } = setupWithJotaiProvider(<FileExplorer />, store);
+      const { user } = setupWithJotaiProvider(<FileExplorer projectName="Project Name" />, store);
 
       expect(await screen.findByRole('textbox')).toBeInTheDocument();
       await user.keyboard('{Escape}');
@@ -130,7 +135,7 @@ describe('FileExplorer', () => {
     });
 
     it('should remove the input element when unfocusing', async () => {
-      const { user } = setupWithJotaiProvider(<FileExplorer />, store);
+      const { user } = setupWithJotaiProvider(<FileExplorer projectName="Project Name" />, store);
 
       expect(await screen.findByRole('textbox')).toBeInTheDocument();
       await user.tab();

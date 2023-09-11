@@ -17,13 +17,6 @@ export function FileExplorerProjectContextMenu() {
       <Separator />
       <Item
         onClick={() => {
-          emitEvent('refstudio://menu/file/project/open');
-        }}
-      >
-        Open Project
-      </Item>
-      <Item
-        onClick={() => {
           emitEvent('refstudio://menu/file/project/close');
         }}
       >
