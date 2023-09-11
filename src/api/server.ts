@@ -124,7 +124,7 @@ async function getOrStartServer(servingCallback: () => void) {
  */
 export function useRefStudioServerOnDesktop() {
   // the server is always running for the web version
-  const [isServerRunning, setIsServerRunning] = React.useState(true); // !!import.meta.env.VITE_IS_WEB);
+  const [isServerRunning, setIsServerRunning] = React.useState(!!import.meta.env.VITE_IS_WEB);
 
   React.useEffect(() => {
     if (isServerRunning) {
