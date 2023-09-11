@@ -107,49 +107,6 @@ function ProjectModals() {
 }
 
 export function AppSimple() {
-  const panelRef = React.createRef<ImperativePanelGroupHandle>();
-  const size = useWindowSize();
-  const [panelDimensions, setPanelDimensions] = useLocalStorage('refstudio.panels', { left: 400, right: 400 });
-
-  const handleLayoutUpdate = useDebouncedCallback(
-    useCallback(
-      ([leftPerc, , rightPerc]: number[]) => {
-        if (size.width === 0) {
-          return;
-        }
-        const left = Math.round(size.width * (leftPerc / 100));
-        const right = Math.round(size.width * (rightPerc / 100));
-        setPanelDimensions({ left, right });
-
-        // Notify external components that the screen/layout was resized
-        emitEvent('refstudio://layout/update');
-      },
-      [size, setPanelDimensions],
-    ),
-    200,
-  );
-
-  useEventListener('unhandledrejection', (event) => {
-    notifyError('Unhandled rejection in promise', `Reason: ${event.reason}`);
-  });
-
-  // React to width resize or panelDimensions resize (via setLayout/resize panels)
-  useLayoutEffect(() => {
-    if (!panelRef.current || size.width === 0) {
-      return;
-    }
-    const layout = panelRef.current.getLayout();
-    const leftPerc = Math.round((panelDimensions.left / size.width) * 100);
-    const rightPerc = Math.round((panelDimensions.right / size.width) * 100);
-    const centerPerc = 100 - leftPerc - rightPerc;
-    const newLayout = [leftPerc, centerPerc, rightPerc];
-    if (layout.join(',') !== newLayout.join(',')) {
-      panelRef.current.setLayout(newLayout);
-    }
-  }, [panelRef, size, panelDimensions]);
-
-  const isProjectOpen = useAtomValue(isProjectOpenAtom);
-
   return (
     <EventsListener>
       <ReferencesDropZone>
@@ -158,17 +115,10 @@ export function AppSimple() {
             <MenuProvider config={{ animationDuration: 0 }}>
               <CommandPalette />
               {import.meta.env.VITE_IS_WEB && <WebMenuShortcuts />}
-              <PanelGroup
-                className="relative h-full"
-                direction="horizontal"
-                ref={panelRef}
-                onLayout={handleLayoutUpdate}
-              >
-                <LeftSidePanelWrapper disabled={!isProjectOpen} />
+              <PanelGroup className="relative h-full" direction="horizontal">
                 <Panel order={2}>
                   <MainPanel />
                 </Panel>
-                <RightSidePanelWrapper disabled={!isProjectOpen} />
               </PanelGroup>
             </MenuProvider>
           </ContextMenus>
