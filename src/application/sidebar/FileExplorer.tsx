@@ -12,11 +12,16 @@ import { FileExplorerEntry, FileExplorerFileEntry, FileExplorerFolderEntry } fro
 import { FileNameInput } from '../../components/FileNameInput';
 import { emitEvent } from '../../events';
 import { useAsyncEffect } from '../../hooks/useAsyncEffect';
+import { isInUploadsDir } from '../../io/filesystem';
 import { cx } from '../../lib/cx';
 import { isNonNullish } from '../../lib/isNonNullish';
 import { FILE_EXPLORER_FILE_MENU_ID } from './fileExplorerContextMenu/FileExplorerFileContextMenu';
-import { useFileExplorerContextMenu } from './fileExplorerContextMenu/useFileExplorerContextMenu';
-import { ExplorerArrowDownIcon } from './icons';
+import { FILE_EXPLORER_PROJECT_MENU_ID } from './fileExplorerContextMenu/FileExplorerProjectContextMenu';
+import {
+  useFileExplorerContextMenu,
+  useFileExplorerOptionalContextMenu,
+} from './fileExplorerContextMenu/useFileExplorerContextMenu';
+import { ArrowDownIcon, HorizontalDotsIcon } from './icons';
 
 export function FileExplorer({ projectName }: { projectName: string }) {
   const [collapsed, setCollapsed] = useState(false);
@@ -51,44 +56,12 @@ function ProjectExplorerHeader({
   onClick: () => void;
 }) {
   return (
-    <div className="flex w-full cursor-pointer items-center" onClick={onClick}>
-      <div
-        className={cx('text-btn-ico-side-bar-item transition duration-100 ease-in-out', {
-          '-rotate-90': collapsed,
-        })}
-      >
-        <ExplorerArrowDownIcon />
-      </div>
-      <span className="font-semibold">{projectName}</span>
-    </div>
-  );
-}
-
-function ProjectExplorerEntries({
-  collapsed,
-  projectFileEntries,
-}: {
-  collapsed: boolean;
-  projectFileEntries: FileExplorerEntry[];
-}) {
-  if (collapsed) {
-    return null;
-  }
-
-  return (
-    <div className="flex flex-col items-start gap-1 self-stretch pl-6">
-      {projectFileEntries.map((fileEntry) =>
-        fileEntry.isFolder ? (
-          <FolderNode folder={fileEntry} key={fileEntry.path} />
-        ) : (
-          <FileNode
-            existingFileNames={projectFileEntries.map((file) => file.name)}
-            file={fileEntry}
-            key={fileEntry.path}
-          />
-        ),
-      )}
-    </div>
+    <ProjectExplorerChevronNode
+      collapsed={collapsed}
+      contextMenuId={FILE_EXPLORER_PROJECT_MENU_ID}
+      text={projectName}
+      onClick={onClick}
+    />
   );
 }
 
@@ -101,19 +74,7 @@ export function FolderNode({ folder }: FolderNodeProps) {
 
   return (
     <div className="flex flex-col items-start gap-1 self-stretch">
-      {/* FOLDER NAME + CHEVRON */}
-      <div
-        className={cx('flex cursor-pointer select-none items-center gap-1 self-stretch')}
-        onClick={() => setCollapsed((currentState) => !currentState)}
-      >
-        <div
-          className={cx('text-btn-ico-side-bar-item transition duration-100 ease-in-out', { '-rotate-90': collapsed })}
-        >
-          <ExplorerArrowDownIcon />
-        </div>
-        <h2 className="overflow-hidden overflow-ellipsis whitespace-nowrap">{folder.name}</h2>
-      </div>
-      {/* CHILDREN NODES */}
+      <ProjectExplorerChevronNode collapsed={collapsed} text={folder.name} onClick={() => setCollapsed((v) => !v)} />
       <ProjectExplorerEntries collapsed={collapsed} projectFileEntries={childrenEntries} />
     </div>
   );
@@ -155,6 +116,7 @@ export function FileNode({ file, existingFileNames }: FileNodeProps) {
 
   return pathBeingRenamed === file.path ? (
     <FileNameInput
+      className="px-2 py-1"
       fileName={file.name}
       isNameValid={isNameValid}
       onCancel={() => setPathBeingRenamed(null)}
@@ -163,6 +125,8 @@ export function FileNode({ file, existingFileNames }: FileNodeProps) {
   ) : (
     <div
       className={cx(
+        'group',
+        'border border-transparent outline-none', // To match styles for the file name input
         'flex shrink-0 items-center gap-1 self-stretch px-2 py-1',
         'text-btn-txt-side-bar-item-primary',
         'rounded-default hover:bg-btn-bg-side-bar-item-hover',
@@ -176,6 +140,89 @@ export function FileNode({ file, existingFileNames }: FileNodeProps) {
       onContextMenu={show}
     >
       <div className="overflow-hidden overflow-ellipsis whitespace-nowrap">{file.name}</div>
+      {!isInUploadsDir(file.path) && (
+        <div
+          className={cx(
+            'ml-auto hidden group-hover:inline-flex', //
+            'rounded font-extrabold hover:bg-btn-ico-side-bar-dots-icon-hover',
+            '',
+          )}
+          onClick={show}
+        >
+          <HorizontalDotsIcon />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ProjectExplorerEntries({
+  collapsed,
+  projectFileEntries,
+}: {
+  collapsed: boolean;
+  projectFileEntries: FileExplorerEntry[];
+}) {
+  if (collapsed) {
+    return null;
+  }
+
+  return (
+    <div className="flex flex-col items-start gap-1 self-stretch pl-6">
+      {projectFileEntries.map((fileEntry) =>
+        fileEntry.isFolder ? (
+          <FolderNode folder={fileEntry} key={fileEntry.path} />
+        ) : (
+          <FileNode
+            existingFileNames={projectFileEntries.map((file) => file.name)}
+            file={fileEntry}
+            key={fileEntry.path}
+          />
+        ),
+      )}
+    </div>
+  );
+}
+
+function ProjectExplorerChevronNode({
+  collapsed = false,
+  text,
+  onClick,
+  contextMenuId,
+}: {
+  collapsed?: boolean;
+  text: string;
+  onClick: () => void;
+  contextMenuId?: string;
+}) {
+  const show = useFileExplorerOptionalContextMenu(contextMenuId);
+
+  return (
+    <div
+      className="group flex w-full cursor-pointer items-center rounded py-1 pr-1 hover:bg-btn-bg-side-bar-icon-hover"
+      onClick={onClick}
+      onContextMenu={show}
+    >
+      <div
+        className={cx('text-btn-ico-side-bar-item transition duration-100 ease-in-out', {
+          '-rotate-90': collapsed,
+        })}
+      >
+        <ArrowDownIcon />
+      </div>
+      <span className={cx('overflow-hidden overflow-ellipsis whitespace-nowrap font-semibold')}>{text}</span>
+      {contextMenuId && (
+        <div
+          className={cx(
+            'ml-auto hidden group-hover:inline-flex', //
+            'rounded font-extrabold hover:bg-btn-ico-side-bar-dots-icon-hover',
+            '',
+          )}
+          onClick={show}
+        >
+          <HorizontalDotsIcon />
+        </div>
+      )}
     </div>
   );
 }
