@@ -5,6 +5,7 @@ import { readAllProjects, readProjectById } from './api/projectsAPI';
 import { useRefStudioServerOnDesktop } from './api/server';
 import { App } from './application/App';
 import { allProjectsAtom, openProjectAtom } from './atoms/projectState';
+import { emitEvent } from './events';
 import { useAsyncEffect } from './hooks/useAsyncEffect';
 import { noop } from './lib/noop';
 import { notifyErr, notifyInfo } from './notifications/notifications';
@@ -52,6 +53,7 @@ export function AppStartup() {
           setAllProjects(projects);
           if (projectInfo) {
             await openProject(projectId, projectInfo.name);
+            emitEvent('refstudio://sidebars/open', { panel: 'Explorer' });
           }
           notifyInfo('Application Initialized');
         }
