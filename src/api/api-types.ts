@@ -200,6 +200,14 @@ export interface Reference {
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "ProjectBase".
+ */
+export interface ProjectBase {
+  id: string;
+  name: string;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
  * via the `definition` "ProjectCreateRequest".
  */
 export interface ProjectCreateRequest {
@@ -213,7 +221,6 @@ export interface ProjectCreateRequest {
 export interface ProjectDetailsResponse {
   id: string;
   name: string;
-  path: string;
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
@@ -221,6 +228,13 @@ export interface ProjectDetailsResponse {
  */
 export interface ProjectFileTreeResponse {
   contents: (FileEntry | FolderEntry)[];
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "ProjectListResponse".
+ */
+export interface ProjectListResponse {
+  projects: ProjectBase[];
 }
 /**
  * ReferencePatch is the input type for updating a Reference's metadata.
@@ -280,6 +294,14 @@ export interface SearchResponse {
   status: ResponseStatus;
   message: string;
   results: S2SearchResult[];
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "StatusResponse".
+ */
+export interface StatusResponse {
+  status: ResponseStatus;
+  message?: string;
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema

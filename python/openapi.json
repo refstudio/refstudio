@@ -314,6 +314,22 @@
         "title": "IngestStatus",
         "type": "string"
       },
+      "ProjectBase": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "ProjectBase",
+        "type": "object"
+      },
       "ProjectCreateRequest": {
         "properties": {
           "project_name": {
@@ -336,15 +352,11 @@
           },
           "name": {
             "type": "string"
-          },
-          "path": {
-            "type": "string"
           }
         },
         "required": [
           "id",
-          "name",
-          "path"
+          "name"
         ],
         "title": "ProjectDetailsResponse",
         "type": "object"
@@ -369,6 +381,21 @@
           "contents"
         ],
         "title": "ProjectFileTreeResponse",
+        "type": "object"
+      },
+      "ProjectListResponse": {
+        "properties": {
+          "projects": {
+            "items": {
+              "$ref": "#/components/schemas/ProjectBase"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "projects"
+        ],
+        "title": "ProjectListResponse",
         "type": "object"
       },
       "Reference": {
@@ -582,6 +609,22 @@
           "results"
         ],
         "title": "SearchResponse",
+        "type": "object"
+      },
+      "StatusResponse": {
+        "properties": {
+          "message": {
+            "default": "",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ResponseStatus"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "StatusResponse",
         "type": "object"
       },
       "TextCompletionChoice": {
@@ -872,7 +915,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/StatusResponse"
+                }
               }
             },
             "description": "Successful Response"
@@ -1026,7 +1071,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/StatusResponse"
+                }
               }
             },
             "description": "Successful Response"
@@ -1074,7 +1121,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/StatusResponse"
+                }
               }
             },
             "description": "Successful Response"
@@ -1094,7 +1143,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectListResponse"
+                }
               }
             },
             "description": "Successful Response"
@@ -1122,7 +1173,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectBase"
+                }
               }
             },
             "description": "Successful Response"
@@ -1163,7 +1216,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/StatusResponse"
+                }
               }
             },
             "description": "Successful Response"
