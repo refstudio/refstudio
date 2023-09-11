@@ -195,6 +195,9 @@ export default {
         'radio-active': 'rgb(--primary-50 / <alpha-value>)',
         'empty-state-ico-empty': 'rgb(var(--grayscale-40) / <alpha-value>)',
       },
+      backgroundOpacity: {
+        overlay: '0.32',
+      },
       boxShadow: {
         default: '0px 0px 24px 0px rgba(0, 0, 0, 0.04)',
       },
