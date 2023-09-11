@@ -32,6 +32,7 @@ const DataTextInput = ({
     <input
       className="w-full border bg-slate-50 px-2 py-0.5"
       name={id}
+      title={id} // required for unit testing to find this element
       type="text"
       value={value}
       onBlur={(evt) => {
@@ -92,12 +93,14 @@ const TableHeadCell = ({
   content,
   colSpan,
   header,
+  id,
   editing,
   setEditing,
 }: {
   content: string;
   colSpan?: number;
   header?: boolean;
+  id: string;
   editing?: boolean;
   setEditing?: CallableFunction;
 }) => {
@@ -113,7 +116,7 @@ const TableHeadCell = ({
       key={content}
       {...colSpanString}
     >
-      {content}
+      <label htmlFor={id}>{content}</label>
       {IconButtons(header, editing, setEditing)}
     </th>
   );
@@ -155,6 +158,7 @@ const IconButton = ({
     <button
       className={cx(hiddenClass, 'float-right hover:text-cyan-100')}
       key={title}
+      name={title}
       title={title}
       onClick={() => {
         setEditing(!editing);
@@ -230,7 +234,14 @@ export default function ReferenceDetailsCard({
     >
       <thead>
         <tr>
-          <TableHeadCell colSpan={2} content="References" editing={editing} header={true} setEditing={setEditing} />
+          <TableHeadCell
+            colSpan={2}
+            content="References"
+            editing={editing}
+            header={true}
+            id="table-head"
+            setEditing={setEditing}
+          />
         </tr>
       </thead>
       <tbody className="divide-y">
@@ -239,7 +250,7 @@ export default function ReferenceDetailsCard({
 
           return (
             <tr key={key}>
-              <TableHeadCell content={rowData.title} />
+              <TableHeadCell content={rowData.title} id={key} />
               <TableDataCell
                 contentData={contentData ?? ''}
                 editable={rowData.editable}
