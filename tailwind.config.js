@@ -6,17 +6,6 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Using modern `hsl`
-        primary: {
-          DEFAULT: 'hsl(var(--color-primary) / <alpha-value>)',
-          hover: 'hsl(var(--color-primary-hover) / <alpha-value>)',
-        },
-        secondary: {
-          DEFAULT: 'hsl(var(--color-secondary) / <alpha-value>)',
-          hover: 'hsl(var(--color-secondary-hover) / <alpha-value>)',
-        },
-        muted: 'hsl(var(--color-muted) / <alpha-value>)',
-        error: 'hsl(var(--color-error) / <alpha-value>)',
         'resizer-bg': {
           hover: 'rgb(var(--grayscale-40) / <alpha-value>)',
           default: 'rgb(var(--grayscale-20) / <alpha-value>)',
@@ -103,9 +92,10 @@ export default {
           disabled: 'rgb(var(--grayscale-40) / <alpha-value>)',
         },
         'input-border': {
-          active: 'rgb(var(--primary-50) / <alpha-value>)',
+          active: 'rgb(var(--grayscale-50) / <alpha-value>)',
           disabled: 'rgb(var(--grayscale-20) / <alpha-value>)',
           default: 'rgb(var(--grayscale-20) / <alpha-value>)',
+          error: 'rgb(var(--semantic-error-50) / <alpha-value>)',
         },
         'input-bg': {
           disabled: 'rgb(var(--grayscale-20) / <alpha-value>)',
@@ -234,7 +224,6 @@ export default {
 function autocompleteCustomComponentsPlugin() {
   return plugin(function ({ addComponents }) {
     addComponents({
-      '.btn-primary': {},
       '.debug-widget': {},
     });
   });

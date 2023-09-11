@@ -100,10 +100,10 @@ const sentenceCompletionPlugin = new Plugin<SentenceCompletionState>({
           const parentNode = document.createElement('span');
 
           parentNode.innerHTML = suggestionText;
-          parentNode.style.color = 'hsl(var(--color-muted))';
+          parentNode.style.color = 'rgb(var(--grayscale-60))';
 
           if (currentState.status === 'error') {
-            parentNode.style.color = 'hsl(var(--color-error))';
+            parentNode.style.color = 'rgb(var(--semantic-error-50))';
           }
 
           return parentNode;
