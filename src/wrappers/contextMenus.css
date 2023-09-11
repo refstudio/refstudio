@@ -7,7 +7,7 @@ body {
 
 /* This is the class name defined by react-contexify */
 .contexify {
-  @apply min-w-min p-1;
+  @apply z-modals min-w-min p-1;
 }
 
 .contexify .contexify_itemContent {

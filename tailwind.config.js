@@ -91,6 +91,9 @@ export default {
           default: 'rgb(var(--grayscale-60) / <alpha-value>)',
           disabled: 'rgb(var(--grayscale-40) / <alpha-value>)',
         },
+        'btn-ico-side-bar-dots-icon': {
+          hover: 'rgb(var(--grayscale-40) / <alpha-value>)',
+        },
         'input-border': {
           active: 'rgb(var(--grayscale-50) / <alpha-value>)',
           disabled: 'rgb(var(--grayscale-20) / <alpha-value>)',
