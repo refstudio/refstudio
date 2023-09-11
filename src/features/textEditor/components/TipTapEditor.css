@@ -1,5 +1,5 @@
 .editor-container {
-  @apply flex h-full w-full flex-col;
+  @apply flex h-full w-full max-w-[45rem] flex-col;
   @apply overflow-hidden rounded-default shadow-default;
 }
 
@@ -19,7 +19,7 @@
 }
 
 .tiptap-editor > div {
-  @apply w-full max-w-[45rem];
+  @apply w-full;
 }
 
 .tiptap-editor h2 {
