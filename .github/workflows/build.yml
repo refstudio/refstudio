@@ -51,7 +51,7 @@ jobs:
           #   target: aarch64-apple-darwin
           #   runner: macos-latest
           - name: macOS-Intel
-            target: universal-apple-darwin
+            target: x86_64-apple-darwin
             runner: macos-latest
     runs-on: ${{ matrix.runner }}
     steps:
@@ -71,12 +71,13 @@ jobs:
       - name: Create Python binary
         run: |
           poetry run pyinstaller --noconfirm --distpath src-tauri/bin/python python/main.py
+          mv src-tauri/bin/python/main/main src-tauri/bin/python/main/main-${{ matrix.target }}
 
       # start server in the background and verify it's working
       # the binary takes time to start up, so we need to wait a bit
       - name: Start Python binary and verify
         run: |
-          ./src-tauri/bin/python/main/main serve &
+          ./src-tauri/bin/python/main/main-${{ matrix.target }} serve &
           sleep 30
           curl -s http://0.0.0.0:1487/api/meta/status
       
