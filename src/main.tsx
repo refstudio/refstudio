@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom/client';
 
 import { useRefStudioServerOnDesktop } from './api/server';
+import { AppStartup } from './AppStartup';
 
 const queryClient = new QueryClient();
 
@@ -13,7 +14,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <Provider>
       <QueryClientProvider client={queryClient}>
-        <App />
+        <AppStartup />
       </QueryClientProvider>
     </Provider>
   </React.StrictMode>,
