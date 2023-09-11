@@ -9,6 +9,8 @@ import {
 } from '../settingsManager';
 import { SettingsModal } from '../SettingsModal';
 
+global.CSS.supports = () => false;
+
 vi.mock('../settingsManager');
 vi.mock('../../events');
 

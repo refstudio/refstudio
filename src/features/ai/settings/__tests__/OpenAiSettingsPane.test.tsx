@@ -17,6 +17,8 @@ import {
   REWRITE_TEMPERATURE_TEST_ID,
 } from '../OpenAiSettingsPane';
 
+global.CSS.supports = () => false;
+
 vi.mock('../../../../settings/settingsManager');
 vi.mock('../../../../events');
 
