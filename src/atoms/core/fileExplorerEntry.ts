@@ -121,11 +121,11 @@ function compareFileExplorerEntries(
   fileExplorerEntryB: FileExplorerEntry,
 ): -1 | 0 | 1 {
   if (fileExplorerEntryA.isFolder && !fileExplorerEntryB.isFolder) {
-    return -1;
+    return 1;
   }
 
   if (!fileExplorerEntryA.isFolder && fileExplorerEntryB.isFolder) {
-    return 1;
+    return -1;
   }
 
   const fileExplorerEntryNameA = fileExplorerEntryA.name.toLowerCase();
