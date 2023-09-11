@@ -207,6 +207,7 @@ function ProjectExplorerChevronNode({
             'rounded font-extrabold hover:bg-btn-ico-side-bar-dots-icon-hover',
             '',
           )}
+          data-testid="project-explorer-chevron-node-menu"
           onClick={show}
         >
           <HorizontalDotsIcon />

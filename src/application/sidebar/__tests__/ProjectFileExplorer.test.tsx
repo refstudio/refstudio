@@ -6,9 +6,12 @@ import { FileFileEntry } from '../../../atoms/types/FileEntry';
 import { emitEvent, RefStudioEventName, RefStudioEventPayload } from '../../../events';
 import { readAllProjectFiles } from '../../../io/filesystem';
 import { act, render, screen, setup, setupWithJotaiProvider } from '../../../test/test-utils';
+import { ContextMenus } from '../../../wrappers/ContextMenus';
 import { ProjectFileExplorer } from '../ProjectFileExplorer';
 
 const renameEventName: RefStudioEventName = 'refstudio://explorer/rename';
+const newFileEventName: RefStudioEventName = 'refstudio://menu/file/new';
+const closeProjectEventName: RefStudioEventName = 'refstudio://menu/file/project/close';
 
 vi.mock('../../../events');
 vi.mock('../../../io/filesystem');
@@ -66,7 +69,56 @@ describe('ProjectFileExplorer', () => {
     expect(screen.getByText(file.name)).toBeInTheDocument();
   });
 
-  describe('FileExplorer - rename', () => {
+  describe('ProjectFileExplorer - project context menu', () => {
+    it(`should display context menu on ... click`, async () => {
+      const { user } = setupWithJotaiProvider(
+        <ContextMenus>
+          <ProjectFileExplorer projectName="Project Name" />
+        </ContextMenus>,
+        store,
+      );
+
+      await user.hover(screen.getByText('Project Name'));
+      expect(screen.getByTestId('project-explorer-chevron-node-menu')).toBeVisible();
+      await user.click(screen.getByTestId('project-explorer-chevron-node-menu'));
+
+      expect(screen.getByRole('menu')).toHaveClass('contexify');
+    });
+
+    it(`should emit ${newFileEventName} when creating new file`, async () => {
+      const { user } = setupWithJotaiProvider(
+        <ContextMenus>
+          <ProjectFileExplorer projectName="Project Name" />
+        </ContextMenus>,
+        store,
+      );
+
+      await user.hover(screen.getByText('Project Name'));
+      await user.click(screen.getByTestId('project-explorer-chevron-node-menu'));
+      await user.click(screen.getByText('New File'));
+
+      expect(emitEvent).toHaveBeenCalledTimes(1);
+      expect(emitEvent).toHaveBeenCalledWith(newFileEventName);
+    });
+
+    it(`should emit ${closeProjectEventName} when closing the project`, async () => {
+      const { user } = setupWithJotaiProvider(
+        <ContextMenus>
+          <ProjectFileExplorer projectName="Project Name" />
+        </ContextMenus>,
+        store,
+      );
+
+      await user.hover(screen.getByText('Project Name'));
+      await user.click(screen.getByTestId('project-explorer-chevron-node-menu'));
+      await user.click(screen.getByText('Close Project'));
+
+      expect(emitEvent).toHaveBeenCalledTimes(1);
+      expect(emitEvent).toHaveBeenCalledWith(closeProjectEventName);
+    });
+  });
+
+  describe('ProjectFileExplorer - rename', () => {
     beforeEach(() => {
       store.set(fileExplorerEntryPathBeingRenamed, fileEntry.path);
     });
