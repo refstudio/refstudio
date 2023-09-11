@@ -32,35 +32,36 @@ export function RewriteSuggestionsView({ className, suggestions, onGoBack }: Rew
             <ArrowRightIcon />
           </div>
         </div>
-        <div className="flex flex-col items-end gap-4 justify-end rounded bg-input-bg-disabled p-4">
+        <div className="flex flex-col items-end justify-end gap-4 rounded bg-input-bg-disabled p-4">
           <div className="overflow-y-auto">{suggestions[index]}</div>
-          <button className='text-side-bar-ico-default' id="copy-button" onClick={() => {
-            void navigator.clipboard.writeText(suggestions[index]).then(() => {
-              setTooltipOpen(true);
-              setTimeout(() => {
-                setTooltipOpen(false);
-              }, 2000);
-            });
-          }}><CopyIcon /></button>
+          <button
+            className="text-side-bar-ico-default"
+            id="copy-button"
+            onClick={() => {
+              void navigator.clipboard.writeText(suggestions[index]).then(() => {
+                setTooltipOpen(true);
+                setTimeout(() => {
+                  setTooltipOpen(false);
+                }, 2000);
+              });
+            }}
+          >
+            <CopyIcon />
+          </button>
           <Tooltip
             anchorSelect="#copy-button"
-            className={cx(
-              'rounded flex flex-col items-stretch px-2 py-1 z-tooltip bg-pop-up-message-bg',
-              {
-                '!opacity-100 !visible !transition-all !duration-0': isTooltipOpen,
-                '!opacity-0 !invisible !transition-tooltip !ease-linear !duration-200': !isTooltipOpen,
-              },
-            )}
-            classNameArrow='w-2 h-2 rotate-45'
+            className={cx('z-tooltip flex flex-col items-stretch rounded bg-pop-up-message-bg px-2 py-1', {
+              '!visible !opacity-100 !transition-all !duration-0': isTooltipOpen,
+              '!invisible !opacity-0 !transition-tooltip !duration-200 !ease-linear': !isTooltipOpen,
+            })}
+            classNameArrow="w-2 h-2 rotate-45"
             delayHide={200}
             disableStyleInjection
             isOpen={true}
             opacity={100}
             place="bottom"
           >
-            <div className="text-pop-up-message-txt">
-              Variant copied
-            </div>
+            <div className="text-pop-up-message-txt">Variant copied</div>
           </Tooltip>
         </div>
       </div>

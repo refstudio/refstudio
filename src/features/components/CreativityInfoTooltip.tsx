@@ -12,10 +12,10 @@ export function CreativityInfoTooltip({ id }: { id: string }) {
       <Tooltip
         anchorSelect={`#${id}`}
         className={cx(
-          'rounded flex flex-col items-stretch px-4 py-3 relative z-tooltip',
+          'relative z-tooltip flex flex-col items-stretch rounded px-4 py-3',
           'max-w-[16rem] bg-pop-up-message-bg',
         )}
-        classNameArrow='w-2 h-2 rotate-45'
+        classNameArrow="w-2 h-2 rotate-45"
         clickable
         delayShow={100}
         disableStyleInjection
