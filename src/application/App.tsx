@@ -105,27 +105,3 @@ function ProjectModals() {
     </>
   );
 }
-
-export function AppSimple() {
-  return (
-    <EventsListener>
-      <ReferencesDropZone>
-        <ApplicationFrame>
-          <ContextMenus>
-            <MenuProvider config={{ animationDuration: 0 }}>
-              <CommandPalette />
-              {import.meta.env.VITE_IS_WEB && <WebMenuShortcuts />}
-              <PanelGroup className="relative h-full" direction="horizontal">
-                <Panel order={2}>
-                  <MainPanel />
-                </Panel>
-              </PanelGroup>
-            </MenuProvider>
-          </ContextMenus>
-        </ApplicationFrame>
-        <SettingsModalOpener />
-        <ProjectModals />
-      </ReferencesDropZone>
-    </EventsListener>
-  );
-}

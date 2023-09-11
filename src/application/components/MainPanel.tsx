@@ -17,7 +17,6 @@ import { TipTapView } from '../../features/textEditor/editor/TipTapView';
 import { useDebouncedCallback } from '../../hooks/useDebouncedCallback';
 import { assertNever } from '../../lib/assertNever';
 import { EmptyView } from '../views/EmptyView';
-import { PdfViewer } from '../views/PdfViewer';
 import { TextView } from '../views/TextView';
 import { WelcomeView } from '../views/WelcomeView';
 import { OpenEditorsTabPane } from './OpenEditorsTabPane';
@@ -104,7 +103,8 @@ function MainPaneViewContent({ activeEditorAtoms }: MainPaneViewContentProps) {
     case 'json':
       return <TextView file={data} textFormatter={(input) => JSON.stringify(JSON.parse(input), null, 2)} />;
     case 'pdf':
-      return <PdfViewer file={data} />;
+      return <div>PDF</div>;
+    // return <PdfViewer file={data} />;
     case 'refstudio':
       return <TipTapView activeEditorContentAtoms={activeEditorAtoms} file={data} />;
     case 'reference':

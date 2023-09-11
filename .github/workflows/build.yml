@@ -85,7 +85,6 @@ jobs:
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DEV_TOOLS: 1
         with:
           args: --verbose --target ${{ matrix.target }}
           includeDebug: true
