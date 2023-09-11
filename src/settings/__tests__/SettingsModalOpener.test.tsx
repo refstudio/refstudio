@@ -5,6 +5,8 @@ import { mockListenEvent, render, screen } from '../../test/test-utils';
 import { getCachedSetting, initSettings, saveCachedSettings, setCachedSetting } from '../settingsManager';
 import { SettingsModalOpener } from '../SettingsModalOpener';
 
+global.CSS.supports = () => false;
+
 vi.mock('../settingsManager');
 vi.mock('../../events');
 

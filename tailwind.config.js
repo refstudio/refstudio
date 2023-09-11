@@ -49,6 +49,7 @@ export default {
           hover: 'rgb(var(--grayscale-20) / <alpha-value>)',
           default: 'rgb(var(--grayscale-00) / <alpha-value>)',
         },
+        'btn-bg-info-pop-up': 'rgb(var(--grayscale-50) / <alpha-value>)',
         'btn-ico-side-bar-tool': {
           disabled: 'rgb(var(--grayscale-20) / <alpha-value>)',
           hover: 'rgb(var(--grayscale-70) / <alpha-value>)',
@@ -131,7 +132,10 @@ export default {
           primary: 'rgb(var(--grayscale-00) / <alpha-value>)',
           secondary: 'rgb(var(--grayscale-20) / <alpha-value>)',
         },
-        'side-bar-ico-empty': 'rgb(var(--grayscale-40) / <alpha-value>)',
+        'side-bar-ico': {
+          empty: 'rgb(var(--grayscale-40) / <alpha-value>)',
+          default: 'rgb(var(--grayscale-70) / <alpha-value>)',
+        },
         'card-txt-header': 'rgb(var(--grayscale-00) / <alpha-value>)',
         'card-border-header': 'rgb(var(--primary-90) / <alpha-value>)',
         'card-border': {
@@ -187,6 +191,10 @@ export default {
         'editor-selection': 'rgb(196 220 246 / <alpha-value>)',
         'radio-active': 'rgb(--primary-50 / <alpha-value>)',
         'empty-state-ico-empty': 'rgb(var(--grayscale-40) / <alpha-value>)',
+        'pop-up-message': {
+          txt: 'rgb(var(--grayscale-00) / <alpha-value>)',
+          bg: 'rgb(var(--grayscale-80) / <alpha-value>)',
+        },
       },
       backgroundOpacity: {
         overlay: '0.32',
@@ -200,18 +208,20 @@ export default {
       },
       transitionProperty: {
         position: 'top, left, bottom, right',
+        tooltip: 'opacity, visibility',
       },
       fontFamily: {
         default: ['"Roboto", sans-serif'],
       },
       zIndex: {
-        modals: 99999,
-        notifications: 88888,
-        'drop-zone': 55555,
-        'resize-handle': 44444,
-        dropdown: 33333,
-        sidebar: 11,
-        'sidebar-panel': 10,
+        modals: 999999,
+        notifications: 888888,
+        'drop-zone': 555555,
+        tooltip: 444444,
+        'resize-handle': 333333,
+        dropdown: 222222,
+        'sidebar-panel': 151515,
+        sidebar: 111111,
       },
     },
   },
