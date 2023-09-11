@@ -23,7 +23,7 @@ import {
 } from './fileExplorerContextMenu/useFileExplorerContextMenu';
 import { ArrowDownIcon, HorizontalDotsIcon } from './icons';
 
-export function FileExplorer({ projectName }: { projectName: string }) {
+export function ProjectFileExplorer({ projectName }: { projectName: string }) {
   const [collapsed, setCollapsed] = useState(false);
 
   const rootFileExplorerEntry = useAtomValue(fileExplorerAtom);
@@ -40,7 +40,7 @@ export function FileExplorer({ projectName }: { projectName: string }) {
           projectName={projectName}
           onClick={() => setCollapsed(!collapsed)}
         />
-        <ProjectExplorerEntries collapsed={collapsed} projectFileEntries={projectFileEntries} />
+        {!collapsed && <ProjectExplorerEntries projectFileEntries={projectFileEntries} />}
       </div>
     </>
   );
@@ -75,7 +75,7 @@ export function FolderNode({ folder }: FolderNodeProps) {
   return (
     <div className="flex flex-col items-start gap-1 self-stretch">
       <ProjectExplorerChevronNode collapsed={collapsed} text={folder.name} onClick={() => setCollapsed((v) => !v)} />
-      <ProjectExplorerEntries collapsed={collapsed} projectFileEntries={childrenEntries} />
+      {!collapsed && <ProjectExplorerEntries projectFileEntries={childrenEntries} />}
     </div>
   );
 }
@@ -116,7 +116,6 @@ export function FileNode({ file, existingFileNames }: FileNodeProps) {
 
   return pathBeingRenamed === file.path ? (
     <FileNameInput
-      className="px-2 py-1"
       fileName={file.name}
       isNameValid={isNameValid}
       onCancel={() => setPathBeingRenamed(null)}
@@ -156,17 +155,7 @@ export function FileNode({ file, existingFileNames }: FileNodeProps) {
   );
 }
 
-function ProjectExplorerEntries({
-  collapsed,
-  projectFileEntries,
-}: {
-  collapsed: boolean;
-  projectFileEntries: FileExplorerEntry[];
-}) {
-  if (collapsed) {
-    return null;
-  }
-
+function ProjectExplorerEntries({ projectFileEntries }: { projectFileEntries: FileExplorerEntry[] }) {
   return (
     <div className="flex flex-col items-start gap-1 self-stretch pl-6">
       {projectFileEntries.map((fileEntry) =>

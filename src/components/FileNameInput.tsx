@@ -8,10 +8,9 @@ interface FileNameInputProps {
   onCancel: () => void;
   onSubmit: (newValue: string) => void;
   isNameValid: (name: string) => boolean;
-  className?: string;
 }
 
-export function FileNameInput({ className, fileName, isNameValid, onCancel, onSubmit }: FileNameInputProps) {
+export function FileNameInput({ fileName, isNameValid, onCancel, onSubmit }: FileNameInputProps) {
   const [value, setValue] = useState(fileName);
   const isValueValid = useMemo(() => value === fileName || isNameValid(value), [isNameValid, fileName, value]);
 
@@ -46,13 +45,9 @@ export function FileNameInput({ className, fileName, isNameValid, onCancel, onSu
 
   return (
     <input
-      className={cx(
-        'w-full border border-blue-400 outline-none',
-        {
-          'border-red-600': !isValueValid,
-        },
-        className,
-      )}
+      className={cx('w-full border border-blue-400 outline-none', {
+        'border-red-600': !isValueValid,
+      })}
       ref={focusAndSelect}
       role="textbox"
       value={value}
