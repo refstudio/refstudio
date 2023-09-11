@@ -205,7 +205,7 @@ export default function ReferenceDetailsCard({
   const referenceDetailsCardFormat = {
     citationKey: {
       title: 'Citation Key',
-      editable: true,
+      editable: false,
     },
     title: {
       title: 'Title',
