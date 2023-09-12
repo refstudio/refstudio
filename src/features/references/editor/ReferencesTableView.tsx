@@ -136,7 +136,7 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
   return (
     <div className="flex flex-1 flex-col items-stretch gap-6 pb-10">
       <div className="flex items-center justify-center gap-4">
-        <div className='flex-1'>
+        <div className="flex-1">
           <SearchBar
             fluid
             initialValue={quickFilter}
@@ -153,7 +153,7 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
           onClick={() => emitEvent('refstudio://menu/references/upload')}
         />
         <div className="h-8 w-px bg-content-area-border" />
-        <div className='flex justify-center gap-2 items-center'>
+        <div className="flex items-center justify-center gap-2">
           <Button
             Action={<BinIcon />}
             disabled={selectedReferences.length === 0}
@@ -180,7 +180,7 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
         />
       </div>
 
-      <div className='flex-1 rounded-default bg-card-bg-primary shadow-default overflow-hidden'>
+      <div className="flex-1 overflow-hidden rounded-default bg-card-bg-primary shadow-default">
         <AgGridReact
           animateRows
           className="ag-theme-alpine ag-theme-refstudio flex-1"
