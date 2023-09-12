@@ -26,7 +26,8 @@ describe('ReferencesTableView component', () => {
     vi.clearAllMocks();
   });
 
-  it('should render empty table with upload tips', () => {
+  // TODO: Update this test once we have the design for the empty view
+  it.skip('should render empty table with upload tips', () => {
     setupWithJotaiProvider(<ReferencesTableView />);
     expect(screen.getByTestId(UploadTipInstructions.name)).toBeInTheDocument();
   });
@@ -39,7 +40,7 @@ describe('ReferencesTableView component', () => {
 
   it('should use default filter to filter references', () => {
     setupWithJotaiProvider(<ReferencesTableView defaultFilter={ref1.title} />, store);
-    expect(screen.getByPlaceholderText('Search within references...')).toHaveValue(ref1.title);
+    expect(screen.getByPlaceholderText('Filter author/title...')).toHaveValue(ref1.title);
   });
 
   it('should filter references with default filter', () => {
@@ -52,7 +53,7 @@ describe('ReferencesTableView component', () => {
   it('should filter references with filter input', async () => {
     const { user } = setupWithJotaiProvider(<ReferencesTableView />, store);
 
-    await user.type(screen.getByPlaceholderText('Search within references...'), ref1.title);
+    await user.type(screen.getByPlaceholderText('Filter author/title...'), ref1.title);
 
     const grid = screen.getByRole('treegrid');
     await waitFor(() => expect(within(grid).queryByText(ref2.title)).not.toBeInTheDocument());
@@ -67,12 +68,12 @@ describe('ReferencesTableView component', () => {
     await user.type(screen.getByText(ref1.title), ' ', { skipClick: false }); // select row
     await user.type(screen.getByText(ref2.title), ' ', { skipClick: false }); // select row
 
-    expect(screen.getByText('(2)')).toBeInTheDocument();
+    expect(screen.getByText('Remove (2)')).toBeInTheDocument();
   });
 
-  it('should render 8 columns', () => {
+  it('should render 7 columns', () => {
     setupWithJotaiProvider(<ReferencesTableView />, store);
-    expect(screen.getAllByRole('columnheader')).toHaveLength(8);
+    expect(screen.getAllByRole('columnheader')).toHaveLength(7);
   });
 
   it('should render title column in 3rd position', () => {
@@ -117,24 +118,21 @@ describe('ReferencesTableView component', () => {
   it(`should not emit ${'refstudio://references/remove' as RefStudioEventName} with NO selections`, async () => {
     const { user } = setupWithJotaiProvider(<ReferencesTableView />, store);
 
-    const actionsMenu = screen.getByTestId('actions-menu');
-    await user.hover(actionsMenu);
-    const removeBtn = within(actionsMenu).getByText('Remove');
+    const removeBtn = screen.getByText('Remove');
     await user.click(removeBtn);
 
+    expect(removeBtn).toBeDisabled();
     expect(removeBtn).toHaveAttribute('aria-disabled', 'true');
     expect(vi.mocked(emitEvent)).not.toHaveBeenCalled();
   });
 
-  // Note: This test can't run because there is a weird issue when clicking remove ("TypeError: Cannot read properties of undefined (reading 'contains')")
-  // https://github.com/ag-grid/ag-grid/issues/6179
-  it.skip(`should emit ${'refstudio://references/remove' as RefStudioEventName} with SOME selections`, async () => {
+  it(`should emit ${'refstudio://references/remove' as RefStudioEventName} with SOME selections`, async () => {
     const { user } = setupWithJotaiProvider(<ReferencesTableView />, store);
 
     await user.type(screen.getByText(ref1.title), ' ', { skipClick: false }); // select row
     await user.type(screen.getByText(ref2.title), ' ', { skipClick: false }); // select row
 
-    await user.click(within(screen.getByTestId('actions-menu')).getByText('Remove'));
+    await user.click(screen.getByText('Remove (2)'));
 
     expect(vi.mocked(emitEvent)).toHaveBeenCalledWith<
       [RefStudioEventName, RefStudioEventPayload<'refstudio://references/remove'>]

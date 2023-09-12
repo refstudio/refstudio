@@ -29,6 +29,7 @@ export function Button({
 }: ButtonProps) {
   return (
     <button
+      aria-disabled={disabled}
       className={cx(
         'flex items-center gap-2 rounded-default px-2 py-2',
         {
