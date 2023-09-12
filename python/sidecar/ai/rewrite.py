@@ -161,20 +161,20 @@ async def complete_text(
 
 class Rewriter:
     """
-    Rewrite or complete text using the OpenAI chat API.
+    Rewrite or complete text using the specified model.
 
     Parameters
     ----------
     prompt : str
-        The prompt to send to the OpenAI chat API.
+        The prompt to send to the LLM.
     n_choices : int
-        The number of choices to return from the OpenAI chat API.
+        The number of choices to return. Not valid for `llama2`.
     temperature : float, optional, default=0.7
-        The temperature to use when generating text from the OpenAI chat API.
+        The temperature to use when generating text. Not valid for `llama2`.
     max_tokens : int, optional, default=512
-        The maximum number of tokens to generate from the OpenAI chat API.
+        The maximum number of tokens to generate. Not valid for `llama2`.
     model : str, optional, default="gpt-3.5-turbo"
-        The name of the OpenAI model to use.
+        The name of the model to use (must be an OpenAI model or `llama2`).
     """
 
     def __init__(
