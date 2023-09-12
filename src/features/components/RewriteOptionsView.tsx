@@ -1,5 +1,3 @@
-import { useRef } from 'react';
-
 import { REWRITE_MANNER, RewriteOptions } from '../../api/rewrite.config';
 import { Button } from '../../components/Button';
 import { Dropdown } from '../../components/Dropdown';
@@ -24,8 +22,6 @@ export function RewriteOptionsView({
   onChange,
   rewriteSelection,
 }: RewriteOptionsViewProps) {
-  const tooltipContainerRef = useRef<HTMLDivElement>(null);
-
   return (
     <div className={cx('flex h-full w-full flex-col items-start p-4 pt-2', className)}>
       <div className="text-side-bar-txt flex flex-1 flex-col items-start gap-6 self-stretch overflow-scroll">
@@ -56,18 +52,10 @@ export function RewriteOptionsView({
             onChange={(manner: (typeof REWRITE_MANNER)[number]) => onChange({ ...options, manner })}
           />
         </div>
-        <div
-          className="flex cursor-default select-none flex-col items-start gap-2 self-stretch"
-          ref={tooltipContainerRef}
-        >
+        <div className="flex cursor-default select-none flex-col items-start gap-2 self-stretch">
           <div className="flex items-start gap-1 self-stretch">
             <h2>Creativity Level</h2>
-            {tooltipContainerRef.current && (
-              <CreativityInfoTooltip
-                id="rewrite-options-creativity-tooltip"
-                maxWidth={tooltipContainerRef.current.clientWidth - 8}
-              />
-            )}
+            <CreativityInfoTooltip id="rewrite-options-creativity-tooltip" />
           </div>
           <Slider
             fluid

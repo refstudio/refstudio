@@ -102,7 +102,7 @@ const citationPlugin = new Plugin<CitationPluginState>({
             const parentNode = document.createElement('span');
 
             parentNode.innerHTML = '; ';
-            parentNode.style.color = 'hsl(var(--color-muted))';
+            parentNode.style.color = 'rgb(var(--grayscale-60))';
 
             return parentNode;
           },

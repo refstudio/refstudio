@@ -16,5 +16,4 @@
 .reference-details th {
   @apply py-3;
   @apply text-left;
-  @apply bg-primary;
 }

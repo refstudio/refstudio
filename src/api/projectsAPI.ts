@@ -6,15 +6,12 @@ export interface ProjectInfo {
   name: string;
 }
 
-type ProjectsResponse = Record<string, { project_name: string }>;
-type ProjectPostResponse = ProjectsResponse;
-
 // ########################################################################################
 // PROJECT LIFE CYCLE
 // ########################################################################################
 export async function readAllProjects(): Promise<ProjectInfo[]> {
-  const projects = (await apiGetJson('/api/projects/')) as ProjectsResponse;
-  return Object.keys(projects).map((id) => ({ id, name: projects[id].project_name }));
+  const response = await apiGetJson('/api/projects/');
+  return response.projects.map((p) => ({ id: p.id, name: p.name }));
 }
 
 export async function readProjectById(projectId: string): Promise<ProjectInfo> {
@@ -35,21 +32,18 @@ export async function readProjectById(projectId: string): Promise<ProjectInfo> {
  * @returns the project info
  */
 export async function createRemoteProject(projectName: string, projectPath?: string): Promise<ProjectInfo> {
-  const payload = (await apiPost('/api/projects/', {
+  const response = await apiPost('/api/projects/', {
     project_name: projectName,
     project_path: projectPath,
-  })) as ProjectPostResponse;
+  });
 
   if (projectPath && import.meta.env.VITE_IS_WEB) {
     throw new Error('Cannot set the project path when running in the browser.');
   }
 
-  const projectId = Object.keys(payload)[0];
-  const { project_name } = payload[projectId];
-
   return {
-    id: projectId,
-    name: project_name,
+    id: response.id,
+    name: response.name,
   };
 }
 

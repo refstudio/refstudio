@@ -6,17 +6,6 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Using modern `hsl`
-        primary: {
-          DEFAULT: 'hsl(var(--color-primary) / <alpha-value>)',
-          hover: 'hsl(var(--color-primary-hover) / <alpha-value>)',
-        },
-        secondary: {
-          DEFAULT: 'hsl(var(--color-secondary) / <alpha-value>)',
-          hover: 'hsl(var(--color-secondary-hover) / <alpha-value>)',
-        },
-        muted: 'hsl(var(--color-muted) / <alpha-value>)',
-        error: 'hsl(var(--color-error) / <alpha-value>)',
         'resizer-bg': {
           hover: 'rgb(var(--grayscale-40) / <alpha-value>)',
           default: 'rgb(var(--grayscale-20) / <alpha-value>)',
@@ -60,6 +49,7 @@ export default {
           hover: 'rgb(var(--grayscale-20) / <alpha-value>)',
           default: 'rgb(var(--grayscale-00) / <alpha-value>)',
         },
+        'btn-bg-info-pop-up': 'rgb(var(--grayscale-50) / <alpha-value>)',
         'btn-ico-side-bar-tool': {
           disabled: 'rgb(var(--grayscale-20) / <alpha-value>)',
           hover: 'rgb(var(--grayscale-70) / <alpha-value>)',
@@ -102,10 +92,14 @@ export default {
           default: 'rgb(var(--grayscale-60) / <alpha-value>)',
           disabled: 'rgb(var(--grayscale-40) / <alpha-value>)',
         },
+        'btn-ico-side-bar-dots-icon': {
+          hover: 'rgb(var(--grayscale-40) / <alpha-value>)',
+        },
         'input-border': {
-          active: 'rgb(var(--primary-50) / <alpha-value>)',
+          active: 'rgb(var(--grayscale-50) / <alpha-value>)',
           disabled: 'rgb(var(--grayscale-20) / <alpha-value>)',
           default: 'rgb(var(--grayscale-20) / <alpha-value>)',
+          error: 'rgb(var(--semantic-error-50) / <alpha-value>)',
         },
         'input-bg': {
           disabled: 'rgb(var(--grayscale-20) / <alpha-value>)',
@@ -138,7 +132,10 @@ export default {
           primary: 'rgb(var(--grayscale-00) / <alpha-value>)',
           secondary: 'rgb(var(--grayscale-20) / <alpha-value>)',
         },
-        'side-bar-ico-empty': 'rgb(var(--grayscale-40) / <alpha-value>)',
+        'side-bar-ico': {
+          empty: 'rgb(var(--grayscale-40) / <alpha-value>)',
+          default: 'rgb(var(--grayscale-70) / <alpha-value>)',
+        },
         'card-txt-header': 'rgb(var(--grayscale-00) / <alpha-value>)',
         'card-border-header': 'rgb(var(--primary-90) / <alpha-value>)',
         'card-border': {
@@ -194,6 +191,13 @@ export default {
         'editor-selection': 'rgb(196 220 246 / <alpha-value>)',
         'radio-active': 'rgb(--primary-50 / <alpha-value>)',
         'empty-state-ico-empty': 'rgb(var(--grayscale-40) / <alpha-value>)',
+        'pop-up-message': {
+          txt: 'rgb(var(--grayscale-00) / <alpha-value>)',
+          bg: 'rgb(var(--grayscale-80) / <alpha-value>)',
+        },
+      },
+      backgroundOpacity: {
+        overlay: '0.32',
       },
       boxShadow: {
         default: '0px 0px 24px 0px rgba(0, 0, 0, 0.04)',
@@ -204,18 +208,20 @@ export default {
       },
       transitionProperty: {
         position: 'top, left, bottom, right',
+        tooltip: 'opacity, visibility',
       },
       fontFamily: {
         default: ['"Roboto", sans-serif'],
       },
       zIndex: {
-        modals: 99999,
-        notifications: 88888,
-        'drop-zone': 55555,
-        'resize-handle': 44444,
-        dropdown: 33333,
-        sidebar: 11,
-        'sidebar-panel': 10,
+        modals: 999999,
+        notifications: 888888,
+        'drop-zone': 555555,
+        tooltip: 444444,
+        'resize-handle': 333333,
+        dropdown: 222222,
+        'sidebar-panel': 151515,
+        sidebar: 111111,
       },
     },
   },
@@ -231,7 +237,6 @@ export default {
 function autocompleteCustomComponentsPlugin() {
   return plugin(function ({ addComponents }) {
     addComponents({
-      '.btn-primary': {},
       '.debug-widget': {},
     });
   });

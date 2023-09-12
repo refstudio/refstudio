@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
+import { Tooltip } from 'react-tooltip';
 
 import { FlatSettingsSchema, RewriteMannerType } from '../../../api/api-types';
 import { REWRITE_MANNER } from '../../../api/rewrite.config';
@@ -53,8 +54,6 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
 
   const isDirty = JSON.stringify(paneSettings) !== JSON.stringify(getOpenAISettingsCached());
 
-  const tooltipContainerRef = useRef<HTMLDivElement>(null);
-
   return (
     <SettingsPane config={config} header={config.title} isDirty={isDirty} onSave={handleSaveSettings}>
       <div className="flex flex-col items-start gap-2">
@@ -68,7 +67,7 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
       </div>
       <div className="flex flex-col items-start gap-2">
         <div className="flex flex-row gap-1">
-          <h2 className="t text-modal-txt-primary">Chat Model</h2>
+          <h2 className="text-modal-txt-primary">Chat Model</h2>
           <ChatModelTooltip />
         </div>
         <Input
@@ -78,7 +77,7 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
         />
       </div>
       <div className="flex flex-col items-start gap-2">
-        <h2 className="t text-modal-txt-primary">Speech Type</h2>
+        <h2 className="text-modal-txt-primary">Speech Type</h2>
         <Dropdown
           aria-label="manner"
           data-testid={REWRITE_MANNER_TEST_ID}
@@ -90,10 +89,10 @@ export function OpenAiSettingsPane({ config }: SettingsPaneProps) {
           onChange={(manner: RewriteMannerType) => setPaneSettings({ ...paneSettings, manner })}
         />
       </div>
-      <div className="flex flex-col items-start gap-2" ref={tooltipContainerRef}>
+      <div className="flex flex-col items-start gap-2">
         <div className="flex items-start gap-1 self-stretch">
           <h2>Creativity Level</h2>
-          <CreativityInfoTooltip id="settings-creativity-tooltip" maxWidth={tooltipContainerRef.current?.clientWidth} />
+          <CreativityInfoTooltip id="settings-creativity-tooltip" />
         </div>
         <Slider
           data-testid={REWRITE_TEMPERATURE_TEST_ID}
@@ -121,7 +120,7 @@ function ChatModelTooltip() {
       <div id="chat-tooltip">
         <InfoIcon />
       </div>
-      {/* TODO: <Tooltip anchorSelect="#chat-tooltip" /> */}
+      <Tooltip anchorSelect="#chat-tooltip">Chat Model</Tooltip>
     </div>
   );
 }

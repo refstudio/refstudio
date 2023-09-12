@@ -61,7 +61,7 @@ interface TabItemProps {
     menuId: string;
     ctxProps: unknown;
   };
-  text: React.ReactNode;
+  text: string;
   className?: string;
   isDirty?: boolean;
   Icon?: React.ReactElement;
@@ -107,6 +107,7 @@ export function TabItem({ active, isDirty, className, contextMenu, Icon, text, o
           'text-btn-txt-top-bar-active': active,
           'text-btn-txt-top-bar-inactive': !active,
         })}
+        title={text}
       >
         {text}
       </span>
