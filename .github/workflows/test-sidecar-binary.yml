@@ -7,6 +7,7 @@ on:
   pull_request:
     paths:
       - 'python/**'
+      - 'package.json'
 
 jobs:
   test-binary:
