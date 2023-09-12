@@ -1,4 +1,3 @@
-import asyncio
 import os
 import re
 
@@ -115,7 +114,7 @@ async def rewrite(arg: RewriteRequest, user_settings: FlatSettingsSchema = None)
     return response
 
 
-def complete_text(
+async def complete_text(
     request: TextCompletionRequest, user_settings: FlatSettingsSchema = None
 ):
     if user_settings is not None:
@@ -138,7 +137,7 @@ def complete_text(
     )
 
     try:
-        choices = chat.get_response(response_type=TextCompletionChoice)
+        choices = await chat.get_response(response_type=TextCompletionChoice)
     except Exception as e:
         logger.error(e)
         response = TextCompletionResponse(
@@ -213,20 +212,32 @@ class Rewriter:
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(1))
     async def call_model(self, messages: list):
         logger.info(
-            f"Calling {self.model} chat API with the following input message(s): {messages}"
+            f"Calling {self.model} rewrite API with input message(s): {messages}"
         )
-        response = await litellm.acompletion(
-            model=self.model,
-            messages=messages,
-            n=self.n_choices,  # number of completions to generate
-            temperature=self.temperature,
+        params = {
+            "model": self.model,
+            "messages": messages,
+            "n": self.n_choices,  # number of completions to generate
+            "temperature": self.temperature,
             # maximum number of tokens to generate (1 word ~= 1.33 tokens)
-            max_tokens=self.max_tokens,
-            api_base="http://localhost:11434" if self.model == "llama2" else None,
-            custom_llm_provider="ollama" if self.model == "llama2" else None,
-        )
+            "max_tokens": self.max_tokens,
+        }
 
         if self.model == "llama2":
+            # NOTE: Ollama does not support the following parameters:
+            # - n
+            # - max_tokens
+            params["api_base"] = "http://localhost:11434"
+            params["custom_llm_provider"] = "ollama"
+            # LiteLLM does not support temperature for Ollama
+            # but according to the Ollama docs, it should be supported
+            # so I'm leaving this here just in case we decide to write our own wrapper
+            params["options"] = {"temperature": self.temperature}
+
+        response = await litellm.acompletion(**params)
+
+        if self.model == "llama2":
+            # Will only be a single choice response from Ollama
             response = await self.unwrap_response(response)
 
         logger.info(f"Received response from {self.model} chat API: {response}")

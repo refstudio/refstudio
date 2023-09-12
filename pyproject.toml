@@ -33,6 +33,8 @@ pyinstaller = "^5.11.0"
 ipdb = "^0.13.13"
 black = "^23.7.0"
 isort = "^5.12.0"
+pytest-asyncio = "^0.21.1"
+pytest-mock = "^3.11.1"
 
 [build-system]
 requires = ["poetry-core"]
@@ -48,7 +50,6 @@ include_trailing_comma = true
 force_grid_wrap = 0
 line_length = 88
 profile = "black"
-
 
 [tool.coverage.run]
 source = ["python"]

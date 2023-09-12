@@ -12,8 +12,8 @@ from ..helpers import _copy_fixture_to_temp_dir
 client = TestClient(api)
 
 
-def test_ai_rewrite_is_ok(monkeypatch, mock_call_model_is_ok):
-    monkeypatch.setattr(Rewriter, "call_model", mock_call_model_is_ok)
+def test_ai_rewrite_is_ok(monkeypatch, amock_call_model_is_ok):
+    monkeypatch.setattr(Rewriter, "call_model", amock_call_model_is_ok)
 
     params = {"user_id": "user1"}
     request = {"text": "This is a test"}
@@ -51,8 +51,8 @@ def test_ai_rewrite_missing_required_request_params(monkeypatch, mock_call_model
     }
 
 
-def test_ai_completion_is_ok(monkeypatch, mock_call_model_is_ok):
-    monkeypatch.setattr(Rewriter, "call_model", mock_call_model_is_ok)
+def test_ai_completion_is_ok(monkeypatch, amock_call_model_is_ok):
+    monkeypatch.setattr(Rewriter, "call_model", amock_call_model_is_ok)
 
     params = {"user_id": "user1"}
     request = {"text": "This is a test"}

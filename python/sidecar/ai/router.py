@@ -1,4 +1,3 @@
-import litellm
 from fastapi import APIRouter
 from sidecar.ai.chat import ask_question
 from sidecar.ai.rewrite import complete_text, rewrite
@@ -32,7 +31,7 @@ async def http_ai_completion(
 ) -> TextCompletionResponse:
     user_id = "user1"
     user_settings = get_settings_for_user(user_id)
-    response = complete_text(req, user_settings=user_settings)
+    response = await complete_text(req, user_settings=user_settings)
     return response
 
 
