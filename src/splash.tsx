@@ -14,6 +14,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   </React.StrictMode>,
 );
 
+// Listen for server logs sent by server.ts during initialization
 void listen('server-logs', (event) => {
   console.log('SERVER LOGS: ', event.payload);
 });

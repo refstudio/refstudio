@@ -31,25 +31,25 @@ async function startServer(servingCallback: () => void) {
   console.log('Starting RefStudio server');
   const command = new TauriCommand('call-sidecar', ['serve']);
   command.stderr.addListener('data', (line) => {
+    emitServerLogs('stderr', line);
     console.log('server stderr', line);
-    void emit('server-logs', line);
     if (line.includes('running on http')) {
       console.log('matched the magic words');
       servingCallback();
     }
   });
   command.stdout.addListener('data', (line) => {
-    void emit('server-logs', line);
+    emitServerLogs('stdout', line);
     console.log('server stdout', line);
   });
   command.addListener('close', (data: Pick<ChildProcess, 'code' | 'signal'>) => {
-    void emit('server-logs', 'server closed, restarting');
+    emitServerLogs('close', 'server closed, restarting');
     console.warn('server closed, restarting', data.code, data.signal);
     serverProcess = null;
     void getOrStartServer(noop);
   });
   command.addListener('error', (data) => {
-    void emit('server-logs', 'server crashed, restarting');
+    emitServerLogs('error', 'server crashed, restarting');
     console.error('server crashed, restarting', data);
     serverProcess = null;
     void getOrStartServer(noop);
@@ -136,11 +136,24 @@ export function useRefStudioServerOnDesktop() {
         setIsServerRunning(true);
       });
     })().catch((e) => {
-      // void showMessage(String(e), { title: 'ERROR', type: 'error' });
-      void emit('server-logs', 'STARTUP ERROR: ' + String(e));
+      emitServerLogs('STARTUP ERROR', e);
       console.error(e);
     });
   }, [isServerRunning]);
 
   return isServerRunning;
+}
+
+/**
+ * Emit server logs.
+ * This is usefull to display content in the splashscreen
+ *
+ * @param tag text before message
+ * @param message message to log
+ */
+function emitServerLogs(tag: string, message: unknown) {
+  if (import.meta.env.VITE_IS_WEB) {
+    return;
+  }
+  void emit('server-logs', `${tag.toUpperCase()}: ${String(message)}`);
 }
