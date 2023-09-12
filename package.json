@@ -23,7 +23,7 @@
     "lint:fix": "eslint --fix --ext .js,.ts,.tsx ./src",
     "ts:check": "tsc --noEmit",
     "preview": "vite preview",
-    "python": "bash scripts/remove_binary.sh && poetry run pyinstaller --noconfirm --hidden-import=tiktoken_ext.openai_public --hidden-import=tiktoken_ext --distpath src-tauri/bin/python python/main.py && bash scripts/move_binary.sh",
+    "python": "bash scripts/remove_binary.sh && poetry run pyinstaller --noconfirm --hidden-import=tiktoken_ext.openai_public --hidden-import=tiktoken_ext --distpath src-tauri/bin/python python/main.py",
     "python:test": "poetry run pytest python/tests",
     "test": "vitest run",
     "test:watch": "vitest --watch",

@@ -1,0 +1,29 @@
+name: Build and test sidecar binary
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  test-binary:
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - name: macOS
+            runner: macos-latest
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-python
+      - uses: ./.github/actions/setup-node
+      - name: Create binary
+        run: |
+          yarn python
+      - name: Start server and verify
+        run: |
+          ./src-tauri/bin/python/main/main serve &
+          sleep 30
+          curl -s http://0.0.0.0:1487/api/meta/status
