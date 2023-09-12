@@ -3,6 +3,7 @@ import { JSONContent } from '@tiptap/core';
 import { FileEntry as ApiFileEntry, FolderEntry as ApiFolderEntry } from '../api/api-types';
 import {
   deleteProjectFile,
+  readProjectBinaryFile,
   readProjectFiles,
   readProjectTextFile,
   renameProjectFile,
@@ -177,7 +178,8 @@ export async function readFileContent(file: FileFileEntry): Promise<EditorConten
       return { type: 'json', textContent };
     }
     case 'pdf': {
-      return { type: 'pdf', projectId: currentProjectId, filePath: file.path };
+      const binaryContent = await readProjectBinaryFile(currentProjectId, file.path);
+      return { type: 'pdf', binaryContent };
     }
     case 'refstudio':
     case '': {
