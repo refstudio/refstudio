@@ -1,19 +1,27 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { useDebouncedCallback } from '../hooks/useDebouncedCallback';
 import { cx } from '../lib/cx';
 import { SearchIcon } from './icons';
 
 interface SearchBarProps {
+  autoFocus?: boolean;
   initialValue?: string;
   fluid?: boolean;
   placeholder: string;
   onChange: (value: string) => void;
 }
-export function SearchBar({ initialValue, fluid, placeholder, onChange }: SearchBarProps) {
+export function SearchBar({ autoFocus, initialValue, fluid, placeholder, onChange }: SearchBarProps) {
   const [value, setValue] = useState(initialValue);
+
   const debouncedOnChange = useDebouncedCallback(onChange, 200);
   const inputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (autoFocus) {
+      inputRef.current?.focus();
+    }
+  }, [autoFocus, inputRef]);
 
   return (
     <div

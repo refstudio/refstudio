@@ -138,6 +138,7 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
       <div className="flex items-center justify-center gap-4">
         <div className="flex-1">
           <SearchBar
+            autoFocus
             fluid
             initialValue={quickFilter}
             placeholder="Filter author/title..."
