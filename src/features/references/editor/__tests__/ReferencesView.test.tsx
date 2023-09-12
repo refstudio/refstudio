@@ -8,8 +8,8 @@ import { act, screen, setupWithJotaiProvider, waitFor } from '../../../../test/t
 import { REFERENCES } from '../../__tests__/test-fixtures';
 import { ReferenceView } from '../ReferenceView';
 
-vi.mock('../../../../api/referencesAPI', async () => {
-  const actual: object = await vi.importActual('../../../../api/referencesAPI');
+vi.mock('../../../../api/referencesAPI', async (importOriginal) => {
+  const actual: object = await importOriginal();
   return {
     ...actual,
     updateProjectReference: () => null,
@@ -51,7 +51,7 @@ describe('ReferencesView component', () => {
     const { user } = setupWithJotaiProvider(<ReferenceView referenceId={refId} />, store);
 
     await user.click(screen.getByTitle('Edit Reference'));
-    const doiInput = await screen.findByRole('textbox', { name: 'doi' });
+    const doiInput = await screen.findByLabelText('DOI', { selector: 'input' });
 
     await waitFor(() => {
       expect(doiInput).toBeInTheDocument();
@@ -71,7 +71,7 @@ describe('ReferencesView component', () => {
     const editButton = screen.getByTitle('Edit Reference');
 
     await user.click(editButton);
-    const doiInput = await screen.findByRole('textbox', { name: 'doi' });
+    const doiInput = await screen.findByLabelText('DOI', { selector: 'input' });
     await user.type(doiInput, '2222');
     await user.tab();
 

@@ -5,8 +5,8 @@ import { REFERENCES } from '../../features/references/__tests__/test-fixtures';
 import { ReferenceItem } from '../../types/ReferenceItem';
 import { getDerivedReferenceAtom, setReferencesAtom, updateReferenceAtom } from '../referencesState';
 
-vi.mock('../../api/referencesAPI', async () => {
-  const actual: object = await vi.importActual('../../api/referencesAPI');
+vi.mock('../../api/referencesAPI', async (importOriginal) => {
+  const actual: object = await importOriginal();
   return {
     ...actual,
     updateProjectReference: () => null,

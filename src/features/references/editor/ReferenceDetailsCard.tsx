@@ -5,12 +5,12 @@ import { cx } from '../../../lib/cx';
 import { Author, ReferenceItem } from '../../../types/ReferenceItem';
 import { authorsFormatter } from './grid/formatters';
 
-const getContentString = (id: string, content?: string | Author[]): string => {
+const getContentString = (fieldName: string, content?: string | Author[]): string => {
   if (typeof content == 'undefined') {
     return '';
-  } else if (typeof content != 'string' && id === 'authors') {
+  } else if (typeof content != 'string' && fieldName === 'authors') {
     return authorsFormatter({ value: content });
-  } else if (id === 'citationKey') {
+  } else if (fieldName === 'citationKey') {
     return '[' + content.toString() + ']';
   } else {
     return content.toString();
@@ -19,24 +19,26 @@ const getContentString = (id: string, content?: string | Author[]): string => {
 
 const DataTextInput = ({
   content,
-  id,
-  onChangeHandler,
+  fieldName,
+  refId,
+  onBlur,
 }: {
   content: string;
-  id: string;
-  onChangeHandler: CallableFunction;
+  fieldName: string;
+  refId: string;
+  onBlur: (fieldName: string, value: string) => void;
 }) => {
   const [value, setValue] = useState(content);
 
   return (
     <input
       className="w-full border bg-slate-50 px-2 py-0.5"
-      name={id}
-      title={id} // required for unit testing to find this element
+      id={refId + '_' + fieldName}
+      name={fieldName}
       type="text"
       value={value}
       onBlur={(evt) => {
-        onChangeHandler(id, evt.target.value);
+        onBlur(fieldName, evt.target.value);
       }}
       onChange={(evt) => {
         setValue(evt.target.value);
@@ -47,127 +49,70 @@ const DataTextInput = ({
 
 const TableDataCell = ({
   contentData,
-  id,
-  onChangeHandler,
+  fieldName,
+  refId,
+  onBlur,
   editable,
   editing,
 }: {
   contentData: string | Author[];
-  id: string;
-  onChangeHandler: CallableFunction;
+  fieldName: string;
+  refId: string;
+  onBlur: (fieldName: string, value: string) => void;
   editable: boolean;
   editing: boolean;
-}) => {
-  if (!editing || !editable || typeof contentData != 'string') {
-    return <UnEditableTableDataCell contentData={contentData} id={id} />;
-  } else {
-    return <EditableTableDataCell contentData={contentData} id={id} onChangeHandler={onChangeHandler} />;
-  }
-};
-
-const EditableTableDataCell = ({
-  contentData,
-  id,
-  onChangeHandler,
-}: {
-  contentData: string;
-  id: string;
-  onChangeHandler: CallableFunction;
 }) => (
   <td className="w-auto p-5">
-    <DataTextInput content={contentData} id={id} onChangeHandler={onChangeHandler} />
+    {editing && editable && typeof contentData === 'string' ? (
+      <DataTextInput content={contentData} fieldName={fieldName} refId={refId} onBlur={onBlur} />
+    ) : (
+      <span className="leading-[30px]">{getContentString(fieldName, contentData)}</span>
+    )}
   </td>
 );
-
-const UnEditableTableDataCell = ({ contentData, id }: { contentData: string | Author[]; id: string }) => {
-  const contentString = getContentString(id, contentData);
-
-  return (
-    <td className="w-auto p-5">
-      <span className="leading-[30px]">{contentString}</span>
-    </td>
-  );
-};
 
 const TableHeadCell = ({
   content,
   colSpan,
   header,
-  id,
+  fieldName,
+  refId,
   editing,
   setEditing,
 }: {
   content: string;
   colSpan?: number;
   header?: boolean;
-  id: string;
-  editing?: boolean;
-  setEditing?: CallableFunction;
-}) => {
-  const colSpanString = { ['colSpan']: colSpan };
-
-  return (
-    <th
-      className={cx(
-        { 'rounded-t bg-card-bg-header p-3 text-white': header },
-        { 'w-1/6 p-6': !header },
-        'text-sm uppercase',
-      )}
-      key={content}
-      {...colSpanString}
-    >
-      <label htmlFor={id}>{content}</label>
-      {IconButtons(header, editing, setEditing)}
-    </th>
-  );
-};
-
-const IconButtons = (header?: boolean, editing?: boolean, setEditing?: CallableFunction): ReactElement[] => {
-  if (!header || editing === undefined || setEditing === undefined) {
-    return [];
-  } else {
-    return [
-      IconButton({ hiddenWhenEditing: true, icon: EditIcon(), title: 'Edit Reference', editing, setEditing }),
-      IconButton({
-        hiddenWhenEditing: false,
-        icon: CloseIcon(),
-        title: 'Finished Editing Reference',
-        editing,
-        setEditing,
-      }),
-    ];
-  }
-};
-
-const IconButton = ({
-  hiddenWhenEditing,
-  title,
-  icon,
-  editing,
-  setEditing,
-}: {
-  hiddenWhenEditing: boolean;
-  title: string;
-  icon: ReactElement;
+  fieldName: string;
+  refId: string;
   editing: boolean;
-  setEditing: CallableFunction;
-}) => {
-  const hiddenClass = hiddenWhenEditing ? { hidden: editing } : { hidden: !editing };
+  setEditing?: (value: boolean) => void;
+}) => (
+  <th
+    className={cx(
+      { 'rounded-t bg-card-bg-header p-3 text-white': header },
+      { 'w-1/6 p-6': !header },
+      'text-sm uppercase',
+    )}
+    colSpan={colSpan}
+    key={content}
+  >
+    <label htmlFor={refId + '_' + fieldName}>{content}</label>
+    {header &&
+      setEditing &&
+      (editing ? (
+        <IconButton icon={<CloseIcon />} title="Finished Editing Reference" onClick={() => setEditing(false)} />
+      ) : (
+        <IconButton icon={<EditIcon />} title="Edit Reference" onClick={() => setEditing(true)} />
+      ))}
+  </th>
+);
 
-  return (
-    <button
-      className={cx(hiddenClass, 'float-right hover:text-cyan-100')}
-      key={title}
-      name={title}
-      title={title}
-      onClick={() => {
-        setEditing(!editing);
-      }}
-    >
-      {icon}
-    </button>
-  );
-};
+const IconButton = ({ title, icon, onClick }: { title: string; icon: ReactElement; onClick: () => void }) => (
+  <button className="float-right hover:text-cyan-100" key={title} name={title} title={title} onClick={onClick}>
+    {icon}
+  </button>
+);
 
 export default function ReferenceDetailsCard({
   reference,
@@ -238,8 +183,9 @@ export default function ReferenceDetailsCard({
             colSpan={2}
             content="References"
             editing={editing}
+            fieldName="table-head"
             header={true}
-            id="table-head"
+            refId={reference.id}
             setEditing={setEditing}
           />
         </tr>
@@ -250,13 +196,14 @@ export default function ReferenceDetailsCard({
 
           return (
             <tr key={key}>
-              <TableHeadCell content={rowData.title} id={key} />
+              <TableHeadCell content={rowData.title} editing={editing} fieldName={key} refId={reference.id} />
               <TableDataCell
                 contentData={contentData ?? ''}
                 editable={rowData.editable}
                 editing={editing}
-                id={key}
-                onChangeHandler={recordChangesAndHandleReferenceChange}
+                fieldName={key}
+                refId={reference.id}
+                onBlur={recordChangesAndHandleReferenceChange}
               />
             </tr>
           );
