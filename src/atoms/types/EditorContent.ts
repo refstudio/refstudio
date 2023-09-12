@@ -9,7 +9,8 @@ export interface RefStudioEditorContent {
 
 export interface PdfEditorContent {
   type: 'pdf';
-  binaryContent: Uint8Array;
+  projectId: string;
+  filePath: string;
 }
 
 export interface RawTextEditorContent {
