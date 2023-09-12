@@ -67,6 +67,9 @@ jobs:
       - name: Setup Rust
         uses: ./.github/actions/setup-rust
 
+      - name: Install target support for rust
+        run: rustup target add ${{ matrix.target }}
+
       - name: Install dependencies (ubuntu only)
         if: matrix.runner == 'ubuntu-latest'
         run: |
