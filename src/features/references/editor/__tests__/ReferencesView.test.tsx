@@ -1,6 +1,6 @@
 import { createStore } from 'jotai';
 
-import * as referencesAPI from '../../../../api/referencesAPI';
+import { updateProjectReference } from '../../../../api/referencesAPI';
 import { runSetAtomHook } from '../../../../atoms/__tests__/test-utils';
 import { setReferencesAtom } from '../../../../atoms/referencesState';
 import { buildEditorId } from '../../../../atoms/types/EditorData';
@@ -12,7 +12,7 @@ vi.mock('../../../../api/referencesAPI', async (importOriginal) => {
   const actual: object = await importOriginal();
   return {
     ...actual,
-    updateProjectReference: () => null,
+    updateProjectReference: vi.fn(),
   };
 });
 
@@ -58,8 +58,6 @@ describe('ReferencesView component', () => {
     });
   });
 
-  const updateProjectReferenceSpy = vi.spyOn(referencesAPI, 'updateProjectReference');
-
   it('should call update API on blur', async () => {
     const store = createStore();
     store.set(setReferencesAtom, REFERENCES);
@@ -76,7 +74,7 @@ describe('ReferencesView component', () => {
     await user.tab();
 
     await waitFor(() => {
-      expect(updateProjectReferenceSpy).toHaveBeenCalledTimes(1);
+      expect(updateProjectReference).toHaveBeenCalledTimes(1);
     });
   });
 });

@@ -1,6 +1,6 @@
 import { createStore } from 'jotai';
 
-import * as referencesAPI from '../../api/referencesAPI';
+import { updateProjectReference } from '../../api/referencesAPI';
 import { REFERENCES } from '../../features/references/__tests__/test-fixtures';
 import { ReferenceItem } from '../../types/ReferenceItem';
 import { getDerivedReferenceAtom, setReferencesAtom, updateReferenceAtom } from '../referencesState';
@@ -9,11 +9,9 @@ vi.mock('../../api/referencesAPI', async (importOriginal) => {
   const actual: object = await importOriginal();
   return {
     ...actual,
-    updateProjectReference: () => null,
+    updateProjectReference: vi.fn(),
   };
 });
-
-const updateProjectReferenceSpy = vi.spyOn(referencesAPI, 'updateProjectReference');
 
 const PROJECT_ID = 'cafe-babe-1234-5678-1234-5678-1234-5678';
 
@@ -34,8 +32,8 @@ describe('referencesState.update', () => {
     const newTitle = 'Updated title';
     await store.set(updateReferenceAtom, PROJECT_ID, ref1.id, { ...ref1, title: newTitle });
 
-    expect(updateProjectReferenceSpy).toHaveBeenCalledTimes(1);
-    expect(updateProjectReferenceSpy).toHaveBeenCalledWith(PROJECT_ID, ref1.id, { title: newTitle });
+    expect(updateProjectReference).toHaveBeenCalledTimes(1);
+    expect(updateProjectReference).toHaveBeenCalledWith(PROJECT_ID, ref1.id, { title: newTitle });
   });
 
   it('should save updated fields back to store reference', async () => {
@@ -50,17 +48,17 @@ describe('referencesState.update', () => {
 
   it('should not update references not found in the store', async () => {
     await store.set(updateReferenceAtom, PROJECT_ID, 'UNKNOWN ID', { ...ref1, title: 'some' });
-    expect(updateProjectReferenceSpy).not.toHaveBeenCalled();
+    expect(updateProjectReference).not.toHaveBeenCalled();
   });
 
   it('should not send fields that are updated to same value', async () => {
     await store.set(updateReferenceAtom, PROJECT_ID, ref1.id, { ...ref1, title: String(ref1.title) });
-    expect(updateProjectReferenceSpy).toHaveBeenCalledTimes(0);
+    expect(updateProjectReference).toHaveBeenCalledTimes(0);
   });
 
   it('should not patch fields not tracked by updateReference', async () => {
     await store.set(updateReferenceAtom, PROJECT_ID, ref1.id, { ...ref1, abstract: 'new abstract' });
-    expect(updateProjectReferenceSpy).toHaveBeenCalledTimes(0);
+    expect(updateProjectReference).toHaveBeenCalledTimes(0);
 
     const updated = store.get(getDerivedReferenceAtom(ref1.id));
     expect(updated?.abstract).not.toBe('new abstract');
@@ -75,24 +73,20 @@ describe('referencesState.update', () => {
       doi: '3456',
       authors: [{ fullName: 'Author Name', lastName: 'Name' }, ...ref1.authors],
     });
-    expect(updateProjectReferenceSpy).toHaveBeenCalledTimes(1);
-    expect(updateProjectReferenceSpy).toHaveBeenCalledWith<[string, string, Partial<ReferenceItem>]>(
-      PROJECT_ID,
-      ref1.id,
-      {
-        authors: [
-          {
-            fullName: 'Author Name',
-            lastName: 'Name',
-          },
-          ...ref1.authors,
-        ],
-        citationKey: ref1.citationKey + 'z',
-        publishedDate: '2023-07-11',
-        doi: '3456',
-        title: ref1.title + ' updated',
-      },
-    );
+    expect(updateProjectReference).toHaveBeenCalledTimes(1);
+    expect(updateProjectReference).toHaveBeenCalledWith<[string, string, Partial<ReferenceItem>]>(PROJECT_ID, ref1.id, {
+      authors: [
+        {
+          fullName: 'Author Name',
+          lastName: 'Name',
+        },
+        ...ref1.authors,
+      ],
+      citationKey: ref1.citationKey + 'z',
+      publishedDate: '2023-07-11',
+      doi: '3456',
+      title: ref1.title + ' updated',
+    });
 
     const updated = store.get(getDerivedReferenceAtom(ref1.id));
     expect(updated?.abstract).not.toBe('new abstract');
