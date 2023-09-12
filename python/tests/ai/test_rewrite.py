@@ -1,4 +1,3 @@
-import litellm
 import pytest
 from sidecar.ai import rewrite
 from sidecar.ai.schemas import (
@@ -10,7 +9,7 @@ from sidecar.settings.service import default_settings
 
 
 @pytest.mark.asyncio
-async def test_rewrite_is_ok_for_openai(monkeypatch, amock_call_model_is_ok):
+async def test_rewrite_is_ok(monkeypatch, amock_call_model_is_ok):
     monkeypatch.setattr(rewrite.Rewriter, "call_model", amock_call_model_is_ok)
 
     user_settings = default_settings()
@@ -20,28 +19,6 @@ async def test_rewrite_is_ok_for_openai(monkeypatch, amock_call_model_is_ok):
     response = await rewrite.rewrite(
         RewriteRequest(text="This is a test"), user_settings=user_settings
     )
-    output = response.dict()
-
-    assert output["status"] == "ok"
-    assert output["message"] == ""
-    assert len(output["choices"]) == 1
-    assert output["choices"][0]["index"] == 0
-    assert output["choices"][0]["text"] == "This is a mocked response"
-
-
-@pytest.mark.asyncio
-async def test_rewrite_is_ok_for_ollama(monkeypatch, amock_call_model_is_ok, mocker):
-    monkeypatch.setattr(rewrite.Rewriter, "call_model", amock_call_model_is_ok)
-
-    user_settings = default_settings()
-    user_settings.openai_api_key = "mocked-api-key"
-    user_settings.openai_chat_model = "llama2"
-
-    response = await rewrite.rewrite(
-        RewriteRequest(text="This is a test"), user_settings=user_settings
-    )
-    # TODO: assert that this calls Ollama instead of OpenAI
-
     output = response.dict()
 
     assert output["status"] == "ok"
