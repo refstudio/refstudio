@@ -5,6 +5,8 @@ on:
     branches:
       - main
   pull_request:
+    paths:
+      - 'python/**'
 
 jobs:
   test-binary:
