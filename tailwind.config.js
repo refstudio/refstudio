@@ -40,6 +40,9 @@ export default {
         'card-ico': {
           primary: 'rgb(var(--card-ico-primary) / <alpha-value>)',
         },
+        'card-ico-header': {
+          active: 'rgb(var(--card-ico-header-active) / <alpha-value>)',
+        },
         'input-txt': {
           disabled: 'rgb(var(--input-txt-disabled) / <alpha-value>)',
           secondary: 'rgb(var(--input-txt-secondary) / <alpha-value>)',
@@ -50,6 +53,9 @@ export default {
           default: 'rgb(var(--btn-bg-side-bar-icon-default) / <alpha-value>)',
         },
         'btn-bg-info-pop-up': 'rgb(var(--btn-bg-info-pop-up) / <alpha-value>)',
+        'btn-bg-radio': {
+          active: 'rgb(var(--btn-bg-radio-active) / <alpha-value>)',
+        },
         'btn-ico-side-bar-tool': {
           disabled: 'rgb(var(--btn-ico-side-bar-tool-disabled) / <alpha-value>)',
           hover: 'rgb(var(--btn-ico-side-bar-tool-hover) / <alpha-value>)',
@@ -194,6 +200,7 @@ export default {
         'welcome-border': 'rgb(var(--welcome-border) / <alpha-value>)',
         'editor-selection': 'rgb(var(--editor-selection) / <alpha-value>)',
         'radio-active': 'rgb(var(--radio-active) / <alpha-value>)',
+        'radio-border-inactive': 'rgb(var(--radio-border-inactive) / <alpha-value>)',
         'empty-state-ico-empty': 'rgb(var(--empty-state-ico-empty) / <alpha-value>)',
         'pop-up-message': {
           txt: 'rgb(var(--pop-up-message-txt) / <alpha-value>)',
