@@ -3,7 +3,10 @@ name: Build
 
 on:
   workflow_dispatch:
-  # pull_request:
+  push:
+    branches:
+      - 334-error-bad-cpu-type-in-executable-os-error-86-when-trying-to-use-ai-selection-feature
+    # pull_request:
   # push:
     # tags:
     #  - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
