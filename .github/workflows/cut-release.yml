@@ -28,13 +28,13 @@ jobs:
           script: |
             // API: https://github.com/octokit/plugin-rest-endpoint-methods.js/tree/main/docs/repos
 
-            const { data } = await github.rest.repos.findReleaseByTag({
+            const existingRelease = await github.rest.repos.getReleaseByTag({
               owner: context.repo.owner,
               repo: context.repo.repo,
               tag: `${process.env.PACKAGE_VERSION}`
             })
-            if (data) {
-              return data.id
+            if (existingRelease && existingRelease) {
+              return existingRelease.data.id
             }
 
             const { data } = await github.rest.repos.createRelease({
@@ -99,7 +99,7 @@ jobs:
           ./src-tauri/bin/python/main/main serve &
           sleep 30
           curl -s http://0.0.0.0:1487/api/meta/status
-      
+
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
