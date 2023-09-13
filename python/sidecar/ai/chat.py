@@ -14,6 +14,41 @@ from sidecar.typing import ResponseStatus
 from tenacity import retry, stop_after_attempt, wait_fixed
 
 
+def yield_response(
+    request: ChatRequest,
+    project_id: str = None,
+    user_settings: FlatSettingsSchema = None,
+):
+    input_text = request.text
+    temperature = request.temperature
+    stream = request.stream
+
+    if user_settings is not None:
+        openai.api_key = user_settings.openai_api_key
+        model = user_settings.openai_chat_model
+    else:
+        openai.api_key = os.environ.get("OPENAI_API_KEY")
+        model = "gpt-3.5-turbo"
+
+    logger.info(f"Calling chat with the following parameters: {request.dict()}")
+
+    if project_id:
+        project_path = get_project_path(user_id="user1", project_id=project_id)
+        filepath = project_path / ".storage" / "references.json"
+        storage = JsonStorage(filepath=filepath)
+    else:
+        storage = JsonStorage(filepath=config.REFERENCES_JSON_PATH)
+
+    logger.info(f"Loading documents from storage: {storage.filepath}")
+    storage.load()
+    logger.info(f"Loaded {len(storage.chunks)} documents from storage")
+
+    ranker = BM25Ranker(storage=storage)
+    chat = Chat(input_text=input_text, storage=storage, ranker=ranker, model=model)
+
+    return chat.yield_response(temperature=temperature, stream=stream)
+
+
 def ask_question(
     request: ChatRequest,
     project_id: str = None,
@@ -22,6 +57,7 @@ def ask_question(
     input_text = request.text
     n_choices = request.n_choices
     temperature = request.temperature
+    stream = request.stream
 
     if user_settings is None:
         # this is for local dev environment
@@ -50,7 +86,9 @@ def ask_question(
     chat = Chat(input_text=input_text, storage=storage, ranker=ranker, model=model)
 
     try:
-        choices = chat.ask_question(n_choices=n_choices, temperature=temperature)
+        choices = chat.ask_question(
+            n_choices=n_choices, temperature=temperature, stream=stream
+        )
     except Exception as e:
         logger.error(e)
         response = ChatResponse(
@@ -87,7 +125,13 @@ class Chat:
         return docs
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(1), reraise=True)
-    def call_model(self, messages: list, n_choices: int = 1, temperature: float = 0.7):
+    def call_model(
+        self,
+        messages: list,
+        n_choices: int = 1,
+        temperature: float = 0.7,
+        stream: bool = False,
+    ):
         logger.info(
             f"Calling OpenAI chat API with the following input message(s): {messages}"
         )
@@ -97,6 +141,7 @@ class Chat:
             n=n_choices,  # number of completions to generate
             temperature=temperature,  # 0 = no randomness, deterministic
             # max_tokens=200,
+            stream=stream,
         )
         logger.info(f"Received response from OpenAI chat API: {response}")
         return response
@@ -113,7 +158,9 @@ class Chat:
             for choice in response["choices"]
         ]
 
-    def ask_question(self, n_choices: int = 1, temperature: float = 0.7) -> dict:
+    def ask_question(
+        self, n_choices: int = 1, temperature: float = 0.7, stream: bool = False
+    ) -> dict:
         logger.info("Fetching 5 most relevant document chunks from storage")
         docs = self.get_relevant_documents()
         logger.info("Creating input prompt for chat API")
@@ -121,7 +168,19 @@ class Chat:
         prompt = create_prompt_for_chat(query=self.input_text, context=context_str)
         messages = self.prepare_messages_for_chat(text=prompt)
         response = self.call_model(
-            messages=messages, n_choices=n_choices, temperature=temperature
+            messages=messages,
+            n_choices=n_choices,
+            temperature=temperature,
+            stream=stream,
         )
+        if stream:
+            return response
         choices = self.prepare_choices_for_client(response=response)
         return choices
+
+    def yield_response(self, temperature: float = 0.7, stream: bool = False):
+        response = self.ask_question(
+            n_choices=1, temperature=temperature, stream=stream
+        )
+        for chunk in response:
+            yield chunk["choices"][0]["delta"]["content"]

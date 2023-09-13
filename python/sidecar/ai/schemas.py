@@ -61,6 +61,7 @@ class ChatRequest(RefStudioModel):
     text: str
     n_choices: int = 1
     temperature: float = 0.7
+    stream: bool = True
 
 
 class ChatResponseChoice(TextSuggestionChoice):
@@ -70,5 +71,4 @@ class ChatResponseChoice(TextSuggestionChoice):
 class ChatResponse(RefStudioModel):
     status: ResponseStatus
     message: str
-    choices: list[ChatResponseChoice]
     choices: list[ChatResponseChoice]
