@@ -27,16 +27,18 @@ jobs:
         with:
           script: |
             // API: https://github.com/octokit/plugin-rest-endpoint-methods.js/tree/main/docs/repos
-
-            const existingRelease = await github.rest.repos.getReleaseByTag({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              tag: `${process.env.PACKAGE_VERSION}`
-            })
-            if (existingRelease.status === 200) {
+            try {
+              const existingRelease = await github.rest.repos.getReleaseByTag({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                tag: `${process.env.PACKAGE_VERSION}`
+              })
               return existingRelease.data.id
+            } catch(err) {
+              console.log("No existing release found. Creating a new release for tag: " + process.env.PACKAGE_VERSION)
             }
-
+            
+            // Create a new release
             const { data } = await github.rest.repos.createRelease({
               owner: context.repo.owner,
               repo: context.repo.repo,
