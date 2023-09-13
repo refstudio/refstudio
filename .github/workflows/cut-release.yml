@@ -26,6 +26,17 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
+            // API: https://github.com/octokit/plugin-rest-endpoint-methods.js/tree/main/docs/repos
+
+            const { data } = await github.rest.repos.findReleaseByTag({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag: `${process.env.PACKAGE_VERSION}`
+            })
+            if (data) {
+              return data.id
+            }
+
             const { data } = await github.rest.repos.createRelease({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -33,6 +44,7 @@ jobs:
               name: `v${process.env.PACKAGE_VERSION}`,
               body: 'Take a look at the assets to download and install Ref Studio.',
               draft: true,
+              generate_release_notes: true,
               prerelease: false
             })
             return data.id
@@ -94,7 +106,7 @@ jobs:
         with:
           releaseId: ${{ needs.create-release.outputs.release_id }}
           args: --verbose --target ${{ matrix.target }}
-          includeDebug: true
+          includeDebug: false
   
   # publish-release:
   #   permissions:
