@@ -1,5 +1,6 @@
 /** Code for managing the connection the RefStudio server. This is only relevant for desktop. */
 
+import { emit } from '@tauri-apps/api/event';
 import { fetch as tauriFetch } from '@tauri-apps/api/http';
 import { Child, ChildProcess, Command as TauriCommand } from '@tauri-apps/api/shell';
 import React from 'react';
@@ -30,6 +31,7 @@ async function startServer(servingCallback: () => void) {
   console.log('Starting RefStudio server');
   const command = new TauriCommand('call-sidecar', ['serve']);
   command.stderr.addListener('data', (line) => {
+    emitServerLogs('stderr', line);
     console.log('server stderr', line);
     if (line.includes('running on http')) {
       console.log('matched the magic words');
@@ -37,14 +39,17 @@ async function startServer(servingCallback: () => void) {
     }
   });
   command.stdout.addListener('data', (line) => {
+    emitServerLogs('stdout', line);
     console.log('server stdout', line);
   });
   command.addListener('close', (data: Pick<ChildProcess, 'code' | 'signal'>) => {
+    emitServerLogs('close', 'server closed, restarting');
     console.warn('server closed, restarting', data.code, data.signal);
     serverProcess = null;
     void getOrStartServer(noop);
   });
   command.addListener('error', (data) => {
+    emitServerLogs('error', 'server crashed, restarting');
     console.error('server crashed, restarting', data);
     serverProcess = null;
     void getOrStartServer(noop);
@@ -131,9 +136,24 @@ export function useRefStudioServerOnDesktop() {
         setIsServerRunning(true);
       });
     })().catch((e) => {
+      emitServerLogs('STARTUP ERROR', e);
       console.error(e);
     });
   }, [isServerRunning]);
 
   return isServerRunning;
+}
+
+/**
+ * Emit server logs.
+ * This is usefull to display content in the splashscreen
+ *
+ * @param tag text before message
+ * @param message message to log
+ */
+function emitServerLogs(tag: string, message: unknown) {
+  if (import.meta.env.VITE_IS_WEB) {
+    return;
+  }
+  void emit('server-logs', `${tag.toUpperCase()}: ${String(message)}`);
 }

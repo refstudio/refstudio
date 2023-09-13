@@ -23,13 +23,7 @@
       },
       "fs": {
         "all": true,
-        "scope": [
-          "$APPCONFIG",
-          "$APPCONFIG/*",
-          "$APPDATA/**",
-          "$RESOURCE/**",
-          "$HOME/**"
-        ]
+        "scope": ["$APPCONFIG", "$APPCONFIG/*", "$APPDATA/**", "$RESOURCE/**", "$HOME/**"]
       },
       "shell": {
         "all": true,
@@ -38,7 +32,7 @@
         "scope": [
           {
             "name": "call-sidecar",
-            "cmd": "$RESOURCE/bin/python/main-aarch64-apple-darwin/main",
+            "cmd": "$RESOURCE/bin/python/main/main",
             "args": true
           }
         ]
@@ -46,7 +40,7 @@
       "http": {
         "all": true,
         "request": true,
-        "scope": [ "http://localhost:1487/*" ]
+        "scope": ["http://localhost:1487/*"]
       }
     },
     "bundle": {

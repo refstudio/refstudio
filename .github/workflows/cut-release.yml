@@ -1,46 +1,154 @@
+# Thanks to this blog post: https://data-dive.com/multi-os-deployment-in-cloud-using-pyinstaller-and-github-actions/
+# Thanks to https://github.com/tauri-apps/tauri-action/tree/v0/
 name: Cut Release
 
 on:
-  - workflow_dispatch
+  workflow_dispatch:
 
 jobs:
   setup-js:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - uses: ./.github/actions/setup-node
 
   setup-rust:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - uses: ./.github/actions/setup-rust
 
   setup-python:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - uses: ./.github/actions/setup-python
 
   create-release:
-    needs: [setup-js, setup-python, setup-rust]
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
+    outputs:
+      release_id: ${{ steps.create-release.outputs.result }}
+    
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Node.js
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+
+      - name: get version
+        run: echo "PACKAGE_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+
+      - name: Create release
+        id: create-release
+        uses: actions/github-script@v6
+        with:
+          script: |
+            // API: https://github.com/octokit/plugin-rest-endpoint-methods.js/tree/main/docs/repos
+            try {
+              const existingRelease = await github.rest.repos.getReleaseByTag({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                tag: `${process.env.PACKAGE_VERSION}`
+              })
+              return existingRelease.data.id
+            } catch(err) {
+              console.log("No existing release found. Creating a new release for tag: " + process.env.PACKAGE_VERSION)
+            }
+            
+            // Create a new release
+            const { data } = await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: `${process.env.PACKAGE_VERSION}`,
+              name: `v${process.env.PACKAGE_VERSION}`,
+              body: 'Take a look at the assets to download and install Ref Studio.',
+              draft: true,
+              generate_release_notes: true,
+              prerelease: false
+            })
+            return data.id
+
+  build-tauri:
+    needs: [create-release, setup-js, setup-python, setup-rust]
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          # - name: Linx-x86_64
+          #   target: x86_64-unknown-linux-gnu
+          #   runner: ubuntu-latest
+          - name: macOS-Apple
+            target: aarch64-apple-darwin
+            runner: macos-latest
+          - name: macOS-Intel
+            target: x86_64-apple-darwin
+            runner: macos-latest
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup JS
         uses: ./.github/actions/setup-node
-      - name: Setup Rust
-        uses: ./.github/actions/setup-rust
+
       - name: Setup Python
         uses: ./.github/actions/setup-python
-      - name: Install build dependencies
+
+      - name: Setup Rust
+        uses: ./.github/actions/setup-rust
+
+      - name: Install target support for rust
+        run: rustup target add ${{ matrix.target }}
+
+      - name: Install dependencies (ubuntu only)
+        if: matrix.runner == 'ubuntu-latest'
         run: |
           sudo apt-get update
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
+      
+      - name: Create Python binary
+        run: |
+          poetry run pyinstaller --noconfirm --distpath src-tauri/bin/python python/main.py
+
+      # start server in the background and verify it's working
+      # the binary takes time to start up, so we need to wait a bit
+      - name: Start Python binary and verify
+        run: |
+          ./src-tauri/bin/python/main/main serve &
+          sleep 30
+          curl -s http://0.0.0.0:1487/api/meta/status
+
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          releaseId: ${{ needs.create-release.outputs.release_id }}
+          args: --verbose --target ${{ matrix.target }}
+          includeDebug: false
+  
+  # publish-release:
+  #   permissions:
+  #     contents: write
+  #   runs-on: ubuntu-latest
+  #   needs: [create-release, build-tauri]
+  #   steps:
+  #     - name: publish release
+  #       id: publish-release
+  #       uses: actions/github-script@v6
+  #       env:
+  #         release_id: ${{ needs.create-release.outputs.release_id }}
+  #       with:
+  #         script: |
+  #           github.rest.repos.updateRelease({
+  #             owner: context.repo.owner,
+  #             repo: context.repo.repo,
+  #             release_id: process.env.release_id,
+  #             name: 'refstudio',
+  #             draft: true,
+  #             prerelease: false
+  #           })

@@ -9,6 +9,12 @@
 			],
 			"label": "npm: ts:check",
 			"detail": "tsc --noEmit"
+		},
+		{
+			"type": "shell",
+			"label": "git: push --no-verify",
+			"command": "git push --no-verify",
+			"problemMatcher": []
 		}
 	]
 }
