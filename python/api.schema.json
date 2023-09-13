@@ -189,17 +189,20 @@
         "logging_filepath": {
           "type": "string"
         },
-        "openai_api_key": {
+        "model_provider": {
+          "$ref": "#/definitions/ModelProvider"
+        },
+        "api_key": {
           "type": "string"
         },
-        "openai_chat_model": {
+        "model": {
           "type": "string"
         },
-        "openai_manner": {
-          "$ref": "#/definitions/RewriteMannerType"
-        },
-        "openai_temperature": {
+        "temperature": {
           "type": "number"
+        },
+        "rewrite_manner": {
+          "$ref": "#/definitions/RewriteMannerType"
         }
       },
       "type": "object",
@@ -207,10 +210,11 @@
         "active_project_id",
         "logging_enabled",
         "logging_filepath",
-        "openai_api_key",
-        "openai_chat_model",
-        "openai_manner",
-        "openai_temperature"
+        "model_provider",
+        "api_key",
+        "model",
+        "temperature",
+        "rewrite_manner"
       ],
       "title": "FlatSettingsSchema"
     },
@@ -225,17 +229,20 @@
         "logging_filepath": {
           "type": "string"
         },
-        "openai_api_key": {
+        "model_provider": {
+          "$ref": "#/definitions/ModelProvider"
+        },
+        "api_key": {
           "type": "string"
         },
-        "openai_chat_model": {
+        "model": {
           "type": "string"
         },
-        "openai_manner": {
-          "$ref": "#/definitions/RewriteMannerType"
-        },
-        "openai_temperature": {
+        "temperature": {
           "type": "number"
+        },
+        "rewrite_manner": {
+          "$ref": "#/definitions/RewriteMannerType"
         }
       },
       "type": "object",
@@ -311,6 +318,15 @@
         "complete"
       ],
       "title": "IngestStatus",
+      "description": "An enumeration."
+    },
+    "ModelProvider": {
+      "type": "string",
+      "enum": [
+        "openai",
+        "ollama"
+      ],
+      "title": "ModelProvider",
       "description": "An enumeration."
     },
     "ProjectBase": {

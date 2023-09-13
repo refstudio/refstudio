@@ -17,6 +17,13 @@ export type ResponseStatus = 'ok' | 'error';
  * An enumeration.
  *
  * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "ModelProvider".
+ */
+export type ModelProvider = 'openai' | 'ollama';
+/**
+ * An enumeration.
+ *
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
  * via the `definition` "RewriteMannerType".
  */
 export type RewriteMannerType = 'concise' | 'elaborate' | 'scholarly';
@@ -127,10 +134,11 @@ export interface FlatSettingsSchema {
   active_project_id: string;
   logging_enabled: boolean;
   logging_filepath: string;
-  openai_api_key: string;
-  openai_chat_model: string;
-  openai_manner: RewriteMannerType;
-  openai_temperature: number;
+  model_provider: ModelProvider;
+  api_key: string;
+  model: string;
+  temperature: number;
+  rewrite_manner: RewriteMannerType;
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
@@ -140,10 +148,11 @@ export interface FlatSettingsSchemaPatch {
   active_project_id?: string;
   logging_enabled?: boolean;
   logging_filepath?: string;
-  openai_api_key?: string;
-  openai_chat_model?: string;
-  openai_manner?: RewriteMannerType;
-  openai_temperature?: number;
+  model_provider?: ModelProvider;
+  api_key?: string;
+  model?: string;
+  temperature?: number;
+  rewrite_manner?: RewriteMannerType;
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
