@@ -52,7 +52,8 @@ export function EventsListener({ children }: { children?: React.ReactNode }) {
   useListenEvent('refstudio://explorer/rename', useRenameFileListener());
   // References
   useListenEvent('refstudio://references/remove', useRemoveReferencesListener());
-  useListenEvent('refstudio://menu/references/export', useExportReferencesListener());
+  useListenEvent('refstudio://menu/references/export', useExportAllReferencesListener());
+  useListenEvent('refstudio://references/export', useExportReferencesListener());
   // Projects
   useListenEvent('refstudio://projects/open', useOpenProjectListener());
   // Notifications
@@ -113,12 +114,19 @@ function useRemoveReferencesListener() {
   return ({ referenceIds }: { referenceIds: string[] }) => void removeReferences(referenceIds, projectId);
 }
 
+function useExportAllReferencesListener() {
+  return () => emitEvent('refstudio://references/export', { type: 'all' });
+}
+
 function useExportReferencesListener() {
   const references = useAtomValue(getReferencesAtom);
   const closeEditorFromAllPanes = useSetAtom(closeEditorFromAllPanesAtom);
   const openFilePath = useSetAtom(openFilePathAtom);
-  return async () => {
-    const exportedFilePath = await exportReferences(references);
+
+  return async (args: { type: 'all' } | { type: 'bulk'; referenceIds: string[] }) => {
+    const referencesToExport =
+      args.type === 'bulk' ? references.filter((reference) => args.referenceIds.includes(reference.id)) : references;
+    const exportedFilePath = await exportReferences(referencesToExport);
     if (exportedFilePath) {
       const editorId = buildEditorIdFromPath(exportedFilePath);
       closeEditorFromAllPanes(editorId);

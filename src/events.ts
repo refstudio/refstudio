@@ -29,6 +29,7 @@ interface RefStudioEvents {
   // References actions
   'refstudio://references/ingestion/run': undefined;
   'refstudio://references/remove': { referenceIds: string[] };
+  'refstudio://references/export': { type: 'all' } | { type: 'bulk'; referenceIds: string[] };
   // Explorer actions
   'refstudio://explorer/delete': { path: string };
   'refstudio://explorer/open': { path: string };
