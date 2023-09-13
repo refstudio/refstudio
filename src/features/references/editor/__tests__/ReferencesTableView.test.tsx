@@ -139,4 +139,30 @@ describe('ReferencesTableView component', () => {
       referenceIds: [ref1.id, ref2.id],
     });
   });
+
+  it(`should not emit ${'refstudio://references/export'} with NO selections`, async () => {
+    const { user } = setupWithJotaiProvider(<ReferencesTableView />, store);
+
+    const exportBtn = screen.getByText('Export');
+    await user.click(exportBtn);
+
+    expect(exportBtn).toHaveAttribute('aria-disabled', 'true');
+    expect(vi.mocked(emitEvent)).not.toHaveBeenCalled();
+  });
+
+  it(`should emit ${'refstudio://references/export'} with SOME selections`, async () => {
+    const { user } = setupWithJotaiProvider(<ReferencesTableView />, store);
+
+    await user.type(screen.getByText(ref1.title), ' ', { skipClick: false }); // select row
+    await user.type(screen.getByText(ref2.title), ' ', { skipClick: false }); // select row
+
+    await user.click(screen.getByText('Export (2)'));
+
+    expect(vi.mocked(emitEvent)).toHaveBeenCalledWith<
+      [RefStudioEventName, RefStudioEventPayload<'refstudio://references/export'>]
+    >('refstudio://references/export', {
+      type: 'bulk',
+      referenceIds: [ref1.id, ref2.id],
+    });
+  });
 });

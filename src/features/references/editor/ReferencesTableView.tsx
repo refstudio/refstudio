@@ -131,6 +131,12 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
       referenceIds: selectedReferences.map((r) => r.id),
     });
 
+  const handleExportReferences = () =>
+    emitEvent('refstudio://references/export', {
+      type: 'bulk',
+      referenceIds: selectedReferences.map((r) => r.id),
+    });
+
   const rowData = useMemo(() => references.map((r) => ({ ...r })), [references]);
 
   return (
@@ -165,10 +171,11 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
           />
           <Button
             Action={<ExportIcon />}
+            disabled={selectedReferences.length === 0}
             size="M"
-            text="Export"
+            text={selectedReferences.length > 0 ? `Export (${selectedReferences.length})` : 'Export'}
             type="secondary"
-            onClick={() => emitEvent('refstudio://menu/references/export')}
+            onClick={handleExportReferences}
           />
         </div>
         <div className="h-8 w-px bg-content-area-border" />
