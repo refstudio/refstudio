@@ -9,6 +9,8 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
     <link rel="manifest" href="/favicon/site.webmanifest">
 
+    <!-- This is required by react-pdf: https://github.com/wojtekmaj/react-pdf/blob/main/packages/react-pdf/README.md#compatibility -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=Promise.allSettled%2CArray.prototype.at"></script>
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
     </style>
