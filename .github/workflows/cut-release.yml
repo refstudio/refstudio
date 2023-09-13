@@ -6,6 +6,27 @@ on:
   workflow_dispatch:
 
 jobs:
+  setup-js:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-node
+
+  setup-rust:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-rust
+
+  setup-python:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-python
+
   create-release:
     permissions:
       contents: write
@@ -52,7 +73,7 @@ jobs:
             return data.id
 
   build-tauri:
-    needs: create-release
+    needs: [create-release, setup-js, setup-python, setup-rust]
     permissions:
       contents: write
     strategy:
