@@ -215,7 +215,7 @@ class Rewriter:
             for choice in response["choices"]
         ]
 
-    @retry(stop=stop_after_attempt(3), wait=wait_fixed(1))
+    # @retry(stop=stop_after_attempt(3), wait=wait_fixed(1))
     async def call_model(self, messages: list):
         logger.info(
             f"Calling {self.model} rewrite API with input message(s): {messages}"
@@ -233,12 +233,9 @@ class Rewriter:
             # NOTE: Ollama does not support the following parameters:
             # - n
             # - max_tokens
+            # - temperature
             params["api_base"] = "http://localhost:11434"
             params["custom_llm_provider"] = "ollama"
-            # LiteLLM does not support temperature for Ollama
-            # but according to the Ollama docs, it should be supported
-            # so I'm leaving this here just in case we decide to write our own wrapper
-            params["options"] = {"temperature": self.temperature}
 
         response = await litellm.acompletion(**params)
 
