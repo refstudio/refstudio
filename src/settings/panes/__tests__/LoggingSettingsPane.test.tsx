@@ -57,7 +57,7 @@ describe('GeneralSettingsPane component', () => {
     const user = userEvent.setup();
     render(<LoggingSettingsPane config={panelConfig} />);
 
-    expect(screen.getByRole('button', { name: /save/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /save/i })).toHaveAttribute('aria-disabled', 'true');
 
     // Type
     await user.click(screen.getByTestId(LOGGING_ACTIVE_TEST_ID));
@@ -66,7 +66,7 @@ describe('GeneralSettingsPane component', () => {
     expect(within(screen.getByTestId(LOGGING_FILEPATH_TEST_ID)).getByRole('input')).toHaveValue(
       `${mockSettings.logging_filepath}-Updated-2`,
     );
-    expect(screen.getByRole('button', { name: /save/i })).toBeEnabled();
+    expect(screen.getByRole('button', { name: /save/i })).toHaveAttribute('aria-disabled', 'false');
 
     // Submit
     await user.click(screen.getByRole('button', { name: /save/i }));

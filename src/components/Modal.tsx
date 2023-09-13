@@ -29,7 +29,7 @@ export function Modal({ children, className, open, onClose }: ModalProps) {
       className={cx(
         'cursor-default select-none',
         'fixed left-0 top-0 z-modals flex h-screen w-screen items-center justify-center',
-        'bg-modal-bg-overlay bg-opacity-[0.32]',
+        'bg-modal-bg-overlay bg-opacity-overlay',
       )}
     >
       <div

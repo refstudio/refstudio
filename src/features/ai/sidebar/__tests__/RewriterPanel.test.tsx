@@ -9,6 +9,12 @@ import { setupWithJotaiProvider } from '../../../../test/test-utils';
 import { RewriteOptionsView } from '../../../components/RewriteOptionsView';
 import { RewriterPanel } from '../RewriterPanel';
 
+global.CSS.supports = () => false;
+global.ResizeObserver = vi.fn().mockImplementation(() => ({
+  observe: vi.fn(),
+  disconnect: vi.fn(),
+}));
+
 vi.mock('../../../../settings/settingsManager');
 vi.mock('../../../../api/rewrite');
 

@@ -1,0 +1,48 @@
+.ag-theme-refstudio {
+  /* GENERAL */
+  @apply rounded-default shadow-default;
+  --ag-borders: none;
+  --ag-borders-critical: solid 1px;
+  --ag-border-color: rgb(var(--card-border-primary));
+  --ag-font-family: Roboto;
+
+  /* BACKGROUND */
+  --ag-odd-row-background-color: rgb(var(--card-bg-primary));
+  --ag-row-background-color: rgb(var(--card-bg-primary));
+
+  /* HEADER */
+  --ag-header-background-color: rgb(var(--card-bg-header));
+  --ag-header-foreground-color: rgb(var(--card-txt-header));
+  --ag-secondary-foreground-color: rgb(var(--card-txt-header));
+
+  /* RESIZE HANDLE */
+  --ag-header-column-resize-handle-width: 1px;
+  --ag-header-column-resize-handle-height: 1.5rem;
+  --ag-header-column-resize-handle-color: rgb(var(--card-border-header));
+
+  /* CHECKBOXES */
+  --ag-checkbox-unchecked-color: rgb(var(--radio-border-inactive));
+  --ag-checkbox-checked-color: rgb(var(--btn-bg-radio-active));
+}
+
+.ag-theme-refstudio .ag-header {
+  @apply text-sm font-extrabold uppercase not-italic;
+  --ag-border-color: rgb(var(--card-border-header));
+
+  --ag-checkbox-indeterminate-color: rgb(var(--card-ico-header-active));
+  --ag-checkbox-checked-color: rgb(var(--card-ico-header-active));
+}
+
+.ag-theme-refstudio .ag-header .ag-checkbox-input-wrapper.ag-checked::after {
+  @apply bg-btn-bg-radio-active;
+}
+
+/* INDETERMINATE CHECKBOXES */
+.ag-theme-refstudio .ag-checkbox-input-wrapper.ag-indeterminate::after {
+  @apply rounded-default bg-radio-active;
+}
+
+.ag-theme-refstudio .ag-pinned-left-cols-container {
+  height: 100% !important;
+  border-right: solid 1px var(--ag-border-color);
+}

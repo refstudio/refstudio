@@ -1,6 +1,7 @@
 import './contextMenus.css';
 
 import { FileExplorerFileContextMenu } from '../application/sidebar/fileExplorerContextMenu/FileExplorerFileContextMenu';
+import { FileExplorerProjectContextMenu } from '../application/sidebar/fileExplorerContextMenu/FileExplorerProjectContextMenu';
 import { TabPaneTabContextMenu } from '../components/TabPaneTabContextMenu';
 
 interface ContextMenusProps {
@@ -12,6 +13,7 @@ export function ContextMenus({ children }: ContextMenusProps) {
     <>
       {children}
       <FileExplorerFileContextMenu />
+      <FileExplorerProjectContextMenu />
       <TabPaneTabContextMenu />
     </>
   );

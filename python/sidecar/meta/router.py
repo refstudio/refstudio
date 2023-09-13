@@ -3,6 +3,7 @@ import os
 
 import psutil
 from fastapi import APIRouter
+from sidecar.typing import ResponseStatus, StatusResponse
 
 router = APIRouter(
     prefix="/meta",
@@ -11,12 +12,12 @@ router = APIRouter(
 
 
 @router.get("/status")
-async def status():
-    return {"status": "ok"}
+async def status() -> StatusResponse:
+    return StatusResponse(status=ResponseStatus.OK)
 
 
 @router.post("/shutdown")
-async def shutdown():
+async def shutdown() -> None:
     # See https://stackoverflow.com/a/74757349/388951
     parent_pid = os.getpid()
     parent = psutil.Process(parent_pid)

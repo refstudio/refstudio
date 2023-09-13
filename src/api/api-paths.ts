@@ -17,9 +17,11 @@ import {
   HTTPValidationError,
   IngestResponse,
   IngestStatus,
+  ProjectBase,
   ProjectCreateRequest,
   ProjectDetailsResponse,
   ProjectFileTreeResponse,
+  ProjectListResponse,
   Reference,
   ReferencePatch,
   ResponseStatus,
@@ -29,6 +31,7 @@ import {
   RewriteResponse,
   S2SearchResult,
   SearchResponse,
+  StatusResponse,
   TextCompletionChoice,
   TextCompletionRequest,
   TextCompletionResponse,
@@ -247,6 +250,11 @@ export interface components {
      * @enum {string}
      */
     IngestStatus: 'processing' | 'failure' | 'complete';
+    /** ProjectBase */
+    ProjectBase: {
+      id: string;
+      name: string;
+    };
     /** ProjectCreateRequest */
     ProjectCreateRequest: {
       project_name: string;
@@ -256,11 +264,14 @@ export interface components {
     ProjectDetailsResponse: {
       id: string;
       name: string;
-      path: string;
     };
     /** ProjectFileTreeResponse */
     ProjectFileTreeResponse: {
       contents: (FileEntry | FolderEntry)[];
+    };
+    /** ProjectListResponse */
+    ProjectListResponse: {
+      projects: ProjectBase[];
     };
     /**
      * Reference
@@ -339,6 +350,12 @@ export interface components {
     SearchResponse: {
       message: string;
       results: S2SearchResult[];
+      status: ResponseStatus;
+    };
+    /** StatusResponse */
+    StatusResponse: {
+      /** @default */
+      message?: string;
       status: ResponseStatus;
     };
     /** TextCompletionChoice */
@@ -502,7 +519,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': unknown;
+          'application/json': StatusResponse;
         };
       };
       /** @description Validation Error */
@@ -525,7 +542,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': unknown;
+          'application/json': StatusResponse;
         };
       };
       /** @description Validation Error */
@@ -576,7 +593,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': unknown;
+          'application/json': StatusResponse;
         };
       };
     };
@@ -590,7 +607,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': unknown;
+          'application/json': ProjectListResponse;
         };
       };
     };
@@ -609,7 +626,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': unknown;
+          'application/json': ProjectBase;
         };
       };
       /** @description Validation Error */
@@ -659,7 +676,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': unknown;
+          'application/json': StatusResponse;
         };
       };
       /** @description Validation Error */

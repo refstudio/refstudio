@@ -47,7 +47,7 @@ function createEmptyCollapsiblePlaceholderWidget(pos: number) {
   return Decoration.widget(pos, () => {
     const placeholder = document.createElement('div');
     placeholder.innerHTML = 'Empty collapsible. Click or drop blocks inside.';
-    placeholder.style.color = 'hsl(var(--color-muted))';
+    placeholder.style.color = 'rgb(var(--grayscale-60))';
     placeholder.classList.add('empty-collapsible-placeholder');
 
     return placeholder;

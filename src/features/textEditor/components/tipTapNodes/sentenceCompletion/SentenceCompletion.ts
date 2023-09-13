@@ -17,9 +17,19 @@ export const sentenceCompletionPluginKey = new PluginKey<SentenceCompletionState
 const sentenceCompletionPlugin = new Plugin<SentenceCompletionState>({
   state: {
     init: () => ({ status: 'closed' }),
-    apply: (transaction, state): SentenceCompletionState => {
+    apply: (transaction, state, oldEditorState, newEditorState): SentenceCompletionState => {
       const metadata = transaction.getMeta(sentenceCompletionPluginKey) as SentenceCompletionMetadata | undefined;
-      if (!metadata || metadata.action === 'close' || (state.status === 'error' && metadata.action !== 'open')) {
+
+      if (!metadata) {
+        // If neither the doc nor the document did change, we do not change the plugin's state
+        if (!transaction.docChanged && oldEditorState.selection.eq(newEditorState.selection)) {
+          return state;
+        }
+        // Otherwise, close it
+        return { status: 'closed' };
+      }
+
+      if (metadata.action === 'close' || (state.status === 'error' && metadata.action !== 'open')) {
         return { status: 'closed' };
       }
 
@@ -90,10 +100,10 @@ const sentenceCompletionPlugin = new Plugin<SentenceCompletionState>({
           const parentNode = document.createElement('span');
 
           parentNode.innerHTML = suggestionText;
-          parentNode.style.color = 'hsl(var(--color-muted))';
+          parentNode.style.color = 'rgb(var(--grayscale-60))';
 
           if (currentState.status === 'error') {
-            parentNode.style.color = 'hsl(var(--color-error))';
+            parentNode.style.color = 'rgb(var(--semantic-error-50))';
           }
 
           return parentNode;

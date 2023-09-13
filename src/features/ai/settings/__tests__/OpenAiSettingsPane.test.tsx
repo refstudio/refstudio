@@ -17,6 +17,8 @@ import {
   REWRITE_TEMPERATURE_TEST_ID,
 } from '../OpenAiSettingsPane';
 
+global.CSS.supports = () => false;
+
 vi.mock('../../../../settings/settingsManager');
 vi.mock('../../../../events');
 
@@ -78,7 +80,7 @@ describe('OpenAiSettingsPane component', () => {
     render(<OpenAiSettingsPane config={panelConfig} />);
 
     expect(within(screen.getByTestId(API_KEY_TEST_ID)).getByRole('input')).toHaveValue('API KEY');
-    expect(screen.getByRole('button', { name: /save/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /save/i })).toHaveAttribute('aria-disabled', 'true');
 
     // Type
     await user.type(screen.getByTestId(API_KEY_TEST_ID), '-Updated-1');

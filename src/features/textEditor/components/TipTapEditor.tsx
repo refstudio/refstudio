@@ -16,6 +16,7 @@ import { saveAsMarkdown } from '../saveAsMarkdown';
 import { MenuBar } from './MenuBar';
 import { EDITOR_EXTENSIONS, transformPasted } from './tipTapEditorConfigs';
 import { MarkdownSerializer } from './tipTapNodes/refStudioDocument/serialization/MarkdownSerializer';
+import { sentenceCompletionCommand } from './tipTapNodes/sentenceCompletion/helpers/sentenceCompletionCommand';
 
 interface EditorProps {
   editorContent: JSONContent;
@@ -74,6 +75,12 @@ export function TipTapEditor({ editorContent, editorId, isActive, saveFileInMemo
     [editor, isActive],
   );
 
+  const suggestSentenceCompletion = useCallback(() => {
+    if (isActive) {
+      editor?.chain().focus().command(sentenceCompletionCommand).run();
+    }
+  }, [editor, isActive]);
+
   const saveContentAsMarkdown = useCallback(() => {
     if (!isActive || !editor) {
       return;
@@ -88,6 +95,7 @@ export function TipTapEditor({ editorContent, editorId, isActive, saveFileInMemo
       .then(refreshFileTree);
   }, [editor, editorId, isActive, references, refreshFileTree]);
 
+  useListenEvent('refstudio://ai/suggestion/suggest', suggestSentenceCompletion);
   useListenEvent('refstudio://ai/suggestion/insert', insertContent);
   useListenEvent('refstudio://menu/file/markdown', saveContentAsMarkdown);
 

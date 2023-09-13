@@ -4,12 +4,13 @@ import { ImperativePanelHandle, Panel } from 'react-resizable-panels';
 import { VerticalResizeHandle } from '../../components/VerticalResizeHandle';
 import { ChatbotPanel } from '../../features/ai/sidebar/ChatPanel';
 import { RewriterPanel } from '../../features/ai/sidebar/RewriterPanel';
+import { useListenEvent } from '../../hooks/useListenEvent';
 import { useRefStudioHotkeys } from '../../hooks/useRefStudioHotkeys';
 import { cx } from '../../lib/cx';
 import { SideBar } from '../components/SideBar';
 import { BotIcon, PenIcon } from './icons';
 
-type SecondarySideBarPanel = 'Rewriter' | 'Chatbot';
+export type SecondarySideBarPanel = 'Rewriter' | 'Chatbot';
 export function RightSidePanelWrapper({ disabled }: { disabled?: boolean }) {
   const rightPanelRef = useRef<ImperativePanelHandle>(null);
   const [isPanelCollapsed, setIsPanelCollapsed] = useState(true);
@@ -49,6 +50,16 @@ export function RightSidePanelWrapper({ disabled }: { disabled?: boolean }) {
       setIsPanelCollapsed(true);
     }
   }, [disabled]);
+
+  useListenEvent('refstudio://sidebars/open', ({ panel }) => {
+    if (disabled) {
+      return;
+    }
+    if (panel === 'Chatbot' || panel === 'Rewriter') {
+      setActivePanel(panel);
+      setIsPanelCollapsed(false);
+    }
+  });
 
   return (
     <>

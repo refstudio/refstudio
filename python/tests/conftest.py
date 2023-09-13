@@ -15,7 +15,7 @@ def fixtures_dir():
 
 
 @pytest.fixture
-def setup_project_path_storage(monkeypatch, tmp_path):
+def setup_project_storage(monkeypatch, tmp_path):
     user_id = "user1"
     project_id = "project1"
     project_name = "project1name"
