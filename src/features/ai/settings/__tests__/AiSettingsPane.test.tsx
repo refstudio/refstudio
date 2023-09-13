@@ -92,7 +92,7 @@ describe('AiSettingsPane component', () => {
     // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.change(range, { target: { value: 0.9 } });
 
-    expect(within(screen.getByTestId(MODEL_TEST_ID)).getByRole('input')).toHaveValue(`${mockSettings.model}-Updated-2`);
+    expect(within(screen.getByTestId(MODEL_TEST_ID)).getByRole('input')).toHaveValue(`llama2-Updated-2`);
     expect(within(screen.getByTestId(API_KEY_TEST_ID)).getByRole('input')).toHaveValue(
       `${mockSettings.api_key}-Updated-1`,
     );
@@ -102,7 +102,7 @@ describe('AiSettingsPane component', () => {
     await user.click(screen.getByRole('button', { name: /save/i }));
     expect(vi.mocked(setCachedSetting)).toHaveBeenCalledTimes(5);
     expect(vi.mocked(setCachedSetting)).toHaveBeenNthCalledWith(1, 'model_provider', 'ollama');
-    expect(vi.mocked(setCachedSetting)).toHaveBeenNthCalledWith(2, 'model', 'MODEL-Updated-2');
+    expect(vi.mocked(setCachedSetting)).toHaveBeenNthCalledWith(2, 'model', 'llama2-Updated-2');
     expect(vi.mocked(setCachedSetting)).toHaveBeenNthCalledWith(3, 'api_key', 'API KEY-Updated-1');
     expect(vi.mocked(setCachedSetting)).toHaveBeenNthCalledWith(4, 'rewrite_manner', 'scholarly');
     expect(vi.mocked(setCachedSetting)).toHaveBeenNthCalledWith(5, 'temperature', 0.9);

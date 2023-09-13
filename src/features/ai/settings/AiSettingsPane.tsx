@@ -80,7 +80,13 @@ export function AiSettingsPane({ config }: SettingsPaneProps) {
             value: option.provider,
           }))}
           value={paneSettings.provider}
-          onChange={(provider: ModelProvider) => setPaneSettings({ ...paneSettings, provider })}
+          onChange={(provider: ModelProvider) =>
+            setPaneSettings({
+              ...paneSettings,
+              provider,
+              model: provider === 'openai' ? 'gpt-3.5-turbo' : 'llama2',
+            })
+          }
         />
       </div>
 
@@ -92,7 +98,7 @@ export function AiSettingsPane({ config }: SettingsPaneProps) {
           onChange={(chat_model) => setPaneSettings({ ...paneSettings, model: chat_model })}
         />
         <InfoText>
-          <strong>Use: </strong>
+          <strong>Tip: </strong>
           <InfoTextOptions
             options={[
               { value: 'gpt-3.5-turbo', label: 'OpenAI' },
