@@ -86,7 +86,7 @@ class Chat:
         docs = self.ranker.get_top_n(query=self.input_text, limit=5)
         return docs
 
-    @retry(stop=stop_after_attempt(3), wait=wait_fixed(1))
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(1), reraise=True)
     def call_model(self, messages: list, n_choices: int = 1, temperature: float = 0.7):
         logger.info(
             f"Calling OpenAI chat API with the following input message(s): {messages}"

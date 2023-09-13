@@ -215,7 +215,7 @@ class Rewriter:
             for choice in response["choices"]
         ]
 
-    @retry(stop=stop_after_attempt(3), wait=wait_fixed(1))
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(1), reraise=True)
     async def call_model(self, messages: list):
         logger.info(
             f"Calling {self.model} rewrite API with input message(s): {messages}"
