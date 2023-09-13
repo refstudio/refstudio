@@ -155,6 +155,7 @@ describe('editorActions', () => {
       citationKey: 'citationKey',
       title: 'Reference',
       status: 'complete',
+      doi: '0000',
       authors: [],
     };
     const editorId = buildEditorId('reference', reference.id);
@@ -260,6 +261,7 @@ describe('editorActions', () => {
       citationKey: 'citationKey',
       title: 'Reference',
       status: 'complete',
+      doi: '0000',
       authors: [],
     };
     const editorId = buildEditorId('reference', reference.id);

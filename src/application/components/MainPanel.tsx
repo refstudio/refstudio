@@ -108,7 +108,7 @@ function MainPaneViewContent({ activeEditorAtoms }: MainPaneViewContentProps) {
     case 'refstudio':
       return <TipTapView activeEditorContentAtoms={activeEditorAtoms} file={data} />;
     case 'reference':
-      return <ReferenceView referenceId={data.referenceId} />;
+      return <ReferenceView key={data.referenceId} referenceId={data.referenceId} />;
     case 'references':
       return <ReferencesTableView defaultFilter={data.filter} />;
     default: {
