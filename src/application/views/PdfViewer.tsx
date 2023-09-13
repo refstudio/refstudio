@@ -7,7 +7,7 @@ import { Document, Page, pdfjs } from 'react-pdf';
 import { PdfEditorContent } from '../../atoms/types/EditorContent';
 import { useListenEvent } from '../../hooks/useListenEvent';
 
-pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).toString();
+pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/legacy/build/pdf.worker.min.js', import.meta.url).toString();
 
 interface PdfViewerProps {
   file: PdfEditorContent;

@@ -1,5 +1,6 @@
 import '@ag-grid-community/styles/ag-grid.css';
 import '@ag-grid-community/styles/ag-theme-alpine.css';
+import './ReferencesTableView.css';
 
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import {
@@ -13,21 +14,20 @@ import {
 import { AgGridReact } from '@ag-grid-community/react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { VscDesktopDownload, VscKebabVertical, VscNewFile, VscTable, VscTrash } from 'react-icons/vsc';
 
+import { AddIcon } from '../../../application/components/icons';
 import { projectIdAtom } from '../../../atoms/projectState';
 import { getReferencesAtom, updateReferenceAtom } from '../../../atoms/referencesState';
+import { Button } from '../../../components/Button';
+import { SearchBar } from '../../../components/SearchBar';
 import { emitEvent } from '../../../events';
-import { autoFocusAndSelect } from '../../../lib/autoFocusAndSelect';
 import { isNonNullish } from '../../../lib/isNonNullish';
 import { ReferenceItem } from '../../../types/ReferenceItem';
-import { TopActionIcon } from '../components/TopActionIcon';
-import { UploadTipInstructions } from '../components/UploadTipInstructions';
+import { BinIcon, ExportIcon, ResetColIcon } from '../components/icons';
 import { ActionsCell } from './grid/ActionsCell';
 import { AuthorsEditor } from './grid/AuthorsEditor';
 import { loadColumnsState, resetColumnsState, saveColumnsState } from './grid/columnsState';
 import { authorsFormatter, firstAuthorFormatter } from './grid/formatters';
-import { StatusCell } from './grid/StatusCell';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
@@ -65,7 +65,7 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
     () => [
       {
         field: 'citationKey',
-        headerName: 'Cite Key',
+        headerName: 'Citation Key',
         initialPinned: 'left',
         initialWidth: 160,
         sortable: true,
@@ -114,13 +114,6 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
         onCellValueChanged: handleCellValueChanged,
       },
       {
-        field: 'status',
-        initialWidth: 120,
-        sortable: true,
-        filter: true,
-        cellRenderer: memo(StatusCell),
-      },
-      {
         field: 'id',
         colId: 'actions',
         headerName: '',
@@ -138,67 +131,85 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
       referenceIds: selectedReferences.map((r) => r.id),
     });
 
+  const handleExportReferences = () =>
+    emitEvent('refstudio://references/export', {
+      type: 'bulk',
+      referenceIds: selectedReferences.map((r) => r.id),
+    });
+
   const rowData = useMemo(() => references.map((r) => ({ ...r })), [references]);
 
   return (
-    <div className="flex w-full flex-col overflow-y-auto p-6">
-      {references.length === 0 && <UploadTipInstructions />}
-
-      <div className="relative mb-4 flex items-center justify-between gap-10">
-        <input
-          className="grow border border-slate-400 bg-slate-50 px-4 py-1 outline-none"
-          data-testid="filter-text-box"
-          id="filter-text-box"
-          placeholder="Search within references..."
-          ref={autoFocusAndSelect}
-          type="text"
-          value={quickFilter}
-          onInput={(e) => setQuickFilter(e.currentTarget.value)}
-        />
-        <div className="text-md flex items-center gap-2" data-testid="actions-menu">
-          <TopActionIcon
-            action="Add"
-            icon={VscNewFile}
-            onClick={() => emitEvent('refstudio://menu/references/upload')}
-          />
-          <VscKebabVertical />
-          <TopActionIcon
-            action="Remove"
-            disabled={selectedReferences.length === 0}
-            icon={VscTrash}
-            selectedCount={selectedReferences.length}
-            onClick={handleOnBulkRemove}
-          />
-          <TopActionIcon action="Export" disabled icon={VscDesktopDownload} />
-          <VscKebabVertical />
-          <TopActionIcon
-            action="Reset Cols"
-            icon={VscTable}
-            onClick={() => resetColumnsState(() => gridRef.current!.columnApi.resetColumnState())}
+    <div className="flex flex-1 flex-col items-stretch gap-6 pb-10">
+      <div className="flex items-center justify-center gap-4">
+        <div className="flex-1">
+          <SearchBar
+            autoFocus
+            fluid
+            initialValue={quickFilter}
+            placeholder="Filter author/title..."
+            onChange={(newValue) => setQuickFilter(newValue)}
           />
         </div>
+        <div className="h-8 w-px bg-content-area-border" />
+        <Button
+          Action={<AddIcon />}
+          size="M"
+          text="Add"
+          type="secondary"
+          onClick={() => emitEvent('refstudio://menu/references/upload')}
+        />
+        <div className="h-8 w-px bg-content-area-border" />
+        <div className="flex items-center justify-center gap-2">
+          <Button
+            Action={<BinIcon />}
+            disabled={selectedReferences.length === 0}
+            size="M"
+            text={selectedReferences.length > 0 ? `Remove (${selectedReferences.length})` : 'Remove'}
+            type="secondary"
+            onClick={handleOnBulkRemove}
+          />
+          <Button
+            Action={<ExportIcon />}
+            disabled={selectedReferences.length === 0}
+            size="M"
+            text={selectedReferences.length > 0 ? `Export (${selectedReferences.length})` : 'Export'}
+            type="secondary"
+            onClick={handleExportReferences}
+          />
+        </div>
+        <div className="h-8 w-px bg-content-area-border" />
+        <Button
+          Action={<ResetColIcon />}
+          size="M"
+          text="Reset Col"
+          type="secondary"
+          onClick={() => resetColumnsState(() => gridRef.current!.columnApi.resetColumnState())}
+        />
       </div>
 
-      <AgGridReact
-        animateRows
-        className="ag-theme-alpine grow"
-        columnDefs={columnDefs}
-        defaultColDef={defaultColDef}
-        getRowId={(params: GetRowIdParams<ReferenceItem>) => params.data.id}
-        quickFilterText={quickFilter}
-        ref={gridRef}
-        rowData={rowData}
-        rowSelection="multiple"
-        suppressRowClickSelection
-        onColumnMoved={(params) => saveColumnsState(() => params.columnApi.getColumnState(), !params.finished)}
-        onColumnResized={(params) => saveColumnsState(() => params.columnApi.getColumnState(), !params.finished)}
-        onColumnValueChanged={(params) => saveColumnsState(() => params.columnApi.getColumnState())}
-        onGridReady={(params) =>
-          loadColumnsState((cols) => params.columnApi.applyColumnState({ state: cols, applyOrder: true }))
-        }
-        onSelectionChanged={onSelectionChanged}
-        onSortChanged={(params) => saveColumnsState(() => params.columnApi.getColumnState())}
-      />
+      <div className="flex-1 overflow-hidden rounded-default bg-card-bg-primary shadow-default">
+        <AgGridReact
+          animateRows
+          className="ag-theme-alpine ag-theme-refstudio flex-1"
+          columnDefs={columnDefs}
+          defaultColDef={defaultColDef}
+          getRowId={(params: GetRowIdParams<ReferenceItem>) => params.data.id}
+          quickFilterText={quickFilter}
+          ref={gridRef}
+          rowData={rowData}
+          rowSelection="multiple"
+          suppressRowClickSelection
+          onColumnMoved={(params) => saveColumnsState(() => params.columnApi.getColumnState(), !params.finished)}
+          onColumnResized={(params) => saveColumnsState(() => params.columnApi.getColumnState(), !params.finished)}
+          onColumnValueChanged={(params) => saveColumnsState(() => params.columnApi.getColumnState())}
+          onGridReady={(params) =>
+            loadColumnsState((cols) => params.columnApi.applyColumnState({ state: cols, applyOrder: true }))
+          }
+          onSelectionChanged={onSelectionChanged}
+          onSortChanged={(params) => saveColumnsState(() => params.columnApi.getColumnState())}
+        />
+      </div>
     </div>
   );
 }
