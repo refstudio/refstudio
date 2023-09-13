@@ -27,6 +27,8 @@
     --semantic-info-10: 225 247 247;
     --semantic-info-50: 17 155 173;
 
+    --text-muted: var(--grayscale-60);
+
     --resizer-bg-hover: var(--grayscale-40);
     --resizer-bg-default: var(--grayscale-20);
     --btn-ico-modal-item-active: var(--grayscale-80);

@@ -6,6 +6,9 @@ export default {
   theme: {
     extend: {
       colors: {
+        'txt': {
+          muted: 'rgb(var(--text-muted) / <alpha-value>)',
+        },
         'resizer-bg': {
           hover: 'rgb(var(--resizer-bg-hover) / <alpha-value>)',
           default: 'rgb(var(--resizer-bg-default) / <alpha-value>)',

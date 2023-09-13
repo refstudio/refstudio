@@ -10,12 +10,13 @@ import {
 import { PaneConfig } from '../../../../settings/types';
 import { fireEvent, render, screen, userEvent, within } from '../../../../test/test-utils';
 import {
+  AiSettingsPane,
   API_KEY_TEST_ID,
-  CHAT_MODEL_TEST_ID,
-  OpenAiSettingsPane,
+  MODEL_PROVIDER_TEST_ID,
+  MODEL_TEST_ID,
   REWRITE_MANNER_TEST_ID,
   REWRITE_TEMPERATURE_TEST_ID,
-} from '../OpenAiSettingsPane';
+} from '../AiSettingsPane';
 
 global.CSS.supports = () => false;
 
@@ -23,19 +24,20 @@ vi.mock('../../../../settings/settingsManager');
 vi.mock('../../../../events');
 
 const panelConfig: PaneConfig = {
-  id: 'project-openai',
-  Pane: OpenAiSettingsPane,
-  title: 'OPEN AI',
+  id: 'project-ai',
+  Pane: AiSettingsPane,
+  title: 'AI',
 };
 
 const mockSettings = {
-  openai_api_key: 'API KEY',
-  openai_chat_model: 'CHAT MODEL',
-  openai_manner: 'elaborate',
-  openai_temperature: 0.8,
+  model_provider: 'openai',
+  model: 'MODEL',
+  api_key: 'API KEY',
+  rewrite_manner: 'elaborate',
+  temperature: 0.8,
 } satisfies Partial<FlatSettingsSchema>;
 
-describe('OpenAiSettingsPane component', () => {
+describe('AiSettingsPane component', () => {
   beforeEach(() => {
     // Fake settings methods
     vi.mocked(initSettings).mockResolvedValue();
@@ -55,57 +57,55 @@ describe('OpenAiSettingsPane component', () => {
   });
 
   it('should render the component', () => {
-    render(<OpenAiSettingsPane config={panelConfig} />);
+    render(<AiSettingsPane config={panelConfig} />);
     expect(screen.getByTestId(panelConfig.id)).toBeInTheDocument();
   });
 
   it('should render existing settings value', () => {
-    render(<OpenAiSettingsPane config={panelConfig} />);
+    render(<AiSettingsPane config={panelConfig} />);
 
     expect(getCachedSetting).toHaveBeenCalled();
-    expect(within(screen.getByTestId(API_KEY_TEST_ID)).getByRole('input')).toHaveValue(mockSettings.openai_api_key);
-    expect(within(screen.getByTestId(CHAT_MODEL_TEST_ID)).getByRole('input')).toHaveValue(
-      mockSettings.openai_chat_model,
-    );
+    expect(within(screen.getByTestId(API_KEY_TEST_ID)).getByRole('input')).toHaveValue(mockSettings.api_key);
+    expect(within(screen.getByTestId(MODEL_TEST_ID)).getByRole('input')).toHaveValue(mockSettings.model);
     expect(within(screen.getByTestId(REWRITE_MANNER_TEST_ID)).getByRole('select')).toHaveValue(
-      mockSettings.openai_manner,
+      mockSettings.rewrite_manner,
     );
     expect(within(screen.getByTestId(REWRITE_TEMPERATURE_TEST_ID)).getByRole('slider')).toHaveValue(
-      `${mockSettings.openai_temperature}`,
+      `${mockSettings.temperature}`,
     );
   });
 
   it('should save (setCached, flush) with edited values on save', async () => {
     const user = userEvent.setup();
-    render(<OpenAiSettingsPane config={panelConfig} />);
+    render(<AiSettingsPane config={panelConfig} />);
 
     expect(within(screen.getByTestId(API_KEY_TEST_ID)).getByRole('input')).toHaveValue('API KEY');
     expect(screen.getByRole('button', { name: /save/i })).toHaveAttribute('aria-disabled', 'true');
 
     // Type
+    await user.selectOptions(within(screen.getByTestId(MODEL_PROVIDER_TEST_ID)).getByRole('select'), 'ollama');
+    await user.type(screen.getByTestId(MODEL_TEST_ID), '-Updated-2');
     await user.type(screen.getByTestId(API_KEY_TEST_ID), '-Updated-1');
-    await user.type(screen.getByTestId(CHAT_MODEL_TEST_ID), '-Updated-2');
     await user.selectOptions(within(screen.getByTestId(REWRITE_MANNER_TEST_ID)).getByRole('select'), 'scholarly');
     const range = within(screen.getByTestId(REWRITE_TEMPERATURE_TEST_ID)).getByRole('slider');
     // https://github.com/testing-library/user-event/issues/871
     // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.change(range, { target: { value: 0.9 } });
 
+    expect(within(screen.getByTestId(MODEL_TEST_ID)).getByRole('input')).toHaveValue(`${mockSettings.model}-Updated-2`);
     expect(within(screen.getByTestId(API_KEY_TEST_ID)).getByRole('input')).toHaveValue(
-      `${mockSettings.openai_api_key}-Updated-1`,
-    );
-    expect(within(screen.getByTestId(CHAT_MODEL_TEST_ID)).getByRole('input')).toHaveValue(
-      `${mockSettings.openai_chat_model}-Updated-2`,
+      `${mockSettings.api_key}-Updated-1`,
     );
     expect(screen.getByRole('button', { name: /save/i })).toBeEnabled();
 
     // Submit
     await user.click(screen.getByRole('button', { name: /save/i }));
-    expect(vi.mocked(setCachedSetting)).toHaveBeenCalledTimes(4);
-    expect(vi.mocked(setCachedSetting)).toHaveBeenNthCalledWith(1, 'openai_api_key', 'API KEY-Updated-1');
-    expect(vi.mocked(setCachedSetting)).toHaveBeenNthCalledWith(2, 'openai_chat_model', 'CHAT MODEL-Updated-2');
-    expect(vi.mocked(setCachedSetting)).toHaveBeenNthCalledWith(3, 'openai_manner', 'scholarly');
-    expect(vi.mocked(setCachedSetting)).toHaveBeenNthCalledWith(4, 'openai_temperature', 0.9);
+    expect(vi.mocked(setCachedSetting)).toHaveBeenCalledTimes(5);
+    expect(vi.mocked(setCachedSetting)).toHaveBeenNthCalledWith(1, 'model_provider', 'ollama');
+    expect(vi.mocked(setCachedSetting)).toHaveBeenNthCalledWith(2, 'model', 'MODEL-Updated-2');
+    expect(vi.mocked(setCachedSetting)).toHaveBeenNthCalledWith(3, 'api_key', 'API KEY-Updated-1');
+    expect(vi.mocked(setCachedSetting)).toHaveBeenNthCalledWith(4, 'rewrite_manner', 'scholarly');
+    expect(vi.mocked(setCachedSetting)).toHaveBeenNthCalledWith(5, 'temperature', 0.9);
     expect(vi.mocked(saveCachedSettings)).toHaveBeenCalledTimes(1);
   });
 });

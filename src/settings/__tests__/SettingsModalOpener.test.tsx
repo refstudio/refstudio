@@ -32,7 +32,7 @@ describe('SettingsModalOpener component', () => {
     const mockData = mockListenEvent();
 
     render(<SettingsModalOpener />);
-    expect(screen.queryByRole('menuitem', { name: 'Open AI' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: 'AI' })).not.toBeInTheDocument();
     expect(screen.queryByRole('menuitem', { name: 'Logging' })).not.toBeInTheDocument();
     expect(screen.queryByRole('menuitem', { name: 'Config' })).not.toBeInTheDocument();
 
@@ -41,7 +41,7 @@ describe('SettingsModalOpener component', () => {
     // Trigger the settings event to open the modal
     act(() => mockData.trigger('refstudio://menu/settings'));
 
-    expect(screen.getByRole('menuitem', { name: 'Open AI' })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'AI' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Logging' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Config' })).toBeInTheDocument();
   });

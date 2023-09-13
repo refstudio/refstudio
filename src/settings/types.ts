@@ -1,4 +1,4 @@
-export type SettingsPaneId = 'user-account' | 'project-logging' | 'project-openai' | 'debug';
+export type SettingsPaneId = 'user-account' | 'project-logging' | 'project-ai' | 'debug';
 
 export interface PaneConfig {
   id: SettingsPaneId;
