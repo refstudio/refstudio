@@ -21,7 +21,7 @@ router = APIRouter(
 async def http_ai_rewrite(req: RewriteRequest) -> RewriteResponse:
     user_id = "user1"
     user_settings = get_settings_for_user(user_id)
-    response = rewrite(req, user_settings=user_settings)
+    response = await rewrite(req, user_settings=user_settings)
     return response
 
 
@@ -31,7 +31,7 @@ async def http_ai_completion(
 ) -> TextCompletionResponse:
     user_id = "user1"
     user_settings = get_settings_for_user(user_id)
-    response = complete_text(req, user_settings=user_settings)
+    response = await complete_text(req, user_settings=user_settings)
     return response
 
 

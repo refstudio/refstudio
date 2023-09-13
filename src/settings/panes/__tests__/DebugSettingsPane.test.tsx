@@ -16,10 +16,11 @@ const panelConfig: PaneConfig = {
 
 const mockSettings: FlatSettingsSchema = {
   active_project_id: 'project-id',
-  openai_api_key: '',
-  openai_chat_model: 'gpt-3.5-turbo',
-  openai_manner: 'concise',
-  openai_temperature: 0.7,
+  model_provider: 'openai',
+  model: 'gpt-3.5-turbo',
+  api_key: '',
+  rewrite_manner: 'concise',
+  temperature: 0.7,
   logging_enabled: true,
   logging_filepath: '/tmp',
 };

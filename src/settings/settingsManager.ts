@@ -23,14 +23,7 @@ export async function initSettings() {
   let settings: FlatSettingsSchema;
   try {
     settings = await apiGetJson('/api/settings/');
-
     console.log('Settings initialized with success with', settings);
-    console.log('openAI', {
-      api_key: settings.openai_api_key,
-      chat_model: settings.openai_chat_model,
-      manner: settings.openai_manner,
-      temperature: settings.openai_temperature,
-    });
   } catch (err) {
     console.error('Cannot init settings', err);
     throw new Error('Cannot init settings');

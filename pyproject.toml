@@ -22,6 +22,7 @@ uvicorn = "^0.23.2"
 httpx = "^0.24.1"
 python-multipart = "^0.0.6"
 psutil = "^5.9.5"
+litellm = "^0.1.558"
 
 [tool.poetry.group.dev.dependencies]
 ipython = "^8.13.2"
@@ -32,6 +33,7 @@ pyinstaller = "^5.11.0"
 ipdb = "^0.13.13"
 black = "^23.7.0"
 isort = "^5.12.0"
+pytest-asyncio = "^0.21.1"
 
 [build-system]
 requires = ["poetry-core"]
@@ -47,7 +49,6 @@ include_trailing_comma = true
 force_grid_wrap = 0
 line_length = 88
 profile = "black"
-
 
 [tool.coverage.run]
 source = ["python"]

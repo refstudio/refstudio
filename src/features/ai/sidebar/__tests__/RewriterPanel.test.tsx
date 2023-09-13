@@ -19,10 +19,11 @@ vi.mock('../../../../settings/settingsManager');
 vi.mock('../../../../api/rewrite');
 
 const mockSettings = {
-  openai_chat_model: 'dont-care',
-  openai_api_key: 'dont-care',
-  openai_manner: 'scholarly',
-  openai_temperature: 0.5,
+  model_provider: 'openai',
+  model: 'dont-care',
+  api_key: 'dont-care',
+  rewrite_manner: 'scholarly',
+  temperature: 0.5,
 } satisfies Partial<FlatSettingsSchema>;
 
 describe('RewriterPanel component', () => {

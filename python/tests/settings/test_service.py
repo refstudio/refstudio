@@ -5,7 +5,6 @@ from sidecar.settings.service import (
     get_settings_for_user,
     initialize_settings_for_user,
     make_settings_json_path,
-    migrate_settings,
     update_settings_for_user,
 )
 
@@ -49,7 +48,7 @@ def test_get_settings_for_existing_user(monkeypatch, tmp_path, create_settings_j
     user_id = "user1"
 
     response = get_settings_for_user(user_id)
-    assert response.openai_api_key == "1234"
+    assert response.api_key == "1234"
 
 
 def test_update_settings_for_user(monkeypatch, tmp_path, create_settings_json):
@@ -63,18 +62,8 @@ def test_update_settings_for_user(monkeypatch, tmp_path, create_settings_json):
     assert init_settings != default_settings()
 
     patch = schemas.FlatSettingsSchemaPatch()
-    patch.openai_temperature = 100.0
+    patch.temperature = 100.0
     response = update_settings_for_user(user_id, patch)
 
     # should be updated settings
-    assert response.dict() == {**init_settings, "openai_temperature": 100.0}
-
-
-def test_migrate_settings():
-    old_settings = schemas.SettingsSchema()
-    old_settings.openai.api_key = "abcd"
-    old_settings.sidecar.logging.enable = True
-
-    new_settings = migrate_settings(old_settings.dict())
-    assert new_settings.logging_enabled
-    assert new_settings.openai_api_key == "abcd"
+    assert response.dict() == {**init_settings, "temperature": 100.0}
