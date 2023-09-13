@@ -52,7 +52,6 @@ export function Button({
         },
         className,
       )}
-      disabled={disabled}
       role="button"
       type={submit ? 'submit' : 'button'}
       onClick={disabled ? undefined : onClick}

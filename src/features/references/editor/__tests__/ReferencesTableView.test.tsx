@@ -121,7 +121,6 @@ describe('ReferencesTableView component', () => {
     const removeBtn = screen.getByText('Remove');
     await user.click(removeBtn);
 
-    expect(removeBtn).toBeDisabled();
     expect(removeBtn).toHaveAttribute('aria-disabled', 'true');
     expect(vi.mocked(emitEvent)).not.toHaveBeenCalled();
   });
