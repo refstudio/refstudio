@@ -17,7 +17,7 @@ from sidecar.ai.schemas import (
     TextSuggestionChoice,
 )
 from sidecar.config import logger
-from sidecar.settings.schemas import FlatSettingsSchema
+from sidecar.settings.schemas import FlatSettingsSchema, ModelProvider
 from sidecar.typing import ResponseStatus
 from tenacity import retry, stop_after_attempt, wait_fixed
 
@@ -77,12 +77,15 @@ async def rewrite(arg: RewriteRequest, user_settings: FlatSettingsSchema = None)
     n_choices = arg.n_choices
     temperature = arg.temperature
 
-    if user_settings is not None:
-        openai.api_key = user_settings.openai_api_key
-        model = user_settings.openai_chat_model
-    else:
-        openai.api_key = os.environ.get("OPENAI_API_KEY")
+    if user_settings is None:
+        # this is for local dev environment
+        openai.api_key = os.environ.get("API_KEY")
         model = "gpt-3.5-turbo"
+    elif user_settings.model_provider == ModelProvider.OPENAI:
+        openai.api_key = user_settings.api_key
+        model = user_settings.model
+    elif user_settings.model_provider == ModelProvider.OLLAMA:
+        model = "llama2"
 
     # there are 1.33 tokens per word on average
     # seems reasonable to require a max_tokens roughly equivalent to our input text
@@ -117,12 +120,15 @@ async def rewrite(arg: RewriteRequest, user_settings: FlatSettingsSchema = None)
 async def complete_text(
     request: TextCompletionRequest, user_settings: FlatSettingsSchema = None
 ):
-    if user_settings is not None:
-        openai.api_key = user_settings.openai_api_key
-        model = user_settings.openai_chat_model
-    else:
-        openai.api_key = os.environ.get("OPENAI_API_KEY")
+    if user_settings is None:
+        # this is for local dev environment
+        openai.api_key = os.environ.get("API_KEY")
         model = "gpt-3.5-turbo"
+    elif user_settings.model_provider == ModelProvider.OPENAI:
+        openai.api_key = user_settings.api_key
+        model = user_settings.model
+    elif user_settings.model_provider == ModelProvider.OLLAMA:
+        model = "llama2"
 
     logger.info(
         f"Calling text completion with the following parameters: {request.dict()}"

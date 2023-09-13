@@ -5,7 +5,7 @@ from sidecar.ai.schemas import (
     TextCompletionChoice,
     TextCompletionRequest,
 )
-from sidecar.settings.service import default_settings
+from sidecar.settings.service import ModelProvider, default_settings
 
 
 @pytest.mark.asyncio
@@ -13,8 +13,9 @@ async def test_rewrite_is_ok(monkeypatch, amock_call_model_is_ok):
     monkeypatch.setattr(rewrite.Rewriter, "call_model", amock_call_model_is_ok)
 
     user_settings = default_settings()
-    user_settings.openai_api_key = "mocked-api-key"
-    user_settings.openai_chat_model = "gpt-3.5-turbo"
+    user_settings.model_provider = ModelProvider.OPENAI
+    user_settings.api_key = "mocked-api-key"
+    user_settings.model = "gpt-3.5-turbo"
 
     response = await rewrite.rewrite(
         RewriteRequest(text="This is a test"), user_settings=user_settings
