@@ -33,7 +33,7 @@ jobs:
               repo: context.repo.repo,
               tag: `${process.env.PACKAGE_VERSION}`
             })
-            if (existingRelease && existingRelease) {
+            if (existingRelease.status === 200) {
               return existingRelease.data.id
             }
 
