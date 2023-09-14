@@ -133,7 +133,7 @@ def test_ai_chat_is_streaming(
 
     project_id = "project1"
 
-    request = {"text": "This is a test"}
+    request = {"text": "This is a test", "stream": True}
     response = client.post(f"/api/ai/{project_id}/chat_stream", json=request)
 
     assert response.status_code == 200
