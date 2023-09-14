@@ -157,7 +157,8 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
           size="M"
           text="Add"
           type="secondary"
-          onClick={() => emitEvent('refstudio://menu/references/upload')}
+          // onClick={() => emitEvent('refstudio://menu/references/upload')}
+          onClick={() => emitEvent('refstudio://menu/search')}
         />
         <div className="h-8 w-px bg-content-area-border" />
         <div className="flex items-center justify-center gap-2">

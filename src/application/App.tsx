@@ -9,6 +9,7 @@ import { useEventListener, useLocalStorage, useWindowSize } from 'usehooks-ts';
 import { isProjectOpenAtom } from '../atoms/projectState';
 import { emitEvent } from '../events';
 import { ReferencesDropZone } from '../features/references/components/ReferencesDropZone';
+import { SearchModalOpener } from '../features/s2search/SearchModalOpener';
 import { useDebouncedCallback } from '../hooks/useDebouncedCallback';
 import { notifyError } from '../notifications/notifications';
 import { SettingsModalOpener } from '../settings/SettingsModalOpener';
@@ -92,6 +93,7 @@ export function App() {
           </ContextMenus>
         </ApplicationFrame>
         <SettingsModalOpener />
+        <SearchModalOpener />
         <ProjectModals />
       </ReferencesDropZone>
     </EventsListener>
