@@ -7,6 +7,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+HOST = os.environ.get("HOST", "0.0.0.0")
+PORT = int(os.environ.get("PORT", 1487))
+
 WEB_STORAGE_URL = Path(os.environ.get("WEB_STORAGE_URL", "/tmp/web-storage-url"))
 PROJECT_DIR = Path(os.environ.get("PROJECT_DIR", "/tmp/project-x"))
 UPLOADS_DIR = Path(os.path.join(PROJECT_DIR, "uploads"))

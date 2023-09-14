@@ -69,6 +69,13 @@ class JsonStorage:
         with open(self.filepath, "w") as f:
             json.dump(contents, f, indent=2, default=str)
 
+    def add_reference(self, reference: Reference) -> None:
+        """
+        Add a Reference to storage.
+        """
+        self.references.append(reference)
+        self.save()
+
     def get_reference(self, reference_id: str) -> Reference | None:
         """
         Get a Reference from storage by id.

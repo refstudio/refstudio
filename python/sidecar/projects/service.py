@@ -4,11 +4,7 @@ from pathlib import Path
 
 from sidecar.config import WEB_STORAGE_URL
 from sidecar.filesystem.service import traverse_directory
-from sidecar.projects.schemas import (
-    Project,
-    ProjectFileTreeResponse,
-    ProjectStore,
-)
+from sidecar.projects.schemas import Project, ProjectFileTreeResponse, ProjectStore
 
 # Ensure that the server's path storage directory exists.
 Path(WEB_STORAGE_URL).mkdir(parents=True, exist_ok=True)
@@ -105,6 +101,35 @@ def get_project_path(user_id: str, project_id: str) -> Path:
     project_store = read_project_storage(user_id)
     project = project_store.projects[project_id]
     return Path(project.path)
+
+
+def get_project_staging_path(user_id: str, project_id: str) -> Path:
+    project_path = get_project_path(user_id, project_id)
+    return project_path / ".staging"
+
+
+def create_project_staging_filepath(
+    user_id: str, project_id: str, filename: str
+) -> Path:
+    project_path = get_project_staging_path(user_id, project_id)
+    return project_path / filename
+
+
+def get_project_uploads_path(user_id: str, project_id: str) -> Path:
+    project_path = get_project_path(user_id, project_id)
+    return project_path / "uploads"
+
+
+def create_project_uploads_filepath(
+    user_id: str, project_id: str, filename: str
+) -> Path:
+    project_path = get_project_uploads_path(user_id, project_id)
+    return project_path / filename
+
+
+def get_project_exports_path(user_id: str, project_id: str) -> Path:
+    project_path = get_project_path(user_id, project_id)
+    return project_path / "exports"
 
 
 def get_project_name(user_id: str, project_id: str) -> str:
