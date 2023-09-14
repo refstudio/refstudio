@@ -36,6 +36,19 @@ class Reference(RefStudioModel):
     metadata: dict[str, Any] = {}
 
 
+class ReferenceCreate(RefStudioModel):
+    source_filename: str
+    source_url: str
+    citation_key: str | None = None
+    doi: str | None = None
+    title: str | None = None
+    abstract: str | None = None
+    contents: str | None = None
+    published_date: date | None = None
+    authors: list["Author"] = []
+    metadata: dict[str, Any] = {}
+
+
 class ReferencePatch(RefStudioModel):
     """
     ReferencePatch is the input type for updating a Reference's metadata.

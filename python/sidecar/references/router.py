@@ -7,9 +7,11 @@ from sidecar.references.schemas import (
     IngestRequest,
     IngestResponse,
     Reference,
+    ReferenceCreate,
     ReferencePatch,
     UpdateStatusResponse,
 )
+from sidecar.references.service import create_reference_from_url
 from sidecar.typing import EmptyRequest
 
 router = APIRouter(
@@ -41,6 +43,18 @@ async def ingest_references(project_id: str, payload: EmptyRequest) -> IngestRes
     uploads_dir = project_path / "uploads"
     req = IngestRequest(pdf_directory=str(uploads_dir))
     response = ingest.run_ingest(req)
+    return response
+
+
+@router.post("/{project_id}/create_from_url")
+async def create_from_url(project_id: str, payload: ReferenceCreate) -> Reference:
+    """
+    Creates a reference from a PDF URL.
+    """
+    user_id = "user1"
+    response = create_reference_from_url(
+        project_id, url=payload.source_url, metadata=payload
+    )
     return response
 
 
