@@ -42,6 +42,10 @@
             "default": 1,
             "type": "integer"
           },
+          "stream": {
+            "default": true,
+            "type": "boolean"
+          },
           "temperature": {
             "default": 0.7,
             "type": "number"
@@ -898,6 +902,56 @@
           }
         },
         "summary": "Http Ai Chat",
+        "tags": [
+          "ai"
+        ]
+      }
+    },
+    "/api/ai/{project_id}/chat_stream": {
+      "post": {
+        "operationId": "http_ai_chat_stream_api_ai__project_id__chat_stream_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Http Ai Chat Stream",
         "tags": [
           "ai"
         ]

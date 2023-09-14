@@ -47,6 +47,10 @@
         "temperature": {
           "type": "number",
           "default": 0.7
+        },
+        "stream": {
+          "type": "boolean",
+          "default": true
         }
       },
       "type": "object",

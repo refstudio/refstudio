@@ -50,6 +50,10 @@ export interface paths {
     /** Http Ai Chat */
     post: operations['http_ai_chat_api_ai__project_id__chat_post'];
   };
+  '/api/ai/{project_id}/chat_stream': {
+    /** Http Ai Chat Stream */
+    post: operations['http_ai_chat_stream_api_ai__project_id__chat_stream_post'];
+  };
   '/api/ai/completion': {
     /** Http Ai Completion */
     post: operations['http_ai_completion_api_ai_completion_post'];
@@ -163,6 +167,8 @@ export interface components {
     ChatRequest: {
       /** @default 1 */
       n_choices?: number;
+      /** @default true */
+      stream?: boolean;
       /** @default 0.7 */
       temperature?: number;
       text: string;
@@ -434,6 +440,33 @@ export interface operations {
       200: {
         content: {
           'application/json': ChatResponse;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': HTTPValidationError;
+        };
+      };
+    };
+  };
+  /** Http Ai Chat Stream */
+  http_ai_chat_stream_api_ai__project_id__chat_stream_post: {
+    parameters: {
+      path: {
+        project_id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        'application/json': ChatRequest;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': unknown;
         };
       };
       /** @description Validation Error */
