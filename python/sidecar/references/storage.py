@@ -1,15 +1,16 @@
-import json
+from __future__ import annotations
 
-from sidecar import config
+import json
+from pathlib import Path
+
 from sidecar.config import logger
+from sidecar.projects.service import get_project_path
 from sidecar.references.schemas import (
     Author,
     Chunk,
-    DeleteRequest,
     DeleteStatusResponse,
     Reference,
     ReferencePatch,
-    ReferenceUpdate,
     UpdateStatusResponse,
 )
 from sidecar.typing import ResponseStatus
@@ -17,24 +18,23 @@ from sidecar.typing import ResponseStatus
 logger = logger.getChild(__name__)
 
 
-def get_reference(reference_id: str):
-    storage = JsonStorage(config.REFERENCES_JSON_PATH)
+def get_references_json_path(user_id: str, project_id: str) -> Path:
+    """
+    Returns the path to the JSON file that stores the references for a given
+    project.
+    """
+    project_path = get_project_path(user_id=user_id, project_id=project_id)
+    return project_path / ".storage" / "references.json"
+
+
+def get_references_json_storage(user_id: str, project_id: str) -> JsonStorage:
+    """
+    Returns the JSON storage object for a given project.
+    """
+    filepath = get_references_json_path(user_id=user_id, project_id=project_id)
+    storage = JsonStorage(filepath=filepath)
     storage.load()
-    return storage.get_reference(reference_id)
-
-
-def update_reference(reference_id: str, reference_update: ReferenceUpdate):
-    storage = JsonStorage(config.REFERENCES_JSON_PATH)
-    storage.load()
-    response = storage.update(reference_id, reference_update=reference_update)
-    return response
-
-
-def delete_references(delete_request: DeleteRequest):
-    storage = JsonStorage(config.REFERENCES_JSON_PATH)
-    storage.load()
-    response = storage.delete(ids=delete_request.reference_ids, all_=delete_request.all)
-    return response
+    return storage
 
 
 class JsonStorage:
