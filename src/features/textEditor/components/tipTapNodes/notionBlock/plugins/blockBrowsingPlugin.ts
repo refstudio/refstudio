@@ -38,7 +38,12 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
       return true;
     }
     // Block every transaction except pointer events, collapsing/uncollapsing events and events dispatched by the plugin
-    return !!tr.getMeta('pointer') || !!tr.getMeta(collapsibleArrowsPluginKey) || !!tr.getMeta(blockBrowsingPluginKey);
+    return (
+      tr.docChanged ||
+      !!tr.getMeta('pointer') ||
+      !!tr.getMeta(collapsibleArrowsPluginKey) ||
+      !!tr.getMeta(blockBrowsingPluginKey)
+    );
   },
   props: {
     decorations(state) {
@@ -75,11 +80,19 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
           return;
         }
         case 'ArrowDown': {
-          selection.selectNextBlock(tr, (t) => view.dispatch(t));
+          if (!event.shiftKey) {
+            selection.selectNextBlock(tr, (t) => view.dispatch(t));
+          } else {
+            selection.extendDown(tr, (t) => view.dispatch(t));
+          }
           return;
         }
         case 'ArrowUp': {
-          selection.selectPreviousBlock(tr, (t) => view.dispatch(t));
+          if (!event.shiftKey) {
+            selection.selectPreviousBlock(tr, (t) => view.dispatch(t));
+          } else {
+            selection.extendUp(tr, (t) => view.dispatch(t));
+          }
           return;
         }
         case 'ArrowLeft': {

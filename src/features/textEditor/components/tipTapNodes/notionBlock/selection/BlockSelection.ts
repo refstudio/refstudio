@@ -1,11 +1,12 @@
 import { Node, ResolvedPos, Slice } from '@tiptap/pm/model';
-import { Selection, Transaction } from '@tiptap/pm/state';
+import { Selection, TextSelection, Transaction } from '@tiptap/pm/state';
 import { Mappable } from '@tiptap/pm/transform';
 
 import { getNextSibling } from '../utils/getNextSibling';
 import { getNotionBlockParent } from '../utils/getNotionBlockParent';
 import { getParent } from '../utils/getParent';
 import { getPreviousSibling } from '../utils/getPreviousSibling';
+import { NodeData } from '../utils/types';
 
 export class BlockSelection extends Selection {
   constructor($anchor: ResolvedPos, $head = $anchor) {
@@ -26,10 +27,7 @@ export class BlockSelection extends Selection {
 
   map(doc: Node, mapping: Mappable): Selection {
     const $from = doc.resolve(mapping.map(this.from));
-    const $to = doc.resolve(mapping.map(this.to));
-    const $anchor = this.anchor === this.from ? $from : $to;
-    const $head = this.head === this.to ? $from : $to;
-    return new BlockSelection($anchor, $head);
+    return TextSelection.near($from);
   }
 
   content(): Slice {
@@ -157,6 +155,106 @@ export class BlockSelection extends Selection {
     tr.setSelection(new BlockSelection(previousBlock.resolvedPos));
     dispatch(tr);
     return true;
+  }
+
+  extendDown(tr: Transaction, dispatch: (tr: Transaction) => void): boolean {
+    const { nextBlock } = this;
+    if (nextBlock) {
+      tr.setSelection(new BlockSelection(this.$anchor, nextBlock.resolvedPos));
+      dispatch(tr);
+      return true;
+    }
+    return false;
+  }
+
+  extendUp(tr: Transaction, dispatch: (tr: Transaction) => void): boolean {
+    const { previousBlock } = this;
+    const doc = this.$head.node(0);
+    if (previousBlock) {
+      let newResolvedHead = previousBlock.resolvedPos;
+      let newResolvedAnchor = this.$anchor;
+      // If the head is before the anchor, we need to make sure the anchor's depth is lower than the head's depth
+      if (newResolvedHead.min(newResolvedAnchor).pos === newResolvedHead.pos) {
+        if (newResolvedAnchor.depth > newResolvedHead.depth) {
+          const anchorIndex = this.$anchor.indexAfter(newResolvedHead.depth) - 1;
+          const newAnchorPos = this.$anchor.posAtIndex(anchorIndex, newResolvedHead.depth);
+          newResolvedAnchor = doc.resolve(newAnchorPos);
+        }
+        // Otherwise, we need to make sure the head's depth is the lowest
+      } else {
+        if (newResolvedHead.depth > newResolvedAnchor.depth) {
+          const headIndex = newResolvedHead.indexAfter(newResolvedAnchor.depth) - 1;
+          const newHeadPos = newResolvedHead.posAtIndex(headIndex, newResolvedAnchor.depth);
+          newResolvedHead = doc.resolve(newHeadPos);
+        }
+      }
+      tr.setSelection(new BlockSelection(newResolvedAnchor, newResolvedHead));
+      dispatch(tr);
+      return true;
+    }
+    return false;
+  }
+
+  private get childBlock(): NodeData | null {
+    const doc = this.$head.node(0);
+    const currentBlock = doc.nodeAt(this.head)!;
+    if ((currentBlock.attrs.type !== 'collapsible' || !currentBlock.attrs.collapsed) && currentBlock.childCount > 1) {
+      const childPos = this.head + currentBlock.firstChild!.nodeSize + 1;
+      const resolvedChildPos = doc.resolve(childPos);
+
+      return { node: doc.nodeAt(childPos)!, resolvedPos: resolvedChildPos };
+    }
+    return null;
+  }
+
+  private get parentBlock(): NodeData | null {
+    return getParent(this.$head);
+  }
+
+  private get nextBlock(): NodeData | null {
+    let currentResolvedPos = this.$head;
+    let nextBlock = getNextSibling(currentResolvedPos);
+    while (!nextBlock) {
+      const parent = getParent(currentResolvedPos);
+      if (!parent) {
+        // If the node is at the end of the document, it has no next block
+        return null;
+      }
+      currentResolvedPos = parent.resolvedPos;
+      nextBlock = getNextSibling(currentResolvedPos);
+    }
+    return nextBlock;
+  }
+
+  private get previousBlock(): NodeData | null {
+    const currentResolvedPos = this.$head;
+    const previousSibling = getPreviousSibling(currentResolvedPos);
+
+    // If the block is its parent's first child, return the parent
+    if (!previousSibling) {
+      return this.parentBlock;
+    }
+
+    // Otherwise select the deepest child of the previous sibling
+    const doc = this.$head.node(0);
+    let previousBlock = previousSibling;
+    while (
+      (previousBlock.node.attrs.type !== 'collapsible' || !previousBlock.node.attrs.collapsed) &&
+      previousBlock.node.childCount > 1
+    ) {
+      let lastChildOffset = 1;
+      previousBlock.node.forEach((_child, offset, index) => {
+        if (index === previousBlock.node.childCount - 1) {
+          lastChildOffset += offset;
+        }
+      });
+      previousBlock = {
+        node: previousBlock.node.lastChild!,
+        resolvedPos: doc.resolve(previousBlock.resolvedPos.pos + lastChildOffset),
+      };
+    }
+
+    return previousBlock;
   }
 }
 
