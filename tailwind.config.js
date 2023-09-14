@@ -248,7 +248,7 @@ export default {
       },
     },
   },
-  plugins: [debugPlugin(), autocompleteCustomComponentsPlugin()],
+  plugins: [debugPlugin(), autocompleteCustomComponentsPlugin(), require('@tailwindcss/line-clamp'),],
 };
 
 /**

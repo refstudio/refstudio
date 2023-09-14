@@ -327,7 +327,7 @@ export interface S2SearchResult {
   paperId?: string;
   citationCount?: number;
   openAccessPdf?: string;
-  authors?: string[];
+  authors: string[];
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema

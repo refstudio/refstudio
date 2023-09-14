@@ -136,3 +136,11 @@ export const EditIcon = () => (
     </svg>
   </div>
 );
+
+export const DotIcon = () => (
+  <div className="flex h-6 w-6 shrink-0 items-center justify-center">
+    <svg height="16" viewBox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="8" cy="8" r="3" />
+    </svg>
+  </div>
+);
