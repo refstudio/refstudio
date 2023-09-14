@@ -8,6 +8,7 @@ import { isProjectOpenAtom } from '../../../atoms/projectState';
 import { CloseIcon, OpenIcon } from '../../../components/icons';
 import { emitEvent } from '../../../events';
 import { AddIcon, SampleIcon } from '../../components/icons';
+import { KeyboardIcon } from '../../sidebar/icons';
 import { INDEX_FILES } from '../CommandPaletteConfigs';
 
 export function useActionsCommands(openPanel: (panelIndex: number) => void): Command[] {
@@ -107,6 +108,11 @@ export function useActionsCommands(openPanel: (panelIndex: number) => void): Com
           icon: <VscGear />,
           text: 'Show Settings',
           perform: () => emitEvent('refstudio://menu/settings'),
+        },
+        {
+          icon: <KeyboardIcon />,
+          text: 'Show Keyboard Shortcuts',
+          perform: () => emitEvent('refstudio://menu/view/keyboard-shortcuts'),
         },
       ],
     },
