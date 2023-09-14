@@ -39,7 +39,7 @@ describe('ReferencesPanel', () => {
 
   it('should trigger refstudio://menu/references/upload on click', async () => {
     const { user } = setupWithJotaiProvider(<ReferencesPanel />);
-    await user.click(screen.getByText('Browse Reference'));
+    await user.click(screen.getByText('Upload References'));
     expect(vi.mocked(emitEvent)).toBeCalledWith<[RefStudioEventName]>('refstudio://menu/references/upload');
   });
 
