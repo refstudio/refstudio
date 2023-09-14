@@ -176,7 +176,7 @@ def mock_call_model_is_stream(*args, **kwargs):
             "choices": [
                 {
                     "delta": {
-                        "content": "This is a mocked response",
+                        "content": "This is a mocked streaming response",
                     }
                 }
             ]

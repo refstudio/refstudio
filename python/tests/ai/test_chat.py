@@ -36,7 +36,7 @@ def test_chat_yield_response_is_ok(
     for chunk in response:
         result += chunk
 
-    assert result == "This is a mocked response"
+    assert result == "This is a mocked streaming response"
 
 
 def test_chat_ask_question_is_openai_error(
