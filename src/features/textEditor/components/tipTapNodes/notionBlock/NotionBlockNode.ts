@@ -11,12 +11,14 @@ import { toggleUnorderedList } from './commands/toggleUnorderedList';
 import { unindent } from './commands/unindent';
 import { createNotionBlockInputRule } from './inputRuleHandlers/createNotionBlockInputRule';
 import { NotionBlock } from './NotionBlock';
+import { blockBrowsingPlugin } from './plugins/blockBrowsingPlugin';
 import { collapsibleArrowsPlugin } from './plugins/collapsibleArrowPlugin';
 import { collapsiblePlaceholderPlugin } from './plugins/collapsiblePlaceholderPlugin';
 import { hideHandlePlugin } from './plugins/hideHandlePlugin';
 import { orderedListPlugin } from './plugins/orderedListPlugin';
 import { placeholderPlugin } from './plugins/placeholderPlugin';
 import { unorderedListPlugin } from './plugins/unorderedListPlugin';
+import { getNotionBlockParent } from './utils/getNotionBlockParent';
 
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
@@ -124,21 +126,24 @@ export const NotionBlockNode = Node.create({
       Delete: ({ editor }) => editor.commands.command(joinForward),
       'Cmd-Enter': ({ editor }) => {
         const { $from } = editor.state.selection;
-        if ($from.node(-1).type.name !== NotionBlockNode.name || $from.node(-1).attrs.type !== 'collapsible') {
+        const notionBlock = getNotionBlockParent($from);
+        if (!notionBlock) {
           return false;
         }
-        const pos = $from.before(-1);
-        return editor.commands.command(({ dispatch, tr, view }) => toggleCollapsed({ pos, dispatch, tr, view }));
+        return editor.commands.command(({ dispatch, tr, view }) =>
+          toggleCollapsed({ pos: notionBlock.resolvedPos.pos, dispatch, tr, view }),
+        );
       },
     };
   },
 
   addProseMirrorPlugins: () => [
-    placeholderPlugin,
-    hideHandlePlugin,
+    blockBrowsingPlugin,
     collapsibleArrowsPlugin,
     collapsiblePlaceholderPlugin,
+    hideHandlePlugin,
     orderedListPlugin,
+    placeholderPlugin,
     unorderedListPlugin,
   ],
 

@@ -39,8 +39,11 @@ export function TipTapEditor({ editorContent, editorId, isActive, saveFileInMemo
       content: editorContent,
       onSelectionUpdate: (update) => {
         const updatedEditor = update.editor;
-        const { from, to } = updatedEditor.view.state.selection;
-        const text = updatedEditor.view.state.doc.textBetween(from, to);
+        const { selection } = updatedEditor.view.state;
+
+        const { content } = selection.content();
+
+        const text = content.textBetween(0, content.size, '\n');
         setSelection(text);
       },
       editorProps: {
