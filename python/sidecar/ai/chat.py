@@ -119,9 +119,7 @@ class Chat:
         temperature: float = 0.7,
         stream: bool = False,
     ):
-        logger.info(
-            f"Calling OpenAI chat API with the following input message(s): {messages}"
-        )
+        logger.info(f"Calling chat API with the following input message(s): {messages}")
         response = litellm.completion(
             model=self.model,
             messages=messages,
@@ -130,7 +128,7 @@ class Chat:
             # max_tokens=200,
             stream=stream,
         )
-        logger.info(f"Received response from OpenAI chat API: {response}")
+        logger.info(f"Received response from chat API: {response}")
         return response
 
     def prepare_messages_for_chat(self, text: str) -> list:
@@ -149,8 +147,11 @@ class Chat:
         self, n_choices: int = 1, temperature: float = 0.7, stream: bool = False
     ) -> dict:
         logger.info("Fetching 5 most relevant document chunks from storage")
+
         docs = self.get_relevant_documents()
+
         logger.info("Creating input prompt for chat API")
+
         context_str = prepare_chunks_for_prompt(chunks=docs)
         prompt = create_prompt_for_chat(query=self.input_text, context=context_str)
         messages = self.prepare_messages_for_chat(text=prompt)
