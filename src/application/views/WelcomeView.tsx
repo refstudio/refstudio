@@ -2,10 +2,9 @@ import { useAtomValue } from 'jotai';
 
 import { allProjectsAtom } from '../../atoms/projectState';
 import { Button } from '../../components/Button';
-import { OpenIcon } from '../../components/icons';
 import { TabPane } from '../../components/TabPane';
 import { emitEvent } from '../../events';
-import { AddIcon, WelcomeIcon } from '../components/icons';
+import { WelcomeIcon } from '../components/icons';
 import { ProjectsList } from '../components/ProjectsList';
 import { Logo } from './Logo';
 
@@ -29,7 +28,7 @@ export function WelcomeView() {
       <div className="flex flex-1 gap-10 bg-content-area-bg-primary p-10">
         {projects.length > 0 ? (
           <>
-            <div className="flex w-56 flex-col items-stretch">
+            <div className="flex w-64 flex-col items-stretch">
               <WelcomeActions />
             </div>
             <div className="w-[1px] bg-welcome-border" />
@@ -82,22 +81,19 @@ function EmptyWelcomeView() {
 
 function WelcomeActions() {
   return (
-    <div className="flex flex-col items-start gap-4">
-      <h1 className="text-card-txt-primary">Welcome to refstudio</h1>
-      <div className="flex flex-col items-center gap-2 self-stretch">
-        <Button
-          Action={<AddIcon />}
-          fluid
-          text="Create Project"
-          onClick={() => emitEvent('refstudio://menu/file/project/new')}
-        />
-        <Button
-          Action={<OpenIcon />}
-          fluid
-          text="Open Project"
-          type="secondary"
-          onClick={() => emitEvent('refstudio://menu/file/project/open')}
-        />
+    <div className=" flex flex-col gap-2">
+      <Logo small />
+      <div className="flex flex-col items-start gap-4">
+        <h1 className="text-card-txt-primary">Welcome to refstudio</h1>
+        <div className="flex flex-col items-center gap-2 self-stretch">
+          <Button fluid text="New Project" onClick={() => emitEvent('refstudio://menu/file/project/new')} />
+          <Button
+            fluid
+            text="Try Sample Project"
+            type="secondary"
+            onClick={() => emitEvent('refstudio://menu/file/project/new/sample')}
+          />
+        </div>
       </div>
     </div>
   );
