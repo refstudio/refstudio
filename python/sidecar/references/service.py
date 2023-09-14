@@ -28,7 +28,7 @@ def create_reference_from_url(
     user_id = "user1"
 
     source = requests.get(url)
-    filename = url.split("/")[-1]
+    filename = metadata.source_filename
 
     store = storage.get_references_json_storage(user_id, project_id)
 
