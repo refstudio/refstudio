@@ -204,7 +204,6 @@ export default {
         'editor-selection': 'rgb(var(--editor-selection) / <alpha-value>)',
         'radio-active': 'rgb(var(--radio-active) / <alpha-value>)',
         'radio-border-inactive': 'rgb(var(--radio-border-inactive) / <alpha-value>)',
-        'empty-state-ico-empty': 'rgb(var(--empty-state-ico-empty) / <alpha-value>)',
         'pop-up-message': {
           txt: 'rgb(var(--pop-up-message-txt) / <alpha-value>)',
           bg: 'rgb(var(--pop-up-message-bg) / <alpha-value>)',

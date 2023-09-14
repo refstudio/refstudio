@@ -34,26 +34,6 @@ export const PdfEditorIcon = () => (
   </div>
 );
 
-export const EmptyStateIcon = () => (
-  <div className="flex h-12 w-12 items-center justify-center">
-    <svg height="48" viewBox="0 0 49 48" width="49" xmlns="http://www.w3.org/2000/svg">
-      <g clipPath="url(#clip0_1250_4005)">
-        <path d="M32.9999 30H36.9999V48H32.9999V30Z" fill="currentcolor" />
-        <path d="M25.9999 41V37H43.9999V41H25.9999Z" fill="currentcolor" />
-        <path d="M3.99991 3V45L21.5 45V41H8.00001V7H29V27L32.9999 27V13V12V7.5V3H3.99991Z" fill="currentcolor" />
-        <path d="M48.4999 16L32.9999 7.5V12L43.4999 17.5L37.9999 27L40.9999 29L48.4999 16Z" fill="currentcolor" />
-        <path d="M11.9999 10.5H24.9999V14.5H11.9999V10.5Z" fill="currentcolor" />
-        <path d="M11.9999 18H20.4999V22H11.9999V18Z" fill="currentcolor" />
-      </g>
-      <defs>
-        <clipPath id="clip0_1250_4005">
-          <rect fill="white" height="48" transform="translate(0.5)" width="48" />
-        </clipPath>
-      </defs>
-    </svg>
-  </div>
-);
-
 export const WelcomeIcon = () => (
   <div className="flex h-6 w-6 items-center justify-center">
     <svg height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">

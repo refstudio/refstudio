@@ -5,8 +5,9 @@ import { Button } from '../../components/Button';
 import { OpenIcon } from '../../components/icons';
 import { TabPane } from '../../components/TabPane';
 import { emitEvent } from '../../events';
-import { AddIcon, EmptyStateIcon, WelcomeIcon } from '../components/icons';
+import { AddIcon, WelcomeIcon } from '../components/icons';
 import { ProjectsList } from '../components/ProjectsList';
+import { Logo } from './Logo';
 
 export function WelcomeView() {
   const projects = useAtomValue(allProjectsAtom);
@@ -50,28 +51,30 @@ export function WelcomeView() {
 
 function EmptyWelcomeView() {
   return (
-    <div className="flex flex-1 cursor-default select-none flex-col items-center justify-center gap-6">
-      <div className="text-empty-state-ico-empty">
-        <EmptyStateIcon />
+    <div className="flex flex-1 cursor-default select-none flex-col items-center justify-center gap-10">
+      <div>
+        <Logo />
       </div>
-      <div className="flex flex-col items-center justify-center gap-2 self-stretch">
-        <div className="text-xl/6 font-semibold text-side-bar-txt-primary">Get Started</div>
-        <div className="text-side-bar-txt-secondary">Create a new project or try a sample one.</div>
-      </div>
-      <div className="flex w-64 flex-col items-center justify-center gap-2">
-        <Button
-          fluid
-          size="M"
-          text="Create First Project"
-          onClick={() => emitEvent('refstudio://menu/file/project/new')}
-        />
-        <Button
-          fluid
-          size="M"
-          text="Try Sample Project"
-          type="secondary"
-          onClick={() => emitEvent('refstudio://menu/file/project/new/sample')}
-        />
+      <div className="mb-12 flex w-full flex-col items-center justify-center gap-6">
+        <div className="flex flex-col items-center justify-center gap-2 self-stretch">
+          <div className="text-xl/6 font-semibold text-side-bar-txt-primary">Get Started</div>
+          <div className="text-side-bar-txt-secondary">Create a new project or try a sample one.</div>
+        </div>
+        <div className="flex w-64 flex-col items-center justify-center gap-2">
+          <Button
+            fluid
+            size="M"
+            text="Create First Project"
+            onClick={() => emitEvent('refstudio://menu/file/project/new')}
+          />
+          <Button
+            fluid
+            size="M"
+            text="Try Sample Project"
+            type="secondary"
+            onClick={() => emitEvent('refstudio://menu/file/project/new/sample')}
+          />
+        </div>
       </div>
     </div>
   );
