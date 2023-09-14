@@ -3,6 +3,7 @@ import { Decoration, DecorationSet } from '@tiptap/pm/view';
 
 import { BlockSelection } from '../selection/BlockSelection';
 import { collapsibleArrowsPluginKey } from './collapsibleArrowPlugin';
+import { hideHandlePluginKey } from './hideHandlePlugin';
 
 interface BlockBrowsingPluginOnState {
   enabled: true;
@@ -37,12 +38,13 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
     if (!pluginState?.enabled) {
       return true;
     }
-    // Block every transaction except pointer events, collapsing/uncollapsing events and events dispatched by the plugin
+    // Block every transaction except pointer events, collapsing/uncollapsing events, events dispatched by the plugin and events from hideHandlePlugin
     return (
       tr.docChanged ||
       !!tr.getMeta('pointer') ||
-      !!tr.getMeta(collapsibleArrowsPluginKey) ||
-      !!tr.getMeta(blockBrowsingPluginKey)
+      !!tr.getMeta(blockBrowsingPluginKey) ||
+      tr.getMeta(collapsibleArrowsPluginKey) !== undefined ||
+      tr.getMeta(hideHandlePluginKey) !== undefined
     );
   },
   props: {
@@ -70,12 +72,14 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
         return;
       }
 
-      const selectedBlock = view.state.doc.nodeAt(selection.head);
+      const selectedBlock = view.state.doc.nodeAt(selection.head)!;
       tr.setMeta(blockBrowsingPluginKey, true);
 
       switch (event.code) {
         case 'Escape': {
-          tr.setSelection(TextSelection.near(selection.$head));
+          tr.setSelection(
+            TextSelection.near(view.state.doc.resolve(selection.head + selectedBlock.firstChild!.nodeSize)),
+          );
           view.dispatch(tr);
           return;
         }
@@ -97,7 +101,7 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
         }
         case 'ArrowLeft': {
           // If the block is not collapsed, collapse it
-          if (selectedBlock?.attrs.type === 'collapsible' && !selectedBlock.attrs.collapsed) {
+          if (selectedBlock.attrs.type === 'collapsible' && !selectedBlock.attrs.collapsed) {
             tr.setMeta(collapsibleArrowsPluginKey, true).setNodeAttribute(selection.head, 'collapsed', true);
             view.dispatch(tr);
           } else {
@@ -108,7 +112,7 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
         }
         case 'ArrowRight': {
           // If the block is collapsed, uncollapse it
-          if (selectedBlock?.attrs.type === 'collapsible' && selectedBlock.attrs.collapsed) {
+          if (selectedBlock.attrs.type === 'collapsible' && selectedBlock.attrs.collapsed) {
             tr.setMeta(collapsibleArrowsPluginKey, true).setNodeAttribute(selection.head, 'collapsed', false);
             view.dispatch(tr);
           } else {
