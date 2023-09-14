@@ -3,17 +3,14 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from sidecar import config
 from sidecar.config import logger
 from sidecar.projects.service import get_project_path
 from sidecar.references.schemas import (
     Author,
     Chunk,
-    DeleteRequest,
     DeleteStatusResponse,
     Reference,
     ReferencePatch,
-    ReferenceUpdate,
     UpdateStatusResponse,
 )
 from sidecar.typing import ResponseStatus
@@ -41,7 +38,6 @@ def delete_references(delete_request: DeleteRequest) -> ResponseStatus:
     storage.load()
     response = storage.delete(ids=delete_request.reference_ids, all_=delete_request.all)
     return response
-
 
 def get_references_json_path(user_id: str, project_id: str) -> Path:
     """
