@@ -43,7 +43,7 @@ def delete_references(delete_request: DeleteRequest) -> ResponseStatus:
     return response
 
 
-def get_references_storage_path(user_id: str, project_id: str) -> Path:
+def get_references_json_path(user_id: str, project_id: str) -> Path:
     """
     Returns the path to the JSON file that stores the references for a given
     project.
@@ -56,7 +56,7 @@ def get_references_json_storage(user_id: str, project_id: str) -> JsonStorage:
     """
     Returns the JSON storage object for a given project.
     """
-    filepath = get_references_storage_path(user_id=user_id, project_id=project_id)
+    filepath = get_references_json_path(user_id=user_id, project_id=project_id)
     storage = JsonStorage(filepath=filepath)
     storage.load()
     return storage

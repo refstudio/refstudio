@@ -17,6 +17,10 @@ def yield_response(
     project_id: str = None,
     user_settings: FlatSettingsSchema = None,
 ):
+    """
+    This is a generator function that yields responses from the chat API.
+    Only used for streaming responses to the client.
+    """
     input_text = request.text
     temperature = request.temperature
     stream = request.stream
@@ -39,7 +43,7 @@ def yield_response(
 
     ranker = BM25Ranker(storage=storage)
     chat = Chat(input_text=input_text, storage=storage, ranker=ranker, model=model)
-    return chat.stream_response(temperature=temperature, stream=stream)
+    return chat.yield_response(temperature=temperature, stream=stream)
 
 
 def ask_question(
@@ -50,7 +54,6 @@ def ask_question(
     input_text = request.text
     n_choices = request.n_choices
     temperature = request.temperature
-    stream = request.stream
 
     if user_settings is None:
         # this is for local dev environment
@@ -72,9 +75,7 @@ def ask_question(
     chat = Chat(input_text=input_text, storage=storage, ranker=ranker, model=model)
 
     try:
-        choices = chat.ask_question(
-            n_choices=n_choices, temperature=temperature, stream=stream
-        )
+        choices = chat.ask_question(n_choices=n_choices, temperature=temperature)
     except Exception as e:
         logger.error(e)
         response = ChatResponse(
