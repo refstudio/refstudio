@@ -50,7 +50,7 @@
         },
         "stream": {
           "type": "boolean",
-          "default": true
+          "default": false
         }
       },
       "type": "object",

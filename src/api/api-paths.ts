@@ -167,7 +167,7 @@ export interface components {
     ChatRequest: {
       /** @default 1 */
       n_choices?: number;
-      /** @default true */
+      /** @default false */
       stream?: boolean;
       /** @default 0.7 */
       temperature?: number;
