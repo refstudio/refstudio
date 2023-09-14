@@ -27,12 +27,12 @@ export function CreateProjectModal() {
   }
 
   return (
-    <Modal className="w-[1150px] max-w-[calc(30vw-100px)]" open={isVisible} onClose={dismissModal}>
+    <Modal className="w-[1150px] max-w-[calc(40vw-100px)]" open={isVisible} onClose={dismissModal}>
       <div className="flex w-full flex-col bg-white">
-        <div className="border-b-2 p-2 font-bold">Project Name</div>
-        <div className="p-2">
+        <h1 className="border-b-2 p-4">Project Name</h1>
+        <div className="p-4">
           <p>What is the name you want to use for this project?</p>
-          <form className="flex gap-2 p-2" onSubmit={handleFormSubmit}>
+          <form className="flex gap-2 py-2" onSubmit={handleFormSubmit}>
             <Input
               autoFocus
               data-testid="project-name-input"
@@ -42,6 +42,9 @@ export function CreateProjectModal() {
             />
             <Button className="w-auto" disabled={cleanupName(name).length === 0} submit text="Create" type="primary" />
           </form>
+          <p>
+            <small>Note: This action will close any open project you already have.</small>
+          </p>
         </div>
       </div>
     </Modal>
