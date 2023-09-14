@@ -2,13 +2,11 @@ import os
 
 import litellm
 import openai
-from sidecar import config
 from sidecar.ai.prompts import create_prompt_for_chat, prepare_chunks_for_prompt
 from sidecar.ai.ranker import BM25Ranker
 from sidecar.ai.schemas import ChatRequest, ChatResponse, ChatResponseChoice
 from sidecar.config import logger
-from sidecar.projects.service import get_project_path
-from sidecar.references.storage import JsonStorage
+from sidecar.references.storage import JsonStorage, get_references_json_storage
 from sidecar.settings.schemas import FlatSettingsSchema, ModelProvider
 from sidecar.typing import ResponseStatus
 from tenacity import retry, stop_after_attempt, wait_fixed
@@ -23,30 +21,25 @@ def yield_response(
     temperature = request.temperature
     stream = request.stream
 
-    if user_settings is not None:
-        openai.api_key = user_settings.openai_api_key
-        model = user_settings.openai_chat_model
-    else:
-        openai.api_key = os.environ.get("OPENAI_API_KEY")
+    if user_settings is None:
+        # this is for local dev environment
+        openai.api_key = os.environ.get("API_KEY")
         model = "gpt-3.5-turbo"
+    elif user_settings.model_provider == ModelProvider.OPENAI:
+        openai.api_key = user_settings.api_key
+        model = user_settings.model
+    elif user_settings.model_provider == ModelProvider.OLLAMA:
+        model = "llama2"
 
     logger.info(f"Calling chat with the following parameters: {request.dict()}")
 
-    if project_id:
-        project_path = get_project_path(user_id="user1", project_id=project_id)
-        filepath = project_path / ".storage" / "references.json"
-        storage = JsonStorage(filepath=filepath)
-    else:
-        storage = JsonStorage(filepath=config.REFERENCES_JSON_PATH)
+    storage = get_references_json_storage(user_id="user1", project_id=project_id)
 
-    logger.info(f"Loading documents from storage: {storage.filepath}")
-    storage.load()
     logger.info(f"Loaded {len(storage.chunks)} documents from storage")
 
     ranker = BM25Ranker(storage=storage)
     chat = Chat(input_text=input_text, storage=storage, ranker=ranker, model=model)
-
-    return chat.yield_response(temperature=temperature, stream=stream)
+    return chat.stream_response(temperature=temperature, stream=stream)
 
 
 def ask_question(
@@ -71,15 +64,8 @@ def ask_question(
 
     logger.info(f"Calling chat with the following parameters: {request.dict()}")
 
-    if project_id:
-        project_path = get_project_path(user_id="user1", project_id=project_id)
-        filepath = project_path / ".storage" / "references.json"
-        storage = JsonStorage(filepath=filepath)
-    else:
-        storage = JsonStorage(filepath=config.REFERENCES_JSON_PATH)
+    storage = get_references_json_storage(user_id="user1", project_id=project_id)
 
-    logger.info(f"Loading documents from storage: {storage.filepath}")
-    storage.load()
     logger.info(f"Loaded {len(storage.chunks)} documents from storage")
 
     ranker = BM25Ranker(storage=storage)
@@ -173,8 +159,11 @@ class Chat:
             temperature=temperature,
             stream=stream,
         )
+
         if stream:
+            # no need to wrap in a ChatResponse object
             return response
+
         choices = self.prepare_choices_for_client(response=response)
         return choices
 
