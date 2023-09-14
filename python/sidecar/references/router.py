@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from sidecar.projects.service import get_project_path
+from sidecar.projects.service import get_project_uploads_path
 from sidecar.references import ingest, storage
 from sidecar.references.schemas import (
     DeleteRequest,
@@ -39,8 +39,7 @@ async def ingest_references(project_id: str, payload: EmptyRequest) -> IngestRes
     Ingests references from PDFs in the project uploads directory
     """
     user_id = "user1"
-    project_path = get_project_path(user_id, project_id)
-    uploads_dir = project_path / "uploads"
+    uploads_dir = get_project_uploads_path(user_id, project_id)
     req = IngestRequest(pdf_directory=str(uploads_dir))
     response = ingest.run_ingest(req)
     return response
@@ -51,7 +50,6 @@ async def create_from_url(project_id: str, payload: ReferenceCreate) -> Referenc
     """
     Creates a reference from a PDF URL.
     """
-    user_id = "user1"
     response = create_reference_from_url(
         project_id, url=payload.source_url, metadata=payload
     )
