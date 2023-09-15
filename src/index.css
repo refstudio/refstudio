@@ -144,7 +144,6 @@
     --btn-bg-radio-active: var(--primary-50);
     --radio-active: var(--primary-50);
     --radio-border-inactive: var(--grayscale-20);
-    --empty-state-ico-empty: var(--grayscale-40);
     --pop-up-message-txt: var(--grayscale-00);
     --pop-up-message-bg: var(--grayscale-80);
   }

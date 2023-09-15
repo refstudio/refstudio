@@ -1,17 +1,39 @@
 import { cx } from '../../lib/cx';
 
-export function Logo() {
+export function Logo({ small = false }: { small?: boolean }) {
   return (
-    <div className="flex h-32 w-64 shrink-0 flex-row overflow-hidden rounded-default shadow-default">
-      <LogoLetter className="bg-logo-primary text-logo-secondary" letter="R" />
-      <LogoLetter className="bg-logo-secondary text-logo-primary" letter="S" />
+    <div
+      className={cx('flex shrink-0 flex-row overflow-hidden rounded-default shadow-default', {
+        'h-12 w-24': small,
+        'h-32 w-64': !small,
+      })}
+    >
+      <LogoLetter className="bg-logo-primary text-logo-secondary" letter="R" small={small} />
+      <LogoLetter className="bg-logo-secondary text-logo-primary" letter="S" small={small} />
     </div>
   );
 }
 
-function LogoLetter({ letter, className = '' }: { letter: string; className?: string }) {
+function LogoLetter({
+  letter,
+  className = '',
+  small = false,
+}: {
+  letter: string;
+  className?: string;
+  small?: boolean;
+}) {
   return (
-    <div className={cx('flex flex-1 items-center justify-center text-8xl font-black', className)}>
+    <div
+      className={cx(
+        'flex flex-1 items-center justify-center font-black',
+        {
+          'text-4xl': small,
+          'text-8xl': !small,
+        },
+        className,
+      )}
+    >
       <span>{letter}</span>
     </div>
   );

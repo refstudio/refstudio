@@ -20,6 +20,8 @@ export async function saveAsMarkdown(markdownSerializer: MarkdownSerializer, fil
       const bibliographyFilePath = makeExportsPath(bibliographyFileName);
       await writeFileContent(bibliographyFilePath, serializedContent.bibliography.textContent);
     }
+
+    return markdownFilePath;
   } catch (err) {
     console.error('Error', err);
   }

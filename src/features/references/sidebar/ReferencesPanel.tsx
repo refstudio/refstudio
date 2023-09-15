@@ -97,10 +97,10 @@ export function ReferencesPanel() {
               <DragAndDropIcon />
             </div>
             <div className="flex flex-col items-stretch justify-center gap-2 self-stretch">
-              <h2 className="text-center text-xl/6 text-side-bar-txt-primary">No References</h2>
+              <h2 className="text-center text-xl/6 font-semibold text-side-bar-txt-primary">No References</h2>
               <div className="text-center text-side-bar-txt-secondary">Drag or choose your first reference here.</div>
             </div>
-            <Button text="Browse Reference" onClick={() => emitEvent('refstudio://menu/references/upload')} />
+            <Button text="Upload References" onClick={() => emitEvent('refstudio://menu/references/upload')} />
           </div>
         </div>
       )}
