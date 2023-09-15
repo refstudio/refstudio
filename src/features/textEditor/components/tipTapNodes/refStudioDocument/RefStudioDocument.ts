@@ -32,7 +32,7 @@ const selectionPlugin = new Plugin({
 });
 
 export const RefStudioDocument = Document.extend({
-  content: 'notionBlock* | codeBlock',
+  content: 'notionBlock+',
   addProseMirrorPlugins: () => [selectionPlugin],
 });
 

@@ -43,20 +43,38 @@ export class BlockSelection extends Selection {
   }
 
   content(): Slice {
-    const lastNode = this.$to.node(0).nodeAt(this.to)!;
-    const content = this.$from.node(0).slice(this.from, this.to + lastNode.nodeSize);
+    const doc = this.$from.node(0);
+    const lastNode = doc.nodeAt(this.to)!;
 
-    return content;
+    if (this.$from.depth === this.$to.depth) {
+      return doc.slice(this.from, this.to + lastNode.nodeSize);
+    }
+
+    // We treat the first node differently because its depth is higher than the last node,
+    // and we need to flatten the slice to be able to move it around without having an open start
+    const firstNode = doc.nodeAt(this.from)!;
+
+    const contentSlice = doc.slice(
+      this.$from.posAtIndex(this.$from.indexAfter(this.$to.depth), this.$to.depth),
+      this.to + lastNode.nodeSize,
+    );
+
+    return new Slice(contentSlice.content.addToStart(firstNode), 0, 0);
   }
 
   replace(tr: Transaction, content?: Slice): void {
-    const lastNode = this.$to.node(0).nodeAt(this.to)!;
-    tr.replace(this.from, this.to + lastNode.nodeSize, content);
+    const lastNode = this.$from.node(0).nodeAt(this.to)!;
+    tr.replace(this.from, this.to + lastNode.nodeSize, content).setSelection(
+      Selection.near(tr.doc.resolve(this.from), -1),
+    );
   }
 
   replaceWith(tr: Transaction, node: Node): void {
-    const lastNode = this.$to.node(0).nodeAt(this.to)!;
-    tr.replaceWith(this.from, this.to + lastNode.nodeSize, node);
+    const doc = this.$from.node(0);
+    const lastNode = doc.nodeAt(this.to)!;
+    tr.replaceWith(this.from, this.to + lastNode.nodeSize, node).setSelection(
+      Selection.near(tr.doc.resolve(this.from), -1),
+    );
   }
 
   toJSON() {
