@@ -29,8 +29,8 @@ export function CreateProjectModal() {
   return (
     <Modal className="w-[1150px] max-w-[calc(40vw-100px)]" open={isVisible} onClose={dismissModal}>
       <div className="flex w-full flex-col bg-white">
-        <h1 className="border-b-2 p-4">Project Name</h1>
-        <div className="p-4">
+        <h1 className="border-b-2 px-6 py-4">Project Name</h1>
+        <div className="p-6">
           <p>What is the name you want to use for this project?</p>
           <form className="flex gap-2 py-2" onSubmit={handleFormSubmit}>
             <Input
