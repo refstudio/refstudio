@@ -4,68 +4,61 @@ import { Modal } from '../components/Modal';
 import { useListenEvent } from '../hooks/useListenEvent';
 import { cx } from '../lib/cx';
 
-interface ModalTab {
-  name: string;
-  disabled?: boolean;
-  groups: {
-    header: string;
-    shortcuts: {
-      label: string;
-      keys: string[];
-    }[];
+interface ShortcutSection {
+  header: string;
+  colSpan?: number;
+  rowSpan?: number;
+  shortcuts: {
+    label: string;
+    keys: string[];
   }[];
 }
 
-const MODAL_TABS: ModalTab[] = [
+const SHORTCUT_SECTIONS: ShortcutSection[] = [
   {
-    name: 'Essentials',
-    groups: [
-      {
-        header: 'File',
-        shortcuts: [
-          makeShortcut('Save File', ['⌘', 'S']), //
-          makeShortcut('New File', ['⌘', 'N']),
-        ],
-      },
-      {
-        header: 'Quick Panes',
-        shortcuts: [
-          makeShortcut('Quick Actions', ['⌘', 'K']), //
-          makeShortcut('Quick Files', ['⌘', 'P']),
-        ],
-      },
-      {
-        header: 'AI Tools',
-        shortcuts: [
-          makeShortcut('AI Text Completion', ['⌘', 'J']), //
-        ],
-      },
+    header: 'File',
+    shortcuts: [
+      makeShortcut('Save File', ['⌘', 'S']), //
+      makeShortcut('New File', ['⌘', 'N']),
+      makeShortcut('Close Editor', ['⌘', 'W']),
     ],
   },
   {
-    name: 'Editor',
-    disabled: true,
-    groups: [],
+    header: 'Application',
+    shortcuts: [
+      makeShortcut('Quick Actions', ['⌘', 'K']), //
+      makeShortcut('Quick Files', ['⌘', 'P']),
+      makeShortcut('Open References', ['⌘', 'R']),
+    ],
   },
   {
-    name: 'AI Tools',
-    disabled: true,
-    groups: [],
+    header: 'AI Tools',
+    shortcuts: [
+      makeShortcut('AI Text Completion', ['⌘', 'J']), //
+    ],
   },
   {
-    name: 'File',
-    disabled: true,
-    groups: [],
+    header: 'View',
+    shortcuts: [
+      makeShortcut('Toggle Explorer Pane', ['⌘', '1']), //
+      makeShortcut('Toggle References Pane', ['⌘', '2']),
+      makeShortcut('Toggle Rewriter Pane', ['⌘', '9']),
+      makeShortcut('Toggle Chatbot Pane', ['⌘', '0']),
+    ],
   },
   {
-    name: 'References',
-    disabled: true,
-    groups: [],
-  },
-  {
-    name: 'View',
-    disabled: true,
-    groups: [],
+    header: 'Editor',
+    colSpan: 1,
+    rowSpan: 2,
+    shortcuts: [
+      makeShortcut('Standard text edit shortcuts (bold, italic, ...)', []), //
+      makeShortcut('Standard markdown shortcuts', []), //
+      makeShortcut('References citation interaction', ['[']),
+      makeShortcut('Select aditional reference (inside citation)', ['@']),
+      makeShortcut('Creates a collapsible section', ['>', '␣']),
+      makeShortcut('Indent editor block', ['TAB']),
+      makeShortcut('Toggle block navigation', ['ESC']),
+    ],
   },
 ];
 
@@ -77,81 +70,61 @@ function makeShortcut(label: string, keys: string[]) {
 }
 
 export function KeyboardShortcutsModal() {
-  const [isVisible, setVisible] = useState(false);
-  const [selectedTab, setSelectedTab] = useState(MODAL_TABS[0]);
-
+  const [isVisible, setVisible] = useState(true);
   useListenEvent('refstudio://menu/view/keyboard-shortcuts', () => setVisible(true));
 
   return (
     <Modal
-      className="hx-[568px] max-h-full w-[730px] max-w-[630px] bg-white text-modal-txt-primary"
+      className="max-h-full min-w-[700px] bg-white text-modal-txt-primary"
       open={isVisible}
       onClose={() => setVisible(false)}
     >
       <div className="flex w-full flex-col gap-1">
-        <Tabs selectedTab={selectedTab} onClick={setSelectedTab} />
-        <KeysTabPane selectedTab={selectedTab} />
+        <h1 className="border-b-2 p-4">Keyboard Shortcuts</h1>
+        <div className="grid grid-flow-col grid-rows-2 gap-6 p-2">
+          {SHORTCUT_SECTIONS.map((section) => (
+            <SectionPane key={section.header} section={section} />
+          ))}
+        </div>
       </div>
     </Modal>
   );
 }
 
-function Tabs({ selectedTab, onClick }: { selectedTab: ModalTab; onClick: (tab: ModalTab) => void }) {
+function SectionPane({ section }: { section: ShortcutSection }) {
   return (
-    <div>
-      <div className="relative flex w-full pl-3 pt-1">
-        {MODAL_TABS.map((tab) => (
-          <div
-            className={cx('px-4 py-3', {
-              'font-bold': selectedTab.name === tab.name,
-              'z-[1] border border-b border-modal-border border-b-white': selectedTab.name === tab.name,
-              'cursor-pointer hover:font-bold': selectedTab.name !== tab.name,
-              'pointer-events-none opacity-50': tab.disabled,
-            })}
-            key={tab.name}
-            onClick={() => onClick(tab)}
-          >
-            {tab.name}
-          </div>
-        ))}
-      </div>
-      <div className="relative -top-[1px] flex h-[1px] w-full bg-modal-border" />
-    </div>
-  );
-}
-
-function KeysTabPane({ selectedTab }: { selectedTab: ModalTab }) {
-  return (
-    <div className="p-8">
-      <div className="flex flex-col gap-6">
-        {selectedTab.groups.map((group) => (
-          <div className="rounded border border-modal-border" key={group.header}>
-            <div className="bg-modal-border  px-4 py-3 font-bold">{group.header}</div>
-            <div className="flex flex-col">
-              {group.shortcuts.map((shortcut) => (
-                <div
-                  className="flex items-center justify-between gap-2 border-t border-modal-border px-4 py-3"
-                  key={shortcut.label}
-                >
-                  <div className="">{shortcut.label}</div>
-                  <div className="flex gap-1">
-                    {shortcut.keys.map((key) => (
-                      <kbd
-                        className={cx(
-                          'flex h-8 w-8 items-center justify-center rounded-default bg-modal-border',
-                          'font-default text-base/4 font-medium',
-                        )}
-                        key={key}
-                      >
-                        {key}
-                      </kbd>
-                    ))}
-                  </div>
-                </div>
-              ))}
+    <div
+      className={cx('min-w-[300px] ', {
+        'col-span-2': section.colSpan === 2,
+        'row-span-2': section.rowSpan === 2,
+      })}
+      key={section.header}
+    >
+      <div className="rounded border border-modal-border">
+        <div className="bg-modal-border px-4 py-3 font-bold">{section.header}</div>
+        <div className="flex flex-col">
+          {section.shortcuts.map((shortcut) => (
+            <div
+              className="flex items-center justify-between gap-2 border-t border-modal-border px-4 py-3"
+              key={shortcut.label}
+            >
+              <div className="">{shortcut.label}</div>
+              <div className="flex gap-1">
+                {shortcut.keys.map((key) => (
+                  <kbd
+                    className={cx(
+                      'flex h-8 w-8 items-center justify-center rounded-default bg-modal-border',
+                      'font-default  font-medium',
+                    )}
+                    key={key}
+                  >
+                    {key}
+                  </kbd>
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
