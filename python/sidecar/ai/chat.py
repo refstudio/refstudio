@@ -23,7 +23,6 @@ def yield_response(
     """
     input_text = request.text
     temperature = request.temperature
-    stream = request.stream
 
     if user_settings is None:
         # this is for local dev environment
@@ -43,7 +42,7 @@ def yield_response(
 
     ranker = BM25Ranker(storage=storage)
     chat = Chat(input_text=input_text, storage=storage, ranker=ranker, model=model)
-    return chat.yield_response(temperature=temperature, stream=stream)
+    return chat.yield_response(temperature=temperature)
 
 
 def ask_question(
@@ -169,9 +168,11 @@ class Chat:
         choices = self.prepare_choices_for_client(response=response)
         return choices
 
-    def yield_response(self, temperature: float = 0.7, stream: bool = False):
-        response = self.ask_question(
-            n_choices=1, temperature=temperature, stream=stream
-        )
+    def yield_response(self, temperature: float = 0.7):
+        """
+        This is a generator function that yields responses from the chat API.
+        Only used for streaming chat responses to the client.
+        """
+        response = self.ask_question(n_choices=1, temperature=temperature, stream=True)
         for chunk in response:
             yield chunk["choices"][0]["delta"]["content"]

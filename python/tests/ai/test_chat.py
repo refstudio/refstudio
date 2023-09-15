@@ -27,7 +27,7 @@ def test_chat_yield_response_is_ok(
     monkeypatch.setattr(chat.Chat, "call_model", mock_call_model_is_stream)
 
     response = chat.yield_response(
-        request=ChatRequest(text="This is a question about something", stream=True),
+        request=ChatRequest(text="This is a question about something"),
         project_id="project1",
     )
     assert isinstance(response, GeneratorType)
