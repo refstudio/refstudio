@@ -21,18 +21,20 @@ export const RefStudioEditorIcon = () => (
   </div>
 );
 
-// TODO: We need to replace this icon with the real one
-export const FallbackEditorIconBuilder = (letter: string) =>
-  // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
-  function FallbackEditorIconFor() {
-    return (
-      <div className="flex h-5 w-5 items-center justify-center rounded bg-btn-ico-top-bar-active">
-        <span className="text-[9px] font-semibold text-white">{letter}</span>
-      </div>
-    );
-  };
+function EditorIconFor({ letter }: { letter: string }) {
+  return (
+    <div className="flex h-5 w-5 items-center justify-center rounded bg-btn-ico-top-bar-active">
+      <span className="text-[9px] font-semibold text-white">{letter}</span>
+    </div>
+  );
+}
 
-export const PdfEditorIcon = () => (
+export const RefStudioTextEditorIcon = () => <EditorIconFor letter="F" />;
+export const RefStudioJsonEditorIcon = () => <EditorIconFor letter="J" />;
+export const RefStudioReferenceEditorIcon = () => <EditorIconFor letter="R" />;
+export const RefStudioReferencesEditorIcon = () => <EditorIconFor letter="R" />;
+
+export const RefStudioPdfEditorIcon = () => (
   <div className="flex h-6 w-6 items-center justify-center">
     <svg height="20" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg">
       <path
