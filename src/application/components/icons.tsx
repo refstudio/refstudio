@@ -21,6 +21,7 @@ export const RefStudioEditorIcon = () => (
   </div>
 );
 
+// TODO: We need to replace this icon with the real one
 export const FallbackEditorIconBuilder = (letter: string) =>
   // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
   function FallbackEditorIconFor() {
@@ -30,9 +31,6 @@ export const FallbackEditorIconBuilder = (letter: string) =>
       </div>
     );
   };
-
-// TODO: We need to replace this icon with the real one
-export const FallbackEditorIcon = FallbackEditorIconBuilder('F');
 
 export const PdfEditorIcon = () => (
   <div className="flex h-6 w-6 items-center justify-center">
