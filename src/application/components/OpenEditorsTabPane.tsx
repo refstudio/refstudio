@@ -9,15 +9,15 @@ import { PaneId } from '../../atoms/types/PaneGroup';
 import { TabPane, TabPaneItem } from '../../components/TabPane';
 import { TABPANE_TAB_MENU_ID } from '../../components/TabPaneTabContextMenu';
 import { emitEvent } from '../../events';
-import { PdfEditorIcon, RefStudioEditorIcon } from './icons';
+import { FallbackEditorIcon, PdfEditorIcon, RefStudioEditorIcon } from './icons';
 
 const EDITOR_ICONS: Record<EditorContentType, () => React.ReactElement | undefined> = {
   refstudio: RefStudioEditorIcon,
   pdf: PdfEditorIcon,
-  text: () => undefined,
-  json: () => undefined,
-  references: () => undefined,
-  reference: () => undefined,
+  text: FallbackEditorIcon,
+  json: FallbackEditorIcon,
+  references: FallbackEditorIcon,
+  reference: FallbackEditorIcon,
 };
 
 interface OpenEditorsTabPaneProps {

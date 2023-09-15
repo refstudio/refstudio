@@ -21,6 +21,13 @@ export const RefStudioEditorIcon = () => (
   </div>
 );
 
+// TODO: We need to replace this icon with the real one
+export const FallbackEditorIcon = () => (
+  <div className="flex h-5 w-5 items-center justify-center rounded bg-btn-ico-top-bar-active">
+    <span className="text-[9px] font-semibold text-white">F</span>
+  </div>
+);
+
 export const PdfEditorIcon = () => (
   <div className="flex h-6 w-6 items-center justify-center">
     <svg height="20" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg">
