@@ -15,6 +15,19 @@ export const SearchIcon = () => (
   </div>
 );
 
+export const OpenPdfIcon = () => (
+  <div className="flex h-6 w-6 shrink-0 items-center justify-center">
+    <svg fill="none" height="20" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg">
+      <path
+        clipRule="evenodd"
+        d="M1 2.8C1 1.80589 1.80589 1 2.8 1H17.2C18.1941 1 19 1.80589 19 2.8V17.2C19 18.1941 18.1941 19 17.2 19H2.8C1.80589 19 1 18.1941 1 17.2V2.8ZM14.5 8.65H15.85V7.3H13.15V12.7H14.5V10.9H15.85V9.55H14.5V8.65ZM12.25 11.35C12.25 12.07 11.62 12.7 10.9 12.7H8.65V7.3H10.9C11.62 7.3 12.25 7.93 12.25 8.65V11.35ZM10.9 8.65H10V11.35H10.9V8.65ZM6.4 10.9C7.12 10.9 7.75 10.27 7.75 9.55V8.65C7.75 7.93 7.12 7.3 6.4 7.3H4.15V12.7H5.5V10.9H6.4ZM5.5 8.65H6.4V9.55H5.5V8.65Z"
+        fill="currentcolor"
+        fillRule="evenodd"
+      />
+    </svg>
+  </div>
+);
+
 export const CloseIcon = () => (
   <div className="flex h-6 w-6 shrink-0 items-center justify-center">
     <svg height="12" viewBox="0 0 12 12" width="12" xmlns="http://www.w3.org/2000/svg">

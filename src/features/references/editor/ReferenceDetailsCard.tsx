@@ -1,6 +1,6 @@
 import { ReactElement, useCallback, useState } from 'react';
 
-import { CloseIcon, EditIcon } from '../../../components/icons';
+import { CloseIcon, EditIcon, OpenPdfIcon } from '../../../components/icons';
 import { cx } from '../../../lib/cx';
 import { Author, ReferenceItem } from '../../../types/ReferenceItem';
 import { authorsFormatter } from './grid/formatters';
@@ -76,17 +76,19 @@ const TableHeadCell = ({
   colSpan,
   header,
   fieldName,
-  refId,
+  reference,
   editing,
   setEditing,
+  openPdf,
 }: {
   content: string;
   colSpan?: number;
   header?: boolean;
   fieldName: string;
-  refId: string;
+  reference: ReferenceItem;
   editing: boolean;
   setEditing?: (value: boolean) => void;
+  openPdf?: (reference: ReferenceItem) => void;
 }) => (
   <th
     className={cx(
@@ -97,14 +99,20 @@ const TableHeadCell = ({
     colSpan={colSpan}
     key={content}
   >
-    <label htmlFor={refId + '_' + fieldName}>{content}</label>
-    {header &&
-      setEditing &&
-      (editing ? (
-        <IconButton icon={<CloseIcon />} title="Finished Editing Reference" onClick={() => setEditing(false)} />
-      ) : (
-        <IconButton icon={<EditIcon />} title="Edit Reference" onClick={() => setEditing(true)} />
-      ))}
+    <label htmlFor={reference.id + '_' + fieldName}>{content}</label>
+
+    {header && setEditing && (
+      <>
+        {editing ? (
+          <IconButton icon={<CloseIcon />} title="Finished Editing Reference" onClick={() => setEditing(false)} />
+        ) : (
+          <IconButton icon={<EditIcon />} title="Edit Reference" onClick={() => setEditing(true)} />
+        )}
+        {reference.filepath && (
+          <IconButton icon={<OpenPdfIcon />} title="Open PDF Reference" onClick={() => openPdf?.(reference)} />
+        )}
+      </>
+    )}
   </th>
 );
 
@@ -117,9 +125,11 @@ const IconButton = ({ title, icon, onClick }: { title: string; icon: ReactElemen
 export default function ReferenceDetailsCard({
   reference,
   handleReferenceChange,
+  handleOpenPdf,
 }: {
   reference: ReferenceItem;
   handleReferenceChange: (params: ReferenceItem) => void;
+  handleOpenPdf?: (reference: ReferenceItem) => void;
 }) {
   const [editing, setEditing] = useState(false);
   const cloneReferenceItem = <T extends object>(source: T): T => ({
@@ -181,11 +191,12 @@ export default function ReferenceDetailsCard({
         <tr>
           <TableHeadCell
             colSpan={2}
-            content="References"
+            content="Reference Details"
             editing={editing}
             fieldName="table-head"
             header={true}
-            refId={reference.id}
+            openPdf={handleOpenPdf}
+            reference={reference}
             setEditing={setEditing}
           />
         </tr>
@@ -196,7 +207,7 @@ export default function ReferenceDetailsCard({
 
           return (
             <tr key={key}>
-              <TableHeadCell content={rowData.title} editing={editing} fieldName={key} refId={reference.id} />
+              <TableHeadCell content={rowData.title} editing={editing} fieldName={key} reference={reference} />
               <TableDataCell
                 contentData={contentData ?? ''}
                 editable={rowData.editable}

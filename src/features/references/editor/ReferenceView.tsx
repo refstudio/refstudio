@@ -1,6 +1,7 @@
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback, useMemo } from 'react';
 
+import { openFilePathAtom } from '../../../atoms/fileEntryActions';
 import { projectIdAtom } from '../../../atoms/projectState';
 import { getDerivedReferenceAtom, updateReferenceAtom } from '../../../atoms/referencesState';
 import { EditorIdFor, parseEditorId } from '../../../atoms/types/EditorData';
@@ -14,14 +15,24 @@ export function ReferenceView({ referenceId }: { referenceId: EditorIdFor<'refer
   const updateReference = useSetAtom(updateReferenceAtom);
   const projectId = useAtomValue(projectIdAtom);
 
+  const openfilePath = useSetAtom(openFilePathAtom);
+
   const handleReferenceChange = useCallback(
     (params: ReferenceItem) => void updateReference(projectId, params.id, params),
     [updateReference, projectId],
   );
 
+  const handleOpenPdf = (ref: ReferenceItem) => openfilePath(ref.filepath);
+
   if (!reference) {
     return null;
   }
 
-  return <ReferenceDetailsCard handleReferenceChange={handleReferenceChange} reference={reference} />;
+  return (
+    <ReferenceDetailsCard
+      handleOpenPdf={handleOpenPdf}
+      handleReferenceChange={handleReferenceChange}
+      reference={reference}
+    />
+  );
 }
