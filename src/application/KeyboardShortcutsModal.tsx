@@ -70,7 +70,7 @@ function makeShortcut(label: string, keys: string[]) {
 }
 
 export function KeyboardShortcutsModal() {
-  const [isVisible, setVisible] = useState(true);
+  const [isVisible, setVisible] = useState(false);
   useListenEvent('refstudio://menu/view/keyboard-shortcuts', () => setVisible(true));
 
   return (
@@ -81,7 +81,7 @@ export function KeyboardShortcutsModal() {
     >
       <div className="flex w-full flex-col gap-1">
         <h1 className="border-b-2 p-4">Keyboard Shortcuts</h1>
-        <div className="grid grid-flow-col grid-rows-2 gap-6 p-2">
+        <div className="columns-3 gap-6 p-4">
           {SHORTCUT_SECTIONS.map((section) => (
             <SectionPane key={section.header} section={section} />
           ))}
@@ -93,38 +93,30 @@ export function KeyboardShortcutsModal() {
 
 function SectionPane({ section }: { section: ShortcutSection }) {
   return (
-    <div
-      className={cx('min-w-[300px] ', {
-        'col-span-2': section.colSpan === 2,
-        'row-span-2': section.rowSpan === 2,
-      })}
-      key={section.header}
-    >
-      <div className="rounded border border-modal-border">
-        <div className="bg-modal-border px-4 py-3 font-bold">{section.header}</div>
-        <div className="flex flex-col">
-          {section.shortcuts.map((shortcut) => (
-            <div
-              className="flex items-center justify-between gap-2 border-t border-modal-border px-4 py-3"
-              key={shortcut.label}
-            >
-              <div className="">{shortcut.label}</div>
-              <div className="flex gap-1">
-                {shortcut.keys.map((key) => (
-                  <kbd
-                    className={cx(
-                      'flex h-8 w-8 items-center justify-center rounded-default bg-modal-border',
-                      'font-default  font-medium',
-                    )}
-                    key={key}
-                  >
-                    {key}
-                  </kbd>
-                ))}
-              </div>
+    <div className="mb-4 min-w-[300px] rounded border border-modal-border" key={section.header}>
+      <div className="bg-modal-border px-4 py-3 font-bold">{section.header}</div>
+      <div className="flex flex-col">
+        {section.shortcuts.map((shortcut) => (
+          <div
+            className="flex items-center justify-between gap-2 border-t border-modal-border px-4 py-3"
+            key={shortcut.label}
+          >
+            <div className="">{shortcut.label}</div>
+            <div className="flex gap-1">
+              {shortcut.keys.map((key) => (
+                <kbd
+                  className={cx(
+                    'flex h-8 w-8 items-center justify-center rounded-default bg-modal-border',
+                    'font-default text-xs font-medium',
+                  )}
+                  key={key}
+                >
+                  {key}
+                </kbd>
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     </div>
   );
