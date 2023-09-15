@@ -14,6 +14,7 @@ const MENU_FILE_PROJECT_OPEN: &str = /*   */ "refstudio://menu/file/project/open
 const MENU_FILE_PROJECT_CLOSE: &str = /*  */ "refstudio://menu/file/project/close";
 const MENU_FILE_CLOSE_ALL: &str = /*      */ "refstudio://menu/file/close/all";
 const MENU_VIEW_NOTIFICATIONS: &str = /*  */ "refstudio://menu/view/notifications";
+const MENU_VIEW_KBD_SHORTCUTS: &str = /*  */ "refstudio://menu/view/keyboard-shortcuts";
 
 #[cfg(any(debug_assertions, feature = "devtools"))]
 const MENU_DEBUG_CONSOLE_TOGGLE: &str = /**/ "refstudio://menu/debug/console/toggle";
@@ -32,6 +33,10 @@ impl AppMenu {
                 .add_item(
                     CustomMenuItem::new(MENU_SETTINGS, "Settings").accelerator("cmdOrControl+,"),
                 )
+                .add_item(CustomMenuItem::new(
+                    MENU_VIEW_KBD_SHORTCUTS,
+                    "Keyboard Shortcuts",
+                ))
                 .add_native_item(MenuItem::Separator)
                 .add_native_item(MenuItem::Services)
                 .add_native_item(MenuItem::Hide)

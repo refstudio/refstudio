@@ -146,7 +146,10 @@ export function FileNode({ file, existingFileNames }: FileNodeProps) {
             'rounded font-extrabold hover:bg-btn-ico-side-bar-dots-icon-hover',
             '',
           )}
-          onClick={show}
+          onClick={(e) => {
+            e.stopPropagation();
+            show(e);
+          }}
         >
           <HorizontalDotsIcon />
         </div>

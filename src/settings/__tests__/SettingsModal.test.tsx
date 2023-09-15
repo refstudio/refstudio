@@ -35,7 +35,7 @@ describe('SettingsModal component', () => {
 
   it('should render 3 settings panels with open={true}', () => {
     render(<SettingsModal open onClose={noop} />);
-    expect(screen.getByRole('menuitem', { name: 'Open AI' })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'AI' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Logging' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Config' })).toBeInTheDocument();
   });
@@ -49,9 +49,9 @@ describe('SettingsModal component', () => {
     expect(spyClose).toBeCalled();
   });
 
-  it('should render "Open AI" panel by default', () => {
+  it('should render "AI" panel by default', () => {
     render(<SettingsModal open onClose={noop} />);
-    expect(screen.getByTestId('project-openai')).toBeInTheDocument();
+    expect(screen.getByTestId('project-ai')).toBeInTheDocument();
   });
 
   it('should toggle to "Logging" panel from sidebar', async () => {

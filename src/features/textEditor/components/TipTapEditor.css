@@ -12,23 +12,35 @@
 }
 
 .tiptap-editor {
+  @apply text-editor-base font-normal;
   @apply flex-1 overflow-y-scroll px-12 py-16;
-  @apply text-lg/6 font-normal;
   @apply bg-card-bg-primary;
   @apply flex justify-center;
 }
 
-.tiptap-editor > div {
-  @apply w-full;
+.tiptap-editor h1 {
+  @apply text-editor-h1 font-extrabold;
+  @apply normal-case;
 }
 
 .tiptap-editor h2 {
-  @apply text-2xl font-semibold;
+  @apply text-editor-h2 font-semibold;
 }
 
-.tiptap-editor h1 {
-  @apply text-[2rem]/10 font-extrabold;
-  @apply normal-case;
+.tiptap-editor h3 {
+  @apply text-editor-h3 font-semibold;
+}
+
+.tiptap-editor h4 {
+  @apply text-editor-h4 font-semibold;
+}
+
+.tiptap-editor h5 {
+  @apply text-editor-h5 font-semibold;
+}
+
+.tiptap-editor > div {
+  @apply w-full;
 }
 
 .tiptap-editor *::selection {

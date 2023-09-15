@@ -3,6 +3,9 @@ import { Tooltip } from 'react-tooltip';
 import { cx } from '../../lib/cx';
 import { InfoIcon } from './icons';
 
+export const CreativityInfoTooltipText =
+  'Control how closely the rewritten text is to the original — lower for more accuracy, higher for more variation.';
+
 export function CreativityInfoTooltip({ id }: { id: string }) {
   return (
     <div>
@@ -22,10 +25,7 @@ export function CreativityInfoTooltip({ id }: { id: string }) {
         opacity={100}
         positionStrategy="fixed"
       >
-        <div className="text-pop-up-message-txt">
-          Control how closely the rewritten text is to the original — lower for more accuracy, higher for more
-          variation.
-        </div>
+        <div className="text-pop-up-message-txt">{CreativityInfoTooltipText}</div>
       </Tooltip>
     </div>
   );

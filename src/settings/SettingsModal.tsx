@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { Modal } from '../components/Modal';
-import { OpenAiSettingsPane } from '../features/ai/settings/OpenAiSettingsPane';
+import { AiSettingsPane } from '../features/ai/settings/AiSettingsPane';
 import { cx } from '../lib/cx';
 import { DebugSettingsPane } from './panes/DebugSettingsPane';
 import { LoggingSettingsPane } from './panes/LoggingSettingsPane';
@@ -22,9 +22,9 @@ const SETTINGS_PANES: SettingsPanesConfig[] = [
     section: 'Project',
     panes: [
       {
-        id: 'project-openai',
-        title: 'Open AI',
-        Pane: OpenAiSettingsPane,
+        id: 'project-ai',
+        title: 'AI',
+        Pane: AiSettingsPane,
       },
       {
         id: 'project-logging',
@@ -51,7 +51,7 @@ export function SettingsModal({ open, onClose: onClose }: { open: boolean; onClo
   const [pane, selectPane] = useState<PaneConfig>(SETTINGS_PANES[0].panes[0]);
 
   return (
-    <Modal className="h-[37.5rem] w-[50rem]" open={open} onClose={onClose}>
+    <Modal className="h-[45rem] w-[50rem]" open={open} onClose={onClose}>
       <div
         className={cx(
           'flex w-40 shrink-0 flex-col items-stretch gap-2 bg-modal-bg-secondary px-2 py-6',

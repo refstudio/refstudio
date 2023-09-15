@@ -1,9 +1,10 @@
 export const TableIcon = () => (
   <div className="flex h-6 w-6 shrink-0 items-center justify-center">
-    <svg height="12" viewBox="0 0 12 12" width="12" xmlns="http://www.w3.org/2000/svg">
-      <path d="M0 1C0 0.447715 0.447715 0 1 0H11C11.5523 0 12 0.447715 12 1V5.5H0V1Z" fill="currentcolor" />
-      <path d="M0 6.5H5.5V12H1C0.447715 12 0 11.5523 0 11V6.5Z" fill="currentcolor" />
-      <path d="M6.5 6.5H12V11C12 11.5523 11.5523 12 11 12H6.5V6.5Z" fill="currentcolor" />
+    <svg fill="none" height="20" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M4 15H9V11H4V15ZM4 9H16V5H4V9ZM11 15H16V11H11V15ZM4 17C2.89543 17 2 16.1046 2 15V5C2 3.89543 2.89543 3 4 3H16C17.1046 3 18 3.89543 18 5V15C18 16.1046 17.1046 17 16 17H4Z"
+        fill="currentcolor"
+      />
     </svg>
   </div>
 );

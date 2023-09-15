@@ -7,6 +7,7 @@ from sidecar import config
 from sidecar.api import api
 from sidecar.projects import service as projects_service
 from sidecar.settings import service as settings_service
+from sidecar.settings.schemas import ModelProvider
 
 
 @pytest.fixture
@@ -79,7 +80,8 @@ def create_settings_json(monkeypatch, tmp_path, request):
     settings_service.initialize_settings_for_user(user_id)
 
     defaults = settings_service.default_settings()
-    defaults.openai_api_key = "1234"
+    defaults.model_provider = ModelProvider.OPENAI
+    defaults.api_key = "1234"
 
     with open(filepath, "w") as f:
         json.dump(defaults.dict(), f)
@@ -119,8 +121,44 @@ def mock_call_model_is_ok(*args, **kwargs):
 
 
 @pytest.fixture
+def amock_call_model_is_ok(*args, **kwargs):
+    async def mock_call_model_response(*args, **kwargs):
+        return {
+            "choices": [
+                {
+                    "finish_reason": "stop",
+                    "index": 0,
+                    "message": {
+                        "content": "This is a mocked response",
+                        "role": "assistant",
+                    },
+                }
+            ],
+            "created": 1685588892,
+            "id": "chatcmpl-somelonghashedstring",
+            "model": "gpt-3.5-turbo-0301",
+            "object": "chat.completion",
+            "usage": {
+                "completion_tokens": 121,
+                "prompt_tokens": 351,
+                "total_tokens": 472,
+            },
+        }
+
+    return mock_call_model_response
+
+
+@pytest.fixture
 def mock_call_model_is_error(*args, **kwargs):
     def mock_call_model_response(*args, **kwargs):
+        raise Exception("This is a mocked error")
+
+    return mock_call_model_response
+
+
+@pytest.fixture
+def amock_call_model_is_error(*args, **kwargs):
+    async def mock_call_model_response(*args, **kwargs):
         raise Exception("This is a mocked error")
 
     return mock_call_model_response

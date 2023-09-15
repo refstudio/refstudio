@@ -5,7 +5,14 @@ import { REFERENCES } from '../../features/references/__tests__/test-fixtures';
 import { ReferenceItem } from '../../types/ReferenceItem';
 import { getDerivedReferenceAtom, setReferencesAtom, updateReferenceAtom } from '../referencesState';
 
-vi.mock('../../api/referencesAPI');
+vi.mock('../../api/referencesAPI', async (importOriginal) => {
+  const actual: object = await importOriginal();
+  return {
+    ...actual,
+    updateProjectReference: vi.fn(),
+  };
+});
+
 const PROJECT_ID = 'cafe-babe-1234-5678-1234-5678-1234-5678';
 
 describe('referencesState.update', () => {
@@ -57,12 +64,13 @@ describe('referencesState.update', () => {
     expect(updated?.abstract).not.toBe('new abstract');
   });
 
-  it('should patch "citationKey", "title", "publishedDate" and "authors"', async () => {
+  it('should patch "citationKey", "title", "publishedDate", "authors", and "doi"', async () => {
     await store.set(updateReferenceAtom, PROJECT_ID, ref1.id, {
       ...ref1,
       citationKey: ref1.citationKey + 'z',
       title: ref1.title + ' updated',
       publishedDate: '2023-07-11',
+      doi: '3456',
       authors: [{ fullName: 'Author Name', lastName: 'Name' }, ...ref1.authors],
     });
     expect(updateProjectReference).toHaveBeenCalledTimes(1);
@@ -76,6 +84,7 @@ describe('referencesState.update', () => {
       ],
       citationKey: ref1.citationKey + 'z',
       publishedDate: '2023-07-11',
+      doi: '3456',
       title: ref1.title + ' updated',
     });
 

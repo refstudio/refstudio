@@ -1,6 +1,7 @@
 import { useAtomValue, useSetAtom } from 'jotai';
-import { VscLibrary, VscRefresh } from 'react-icons/vsc';
+import { VscRefresh } from 'react-icons/vsc';
 
+import { ReferencesIconSmall } from '../../../application/sidebar/icons';
 import { openReferencesAtom } from '../../../atoms/editorActions';
 import {
   areReferencesLoadedAtom,
@@ -26,7 +27,7 @@ export function ReferencesFooterItems() {
         <FooterItem icon={<VscRefresh className="animate-spin" />} text="Loading references..." />
       )}
       <FooterItem
-        icon={<VscLibrary />}
+        icon={<ReferencesIconSmall />}
         text={`References: ${references.length}`}
         onClick={() => emitEvent('refstudio://menu/references/open')}
       />

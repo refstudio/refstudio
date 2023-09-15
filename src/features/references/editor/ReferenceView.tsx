@@ -1,42 +1,38 @@
-import './ReferenceView.css';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { useCallback, useMemo } from 'react';
 
-import { useAtomValue } from 'jotai';
-import { useMemo } from 'react';
-
-import { getDerivedReferenceAtom } from '../../../atoms/referencesState';
+import { openFilePathAtom } from '../../../atoms/fileEntryActions';
+import { projectIdAtom } from '../../../atoms/projectState';
+import { getDerivedReferenceAtom, updateReferenceAtom } from '../../../atoms/referencesState';
 import { EditorIdFor, parseEditorId } from '../../../atoms/types/EditorData';
+import { ReferenceItem } from '../../../types/ReferenceItem';
+import ReferenceDetailsCard from './ReferenceDetailsCard';
 
 export function ReferenceView({ referenceId }: { referenceId: EditorIdFor<'reference'> }) {
   const { id } = parseEditorId(referenceId);
   const referenceAtom = useMemo(() => getDerivedReferenceAtom(id), [id]);
   const reference = useAtomValue(referenceAtom);
+  const updateReference = useSetAtom(updateReferenceAtom);
+  const projectId = useAtomValue(projectIdAtom);
+
+  const openfilePath = useSetAtom(openFilePathAtom);
+
+  const handleReferenceChange = useCallback(
+    (params: ReferenceItem) => void updateReference(projectId, params.id, params),
+    [updateReference, projectId],
+  );
+
+  const handleOpenPdf = (ref: ReferenceItem) => openfilePath(ref.filepath);
 
   if (!reference) {
     return null;
   }
 
   return (
-    <table className="reference-details">
-      <thead>
-        <tr>
-          <th>Key</th>
-          <th>Value</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Citation key</td>
-          <td>[{reference.citationKey}]</td>
-        </tr>
-        <tr>
-          <td>Title</td>
-          <td>{reference.title}</td>
-        </tr>
-        <tr>
-          <td>Authors</td>
-          <td>{reference.authors.map(({ fullName }) => fullName).join(', ')}</td>
-        </tr>
-      </tbody>
-    </table>
+    <ReferenceDetailsCard
+      handleOpenPdf={handleOpenPdf}
+      handleReferenceChange={handleReferenceChange}
+      reference={reference}
+    />
   );
 }

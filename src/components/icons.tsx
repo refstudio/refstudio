@@ -15,6 +15,19 @@ export const SearchIcon = () => (
   </div>
 );
 
+export const OpenPdfIcon = () => (
+  <div className="flex h-6 w-6 shrink-0 items-center justify-center">
+    <svg fill="none" height="20" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg">
+      <path
+        clipRule="evenodd"
+        d="M1 2.8C1 1.80589 1.80589 1 2.8 1H17.2C18.1941 1 19 1.80589 19 2.8V17.2C19 18.1941 18.1941 19 17.2 19H2.8C1.80589 19 1 18.1941 1 17.2V2.8ZM14.5 8.65H15.85V7.3H13.15V12.7H14.5V10.9H15.85V9.55H14.5V8.65ZM12.25 11.35C12.25 12.07 11.62 12.7 10.9 12.7H8.65V7.3H10.9C11.62 7.3 12.25 7.93 12.25 8.65V11.35ZM10.9 8.65H10V11.35H10.9V8.65ZM6.4 10.9C7.12 10.9 7.75 10.27 7.75 9.55V8.65C7.75 7.93 7.12 7.3 6.4 7.3H4.15V12.7H5.5V10.9H6.4ZM5.5 8.65H6.4V9.55H5.5V8.65Z"
+        fill="currentcolor"
+        fillRule="evenodd"
+      />
+    </svg>
+  </div>
+);
+
 export const CloseIcon = () => (
   <div className="flex h-6 w-6 shrink-0 items-center justify-center">
     <svg height="12" viewBox="0 0 12 12" width="12" xmlns="http://www.w3.org/2000/svg">
@@ -28,9 +41,9 @@ export const CloseIcon = () => (
 
 export const OpenIcon = () => (
   <div className="flex h-6 w-6 shrink-0 items-center justify-center">
-    <svg height="12" viewBox="0 0 16 12" width="16" xmlns="http://www.w3.org/2000/svg">
+    <svg fill="none" height="20" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg">
       <path
-        d="M1.6 12C1.16 12 0.783201 11.853 0.469601 11.559C0.156001 11.265 -0.000531975 10.912 1.35823e-06 10.5V1.5C1.35823e-06 1.0875 0.156801 0.734251 0.470401 0.440251C0.784001 0.146251 1.16053 -0.000498727 1.6 1.27334e-06H6.4L8 1.5H14.4C14.84 1.5 15.2168 1.647 15.5304 1.941C15.844 2.235 16.0005 2.588 16 3V10.5C16 10.9125 15.8432 11.2657 15.5296 11.5597C15.216 11.8537 14.8395 12.0005 14.4 12H1.6Z"
+        d="M2.67442 17C2.21395 17 1.81963 16.8285 1.49144 16.4855C1.16326 16.1425 0.999443 15.7307 1 15.25V4.75C1 4.26875 1.16409 3.85663 1.49228 3.51363C1.82047 3.17063 2.21451 2.99942 2.67442 3H7.69768L9.37209 4.75H16.0698C16.5302 4.75 16.9246 4.9215 17.2527 5.2645C17.5809 5.6075 17.7447 6.01933 17.7442 6.5H8.6814L7.00698 4.75H2.67442V15.25L4.68372 8.25H19L16.8442 15.7531C16.7326 16.1323 16.5266 16.435 16.2263 16.6614C15.926 16.8877 15.5948 17.0006 15.2326 17H2.67442ZM4.43256 15.25H15.2326L16.7395 10H5.93954L4.43256 15.25Z"
         fill="currentcolor"
       />
     </svg>
@@ -62,7 +75,6 @@ export function ChevronUpIcon() {
     </div>
   );
 }
-
 export function NotVisibleIcon() {
   return (
     <div className="flex h-6 w-6 items-center justify-center">
@@ -113,3 +125,14 @@ export function SelectedRadioIcon() {
     </div>
   );
 }
+
+export const EditIcon = () => (
+  <div className="flex h-6 w-6 shrink-0 items-center justify-center">
+    <svg height="16" viewBox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M14.27 5.4137L10.5493 1.73151L11.775 0.50411C12.1106 0.168037 12.5229 0 13.012 0C13.5011 0 13.9132 0.168037 14.2482 0.50411L15.4738 1.73151C15.8094 2.06758 15.9845 2.47321 15.9991 2.94838C16.0137 3.42356 15.8532 3.82889 15.5176 4.16438L14.27 5.4137ZM13.0006 6.70685L3.72072 16H0V12.274L9.27991 2.98082L13.0006 6.70685Z"
+        fill="currentcolor"
+      />
+    </svg>
+  </div>
+);

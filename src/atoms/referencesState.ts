@@ -1,6 +1,11 @@
 import { atom } from 'jotai';
 
-import { getProjectReferences, removeProjectReferences, updateProjectReference } from '../api/referencesAPI';
+import {
+  getProjectReferences,
+  removeProjectReferences,
+  UPDATABLE_FIELDS,
+  updateProjectReference,
+} from '../api/referencesAPI';
 import { deleteFile } from '../io/filesystem';
 import { isNonNullish } from '../lib/isNonNullish';
 import { ReferenceItem } from '../types/ReferenceItem';
@@ -64,7 +69,6 @@ const removeReferenceAtom = atom(null, (get, set, id: string) => {
   set(setReferencesAtom, newReferences);
 });
 
-const UPDATABLE_FIELDS: (keyof ReferenceItem)[] = ['citationKey', 'title', 'publishedDate', 'authors'];
 export const updateReferenceAtom = atom(
   null,
   async (get, set, projectId: string, referenceId: string, updatedReference: ReferenceItem) => {

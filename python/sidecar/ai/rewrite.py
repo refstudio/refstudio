@@ -1,6 +1,7 @@
 import os
 import re
 
+import litellm
 import openai
 from sidecar.ai.prompts import (
     create_prompt_for_rewrite,
@@ -16,7 +17,7 @@ from sidecar.ai.schemas import (
     TextSuggestionChoice,
 )
 from sidecar.config import logger
-from sidecar.settings.schemas import FlatSettingsSchema
+from sidecar.settings.schemas import FlatSettingsSchema, ModelProvider
 from sidecar.typing import ResponseStatus
 from tenacity import retry, stop_after_attempt, wait_fixed
 
@@ -70,18 +71,21 @@ def trim_completion_prefix_from_choices(
     return choices
 
 
-def rewrite(arg: RewriteRequest, user_settings: FlatSettingsSchema = None):
+async def rewrite(arg: RewriteRequest, user_settings: FlatSettingsSchema = None):
     text = arg.text
     manner = arg.manner
     n_choices = arg.n_choices
     temperature = arg.temperature
 
-    if user_settings is not None:
-        openai.api_key = user_settings.openai_api_key
-        model = user_settings.openai_chat_model
-    else:
-        openai.api_key = os.environ.get("OPENAI_API_KEY")
+    if user_settings is None:
+        # this is for local dev environment
+        openai.api_key = os.environ.get("API_KEY")
         model = "gpt-3.5-turbo"
+    elif user_settings.model_provider == ModelProvider.OPENAI:
+        openai.api_key = user_settings.api_key
+        model = user_settings.model
+    elif user_settings.model_provider == ModelProvider.OLLAMA:
+        model = "llama2"
 
     # there are 1.33 tokens per word on average
     # seems reasonable to require a max_tokens roughly equivalent to our input text
@@ -94,7 +98,7 @@ def rewrite(arg: RewriteRequest, user_settings: FlatSettingsSchema = None):
     chat = Rewriter(prompt, n_choices, temperature, max_tokens, model)
 
     try:
-        choices = chat.get_response(response_type=RewriteChoice)
+        choices = await chat.get_response(response_type=RewriteChoice)
     except Exception as e:
         logger.error(e)
         response = RewriteResponse(
@@ -113,15 +117,18 @@ def rewrite(arg: RewriteRequest, user_settings: FlatSettingsSchema = None):
     return response
 
 
-def complete_text(
+async def complete_text(
     request: TextCompletionRequest, user_settings: FlatSettingsSchema = None
 ):
-    if user_settings is not None:
-        openai.api_key = user_settings.openai_api_key
-        model = user_settings.openai_chat_model
-    else:
-        openai.api_key = os.environ.get("OPENAI_API_KEY")
+    if user_settings is None:
+        # this is for local dev environment
+        openai.api_key = os.environ.get("API_KEY")
         model = "gpt-3.5-turbo"
+    elif user_settings.model_provider == ModelProvider.OPENAI:
+        openai.api_key = user_settings.api_key
+        model = user_settings.model
+    elif user_settings.model_provider == ModelProvider.OLLAMA:
+        model = "llama2"
 
     logger.info(
         f"Calling text completion with the following parameters: {request.dict()}"
@@ -136,7 +143,7 @@ def complete_text(
     )
 
     try:
-        choices = chat.get_response(response_type=TextCompletionChoice)
+        choices = await chat.get_response(response_type=TextCompletionChoice)
     except Exception as e:
         logger.error(e)
         response = TextCompletionResponse(
@@ -160,20 +167,20 @@ def complete_text(
 
 class Rewriter:
     """
-    Rewrite or complete text using the OpenAI chat API.
+    Rewrite or complete text using the specified model.
 
     Parameters
     ----------
     prompt : str
-        The prompt to send to the OpenAI chat API.
+        The prompt to send to the LLM.
     n_choices : int
-        The number of choices to return from the OpenAI chat API.
+        The number of choices to return. Not valid for `llama2`.
     temperature : float, optional, default=0.7
-        The temperature to use when generating text from the OpenAI chat API.
+        The temperature to use when generating text. Not valid for `llama2`.
     max_tokens : int, optional, default=512
-        The maximum number of tokens to generate from the OpenAI chat API.
+        The maximum number of tokens to generate. Not valid for `llama2`.
     model : str, optional, default="gpt-3.5-turbo"
-        The name of the OpenAI model to use.
+        The name of the model to use (must be an OpenAI model or `llama2`).
     """
 
     def __init__(
@@ -190,9 +197,9 @@ class Rewriter:
         self.max_tokens = max_tokens
         self.model = model
 
-    def get_response(self, response_type: TextSuggestionChoice):
+    async def get_response(self, response_type: TextSuggestionChoice):
         messages = self.prepare_messages_for_chat(self.prompt)
-        response = self.call_model(messages)
+        response = await self.call_model(messages)
         response = self.prepare_choices_for_client(
             response, response_type=response_type
         )
@@ -208,20 +215,35 @@ class Rewriter:
             for choice in response["choices"]
         ]
 
-    @retry(stop=stop_after_attempt(3), wait=wait_fixed(1))
-    def call_model(self, messages: list):
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(1), reraise=True)
+    async def call_model(self, messages: list):
         logger.info(
-            f"Calling OpenAI chat API with the following input message(s): {messages}"
+            f"Calling {self.model} rewrite API with input message(s): {messages}"
         )
-        response = openai.ChatCompletion.create(
-            model=self.model,
-            messages=messages,
-            n=self.n_choices,  # number of completions to generate
-            temperature=self.temperature,
+        params = {
+            "model": self.model,
+            "messages": messages,
+            "n": self.n_choices,  # number of completions to generate
+            "temperature": self.temperature,
             # maximum number of tokens to generate (1 word ~= 1.33 tokens)
-            max_tokens=self.max_tokens,
-        )
-        logger.info(f"Received response from OpenAI chat API: {response}")
+            "max_tokens": self.max_tokens,
+        }
+
+        if self.model == "llama2":
+            # NOTE: Ollama does not support the following parameters:
+            # - n
+            # - max_tokens
+            # - temperature
+            params["api_base"] = "http://localhost:11434"
+            params["custom_llm_provider"] = "ollama"
+
+        response = await litellm.acompletion(**params)
+
+        if self.model == "llama2":
+            # Will only be a single choice response from Ollama
+            response = await self.unwrap_response(response)
+
+        logger.info(f"Received response from {self.model} chat API: {response}")
         return response
 
     def prepare_messages_for_chat(self, text: str) -> list:
@@ -229,3 +251,9 @@ class Rewriter:
             {"role": "user", "content": text},
         ]
         return messages
+
+    async def unwrap_response(self, generator):
+        response = ""
+        async for elem in generator:
+            response += elem["choices"][0]["delta"]["content"]
+        return {"choices": [{"index": 0, "message": {"content": response}}]}

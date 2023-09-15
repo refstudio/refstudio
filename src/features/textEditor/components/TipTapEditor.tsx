@@ -4,11 +4,13 @@ import { Editor, EditorContent, JSONContent } from '@tiptap/react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback, useEffect, useState } from 'react';
 
+import { closeEditorFromAllPanesAtom } from '../../../atoms/editorActions';
+import { openFilePathAtom } from '../../../atoms/fileEntryActions';
 import { refreshFileTreeAtom } from '../../../atoms/fileExplorerActions';
 import { getReferencesAtom } from '../../../atoms/referencesState';
 import { selectionAtom } from '../../../atoms/selectionState';
 import { EditorContent as EditorContentType } from '../../../atoms/types/EditorContent';
-import { EditorId, parseEditorId } from '../../../atoms/types/EditorData';
+import { buildEditorIdFromPath, EditorId, parseEditorId } from '../../../atoms/types/EditorData';
 import { Spinner } from '../../../components/Spinner';
 import { emitEvent } from '../../../events';
 import { useListenEvent } from '../../../hooks/useListenEvent';
@@ -32,6 +34,9 @@ export function TipTapEditor({ editorContent, editorId, isActive, saveFileInMemo
 
   const references = useAtomValue(getReferencesAtom);
   const refreshFileTree = useSetAtom(refreshFileTreeAtom);
+
+  const closeEditorFromAllPanes = useSetAtom(closeEditorFromAllPanesAtom);
+  const openFilePath = useSetAtom(openFilePathAtom);
 
   useEffect(() => {
     const newEditor = new Editor({
@@ -94,9 +99,15 @@ export function TipTapEditor({ editorContent, editorId, isActive, saveFileInMemo
     const { id: filePath } = parseEditorId(editorId);
 
     void saveAsMarkdown(mdSerializer, filePath)
+      .then((markdownFilePath) => {
+        if (markdownFilePath) {
+          closeEditorFromAllPanes(buildEditorIdFromPath(markdownFilePath));
+          openFilePath(markdownFilePath);
+        }
+      })
       // We need to make sure the files were saved before refreshing the file tree.
       .then(refreshFileTree);
-  }, [editor, editorId, isActive, references, refreshFileTree]);
+  }, [editor, editorId, isActive, references, refreshFileTree, closeEditorFromAllPanes, openFilePath]);
 
   useListenEvent('refstudio://ai/suggestion/suggest', suggestSentenceCompletion);
   useListenEvent('refstudio://ai/suggestion/insert', insertContent);

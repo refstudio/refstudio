@@ -5,7 +5,20 @@ export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      fontSize: {
+        "base": ["14px", "20px"],
+        // TipTap Editor styles
+        "editor-h1": ["32px", "36px"],
+        "editor-h2": ["24px", "32px"],
+        "editor-h3": ["20px", "28px"],
+        "editor-h4": ["18px", "24px"],
+        "editor-h5": ["16px", "22px"],
+        "editor-base": ["16px", "20px"],
+      },
       colors: {
+        'txt': {
+          muted: 'rgb(var(--text-muted) / <alpha-value>)',
+        },
         'resizer-bg': {
           hover: 'rgb(var(--resizer-bg-hover) / <alpha-value>)',
           default: 'rgb(var(--resizer-bg-default) / <alpha-value>)',
@@ -201,7 +214,6 @@ export default {
         'editor-selection': 'rgb(var(--editor-selection) / <alpha-value>)',
         'radio-active': 'rgb(var(--radio-active) / <alpha-value>)',
         'radio-border-inactive': 'rgb(var(--radio-border-inactive) / <alpha-value>)',
-        'empty-state-ico-empty': 'rgb(var(--empty-state-ico-empty) / <alpha-value>)',
         'pop-up-message': {
           txt: 'rgb(var(--pop-up-message-txt) / <alpha-value>)',
           bg: 'rgb(var(--pop-up-message-bg) / <alpha-value>)',

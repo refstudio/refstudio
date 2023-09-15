@@ -1,15 +1,25 @@
+import pytest
 from sidecar.ai import rewrite
 from sidecar.ai.schemas import (
     RewriteRequest,
     TextCompletionChoice,
     TextCompletionRequest,
 )
+from sidecar.settings.service import ModelProvider, default_settings
 
 
-def test_rewrite_is_ok(monkeypatch, mock_call_model_is_ok):
-    monkeypatch.setattr(rewrite.Rewriter, "call_model", mock_call_model_is_ok)
+@pytest.mark.asyncio
+async def test_rewrite_is_ok(monkeypatch, amock_call_model_is_ok):
+    monkeypatch.setattr(rewrite.Rewriter, "call_model", amock_call_model_is_ok)
 
-    response = rewrite.rewrite(RewriteRequest(text="This is a test"))
+    user_settings = default_settings()
+    user_settings.model_provider = ModelProvider.OPENAI
+    user_settings.api_key = "mocked-api-key"
+    user_settings.model = "gpt-3.5-turbo"
+
+    response = await rewrite.rewrite(
+        RewriteRequest(text="This is a test"), user_settings=user_settings
+    )
     output = response.dict()
 
     assert output["status"] == "ok"
@@ -19,10 +29,11 @@ def test_rewrite_is_ok(monkeypatch, mock_call_model_is_ok):
     assert output["choices"][0]["text"] == "This is a mocked response"
 
 
-def test_rewrite_is_error(monkeypatch, mock_call_model_is_error):
+@pytest.mark.asyncio
+async def test_rewrite_is_error(monkeypatch, mock_call_model_is_error):
     monkeypatch.setattr(rewrite.Rewriter, "call_model", mock_call_model_is_error)
 
-    response = rewrite.rewrite(RewriteRequest(text="This is a test"))
+    response = await rewrite.rewrite(RewriteRequest(text="This is a test"))
     output = response.dict()
 
     assert output["status"] == "error"
@@ -30,10 +41,11 @@ def test_rewrite_is_error(monkeypatch, mock_call_model_is_error):
     assert len(output["choices"]) == 0
 
 
-def test_complete_text_is_ok(monkeypatch, mock_call_model_is_ok):
-    monkeypatch.setattr(rewrite.Rewriter, "call_model", mock_call_model_is_ok)
+@pytest.mark.asyncio
+async def test_complete_text_is_ok(monkeypatch, amock_call_model_is_ok):
+    monkeypatch.setattr(rewrite.Rewriter, "call_model", amock_call_model_is_ok)
 
-    response = rewrite.complete_text(TextCompletionRequest(text="This is a test"))
+    response = await rewrite.complete_text(TextCompletionRequest(text="This is a test"))
     output = response.dict()
 
     assert output["status"] == "ok"
@@ -43,10 +55,11 @@ def test_complete_text_is_ok(monkeypatch, mock_call_model_is_ok):
     assert output["choices"][0]["text"] == "This is a mocked response"
 
 
-def test_complete_text_is_error(monkeypatch, mock_call_model_is_error):
+@pytest.mark.asyncio
+async def test_complete_text_is_error(monkeypatch, mock_call_model_is_error):
     monkeypatch.setattr(rewrite.Rewriter, "call_model", mock_call_model_is_error)
 
-    response = rewrite.complete_text(TextCompletionRequest(text="This is a test"))
+    response = await rewrite.complete_text(TextCompletionRequest(text="This is a test"))
     output = response.dict()
 
     assert output["status"] == "error"

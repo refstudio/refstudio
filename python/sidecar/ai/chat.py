@@ -1,5 +1,6 @@
 import os
 
+import litellm
 import openai
 from sidecar import config
 from sidecar.ai.prompts import create_prompt_for_chat, prepare_chunks_for_prompt
@@ -8,7 +9,7 @@ from sidecar.ai.schemas import ChatRequest, ChatResponse, ChatResponseChoice
 from sidecar.config import logger
 from sidecar.projects.service import get_project_path
 from sidecar.references.storage import JsonStorage
-from sidecar.settings.schemas import FlatSettingsSchema
+from sidecar.settings.schemas import FlatSettingsSchema, ModelProvider
 from sidecar.typing import ResponseStatus
 from tenacity import retry, stop_after_attempt, wait_fixed
 
@@ -22,12 +23,15 @@ def ask_question(
     n_choices = request.n_choices
     temperature = request.temperature
 
-    if user_settings is not None:
-        openai.api_key = user_settings.openai_api_key
-        model = user_settings.openai_chat_model
-    else:
-        openai.api_key = os.environ.get("OPENAI_API_KEY")
+    if user_settings is None:
+        # this is for local dev environment
+        openai.api_key = os.environ.get("API_KEY")
         model = "gpt-3.5-turbo"
+    elif user_settings.model_provider == ModelProvider.OPENAI:
+        openai.api_key = user_settings.api_key
+        model = user_settings.model
+    elif user_settings.model_provider == ModelProvider.OLLAMA:
+        model = "llama2"
 
     logger.info(f"Calling chat with the following parameters: {request.dict()}")
 
@@ -82,12 +86,12 @@ class Chat:
         docs = self.ranker.get_top_n(query=self.input_text, limit=5)
         return docs
 
-    @retry(stop=stop_after_attempt(3), wait=wait_fixed(1))
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(1), reraise=True)
     def call_model(self, messages: list, n_choices: int = 1, temperature: float = 0.7):
         logger.info(
             f"Calling OpenAI chat API with the following input message(s): {messages}"
         )
-        response = openai.ChatCompletion.create(
+        response = litellm.completion(
             model=self.model,
             messages=messages,
             n=n_choices,  # number of completions to generate

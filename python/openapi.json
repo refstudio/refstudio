@@ -184,22 +184,25 @@
           "active_project_id": {
             "type": "string"
           },
+          "api_key": {
+            "type": "string"
+          },
           "logging_enabled": {
             "type": "boolean"
           },
           "logging_filepath": {
             "type": "string"
           },
-          "openai_api_key": {
+          "model": {
             "type": "string"
           },
-          "openai_chat_model": {
-            "type": "string"
+          "model_provider": {
+            "$ref": "#/components/schemas/ModelProvider"
           },
-          "openai_manner": {
+          "rewrite_manner": {
             "$ref": "#/components/schemas/RewriteMannerType"
           },
-          "openai_temperature": {
+          "temperature": {
             "type": "number"
           }
         },
@@ -207,10 +210,11 @@
           "active_project_id",
           "logging_enabled",
           "logging_filepath",
-          "openai_api_key",
-          "openai_chat_model",
-          "openai_manner",
-          "openai_temperature"
+          "model_provider",
+          "api_key",
+          "model",
+          "temperature",
+          "rewrite_manner"
         ],
         "title": "FlatSettingsSchema",
         "type": "object"
@@ -220,22 +224,25 @@
           "active_project_id": {
             "type": "string"
           },
+          "api_key": {
+            "type": "string"
+          },
           "logging_enabled": {
             "type": "boolean"
           },
           "logging_filepath": {
             "type": "string"
           },
-          "openai_api_key": {
+          "model": {
             "type": "string"
           },
-          "openai_chat_model": {
-            "type": "string"
+          "model_provider": {
+            "$ref": "#/components/schemas/ModelProvider"
           },
-          "openai_manner": {
+          "rewrite_manner": {
             "$ref": "#/components/schemas/RewriteMannerType"
           },
-          "openai_temperature": {
+          "temperature": {
             "type": "number"
           }
         },
@@ -312,6 +319,15 @@
           "complete"
         ],
         "title": "IngestStatus",
+        "type": "string"
+      },
+      "ModelProvider": {
+        "description": "An enumeration.",
+        "enum": [
+          "openai",
+          "ollama"
+        ],
+        "title": "ModelProvider",
         "type": "string"
       },
       "ProjectBase": {

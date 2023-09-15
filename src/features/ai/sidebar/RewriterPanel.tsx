@@ -17,8 +17,8 @@ export function RewriterPanel({ debounceMs = 200 }: { debounceMs?: number }) {
   const debouncedSelection = useDebounce(selection, debounceMs);
 
   const openAiSettings = {
-    manner: getCachedSetting('openai_manner'),
-    temperature: getCachedSetting('openai_temperature'),
+    manner: getCachedSetting('rewrite_manner'),
+    temperature: getCachedSetting('temperature'),
   };
 
   const [rewriteOptions, setRewriteOptions] = useState<Required<RewriteOptions>>({

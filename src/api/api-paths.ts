@@ -17,6 +17,7 @@ import {
   HTTPValidationError,
   IngestResponse,
   IngestStatus,
+  ModelProvider,
   ProjectBase,
   ProjectCreateRequest,
   ProjectDetailsResponse,
@@ -210,22 +211,24 @@ export interface components {
     /** FlatSettingsSchema */
     FlatSettingsSchema: {
       active_project_id: string;
+      api_key: string;
       logging_enabled: boolean;
       logging_filepath: string;
-      openai_api_key: string;
-      openai_chat_model: string;
-      openai_manner: RewriteMannerType;
-      openai_temperature: number;
+      model: string;
+      model_provider: ModelProvider;
+      rewrite_manner: RewriteMannerType;
+      temperature: number;
     };
     /** FlatSettingsSchemaPatch */
     FlatSettingsSchemaPatch: {
       active_project_id?: string;
+      api_key?: string;
       logging_enabled?: boolean;
       logging_filepath?: string;
-      openai_api_key?: string;
-      openai_chat_model?: string;
-      openai_manner?: RewriteMannerType;
-      openai_temperature?: number;
+      model?: string;
+      model_provider?: ModelProvider;
+      rewrite_manner?: RewriteMannerType;
+      temperature?: number;
     };
     /** FolderEntry */
     FolderEntry: {
@@ -250,6 +253,12 @@ export interface components {
      * @enum {string}
      */
     IngestStatus: 'processing' | 'failure' | 'complete';
+    /**
+     * ModelProvider
+     * @description An enumeration.
+     * @enum {string}
+     */
+    ModelProvider: 'openai' | 'ollama';
     /** ProjectBase */
     ProjectBase: {
       id: string;
