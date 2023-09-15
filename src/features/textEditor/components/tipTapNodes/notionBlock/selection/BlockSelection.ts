@@ -147,7 +147,7 @@ export class BlockSelection extends Selection {
     return true;
   }
 
-  extendDown(tr: Transaction, dispatch: (tr: Transaction) => void): boolean {
+  expandDown(tr: Transaction, dispatch: (tr: Transaction) => void): boolean {
     const { nextBlock } = this;
     if (nextBlock) {
       tr.setSelection(new BlockSelection(this.$anchor, nextBlock.resolvedPos));
@@ -157,7 +157,7 @@ export class BlockSelection extends Selection {
     return false;
   }
 
-  extendUp(tr: Transaction, dispatch: (tr: Transaction) => void): boolean {
+  expandUp(tr: Transaction, dispatch: (tr: Transaction) => void): boolean {
     const { previousOrParentBlock: previousBlock } = this;
     const doc = this.$head.node(0);
     if (previousBlock) {

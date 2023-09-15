@@ -88,7 +88,7 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
           if (!event.shiftKey) {
             selection.selectNextBlock(tr, (t) => view.dispatch(t));
           } else {
-            selection.extendDown(tr, (t) => view.dispatch(t));
+            selection.expandDown(tr, (t) => view.dispatch(t));
           }
           return;
         }
@@ -96,7 +96,7 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
           if (!event.shiftKey) {
             selection.selectPreviousBlock(tr, (t) => view.dispatch(t));
           } else {
-            selection.extendUp(tr, (t) => view.dispatch(t));
+            selection.expandUp(tr, (t) => view.dispatch(t));
           }
           return;
         }
