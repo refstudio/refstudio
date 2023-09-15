@@ -17,7 +17,8 @@ export class BlockSelection extends Selection {
       }
     });
 
-    return new BlockSelection(doc.resolve(0), doc.resolve(lastChildPos));
+    // We make the start of the document the head of selection so that pressing escape positions the cursor in the top node
+    return new BlockSelection(doc.resolve(lastChildPos), doc.resolve(0));
   }
 
   constructor($anchor: ResolvedPos, $head = $anchor) {

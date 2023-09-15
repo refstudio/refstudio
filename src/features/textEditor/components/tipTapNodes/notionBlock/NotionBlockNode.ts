@@ -137,15 +137,16 @@ export const NotionBlockNode = Node.create({
       },
       'Mod-a': ({ editor }) => {
         const { selection } = editor.state;
-        if (selection instanceof BlockSelection || !selection.$from.sameParent(selection.$to)) {
+        if (selection instanceof BlockSelection) {
           return false;
         }
-        const parentBlock = getNotionBlockParent(selection.$from);
-        if (!parentBlock) {
+        const fromParentBlock = getNotionBlockParent(selection.$from);
+        const toParentBlock = getNotionBlockParent(selection.$to);
+        if (!fromParentBlock || !toParentBlock) {
           return false;
         }
-        const from = parentBlock.resolvedPos.pos + 2;
-        const to = from + parentBlock.node.child(0)!.nodeSize - 2;
+        const from = fromParentBlock.resolvedPos.pos + 2;
+        const to = toParentBlock.resolvedPos.pos + toParentBlock.node.firstChild!.nodeSize;
 
         if (from !== selection.from || to !== selection.to) {
           return editor.commands.setTextSelection({ from, to });
