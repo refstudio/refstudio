@@ -6,8 +6,11 @@ from fastapi.testclient import TestClient
 from sidecar import config
 from sidecar.api import api
 from sidecar.projects import service as projects_service
+from sidecar.references import storage
 from sidecar.settings import service as settings_service
 from sidecar.settings.schemas import ModelProvider
+
+from .helpers import _copy_fixture_to_temp_dir
 
 
 @pytest.fixture
@@ -23,6 +26,24 @@ def setup_project_storage(monkeypatch, tmp_path):
     monkeypatch.setattr(projects_service, "WEB_STORAGE_URL", tmp_path)
     projects_service.create_project(user_id, project_id, project_name)
     return user_id, project_id
+
+
+@pytest.fixture
+def setup_project_references_json(monkeypatch, tmp_path, fixtures_dir):
+    user_id = "user1"
+    project_id = "project1"
+    project_name = "project1name"
+    monkeypatch.setattr(projects_service, "WEB_STORAGE_URL", tmp_path)
+
+    projects_service.create_project(user_id, project_id, project_name)
+    write_path = storage.get_references_json_path(user_id, project_id)
+
+    # copy references.json fixtures to temp dir for tests
+    test_file = f"{fixtures_dir}/data/references.json"
+    path_to_test_file = Path(__file__).parent.joinpath(test_file)
+
+    _copy_fixture_to_temp_dir(path_to_test_file, write_path)
+    return write_path
 
 
 @pytest.fixture
@@ -68,6 +89,20 @@ def setup_uploaded_reference_pdfs(monkeypatch, tmp_path, fixtures_dir):
             f"/fs/{project_id}/{filename}",
             files={"file": ("test.pdf", f, "application/pdf")},
         )
+
+
+@pytest.fixture
+def mock_url_pdf_response(fixtures_dir):
+    def mock_url_pdf_response(*args, **kwargs):
+        class MockResponse:
+            @property
+            def content(self):
+                with open(f"{fixtures_dir}/pdf/test.pdf", "rb") as f:
+                    return f.read()
+
+        return MockResponse()
+
+    return mock_url_pdf_response
 
 
 @pytest.fixture
