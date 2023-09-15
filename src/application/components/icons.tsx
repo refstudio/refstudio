@@ -21,12 +21,18 @@ export const RefStudioEditorIcon = () => (
   </div>
 );
 
+export const FallbackEditorIconBuilder = (letter: string) =>
+  // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
+  function FallbackEditorIconFor() {
+    return (
+      <div className="flex h-5 w-5 items-center justify-center rounded bg-btn-ico-top-bar-active">
+        <span className="text-[9px] font-semibold text-white">{letter}</span>
+      </div>
+    );
+  };
+
 // TODO: We need to replace this icon with the real one
-export const FallbackEditorIcon = () => (
-  <div className="flex h-5 w-5 items-center justify-center rounded bg-btn-ico-top-bar-active">
-    <span className="text-[9px] font-semibold text-white">F</span>
-  </div>
-);
+export const FallbackEditorIcon = FallbackEditorIconBuilder('F');
 
 export const PdfEditorIcon = () => (
   <div className="flex h-6 w-6 items-center justify-center">
