@@ -138,9 +138,24 @@ export const EditIcon = () => (
 );
 
 export const DotIcon = () => (
-  <div className="flex h-6 w-6 shrink-0 items-center justify-center">
+  <div className="flex h-5 w-5 shrink-0 items-center justify-center">
     <svg height="16" viewBox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="8" cy="8" r="3" />
+      <circle cx="8" cy="8" fill="currentcolor" r="3" />
+    </svg>
+  </div>
+);
+
+export const SmallInfoIcon = () => (
+  <div className="flex h-5 w-5 shrink-0 items-center justify-center">
+    <svg fill="none" height="20" viewBox="0 0 20 20" width="16" xmlns="http://www.w3.org/2000/svg">
+      <g clipPath="url(#clip0_63_818)">
+        <rect fill="white" height="20" width="20" />
+        <path
+          d="M10.6357 7.60352V15H9.36426V7.60352H10.6357ZM9.26855 5.6416C9.26855 5.43652 9.33008 5.26335 9.45312 5.12207C9.58073 4.98079 9.76758 4.91016 10.0137 4.91016C10.2552 4.91016 10.4398 4.98079 10.5674 5.12207C10.6995 5.26335 10.7656 5.43652 10.7656 5.6416C10.7656 5.83757 10.6995 6.00618 10.5674 6.14746C10.4398 6.28418 10.2552 6.35254 10.0137 6.35254C9.76758 6.35254 9.58073 6.28418 9.45312 6.14746C9.33008 6.00618 9.26855 5.83757 9.26855 5.6416Z"
+          fill="currentcolor"
+        />
+        <circle cx="10" cy="10" r="7.5" stroke="currentcolor" />
+      </g>
     </svg>
   </div>
 );

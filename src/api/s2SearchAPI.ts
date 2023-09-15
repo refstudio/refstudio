@@ -1,8 +1,8 @@
 import { S2SearchResult, SearchResponse } from './api-types';
 import { apiGetJson } from './typed-api';
 
-export async function getS2ReferencesByKeyword(keywords: string): Promise<S2SearchResult[]> {
-  const references = await apiGetJson('/api/search/s2', { query: { query: keywords, limit: 10 } });
+export async function getS2ReferencesByKeyword(keywords: string, limit = 10): Promise<S2SearchResult[]> {
+  const references = await apiGetJson('/api/search/s2', { query: { query: keywords, limit } });
   return parseS2Response(references);
 }
 

@@ -31,16 +31,20 @@ export function Button({
     <button
       aria-disabled={disabled}
       className={cx(
-        'flex items-center gap-2 rounded-default px-2 py-2',
+        'flex items-center rounded-default px-2 py-2',
         {
           'w-full': fluid,
         },
         {
-          'justify-center px-5 py-3': size === 'M',
+          'gap-2': !size,
+          'justify-center gap-2 px-5 py-3': size === 'M',
+          'justify-center gap-1 px-[.5rem] py-[.25rem]': size === 'S',
         },
         {
           'pl-3': !!Action && actionPosition === 'left',
           'pr-3': !!Action && actionPosition === 'right',
+          'pl-[.25rem]': !!Action && actionPosition === 'left' && size === 'S',
+          'pr-[.25rem]': !!Action && actionPosition === 'right' && size === 'S',
         },
         {
           'bg-btn-bg-primary-default text-btn-txt-primary-default': type === 'primary',
