@@ -18,6 +18,7 @@ import { hideHandlePlugin } from './plugins/hideHandlePlugin';
 import { orderedListPlugin } from './plugins/orderedListPlugin';
 import { placeholderPlugin } from './plugins/placeholderPlugin';
 import { unorderedListPlugin } from './plugins/unorderedListPlugin';
+import { BlockSelection } from './selection/BlockSelection';
 import { getNotionBlockParent } from './utils/getNotionBlockParent';
 
 declare module '@tiptap/core' {
@@ -133,6 +134,23 @@ export const NotionBlockNode = Node.create({
         return editor.commands.command(({ dispatch, tr, view }) =>
           toggleCollapsed({ pos: notionBlock.resolvedPos.pos, dispatch, tr, view }),
         );
+      },
+      'Mod-a': ({ editor }) => {
+        const { selection } = editor.state;
+        if (selection instanceof BlockSelection || !selection.$from.sameParent(selection.$to)) {
+          return false;
+        }
+        const parentBlock = getNotionBlockParent(selection.$from);
+        if (!parentBlock) {
+          return false;
+        }
+        const from = parentBlock.resolvedPos.pos + 2;
+        const to = from + parentBlock.node.child(0)!.nodeSize - 2;
+
+        if (from !== selection.from || to !== selection.to) {
+          return editor.commands.setTextSelection({ from, to });
+        }
+        return false;
       },
     };
   },

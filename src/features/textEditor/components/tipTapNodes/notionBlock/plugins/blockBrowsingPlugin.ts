@@ -76,6 +76,7 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
       tr.setMeta(blockBrowsingPluginKey, true);
 
       switch (event.code) {
+        case 'Enter':
         case 'Escape': {
           tr.setSelection(
             TextSelection.near(view.state.doc.resolve(selection.head + selectedBlock.firstChild!.nodeSize)),
@@ -102,7 +103,7 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
         case 'ArrowLeft': {
           // If the block is not collapsed, collapse it
           if (selectedBlock.attrs.type === 'collapsible' && !selectedBlock.attrs.collapsed) {
-            tr.setMeta(collapsibleArrowsPluginKey, true).setNodeAttribute(selection.head, 'collapsed', true);
+            tr.setNodeAttribute(selection.head, 'collapsed', true);
             view.dispatch(tr);
           } else {
             // Otherwise select its parent
@@ -113,13 +114,20 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
         case 'ArrowRight': {
           // If the block is collapsed, uncollapse it
           if (selectedBlock.attrs.type === 'collapsible' && selectedBlock.attrs.collapsed) {
-            tr.setMeta(collapsibleArrowsPluginKey, true).setNodeAttribute(selection.head, 'collapsed', false);
+            tr.setNodeAttribute(selection.head, 'collapsed', false);
             view.dispatch(tr);
           } else {
             // Otherwise select its first child
             selection.selectChildBlock(tr, (t) => view.dispatch(t));
           }
           return;
+        }
+        case 'KeyA': {
+          if (event.metaKey) {
+            tr.setSelection(BlockSelection.all(view.state.doc));
+            view.dispatch(tr);
+          }
+          break;
         }
       }
     },

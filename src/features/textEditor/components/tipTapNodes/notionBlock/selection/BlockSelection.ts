@@ -9,6 +9,17 @@ import { getPreviousSibling } from '../utils/getPreviousSibling';
 import { NodeData } from '../utils/types';
 
 export class BlockSelection extends Selection {
+  static all(doc: Node): Selection {
+    let lastChildPos = 0;
+    doc.forEach((_child, offset, index) => {
+      if (index === doc.childCount - 1) {
+        lastChildPos = offset;
+      }
+    });
+
+    return new BlockSelection(doc.resolve(0), doc.resolve(lastChildPos));
+  }
+
   constructor($anchor: ResolvedPos, $head = $anchor) {
     const anchorParentBlock = getNotionBlockParent($anchor);
     const headParentBlock = getNotionBlockParent($head);
