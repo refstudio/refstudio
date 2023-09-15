@@ -94,16 +94,16 @@ class IngestRequestType(StrEnum):
     PDF = "pdf"
 
 
-class IngestRequestBase(RefStudioModel):
+class IngestRequest(RefStudioModel):
     type: IngestRequestType
 
 
-class IngestUploadsRequest(IngestRequestBase):
+class IngestUploadsRequest(IngestRequest):
     type: IngestRequestType = IngestRequestType.UPLOADS_DIRECTORY
     pass
 
 
-class IngestPdfUrlRequest(IngestRequestBase):
+class IngestPdfUrlRequest(IngestRequest):
     type: IngestRequestType = IngestRequestType.PDF
     url: str
     metadata: ReferenceCreate
