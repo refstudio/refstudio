@@ -1,11 +1,12 @@
 import { useAtomValue, useSetAtom } from 'jotai';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 import { S2SearchResult } from '../../api/api-types';
 import { AddIcon } from '../../application/components/icons';
+import { projectIdAtom } from '../../atoms/projectState';
 import { getSearchResultsAtom, loadSearchResultsAtom } from '../../atoms/s2SearchState';
 import { Button } from '../../components/Button';
-import { DotIcon, SearchIcon, SmallInfoIcon } from '../../components/icons';
+import { CheckIcon, DotIcon, MinusIcon, SearchIcon, SmallInfoIcon } from '../../components/icons';
 import { Modal } from '../../components/Modal';
 import { useDebouncedCallback } from '../../hooks/useDebouncedCallback';
 import { cx } from '../../lib/cx';
@@ -25,60 +26,115 @@ const SearchBar = ({ onChange }: { onChange: (value: string, limit: number) => v
   </div>
 );
 
-const SearchResultsList = ({ searchResultsList }: { searchResultsList: S2SearchResult[] }) => (
+const SearchResultsList = ({
+  searchResultsList,
+  projectId,
+}: {
+  searchResultsList: S2SearchResult[];
+  projectId: string;
+}) => (
   <div className="text-modal-txt-primary">
     {searchResultsList.map((reference) => (
-      <SearchResult key={reference.paperId} reference={reference} />
+      <SearchResult key={reference.paperId} projectId={projectId} reference={reference} />
     ))}
   </div>
 );
 
-const SearchResult = ({ reference }: { reference: S2SearchResult }) => (
-  <div className="border-b border-slate-200 px-5 py-3 text-[.875rem]">
-    <div className="space-y-2">
-      <div className="flex">
-        <div
-          className={cx({ 'opacity-30': !reference.openAccessPdf }, 'basis-4/5 truncate font-semibold')}
-          title={reference.title}
-        >
-          {reference.title}
+const SearchResult = ({ reference, projectId }: { reference: S2SearchResult; projectId: string }) => {
+  const [added, setAdded] = useState(false);
+  const [showRemove, setShowRemove] = useState(false);
+
+  // const addSearchResults = useSetAtom(addS2ReferenceAtom);
+
+  const addClickHandler = useCallback(() => {
+    setAdded(true);
+  }, []);
+
+  const removeClickHandler = useCallback(() => {
+    setAdded(false);
+  }, []);
+
+  return (
+    <div className="border-b border-slate-200 px-5 py-3 text-[.875rem]">
+      <div className="space-y-2">
+        <div className="flex">
+          <div
+            className={cx({ 'opacity-30': !reference.openAccessPdf }, 'basis-4/5 truncate font-semibold')}
+            title={reference.title}
+          >
+            {reference.title}
+          </div>
+          {reference.openAccessPdf && (
+            <div className="flex basis-1/5 justify-end">
+              {!added && (
+                <Button
+                  Action={<AddIcon />}
+                  size="S"
+                  text="Add"
+                  type="secondary"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addClickHandler();
+                  }}
+                />
+              )}
+              {added && (
+                <div
+                  onMouseLeave={() => {
+                    setShowRemove(false);
+                  }}
+                  onMouseOver={() => {
+                    setShowRemove(true);
+                  }}
+                >
+                  <Button
+                    Action={showRemove ? <MinusIcon /> : <CheckIcon />}
+                    className={cx('bg-transparent text-[#61C554]', 'hover:bg-red-400 hover:text-white')}
+                    size="S"
+                    text={showRemove ? 'Remove' : 'Added'}
+                    type="secondary"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeClickHandler();
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+          {!reference.openAccessPdf && (
+            <div className="flex basis-1/5 justify-end">
+              <div title="Ref Studio can only supplort references with a PDF">PDF Not Available</div>
+              <div className=" cursor-pointer" title="Ref Studio can only supplort references with a PDF">
+                <SmallInfoIcon />
+              </div>
+            </div>
+          )}
         </div>
         {reference.openAccessPdf && (
-          <div className="flex basis-1/5 justify-end">
-            <Button Action={<AddIcon />} size="S" text="Add" type="secondary" />
-          </div>
-        )}
-        {!reference.openAccessPdf && (
-          <div className="flex basis-1/5 justify-end">
-            <div title="Ref Studio can only supplort references with a PDF">PDF Not Available</div>
-            <div className=" cursor-pointer" title="Ref Studio can only supplort references with a PDF">
-              <SmallInfoIcon />
+          <>
+            <div className="flex">
+              <div className="truncate" title={'Authors: ' + reference.authors.join(', ')}>
+                {reference.authors.join(', ')}
+              </div>
+              <div>{reference.authors.length > 0 ? DotIcon() : ''}</div>
+              <div className="truncate" title={reference.venue}>
+                {reference.venue}
+              </div>
+              <div>{reference.venue ? DotIcon() : ''}</div>
+              <div> {reference.year}</div>
             </div>
-          </div>
+            <div className="line-clamp-4">{reference.abstract}</div>
+          </>
         )}
       </div>
-      {reference.openAccessPdf && (
-        <>
-          <div className="flex">
-            <div className="truncate" title={'Authors: ' + reference.authors.join(', ')}>
-              {reference.authors.join(', ')}
-            </div>
-            <div>{reference.authors.length > 0 ? DotIcon() : ''}</div>
-            <div className="truncate" title={reference.venue}>
-              {reference.venue}
-            </div>
-            <div>{reference.venue ? DotIcon() : ''}</div>
-            <div> {reference.year}</div>
-          </div>
-          <div className="line-clamp-4">{reference.abstract}</div>
-        </>
-      )}
     </div>
-  </div>
-);
+  );
+};
 
 export function S2SearchModal({ open, onClose: onClose }: { open: boolean; onClose: () => void }) {
   const searchResultsList: S2SearchResult[] = useAtomValue(getSearchResultsAtom);
+  const projectId = useAtomValue(projectIdAtom);
 
   const loadSearchResults = useSetAtom(loadSearchResultsAtom);
 
@@ -95,7 +151,7 @@ export function S2SearchModal({ open, onClose: onClose }: { open: boolean; onClo
     <Modal className="h-[37.5rem] w-[50rem]" open={open} onClose={onClose}>
       <div className="h-[37.5rem] w-[50rem] cursor-default select-none gap-2 overflow-auto bg-modal-bg-primary ">
         <SearchBar onChange={debouncedOnChange} />
-        <SearchResultsList searchResultsList={searchResultsList} />
+        <SearchResultsList projectId={projectId} searchResultsList={searchResultsList} />
       </div>
     </Modal>
   );

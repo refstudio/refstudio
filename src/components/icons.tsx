@@ -159,3 +159,25 @@ export const SmallInfoIcon = () => (
     </svg>
   </div>
 );
+
+export const CheckIcon = () => (
+  <div className="flex h-6 w-6 shrink-0 items-center justify-center">
+    <svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M6.5 13.5L11.5 20.5L18.5 3.5"
+        stroke="currentcolor"
+        strokeLinecap="square"
+        strokeLinejoin="bevel"
+        strokeWidth="2"
+      />
+    </svg>
+  </div>
+);
+
+export const MinusIcon = () => (
+  <div className="flex h-6 w-6 shrink-0 items-center justify-center">
+    <svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M6.5 12H17.5" stroke="currentcolor" strokeLinecap="square" strokeLinejoin="round" strokeWidth="2" />
+    </svg>
+  </div>
+);
