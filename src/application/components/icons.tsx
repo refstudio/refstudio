@@ -21,7 +21,59 @@ export const RefStudioEditorIcon = () => (
   </div>
 );
 
-export const PdfEditorIcon = () => (
+export const RefStudioTextEditorIcon = () => (
+  <div className="flex h-6 w-6 items-center justify-center">
+    <svg fill="none" height="20" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg">
+      <path
+        clipRule="evenodd"
+        d="M2.8 1C1.80589 1 1 1.80589 1 2.8V17.2C1 18.1941 1.80589 19 2.8 19H17.2C18.1941 19 19 18.1941 19 17.2V2.8C19 1.80589 18.1941 1 17.2 1H2.8ZM6 7.5V6H14V7.5H6ZM6 9V10.5H14V9H6ZM6 13.5V12H10.5V13.5H6Z"
+        fill="currentcolor"
+        fillRule="evenodd"
+      />
+    </svg>
+  </div>
+);
+
+export const RefStudioJsonEditorIcon = () => (
+  <div className="flex h-6 w-6 items-center justify-center">
+    <svg fill="none" height="20" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg">
+      <path
+        clipRule="evenodd"
+        d="M2.8 1C1.80589 1 1 1.80589 1 2.8V17.2C1 18.1941 1.80589 19 2.8 19H17.2C18.1941 19 19 18.1941 19 17.2V2.8C19 1.80589 18.1941 1 17.2 1H2.8ZM5 10L7.5 9V7.5L3.5 9.25V10.75L7.5 12.5V11L5 10ZM8 13.5H9.4L11.9 6.5H10.5L8 13.5ZM12.5 7.5V9L15 10L12.5 11V12.5L16.5 10.75V9.25L12.5 7.5Z"
+        fill="currentcolor"
+        fillRule="evenodd"
+      />
+    </svg>
+  </div>
+);
+
+export const RefStudioReferenceEditorIcon = () => (
+  <div className="flex h-6 w-6 items-center justify-center">
+    <svg fill="none" height="20" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg">
+      <path
+        clipRule="evenodd"
+        d="M1 2.8C1 1.80589 1.80589 1 2.8 1H17.2C18.1941 1 19 1.80589 19 2.8V17.2C19 18.1941 18.1941 19 17.2 19H2.8C1.80589 19 1 18.1941 1 17.2V2.8ZM5.86523 13.6758V13.1387C6.60286 12.8665 7.18294 12.4404 7.60547 11.8604C8.02799 11.2731 8.23926 10.6644 8.23926 10.0342C8.23926 9.89811 8.21777 9.79785 8.1748 9.7334C8.15332 9.69043 8.12467 9.66895 8.08887 9.66895C8.05306 9.66895 7.99577 9.69759 7.91699 9.75488C7.68783 9.9196 7.40137 10.002 7.05762 10.002C6.64225 10.002 6.27702 9.83724 5.96191 9.50781C5.65397 9.17122 5.5 8.77376 5.5 8.31543C5.5 7.82845 5.67904 7.40592 6.03711 7.04785C6.39518 6.68262 6.83561 6.5 7.3584 6.5C7.9528 6.5 8.46842 6.74707 8.90527 7.24121C9.34928 7.72819 9.57129 8.38704 9.57129 9.21777C9.57129 10.1846 9.27409 11.0511 8.67969 11.8174C8.08529 12.5837 7.14714 13.2031 5.86523 13.6758ZM11.0322 13.1387V13.6758C12.3141 13.2031 13.2523 12.5837 13.8467 11.8174C14.4411 11.0511 14.7383 10.1846 14.7383 9.21777C14.7383 8.38704 14.5163 7.72819 14.0723 7.24121C13.6354 6.74707 13.1198 6.5 12.5254 6.5C12.0026 6.5 11.5622 6.68262 11.2041 7.04785C10.846 7.40592 10.667 7.82845 10.667 8.31543C10.667 8.77376 10.821 9.17122 11.1289 9.50781C11.444 9.83724 11.8092 10.002 12.2246 10.002C12.5684 10.002 12.8548 9.9196 13.084 9.75488C13.1628 9.69759 13.2201 9.66895 13.2559 9.66895C13.2917 9.66895 13.3203 9.69043 13.3418 9.7334C13.3848 9.79785 13.4062 9.89811 13.4062 10.0342C13.4062 10.6644 13.195 11.2731 12.7725 11.8604C12.3499 12.4404 11.7699 12.8665 11.0322 13.1387Z"
+        fill="currentcolor"
+        fillRule="evenodd"
+      />
+    </svg>
+  </div>
+);
+
+export const RefStudioReferencesEditorIcon = () => (
+  <div className="flex h-6 w-6 items-center justify-center">
+    <svg fill="none" height="20" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg">
+      <path
+        clipRule="evenodd"
+        d="M1 2.8C1 1.80589 1.80589 1 2.8 1H17.2C18.1941 1 19 1.80589 19 2.8V17.2C19 18.1941 18.1941 19 17.2 19H2.8C1.80589 19 1 18.1941 1 17.2V2.8ZM5 6V14C5 15.1046 4.89543 15 6 15H14C15.1046 15 15 15.1046 15 14V6C15 4.89543 15.1046 5 14 5H6C4.89543 5 5 4.89543 5 6ZM6.4 13.6H9.25V10.4H6.4V13.6ZM6.4 9H13.6V6.4H6.4V9ZM10.75 13.6H13.6V10.4H10.75V13.6Z"
+        fill="currentcolor"
+        fillRule="evenodd"
+      />
+    </svg>
+  </div>
+);
+
+export const RefStudioPdfEditorIcon = () => (
   <div className="flex h-6 w-6 items-center justify-center">
     <svg height="20" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg">
       <path
@@ -30,26 +82,6 @@ export const PdfEditorIcon = () => (
         fill="currentcolor"
         fillRule="evenodd"
       />
-    </svg>
-  </div>
-);
-
-export const EmptyStateIcon = () => (
-  <div className="flex h-12 w-12 items-center justify-center">
-    <svg height="48" viewBox="0 0 49 48" width="49" xmlns="http://www.w3.org/2000/svg">
-      <g clipPath="url(#clip0_1250_4005)">
-        <path d="M32.9999 30H36.9999V48H32.9999V30Z" fill="currentcolor" />
-        <path d="M25.9999 41V37H43.9999V41H25.9999Z" fill="currentcolor" />
-        <path d="M3.99991 3V45L21.5 45V41H8.00001V7H29V27L32.9999 27V13V12V7.5V3H3.99991Z" fill="currentcolor" />
-        <path d="M48.4999 16L32.9999 7.5V12L43.4999 17.5L37.9999 27L40.9999 29L48.4999 16Z" fill="currentcolor" />
-        <path d="M11.9999 10.5H24.9999V14.5H11.9999V10.5Z" fill="currentcolor" />
-        <path d="M11.9999 18H20.4999V22H11.9999V18Z" fill="currentcolor" />
-      </g>
-      <defs>
-        <clipPath id="clip0_1250_4005">
-          <rect fill="white" height="48" transform="translate(0.5)" width="48" />
-        </clipPath>
-      </defs>
     </svg>
   </div>
 );

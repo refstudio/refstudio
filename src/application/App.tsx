@@ -18,6 +18,7 @@ import { EventsListener } from '../wrappers/EventsListener';
 import { CommandPalette } from './commands/CommandPalette';
 import { MainPanel } from './components/MainPanel';
 import { CreateProjectModal } from './CreateProjectModal';
+import { KeyboardShortcutsModal } from './KeyboardShortcutsModal';
 import { SelectProjectModal } from './SelectProjectModal';
 import { LeftSidePanelWrapper } from './sidebar/LeftSidePanelWrapper';
 import { RightSidePanelWrapper } from './sidebar/RightSidePanelWrapper';
@@ -102,6 +103,7 @@ function ProjectModals() {
     <>
       <CreateProjectModal />
       <SelectProjectModal />
+      <KeyboardShortcutsModal />
     </>
   );
 }

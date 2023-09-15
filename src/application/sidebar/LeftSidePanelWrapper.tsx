@@ -7,7 +7,6 @@ import { ReferencesPanel } from '../../features/references/sidebar/ReferencesPan
 import { useListenEvent } from '../../hooks/useListenEvent';
 import { useRefStudioHotkeys } from '../../hooks/useRefStudioHotkeys';
 import { cx } from '../../lib/cx';
-import { noop } from '../../lib/noop';
 import { SideBar } from '../components/SideBar';
 import { ExplorerPanel } from './ExplorerPanel';
 import { FilesIcon, KeyboardIcon, ReferencesIcon, SettingsIcon } from './icons';
@@ -64,6 +63,7 @@ export function LeftSidePanelWrapper({ disabled }: { disabled?: boolean }) {
   });
 
   const openSettings = useCallback(() => emitEvent('refstudio://menu/settings'), []);
+  const openKbdShortcuts = useCallback(() => emitEvent('refstudio://menu/view/keyboard-shortcuts'), []);
 
   return (
     <>
@@ -74,7 +74,7 @@ export function LeftSidePanelWrapper({ disabled }: { disabled?: boolean }) {
           'shadow-default': isPanelCollapsed,
         })}
         footerItems={[
-          { label: 'Keybinds', Icon: <KeyboardIcon />, onClick: noop }, // TODO: Implement Keybinds screen
+          { label: 'Keybinds', Icon: <KeyboardIcon />, onClick: openKbdShortcuts },
           { label: 'Settings', Icon: <SettingsIcon />, onClick: openSettings },
         ]}
         items={[
