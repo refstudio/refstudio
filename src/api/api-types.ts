@@ -67,7 +67,6 @@ export interface ChatRequest {
   text: string;
   n_choices?: number;
   temperature?: number;
-  stream?: boolean;
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema

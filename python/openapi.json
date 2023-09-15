@@ -42,10 +42,6 @@
             "default": 1,
             "type": "integer"
           },
-          "stream": {
-            "default": false,
-            "type": "boolean"
-          },
           "temperature": {
             "default": 0.7,
             "type": "number"
