@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { Item, Menu, Separator, TriggerEvent, useContextMenu } from 'react-contexify';
+import { Item, Menu, TriggerEvent, useContextMenu } from 'react-contexify';
 
 import { emitEvent } from '../../../events';
 
@@ -15,7 +15,6 @@ export function UploadContextMenu() {
       >
         Upload
       </Item>
-      <Separator />
       <Item
         onClick={() => {
           emitEvent('refstudio://menu/search');
