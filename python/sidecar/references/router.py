@@ -1,18 +1,23 @@
-from fastapi import APIRouter
+from typing import TypeVar, Union
+
+from fastapi import APIRouter, Body
 from sidecar.projects.service import get_project_uploads_path
 from sidecar.references import ingest, storage
 from sidecar.references.schemas import (
     DeleteRequest,
     DeleteStatusResponse,
+    IngestPdfUrlRequest,
     IngestRequest,
+    IngestRequestType,
     IngestResponse,
+    IngestUploadsRequest,
     Reference,
-    ReferenceCreate,
     ReferencePatch,
     UpdateStatusResponse,
 )
 from sidecar.references.service import create_reference_from_url
-from sidecar.typing import EmptyRequest
+
+IngestibleRequest = Union[IngestPdfUrlRequest, IngestUploadsRequest]
 
 router = APIRouter(
     prefix="/references",
@@ -34,25 +39,22 @@ async def list_references(project_id: str) -> list[Reference]:
 
 
 @router.post("/{project_id}")
-async def ingest_references(project_id: str, payload: EmptyRequest) -> IngestResponse:
+async def ingest_references(
+    project_id: str, request: IngestibleRequest
+) -> IngestResponse:
     """
-    Ingests references from PDFs in the project uploads directory
+    Creates references from a PDF directory or URL.
     """
     user_id = "user1"
-    uploads_dir = get_project_uploads_path(user_id, project_id)
-    req = IngestRequest(pdf_directory=str(uploads_dir))
-    response = ingest.run_ingest(req)
-    return response
 
+    if request.type == IngestRequestType.UPLOADS_DIRECTORY:
+        uploads_dir = get_project_uploads_path(user_id, project_id)
+        response = ingest.run_ingest(pdf_directory=str(uploads_dir))
 
-@router.post("/{project_id}/create_from_url")
-async def create_from_url(project_id: str, payload: ReferenceCreate) -> Reference:
-    """
-    Creates a reference from a PDF URL.
-    """
-    response = create_reference_from_url(
-        project_id, url=payload.source_url, metadata=payload
-    )
+    elif request.type == IngestRequestType.PDF:
+        response = create_reference_from_url(
+            project_id, url=request.url, metadata=request.metadata
+        )
     return response
 
 

@@ -6,7 +6,12 @@ from uuid import uuid4
 
 from sidecar import config
 from sidecar.references import ingest, storage
-from sidecar.references.schemas import Author, IngestRequest, IngestStatus, Reference
+from sidecar.references.schemas import (
+    Author,
+    IngestStatus,
+    IngestUploadsRequest,
+    Reference,
+)
 
 
 def _copy_fixture_to_temp_dir(source_path: Path, write_path: Path) -> None:
@@ -51,7 +56,7 @@ def test_run_ingest(monkeypatch, tmp_path, fixtures_dir):
     monkeypatch.setattr(ingest.GrobidClient, "process", mock_grobid_client_process)
 
     pdf_directory = tmp_path.joinpath("uploads")
-    response = ingest.run_ingest(IngestRequest(pdf_directory=str(pdf_directory)))
+    response = ingest.run_ingest(pdf_directory=pdf_directory)
 
     # project name is the name of the parent directory of the input directory
     assert response.project_name == tmp_path.name

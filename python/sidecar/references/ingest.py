@@ -17,6 +17,7 @@ from sidecar.references.schemas import (
     IngestResponse,
     IngestStatus,
     IngestStatusResponse,
+    IngestUploadsRequest,
     Reference,
     ReferenceStatus,
 )
@@ -29,13 +30,7 @@ logger = logger.getChild(__name__)
 GROBID_SERVER_URL = "https://kermitt2-grobid.hf.space"
 
 
-def run_ingest(args: IngestRequest):
-    pdf_directory = Path(args.pdf_directory)
-
-    # PDF files for ingest must be written to the `uploads` directory
-    if pdf_directory.parent != "uploads":
-        pdf_directory = pdf_directory.parent / "uploads"
-
+def run_ingest(pdf_directory: Path):
     ingest = PDFIngestion(input_dir=pdf_directory)
     response = ingest.run()
     return response
