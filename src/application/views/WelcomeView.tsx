@@ -81,9 +81,9 @@ function EmptyWelcomeView() {
 
 function WelcomeActions() {
   return (
-    <div className=" flex flex-col gap-2">
+    <div className=" flex flex-col gap-4">
       <Logo small />
-      <div className="flex flex-col items-start gap-4">
+      <div className="flex flex-col items-start gap-8">
         <h1 className="text-card-txt-primary">Welcome to refstudio</h1>
         <div className="flex flex-col items-center gap-2 self-stretch">
           <Button fluid text="New Project" onClick={() => emitEvent('refstudio://menu/file/project/new')} />

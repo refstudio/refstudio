@@ -4,7 +4,7 @@ export function Logo({ small = false }: { small?: boolean }) {
   return (
     <div
       className={cx('flex shrink-0 flex-row overflow-hidden rounded-default shadow-default', {
-        'h-16 w-32': small,
+        'h-12 w-24': small,
         'h-32 w-64': !small,
       })}
     >
@@ -28,7 +28,7 @@ function LogoLetter({
       className={cx(
         'flex flex-1 items-center justify-center font-black',
         {
-          'text-5xl': small,
+          'text-4xl': small,
           'text-8xl': !small,
         },
         className,
