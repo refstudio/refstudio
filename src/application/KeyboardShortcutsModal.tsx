@@ -17,8 +17,8 @@ const SHORTCUT_SECTIONS: ShortcutSection[] = [
     header: 'File',
     shortcuts: [
       makeShortcut('Save File', ['⌘', 'S']), //
-      makeShortcut('New File', ['⌘', 'N']),
-      makeShortcut('Close Editor', ['⌘', 'W']),
+      makeShortcut('New File', ['⌘', 'N'], ['CTRL', 'N']),
+      makeShortcut('Close Editor', ['⌘', 'W'], ['CTRL', 'W']),
     ],
   },
   {
@@ -59,10 +59,10 @@ const SHORTCUT_SECTIONS: ShortcutSection[] = [
   },
 ];
 
-function makeShortcut(label: string, keys: string[]) {
+function makeShortcut(label: string, keys: string[], keysOverrideWeb?: string[]) {
   return {
     label,
-    keys,
+    keys: import.meta.env.VITE_IS_WEB && keysOverrideWeb ? keysOverrideWeb : keys,
   };
 }
 
