@@ -1,6 +1,7 @@
 from datetime import date
-from typing import Any
+from typing import Any, Literal, Union
 
+from pydantic import Field
 from sidecar.typing import RefStudioModel, ResponseStatus
 
 try:
@@ -38,7 +39,6 @@ class Reference(RefStudioModel):
 
 class ReferenceCreate(RefStudioModel):
     source_filename: str
-    source_url: str
     citation_key: str | None = None
     doi: str | None = None
     title: str | None = None
@@ -89,8 +89,24 @@ class ReferenceStatus(RefStudioModel):
     status: IngestStatus
 
 
-class IngestRequest(RefStudioModel):
-    pdf_directory: str
+class IngestRequestType(StrEnum):
+    UPLOADS_DIRECTORY = "uploads"
+    PDF = "pdf"
+
+
+class IngestRequestBase(RefStudioModel):
+    type: IngestRequestType
+
+
+class IngestUploadsRequest(IngestRequestBase):
+    type: IngestRequestType = IngestRequestType.UPLOADS_DIRECTORY
+    pass
+
+
+class IngestPdfUrlRequest(IngestRequestBase):
+    type: IngestRequestType = IngestRequestType.PDF
+    url: str
+    metadata: ReferenceCreate
 
 
 class IngestStatusResponse(RefStudioModel):
@@ -114,4 +130,5 @@ class DeleteStatusResponse(RefStudioModel):
     message: str
 
 
+ReferenceCreate.update_forward_refs()
 Reference.update_forward_refs()

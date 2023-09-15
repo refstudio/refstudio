@@ -1,7 +1,7 @@
+import shutil
 from uuid import uuid4
 
 import requests
-from sidecar import config
 from sidecar.projects import service as projects_service
 from sidecar.references import storage
 from sidecar.references.schemas import IngestStatus, Reference, ReferenceCreate
@@ -23,8 +23,6 @@ def create_reference_from_url(
     metadata : dict
         The metadata to add to the reference.
     """
-    from sidecar.api import api  # avoid circular import
-
     user_id = "user1"
 
     source = requests.get(url)
@@ -39,21 +37,14 @@ def create_reference_from_url(
         user_id, project_id, filename
     )
 
-    urlpath = api.url_path_for(
-        "create_file", project_id=project_id, filepath=f"uploads/{filename}"
-    )
-    upload_url = f"http://{config.HOST}:{config.PORT}{urlpath}"
+    # if `uploads` ingest has never been run, these directories might not exist yet
+    staged_filepath.parent.mkdir(parents=True, exist_ok=True)
+    upload_filepath.parent.mkdir(parents=True, exist_ok=True)
 
     with open(staged_filepath, "wb") as f:
         f.write(source.content)
 
-    with open(staged_filepath, "rb") as f:
-        response = requests.put(
-            upload_url, files={"file": (filename, f, "application/pdf")}
-        )
-
-    if response.status_code != 200:
-        raise Exception(f"Error uploading file: {response.text}")
+    shutil.copyfile(staged_filepath, upload_filepath)
 
     ref = Reference(
         id=str(uuid4()),
