@@ -49,12 +49,14 @@ async def ingest_references(
 
     if request.type == IngestRequestType.UPLOADS_DIRECTORY:
         uploads_dir = get_project_uploads_path(user_id, project_id)
-        response = ingest.run_ingest(pdf_directory=str(uploads_dir))
+        response = ingest.run_ingest(pdf_directory=uploads_dir)
 
     elif request.type == IngestRequestType.PDF:
-        response = create_reference_from_url(
+        reference = create_reference_from_url(
             project_id, url=request.url, metadata=request.metadata
         )
+        response = IngestResponse(project_name=project_id, references=[reference])
+
     return response
 
 

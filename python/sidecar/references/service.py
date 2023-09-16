@@ -61,3 +61,4 @@ def create_reference_from_url(
     store.add_reference(ref)
 
     staged_filepath.unlink()
+    return store.get_reference(ref.id)

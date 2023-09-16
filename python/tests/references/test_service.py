@@ -1,5 +1,5 @@
 from sidecar.projects.service import get_project_uploads_path
-from sidecar.references.schemas import ReferenceCreate
+from sidecar.references.schemas import Reference, ReferenceCreate
 from sidecar.references.service import create_reference_from_url, requests
 from sidecar.references.storage import JsonStorage
 
@@ -17,7 +17,9 @@ def test_create_reference_from_url(
         title="Some new title",
     )
 
-    create_reference_from_url(project_id=project_id, url=url, metadata=metadata)
+    ref = create_reference_from_url(project_id=project_id, url=url, metadata=metadata)
+
+    assert isinstance(ref, Reference)
 
     uploads = get_project_uploads_path("user1", project_id)
     assert (uploads / metadata.source_filename).exists()

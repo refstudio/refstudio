@@ -17,7 +17,6 @@ from sidecar.references.schemas import (
     IngestResponse,
     IngestStatus,
     IngestStatusResponse,
-    IngestUploadsRequest,
     Reference,
     ReferenceStatus,
 )
