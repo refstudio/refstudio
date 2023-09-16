@@ -1,7 +1,6 @@
 from datetime import date
-from typing import Any, Literal, Union
+from typing import Any
 
-from pydantic import Field
 from sidecar.typing import RefStudioModel, ResponseStatus
 
 try:

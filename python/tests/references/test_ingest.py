@@ -9,7 +9,6 @@ from sidecar.references import ingest, storage
 from sidecar.references.schemas import (
     Author,
     IngestStatus,
-    IngestUploadsRequest,
     Reference,
 )
 
