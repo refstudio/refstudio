@@ -9,14 +9,16 @@ import {
   Chunk,
   DeleteRequest,
   DeleteStatusResponse,
-  EmptyRequest,
   FileEntry,
   FlatSettingsSchema,
   FlatSettingsSchemaPatch,
   FolderEntry,
   HTTPValidationError,
+  IngestPdfUrlRequest,
+  IngestRequestType,
   IngestResponse,
   IngestStatus,
+  IngestUploadsRequest,
   ModelProvider,
   ProjectBase,
   ProjectCreateRequest,
@@ -24,6 +26,7 @@ import {
   ProjectFileTreeResponse,
   ProjectListResponse,
   Reference,
+  ReferenceCreate,
   ReferencePatch,
   ResponseStatus,
   RewriteChoice,
@@ -112,7 +115,7 @@ export interface paths {
     get: operations['list_references_api_references__project_id__get'];
     /**
      * Ingest References
-     * @description Ingests references from PDFs in the project uploads directory
+     * @description Creates references from a PDF directory or URL.
      */
     post: operations['ingest_references_api_references__project_id__post'];
   };
@@ -197,11 +200,6 @@ export interface components {
       message: string;
       status: ResponseStatus;
     };
-    /**
-     * EmptyRequest
-     * @description Use this to indicate that a request only accepts an empty object ({})
-     */
-    EmptyRequest: Record<string, never>;
     /** FileEntry */
     FileEntry: {
       file_extension: string;
@@ -242,6 +240,19 @@ export interface components {
       /** Detail */
       detail?: ValidationError[];
     };
+    /** IngestPdfUrlRequest */
+    IngestPdfUrlRequest: {
+      metadata: ReferenceCreate;
+      /** @default pdf */
+      type?: IngestRequestType;
+      url: string;
+    };
+    /**
+     * IngestRequestType
+     * @description An enumeration.
+     * @enum {string}
+     */
+    IngestRequestType: 'uploads' | 'pdf';
     /** IngestResponse */
     IngestResponse: {
       project_name: string;
@@ -253,6 +264,11 @@ export interface components {
      * @enum {string}
      */
     IngestStatus: 'processing' | 'failure' | 'complete';
+    /** IngestUploadsRequest */
+    IngestUploadsRequest: {
+      /** @default uploads */
+      type?: IngestRequestType;
+    };
     /**
      * ModelProvider
      * @description An enumeration.
@@ -302,6 +318,21 @@ export interface components {
       published_date?: string;
       source_filename: string;
       status: IngestStatus;
+      title?: string;
+    };
+    /** ReferenceCreate */
+    ReferenceCreate: {
+      abstract?: string;
+      /** @default [] */
+      authors?: Author[];
+      citation_key?: string;
+      contents?: string;
+      doi?: string;
+      /** @default {} */
+      metadata?: Record<string, never>;
+      /** Format: date */
+      published_date?: string;
+      source_filename: string;
       title?: string;
     };
     /**
@@ -745,7 +776,7 @@ export interface operations {
   };
   /**
    * Ingest References
-   * @description Ingests references from PDFs in the project uploads directory
+   * @description Creates references from a PDF directory or URL.
    */
   ingest_references_api_references__project_id__post: {
     parameters: {
@@ -755,7 +786,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': EmptyRequest;
+        'application/json': IngestPdfUrlRequest | IngestUploadsRequest;
       };
     };
     responses: {

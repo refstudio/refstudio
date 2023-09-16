@@ -153,12 +153,6 @@
         "title": "DeleteStatusResponse",
         "type": "object"
       },
-      "EmptyRequest": {
-        "description": "Use this to indicate that a request only accepts an empty object ({})",
-        "properties": {},
-        "title": "EmptyRequest",
-        "type": "object"
-      },
       "FileEntry": {
         "properties": {
           "file_extension": {
@@ -292,6 +286,39 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
+      "IngestPdfUrlRequest": {
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/ReferenceCreate"
+          },
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/IngestRequestType"
+              }
+            ],
+            "default": "pdf"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url",
+          "metadata"
+        ],
+        "title": "IngestPdfUrlRequest",
+        "type": "object"
+      },
+      "IngestRequestType": {
+        "description": "An enumeration.",
+        "enum": [
+          "uploads",
+          "pdf"
+        ],
+        "title": "IngestRequestType",
+        "type": "string"
+      },
       "IngestResponse": {
         "properties": {
           "project_name": {
@@ -320,6 +347,20 @@
         ],
         "title": "IngestStatus",
         "type": "string"
+      },
+      "IngestUploadsRequest": {
+        "properties": {
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/IngestRequestType"
+              }
+            ],
+            "default": "uploads"
+          }
+        },
+        "title": "IngestUploadsRequest",
+        "type": "object"
       },
       "ModelProvider": {
         "description": "An enumeration.",
@@ -470,6 +511,48 @@
           "status"
         ],
         "title": "Reference",
+        "type": "object"
+      },
+      "ReferenceCreate": {
+        "properties": {
+          "abstract": {
+            "type": "string"
+          },
+          "authors": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Author"
+            },
+            "type": "array"
+          },
+          "citation_key": {
+            "type": "string"
+          },
+          "contents": {
+            "type": "string"
+          },
+          "doi": {
+            "type": "string"
+          },
+          "metadata": {
+            "default": {},
+            "type": "object"
+          },
+          "published_date": {
+            "format": "date",
+            "type": "string"
+          },
+          "source_filename": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_filename"
+        ],
+        "title": "ReferenceCreate",
         "type": "object"
       },
       "ReferencePatch": {
@@ -1386,7 +1469,7 @@
         ]
       },
       "post": {
-        "description": "Ingests references from PDFs in the project uploads directory",
+        "description": "Creates references from a PDF directory or URL.",
         "operationId": "ingest_references_api_references__project_id__post",
         "parameters": [
           {
@@ -1403,7 +1486,15 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/EmptyRequest"
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/IngestPdfUrlRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/IngestUploadsRequest"
+                  }
+                ],
+                "title": "Request"
               }
             }
           },
