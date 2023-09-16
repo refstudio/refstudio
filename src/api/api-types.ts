@@ -35,6 +35,13 @@ export type Detail = ValidationError[];
  * An enumeration.
  *
  * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "IngestRequestType".
+ */
+export type IngestRequestType = 'uploads' | 'pdf';
+/**
+ * An enumeration.
+ *
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
  * via the `definition` "IngestStatus".
  */
 export type IngestStatus = 'processing' | 'failure' | 'complete';
@@ -111,13 +118,6 @@ export interface DeleteStatusResponse {
   message: string;
 }
 /**
- * Use this to indicate that a request only accepts an empty object ({})
- *
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "EmptyRequest".
- */
-export interface EmptyRequest {}
-/**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
  * via the `definition` "FileEntry".
  */
@@ -181,6 +181,30 @@ export interface ValidationError {
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "IngestPdfUrlRequest".
+ */
+export interface IngestPdfUrlRequest {
+  type?: IngestRequestType & string;
+  url: string;
+  metadata: ReferenceCreate;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "ReferenceCreate".
+ */
+export interface ReferenceCreate {
+  source_filename: string;
+  citation_key?: string;
+  doi?: string;
+  title?: string;
+  abstract?: string;
+  contents?: string;
+  published_date?: string;
+  authors?: Author[];
+  metadata?: {};
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
  * via the `definition` "IngestResponse".
  */
 export interface IngestResponse {
@@ -206,6 +230,13 @@ export interface Reference {
   authors?: Author[];
   chunks?: Chunk[];
   metadata?: {};
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "IngestUploadsRequest".
+ */
+export interface IngestUploadsRequest {
+  type?: IngestRequestType & string;
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
