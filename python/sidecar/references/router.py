@@ -1,13 +1,12 @@
-from typing import TypeVar, Union
+from typing import Union
 
-from fastapi import APIRouter, Body
+from fastapi import APIRouter
 from sidecar.projects.service import get_project_uploads_path
 from sidecar.references import ingest, storage
 from sidecar.references.schemas import (
     DeleteRequest,
     DeleteStatusResponse,
     IngestPdfUrlRequest,
-    IngestRequest,
     IngestRequestType,
     IngestResponse,
     IngestUploadsRequest,
