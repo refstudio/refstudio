@@ -286,7 +286,7 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
-      "IngestPdfUrlRequest": {
+      "IngestMetadataRequest": {
         "properties": {
           "metadata": {
             "$ref": "#/components/schemas/ReferenceCreate"
@@ -297,25 +297,23 @@
                 "$ref": "#/components/schemas/IngestRequestType"
               }
             ],
-            "default": "pdf"
+            "default": "metadata"
           },
           "url": {
             "type": "string"
           }
         },
         "required": [
-          "url",
           "metadata"
         ],
-        "title": "IngestPdfUrlRequest",
+        "title": "IngestMetadataRequest",
         "type": "object"
       },
       "IngestRequestType": {
         "description": "An enumeration.",
         "enum": [
           "uploads",
-          "pdf",
-          "generic"
+          "metadata"
         ],
         "title": "IngestRequestType",
         "type": "string"
@@ -485,6 +483,9 @@
           "doi": {
             "type": "string"
           },
+          "filepath": {
+            "type": "string"
+          },
           "id": {
             "type": "string"
           },
@@ -508,7 +509,6 @@
         },
         "required": [
           "id",
-          "source_filename",
           "status"
         ],
         "title": "Reference",
@@ -558,7 +558,7 @@
           }
         },
         "required": [
-          "source_filename"
+          "title"
         ],
         "title": "ReferenceCreate",
         "type": "object"
@@ -1551,7 +1551,7 @@
               "schema": {
                 "anyOf": [
                   {
-                    "$ref": "#/components/schemas/IngestPdfUrlRequest"
+                    "$ref": "#/components/schemas/IngestMetadataRequest"
                   },
                   {
                     "$ref": "#/components/schemas/IngestUploadsRequest"

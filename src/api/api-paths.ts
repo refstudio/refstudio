@@ -14,7 +14,7 @@ import {
   FlatSettingsSchemaPatch,
   FolderEntry,
   HTTPValidationError,
-  IngestPdfUrlRequest,
+  IngestMetadataRequest,
   IngestRequestType,
   IngestResponse,
   IngestStatus,
@@ -244,19 +244,19 @@ export interface components {
       /** Detail */
       detail?: ValidationError[];
     };
-    /** IngestPdfUrlRequest */
-    IngestPdfUrlRequest: {
+    /** IngestMetadataRequest */
+    IngestMetadataRequest: {
       metadata: ReferenceCreate;
-      /** @default pdf */
+      /** @default metadata */
       type?: IngestRequestType;
-      url: string;
+      url?: string;
     };
     /**
      * IngestRequestType
      * @description An enumeration.
      * @enum {string}
      */
-    IngestRequestType: 'uploads' | 'pdf' | 'generic';
+    IngestRequestType: 'uploads' | 'metadata';
     /** IngestResponse */
     IngestResponse: {
       project_name: string;
@@ -315,12 +315,13 @@ export interface components {
       citation_key?: string;
       contents?: string;
       doi?: string;
+      filepath?: string;
       id: string;
       /** @default {} */
       metadata?: Record<string, never>;
       /** Format: date */
       published_date?: string;
-      source_filename: string;
+      source_filename?: string;
       status: IngestStatus;
       title?: string;
     };
@@ -338,8 +339,8 @@ export interface components {
       metadata?: Record<string, never>;
       /** Format: date */
       published_date?: string;
-      source_filename: string;
-      title?: string;
+      source_filename?: string;
+      title: string;
     };
     /**
      * ReferencePatch
@@ -820,7 +821,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': IngestPdfUrlRequest | IngestUploadsRequest;
+        'application/json': IngestMetadataRequest | IngestUploadsRequest;
       };
     };
     responses: {

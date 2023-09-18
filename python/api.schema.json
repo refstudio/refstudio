@@ -285,7 +285,7 @@
       "type": "object",
       "title": "HTTPValidationError"
     },
-    "IngestPdfUrlRequest": {
+    "IngestMetadataRequest": {
       "properties": {
         "type": {
           "allOf": [
@@ -293,28 +293,26 @@
               "$ref": "#/definitions/IngestRequestType"
             }
           ],
-          "default": "pdf"
-        },
-        "url": {
-          "type": "string"
+          "default": "metadata"
         },
         "metadata": {
           "$ref": "#/definitions/ReferenceCreate"
+        },
+        "url": {
+          "type": "string"
         }
       },
       "type": "object",
       "required": [
-        "url",
         "metadata"
       ],
-      "title": "IngestPdfUrlRequest"
+      "title": "IngestMetadataRequest"
     },
     "IngestRequestType": {
       "type": "string",
       "enum": [
         "uploads",
-        "pdf",
-        "generic"
+        "metadata"
       ],
       "title": "IngestRequestType",
       "description": "An enumeration."
@@ -460,11 +458,14 @@
         "id": {
           "type": "string"
         },
+        "status": {
+          "$ref": "#/definitions/IngestStatus"
+        },
         "source_filename": {
           "type": "string"
         },
-        "status": {
-          "$ref": "#/definitions/IngestStatus"
+        "filepath": {
+          "type": "string"
         },
         "citation_key": {
           "type": "string"
@@ -507,7 +508,6 @@
       "type": "object",
       "required": [
         "id",
-        "source_filename",
         "status"
       ],
       "title": "Reference",
@@ -515,6 +515,9 @@
     },
     "ReferenceCreate": {
       "properties": {
+        "title": {
+          "type": "string"
+        },
         "source_filename": {
           "type": "string"
         },
@@ -522,9 +525,6 @@
           "type": "string"
         },
         "doi": {
-          "type": "string"
-        },
-        "title": {
           "type": "string"
         },
         "abstract": {
@@ -558,7 +558,7 @@
       },
       "type": "object",
       "required": [
-        "source_filename"
+        "title"
       ],
       "title": "ReferenceCreate"
     },
