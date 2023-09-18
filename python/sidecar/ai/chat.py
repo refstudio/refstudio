@@ -219,3 +219,4 @@ class Chat:
             logger.error(e)
             yield f"data: {str(e)}\n\n"
             return
+        return
