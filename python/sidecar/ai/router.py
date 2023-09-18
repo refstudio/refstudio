@@ -51,7 +51,10 @@ async def http_ai_chat(
     "/{project_id}/chat_stream",
     responses={
         200: {
-            "content": {"text/event-stream": {}},
+            "content": {
+                "application/json": {},
+                "text/event-stream": {"schema": {"type": "string"}},
+            },
             "description": "Stream chat reply.",
         }
     },

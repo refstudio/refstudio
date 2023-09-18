@@ -933,7 +933,11 @@
               "application/json": {
                 "schema": {}
               },
-              "text/event-stream": {}
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
             },
             "description": "Stream chat reply."
           },

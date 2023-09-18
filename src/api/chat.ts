@@ -1,6 +1,4 @@
-import { fetchEventSource } from '@microsoft/fetch-event-source';
-
-import { apiPost } from './typed-api';
+import { apiPost, apiPostStream } from './typed-api';
 
 export async function chatWithAI(projectId: string, question: string): Promise<string[]> {
   try {
@@ -27,18 +25,16 @@ export async function chatWithAiStreaming(
     return '';
   }
 
-  let fullText = '';
-  return fetchEventSource(`/api/ai/${projectId}/chat_stream`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({
-      text: question,
-    }),
-    onmessage: (msg) => {
-      fullText += msg.data;
-      onText(msg.data, fullText);
+  let fullReply = '';
+  return apiPostStream(
+    '/api/ai/{project_id}/chat_stream',
+    { path: { project_id: projectId } },
+    { text: question },
+    (replyChunk) => {
+      fullReply += replyChunk;
+      onText(replyChunk, fullReply);
     },
-  })
-    .then(() => fullText)
+  )
+    .then(() => fullReply)
     .catch((err) => `Chat error: ${String(err)}`);
 }

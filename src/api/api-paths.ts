@@ -465,7 +465,7 @@ export interface operations {
       200: {
         content: {
           'application/json': unknown;
-          'text/event-stream': unknown;
+          'text/event-stream': string;
         };
       };
       /** @description Validation Error */
