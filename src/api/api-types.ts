@@ -37,7 +37,7 @@ export type Detail = ValidationError[];
  * This interface was referenced by `ApiSchema`'s JSON-Schema
  * via the `definition` "IngestRequestType".
  */
-export type IngestRequestType = 'uploads' | 'pdf';
+export type IngestRequestType = 'uploads' | 'pdf' | 'generic';
 /**
  * An enumeration.
  *
@@ -201,6 +201,7 @@ export interface ReferenceCreate {
   contents?: string;
   published_date?: string;
   authors?: Author[];
+  chunks?: Chunk[];
   metadata?: {};
 }
 /**

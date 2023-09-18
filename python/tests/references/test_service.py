@@ -1,10 +1,10 @@
 from sidecar.projects.service import get_project_uploads_path
 from sidecar.references.schemas import Reference, ReferenceCreate
-from sidecar.references.service import create_reference_from_url, requests
+from sidecar.references.service import create_reference, requests
 from sidecar.references.storage import JsonStorage
 
 
-def test_create_reference_from_url(
+def test_create_reference_with_url(
     monkeypatch, tmp_path, mock_url_pdf_response, setup_project_references_json
 ):
     monkeypatch.setattr(requests, "get", mock_url_pdf_response)
@@ -17,7 +17,7 @@ def test_create_reference_from_url(
         title="Some new title",
     )
 
-    ref = create_reference_from_url(project_id=project_id, url=url, metadata=metadata)
+    ref = create_reference(project_id=project_id, url=url, metadata=metadata)
 
     assert isinstance(ref, Reference)
 

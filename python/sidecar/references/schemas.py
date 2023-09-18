@@ -45,6 +45,7 @@ class ReferenceCreate(RefStudioModel):
     contents: str | None = None
     published_date: date | None = None
     authors: list["Author"] = []
+    chunks: list["Chunk"] = []
     metadata: dict[str, Any] = {}
 
 
@@ -91,6 +92,7 @@ class ReferenceStatus(RefStudioModel):
 class IngestRequestType(StrEnum):
     UPLOADS_DIRECTORY = "uploads"
     PDF = "pdf"
+    GENERIC = "generic"
 
 
 class IngestRequest(RefStudioModel):
@@ -105,6 +107,11 @@ class IngestUploadsRequest(IngestRequest):
 class IngestPdfUrlRequest(IngestRequest):
     type: IngestRequestType = IngestRequestType.PDF
     url: str
+    metadata: ReferenceCreate
+
+
+class IngestGenericRequest(IngestRequest):
+    type: IngestRequestType = IngestRequestType.GENERIC
     metadata: ReferenceCreate
 
 

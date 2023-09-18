@@ -313,7 +313,8 @@
       "type": "string",
       "enum": [
         "uploads",
-        "pdf"
+        "pdf",
+        "generic"
       ],
       "title": "IngestRequestType",
       "description": "An enumeration."
@@ -539,6 +540,13 @@
         "authors": {
           "items": {
             "$ref": "#/definitions/Author"
+          },
+          "type": "array",
+          "default": []
+        },
+        "chunks": {
+          "items": {
+            "$ref": "#/definitions/Chunk"
           },
           "type": "array",
           "default": []

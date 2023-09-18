@@ -252,7 +252,7 @@ export interface components {
      * @description An enumeration.
      * @enum {string}
      */
-    IngestRequestType: 'uploads' | 'pdf';
+    IngestRequestType: 'uploads' | 'pdf' | 'generic';
     /** IngestResponse */
     IngestResponse: {
       project_name: string;
@@ -325,6 +325,8 @@ export interface components {
       abstract?: string;
       /** @default [] */
       authors?: Author[];
+      /** @default [] */
+      chunks?: Chunk[];
       citation_key?: string;
       contents?: string;
       doi?: string;

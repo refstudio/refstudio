@@ -14,7 +14,7 @@ from sidecar.references.schemas import (
     ReferencePatch,
     UpdateStatusResponse,
 )
-from sidecar.references.service import create_reference_from_url
+from sidecar.references.service import create_reference
 
 IngestibleRequest = Union[IngestPdfUrlRequest, IngestUploadsRequest]
 
@@ -51,8 +51,8 @@ async def ingest_references(
         response = ingest.run_ingest(pdf_directory=uploads_dir)
 
     elif request.type == IngestRequestType.PDF:
-        reference = create_reference_from_url(
-            project_id, url=request.url, metadata=request.metadata
+        reference = create_reference(
+            project_id, metadata=request.metadata, url=request.url
         )
         response = IngestResponse(project_name=project_id, references=[reference])
 
