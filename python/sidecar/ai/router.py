@@ -56,5 +56,5 @@ async def http_ai_chat_stream(
     user_settings = get_settings_for_user(user_id)
     return StreamingResponse(
         yield_response(req, project_id=project_id, user_settings=user_settings),
-        media_type="text/plain",
+        media_type="text/event-stream",
     )

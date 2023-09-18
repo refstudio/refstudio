@@ -175,4 +175,5 @@ class Chat:
         """
         response = self.ask_question(n_choices=1, temperature=temperature, stream=True)
         for chunk in response:
-            yield chunk["choices"][0]["delta"]["content"]
+            content = chunk["choices"][0]["delta"]["content"]
+            yield f"data: {content}\n\n"
