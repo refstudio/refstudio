@@ -137,4 +137,4 @@ def test_ai_chat_is_streaming(
     response = client.post(f"/api/ai/{project_id}/chat_stream", json=request)
 
     assert response.status_code == 200
-    assert response.content == b"This is a mocked streaming response"
+    assert response.content == b"data: This is a mocked streaming response\n\n"
