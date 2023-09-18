@@ -16,7 +16,7 @@ type ChatThread = ChatThreadItem[];
 
 export function ChatbotPanel() {
   const projectId = useAtomValue(projectIdAtom);
-  const [text, setText] = useState('Can you write an intro about machine learning?');
+  const [text, setText] = useState('');
 
   const [chatThread, setChatThread] = useState<ChatThread>([
     // {

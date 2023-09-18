@@ -23,24 +23,22 @@ export async function chatWithAiStreaming(
   question: string,
   onText: (part: string, full: string) => void,
 ): Promise<string> {
-  try {
-    if (!question) {
-      return '';
-    }
-
-    let fullText = '';
-    return await fetchEventSource(`/api/ai/${projectId}/chat_stream`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        text: question,
-      }),
-      onmessage: (msg) => {
-        fullText += msg.data;
-        onText(msg.data, fullText);
-      },
-    }).then(() => fullText);
-  } catch (err) {
-    return `Chat error: ${String(err)}`;
+  if (!question) {
+    return '';
   }
+
+  let fullText = '';
+  return fetchEventSource(`/api/ai/${projectId}/chat_stream`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      text: question,
+    }),
+    onmessage: (msg) => {
+      fullText += msg.data;
+      onText(msg.data, fullText);
+    },
+  })
+    .then(() => fullText)
+    .catch((err) => `Chat error: ${String(err)}`);
 }
