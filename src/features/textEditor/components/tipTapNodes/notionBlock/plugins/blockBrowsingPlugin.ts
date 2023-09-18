@@ -1,6 +1,10 @@
+import { Fragment, Slice } from '@tiptap/pm/model';
 import { Plugin, PluginKey, TextSelection } from '@tiptap/pm/state';
+import { ReplaceAroundStep, ReplaceStep } from '@tiptap/pm/transform';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
 
+import { addUnindentSteps } from '../commands/unindent';
+import { NotionBlockNode } from '../NotionBlockNode';
 import { BlockSelection } from '../selection/BlockSelection';
 import { collapsibleArrowsPluginKey } from './collapsibleArrowPlugin';
 import { hideHandlePluginKey } from './hideHandlePlugin';
@@ -93,10 +97,83 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
           return;
         }
         case 'ArrowUp': {
-          if (!event.shiftKey) {
-            selection.selectPreviousBlock(tr, (t) => view.dispatch(t));
-          } else {
+          if (event.shiftKey && event.metaKey) {
+            const indexInParent = selection.$from.indexAfter();
+            const { parent } = selection.$from;
+            const depthDifference = selection.$from.depth - selection.$to.depth;
+            const endPos = selection.to + tr.doc.nodeAt(selection.to)!.nodeSize; // end of selection
+            const selectionRange = selection.to - selection.from - depthDifference;
+
+            // Cmd+Shift+Up: Move selection up
+            // Bring the first node back to the same level as other nodes if needed
+            if (selection.$from.depth > selection.$to.depth) {
+              const blocksToUnindent = selection.selectedBlocksPos
+                .filter(({ from }) => tr.doc.resolve(from).depth > selection.$to.depth)
+                .reverse();
+
+              for (const block of blocksToUnindent) {
+                for (let i = 0; i < depthDifference; i++) {
+                  addUnindentSteps(tr, tr.mapping.map(block.from + 2));
+                }
+              }
+            }
+
+            // If the current block has a sibling before itself, make it a child of this sibling
+            if (
+              indexInParent > 0 &&
+              // For NotionBlockNodes, the first child is an inline block so the index must be greater than 1
+              (parent.type.name !== NotionBlockNode.name || indexInParent > 1)
+            ) {
+              const startPos = selection.from - 1; // End of sibling
+
+              let fragment = Fragment.from(selectedBlock.copy());
+              for (let i = 0; i < selection.$from.depth - selection.$to.depth; i++) {
+                fragment = Fragment.from(selectedBlock.copy(fragment));
+              }
+              tr.step(
+                new ReplaceAroundStep(
+                  startPos,
+                  endPos,
+                  selection.from + depthDifference,
+                  endPos,
+                  new Slice(fragment, depthDifference + 1, 0),
+                  0,
+                ),
+              );
+            } else if (parent.type.name === NotionBlockNode.name) {
+              // Otherwise, move block before its parent.
+              // NB: ProseMirror does not support moving content across other content,
+              // so this transaction will not work well in collaborative editing
+
+              const indexInGrandparent = selection.$from.indexAfter(-1) - 1;
+              const parentStartPos = selection.$from.posAtIndex(indexInGrandparent, -1);
+
+              // If this slice is edited by someone else changes will be overriden
+              const sliceToMove = tr.doc.slice(selection.from + depthDifference, endPos);
+
+              // Remove selection
+              tr.replace(selection.from + depthDifference, endPos);
+
+              // Add it before the parent
+              tr.step(new ReplaceStep(parentStartPos, parentStartPos, sliceToMove));
+
+              if (selection.from === selection.anchor) {
+                tr.setSelection(
+                  new BlockSelection(tr.doc.resolve(parentStartPos), tr.doc.resolve(parentStartPos + selectionRange)),
+                );
+              } else {
+                tr.setSelection(
+                  new BlockSelection(tr.doc.resolve(parentStartPos + selectionRange), tr.doc.resolve(parentStartPos)),
+                );
+              }
+            }
+            view.dispatch(tr);
+          } else if (event.shiftKey) {
+            // Shift+Up: Expand selection up
             selection.expandUp(tr, (t) => view.dispatch(t));
+          } else {
+            // Up: Selects previous block
+            selection.selectPreviousBlock(tr, (t) => view.dispatch(t));
           }
           return;
         }
@@ -112,8 +189,8 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
           return;
         }
         case 'ArrowRight': {
-          // If the block is collapsed, uncollapse it
           if (selectedBlock.attrs.type === 'collapsible' && selectedBlock.attrs.collapsed) {
+            // If the block is collapsed, uncollapse it
             tr.setNodeAttribute(selection.head, 'collapsed', false);
             view.dispatch(tr);
           } else {
