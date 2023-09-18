@@ -1,12 +1,11 @@
 import json
 import os
-from datetime import date
 from pathlib import Path
 from uuid import uuid4
 
 from sidecar import config
 from sidecar.references import ingest, storage
-from sidecar.references.schemas import Author, IngestStatus, Reference
+from sidecar.references.schemas import IngestStatus, Reference
 
 
 def _copy_fixture_to_temp_dir(source_path: Path, write_path: Path) -> None:
