@@ -37,7 +37,7 @@ export type Detail = ValidationError[];
  * This interface was referenced by `ApiSchema`'s JSON-Schema
  * via the `definition` "IngestRequestType".
  */
-export type IngestRequestType = 'uploads' | 'pdf' | 'generic';
+export type IngestRequestType = 'uploads' | 'metadata';
 /**
  * An enumeration.
  *
@@ -181,22 +181,22 @@ export interface ValidationError {
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "IngestPdfUrlRequest".
+ * via the `definition` "IngestMetadataRequest".
  */
-export interface IngestPdfUrlRequest {
+export interface IngestMetadataRequest {
   type?: IngestRequestType & string;
-  url: string;
   metadata: ReferenceCreate;
+  url?: string;
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
  * via the `definition` "ReferenceCreate".
  */
 export interface ReferenceCreate {
-  source_filename: string;
+  title: string;
+  source_filename?: string;
   citation_key?: string;
   doi?: string;
-  title?: string;
   abstract?: string;
   contents?: string;
   published_date?: string;
@@ -220,8 +220,9 @@ export interface IngestResponse {
  */
 export interface Reference {
   id: string;
-  source_filename: string;
   status: IngestStatus;
+  source_filename?: string;
+  filepath?: string;
   citation_key?: string;
   doi?: string;
   title?: string;
