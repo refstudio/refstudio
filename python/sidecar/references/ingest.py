@@ -346,10 +346,13 @@ class PDFIngestion:
             source_pdf_path = os.path.join(self.staging_dir, source_pdf)
             full_text = shared.extract_text_from_pdf(source_pdf_path)
 
+            uploads_filepath = self.input_dir.joinpath(source_pdf)
+
             references.append(
                 Reference(
                     id=str(uuid4()),
                     source_filename=source_pdf,
+                    filepath=str(uploads_filepath),
                     status=IngestStatus.FAILURE,
                     citation_key="untitled",
                     contents=full_text,
@@ -462,6 +465,7 @@ class PDFIngestion:
                 doc = json.load(fin)
 
             source_pdf = f"{file.stem}.pdf"
+            uploads_filepath = self.input_dir.joinpath(source_pdf)
 
             header = self._parse_header(doc)
             pub_date = shared.parse_date(header.get("published_date", ""))
@@ -469,6 +473,7 @@ class PDFIngestion:
             ref = Reference(
                 id=str(uuid4()),
                 source_filename=source_pdf,
+                filepath=str(uploads_filepath),
                 status=IngestStatus.COMPLETE,
                 title=header.get("title"),
                 authors=header.get("authors"),
