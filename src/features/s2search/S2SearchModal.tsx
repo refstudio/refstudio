@@ -40,12 +40,10 @@ const SearchResult = ({ reference, projectId }: { reference: S2SearchResult; pro
   const [showRemove, setShowRemove] = useState(false);
   const saveS2Reference = useSetAtom(addS2ReferenceAtom);
 
-  // const addSearchResults = useSetAtom(addS2ReferenceAtom);
-
   const addClickHandler = useCallback(() => {
     setRefStatus('adding');
     saveS2Reference(projectId, reference)
-      .then(() => {
+      .then((result) => {
         setRefStatus('added');
       })
       .catch((e) => {
@@ -53,6 +51,7 @@ const SearchResult = ({ reference, projectId }: { reference: S2SearchResult; pro
       });
   }, [projectId, reference, saveS2Reference]);
 
+  // Not currently called (need new reference ID from add reference response)
   const removeClickHandler = useCallback(() => {
     setRefStatus('ready');
   }, []);
@@ -78,7 +77,7 @@ const SearchResult = ({ reference, projectId }: { reference: S2SearchResult; pro
                 />
               )}
               {refStatus === 'error' && <CouldNotAddRef />}
-              {refStatus === 'adding' && <div>Adding...</div>}
+              {refStatus === 'adding' && <div className="py-[.375rem]">Adding...</div>}
             </div>
           )}
           {!PdfURLIsVaid && <NoPDF />}
@@ -128,8 +127,13 @@ const NoPDF = () => (
 
 const CouldNotAddRef = () => (
   <>
-    <div title="Sorry, something went wrong when adding this reference.">Reference Error</div>
-    <div className=" cursor-pointer" title="Sorry, something went wrong when adding this reference.">
+    <div className="py-[.375rem] text-red-400" title="Sorry, something went wrong when adding this reference.">
+      Reference Error
+    </div>
+    <div
+      className=" cursor-pointer py-[.375rem] text-red-400"
+      title="Sorry, something went wrong when adding this reference."
+    >
       <SmallInfoIcon />
     </div>
   </>
@@ -163,12 +167,14 @@ const RemoveButton = ({
       setShowRemove(false);
     }}
     onMouseOver={() => {
-      setShowRemove(true);
+      // setShowRemove(true);
     }}
   >
     <Button
       Action={showRemove ? <MinusIcon /> : <CheckIcon />}
-      className={cx('bg-transparent text-[#61C554]', 'hover:bg-red-400 hover:text-white')}
+      // className={cx('bg-transparent text-[#61C554]', 'hover:bg-red-400 hover:text-white')}
+      className={cx('bg-transparent text-[#61C554]')}
+      disabled={true}
       inheritColor={true}
       size="S"
       text={showRemove ? 'Remove' : 'Added'}

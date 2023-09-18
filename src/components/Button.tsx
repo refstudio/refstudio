@@ -31,7 +31,6 @@ export function Button({
   onClick,
   ...rest
 }: ButtonProps) {
-  console.log(inheritColor);
   return (
     <button
       aria-disabled={disabled}
