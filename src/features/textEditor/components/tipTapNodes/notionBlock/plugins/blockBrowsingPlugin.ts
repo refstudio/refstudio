@@ -124,22 +124,43 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
               // For NotionBlockNodes, the first child is an inline block so the index must be greater than 1
               (parent.type.name !== NotionBlockNode.name || indexInParent > 1)
             ) {
-              const startPos = selection.from - 1; // End of sibling
+              const siblingPos = selection.$from.posAtIndex(indexInParent - 1);
+              const sibling = tr.doc.nodeAt(siblingPos);
 
-              let fragment = Fragment.from(selectedBlock.copy());
-              for (let i = 0; i < selection.$from.depth - selection.$to.depth; i++) {
-                fragment = Fragment.from(selectedBlock.copy(fragment));
+              if (sibling?.attrs.type === 'collapsible' && sibling.attrs.collapsed) {
+                // If the sibling is collapsed, move the block before its sibling
+                const sliceToMove = tr.doc.slice(selection.from + depthDifference, endPos);
+                tr.replace(selection.from + depthDifference, endPos);
+                tr.replace(siblingPos, siblingPos, sliceToMove);
+
+                if (selection.from === selection.anchor) {
+                  tr.setSelection(
+                    new BlockSelection(tr.doc.resolve(siblingPos), tr.doc.resolve(siblingPos + selectionRange)),
+                  );
+                } else {
+                  tr.setSelection(
+                    new BlockSelection(tr.doc.resolve(siblingPos + selectionRange), tr.doc.resolve(siblingPos)),
+                  );
+                }
+              } else {
+                // Otherwise, make the block a child of its sibling
+                const startPos = selection.from - 1; // End of sibling
+
+                let fragment = Fragment.from(selectedBlock.copy());
+                for (let i = 0; i < depthDifference; i++) {
+                  fragment = Fragment.from(selectedBlock.copy(fragment));
+                }
+                tr.step(
+                  new ReplaceAroundStep(
+                    startPos,
+                    endPos,
+                    selection.from + depthDifference,
+                    endPos,
+                    new Slice(fragment, depthDifference + 1, 0),
+                    0,
+                  ),
+                );
               }
-              tr.step(
-                new ReplaceAroundStep(
-                  startPos,
-                  endPos,
-                  selection.from + depthDifference,
-                  endPos,
-                  new Slice(fragment, depthDifference + 1, 0),
-                  0,
-                ),
-              );
             } else if (parent.type.name === NotionBlockNode.name) {
               // Otherwise, move block before its parent.
               // NB: ProseMirror does not support moving content across other content,
@@ -148,15 +169,16 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
               const indexInGrandparent = selection.$from.indexAfter(-1) - 1;
               const parentStartPos = selection.$from.posAtIndex(indexInGrandparent, -1);
 
-              // If this slice is edited by someone else changes will be overriden
+              // If this slice is edited by someone else, changes will be overriden in collaborative editing
               const sliceToMove = tr.doc.slice(selection.from + depthDifference, endPos);
 
               // Remove selection
               tr.replace(selection.from + depthDifference, endPos);
 
               // Add it before the parent
-              tr.step(new ReplaceStep(parentStartPos, parentStartPos, sliceToMove));
+              tr.replace(parentStartPos, parentStartPos, sliceToMove);
 
+              // Properly set selection
               if (selection.from === selection.anchor) {
                 tr.setSelection(
                   new BlockSelection(tr.doc.resolve(parentStartPos), tr.doc.resolve(parentStartPos + selectionRange)),
