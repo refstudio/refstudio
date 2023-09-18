@@ -1,3 +1,6 @@
+from datetime import date
+from uuid import uuid4
+
 from sidecar.projects.service import get_project_uploads_path
 from sidecar.references.schemas import Author, IngestStatus, Reference, ReferenceCreate
 from sidecar.references.service import (
@@ -56,53 +59,190 @@ def test_create_reference_with_only_metadata(
     assert store.references[-1].title == metadata.title
 
 
-def test_add_citation_keys_for_references():
-    new_references = [
-        Reference(id="1", title="Some title", status=IngestStatus.COMPLETE),
-        Reference(
-            id="2",
-            title="Some title",
-            authors=[Author(full_name="Frank Fakerson")],
-            status=IngestStatus.COMPLETE,
-        ),
-        Reference(
-            id="3",
-            title="Some title",
-            authors=[Author(full_name="Phoebe Fakerson")],
-            status=IngestStatus.COMPLETE,
-        ),
+def test_ingest_add_citation_keys():
+    # set up base reference with required fields
+    # we'll be copying this reference and modifying it for each test
+    base_reference = Reference(
+        id=str(uuid4()), source_filename="test.pdf", status="complete"
+    )
+    fake_data = [
+        {
+            "full_name": "John Smith",
+            "published_date": None,
+            "expected_citation_key": "smith",
+        },
+        {
+            "full_name": "Kathy Jones",
+            "published_date": date(2021, 1, 1),
+            "expected_citation_key": "jones2021",
+        },
+        {
+            "full_name": "Jane Doe",
+            "published_date": date(2022, 1, 1),
+            "expected_citation_key": "doe2022",
+        },
     ]
 
-    existing_references = [
+    # test: references with different authors
+    # expect: should have unique citation keys
+    refs = []
+    for d in fake_data:
+        reference = base_reference.copy()
+        reference.authors = [Author(full_name=d["full_name"])]
+        reference.published_date = d["published_date"]
+        refs.append(reference)
+
+    tested = add_citation_keys_for_references(refs, existing_references=[])
+
+    for ref, d in zip(tested, fake_data):
+        assert ref.citation_key == d["expected_citation_key"]
+
+    # test: references with no author and no published year
+    # expect: should have citation key "untitled" appeneded with a number
+    refs = []
+    for i in range(5):
+        reference = base_reference.copy()
+        reference.authors = []
+        refs.append(reference)
+
+    tested = add_citation_keys_for_references(refs, existing_references=[])
+
+    for i, ref in enumerate(tested):
+        if i == 0:
+            assert ref.citation_key == "untitled"
+        else:
+            assert ref.citation_key == f"untitled{i - 1 + 1}"
+
+    # test: references with no author but with published years
+    # expect: should have citation key "untitled" appeneded with the year
+    refs = []
+    for i in range(3):
+        reference = base_reference.copy()
+        reference.published_date = date(2020 + i, 1, 1)
+        reference.authors = []
+        refs.append(reference)
+
+    tested = add_citation_keys_for_references(refs, existing_references=[])
+
+    for i, ref in enumerate(tested):
+        assert ref.citation_key == f"untitled{ref.published_date.year}"
+
+    # test: references with no author and duplicate published years
+    # expect: should have citation key "untitled" appeneded with year and a letter
+    refs = []
+    for i in range(3):
+        reference = base_reference.copy()
+        reference.published_date = date(2020, 1, 1)
+        reference.authors = []
+        refs.append(reference)
+
+    tested = add_citation_keys_for_references(refs, existing_references=[])
+
+    for i, ref in enumerate(tested):
+        if i == 0:
+            expected = f"untitled{ref.published_date.year}"
+        else:
+            expected = f"untitled{ref.published_date.year}{chr(97 + i)}"
+        assert ref.citation_key == expected
+
+    # test: references with same author last name and no published year
+    # expect: should have citation key of author's last name appended with a letter
+    refs = []
+    for i in range(3):
+        reference = base_reference.copy()
+        reference.authors = [Author(full_name="John Smith")]
+        refs.append(reference)
+
+    tested = add_citation_keys_for_references(refs, existing_references=[])
+
+    for i, ref in enumerate(tested):
+        if i == 0:
+            assert ref.citation_key == "smith"
+        else:
+            assert ref.citation_key == f"smith{chr(97 + i)}"
+
+    # test: references with same author and same published years
+    # expect: should have citation key of author's last name + year + letter
+    refs = []
+    for i in range(3):
+        reference = base_reference.copy()
+        reference.published_date = date(2021, 1, 1)
+        reference.authors = [Author(full_name="John Smith")]
+        refs.append(reference)
+
+    tested = add_citation_keys_for_references(refs, existing_references=[])
+
+    ## should be smith2021a, smith2021b, smith2021c
+    for i, ref in enumerate(tested):
+        if i == 0:
+            assert ref.citation_key == "smith2021"
+        else:
+            assert ref.citation_key == f"smith2021{chr(97 + i)}"
+
+    # test: ingesting new references should not modify existing citation keys
+    # expect: previously created citation keys should be unchanged ...
+    #   ... but new references should have unique citation keys
+    existing_refs = [
         Reference(
-            id="4",
-            title="Some title",
+            id=str(uuid4()),
+            source_filename="test.pdf",
+            status=IngestStatus.PROCESSING,
+            authors=[Author(full_name="Kathy Jones")],
+            published_date=date(2021, 1, 1),
+            citation_key="jones2021",
+        ),
+        Reference(
+            id=str(uuid4()),
+            source_filename="test.pdf",
+            status=IngestStatus.PROCESSING,
+            authors=[Author(full_name="Kathy Jones")],
+            published_date=date(2021, 1, 1),
+            citation_key="jones2021a",
+        ),
+        Reference(
+            id=str(uuid4()),
+            source_filename="test.pdf",
+            status=IngestStatus.PROCESSING,
+            authors=[Author(full_name="John Smith")],
+            citation_key="smith",
+        ),
+        Reference(
+            id=str(uuid4()),
+            source_filename="test.pdf",
+            status=IngestStatus.PROCESSING,
             citation_key="untitled",
-            status=IngestStatus.COMPLETE,
         ),
         Reference(
-            id="5",
-            title="Some title",
+            id=str(uuid4()),
+            source_filename="test.pdf",
+            status=IngestStatus.PROCESSING,
             citation_key="untitled1",
-            status=IngestStatus.COMPLETE,
+        ),
+    ]
+    new_refs = [
+        Reference(
+            id=str(uuid4()),
+            source_filename="test.pdf",
+            status=IngestStatus.PROCESSING,
+            authors=[Author(full_name="Kathy Jones")],
+            published_date=date(2021, 1, 1),
         ),
         Reference(
-            id="6",
-            title="Some title",
-            authors=[Author(full_name="Phoebe Fakerson")],
-            citation_key="fakerson",
-            status=IngestStatus.COMPLETE,
+            id=str(uuid4()),
+            source_filename="test.pdf",
+            status=IngestStatus.PROCESSING,
+            authors=[Author(full_name="John Smith")],
+        ),
+        Reference(
+            id=str(uuid4),
+            source_filename="test.pdf",
+            status=IngestStatus.PROCESSING,
         ),
     ]
 
-    add_citation_keys_for_references(new_references, existing_references)
+    tested = add_citation_keys_for_references(
+        new_refs, existing_references=existing_refs
+    )
+    new_keys = sorted([ref.citation_key for ref in tested])
 
-    # should get citation keys
-    assert new_references[0].citation_key == "untitled2"
-    assert new_references[1].citation_key == "fakersona"
-    assert new_references[2].citation_key == "fakersonb"
-
-    # should be unchanged
-    assert existing_references[0].citation_key == "untitled"
-    assert existing_references[1].citation_key == "untitled1"
-    assert existing_references[2].citation_key == "fakerson"
+    assert new_keys == sorted(["jones2021b", "smitha", "untitled2"])
