@@ -461,10 +461,11 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Successful Response */
+      /** @description Stream chat reply. */
       200: {
         content: {
           'application/json': unknown;
+          'text/event-stream': unknown;
         };
       };
       /** @description Validation Error */

@@ -932,9 +932,10 @@
             "content": {
               "application/json": {
                 "schema": {}
-              }
+              },
+              "text/event-stream": {}
             },
-            "description": "Successful Response"
+            "description": "Stream chat reply."
           },
           "422": {
             "content": {
