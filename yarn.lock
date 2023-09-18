@@ -846,6 +846,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@microsoft/fetch-event-source@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "@microsoft/fetch-event-source@npm:2.0.1"
+  checksum: a50e1c0f33220206967266d0a4bbba0703e2793b079d9f6e6bfd48f71b2115964a803e14cf6e902c6fab321edc084f26022334f5eaacc2cec87f174715d41852
+  languageName: node
+  linkType: hard
+
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5
   resolution: "@nodelib/fs.scandir@npm:2.1.5"
@@ -6930,6 +6937,7 @@ __metadata:
     "@ag-grid-community/core": ^30.0.3
     "@ag-grid-community/react": ^30.0.3
     "@ag-grid-community/styles": ^30.0.3
+    "@microsoft/fetch-event-source": ^2.0.1
     "@popperjs/core": ^2.11.8
     "@tanstack/react-query": ^4.29.13
     "@tauri-apps/api": ^1.2.0

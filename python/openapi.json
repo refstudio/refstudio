@@ -994,6 +994,61 @@
         ]
       }
     },
+    "/api/ai/{project_id}/chat_stream": {
+      "post": {
+        "operationId": "http_ai_chat_stream_api_ai__project_id__chat_stream_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              },
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Stream chat reply."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Http Ai Chat Stream",
+        "tags": [
+          "ai"
+        ]
+      }
+    },
     "/api/fs/{project_id}/{filepath}": {
       "delete": {
         "operationId": "delete_file_api_fs__project_id___filepath__delete",

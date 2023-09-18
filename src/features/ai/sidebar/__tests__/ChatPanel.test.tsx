@@ -1,6 +1,6 @@
 import { screen, waitFor } from '@testing-library/react';
 
-import { chatWithAI } from '../../../../api/chat';
+import { chatWithAiStreaming } from '../../../../api/chat';
 import { render, userEvent } from '../../../../test/test-utils';
 import { ChatbotPanel } from '../ChatPanel';
 
@@ -17,54 +17,54 @@ describe('ChatPanel component', () => {
   });
 
   it('should call api if textbox has text', async () => {
-    const chatWithAiMock = vi.mocked(chatWithAI).mockResolvedValue([]);
+    const chatWithAiMock = vi.mocked(chatWithAiStreaming).mockResolvedValue('');
     const user = userEvent.setup();
     render(<ChatbotPanel />);
     await user.type(screen.getByRole('textbox'), 'This is a question.');
     await user.click(screen.getByTitle('Send'));
-    expect(chatWithAiMock.mock.calls.length).toBe(1);
+    expect(chatWithAiMock).toBeCalled();
   });
 
   it('should NOT call api if textbox has empty text', async () => {
-    const chatWithAiMock = vi.mocked(chatWithAI).mockResolvedValue([]);
+    const chatWithAiMock = vi.mocked(chatWithAiStreaming).mockResolvedValue('');
     const user = userEvent.setup();
     render(<ChatbotPanel />);
     await user.click(screen.getByTitle('Send'));
-    expect(chatWithAiMock.mock.calls.length).toBe(0);
+    expect(chatWithAiMock).not.toHaveBeenCalled();
   });
 
   // https://testing-library.com/docs/user-event/keyboard/
   it('should call api on ENTER in the textbox', async () => {
-    const chatWithAiMock = vi.mocked(chatWithAI).mockResolvedValue([]);
+    const chatWithAiMock = vi.mocked(chatWithAiStreaming).mockResolvedValue('');
     const user = userEvent.setup();
     render(<ChatbotPanel />);
     await user.type(screen.getByRole('textbox'), 'This is a question.');
     await user.type(screen.getByRole('textbox'), '{enter}');
-    expect(chatWithAiMock.mock.calls.length).toBe(1);
+    expect(chatWithAiMock).toHaveBeenCalledTimes(1);
   });
 
   // https://testing-library.com/docs/user-event/keyboard/
   it('should display ERROR if chatWithAI throw exception', async () => {
-    const chatWithAiMock = vi.mocked(chatWithAI).mockRejectedValue('Error message.');
+    const chatWithAiMock = vi.mocked(chatWithAiStreaming).mockRejectedValue('Error message.');
     const user = userEvent.setup();
     render(<ChatbotPanel />);
     await user.type(screen.getByRole('textbox'), 'This is a question.');
     await user.type(screen.getByRole('textbox'), '{enter}');
-    expect(chatWithAiMock.mock.calls.length).toBe(1);
+    expect(chatWithAiMock).toHaveBeenCalledTimes(1);
     expect(screen.getByText('ERROR: Error message.')).toBeInTheDocument();
   });
 
   it('should NOT call api on SHIFT+ENTER in the textbox', async () => {
-    const chatWithAiMock = vi.mocked(chatWithAI).mockResolvedValue([]);
+    const chatWithAiMock = vi.mocked(chatWithAiStreaming).mockResolvedValue('');
     const user = userEvent.setup();
     render(<ChatbotPanel />);
     await user.type(screen.getByRole('textbox'), 'This is a question.');
     await user.type(screen.getByRole('textbox'), '{Shift>}{enter}');
-    expect(chatWithAiMock.mock.calls.length).toBe(0);
+    expect(chatWithAiMock).toHaveBeenCalledTimes(0);
   });
 
   it('should render question and reply in the screen', async () => {
-    const chatWithAiMock = vi.mocked(chatWithAI).mockResolvedValue(['Sure!']);
+    const chatWithAiMock = vi.mocked(chatWithAiStreaming).mockResolvedValue('Sure!');
     const user = userEvent.setup();
     render(<ChatbotPanel />);
     await user.type(screen.getByRole('textbox'), 'Will this test pass?');
@@ -76,7 +76,7 @@ describe('ChatPanel component', () => {
 
   it('should render the thinking animation while waiting for reply', async () => {
     // Note: this is a promise that _don't resolve_ so that we can test the "..." below.
-    vi.mocked(chatWithAI).mockImplementation(async () => new Promise<string[]>(() => ['---']));
+    vi.mocked(chatWithAiStreaming).mockImplementation(async () => new Promise<string>(() => '---'));
     const user = userEvent.setup();
     render(<ChatbotPanel />);
 
@@ -88,13 +88,15 @@ describe('ChatPanel component', () => {
   });
 
   it('should render the thinking animation and then the ### reply text', async () => {
-    let resolveFn: () => void = () => fail();
-    vi.mocked(chatWithAI).mockImplementation(async () => {
-      await new Promise<void>((resolve) => {
-        // Capture resolve function to call after assertion
+    let onMessageChunk: (part: string, full: string) => void = () => fail();
+    let resolveFn: (text: string) => void = () => fail();
+    vi.mocked(chatWithAiStreaming).mockImplementation(async (_, __, onMessage) => {
+      onMessageChunk = onMessage;
+      await new Promise<string>((resolve) => {
+        // Capture resolstrig function to call after assertion
         resolveFn = resolve;
       });
-      return ['###'];
+      return 'Full Text';
     });
     const user = userEvent.setup();
     render(<ChatbotPanel />);
@@ -105,10 +107,21 @@ describe('ChatPanel component', () => {
     expect(screen.getByText('Will this test pass?')).toBeInTheDocument();
     expect(screen.getByTestId('chatLoadingAnimation')).toBeInTheDocument();
 
-    resolveFn();
+    onMessageChunk('Some', 'Some');
 
     await waitFor(() => {
-      expect(screen.getByText('###')).toBeInTheDocument();
+      expect(screen.getByText('Some')).toBeInTheDocument();
+    });
+
+    onMessageChunk(' reply text.', 'Some reply text.');
+
+    await waitFor(() => {
+      expect(screen.getByText('Some reply text.')).toBeInTheDocument();
+    });
+
+    resolveFn('Some reply text.');
+    await waitFor(() => {
+      expect(screen.getByText('Some reply text.')).toBeInTheDocument();
     });
   });
 });

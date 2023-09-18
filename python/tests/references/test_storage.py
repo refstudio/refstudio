@@ -160,3 +160,11 @@ def test_storage_delete_references(monkeypatch, tmp_path, fixtures_dir):
 
     assert output["status"] == "error"
     assert output["message"] != ""
+
+
+def test_get_references_storage_path():
+    pass
+
+
+def test_get_references_json_storage():
+    pass
