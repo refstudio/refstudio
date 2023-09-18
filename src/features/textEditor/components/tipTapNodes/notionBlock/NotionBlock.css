@@ -115,6 +115,15 @@
   content: counter(counter, lower-roman) '. ';
 }
 
+.notion-block.collapsed > .content > div > .node-notionBlock {
+  @apply m-0;
+}
+
+/* Add padding to non-collapsible elements */
+.content:not(:has(div > * > .collapsible-arrow)) {
+  @apply py-1;
+}
+
 .node-notionBlock {
   @apply mt-0.5;
 }
