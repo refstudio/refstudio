@@ -2,6 +2,7 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback, useState } from 'react';
 
 import { S2SearchResult } from '../../api/api-types';
+import { postS2Reference } from '../../api/s2SearchAPI';
 import { AddIcon } from '../../application/components/icons';
 import { projectIdAtom } from '../../atoms/projectState';
 import { clearSearchResultsAtom, getSearchResultsAtom, loadSearchResultsAtom } from '../../atoms/s2SearchState';
@@ -34,11 +35,15 @@ const SearchResult = ({ reference, projectId }: { reference: S2SearchResult; pro
 
   const addClickHandler = useCallback(() => {
     setAdded(true);
-  }, []);
+    void postS2Reference(projectId, reference);
+  }, [projectId, reference]);
 
   const removeClickHandler = useCallback(() => {
     setAdded(false);
   }, []);
+
+  const PdfURLIsVaid =
+    reference.openAccessPdf && new URL(reference.openAccessPdf).pathname.split('/').pop()?.split('.').pop() === 'pdf';
 
   return (
     <div className="border-b border-slate-200 px-5 py-3 text-[.875rem]">
@@ -50,7 +55,7 @@ const SearchResult = ({ reference, projectId }: { reference: S2SearchResult; pro
           >
             {reference.title}
           </div>
-          {reference.openAccessPdf && (
+          {PdfURLIsVaid && (
             <div className="flex basis-1/5 justify-end">
               {!added && <AddButton addClickHandler={addClickHandler} />}
               {added && (
@@ -62,9 +67,9 @@ const SearchResult = ({ reference, projectId }: { reference: S2SearchResult; pro
               )}
             </div>
           )}
-          {!reference.openAccessPdf && <NoPDF />}
+          {!PdfURLIsVaid && <NoPDF />}
         </div>
-        {reference.openAccessPdf && <MetaData reference={reference} />}
+        {PdfURLIsVaid && <MetaData reference={reference} />}
       </div>
     </div>
   );
