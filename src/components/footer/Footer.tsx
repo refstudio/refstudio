@@ -27,17 +27,21 @@ function FooterSavingFilesItem() {
     openEditorsDataRight.reduce((acc, curr) => acc + (curr.isDirty ? 1 : 0), 0);
 
   const saveDebounced = useDebouncedCallback(() => {
+    console.log('Saving file...');
     emitEvent('refstudio://menu/file/save');
-  }, 1000);
+    console.timeEnd('SAVE');
+  }, 500);
 
   useEffect(() => {
     if (totalDirty > 0) {
+      console.time('SAVE');
+      console.log('Request to save files initiated...');
       saveDebounced();
     }
   }, [totalDirty, saveDebounced]);
 
   if (totalDirty > 0) {
-    return <FooterItem className="bg-[#54595F]" icon={<VscCloudUpload />} text="Saving file..." />;
+    return <FooterItem className="bg-white text-black" icon={<VscCloudUpload />} text="Saving file..." />;
   }
 
   return <FooterItem icon={<VscCloud />} text="All files saved" />;
