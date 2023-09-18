@@ -36,7 +36,7 @@ def test_ingest_references_for_pdf_url(setup_project_with_uploads):
     )
 
     request = {
-        "type": "pdf",
+        "type": "metadata",
         "url": "http://somefakeurl.com/fake.pdf",
         "metadata": {
             "source_filename": "fake.pdf",
@@ -53,7 +53,7 @@ def test_ingest_references_for_pdf_url(setup_project_with_uploads):
         response = client.post(f"/api/references/{project_id}", json=request)
 
     mock_create_reference_from_url.assert_called_once_with(
-        project_id, url=request["url"], metadata=ReferenceCreate(**request["metadata"])
+        project_id, metadata=ReferenceCreate(**request["metadata"]), url=request["url"]
     )
     assert response.status_code == 200
     assert len(response.json()["references"]) == 1
