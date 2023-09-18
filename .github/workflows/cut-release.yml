@@ -116,7 +116,7 @@ jobs:
       
       - name: Create Python binary
         run: |
-          poetry run pyinstaller --noconfirm --distpath src-tauri/bin/python python/main.py
+          yarn python
 
       # start server in the background and verify it's working
       # the binary takes time to start up, so we need to wait a bit
