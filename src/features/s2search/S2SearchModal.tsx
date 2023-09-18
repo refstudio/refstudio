@@ -2,10 +2,14 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback, useState } from 'react';
 
 import { S2SearchResult } from '../../api/api-types';
-import { postS2Reference } from '../../api/s2SearchAPI';
 import { AddIcon } from '../../application/components/icons';
 import { projectIdAtom } from '../../atoms/projectState';
-import { clearSearchResultsAtom, getSearchResultsAtom, loadSearchResultsAtom } from '../../atoms/s2SearchState';
+import {
+  addS2ReferenceAtom,
+  clearSearchResultsAtom,
+  getSearchResultsAtom,
+  loadSearchResultsAtom,
+} from '../../atoms/s2SearchState';
 import { Button } from '../../components/Button';
 import { CheckIcon, DotIcon, MinusIcon, SearchIcon, SmallInfoIcon } from '../../components/icons';
 import { Modal } from '../../components/Modal';
@@ -29,22 +33,29 @@ const SearchBar = ({ onChange }: { onChange: (value: string, limit: number) => v
 );
 
 const SearchResult = ({ reference, projectId }: { reference: S2SearchResult; projectId: string }) => {
-  const [added, setAdded] = useState(false);
+  const [refStatus, setRefStatus] = useState('ready');
+  const PdfURLIsVaid =
+    reference.openAccessPdf && new URL(reference.openAccessPdf).pathname.split('/').pop()?.split('.').pop() === 'pdf';
+
   const [showRemove, setShowRemove] = useState(false);
+  const saveS2Reference = useSetAtom(addS2ReferenceAtom);
 
   // const addSearchResults = useSetAtom(addS2ReferenceAtom);
 
   const addClickHandler = useCallback(() => {
-    setAdded(true);
-    void postS2Reference(projectId, reference);
-  }, [projectId, reference]);
+    setRefStatus('adding');
+    saveS2Reference(projectId, reference)
+      .then(() => {
+        setRefStatus('added');
+      })
+      .catch((e) => {
+        setRefStatus('error');
+      });
+  }, [projectId, reference, saveS2Reference]);
 
   const removeClickHandler = useCallback(() => {
-    setAdded(false);
+    setRefStatus('ready');
   }, []);
-
-  const PdfURLIsVaid =
-    reference.openAccessPdf && new URL(reference.openAccessPdf).pathname.split('/').pop()?.split('.').pop() === 'pdf';
 
   return (
     <div className="border-b border-slate-200 px-5 py-3 text-[.875rem]">
@@ -58,14 +69,16 @@ const SearchResult = ({ reference, projectId }: { reference: S2SearchResult; pro
           </div>
           {PdfURLIsVaid && (
             <div className="flex basis-1/5 justify-end">
-              {!added && <AddButton addClickHandler={addClickHandler} />}
-              {added && (
+              {refStatus === 'ready' && <AddButton addClickHandler={addClickHandler} />}
+              {refStatus === 'added' && (
                 <RemoveButton
                   removeClickHandler={removeClickHandler}
                   setShowRemove={setShowRemove}
                   showRemove={showRemove}
                 />
               )}
+              {refStatus === 'error' && <CouldNotAddRef />}
+              {refStatus === 'adding' && <div>Adding...</div>}
             </div>
           )}
           {!PdfURLIsVaid && <NoPDF />}
@@ -111,6 +124,15 @@ const NoPDF = () => (
       <SmallInfoIcon />
     </div>
   </div>
+);
+
+const CouldNotAddRef = () => (
+  <>
+    <div title="Sorry, something went wrong when adding this reference.">Reference Error</div>
+    <div className=" cursor-pointer" title="Sorry, something went wrong when adding this reference.">
+      <SmallInfoIcon />
+    </div>
+  </>
 );
 
 const AddButton = ({ addClickHandler }: { addClickHandler: () => void }) => (
