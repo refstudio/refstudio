@@ -2,6 +2,7 @@ import os
 
 import litellm
 import openai
+from openai.error import AuthenticationError
 from sidecar.ai.prompts import create_prompt_for_chat, prepare_chunks_for_prompt
 from sidecar.ai.ranker import BM25Ranker
 from sidecar.ai.schemas import ChatRequest, ChatResponse, ChatResponseChoice
@@ -173,7 +174,19 @@ class Chat:
         This is a generator function that yields responses from the chat API.
         Only used for streaming chat responses to the client.
         """
-        response = self.ask_question(n_choices=1, temperature=temperature, stream=True)
+        try:
+            response = self.ask_question(
+                n_choices=1, temperature=temperature, stream=True
+            )
+        except AuthenticationError as e:
+            logger.error(e)
+            yield f"data: {str(e)}\n\n"
+            return
+        except Exception as e:
+            logger.error(e)
+            yield f"data: {str(e)}\n\n"
+            return
+
         for chunk in response:
             content = chunk["choices"][0]["delta"]["content"]
             yield f"data: {content}\n\n"

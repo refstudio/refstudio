@@ -47,7 +47,15 @@ async def http_ai_chat(
     return response
 
 
-@router.post("/{project_id}/chat_stream")
+@router.post(
+    "/{project_id}/chat_stream",
+    responses={
+        200: {
+            "content": {"text/event-stream": {}},
+            "description": "Stream chat reply.",
+        }
+    },
+)
 async def http_ai_chat_stream(
     project_id: str,
     req: ChatRequest,

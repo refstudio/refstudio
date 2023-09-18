@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
+from openai.error import AuthenticationError
 from sidecar import config
 from sidecar.api import api
 from sidecar.projects import service as projects_service
@@ -189,6 +190,14 @@ def mock_call_model_is_stream(*args, **kwargs):
 def mock_call_model_is_error(*args, **kwargs):
     def mock_call_model_response(*args, **kwargs):
         raise Exception("This is a mocked error")
+
+    return mock_call_model_response
+
+
+@pytest.fixture
+def mock_call_model_is_authentication_error(*args, **kwargs):
+    def mock_call_model_response(*args, **kwargs):
+        raise AuthenticationError("This is an authentication error")
 
     return mock_call_model_response
 

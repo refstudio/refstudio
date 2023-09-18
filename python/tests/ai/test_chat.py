@@ -21,6 +21,22 @@ def test_chat_ask_question_is_ok(
     assert output["choices"][0]["index"] == 0
 
 
+def test_chat_ask_question_is_openai_error(
+    monkeypatch, mock_call_model_is_error, setup_project_references_json
+):
+    monkeypatch.setattr(chat.Chat, "call_model", mock_call_model_is_error)
+
+    response = chat.ask_question(
+        request=ChatRequest(text="This is a question about something"),
+        project_id="project1",
+    )
+    output = response.dict()
+
+    assert output["status"] == "error"
+    assert output["message"] == "This is a mocked error"
+    assert len(output["choices"]) == 0
+
+
 def test_chat_yield_response_is_ok(
     monkeypatch, mock_call_model_is_stream, setup_project_references_json
 ):
@@ -39,17 +55,21 @@ def test_chat_yield_response_is_ok(
     assert result == "data: This is a mocked streaming response\n\n"
 
 
-def test_chat_ask_question_is_openai_error(
-    monkeypatch, mock_call_model_is_error, setup_project_references_json
+def test_chat_yield_response_is_openai_error(
+    monkeypatch, mock_call_model_is_authentication_error, setup_project_references_json
 ):
-    monkeypatch.setattr(chat.Chat, "call_model", mock_call_model_is_error)
+    monkeypatch.setattr(
+        chat.Chat, "call_model", mock_call_model_is_authentication_error
+    )
 
-    response = chat.ask_question(
+    response = chat.yield_response(
         request=ChatRequest(text="This is a question about something"),
         project_id="project1",
     )
-    output = response.dict()
+    assert isinstance(response, GeneratorType)
 
-    assert output["status"] == "error"
-    assert output["message"] == "This is a mocked error"
-    assert len(output["choices"]) == 0
+    result = ""
+    for chunk in response:
+        result += chunk
+
+    assert result == "data: This is an authentication error\n\n"
