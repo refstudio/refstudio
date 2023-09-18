@@ -1,7 +1,7 @@
 import { useAtomValue } from 'jotai';
 import { useEffect, useRef, useState } from 'react';
 
-import { chatWithAI } from '../../../api/chat';
+import { chatWithAiStreaming } from '../../../api/chat';
 import { projectIdAtom } from '../../../atoms/projectState';
 import { PanelWrapper } from '../../../components/PanelWrapper';
 import { cx } from '../../../lib/cx';
@@ -46,11 +46,16 @@ export function ChatbotPanel() {
     if (!question || currentChatThreadItem) {
       return;
     }
-    setCurrentChatThreadItem({ id: String(chatThread.length + 1), question: text });
+
+    const chatId = String(chatThread.length + 1);
+    setCurrentChatThreadItem({ id: chatId, question: text });
     setText('');
-    chatWithAI(projectId, question)
-      .then((reply) => {
-        setChatThread([...chatThread, { id: String(chatThread.length + 1), question: text, answer: reply[0] }]);
+
+    chatWithAiStreaming(projectId, question, (_, fullAnswer) => {
+      setCurrentChatThreadItem({ id: chatId, question: text, answer: fullAnswer });
+    })
+      .then((answer) => {
+        setChatThread([...chatThread, { id: String(chatThread.length + 1), question: text, answer }]);
         setCurrentChatThreadItem(null);
       })
       .catch((err) => {
@@ -148,13 +153,13 @@ function MessageBox({ disabled, value, onChange, onChat, onKeyDown }: MessageBox
         onKeyDown={onKeyDown}
       />
       <button
-        aria-disabled={disabled}
+        aria-disabled={!value}
         className={cx(
           'flex h-8 w-8 items-center justify-center rounded-default',
           'bg-btn-bg-primary-default text-btn-ico-primary-default',
-          { 'bg-btn-bg-primary-disabled text-btn-ico-primary-disabled': disabled },
+          { 'bg-btn-bg-primary-disabled text-btn-ico-primary-disabled': !value },
         )}
-        disabled={disabled}
+        disabled={!value}
         title="Send"
         onClick={() => onChat(value)}
       >

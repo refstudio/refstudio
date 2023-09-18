@@ -71,4 +71,3 @@ class ChatResponse(RefStudioModel):
     status: ResponseStatus
     message: str
     choices: list[ChatResponseChoice]
-    choices: list[ChatResponseChoice]
