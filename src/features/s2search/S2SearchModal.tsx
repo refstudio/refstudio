@@ -11,9 +11,10 @@ import { CheckIcon, DotIcon, MinusIcon, SearchIcon, SmallInfoIcon } from '../../
 import { Modal } from '../../components/Modal';
 import { useDebouncedCallback } from '../../hooks/useDebouncedCallback';
 import { cx } from '../../lib/cx';
+import { LoadingIcon } from '../components/icons';
 
 const SearchBar = ({ onChange }: { onChange: (value: string, limit: number) => void }) => (
-  <div className="sticky top-0 flex items-center border-b border-slate-200 bg-modal-bg-primary p-4">
+  <div className="sticky top-0 flex border-b border-slate-200 bg-modal-bg-primary p-4">
     <div className="pr-3 text-input-ico-placeholder">
       <SearchIcon />
     </div>
@@ -75,6 +76,17 @@ const SearchResult = ({ reference, projectId }: { reference: S2SearchResult; pro
   );
 };
 
+const formatPublicationDate = (publicationDate: string) => {
+  const date = new Date(publicationDate);
+  return (
+    date.getDate().toString() +
+    ' ' +
+    date.toLocaleString('default', { month: 'short' }) +
+    ' ' +
+    date.getFullYear().toString()
+  );
+};
+
 const MetaData = ({ reference }: { reference: S2SearchResult }) => (
   <>
     <div className="flex">
@@ -86,7 +98,7 @@ const MetaData = ({ reference }: { reference: S2SearchResult }) => (
         {reference.venue}
       </div>
       <div>{reference.venue ? DotIcon() : ''}</div>
-      <div> {reference.year}</div>
+      <div> {reference.publicationDate ? formatPublicationDate(reference.publicationDate) : reference.year}</div>
     </div>
     <div className="line-clamp-4">{reference.abstract}</div>
   </>
@@ -135,6 +147,7 @@ const RemoveButton = ({
     <Button
       Action={showRemove ? <MinusIcon /> : <CheckIcon />}
       className={cx('bg-transparent text-[#61C554]', 'hover:bg-red-400 hover:text-white')}
+      inheritColor={true}
       size="S"
       text={showRemove ? 'Remove' : 'Added'}
       title="Remove this reference from your reference list"
@@ -154,9 +167,18 @@ export function S2SearchModal({ open, onClose: onClose }: { open: boolean; onClo
   const loadSearchResults = useSetAtom(loadSearchResultsAtom);
   const clearSearchResults = useSetAtom(clearSearchResultsAtom);
 
+  const [loading, setLoading] = useState(false);
+
   const handleKeyWordsEntered = useCallback(
     (searchTerm: string, limit?: number) => {
-      void loadSearchResults(searchTerm, limit);
+      setLoading(true);
+      loadSearchResults(searchTerm, limit)
+        .then(() => {
+          setLoading(false);
+        })
+        .catch(() => {
+          console.log('error');
+        });
     },
     [loadSearchResults],
   );
@@ -170,12 +192,28 @@ export function S2SearchModal({ open, onClose: onClose }: { open: boolean; onClo
 
   return (
     <Modal className="h-[37.5rem] w-[50rem]" open={open} onClose={onCloseHandler}>
-      <div className="h-[37.5rem] w-[50rem] cursor-default select-none gap-2 overflow-auto bg-modal-bg-primary ">
+      <div className="flex h-[37.5rem] w-[50rem] cursor-default select-none flex-col bg-modal-bg-primary">
         <SearchBar onChange={debouncedOnChange} />
-        <div className="text-modal-txt-primary">
-          {searchResultsList.map((reference) => (
-            <SearchResult key={reference.paperId} projectId={projectId} reference={reference} />
-          ))}
+        <div className="grow gap-2 overflow-auto text-modal-txt-primary">
+          {!loading && !searchResultsList.length && (
+            <div className="flex h-full flex-col items-center justify-center gap-2">
+              <div className="text-xl/6 font-semibold text-side-bar-txt-primary">
+                Add references from Semantic Scholar
+              </div>
+              <div className="text-side-bar-txt-secondary">
+                Enter keywords above to search Semantic Scholar for references to add to your library.
+              </div>
+            </div>
+          )}
+          {loading && (
+            <div className="flex h-full items-center justify-center">
+              <LoadingIcon />
+            </div>
+          )}
+          {!loading &&
+            searchResultsList.map((reference) => (
+              <SearchResult key={reference.paperId} projectId={projectId} reference={reference} />
+            ))}
         </div>
       </div>
     </Modal>

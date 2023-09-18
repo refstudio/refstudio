@@ -25,6 +25,21 @@ export async function postS2Reference(projectId: string, s2SearchResult: S2Searc
     return newAuthorList;
   };
 
+  const getBestPublicationDate = (reference: S2SearchResult) => {
+    if (reference.publicationDate) {
+      const date = new Date(reference.publicationDate);
+      return (
+        date.getFullYear().toString() +
+        '-' +
+        ('0' + date.getMonth().toString()).slice(-2) +
+        '-' +
+        date.getDate().toString()
+      );
+    } else {
+      return reference.year?.toString();
+    }
+  };
+
   const status = await apiPost(
     '/api/references/{project_id}',
     { path: { project_id: projectId } },
@@ -43,7 +58,7 @@ export async function postS2Reference(projectId: string, s2SearchResult: S2Searc
         title: s2SearchResult.title,
         abstract: s2SearchResult.abstract,
         contents: '',
-        published_date: s2SearchResult.year?.toString(),
+        published_date: getBestPublicationDate(s2SearchResult),
         authors: formatAuthorsFromS2Result(s2SearchResult.authors),
       },
     },
@@ -61,9 +76,10 @@ function parseS2Response(references: SearchResponse): S2SearchResult[] {
     year: reference.year ?? undefined,
     abstract: reference.abstract ?? '',
     venue: reference.venue ?? '',
+    publicationDate: reference.publicationDate ?? '',
     paperId: reference.paperId ?? '',
     citationCount: reference.citationCount ?? 0,
     openAccessPdf: reference.openAccessPdf ?? '',
-    authors: reference.authors ?? [],
+    authors: reference.authors,
   }));
 }

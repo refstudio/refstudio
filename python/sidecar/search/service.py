@@ -57,7 +57,7 @@ class Searcher:
             The maximum number of results to return. Default is 10.
         returned_fields : list of str
             The fields that should be included in the returned results.
-            Default includes 'title', 'abstract', 'venue', 'year', 'publicationDate',
+            Default includes 'title', 'abstract', 'venue', 'year', 'publicationDate'
             'paperId', 'citationCount', 'openAccessPdf', 'authors'.
 
         Returns

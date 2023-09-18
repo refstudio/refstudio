@@ -11,6 +11,7 @@ interface ButtonProps {
   size?: 'S' | 'M';
   text: string;
   type?: 'primary' | 'secondary';
+  inheritColor?: boolean;
   submit?: boolean;
   title?: string;
   onClick?: MouseEventHandler<HTMLButtonElement>;
@@ -24,11 +25,13 @@ export function Button({
   size = 'S',
   text,
   type = 'primary',
+  inheritColor = false,
   submit = false,
   title,
   onClick,
   ...rest
 }: ButtonProps) {
+  console.log(inheritColor);
   return (
     <button
       aria-disabled={disabled}
@@ -49,12 +52,15 @@ export function Button({
           'pr-[.25rem]': !!Action && actionPosition === 'right' && size === 'S',
         },
         {
-          'bg-btn-bg-primary-default text-btn-txt-primary-default': type === 'primary',
-          'bg-btn-bg-primary-disabled text-btn-txt-primary-disabled': disabled && type === 'primary',
+          'bg-btn-bg-primary-default text-btn-txt-primary-default': !inheritColor && type === 'primary',
+          'bg-btn-bg-primary-disabled text-btn-txt-primary-disabled': !inheritColor && disabled && type === 'primary',
+          'bg-btn-bg-primary-default': inheritColor && type === 'primary',
         },
         {
-          'bg-btn-bg-secondary-default text-btn-txt-secondary-default': type === 'secondary',
-          'bg-btn-bg-secondary-disabled text-btn-txt-secondary-disabled': disabled && type === 'secondary',
+          'bg-btn-bg-secondary-default text-btn-txt-secondary-default': !inheritColor && type === 'secondary',
+          'bg-btn-bg-secondary-disabled text-btn-txt-secondary-disabled':
+            !inheritColor && disabled && type === 'secondary',
+          'bg-btn-bg-secondary-default': inheritColor && type === 'secondary',
         },
         className,
       )}
