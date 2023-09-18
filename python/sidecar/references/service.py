@@ -25,8 +25,12 @@ def create_reference_from_url(
     """
     user_id = "user1"
 
+    if metadata.source_filename:
+        filename = metadata.source_filename
+    else:
+        filename = f"{metadata.title}.pdf"
+
     source = requests.get(url)
-    filename = metadata.source_filename
 
     store = storage.get_references_json_storage(user_id, project_id)
 
@@ -48,7 +52,7 @@ def create_reference_from_url(
 
     ref = Reference(
         id=str(uuid4()),
-        source_filename=metadata.source_filename,
+        source_filename=filename,
         status=IngestStatus.COMPLETE,
         title=metadata.title,
         abstract=metadata.abstract,
