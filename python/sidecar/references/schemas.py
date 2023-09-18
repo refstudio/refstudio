@@ -23,8 +23,9 @@ class Reference(RefStudioModel):
     """A reference for an academic paper / PDF"""
 
     id: str
-    source_filename: str
     status: IngestStatus
+    source_filename: str | None = None
+    filepath: str | None = None
     citation_key: str | None = None
     doi: str | None = None
     title: str | None = None
@@ -37,10 +38,10 @@ class Reference(RefStudioModel):
 
 
 class ReferenceCreate(RefStudioModel):
-    source_filename: str
+    title: str
+    source_filename: str | None = None
     citation_key: str | None = None
     doi: str | None = None
-    title: str | None = None
     abstract: str | None = None
     contents: str | None = None
     published_date: date | None = None
@@ -91,8 +92,7 @@ class ReferenceStatus(RefStudioModel):
 
 class IngestRequestType(StrEnum):
     UPLOADS_DIRECTORY = "uploads"
-    PDF = "pdf"
-    GENERIC = "generic"
+    METADATA = "metadata"
 
 
 class IngestRequest(RefStudioModel):
@@ -101,18 +101,12 @@ class IngestRequest(RefStudioModel):
 
 class IngestUploadsRequest(IngestRequest):
     type: IngestRequestType = IngestRequestType.UPLOADS_DIRECTORY
-    pass
 
 
-class IngestPdfUrlRequest(IngestRequest):
-    type: IngestRequestType = IngestRequestType.PDF
-    url: str
+class IngestMetadataRequest(IngestRequest):
+    type: IngestRequestType = IngestRequestType.METADATA
     metadata: ReferenceCreate
-
-
-class IngestGenericRequest(IngestRequest):
-    type: IngestRequestType = IngestRequestType.GENERIC
-    metadata: ReferenceCreate
+    url: str = None
 
 
 class IngestStatusResponse(RefStudioModel):

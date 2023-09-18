@@ -6,7 +6,7 @@ from sidecar.references import ingest, storage
 from sidecar.references.schemas import (
     DeleteRequest,
     DeleteStatusResponse,
-    IngestPdfUrlRequest,
+    IngestMetadataRequest,
     IngestRequestType,
     IngestResponse,
     IngestUploadsRequest,
@@ -16,7 +16,7 @@ from sidecar.references.schemas import (
 )
 from sidecar.references.service import create_reference
 
-IngestibleRequest = Union[IngestPdfUrlRequest, IngestUploadsRequest]
+IngestibleRequest = Union[IngestMetadataRequest, IngestUploadsRequest]
 
 router = APIRouter(
     prefix="/references",
@@ -50,7 +50,7 @@ async def ingest_references(
         uploads_dir = get_project_uploads_path(user_id, project_id)
         response = ingest.run_ingest(pdf_directory=uploads_dir)
 
-    elif request.type == IngestRequestType.PDF:
+    elif request.type == IngestRequestType.METADATA:
         reference = create_reference(
             project_id, metadata=request.metadata, url=request.url
         )
