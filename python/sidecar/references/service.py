@@ -8,37 +8,38 @@ from sidecar.references.schemas import IngestStatus, Reference, ReferenceCreate
 from sidecar.shared import chunk_reference
 
 
-def create_reference_from_url(
-    project_id: str, url: str, metadata: ReferenceCreate
-) -> Reference:
+def fetch_pdf_to_uploads(
+    url: str, project_id: str, user_id: str, metadata: ReferenceCreate
+) -> ReferenceCreate:
     """
-    Creates a reference from a PDF URL.
+    Fetches a PDF from a URL and saves it to the project's uploads directory.
 
     Parameters
     ----------
+    url : str
+        The URL of the PDF to fetch.
     project_id : str
         The ID of the project to add the reference to.
-    url : str
-        The URL of the PDF to ingest.
+    user_id : str
+        The ID of the user who owns the project.
     metadata : dict
         The metadata to add to the reference.
+
+    Returns
+    -------
+    ReferenceCreate
+        The metadata of the reference to create.
     """
-    user_id = "user1"
+    response = requests.get(url)
 
-    if metadata.source_filename:
-        filename = metadata.source_filename
-    else:
-        filename = f"{metadata.title}.pdf"
-
-    source = requests.get(url)
-
-    store = storage.get_references_json_storage(user_id, project_id)
+    if not metadata.source_filename:
+        metadata.source_filename = f"{metadata.title}.pdf"
 
     staged_filepath = projects_service.create_project_staging_filepath(
-        user_id, project_id, filename
+        user_id, project_id, metadata.source_filename
     )
     upload_filepath = projects_service.create_project_uploads_filepath(
-        user_id, project_id, filename
+        user_id, project_id, metadata.source_filename
     )
 
     # if `uploads` ingest has never been run, these directories might not exist yet
@@ -46,23 +47,52 @@ def create_reference_from_url(
     upload_filepath.parent.mkdir(parents=True, exist_ok=True)
 
     with open(staged_filepath, "wb") as f:
-        f.write(source.content)
+        f.write(response.content)
 
     shutil.copyfile(staged_filepath, upload_filepath)
+    staged_filepath.unlink()
+
+    metadata.chunks = chunk_reference(metadata, filepath=upload_filepath)
+    return metadata
+
+
+def create_reference(
+    project_id: str, metadata: ReferenceCreate, url: str = None
+) -> Reference:
+    """
+    Creates a reference.
+
+    Parameters
+    ----------
+    project_id : str
+        The ID of the project to add the reference to.
+    metadata : dict
+        The metadata to add to the reference.
+    url : str, optional
+        The URL of the PDF to ingest.
+
+    Returns
+    -------
+    Reference
+        The created reference.
+    """
+    user_id = "user1"
+    store = storage.get_references_json_storage(user_id, project_id)
+
+    if url:
+        metadata = fetch_pdf_to_uploads(url, project_id, user_id, metadata)
 
     ref = Reference(
         id=str(uuid4()),
-        source_filename=filename,
+        source_filename=metadata.source_filename,
         status=IngestStatus.COMPLETE,
         title=metadata.title,
         abstract=metadata.abstract,
         contents=metadata.contents,
         citation_key=metadata.citation_key,
         authors=metadata.authors,
+        chunks=metadata.chunks,
         metadata=metadata.metadata,
     )
-    ref.chunks = chunk_reference(ref, filepath=upload_filepath)
     store.add_reference(ref)
-
-    staged_filepath.unlink()
     return store.get_reference(ref.id)

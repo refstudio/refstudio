@@ -44,10 +44,10 @@ def test_ingest_references_for_pdf_url(setup_project_with_uploads):
         },
     }
 
-    # since we import `create_reference_from_url` from `service.py` into `router.py`
+    # since we import `create_reference` from `service.py` into `router.py`
     # we need to patch at the `router` level
     with patch(
-        "sidecar.references.router.create_reference_from_url",
+        "sidecar.references.router.create_reference",
         return_value=return_value,
     ) as mock_create_reference_from_url:
         response = client.post(f"/api/references/{project_id}", json=request)
