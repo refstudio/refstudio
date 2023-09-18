@@ -1,13 +1,46 @@
+import { fetchEventSource } from '@microsoft/fetch-event-source';
+
 import { apiPost } from './typed-api';
 
-export async function chatWithAI(projectId: string, text: string): Promise<string[]> {
+export async function chatWithAI(projectId: string, question: string): Promise<string[]> {
   try {
-    if (!text) {
+    if (!question) {
       return [];
     }
-    const res = await apiPost('/api/ai/{project_id}/chat', { path: { project_id: projectId } }, { text, n_choices: 3 });
+    const res = await apiPost(
+      '/api/ai/{project_id}/chat',
+      { path: { project_id: projectId } },
+      { text: question, n_choices: 3 },
+    );
     return res.choices.map((choice) => choice.text);
   } catch (err) {
     return [`Chat error: ${String(err)}`];
+  }
+}
+
+export async function chatWithAiStreaming(
+  projectId: string,
+  question: string,
+  onText: (part: string, full: string) => void,
+): Promise<string> {
+  try {
+    if (!question) {
+      return '';
+    }
+
+    let fullText = '';
+    return await fetchEventSource(`/api/ai/${projectId}/chat_stream`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        text: question,
+      }),
+      onmessage: (msg) => {
+        fullText += msg.data;
+        onText(msg.data, fullText);
+      },
+    }).then(() => fullText);
+  } catch (err) {
+    return `Chat error: ${String(err)}`;
   }
 }

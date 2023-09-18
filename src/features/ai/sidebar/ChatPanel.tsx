@@ -1,7 +1,7 @@
 import { useAtomValue } from 'jotai';
 import { useEffect, useRef, useState } from 'react';
 
-import { chatWithAI } from '../../../api/chat';
+import { chatWithAiStreaming } from '../../../api/chat';
 import { projectIdAtom } from '../../../atoms/projectState';
 import { PanelWrapper } from '../../../components/PanelWrapper';
 import { cx } from '../../../lib/cx';
@@ -16,7 +16,7 @@ type ChatThread = ChatThreadItem[];
 
 export function ChatbotPanel() {
   const projectId = useAtomValue(projectIdAtom);
-  const [text, setText] = useState('');
+  const [text, setText] = useState('Can you write an intro about machine learning?');
 
   const [chatThread, setChatThread] = useState<ChatThread>([
     // {
@@ -46,11 +46,16 @@ export function ChatbotPanel() {
     if (!question || currentChatThreadItem) {
       return;
     }
-    setCurrentChatThreadItem({ id: String(chatThread.length + 1), question: text });
+
+    const chatId = String(chatThread.length + 1);
+    setCurrentChatThreadItem({ id: chatId, question: text });
     setText('');
-    chatWithAI(projectId, question)
-      .then((reply) => {
-        setChatThread([...chatThread, { id: String(chatThread.length + 1), question: text, answer: reply[0] }]);
+
+    chatWithAiStreaming(projectId, question, (_, fullAnswer) => {
+      setCurrentChatThreadItem({ id: chatId, question: text, answer: fullAnswer });
+    })
+      .then((answer) => {
+        setChatThread([...chatThread, { id: String(chatThread.length + 1), question: text, answer }]);
         setCurrentChatThreadItem(null);
       })
       .catch((err) => {
