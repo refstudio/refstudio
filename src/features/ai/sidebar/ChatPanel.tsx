@@ -153,13 +153,13 @@ function MessageBox({ disabled, value, onChange, onChat, onKeyDown }: MessageBox
         onKeyDown={onKeyDown}
       />
       <button
-        aria-disabled={disabled}
+        aria-disabled={!value}
         className={cx(
           'flex h-8 w-8 items-center justify-center rounded-default',
           'bg-btn-bg-primary-default text-btn-ico-primary-default',
-          { 'bg-btn-bg-primary-disabled text-btn-ico-primary-disabled': disabled },
+          { 'bg-btn-bg-primary-disabled text-btn-ico-primary-disabled': !value },
         )}
-        disabled={disabled}
+        disabled={!value}
         title="Send"
         onClick={() => onChat(value)}
       >
