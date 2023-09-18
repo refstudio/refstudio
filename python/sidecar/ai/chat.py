@@ -119,15 +119,23 @@ class Chat:
         temperature: float = 0.7,
         stream: bool = False,
     ):
-        logger.info(f"Calling chat API with the following input message(s): {messages}")
-        response = litellm.completion(
-            model=self.model,
-            messages=messages,
-            n=n_choices,  # number of completions to generate
-            temperature=temperature,  # 0 = no randomness, deterministic
-            # max_tokens=200,
-            stream=stream,
+        logger.info(
+            f"Calling {self.model} chat with the following input message(s): {messages}"
         )
+
+        params = {
+            "model": self.model,
+            "messages": messages,
+            "n": n_choices,  # number of completions to generate
+            "temperature": temperature,  # 0 = no randomness, deterministic
+            "stream": stream,
+        }
+
+        if self.model == "llama2":
+            params["api_base"] = "http://localhost:11434"
+            params["custom_llm_provider"] = "ollama"
+
+        response = litellm.completion(**params)
         logger.info(f"Received response from chat API: {response}")
         return response
 
@@ -188,5 +196,5 @@ class Chat:
             return
 
         for chunk in response:
-            content = chunk["choices"][0]["delta"]["content"]
+            content = chunk["choices"][0]["delta"].get("content", "")
             yield f"data: {content}\n\n"
