@@ -3,6 +3,7 @@ import os
 import litellm
 import openai
 from openai.error import AuthenticationError
+from requests.exceptions import ConnectionError
 from sidecar.ai.prompts import create_prompt_for_chat, prepare_chunks_for_prompt
 from sidecar.ai.ranker import BM25Ranker
 from sidecar.ai.schemas import ChatRequest, ChatResponse, ChatResponseChoice
@@ -187,14 +188,34 @@ class Chat:
                 n_choices=1, temperature=temperature, stream=True
             )
         except AuthenticationError as e:
+            # OpenAI API key is missing
             logger.error(e)
-            yield f"data: {str(e)}\n\n"
+            yield (
+                "data: It looks like you forgot to provide an API key! "
+                "Please add one in the settings menu by clicking the gear icon in the "
+                "lower left corner of the screen.\n\n"
+            )
             return
         except Exception as e:
+            # something unexpected happened
             logger.error(e)
             yield f"data: {str(e)}\n\n"
             return
 
-        for chunk in response:
-            content = chunk["choices"][0]["delta"].get("content", "")
-            yield f"data: {content}\n\n"
+        try:
+            for chunk in response:
+                content = chunk["choices"][0]["delta"].get("content", "")
+                yield f"data: {content}\n\n"
+        except ConnectionError as e:
+            # Ollama is not running
+            logger.error(e)
+            yield (
+                "data: It looks like you forgot to start Ollama! "
+                "Please start Ollama on your local machine and try again.\n\n"
+            )
+            return
+        except Exception as e:
+            # something unexpected happened
+            logger.error(e)
+            yield f"data: {str(e)}\n\n"
+            return

@@ -72,4 +72,9 @@ def test_chat_yield_response_is_openai_error(
     for chunk in response:
         result += chunk
 
-    assert result == "data: This is an authentication error\n\n"
+    expected = (
+        "data: It looks like you forgot to provide an API key! "
+        "Please add one in the settings menu by clicking the gear icon in the "
+        "lower left corner of the screen.\n\n"
+    )
+    assert result == expected
