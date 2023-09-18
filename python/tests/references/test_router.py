@@ -29,7 +29,7 @@ def test_ingest_references_for_uploads_directory(setup_project_with_uploads):
     assert len(response.json()["references"]) == 0
 
 
-def test_ingest_references_for_pdf_url(setup_project_with_uploads):
+def test_ingest_references_for_metadata_with_pdf(setup_project_with_uploads):
     project_id = "project1"
     return_value = Reference(
         id="123", source_filename="fake.pdf", status=IngestStatus.COMPLETE
@@ -49,10 +49,10 @@ def test_ingest_references_for_pdf_url(setup_project_with_uploads):
     with patch(
         "sidecar.references.router.create_reference",
         return_value=return_value,
-    ) as mock_create_reference_from_url:
+    ) as mock_create_reference:
         response = client.post(f"/api/references/{project_id}", json=request)
 
-    mock_create_reference_from_url.assert_called_once_with(
+    mock_create_reference.assert_called_once_with(
         project_id, metadata=ReferenceCreate(**request["metadata"]), url=request["url"]
     )
     assert response.status_code == 200
