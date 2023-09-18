@@ -4,6 +4,9 @@ name: Cut Release
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - 540-windows-and-linux-release
 
 jobs:
   setup-js:
@@ -80,9 +83,9 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          # - name: Linx-x86_64
-          #   target: x86_64-unknown-linux-gnu
-          #   runner: ubuntu-latest
+          - name: Linx-x86_64
+            target: x86_64-unknown-linux-gnu
+            runner: ubuntu-latest
           - name: macOS-Apple
             target: aarch64-apple-darwin
             runner: macos-latest
