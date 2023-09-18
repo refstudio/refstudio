@@ -20,24 +20,6 @@ def fixtures_dir():
 
 
 @pytest.fixture
-def setup_project_references_json(monkeypatch, tmp_path, fixtures_dir):
-    user_id = "user1"
-    project_id = "project1"
-    project_name = "project1name"
-    monkeypatch.setattr(projects_service, "WEB_STORAGE_URL", tmp_path)
-
-    projects_service.create_project(user_id, project_id, project_name)
-    write_path = storage.get_references_json_path(user_id, project_id)
-
-    # copy references.json fixtures to temp dir for tests
-    test_file = f"{fixtures_dir}/data/references.json"
-    path_to_test_file = Path(__file__).parent.joinpath(test_file)
-
-    _copy_fixture_to_temp_dir(path_to_test_file, write_path)
-    return user_id, project_id
-
-
-@pytest.fixture
 def setup_project_storage(monkeypatch, tmp_path):
     user_id = "user1"
     project_id = "project1"
