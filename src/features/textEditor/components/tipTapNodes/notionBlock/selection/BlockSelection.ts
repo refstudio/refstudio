@@ -91,17 +91,17 @@ export class BlockSelection extends Selection {
   get selectedBlocksPos() {
     const selectedBlocks: { from: number; to: number }[] = [];
     const doc = this.$from.node(0);
-    let i = this.from;
+    let { from } = this;
 
-    while (i <= this.to) {
-      let node = doc.nodeAt(i);
+    while (from <= this.to) {
+      let node = doc.nodeAt(from);
       while (node === null) {
-        i++;
-        node = doc.nodeAt(i);
+        from++;
+        node = doc.nodeAt(from);
       }
-      const to = i + node.nodeSize;
-      selectedBlocks.push({ from: i, to });
-      i = to;
+      const to = from + node.nodeSize;
+      selectedBlocks.push({ from, to });
+      from = to;
     }
     return selectedBlocks;
   }
