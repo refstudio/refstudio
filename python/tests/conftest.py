@@ -1,3 +1,4 @@
+import datetime
 import json
 from pathlib import Path
 
@@ -261,7 +262,7 @@ def mock_search_paper(*args, **kwargs):
                     abstract="Sample Abstract",
                     venue="Sample Venue",
                     year=2021,
-                    publicationDate="01-01-2021",
+                    publicationDate=datetime.strptime("01-01-2021", "%Y-%m-%d").date(),
                     paperId="sample-id-1",
                     citationCount=10,
                     openAccessPdf="https://sample1.pdf",
@@ -272,7 +273,7 @@ def mock_search_paper(*args, **kwargs):
                     abstract="Sample Abstract 2",
                     venue="Sample Venue 2",
                     year=2022,
-                    publicationDate="01-01-2022",
+                    publicationDate=datetime.strptime("01-01-2022", "%Y-%m-%d").date(),
                     paperId="sample-id-2",
                     citationCount=20,
                     openAccessPdf="https://sample2.pdf",
