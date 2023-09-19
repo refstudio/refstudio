@@ -56,7 +56,6 @@ const SearchResult = ({ reference, projectId }: { reference: S2SearchResult; pro
       });
   }, [projectId, reference, saveS2Reference]);
 
-  // Not currently called (need new reference ID from add reference response)
   const removeClickHandler = useCallback(() => {
     removeS2Reference(projectId, refId)
       .then(() => {
@@ -136,15 +135,6 @@ const MetaData = ({ reference }: { reference: S2SearchResult }) => (
     </div>
     <div className="line-clamp-4">{reference.abstract}</div>
   </>
-);
-
-const NoPDF = () => (
-  <div className="flex basis-1/5 justify-end">
-    <div title="Ref Studio can only supplort references with a PDF">PDF Not Available</div>
-    <div className=" cursor-pointer" title="Ref Studio can only supplort references with a PDF">
-      <SmallInfoIcon />
-    </div>
-  </div>
 );
 
 const CouldNotAddRef = () => (

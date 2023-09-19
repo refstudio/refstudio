@@ -1,6 +1,6 @@
 import os
 import sys
-from datetime import datetime
+from datetime import datetime, date
 from pathlib import Path
 from typing import List, Union
 
@@ -35,6 +35,8 @@ def parse_date(date_str: str) -> datetime:
     # TODO: support more date formats
     if not date_str:
         return None
+    if isinstance(date_str, date):
+        return date_str
     try:
         return datetime.strptime(date_str, "%Y-%m-%d").date()
     except ValueError:
