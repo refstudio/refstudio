@@ -2,6 +2,7 @@ import inspect
 import json
 from argparse import ArgumentParser
 
+from sidecar import config
 from sidecar.typing import CliCommands
 
 
@@ -48,7 +49,7 @@ if __name__ == "__main__":
     if args.command == "serve":
         from sidecar.api import serve
 
-        serve(host="0.0.0.0", port=1487)
+        serve(host=config.HOST, port=config.PORT)
 
     else:
         raise NotImplementedError(f"Command {args.command} is not implemented.")

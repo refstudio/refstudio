@@ -2,7 +2,6 @@ import json
 import os
 import shutil
 import sys
-from collections import defaultdict
 from pathlib import Path
 from uuid import uuid4
 
@@ -20,6 +19,7 @@ from sidecar.references.schemas import (
     Reference,
     ReferenceStatus,
 )
+from sidecar.references.service import add_citation_keys_for_references
 from sidecar.references.storage import JsonStorage
 from sidecar.typing import ResponseStatus
 
@@ -29,13 +29,7 @@ logger = logger.getChild(__name__)
 GROBID_SERVER_URL = "https://kermitt2-grobid.hf.space"
 
 
-def run_ingest(args: IngestRequest):
-    pdf_directory = Path(args.pdf_directory)
-
-    # PDF files for ingest must be written to the `uploads` directory
-    if pdf_directory.parent != "uploads":
-        pdf_directory = pdf_directory.parent / "uploads"
-
+def run_ingest(pdf_directory: Path):
     ingest = PDFIngestion(input_dir=pdf_directory)
     response = ingest.run()
     return response
@@ -352,97 +346,19 @@ class PDFIngestion:
             source_pdf_path = os.path.join(self.staging_dir, source_pdf)
             full_text = shared.extract_text_from_pdf(source_pdf_path)
 
+            uploads_filepath = Path("uploads") / source_pdf
+
             references.append(
                 Reference(
                     id=str(uuid4()),
                     source_filename=source_pdf,
+                    filepath=str(uploads_filepath),
                     status=IngestStatus.FAILURE,
                     citation_key="untitled",
                     contents=full_text,
                 )
             )
         return references
-
-    def _add_citation_keys(self, new_references: list[Reference]) -> list[Reference]:
-        """
-        Adds unique citation keys for a list of Reference objects based on Pandoc
-        citation key formatting rules.
-
-        A citation key is based on the Reference's first author surname
-        and published date.
-
-        If two References have the same author surname and published date,
-        then the citation key is appended with a, b, c, etc.
-
-        If a Reference does not have an author surname or published date,
-        then the citation key becomes "untitled" and is appended with 1, 2, 3, etc.
-
-        If a Reference already has a citation key, then it is not modified.
-
-        https://quarto.org/docs/authoring/footnotes-and-citations.html#sec-citations
-
-        Parameters
-        ----------
-        new_references : list[References]
-            List of newly uploaded References that need citation keys
-
-        Returns
-        -------
-        references : list[Reference]
-            List of References, each with a unique `citation_key` field
-        """
-
-        # we must determine the max current "appended" index for key
-        # (e.g. 1, 2, 3, a, b, c, etc.)
-        # this will determine the starting index for new references
-        #
-        # we do this by incrementing from what the citation key would have
-        # been in its "unappended" format -- what the key would be if we did not
-        # have any other references
-        max_existing_index_by_key = {}
-        for ref in self.references:
-            key = shared.create_citation_key(ref)
-            if key not in max_existing_index_by_key:
-                max_existing_index_by_key[key] = 1
-            else:
-                max_existing_index_by_key[key] += 1
-
-        new_ref_key_groups = defaultdict(list)
-        for ref in new_references:
-            key = shared.create_citation_key(ref)
-            new_ref_key_groups[key].append(ref)
-
-        for key, new_refs_for_key in new_ref_key_groups.items():
-            idx = max_existing_index_by_key.get(key, 0)
-
-            # if no existing references ...
-            if idx == 0:
-                for i, ref in enumerate(new_refs_for_key):
-                    # first ref always gets the "unappended" key
-                    # this is necessary to maintain consistency upon new uploads
-                    if i == 0:
-                        ref.citation_key = f"{key}"
-                    else:
-                        if key == "untitled":
-                            # untitled refs get numbered 1, 2, 3, etc.
-                            ref.citation_key = f"{key}{i}"
-                        else:
-                            # others get numbered a, b, c, etc.
-                            ref.citation_key = f"{key}{chr(97 + i)}"
-
-            # if existing references, append as necessary starting
-            # from existing max index for the key
-            if idx > 0:
-                for i, ref in enumerate(new_refs_for_key):
-                    if key == "untitled":
-                        # untitleds start at 1
-                        ref.citation_key = f"{key}{idx + i}"
-                    else:
-                        # others start at a = chr(97)
-                        # so need to subtract 1 since idx >= 1
-                        ref.citation_key = f"{key}{chr(97 + idx - 1 + i)}"
-
-        return new_references
 
     def _create_references(self) -> None:
         """
@@ -468,6 +384,7 @@ class PDFIngestion:
                 doc = json.load(fin)
 
             source_pdf = f"{file.stem}.pdf"
+            uploads_filepath = Path("uploads") / source_pdf
 
             header = self._parse_header(doc)
             pub_date = shared.parse_date(header.get("published_date", ""))
@@ -475,6 +392,7 @@ class PDFIngestion:
             ref = Reference(
                 id=str(uuid4()),
                 source_filename=source_pdf,
+                filepath=str(uploads_filepath),
                 status=IngestStatus.COMPLETE,
                 title=header.get("title"),
                 authors=header.get("authors"),
@@ -496,7 +414,9 @@ class PDFIngestion:
         logger.info(msg)
 
         new_references = successes + failures
-        self._add_citation_keys(new_references)
+        add_citation_keys_for_references(
+            new_references, existing_references=self.references
+        )
 
         # append new references to any we have previously loaded
         for ref in new_references:

@@ -35,6 +35,13 @@ export type Detail = ValidationError[];
  * An enumeration.
  *
  * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "IngestRequestType".
+ */
+export type IngestRequestType = 'uploads' | 'metadata';
+/**
+ * An enumeration.
+ *
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
  * via the `definition` "IngestStatus".
  */
 export type IngestStatus = 'processing' | 'failure' | 'complete';
@@ -111,13 +118,6 @@ export interface DeleteStatusResponse {
   message: string;
 }
 /**
- * Use this to indicate that a request only accepts an empty object ({})
- *
- * This interface was referenced by `ApiSchema`'s JSON-Schema
- * via the `definition` "EmptyRequest".
- */
-export interface EmptyRequest {}
-/**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
  * via the `definition` "FileEntry".
  */
@@ -181,6 +181,31 @@ export interface ValidationError {
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "IngestMetadataRequest".
+ */
+export interface IngestMetadataRequest {
+  type?: IngestRequestType & string;
+  metadata: ReferenceCreate;
+  url?: string;
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "ReferenceCreate".
+ */
+export interface ReferenceCreate {
+  title: string;
+  source_filename?: string;
+  citation_key?: string;
+  doi?: string;
+  abstract?: string;
+  contents?: string;
+  published_date?: string;
+  authors?: Author[];
+  chunks?: Chunk[];
+  metadata?: {};
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
  * via the `definition` "IngestResponse".
  */
 export interface IngestResponse {
@@ -195,8 +220,9 @@ export interface IngestResponse {
  */
 export interface Reference {
   id: string;
-  source_filename: string;
   status: IngestStatus;
+  source_filename?: string;
+  filepath?: string;
   citation_key?: string;
   doi?: string;
   title?: string;
@@ -206,6 +232,13 @@ export interface Reference {
   authors?: Author[];
   chunks?: Chunk[];
   metadata?: {};
+}
+/**
+ * This interface was referenced by `ApiSchema`'s JSON-Schema
+ * via the `definition` "IngestUploadsRequest".
+ */
+export interface IngestUploadsRequest {
+  type?: IngestRequestType & string;
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
@@ -290,6 +323,7 @@ export interface S2SearchResult {
   abstract?: string;
   venue?: string;
   year?: number;
+  publicationDate?: string;
   paperId?: string;
   citationCount?: number;
   openAccessPdf?: string;

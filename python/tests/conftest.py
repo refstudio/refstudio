@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from pathlib import Path
 
 import pytest
@@ -20,6 +21,16 @@ def fixtures_dir():
 
 
 @pytest.fixture
+def setup_project_storage(monkeypatch, tmp_path):
+    user_id = "user1"
+    project_id = "project1"
+    project_name = "project1name"
+    monkeypatch.setattr(projects_service, "WEB_STORAGE_URL", tmp_path)
+    projects_service.create_project(user_id, project_id, project_name)
+    return user_id, project_id
+
+
+@pytest.fixture
 def setup_project_references_json(monkeypatch, tmp_path, fixtures_dir):
     user_id = "user1"
     project_id = "project1"
@@ -34,17 +45,7 @@ def setup_project_references_json(monkeypatch, tmp_path, fixtures_dir):
     path_to_test_file = Path(__file__).parent.joinpath(test_file)
 
     _copy_fixture_to_temp_dir(path_to_test_file, write_path)
-    return user_id, project_id
-
-
-@pytest.fixture
-def setup_project_storage(monkeypatch, tmp_path):
-    user_id = "user1"
-    project_id = "project1"
-    project_name = "project1name"
-    monkeypatch.setattr(projects_service, "WEB_STORAGE_URL", tmp_path)
-    projects_service.create_project(user_id, project_id, project_name)
-    return user_id, project_id
+    return write_path
 
 
 @pytest.fixture
@@ -90,6 +91,42 @@ def setup_uploaded_reference_pdfs(monkeypatch, tmp_path, fixtures_dir):
             f"/fs/{project_id}/{filename}",
             files={"file": ("test.pdf", f, "application/pdf")},
         )
+
+
+@pytest.fixture
+def mock_url_pdf_response(fixtures_dir):
+    def mock_url_pdf_response(*args, **kwargs):
+        class MockResponse:
+            @property
+            def content(self):
+                with open(f"{fixtures_dir}/pdf/test.pdf", "rb") as f:
+                    return f.read()
+
+            @property
+            def status_code(self):
+                return 200
+
+        return MockResponse()
+
+    return mock_url_pdf_response
+
+
+@pytest.fixture
+def mock_url_pdf_response_error(fixtures_dir):
+    def mock_url_pdf_response(*args, **kwargs):
+        class MockResponse:
+            @property
+            def content(self):
+                with open(f"{fixtures_dir}/pdf/test.pdf", "rb") as f:
+                    return f.read()
+
+            @property
+            def status_code(self):
+                return 403
+
+        return MockResponse()
+
+    return mock_url_pdf_response
 
 
 @pytest.fixture
@@ -225,6 +262,7 @@ def mock_search_paper(*args, **kwargs):
                     abstract="Sample Abstract",
                     venue="Sample Venue",
                     year=2021,
+                    publicationDate=datetime(2021, 1, 1),
                     paperId="sample-id-1",
                     citationCount=10,
                     openAccessPdf="https://sample1.pdf",
@@ -235,6 +273,7 @@ def mock_search_paper(*args, **kwargs):
                     abstract="Sample Abstract 2",
                     venue="Sample Venue 2",
                     year=2022,
+                    publicationDate=datetime(2022, 1, 1),
                     paperId="sample-id-2",
                     citationCount=20,
                     openAccessPdf="https://sample2.pdf",

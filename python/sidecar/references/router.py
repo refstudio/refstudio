@@ -1,16 +1,22 @@
+from typing import Union
+
 from fastapi import APIRouter
-from sidecar.projects.service import get_project_path
+from sidecar.projects.service import get_project_uploads_path
 from sidecar.references import ingest, storage
 from sidecar.references.schemas import (
     DeleteRequest,
     DeleteStatusResponse,
-    IngestRequest,
+    IngestMetadataRequest,
+    IngestRequestType,
     IngestResponse,
+    IngestUploadsRequest,
     Reference,
     ReferencePatch,
     UpdateStatusResponse,
 )
-from sidecar.typing import EmptyRequest
+from sidecar.references.service import create_reference
+
+IngestibleRequest = Union[IngestMetadataRequest, IngestUploadsRequest]
 
 router = APIRouter(
     prefix="/references",
@@ -24,35 +30,39 @@ async def list_references(project_id: str) -> list[Reference]:
     Returns a list of references for the current user
     """
     user_id = "user1"
-    project_path = get_project_path(user_id, project_id)
-    store = storage.JsonStorage(project_path / ".storage" / "references.json")
     try:
-        store.load()
+        store = storage.get_references_json_storage(user_id, project_id)
     except FileNotFoundError:
-        # no references have been ingested yet
         return []
     return store.references
 
 
 @router.post("/{project_id}")
-async def ingest_references(project_id: str, payload: EmptyRequest) -> IngestResponse:
+async def ingest_references(
+    project_id: str, request: IngestibleRequest
+) -> IngestResponse:
     """
-    Ingests references from PDFs in the project uploads directory
+    Creates references from a PDF directory or URL.
     """
     user_id = "user1"
-    project_path = get_project_path(user_id, project_id)
-    uploads_dir = project_path / "uploads"
-    req = IngestRequest(pdf_directory=str(uploads_dir))
-    response = ingest.run_ingest(req)
+
+    if request.type == IngestRequestType.UPLOADS_DIRECTORY:
+        uploads_dir = get_project_uploads_path(user_id, project_id)
+        response = ingest.run_ingest(pdf_directory=uploads_dir)
+
+    elif request.type == IngestRequestType.METADATA:
+        reference = create_reference(
+            project_id, metadata=request.metadata, url=request.url
+        )
+        response = IngestResponse(project_name=project_id, references=[reference])
+
     return response
 
 
 @router.get("/{project_id}/{reference_id}")
 async def http_get(project_id: str, reference_id: str) -> Reference | None:
     user_id = "user1"
-    project_path = get_project_path(user_id, project_id)
-    store = storage.JsonStorage(project_path / ".storage" / "references.json")
-    store.load()
+    store = storage.get_references_json_storage(user_id, project_id)
     response = store.get_reference(reference_id)
     return response
 
@@ -62,9 +72,7 @@ async def http_update(
     project_id: str, reference_id: str, req: ReferencePatch
 ) -> UpdateStatusResponse:
     user_id = "user1"
-    project_path = get_project_path(user_id, project_id)
-    store = storage.JsonStorage(project_path / ".storage" / "references.json")
-    store.load()
+    store = storage.get_references_json_storage(user_id, project_id)
     response = store.update(reference_id, req)
     return response
 
@@ -72,9 +80,7 @@ async def http_update(
 @router.delete("/{project_id}/{reference_id}")
 async def http_delete(project_id: str, reference_id: str) -> DeleteStatusResponse:
     user_id = "user1"
-    project_path = get_project_path(user_id, project_id)
-    store = storage.JsonStorage(project_path / ".storage" / "references.json")
-    store.load()
+    store = storage.get_references_json_storage(user_id, project_id)
     response = store.delete(reference_ids=[reference_id])
     return response
 
@@ -82,8 +88,6 @@ async def http_delete(project_id: str, reference_id: str) -> DeleteStatusRespons
 @router.post("/{project_id}/bulk_delete")
 async def http_bulk_delete(project_id: str, req: DeleteRequest) -> DeleteStatusResponse:
     user_id = "user1"
-    project_path = get_project_path(user_id, project_id)
-    store = storage.JsonStorage(project_path / ".storage" / "references.json")
-    store.load()
+    store = storage.get_references_json_storage(user_id, project_id)
     response = store.delete(reference_ids=req.reference_ids, all_=req.all)
     return response

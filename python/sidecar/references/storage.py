@@ -3,44 +3,19 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from sidecar import config
 from sidecar.config import logger
 from sidecar.projects.service import get_project_path
 from sidecar.references.schemas import (
     Author,
     Chunk,
-    DeleteRequest,
     DeleteStatusResponse,
     Reference,
     ReferencePatch,
-    ReferenceUpdate,
     UpdateStatusResponse,
 )
 from sidecar.typing import ResponseStatus
 
 logger = logger.getChild(__name__)
-
-
-def get_reference(reference_id: str) -> Reference | None:
-    storage = JsonStorage(config.REFERENCES_JSON_PATH)
-    storage.load()
-    return storage.get_reference(reference_id)
-
-
-def update_reference(
-    reference_id: str, reference_update: ReferenceUpdate
-) -> ResponseStatus:
-    storage = JsonStorage(config.REFERENCES_JSON_PATH)
-    storage.load()
-    response = storage.update(reference_id, reference_update=reference_update)
-    return response
-
-
-def delete_references(delete_request: DeleteRequest) -> ResponseStatus:
-    storage = JsonStorage(config.REFERENCES_JSON_PATH)
-    storage.load()
-    response = storage.delete(ids=delete_request.reference_ids, all_=delete_request.all)
-    return response
 
 
 def get_references_json_path(user_id: str, project_id: str) -> Path:
@@ -64,13 +39,24 @@ def get_references_json_storage(user_id: str, project_id: str) -> JsonStorage:
 
 class JsonStorage:
     def __init__(self, filepath: str):
-        self.filepath = filepath
+        self.filepath = Path(filepath)
         self.references = []
         self.chunks = []
         self.corpus = []
         self.tokenized_corpus = []
 
+    def initialize(self):
+        """
+        Initialize the storage file with an empty list.
+        """
+        self.filepath.parent.mkdir(parents=True, exist_ok=True)
+        with open(self.filepath, "w") as f:
+            json.dump([], f)
+
     def load(self):
+        if not Path(self.filepath).exists():
+            self.initialize()
+
         with open(self.filepath, "r") as f:
             data = json.load(f)
 
@@ -93,6 +79,13 @@ class JsonStorage:
         contents = [ref.dict() for ref in self.references]
         with open(self.filepath, "w") as f:
             json.dump(contents, f, indent=2, default=str)
+
+    def add_reference(self, reference: Reference) -> None:
+        """
+        Add a Reference to storage.
+        """
+        self.references.append(reference)
+        self.save()
 
     def get_reference(self, reference_id: str) -> Reference | None:
         """

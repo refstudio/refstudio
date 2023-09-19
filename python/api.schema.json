@@ -152,12 +152,6 @@
       ],
       "title": "DeleteStatusResponse"
     },
-    "EmptyRequest": {
-      "properties": {},
-      "type": "object",
-      "title": "EmptyRequest",
-      "description": "Use this to indicate that a request only accepts an empty object ({})"
-    },
     "FileEntry": {
       "properties": {
         "name": {
@@ -291,6 +285,38 @@
       "type": "object",
       "title": "HTTPValidationError"
     },
+    "IngestMetadataRequest": {
+      "properties": {
+        "type": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/IngestRequestType"
+            }
+          ],
+          "default": "metadata"
+        },
+        "metadata": {
+          "$ref": "#/definitions/ReferenceCreate"
+        },
+        "url": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "metadata"
+      ],
+      "title": "IngestMetadataRequest"
+    },
+    "IngestRequestType": {
+      "type": "string",
+      "enum": [
+        "uploads",
+        "metadata"
+      ],
+      "title": "IngestRequestType",
+      "description": "An enumeration."
+    },
     "IngestResponse": {
       "properties": {
         "project_name": {
@@ -319,6 +345,20 @@
       ],
       "title": "IngestStatus",
       "description": "An enumeration."
+    },
+    "IngestUploadsRequest": {
+      "properties": {
+        "type": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/IngestRequestType"
+            }
+          ],
+          "default": "uploads"
+        }
+      },
+      "type": "object",
+      "title": "IngestUploadsRequest"
     },
     "ModelProvider": {
       "type": "string",
@@ -418,11 +458,14 @@
         "id": {
           "type": "string"
         },
+        "status": {
+          "$ref": "#/definitions/IngestStatus"
+        },
         "source_filename": {
           "type": "string"
         },
-        "status": {
-          "$ref": "#/definitions/IngestStatus"
+        "filepath": {
+          "type": "string"
         },
         "citation_key": {
           "type": "string"
@@ -465,11 +508,59 @@
       "type": "object",
       "required": [
         "id",
-        "source_filename",
         "status"
       ],
       "title": "Reference",
       "description": "A reference for an academic paper / PDF"
+    },
+    "ReferenceCreate": {
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "source_filename": {
+          "type": "string"
+        },
+        "citation_key": {
+          "type": "string"
+        },
+        "doi": {
+          "type": "string"
+        },
+        "abstract": {
+          "type": "string"
+        },
+        "contents": {
+          "type": "string"
+        },
+        "published_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "authors": {
+          "items": {
+            "$ref": "#/definitions/Author"
+          },
+          "type": "array",
+          "default": []
+        },
+        "chunks": {
+          "items": {
+            "$ref": "#/definitions/Chunk"
+          },
+          "type": "array",
+          "default": []
+        },
+        "metadata": {
+          "type": "object",
+          "default": {}
+        }
+      },
+      "type": "object",
+      "required": [
+        "title"
+      ],
+      "title": "ReferenceCreate"
     },
     "ReferencePatch": {
       "properties": {
@@ -583,6 +674,10 @@
         },
         "year": {
           "type": "integer"
+        },
+        "publicationDate": {
+          "type": "string",
+          "format": "date-time"
         },
         "paperId": {
           "type": "string"
