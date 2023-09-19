@@ -1,5 +1,7 @@
 /** Type-safe access to the RefStudio HTTP APIs. */
 
+import { EventStreamContentType, fetchEventSource } from '@microsoft/fetch-event-source';
+
 import { universalDelete, universalGet, universalPatch, universalPost, universalPut } from './api';
 import type { paths } from './api-paths';
 
@@ -41,6 +43,14 @@ type JsonRequestBodyFor<Path extends keyof paths, Method extends LowerMethod> = 
   Record<Method, { requestBody: { content: { 'application/json': infer RequestBody } } }>
 >
   ? RequestBody
+  : never;
+
+/** Extract the Stream response type for a path/method pair from the paths interface. */
+type StreamResponseFor<Path extends keyof paths, Method extends LowerMethod> = paths extends Record<
+  Path,
+  Record<Method, { responses: { 200: { content: { 'text/event-stream': infer ResponseType } } } }>
+>
+  ? ResponseType
   : never;
 
 /**
@@ -146,4 +156,59 @@ export async function apiPut<Path extends PathsForMethod<'put'>>(
   const path = options ? completePath(pathSpec, options) : pathSpec;
   type ResponseType = JsonResponseFor<Path, 'post'>;
   return universalPut<ResponseType>(path, body);
+}
+
+/**
+ * Issue a POST request with a JSON payload to a RefStudio API endpoint that returns a stream of events.
+ *
+ * If the endpoint takes path parameters or search parameters, then that will be the second argument.
+ * The last two arguments (2nd and 3rd argument) are the request body and streaming event callback.
+ */
+export async function apiPostStream<Path extends PathsForMethod<'post'>>(
+  pathSpec: Path,
+  ...args: [
+    ...params: PathArgs<Path, 'post'>,
+    body: JsonRequestBodyFor<Path, 'post'>,
+    onMessage: (msg: StreamResponseFor<Path, 'post'>) => void,
+  ]
+) {
+  type ResponseType = StreamResponseFor<Path, 'post'>;
+  type StreamingEventCallback = (msg: StreamResponseFor<Path, 'post'>) => void;
+  const safeArgs = args as unknown as
+    | [params: RouteParameters, body: unknown, onMessage: StreamingEventCallback]
+    | [body: unknown, onMessage: StreamingEventCallback];
+  const [options, body, onMessage] = safeArgs.length === 3 ? safeArgs : [undefined, ...safeArgs];
+  const path = options ? completePath(pathSpec, options) : pathSpec;
+
+  return fetchEventSource(path, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', accept: EventStreamContentType },
+    openWhenHidden: false,
+    body: JSON.stringify(body),
+    // eslint-disable-next-line @typescript-eslint/require-await
+    onopen: async (response) => {
+      if (!response.ok) {
+        throw new Error(`Failed to open event stream: ${response.status} ${response.statusText}`);
+      }
+      if (!response.headers.get('content-type')?.startsWith(EventStreamContentType)) {
+        throw new Error(
+          `Expected event stream content type ${EventStreamContentType}, got ${response.headers.get('content-type')}`,
+        );
+      }
+    },
+
+    onclose: () => {
+      console.log('Event stream closed');
+    },
+
+    onmessage: (msg) => {
+      onMessage(msg.data as ResponseType);
+    },
+
+    onerror: (err) => {
+      console.error('Event stream error', err);
+      // Note: This will prevent the stream from reconnecting.
+      throw err;
+    },
+  });
 }
