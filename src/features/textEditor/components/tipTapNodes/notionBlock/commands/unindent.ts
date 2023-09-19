@@ -28,9 +28,6 @@ export const unindent: Command = ({ tr, dispatch }) => {
         const headerSize = node.firstChild!.nodeSize;
         if (from <= pos + headerSize && to >= pos) {
           nodesToUnindentPositions.push(pos);
-
-          // No need to recurse over children: they will automatically be unindented when their parent is
-          return false;
         }
       }
     } else {
@@ -39,7 +36,8 @@ export const unindent: Command = ({ tr, dispatch }) => {
   });
 
   if (dispatch) {
-    nodesToUnindentPositions.forEach((pos) => {
+    // Reverse to unindent children first
+    nodesToUnindentPositions.reverse().forEach((pos) => {
       addUnindentSteps(tr, pos + 2);
     });
     dispatch(tr);
