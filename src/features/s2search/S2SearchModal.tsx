@@ -9,9 +9,10 @@ import {
   clearSearchResultsAtom,
   getSearchResultsAtom,
   loadSearchResultsAtom,
+  removeS2ReferenceAtom,
 } from '../../atoms/s2SearchState';
 import { Button } from '../../components/Button';
-import { CheckIcon, DotIcon, MinusIcon, SearchIcon, SmallInfoIcon } from '../../components/icons';
+import { CheckIcon, DotIcon, MinusIcon, NoPdfIcon, SearchIcon, SmallInfoIcon } from '../../components/icons';
 import { Modal } from '../../components/Modal';
 import { useDebouncedCallback } from '../../hooks/useDebouncedCallback';
 import { cx } from '../../lib/cx';
@@ -34,55 +35,76 @@ const SearchBar = ({ onChange }: { onChange: (value: string, limit: number) => v
 
 const SearchResult = ({ reference, projectId }: { reference: S2SearchResult; projectId: string }) => {
   const [refStatus, setRefStatus] = useState('ready');
-  const PdfURLIsVaid =
-    reference.openAccessPdf && new URL(reference.openAccessPdf).pathname.split('/').pop()?.split('.').pop() === 'pdf';
+  const [refId, setRefId] = useState('');
+  const PdfURLIsVaid = reference.openAccessPdf !== undefined;
 
   const [showRemove, setShowRemove] = useState(false);
   const saveS2Reference = useSetAtom(addS2ReferenceAtom);
+  const removeS2Reference = useSetAtom(removeS2ReferenceAtom);
 
   const addClickHandler = useCallback(() => {
     setRefStatus('adding');
     saveS2Reference(projectId, reference)
       .then((result) => {
+        console.log(result);
+        setRefId(result.references[0].id);
         setRefStatus('added');
       })
       .catch((e) => {
+        console.log(e);
         setRefStatus('error');
       });
   }, [projectId, reference, saveS2Reference]);
 
   // Not currently called (need new reference ID from add reference response)
   const removeClickHandler = useCallback(() => {
-    setRefStatus('ready');
-  }, []);
+    removeS2Reference(projectId, refId)
+      .then(() => {
+        setRefStatus('ready');
+      })
+      .catch(() => {
+        setRefStatus('remove-error');
+      });
+  }, [projectId, refId, removeS2Reference]);
 
   return (
     <div className="border-b border-slate-200 px-5 py-3 text-[.875rem]">
       <div className="space-y-2">
         <div className="flex">
-          <div
-            className={cx({ 'opacity-30': !reference.openAccessPdf }, 'basis-4/5 truncate font-semibold')}
-            title={reference.title}
-          >
+          <div className="basis-4/5 truncate font-semibold" title={reference.title}>
             {reference.title}
           </div>
-          {PdfURLIsVaid && (
-            <div className="flex basis-1/5 justify-end">
-              {refStatus === 'ready' && <AddButton addClickHandler={addClickHandler} />}
-              {refStatus === 'added' && (
-                <RemoveButton
-                  removeClickHandler={removeClickHandler}
-                  setShowRemove={setShowRemove}
-                  showRemove={showRemove}
-                />
-              )}
-              {refStatus === 'error' && <CouldNotAddRef />}
-              {refStatus === 'adding' && <div className="py-[.375rem]">Adding...</div>}
-            </div>
-          )}
-          {!PdfURLIsVaid && <NoPDF />}
+          <div className="flex basis-1/5 justify-end space-x-1">
+            {refStatus === 'ready' && (
+              <>
+                {!PdfURLIsVaid && (
+                  <div
+                    className="flex items-center justify-center"
+                    title="This reference has no PDF. Chat functions will be limited"
+                  >
+                    <NoPdfIcon />
+                  </div>
+                )}
+                <AddButton addClickHandler={addClickHandler} />
+              </>
+            )}
+            {refStatus === 'added' && (
+              <RemoveButton
+                removeClickHandler={removeClickHandler}
+                setShowRemove={setShowRemove}
+                showRemove={showRemove}
+              />
+            )}
+            {refStatus === 'error' && <CouldNotAddRef />}
+            {refStatus === 'remove-error' && <CouldNotRemoveRef />}
+            {refStatus === 'adding' && (
+              <div className="flex py-[.375rem]">
+                Adding <LoadingIcon />
+              </div>
+            )}
+          </div>
         </div>
-        {PdfURLIsVaid && <MetaData reference={reference} />}
+        <MetaData reference={reference} />
       </div>
     </div>
   );
@@ -128,11 +150,25 @@ const NoPDF = () => (
 const CouldNotAddRef = () => (
   <>
     <div className="py-[.375rem] text-red-400" title="Sorry, something went wrong when adding this reference.">
-      Reference Error
+      Upload Error
     </div>
     <div
       className=" cursor-pointer py-[.375rem] text-red-400"
       title="Sorry, something went wrong when adding this reference."
+    >
+      <SmallInfoIcon />
+    </div>
+  </>
+);
+
+const CouldNotRemoveRef = () => (
+  <>
+    <div className="py-[.375rem] text-red-400" title="Sorry, something went wrong when removing this reference.">
+      Remove Error
+    </div>
+    <div
+      className=" cursor-pointer py-[.375rem] text-red-400"
+      title="Sorry, something went wrong when removing this reference."
     >
       <SmallInfoIcon />
     </div>
@@ -167,14 +203,12 @@ const RemoveButton = ({
       setShowRemove(false);
     }}
     onMouseOver={() => {
-      // setShowRemove(true);
+      setShowRemove(true);
     }}
   >
     <Button
       Action={showRemove ? <MinusIcon /> : <CheckIcon />}
-      // className={cx('bg-transparent text-[#61C554]', 'hover:bg-red-400 hover:text-white')}
-      className={cx('bg-transparent text-[#61C554]')}
-      disabled={true}
+      className={cx('bg-transparent text-[#61C554]', 'hover:bg-red-400 hover:text-white')}
       inheritColor={true}
       size="S"
       text={showRemove ? 'Remove' : 'Added'}

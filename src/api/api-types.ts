@@ -239,6 +239,7 @@ export interface Reference {
  */
 export interface IngestUploadsRequest {
   type?: IngestRequestType & string;
+  metadata?: ReferenceCreate;
 }
 /**
  * This interface was referenced by `ApiSchema`'s JSON-Schema
