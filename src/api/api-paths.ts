@@ -389,6 +389,8 @@ export interface components {
       citationCount?: number;
       openAccessPdf?: string;
       paperId?: string;
+      /** Format: date-time */
+      publicationDate?: string;
       title?: string;
       venue?: string;
       year?: number;
