@@ -11,6 +11,9 @@ on:
 
 jobs:
   test-binary:
+    defaults:
+      run:
+        shell: bash
     strategy:
       fail-fast: true
       matrix:
