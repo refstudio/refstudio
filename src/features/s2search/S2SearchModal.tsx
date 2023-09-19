@@ -36,7 +36,6 @@ const SearchBar = ({ onChange }: { onChange: (value: string, limit: number) => v
 const SearchResult = ({ reference, projectId }: { reference: S2SearchResult; projectId: string }) => {
   const [refStatus, setRefStatus] = useState('ready');
   const [refId, setRefId] = useState('');
-  const PdfURLIsVaid = reference.openAccessPdf !== undefined;
 
   const [showRemove, setShowRemove] = useState(false);
   const saveS2Reference = useSetAtom(addS2ReferenceAtom);
@@ -76,7 +75,7 @@ const SearchResult = ({ reference, projectId }: { reference: S2SearchResult; pro
           <div className="flex basis-1/5 justify-end space-x-1">
             {refStatus === 'ready' && (
               <>
-                {!PdfURLIsVaid && (
+                {!reference.openAccessPdf && (
                   <div
                     className="flex items-center justify-center"
                     title="This reference has no PDF. Chat functions will be limited"
