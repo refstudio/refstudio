@@ -346,7 +346,7 @@ class PDFIngestion:
             source_pdf_path = os.path.join(self.staging_dir, source_pdf)
             full_text = shared.extract_text_from_pdf(source_pdf_path)
 
-            uploads_filepath = self.input_dir.joinpath(source_pdf)
+            uploads_filepath = Path("uploads") / source_pdf
 
             references.append(
                 Reference(
@@ -384,7 +384,7 @@ class PDFIngestion:
                 doc = json.load(fin)
 
             source_pdf = f"{file.stem}.pdf"
-            uploads_filepath = self.input_dir.joinpath(source_pdf)
+            uploads_filepath = Path("uploads") / source_pdf
 
             header = self._parse_header(doc)
             pub_date = shared.parse_date(header.get("published_date", ""))
