@@ -14,19 +14,21 @@ export function ActionsCell({ data: reference }: ICellRendererParams<ReferenceIt
     return null;
   }
   return (
-    <div className="flex h-full w-full items-center justify-center gap-2">
+    <div className="justify-left flex h-full w-full items-center gap-2">
       <VscFile
         className="shrink-0 cursor-pointer"
         size={20}
         title="Open Reference Details"
         onClick={() => openReference(reference.id)}
       />
-      <VscFilePdf
-        className="shrink-0 cursor-pointer"
-        size={20}
-        title="Open Reference PDF"
-        onClick={() => openReferencePdf(reference.id)}
-      />
+      {reference.filepath && (
+        <VscFilePdf
+          className="shrink-0 cursor-pointer"
+          size={20}
+          title="Open Reference PDF"
+          onClick={() => openReferencePdf(reference.id)}
+        />
+      )}
     </div>
   );
 }
