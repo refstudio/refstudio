@@ -18,27 +18,6 @@ from sidecar.typing import ResponseStatus
 logger = logger.getChild(__name__)
 
 
-def get_reference(reference_id: str) -> Reference | None:
-    storage = JsonStorage(config.REFERENCES_JSON_PATH)
-    storage.load()
-    return storage.get_reference(reference_id)
-
-
-def update_reference(
-    reference_id: str, reference_update: ReferenceUpdate
-) -> ResponseStatus:
-    storage = JsonStorage(config.REFERENCES_JSON_PATH)
-    storage.load()
-    response = storage.update(reference_id, reference_update=reference_update)
-    return response
-
-
-def delete_references(delete_request: DeleteRequest) -> ResponseStatus:
-    storage = JsonStorage(config.REFERENCES_JSON_PATH)
-    storage.load()
-    response = storage.delete(ids=delete_request.reference_ids, all_=delete_request.all)
-    return response
-
 def get_references_json_path(user_id: str, project_id: str) -> Path:
     """
     Returns the path to the JSON file that stores the references for a given
