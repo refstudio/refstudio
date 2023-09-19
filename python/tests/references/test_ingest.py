@@ -90,13 +90,14 @@ def test_run_ingest(monkeypatch, tmp_path, fixtures_dir):
         assert json.load(f) == response.dict()["references"]
 
 
-def test_ingest_get_statuses(monkeypatch, fixtures_dir):
+def test_ingest_get_statuses(monkeypatch, tmp_path, fixtures_dir):
     monkeypatch.setattr(ingest, "UPLOADS_DIR", Path(f"{fixtures_dir}/pdf"))
-    # ingest.UPLOADS_DIR = f"{fixtures_dir}/pdf"
 
     # test: JsonStorage path does not exist
     # expect: all `uploads` are in process
-    jstore = storage.JsonStorage("does_not_exist.json")
+    fake_filepath = tmp_path.joinpath("does_not_exist.json")
+
+    jstore = storage.JsonStorage(fake_filepath)
     fetcher = ingest.IngestStatusFetcher(storage=jstore)
     response = fetcher.emit_statuses()
 

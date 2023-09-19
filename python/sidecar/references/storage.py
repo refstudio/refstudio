@@ -39,13 +39,24 @@ def get_references_json_storage(user_id: str, project_id: str) -> JsonStorage:
 
 class JsonStorage:
     def __init__(self, filepath: str):
-        self.filepath = filepath
+        self.filepath = Path(filepath)
         self.references = []
         self.chunks = []
         self.corpus = []
         self.tokenized_corpus = []
 
+    def initialize(self):
+        """
+        Initialize the storage file with an empty list.
+        """
+        self.filepath.parent.mkdir(parents=True, exist_ok=True)
+        with open(self.filepath, "w") as f:
+            json.dump([], f)
+
     def load(self):
+        if not Path(self.filepath).exists():
+            self.initialize()
+
         with open(self.filepath, "r") as f:
             data = json.load(f)
 
