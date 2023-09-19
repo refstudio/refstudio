@@ -4,9 +4,6 @@ name: Cut Release
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - 540-windows-and-linux-release
 
 jobs:
   setup-js:
