@@ -102,6 +102,28 @@ def mock_url_pdf_response(fixtures_dir):
                 with open(f"{fixtures_dir}/pdf/test.pdf", "rb") as f:
                     return f.read()
 
+            @property
+            def status_code(self):
+                return 200
+
+        return MockResponse()
+
+    return mock_url_pdf_response
+
+
+@pytest.fixture
+def mock_url_pdf_response_error(fixtures_dir):
+    def mock_url_pdf_response(*args, **kwargs):
+        class MockResponse:
+            @property
+            def content(self):
+                with open(f"{fixtures_dir}/pdf/test.pdf", "rb") as f:
+                    return f.read()
+
+            @property
+            def status_code(self):
+                return 403
+
         return MockResponse()
 
     return mock_url_pdf_response

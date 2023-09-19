@@ -163,7 +163,7 @@ def chunk_reference(
         filepath = Path(config.UPLOADS_DIR).joinpath(ref.source_filename)
 
     try:
-        reader = pypdf.PdfReader(filepath)
+        reader = pypdf.PdfReader(str(filepath))
     except FileNotFoundError:
         logger.error(f"File not found: {filepath}")
         return []

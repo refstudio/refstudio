@@ -3,7 +3,9 @@ from collections import defaultdict
 from uuid import uuid4
 
 import requests
+from requests.exceptions import HTTPError
 from sidecar import shared
+from sidecar.config import logger
 from sidecar.projects import service as projects_service
 from sidecar.references import storage
 from sidecar.references.schemas import IngestStatus, Reference, ReferenceCreate
@@ -33,6 +35,9 @@ def fetch_pdf_to_uploads(
         The metadata of the reference to create.
     """
     response = requests.get(url)
+
+    if response.status_code != 200:
+        raise HTTPError(f"Unable to fetch {url} (status code: {response.status_code})")
 
     if not metadata.source_filename:
         metadata.source_filename = f"{metadata.title[:200]}.pdf"
@@ -83,13 +88,20 @@ def create_reference(
     store = storage.get_references_json_storage(user_id, project_id)
 
     if url:
-        metadata = fetch_pdf_to_uploads(url, project_id, user_id, metadata)
+        try:
+            metadata = fetch_pdf_to_uploads(url, project_id, user_id, metadata)
+        except HTTPError as e:
+            logger.error(str(e))
 
+    if metadata.source_filename:
         filepath = str(
             projects_service.create_project_uploads_filepath(
                 user_id, project_id, metadata.source_filename
             )
         )
+
+    if isinstance(metadata.published_date, str):
+        metadata.published_date = shared.parse_date(metadata.published_date)
 
     ref = Reference(
         id=str(uuid4()),
@@ -99,7 +111,7 @@ def create_reference(
         title=metadata.title,
         abstract=metadata.abstract,
         contents=metadata.contents,
-        published_date=shared.parse_date(metadata.published_date),
+        published_date=metadata.published_date,
         authors=metadata.authors,
         chunks=metadata.chunks,
         metadata=metadata.metadata,
