@@ -38,6 +38,7 @@ class Searcher:
             "abstract",
             "venue",
             "year",
+            "publicationDate",
             "paperId",
             "citationCount",
             "openAccessPdf",
@@ -56,7 +57,7 @@ class Searcher:
             The maximum number of results to return. Default is 10.
         returned_fields : list of str
             The fields that should be included in the returned results.
-            Default includes 'title', 'abstract', 'venue', 'year',
+            Default includes 'title', 'abstract', 'venue', 'year', 'publicationDate',
             'paperId', 'citationCount', 'openAccessPdf', 'authors'.
 
         Returns
@@ -90,6 +91,7 @@ class Searcher:
                 abstract=getattr(item, "abstract", None),
                 venue=getattr(item, "venue", None),
                 year=getattr(item, "year", None),
+                publicationDate=getattr(item, "publicationDate", None),
                 paperId=getattr(item, "paperId", None),
                 citationCount=getattr(item, "citationCount", None),
                 openAccessPdf=openaccesspdf.get("url") if openaccesspdf else None,
