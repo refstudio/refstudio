@@ -1,10 +1,4 @@
-import {
-  IngestMetadataRequest,
-  IngestUploadsRequest,
-  ReferenceCreate,
-  S2SearchResult,
-  SearchResponse,
-} from './api-types';
+import { IngestMetadataRequest, ReferenceCreate, S2SearchResult, SearchResponse } from './api-types';
 import { apiGetJson, apiPost } from './typed-api';
 
 export async function getS2ReferencesByKeyword(keywords: string, limit = 10): Promise<S2SearchResult[]> {
@@ -13,8 +7,13 @@ export async function getS2ReferencesByKeyword(keywords: string, limit = 10): Pr
 }
 
 export async function postS2Reference(projectId: string, s2SearchResult: S2SearchResult) {
-  const formatAuthorsFromS2Result = (authorsList: string[]): { full_name: string }[] => {
+  const formatAuthorsFromS2Result = (authorsList: string[] | undefined): { full_name: string }[] => {
     const newAuthorList: { full_name: string }[] = [];
+
+    if (!authorsList) {
+      return newAuthorList;
+    }
+
     authorsList.forEach((author) => {
       newAuthorList.push({ full_name: author });
     });
@@ -47,7 +46,7 @@ export async function postS2Reference(projectId: string, s2SearchResult: S2Searc
     authors: formatAuthorsFromS2Result(s2SearchResult.authors),
   };
 
-  const genericRequestBody: IngestUploadsRequest = {
+  const genericRequestBody: IngestMetadataRequest = {
     type: 'metadata',
     metadata,
   };

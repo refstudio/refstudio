@@ -120,22 +120,25 @@ const formatPublicationDate = (publicationDate: string) => {
   );
 };
 
-const MetaData = ({ reference }: { reference: S2SearchResult }) => (
-  <>
-    <div className="flex">
-      <div className="truncate" title={'Authors: ' + reference.authors.join(', ')}>
-        {reference.authors.join(', ')}
+const MetaData = ({ reference }: { reference: S2SearchResult }) => {
+  const authors = reference.authors ? reference.authors.join(', ') : '';
+  return (
+    <>
+      <div className="flex">
+        <div className="truncate" title={'Authors: ' + authors}>
+          {authors}
+        </div>
+        <div>{authors ? DotIcon() : ''}</div>
+        <div className="truncate" title={reference.venue}>
+          {reference.venue}
+        </div>
+        <div>{reference.venue ? DotIcon() : ''}</div>
+        <div> {reference.publicationDate ? formatPublicationDate(reference.publicationDate) : reference.year}</div>
       </div>
-      <div>{reference.authors.length > 0 ? DotIcon() : ''}</div>
-      <div className="truncate" title={reference.venue}>
-        {reference.venue}
-      </div>
-      <div>{reference.venue ? DotIcon() : ''}</div>
-      <div> {reference.publicationDate ? formatPublicationDate(reference.publicationDate) : reference.year}</div>
-    </div>
-    <div className="line-clamp-4">{reference.abstract}</div>
-  </>
-);
+      <div className="line-clamp-4">{reference.abstract}</div>
+    </>
+  );
+};
 
 const CouldNotAddRef = () => (
   <>
