@@ -51,7 +51,8 @@ export function MenuBar({ editor }: { editor: Editor }) {
   }, [editor, refreshToggle]);
 
   const { selection } = editor.state;
-  const isActive = (mark: MarkType) => selection instanceof BlockSelection ? selection.isMarkActive(mark) : editor.isActive(mark.name);
+  const isMarkActive = (mark: MarkType) =>
+    selection instanceof BlockSelection ? selection.isMarkActive(mark) : editor.isActive(mark.name);
 
   return (
     <menu className="toolbar">
@@ -75,7 +76,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
       <Divider />
       <button
         className={cx('toolbar-item', {
-          active: isActive(editor.schema.marks.bold),
+          active: isMarkActive(editor.schema.marks.bold),
         })}
         disabled={!editor.can().chain().focus().toggleBold().run()}
         title="Bold"
@@ -85,7 +86,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
       </button>
       <button
         className={cx('toolbar-item', {
-          active: isActive(editor.schema.marks.italic),
+          active: isMarkActive(editor.schema.marks.italic),
         })}
         disabled={!editor.can().chain().focus().toggleItalic().run()}
         title="Italic"
@@ -95,7 +96,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
       </button>
       <button
         className={cx('toolbar-item', {
-          active: isActive(editor.schema.marks.strike),
+          active: isMarkActive(editor.schema.marks.strike),
         })}
         disabled={!editor.can().chain().focus().toggleStrike().run()}
         title="Strikethrough"
@@ -105,7 +106,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
       </button>
       <button
         className={cx('toolbar-item', {
-          active: isActive(editor.schema.marks.code),
+          active: isMarkActive(editor.schema.marks.code),
         })}
         disabled={!editor.can().chain().focus().toggleCode().run()}
         title="Code Formatting"
@@ -120,6 +121,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
         className={cx('toolbar-item', {
           active: editor.isActive('heading', { level: 1 }),
         })}
+        disabled={selection instanceof BlockSelection}
         title="Heading Level 1"
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
       >
@@ -129,6 +131,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
         className={cx('toolbar-item', {
           active: editor.isActive('heading', { level: 2 }),
         })}
+        disabled={selection instanceof BlockSelection}
         title="Heading Level 2"
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
       >
@@ -138,6 +141,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
         className={cx('toolbar-item', {
           active: editor.isActive('heading', { level: 3 }),
         })}
+        disabled={selection instanceof BlockSelection}
         title="Heading Level 3"
         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
       >
