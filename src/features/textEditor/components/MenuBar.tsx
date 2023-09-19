@@ -1,5 +1,6 @@
 import './MenuBar.css';
 
+import { MarkType } from '@tiptap/pm/model';
 import { Editor } from '@tiptap/react';
 import * as React from 'react';
 
@@ -17,6 +18,7 @@ import {
   UndoIcon,
   UnorderedListIcon,
 } from './icons';
+import { BlockSelection } from './tipTapNodes/notionBlock/selection/BlockSelection';
 import { isNotionBlockTypeActive } from './tipTapNodes/notionBlock/utils/isNotionBlockTypeActive';
 
 export function MenuBar({ editor }: { editor: Editor }) {
@@ -48,6 +50,9 @@ export function MenuBar({ editor }: { editor: Editor }) {
     };
   }, [editor, refreshToggle]);
 
+  const { selection } = editor.state;
+  const isActive = (mark: MarkType) => selection instanceof BlockSelection ? selection.isMarkActive(mark) : editor.isActive(mark.name);
+
   return (
     <menu className="toolbar">
       <button
@@ -70,7 +75,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
       <Divider />
       <button
         className={cx('toolbar-item', {
-          active: editor.isActive('bold'),
+          active: isActive(editor.schema.marks.bold),
         })}
         disabled={!editor.can().chain().focus().toggleBold().run()}
         title="Bold"
@@ -80,7 +85,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
       </button>
       <button
         className={cx('toolbar-item', {
-          active: editor.isActive('italic'),
+          active: isActive(editor.schema.marks.italic),
         })}
         disabled={!editor.can().chain().focus().toggleItalic().run()}
         title="Italic"
@@ -90,7 +95,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
       </button>
       <button
         className={cx('toolbar-item', {
-          active: editor.isActive('strike'),
+          active: isActive(editor.schema.marks.strike),
         })}
         disabled={!editor.can().chain().focus().toggleStrike().run()}
         title="Strikethrough"
@@ -100,7 +105,7 @@ export function MenuBar({ editor }: { editor: Editor }) {
       </button>
       <button
         className={cx('toolbar-item', {
-          active: editor.isActive('code'),
+          active: isActive(editor.schema.marks.code),
         })}
         disabled={!editor.can().chain().focus().toggleCode().run()}
         title="Code Formatting"

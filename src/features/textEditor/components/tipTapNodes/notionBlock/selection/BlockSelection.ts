@@ -1,6 +1,7 @@
-import { Node, ResolvedPos, Slice } from '@tiptap/pm/model';
+import { MarkType, Node, ResolvedPos, Slice } from '@tiptap/pm/model';
 import { Selection, Transaction } from '@tiptap/pm/state';
 import { Mappable } from '@tiptap/pm/transform';
+import { MarkRange } from '@tiptap/react';
 
 import { getNextSibling } from '../utils/getNextSibling';
 import { getNotionBlockParent } from '../utils/getNotionBlockParent';
@@ -106,59 +107,47 @@ export class BlockSelection extends Selection {
     return selectedBlocks;
   }
 
-  selectParentBlock(tr: Transaction, dispatch: (tr: Transaction) => void): boolean {
+  selectParentBlock(tr: Transaction, dispatch: (tr: Transaction) => void): void {
     const { parentBlock } = this;
-    if (!parentBlock) {
-      return false;
+    if (parentBlock) {
+      tr.setSelection(new BlockSelection(parentBlock.resolvedPos));
+      dispatch(tr);
     }
-    tr.setSelection(new BlockSelection(parentBlock.resolvedPos));
-    dispatch(tr);
-    return true;
   }
 
-  selectChildBlock(tr: Transaction, dispatch: (tr: Transaction) => void): boolean {
+  selectChildBlock(tr: Transaction, dispatch: (tr: Transaction) => void): void {
     const { childBlock } = this;
-    if (!childBlock) {
-      return false;
+    if (childBlock) {
+      tr.setSelection(new BlockSelection(childBlock.resolvedPos));
+      dispatch(tr);
     }
-    tr.setSelection(new BlockSelection(childBlock.resolvedPos));
-    dispatch(tr);
-    return true;
   }
 
-  selectNextBlock(tr: Transaction, dispatch: (tr: Transaction) => void): boolean {
+  selectNextBlock(tr: Transaction, dispatch: (tr: Transaction) => void): void {
     const { childBlock, nextBlock } = this;
-    if (!childBlock && !nextBlock) {
-      return false;
+    if (childBlock || nextBlock) {
+      tr.setSelection(new BlockSelection((childBlock ?? nextBlock)!.resolvedPos));
+      dispatch(tr);
     }
-
-    tr.setSelection(new BlockSelection((childBlock ?? nextBlock)!.resolvedPos));
-    dispatch(tr);
-    return true;
   }
 
-  selectPreviousBlock(tr: Transaction, dispatch: (tr: Transaction) => void): boolean {
+  selectPreviousBlock(tr: Transaction, dispatch: (tr: Transaction) => void): void {
     const { previousOrParentBlock } = this;
-    if (!previousOrParentBlock) {
-      return false;
+    if (previousOrParentBlock) {
+      tr.setSelection(new BlockSelection(previousOrParentBlock.resolvedPos));
+      dispatch(tr);
     }
-
-    tr.setSelection(new BlockSelection(previousOrParentBlock.resolvedPos));
-    dispatch(tr);
-    return true;
   }
 
-  expandDown(tr: Transaction, dispatch: (tr: Transaction) => void): boolean {
+  expandDown(tr: Transaction, dispatch: (tr: Transaction) => void): void {
     const { nextBlock } = this;
     if (nextBlock) {
       tr.setSelection(new BlockSelection(this.$anchor, nextBlock.resolvedPos));
       dispatch(tr);
-      return true;
     }
-    return false;
   }
 
-  expandUp(tr: Transaction, dispatch: (tr: Transaction) => void): boolean {
+  expandUp(tr: Transaction, dispatch: (tr: Transaction) => void): void {
     const { previousOrParentBlock: previousBlock } = this;
     const doc = this.$head.node(0);
     if (previousBlock) {
@@ -181,9 +170,51 @@ export class BlockSelection extends Selection {
       }
       tr.setSelection(new BlockSelection(newResolvedAnchor, newResolvedHead));
       dispatch(tr);
-      return true;
     }
-    return false;
+  }
+
+  isMarkActive(markType: MarkType): boolean {
+    const doc = this.$from.node(0);
+    const endPos = this.to + doc.nodeAt(this.to)!.nodeSize;
+
+    let selectionRange = 0;
+    const markRanges: MarkRange[] = [];
+
+    doc.nodesBetween(this.from, endPos, (node, pos) => {
+      if (!node.isText && !node.marks.length) {
+        return;
+      }
+
+      const relativeFrom = Math.max(this.from, pos);
+      const relativeTo = Math.min(endPos, pos + node.nodeSize);
+      const markRange = relativeTo - relativeFrom;
+
+      selectionRange += markRange;
+
+      markRanges.push(
+        ...node.marks.map((mark) => ({
+          mark,
+          from: relativeFrom,
+          to: relativeTo,
+        })),
+      );
+    });
+
+    if (selectionRange === 0) {
+      return false;
+    }
+
+    const matchedRange = markRanges
+      .filter((markRange) => markType.name === markRange.mark.type.name)
+      .reduce((sum, markRange) => sum + markRange.to - markRange.from, 0);
+
+    const excludedRange = markRanges
+      .filter((markRange) => markRange.mark.type !== markType && markRange.mark.type.excludes(markType))
+      .reduce((sum, markRange) => sum + markRange.to - markRange.from, 0);
+
+    const range = matchedRange > 0 ? matchedRange + excludedRange : matchedRange;
+
+    return range >= selectionRange;
   }
 
   private get childBlock(): NodeData | null {

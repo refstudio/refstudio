@@ -6,11 +6,10 @@ import { collapsibleArrowsPluginKey } from '../plugins/collapsibleArrowPlugin';
 
 export function toggleCollapsed({
   pos,
-  view,
   dispatch,
   tr,
-}: { pos: number } & Pick<CommandProps, 'view' | 'dispatch' | 'tr'>): boolean {
-  const notionBlock = view.state.doc.nodeAt(pos);
+}: { pos: number } & Pick<CommandProps, 'dispatch' | 'tr'>): boolean {
+  const notionBlock = tr.doc.nodeAt(pos);
   if (!notionBlock || notionBlock.type.name !== NotionBlockNode.name || notionBlock.attrs.type !== 'collapsible') {
     return false;
   }

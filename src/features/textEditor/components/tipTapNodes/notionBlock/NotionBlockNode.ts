@@ -6,6 +6,7 @@ import { joinBackward } from './commands/joinBackward';
 import { joinForward } from './commands/joinForward';
 import { splitBlock } from './commands/splitBlock';
 import { toggleCollapsed } from './commands/toggleCollapsed';
+import { toggleMark } from './commands/toggleMark';
 import { toggleOrderedList } from './commands/toggleOrderedList';
 import { toggleUnorderedList } from './commands/toggleUnorderedList';
 import { unindent } from './commands/unindent';
@@ -125,8 +126,8 @@ export const NotionBlockNode = Node.create({
         if (!notionBlock) {
           return false;
         }
-        return editor.commands.command(({ dispatch, tr, view }) =>
-          toggleCollapsed({ pos: notionBlock.resolvedPos.pos, dispatch, tr, view }),
+        return editor.commands.command(({ dispatch, tr }) =>
+          toggleCollapsed({ pos: notionBlock.resolvedPos.pos, dispatch, tr }),
         );
       },
       'Mod-a': ({ editor }) => {
@@ -167,6 +168,10 @@ export const NotionBlockNode = Node.create({
   ],
 
   addCommands: () => ({
+    toggleBold: () => toggleMark('bold'),
+    toggleItalic: () => toggleMark('italic'),
+    toggleStrike: () => toggleMark('strike'),
+    toggleCode: () => toggleMark('code'),
     toggleUnorderedList: () => toggleUnorderedList,
     toggleOrderedList: () => toggleOrderedList,
   }),
