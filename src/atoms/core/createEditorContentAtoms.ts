@@ -6,7 +6,7 @@ import { refreshFileTreeAtom } from '../fileExplorerActions';
 import { EditorContent } from '../types/EditorContent';
 import { EditorContentAtoms } from '../types/EditorContentAtoms';
 import { EditorId, parseEditorId } from '../types/EditorData';
-import { setEditorDataIsDirtyAtom } from './editorData';
+import { editorsDataAtom, setEditorDataIsDirtyAtom } from './editorData';
 
 export function createEditorContentAtoms(
   editorId: EditorId,
@@ -18,11 +18,6 @@ export function createEditorContentAtoms(
 
   const loadableEditorContentAtom = loadable(editorAtom);
 
-  const updateEditorContentBufferAtom = atom(null, (get, set, payload: EditorContent) => {
-    set(editorBufferAtom, payload);
-    set(setEditorDataIsDirtyAtom, { editorId: get(editorIdAtom), isDirty: true });
-  });
-
   const saveEditorContentInMemoryAtom = atom(null, (get, set) => {
     const editorContent = get(editorBufferAtom);
     if (editorContent) {
@@ -32,7 +27,6 @@ export function createEditorContentAtoms(
 
   const saveEditorContentAtom = atom(null, async (get, set) => {
     const editorContent = get(editorBufferAtom);
-
     if (editorContent) {
       switch (editorContent.type) {
         case 'refstudio': {
@@ -53,6 +47,36 @@ export function createEditorContentAtoms(
         }
       }
     }
+  });
+
+  let saveTimeoutId: NodeJS.Timeout | null = null;
+
+  const updateEditorContentBufferAtom = atom(null, (get, set, payload: EditorContent) => {
+    set(editorBufferAtom, payload);
+    set(setEditorDataIsDirtyAtom, { editorId: get(editorIdAtom), isDirty: true });
+
+    // Debounced auto-save of editor content
+    if (saveTimeoutId) {
+      clearTimeout(saveTimeoutId);
+    }
+    saveTimeoutId = setTimeout(() => {
+      const editorData = get(editorsDataAtom).get(editorId);
+      if (!editorData) {
+        console.log('Editor data not found, cannot save editor content');
+        return;
+      }
+      if (!editorData.isDirty) {
+        console.log('Editor content is not dirty, no need to save');
+        return;
+      }
+      set(saveEditorContentAtom)
+        .catch((error) => {
+          console.error('Error while saving editor content', error);
+        })
+        .finally(() => {
+          saveTimeoutId = null;
+        });
+    }, 500);
   });
 
   return {
