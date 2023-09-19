@@ -1,3 +1,4 @@
+from datetime import datetime
 from sidecar.search.service import Searcher, search_s2
 
 
@@ -12,8 +13,8 @@ def test_search(monkeypatch, mock_search_paper):
     assert output["results"][0]["authors"][0] == "author1"
     assert output["results"][0]["authors"][1] == "author2"
     assert output["results"][0]["authors"][2] == "author3"
-    assert output["results"][0]["publicationDate"] == "01-01-2021"
+    assert output["results"][0]["publicationDate"] == datetime(2021, 1, 1, 0, 0)
     assert output["results"][1]["title"] == "Sample Paper Title 2"
     assert output["results"][1]["authors"][0] == "author1"
     assert output["results"][1]["authors"][1] == "author2"
-    assert output["results"][1]["publicationDate"] == "01-01-2022"
+    assert output["results"][1]["publicationDate"] == datetime(2022, 1, 1, 0, 0)
