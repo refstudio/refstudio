@@ -91,6 +91,9 @@ def create_reference(
             )
         )
 
+    if metadata.published_date:
+        published_date = shared.parse_date(metadata.published_date)
+
     ref = Reference(
         id=str(uuid4()),
         source_filename=metadata.source_filename,
@@ -99,6 +102,7 @@ def create_reference(
         title=metadata.title,
         abstract=metadata.abstract,
         contents=metadata.contents,
+        published_date=published_date,
         authors=metadata.authors,
         chunks=metadata.chunks,
         metadata=metadata.metadata,
