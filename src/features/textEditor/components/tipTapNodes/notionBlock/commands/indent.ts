@@ -19,24 +19,28 @@ export function addIndentSteps(tr: Transaction, pos: number): void {
 }
 
 export const indent: Command = ({ tr, dispatch }) => {
-  const { $from } = tr.selection;
-  if (!tr.selection.empty || $from.node(-1).type.name !== NotionBlockNode.name) {
-    return true;
-  }
+  const nodesToIndentPositions: number[] = [];
+  const { from, to } = tr.selection;
 
-  // If the current node does not have a NotionBlockNode sibling, the node cannot be indented
-  const indexInParent = $from.indexAfter(-2);
-  if (
-    ($from.node(-2).type.name === 'doc' && indexInParent < 2) ||
-    ($from.node(-2).type.name === NotionBlockNode.name && indexInParent < 3)
-  ) {
-    return false;
-  }
+  tr.doc.nodesBetween(tr.selection.from, tr.selection.to, (node, pos, parent, index) => {
+    if (node.type.name === NotionBlockNode.name) {
+      if ((parent?.type.name === NotionBlockNode.name && index > 1) || index > 0) {
+        // Only unindent nodes that are selected (ie their first child is selected)
+        const headerSize = node.firstChild!.nodeSize;
+        if (from <= pos + headerSize && to >= pos) {
+          nodesToIndentPositions.push(pos);
+        }
+      }
+    } else {
+      return false;
+    }
+  });
 
   if (dispatch) {
-    addIndentSteps(tr, $from.pos);
-
+    nodesToIndentPositions.forEach((pos) => {
+      addIndentSteps(tr, pos + 2);
+    });
     dispatch(tr);
   }
-  return true;
+  return nodesToIndentPositions.length > 0;
 };

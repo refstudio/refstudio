@@ -18,20 +18,31 @@ export function addUnindentSteps(tr: Transaction, pos: number): void {
 }
 
 export const unindent: Command = ({ tr, dispatch }) => {
-  const { $from } = tr.selection;
-  if (!tr.selection.empty || $from.node(-1).type.name !== NotionBlockNode.name) {
-    return false;
-  }
+  const nodesToUnindentPositions: number[] = [];
+  const { from, to } = tr.selection;
 
-  // If the current node's grandparent is not a NotionBlockNode, then the node cannot be unindented
-  if ($from.depth <= 2 || $from.node(-2).type.name !== NotionBlockNode.name) {
-    return false;
-  }
+  tr.doc.nodesBetween(tr.selection.from, tr.selection.to, (node, pos, parent) => {
+    if (node.type.name === NotionBlockNode.name) {
+      if (parent?.type.name === NotionBlockNode.name) {
+        // Only unindent nodes that are selected (ie their first child is selected)
+        const headerSize = node.firstChild!.nodeSize;
+        if (from <= pos + headerSize && to >= pos) {
+          nodesToUnindentPositions.push(pos);
+
+          // No need to recurse over children: they will automatically be unindented when their parent is
+          return false;
+        }
+      }
+    } else {
+      return false;
+    }
+  });
 
   if (dispatch) {
-    addUnindentSteps(tr, $from.pos);
-
+    nodesToUnindentPositions.forEach((pos) => {
+      addUnindentSteps(tr, pos + 2);
+    });
     dispatch(tr);
   }
-  return true;
+  return nodesToUnindentPositions.length > 0;
 };
