@@ -16,6 +16,7 @@ runs:
   - run: |
           source $VENV
           poetry --version
+    shell: 'bash'
   - name: Load cached dependencies
     id: cached-poetry-dependencies
     uses: actions/cache@v3
