@@ -40,7 +40,7 @@ def fetch_pdf_to_uploads(
         raise HTTPError(f"Unable to fetch {url} (status code: {response.status_code})")
 
     if not metadata.source_filename:
-        metadata.source_filename = f"{metadata.title[:200]}.pdf"
+        metadata.source_filename = f"{metadata.title[:75]}.pdf"
 
     staged_filepath = projects_service.create_project_staging_filepath(
         user_id, project_id, metadata.source_filename

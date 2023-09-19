@@ -1,5 +1,5 @@
-from datetime import datetime
 import json
+from datetime import datetime
 from pathlib import Path
 
 import pytest
@@ -262,7 +262,7 @@ def mock_search_paper(*args, **kwargs):
                     abstract="Sample Abstract",
                     venue="Sample Venue",
                     year=2021,
-                    publicationDate=datetime.strptime("2021-01-01", "%Y-%m-%d"),
+                    publicationDate=datetime(2021, 1, 1),
                     paperId="sample-id-1",
                     citationCount=10,
                     openAccessPdf="https://sample1.pdf",
@@ -273,7 +273,7 @@ def mock_search_paper(*args, **kwargs):
                     abstract="Sample Abstract 2",
                     venue="Sample Venue 2",
                     year=2022,
-                    publicationDate=datetime.strptime("2022-01-01", "%Y-%m-%d"),
+                    publicationDate=datetime(2022, 1, 1),
                     paperId="sample-id-2",
                     citationCount=20,
                     openAccessPdf="https://sample2.pdf",
