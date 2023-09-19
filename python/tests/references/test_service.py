@@ -22,6 +22,7 @@ def test_create_reference_with_url(
     metadata = ReferenceCreate(
         source_filename="test_create_reference_from_url.pdf",
         title="Some new title",
+        published_date="2021-01-01",
     )
 
     ref = create_reference(project_id=project_id, metadata=metadata, url=url)
@@ -34,6 +35,30 @@ def test_create_reference_with_url(
     store = JsonStorage(setup_project_references_json)
     store.load()
     assert store.references[-1].source_filename == metadata.source_filename
+    assert store.references[-1].published_date == metadata.published_date
+
+
+def test_create_reference_with_url_error(
+    monkeypatch, tmp_path, mock_url_pdf_response_error, setup_project_references_json
+):
+    monkeypatch.setattr(requests, "get", mock_url_pdf_response_error)
+
+    project_id = "project1"
+    url = "http://somefakeurl.com"
+
+    metadata = ReferenceCreate(
+        title="Some new title",
+        published_date="2021-01-01",
+    )
+
+    ref = create_reference(project_id=project_id, metadata=metadata, url=url)
+
+    assert isinstance(ref, Reference)
+
+    store = JsonStorage(setup_project_references_json)
+    store.load()
+    assert store.references[-1].title == metadata.title
+    assert store.references[-1].published_date == metadata.published_date
 
 
 def test_create_reference_with_only_metadata(
