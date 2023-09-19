@@ -1,5 +1,6 @@
 import shutil
 from collections import defaultdict
+from pathlib import Path
 from uuid import uuid4
 
 import requests
@@ -94,11 +95,7 @@ def create_reference(
             logger.error(str(e))
 
     if metadata.source_filename:
-        filepath = str(
-            projects_service.create_project_uploads_filepath(
-                user_id, project_id, metadata.source_filename
-            )
-        )
+        filepath = str(Path("uploads") / metadata.source_filename)
 
     if isinstance(metadata.published_date, str):
         metadata.published_date = shared.parse_date(metadata.published_date)
