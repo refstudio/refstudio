@@ -9,6 +9,7 @@ import { screen, setupWithJotaiProvider, waitFor, within } from '../../../../tes
 import { REFERENCES } from '../../__tests__/test-fixtures';
 import { UploadTipInstructions } from '../../components/UploadTipInstructions';
 import { ReferencesTableView } from '../ReferencesTableView';
+import { UploadContextMenu } from '../UploadContextMenu';
 
 vi.mock('../../../../events');
 vi.mock('../../../../io/filesystem');
@@ -86,8 +87,10 @@ describe('ReferencesTableView component', () => {
 
   it('should emit [refstudio://menu/references/upload] on Add click', async () => {
     const { user } = setupWithJotaiProvider(<ReferencesTableView />, store);
+    setupWithJotaiProvider(<UploadContextMenu />, store);
 
     await user.click(screen.getByText('Add'));
+    await user.click(screen.getByText('Upload'));
     expect(vi.mocked(emitEvent)).toHaveBeenCalledWith('refstudio://menu/references/upload');
   });
 
