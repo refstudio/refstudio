@@ -682,6 +682,10 @@
           "paperId": {
             "type": "string"
           },
+          "publicationDate": {
+            "format": "date-time",
+            "type": "string"
+          },
           "title": {
             "type": "string"
           },

@@ -323,6 +323,7 @@ export interface S2SearchResult {
   abstract?: string;
   venue?: string;
   year?: number;
+  publicationDate?: string;
   paperId?: string;
   citationCount?: number;
   openAccessPdf?: string;

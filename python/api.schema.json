@@ -675,6 +675,10 @@
         "year": {
           "type": "integer"
         },
+        "publicationDate": {
+          "type": "string",
+          "format": "date-time"
+        },
         "paperId": {
           "type": "string"
         },
