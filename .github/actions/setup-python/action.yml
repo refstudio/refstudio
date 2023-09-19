@@ -13,6 +13,13 @@ runs:
       virtualenvs-create: true
       virtualenvs-in-project: true
       installer-parallel: true
+  - name: Ensure Python, Poetry, and Pytest are in PATH
+    run: |
+      source .venv/scripts/activate
+      python --version
+      pytest --version
+      poetry --version
+  if: runner.os == 'Windows'
   - name: Load cached dependencies
     id: cached-poetry-dependencies
     uses: actions/cache@v3
