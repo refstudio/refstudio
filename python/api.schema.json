@@ -16,7 +16,9 @@
         }
       },
       "type": "object",
-      "required": ["full_name"],
+      "required": [
+        "full_name"
+      ],
       "title": "Author"
     },
     "Body_create_file_api_fs__project_id___filepath__put": {
@@ -28,7 +30,9 @@
         }
       },
       "type": "object",
-      "required": ["file"],
+      "required": [
+        "file"
+      ],
       "title": "Body_create_file_api_fs__project_id___filepath__put"
     },
     "ChatRequest": {
@@ -46,7 +50,9 @@
         }
       },
       "type": "object",
-      "required": ["text"],
+      "required": [
+        "text"
+      ],
       "title": "ChatRequest"
     },
     "ChatResponse": {
@@ -65,7 +71,11 @@
         }
       },
       "type": "object",
-      "required": ["status", "message", "choices"],
+      "required": [
+        "status",
+        "message",
+        "choices"
+      ],
       "title": "ChatResponse"
     },
     "ChatResponseChoice": {
@@ -78,7 +88,10 @@
         }
       },
       "type": "object",
-      "required": ["index", "text"],
+      "required": [
+        "index",
+        "text"
+      ],
       "title": "ChatResponseChoice"
     },
     "Chunk": {
@@ -99,7 +112,9 @@
         }
       },
       "type": "object",
-      "required": ["text"],
+      "required": [
+        "text"
+      ],
       "title": "Chunk"
     },
     "DeleteRequest": {
@@ -116,7 +131,9 @@
         }
       },
       "type": "object",
-      "required": ["reference_ids"],
+      "required": [
+        "reference_ids"
+      ],
       "title": "DeleteRequest"
     },
     "DeleteStatusResponse": {
@@ -129,7 +146,10 @@
         }
       },
       "type": "object",
-      "required": ["status", "message"],
+      "required": [
+        "status",
+        "message"
+      ],
       "title": "DeleteStatusResponse"
     },
     "FileEntry": {
@@ -145,7 +165,11 @@
         }
       },
       "type": "object",
-      "required": ["name", "path", "file_extension"],
+      "required": [
+        "name",
+        "path",
+        "file_extension"
+      ],
       "title": "FileEntry"
     },
     "FlatSettingsSchema": {
@@ -242,7 +266,10 @@
         }
       },
       "type": "object",
-      "required": ["name", "path"],
+      "required": [
+        "name",
+        "path"
+      ],
       "title": "FolderEntry"
     },
     "HTTPValidationError": {
@@ -258,7 +285,7 @@
       "type": "object",
       "title": "HTTPValidationError"
     },
-    "IngestPdfUrlRequest": {
+    "IngestMetadataRequest": {
       "properties": {
         "type": {
           "allOf": [
@@ -266,22 +293,27 @@
               "$ref": "#/definitions/IngestRequestType"
             }
           ],
-          "default": "pdf"
-        },
-        "url": {
-          "type": "string"
+          "default": "metadata"
         },
         "metadata": {
           "$ref": "#/definitions/ReferenceCreate"
+        },
+        "url": {
+          "type": "string"
         }
       },
       "type": "object",
-      "required": ["url", "metadata"],
-      "title": "IngestPdfUrlRequest"
+      "required": [
+        "metadata"
+      ],
+      "title": "IngestMetadataRequest"
     },
     "IngestRequestType": {
       "type": "string",
-      "enum": ["uploads", "pdf"],
+      "enum": [
+        "uploads",
+        "metadata"
+      ],
       "title": "IngestRequestType",
       "description": "An enumeration."
     },
@@ -298,12 +330,19 @@
         }
       },
       "type": "object",
-      "required": ["project_name", "references"],
+      "required": [
+        "project_name",
+        "references"
+      ],
       "title": "IngestResponse"
     },
     "IngestStatus": {
       "type": "string",
-      "enum": ["processing", "failure", "complete"],
+      "enum": [
+        "processing",
+        "failure",
+        "complete"
+      ],
       "title": "IngestStatus",
       "description": "An enumeration."
     },
@@ -323,7 +362,10 @@
     },
     "ModelProvider": {
       "type": "string",
-      "enum": ["openai", "ollama"],
+      "enum": [
+        "openai",
+        "ollama"
+      ],
       "title": "ModelProvider",
       "description": "An enumeration."
     },
@@ -337,7 +379,10 @@
         }
       },
       "type": "object",
-      "required": ["id", "name"],
+      "required": [
+        "id",
+        "name"
+      ],
       "title": "ProjectBase"
     },
     "ProjectCreateRequest": {
@@ -350,7 +395,9 @@
         }
       },
       "type": "object",
-      "required": ["project_name"],
+      "required": [
+        "project_name"
+      ],
       "title": "ProjectCreateRequest"
     },
     "ProjectDetailsResponse": {
@@ -363,7 +410,10 @@
         }
       },
       "type": "object",
-      "required": ["id", "name"],
+      "required": [
+        "id",
+        "name"
+      ],
       "title": "ProjectDetailsResponse"
     },
     "ProjectFileTreeResponse": {
@@ -383,7 +433,9 @@
         }
       },
       "type": "object",
-      "required": ["contents"],
+      "required": [
+        "contents"
+      ],
       "title": "ProjectFileTreeResponse"
     },
     "ProjectListResponse": {
@@ -396,7 +448,9 @@
         }
       },
       "type": "object",
-      "required": ["projects"],
+      "required": [
+        "projects"
+      ],
       "title": "ProjectListResponse"
     },
     "Reference": {
@@ -404,11 +458,14 @@
         "id": {
           "type": "string"
         },
+        "status": {
+          "$ref": "#/definitions/IngestStatus"
+        },
         "source_filename": {
           "type": "string"
         },
-        "status": {
-          "$ref": "#/definitions/IngestStatus"
+        "filepath": {
+          "type": "string"
         },
         "citation_key": {
           "type": "string"
@@ -449,12 +506,18 @@
         }
       },
       "type": "object",
-      "required": ["id", "source_filename", "status"],
+      "required": [
+        "id",
+        "status"
+      ],
       "title": "Reference",
       "description": "A reference for an academic paper / PDF"
     },
     "ReferenceCreate": {
       "properties": {
+        "title": {
+          "type": "string"
+        },
         "source_filename": {
           "type": "string"
         },
@@ -462,9 +525,6 @@
           "type": "string"
         },
         "doi": {
-          "type": "string"
-        },
-        "title": {
           "type": "string"
         },
         "abstract": {
@@ -484,13 +544,22 @@
           "type": "array",
           "default": []
         },
+        "chunks": {
+          "items": {
+            "$ref": "#/definitions/Chunk"
+          },
+          "type": "array",
+          "default": []
+        },
         "metadata": {
           "type": "object",
           "default": {}
         }
       },
       "type": "object",
-      "required": ["source_filename"],
+      "required": [
+        "title"
+      ],
       "title": "ReferenceCreate"
     },
     "ReferencePatch": {
@@ -500,13 +569,18 @@
         }
       },
       "type": "object",
-      "required": ["data"],
+      "required": [
+        "data"
+      ],
       "title": "ReferencePatch",
       "description": "ReferencePatch is the input type for updating a Reference's metadata."
     },
     "ResponseStatus": {
       "type": "string",
-      "enum": ["ok", "error"],
+      "enum": [
+        "ok",
+        "error"
+      ],
       "title": "ResponseStatus",
       "description": "An enumeration."
     },
@@ -520,12 +594,19 @@
         }
       },
       "type": "object",
-      "required": ["index", "text"],
+      "required": [
+        "index",
+        "text"
+      ],
       "title": "RewriteChoice"
     },
     "RewriteMannerType": {
       "type": "string",
-      "enum": ["concise", "elaborate", "scholarly"],
+      "enum": [
+        "concise",
+        "elaborate",
+        "scholarly"
+      ],
       "title": "RewriteMannerType",
       "description": "An enumeration."
     },
@@ -552,7 +633,9 @@
         }
       },
       "type": "object",
-      "required": ["text"],
+      "required": [
+        "text"
+      ],
       "title": "RewriteRequest"
     },
     "RewriteResponse": {
@@ -571,7 +654,11 @@
         }
       },
       "type": "object",
-      "required": ["status", "message", "choices"],
+      "required": [
+        "status",
+        "message",
+        "choices"
+      ],
       "title": "RewriteResponse"
     },
     "S2SearchResult": {
@@ -589,7 +676,8 @@
           "type": "integer"
         },
         "publicationDate": {
-          "type": "string"
+          "type": "string",
+          "format": "date-time"
         },
         "paperId": {
           "type": "string"
@@ -626,7 +714,11 @@
         }
       },
       "type": "object",
-      "required": ["status", "message", "results"],
+      "required": [
+        "status",
+        "message",
+        "results"
+      ],
       "title": "SearchResponse"
     },
     "StatusResponse": {
@@ -640,7 +732,9 @@
         }
       },
       "type": "object",
-      "required": ["status"],
+      "required": [
+        "status"
+      ],
       "title": "StatusResponse"
     },
     "TextCompletionChoice": {
@@ -653,7 +747,10 @@
         }
       },
       "type": "object",
-      "required": ["index", "text"],
+      "required": [
+        "index",
+        "text"
+      ],
       "title": "TextCompletionChoice"
     },
     "TextCompletionRequest": {
@@ -681,7 +778,9 @@
         }
       },
       "type": "object",
-      "required": ["text"],
+      "required": [
+        "text"
+      ],
       "title": "TextCompletionRequest"
     },
     "TextCompletionResponse": {
@@ -700,7 +799,11 @@
         }
       },
       "type": "object",
-      "required": ["status", "message", "choices"],
+      "required": [
+        "status",
+        "message",
+        "choices"
+      ],
       "title": "TextCompletionResponse"
     },
     "UpdateStatusResponse": {
@@ -713,7 +816,10 @@
         }
       },
       "type": "object",
-      "required": ["status", "message"],
+      "required": [
+        "status",
+        "message"
+      ],
       "title": "UpdateStatusResponse"
     },
     "ValidationError": {
@@ -742,7 +848,11 @@
         }
       },
       "type": "object",
-      "required": ["loc", "msg", "type"],
+      "required": [
+        "loc",
+        "msg",
+        "type"
+      ],
       "title": "ValidationError"
     }
   }

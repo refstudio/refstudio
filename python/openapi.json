@@ -16,7 +16,9 @@
             "type": "string"
           }
         },
-        "required": ["full_name"],
+        "required": [
+          "full_name"
+        ],
         "title": "Author",
         "type": "object"
       },
@@ -28,7 +30,9 @@
             "type": "string"
           }
         },
-        "required": ["file"],
+        "required": [
+          "file"
+        ],
         "title": "Body_create_file_api_fs__project_id___filepath__put",
         "type": "object"
       },
@@ -46,7 +50,9 @@
             "type": "string"
           }
         },
-        "required": ["text"],
+        "required": [
+          "text"
+        ],
         "title": "ChatRequest",
         "type": "object"
       },
@@ -65,7 +71,11 @@
             "$ref": "#/components/schemas/ResponseStatus"
           }
         },
-        "required": ["status", "message", "choices"],
+        "required": [
+          "status",
+          "message",
+          "choices"
+        ],
         "title": "ChatResponse",
         "type": "object"
       },
@@ -78,7 +88,10 @@
             "type": "string"
           }
         },
-        "required": ["index", "text"],
+        "required": [
+          "index",
+          "text"
+        ],
         "title": "ChatResponseChoice",
         "type": "object"
       },
@@ -99,7 +112,9 @@
             "type": "array"
           }
         },
-        "required": ["text"],
+        "required": [
+          "text"
+        ],
         "title": "Chunk",
         "type": "object"
       },
@@ -116,7 +131,9 @@
             "type": "array"
           }
         },
-        "required": ["reference_ids"],
+        "required": [
+          "reference_ids"
+        ],
         "title": "DeleteRequest",
         "type": "object"
       },
@@ -129,7 +146,10 @@
             "$ref": "#/components/schemas/ResponseStatus"
           }
         },
-        "required": ["status", "message"],
+        "required": [
+          "status",
+          "message"
+        ],
         "title": "DeleteStatusResponse",
         "type": "object"
       },
@@ -145,7 +165,11 @@
             "type": "string"
           }
         },
-        "required": ["name", "path", "file_extension"],
+        "required": [
+          "name",
+          "path",
+          "file_extension"
+        ],
         "title": "FileEntry",
         "type": "object"
       },
@@ -242,7 +266,10 @@
             "type": "string"
           }
         },
-        "required": ["name", "path"],
+        "required": [
+          "name",
+          "path"
+        ],
         "title": "FolderEntry",
         "type": "object"
       },
@@ -259,7 +286,7 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
-      "IngestPdfUrlRequest": {
+      "IngestMetadataRequest": {
         "properties": {
           "metadata": {
             "$ref": "#/components/schemas/ReferenceCreate"
@@ -270,19 +297,24 @@
                 "$ref": "#/components/schemas/IngestRequestType"
               }
             ],
-            "default": "pdf"
+            "default": "metadata"
           },
           "url": {
             "type": "string"
           }
         },
-        "required": ["url", "metadata"],
-        "title": "IngestPdfUrlRequest",
+        "required": [
+          "metadata"
+        ],
+        "title": "IngestMetadataRequest",
         "type": "object"
       },
       "IngestRequestType": {
         "description": "An enumeration.",
-        "enum": ["uploads", "pdf"],
+        "enum": [
+          "uploads",
+          "metadata"
+        ],
         "title": "IngestRequestType",
         "type": "string"
       },
@@ -298,13 +330,20 @@
             "type": "array"
           }
         },
-        "required": ["project_name", "references"],
+        "required": [
+          "project_name",
+          "references"
+        ],
         "title": "IngestResponse",
         "type": "object"
       },
       "IngestStatus": {
         "description": "An enumeration.",
-        "enum": ["processing", "failure", "complete"],
+        "enum": [
+          "processing",
+          "failure",
+          "complete"
+        ],
         "title": "IngestStatus",
         "type": "string"
       },
@@ -324,7 +363,10 @@
       },
       "ModelProvider": {
         "description": "An enumeration.",
-        "enum": ["openai", "ollama"],
+        "enum": [
+          "openai",
+          "ollama"
+        ],
         "title": "ModelProvider",
         "type": "string"
       },
@@ -337,7 +379,10 @@
             "type": "string"
           }
         },
-        "required": ["id", "name"],
+        "required": [
+          "id",
+          "name"
+        ],
         "title": "ProjectBase",
         "type": "object"
       },
@@ -350,7 +395,9 @@
             "type": "string"
           }
         },
-        "required": ["project_name"],
+        "required": [
+          "project_name"
+        ],
         "title": "ProjectCreateRequest",
         "type": "object"
       },
@@ -363,7 +410,10 @@
             "type": "string"
           }
         },
-        "required": ["id", "name"],
+        "required": [
+          "id",
+          "name"
+        ],
         "title": "ProjectDetailsResponse",
         "type": "object"
       },
@@ -383,7 +433,9 @@
             "type": "array"
           }
         },
-        "required": ["contents"],
+        "required": [
+          "contents"
+        ],
         "title": "ProjectFileTreeResponse",
         "type": "object"
       },
@@ -396,7 +448,9 @@
             "type": "array"
           }
         },
-        "required": ["projects"],
+        "required": [
+          "projects"
+        ],
         "title": "ProjectListResponse",
         "type": "object"
       },
@@ -429,6 +483,9 @@
           "doi": {
             "type": "string"
           },
+          "filepath": {
+            "type": "string"
+          },
           "id": {
             "type": "string"
           },
@@ -450,7 +507,10 @@
             "type": "string"
           }
         },
-        "required": ["id", "source_filename", "status"],
+        "required": [
+          "id",
+          "status"
+        ],
         "title": "Reference",
         "type": "object"
       },
@@ -463,6 +523,13 @@
             "default": [],
             "items": {
               "$ref": "#/components/schemas/Author"
+            },
+            "type": "array"
+          },
+          "chunks": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Chunk"
             },
             "type": "array"
           },
@@ -490,7 +557,9 @@
             "type": "string"
           }
         },
-        "required": ["source_filename"],
+        "required": [
+          "title"
+        ],
         "title": "ReferenceCreate",
         "type": "object"
       },
@@ -501,13 +570,18 @@
             "type": "object"
           }
         },
-        "required": ["data"],
+        "required": [
+          "data"
+        ],
         "title": "ReferencePatch",
         "type": "object"
       },
       "ResponseStatus": {
         "description": "An enumeration.",
-        "enum": ["ok", "error"],
+        "enum": [
+          "ok",
+          "error"
+        ],
         "title": "ResponseStatus",
         "type": "string"
       },
@@ -520,13 +594,20 @@
             "type": "string"
           }
         },
-        "required": ["index", "text"],
+        "required": [
+          "index",
+          "text"
+        ],
         "title": "RewriteChoice",
         "type": "object"
       },
       "RewriteMannerType": {
         "description": "An enumeration.",
-        "enum": ["concise", "elaborate", "scholarly"],
+        "enum": [
+          "concise",
+          "elaborate",
+          "scholarly"
+        ],
         "title": "RewriteMannerType",
         "type": "string"
       },
@@ -552,7 +633,9 @@
             "type": "string"
           }
         },
-        "required": ["text"],
+        "required": [
+          "text"
+        ],
         "title": "RewriteRequest",
         "type": "object"
       },
@@ -571,7 +654,11 @@
             "$ref": "#/components/schemas/ResponseStatus"
           }
         },
-        "required": ["status", "message", "choices"],
+        "required": [
+          "status",
+          "message",
+          "choices"
+        ],
         "title": "RewriteResponse",
         "type": "object"
       },
@@ -592,10 +679,11 @@
           "openAccessPdf": {
             "type": "string"
           },
-          "publicationDate": {
+          "paperId": {
             "type": "string"
           },
-          "paperId": {
+          "publicationDate": {
+            "format": "date-time",
             "type": "string"
           },
           "title": {
@@ -626,7 +714,11 @@
             "$ref": "#/components/schemas/ResponseStatus"
           }
         },
-        "required": ["status", "message", "results"],
+        "required": [
+          "status",
+          "message",
+          "results"
+        ],
         "title": "SearchResponse",
         "type": "object"
       },
@@ -640,7 +732,9 @@
             "$ref": "#/components/schemas/ResponseStatus"
           }
         },
-        "required": ["status"],
+        "required": [
+          "status"
+        ],
         "title": "StatusResponse",
         "type": "object"
       },
@@ -653,7 +747,10 @@
             "type": "string"
           }
         },
-        "required": ["index", "text"],
+        "required": [
+          "index",
+          "text"
+        ],
         "title": "TextCompletionChoice",
         "type": "object"
       },
@@ -681,7 +778,9 @@
             "type": "string"
           }
         },
-        "required": ["text"],
+        "required": [
+          "text"
+        ],
         "title": "TextCompletionRequest",
         "type": "object"
       },
@@ -700,7 +799,11 @@
             "$ref": "#/components/schemas/ResponseStatus"
           }
         },
-        "required": ["status", "message", "choices"],
+        "required": [
+          "status",
+          "message",
+          "choices"
+        ],
         "title": "TextCompletionResponse",
         "type": "object"
       },
@@ -713,7 +816,10 @@
             "$ref": "#/components/schemas/ResponseStatus"
           }
         },
-        "required": ["status", "message"],
+        "required": [
+          "status",
+          "message"
+        ],
         "title": "UpdateStatusResponse",
         "type": "object"
       },
@@ -742,7 +848,11 @@
             "type": "string"
           }
         },
-        "required": ["loc", "msg", "type"],
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
         "title": "ValidationError",
         "type": "object"
       }
@@ -790,7 +900,9 @@
           }
         },
         "summary": "Http Ai Completion",
-        "tags": ["ai"]
+        "tags": [
+          "ai"
+        ]
       }
     },
     "/api/ai/rewrite": {
@@ -829,7 +941,9 @@
           }
         },
         "summary": "Http Ai Rewrite",
-        "tags": ["ai"]
+        "tags": [
+          "ai"
+        ]
       }
     },
     "/api/ai/{project_id}/chat": {
@@ -879,7 +993,9 @@
           }
         },
         "summary": "Http Ai Chat",
-        "tags": ["ai"]
+        "tags": [
+          "ai"
+        ]
       }
     },
     "/api/ai/{project_id}/chat_stream": {
@@ -984,7 +1100,9 @@
           }
         },
         "summary": "Delete File",
-        "tags": ["filesystem"]
+        "tags": [
+          "filesystem"
+        ]
       },
       "get": {
         "operationId": "read_file_api_fs__project_id___filepath__get",
@@ -1030,7 +1148,9 @@
           }
         },
         "summary": "Read File",
-        "tags": ["filesystem"]
+        "tags": [
+          "filesystem"
+        ]
       },
       "head": {
         "operationId": "head_file_api_fs__project_id___filepath__head",
@@ -1076,7 +1196,9 @@
           }
         },
         "summary": "Head File",
-        "tags": ["filesystem"]
+        "tags": [
+          "filesystem"
+        ]
       },
       "put": {
         "operationId": "create_file_api_fs__project_id___filepath__put",
@@ -1134,7 +1256,9 @@
           }
         },
         "summary": "Create File",
-        "tags": ["filesystem"]
+        "tags": [
+          "filesystem"
+        ]
       }
     },
     "/api/meta/shutdown": {
@@ -1151,7 +1275,9 @@
           }
         },
         "summary": "Shutdown",
-        "tags": ["meta"]
+        "tags": [
+          "meta"
+        ]
       }
     },
     "/api/meta/status": {
@@ -1170,7 +1296,9 @@
           }
         },
         "summary": "Status",
-        "tags": ["meta"]
+        "tags": [
+          "meta"
+        ]
       }
     },
     "/api/projects/": {
@@ -1190,7 +1318,9 @@
           }
         },
         "summary": "List Projects",
-        "tags": ["projects"]
+        "tags": [
+          "projects"
+        ]
       },
       "post": {
         "description": "Creates a project, and a directory in the filesystem",
@@ -1228,7 +1358,9 @@
           }
         },
         "summary": "Create Project",
-        "tags": ["projects"]
+        "tags": [
+          "projects"
+        ]
       }
     },
     "/api/projects/{project_id}": {
@@ -1269,7 +1401,9 @@
           }
         },
         "summary": "Delete Project",
-        "tags": ["projects"]
+        "tags": [
+          "projects"
+        ]
       },
       "get": {
         "description": "Returns details about a project",
@@ -1308,7 +1442,9 @@
           }
         },
         "summary": "Get Project",
-        "tags": ["projects"]
+        "tags": [
+          "projects"
+        ]
       }
     },
     "/api/projects/{project_id}/files": {
@@ -1348,7 +1484,9 @@
           }
         },
         "summary": "Get Project Files",
-        "tags": ["projects"]
+        "tags": [
+          "projects"
+        ]
       }
     },
     "/api/references/{project_id}": {
@@ -1393,7 +1531,9 @@
           }
         },
         "summary": "List References",
-        "tags": ["references"]
+        "tags": [
+          "references"
+        ]
       },
       "post": {
         "description": "Creates references from a PDF directory or URL.",
@@ -1415,7 +1555,7 @@
               "schema": {
                 "anyOf": [
                   {
-                    "$ref": "#/components/schemas/IngestPdfUrlRequest"
+                    "$ref": "#/components/schemas/IngestMetadataRequest"
                   },
                   {
                     "$ref": "#/components/schemas/IngestUploadsRequest"
@@ -1450,7 +1590,9 @@
           }
         },
         "summary": "Ingest References",
-        "tags": ["references"]
+        "tags": [
+          "references"
+        ]
       }
     },
     "/api/references/{project_id}/bulk_delete": {
@@ -1500,7 +1642,9 @@
           }
         },
         "summary": "Http Bulk Delete",
-        "tags": ["references"]
+        "tags": [
+          "references"
+        ]
       }
     },
     "/api/references/{project_id}/{reference_id}": {
@@ -1549,7 +1693,9 @@
           }
         },
         "summary": "Http Delete",
-        "tags": ["references"]
+        "tags": [
+          "references"
+        ]
       },
       "get": {
         "operationId": "http_get_api_references__project_id___reference_id__get",
@@ -1596,7 +1742,9 @@
           }
         },
         "summary": "Http Get",
-        "tags": ["references"]
+        "tags": [
+          "references"
+        ]
       },
       "patch": {
         "operationId": "http_update_api_references__project_id___reference_id__patch",
@@ -1653,7 +1801,9 @@
           }
         },
         "summary": "Http Update",
-        "tags": ["references"]
+        "tags": [
+          "references"
+        ]
       }
     },
     "/api/search/s2": {
@@ -1703,7 +1853,9 @@
           }
         },
         "summary": "Http Search S2",
-        "tags": ["search"]
+        "tags": [
+          "search"
+        ]
       }
     },
     "/api/settings/": {
@@ -1722,7 +1874,9 @@
           }
         },
         "summary": "Get Settings",
-        "tags": ["settings"]
+        "tags": [
+          "settings"
+        ]
       },
       "put": {
         "operationId": "update_settings_api_settings__put",
@@ -1759,7 +1913,9 @@
           }
         },
         "summary": "Update Settings",
-        "tags": ["settings"]
+        "tags": [
+          "settings"
+        ]
       }
     }
   }

@@ -1,5 +1,9 @@
 /** You probably want to use the types from api-types.ts instead. */
 /* eslint-disable */
+import {} from './api-types';
+
+/** You probably want to use the types from api-types.ts instead. */
+/* eslint-disable */
 import {
   Author,
   BodyCreateFileApiFs_ProjectId__Filepath_Put,
