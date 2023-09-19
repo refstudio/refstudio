@@ -34,6 +34,11 @@ const selectionPlugin = new Plugin({
 export const RefStudioDocument = Document.extend({
   content: 'notionBlock+',
   addProseMirrorPlugins: () => [selectionPlugin],
+  addKeyboardShortcuts: () => ({
+    // Prevent focus behaviour when pressing Tab/Shift-Tab
+    Tab: () => true,
+    'Shift-Tab': () => true,
+  }),
 });
 
 export const EMPTY_DOCUMENT_CONTENT: JSONContent = {

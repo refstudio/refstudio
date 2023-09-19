@@ -66,14 +66,8 @@ export const NotionBlockNode = Node.create({
 
   addKeyboardShortcuts() {
     return {
-      Tab: ({ editor }) => {
-        editor.commands.command(indent);
-        return true;
-      },
-      'Shift-Tab': ({ editor }) => {
-        editor.commands.command(unindent);
-        return true;
-      },
+      Tab: ({ editor }) => editor.commands.command(indent),
+      'Shift-Tab': ({ editor }) => editor.commands.command(unindent),
       Enter: ({ editor }) => {
         const { selection } = editor.state;
         if (

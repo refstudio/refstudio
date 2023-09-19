@@ -6,6 +6,7 @@ import { Decoration, DecorationSet } from '@tiptap/pm/view';
 import { addUnindentSteps } from '../commands/unindent';
 import { NotionBlockNode } from '../NotionBlockNode';
 import { BlockSelection } from '../selection/BlockSelection';
+import { addIndentBlockSteps } from '../utils/addIndentBlockSteps';
 import { collapsibleArrowsPluginKey } from './collapsibleArrowPlugin';
 import { hideHandlePluginKey } from './hideHandlePlugin';
 
@@ -78,6 +79,8 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
 
       const selectedBlock = view.state.doc.nodeAt(selection.head)!;
       tr.setMeta(blockBrowsingPluginKey, true);
+      const depthDifference = selection.$from.depth - selection.$to.depth;
+      const endPos = selection.to + tr.doc.nodeAt(selection.to)!.nodeSize; // end of selection
 
       switch (event.code) {
         case 'Enter':
@@ -93,8 +96,6 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
             // Cmd+Shift+Down: Move selected blocks down
             const indexInParent = selection.$to.indexAfter();
             const { parent } = selection.$to;
-            const depthDifference = selection.$from.depth - selection.$to.depth;
-            const endPos = selection.to + tr.doc.nodeAt(selection.to)!.nodeSize; // end of selection
             const selectionRange = selection.to - selection.from - depthDifference;
 
             if (endPos === tr.doc.content.size) {
@@ -140,7 +141,7 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
                 const sliceToMove = tr.doc.slice(selection.from + depthDifference, endPos);
 
                 tr.delete(selection.from + depthDifference, endPos);
-                const insertPos = tr.mapping.map(endPos + 1 + sibling.child(0)!.nodeSize);
+                const insertPos = tr.mapping.map(endPos + 1 + sibling.firstChild!.nodeSize);
                 tr.replace(insertPos, insertPos, sliceToMove);
 
                 if (selection.from === selection.anchor) {
@@ -186,8 +187,6 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
             // Cmd+Shift+Up: Move selected blocks up
             const indexInParent = selection.$from.indexAfter();
             const { parent } = selection.$from;
-            const depthDifference = selection.$from.depth - selection.$to.depth;
-            const endPos = selection.to + tr.doc.nodeAt(selection.to)!.nodeSize; // end of selection
             const selectionRange = selection.to - selection.from - depthDifference;
 
             // Bring the first nodes back to the same level as other nodes if needed
@@ -227,7 +226,7 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
                   );
                 }
               } else {
-                // Otherwise, make the block a child of its sibling
+                // Otherwise, indent the block
                 const startPos = selection.from - 1; // End of sibling
 
                 let fragment = Fragment.from(selectedBlock.copy());
@@ -310,7 +309,83 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
             tr.setSelection(BlockSelection.all(view.state.doc));
             view.dispatch(tr);
           }
-          break;
+          return;
+        }
+        case 'Tab': {
+          const { parent } = selection.$from;
+
+          if (event.shiftKey) {
+            // Unindent
+
+            // Bring the last nodes to the same level as other nodes if needed
+            if (selection.$from.depth > selection.$to.depth) {
+              const blocksToIndent = selection.selectedBlocksPos.filter(
+                ({ from }) => tr.doc.resolve(from).depth < selection.$from.depth,
+              );
+
+              for (const block of blocksToIndent) {
+                const steps = selection.$from.depth - tr.doc.resolve(block.from).depth;
+                for (let i = 0; i < steps; i++) {
+                  addIndentBlockSteps(tr, block.from - i, block.to - i);
+                }
+              }
+            }
+
+            if (selection.$from.depth > 0) {
+              for (const block of selection.selectedBlocksPos) {
+                addUnindentSteps(tr, tr.mapping.map(block.from + 2));
+              }
+              view.dispatch(tr);
+              return;
+            }
+          } else {
+            // Indent
+
+            // Bring the first nodes back to the same level as other nodes if needed
+            if (selection.$from.depth > selection.$to.depth) {
+              const blocksToUnindent = selection.selectedBlocksPos
+                .filter(({ from }) => tr.doc.resolve(from).depth > selection.$to.depth)
+                .reverse();
+
+              for (const block of blocksToUnindent) {
+                for (let i = 0; i < tr.doc.resolve(block.from).depth - selection.$to.depth; i++) {
+                  addUnindentSteps(tr, tr.mapping.map(block.from + 2));
+                }
+              }
+            }
+
+            const indexInParent = selection.$from.indexAfter();
+            if (
+              indexInParent > 0 &&
+              // For NotionBlockNodes, the first child is an inline block so the index must be greater than 1
+              (parent.type.name !== NotionBlockNode.name || indexInParent > 1)
+            ) {
+              const startPos = selection.from - 1; // End of sibling
+
+              let fragment = Fragment.from(selectedBlock.copy());
+              for (let i = 0; i < depthDifference; i++) {
+                fragment = Fragment.from(selectedBlock.copy(fragment));
+              }
+              tr.step(
+                new ReplaceAroundStep(
+                  startPos,
+                  endPos,
+                  selection.from + depthDifference,
+                  endPos,
+                  new Slice(fragment, depthDifference + 1, 0),
+                  0,
+                ),
+              );
+
+              const siblingPos = selection.$from.posAtIndex(indexInParent - 1);
+              const sibling = tr.doc.nodeAt(siblingPos);
+              if (sibling?.attrs.type === 'collapsible' && sibling.attrs.collapsed) {
+                tr.setNodeAttribute(siblingPos, 'collapsed', false);
+              }
+              view.dispatch(tr);
+            }
+          }
+          return;
         }
       }
     },

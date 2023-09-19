@@ -21,7 +21,7 @@ export function addIndentSteps(tr: Transaction, pos: number): void {
 export const indent: Command = ({ tr, dispatch }) => {
   const { $from } = tr.selection;
   if (!tr.selection.empty || $from.node(-1).type.name !== NotionBlockNode.name) {
-    return true;
+    return false;
   }
 
   // If the current node does not have a NotionBlockNode sibling, the node cannot be indented
