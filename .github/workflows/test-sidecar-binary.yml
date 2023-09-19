@@ -8,6 +8,9 @@ on:
     paths:
       - 'python/**'
       - 'package.json'
+      - '.github/actions/setup-python/**'
+      - '.github/actions/setup-node/**'
+      - '.github/workflows/test-sidecar-binary.yml'
 
 jobs:
   test-binary:
