@@ -68,7 +68,7 @@ interface TabItemProps {
   onClick?: () => void;
   onCloseClick?: () => void;
 }
-export function TabItem({ active, isDirty, className, contextMenu, Icon, text, onClick, onCloseClick }: TabItemProps) {
+export function TabItem({ active, className, contextMenu, Icon, text, onClick, onCloseClick }: TabItemProps) {
   const { show } = useContextMenu();
 
   return (
@@ -111,7 +111,7 @@ export function TabItem({ active, isDirty, className, contextMenu, Icon, text, o
       >
         {text}
       </span>
-      {onCloseClick ? <TabCloseButton isDirty={isDirty} onClick={onCloseClick} /> : <div className="w-1" />}
+      {onCloseClick ? <TabCloseButton onClick={onCloseClick} /> : <div className="w-1" />}
     </div>
   );
 }
