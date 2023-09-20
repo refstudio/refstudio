@@ -47,9 +47,7 @@ export function TipTapEditor({ editorContent, editorId, isActive, saveFileInMemo
       onSelectionUpdate: (update) => {
         const updatedEditor = update.editor;
         const { selection } = updatedEditor.view.state;
-
         const { content } = selection.content();
-
         const text = content.textBetween(0, content.size, '\n');
         setSelection(text);
       },
