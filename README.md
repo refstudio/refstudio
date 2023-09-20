@@ -1,4 +1,4 @@
-<p align="center"><picture><img alt="Ref Studio Logo" src="src-tauri/icons/StoreLogo.png" /></picture></p>
+<p align="center"><picture><img alt="Ref Studio Logo" src="src-tauri/icons/Square107x107Logo.png" /></picture></p>
 <h1 align="center">Ref Studio</h1>
 <p align="center">An open source text editor optimized for writing that relies on references.</p>
 
