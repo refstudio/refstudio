@@ -6,17 +6,21 @@ import { joinBackward } from './commands/joinBackward';
 import { joinForward } from './commands/joinForward';
 import { splitBlock } from './commands/splitBlock';
 import { toggleCollapsed } from './commands/toggleCollapsed';
+import { toggleMark } from './commands/toggleMark';
 import { toggleOrderedList } from './commands/toggleOrderedList';
 import { toggleUnorderedList } from './commands/toggleUnorderedList';
 import { unindent } from './commands/unindent';
 import { createNotionBlockInputRule } from './inputRuleHandlers/createNotionBlockInputRule';
 import { NotionBlock } from './NotionBlock';
-import { collapsibleArrowsPlugin } from './plugins/collapsibleArrowPlugin';
+import { blockBrowsingPlugin } from './plugins/blockBrowsingPlugin';
+import { collapsibleArrowsPlugin, collapsibleArrowsPluginKey } from './plugins/collapsibleArrowPlugin';
 import { collapsiblePlaceholderPlugin } from './plugins/collapsiblePlaceholderPlugin';
 import { hideHandlePlugin } from './plugins/hideHandlePlugin';
 import { orderedListPlugin } from './plugins/orderedListPlugin';
 import { placeholderPlugin } from './plugins/placeholderPlugin';
 import { unorderedListPlugin } from './plugins/unorderedListPlugin';
+import { BlockSelection } from './selection/BlockSelection';
+import { getNotionBlockParent } from './utils/getNotionBlockParent';
 
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
@@ -63,14 +67,8 @@ export const NotionBlockNode = Node.create({
 
   addKeyboardShortcuts() {
     return {
-      Tab: ({ editor }) => {
-        editor.commands.command(indent);
-        return true;
-      },
-      'Shift-Tab': ({ editor }) => {
-        editor.commands.command(unindent);
-        return true;
-      },
+      Tab: ({ editor }) => editor.commands.command(indent),
+      'Shift-Tab': ({ editor }) => editor.commands.command(unindent),
       Enter: ({ editor }) => {
         const { selection } = editor.state;
         if (
@@ -122,23 +120,70 @@ export const NotionBlockNode = Node.create({
         return editor.commands.command(joinBackward);
       },
       Delete: ({ editor }) => editor.commands.command(joinForward),
-      'Cmd-Enter': ({ editor }) => {
-        const { $from } = editor.state.selection;
-        if ($from.node(-1).type.name !== NotionBlockNode.name || $from.node(-1).attrs.type !== 'collapsible') {
+      'Mod-Enter': ({ editor }) => {
+        const { selection } = editor.state;
+
+        // BlockSelection: toggle every selected
+        if (selection instanceof BlockSelection) {
+          let success = false;
+          let collapsed: boolean | null = null;
+          selection.selectedBlocksPos.forEach(({ from: nodePos }) => {
+            const block = editor.state.doc.nodeAt(nodePos)!;
+            if (block.attrs.type === 'collapsible') {
+              if (collapsed === null) {
+                collapsed = !!block.attrs.collapsed;
+              }
+              success = true;
+              return editor.commands.command(({ tr, dispatch }) => {
+                if (dispatch) {
+                  tr.setMeta(collapsibleArrowsPluginKey, true).setNodeAttribute(nodePos, 'collapsed', !collapsed);
+                  dispatch(tr);
+                }
+                return true;
+              });
+            }
+          });
+
+          return success;
+        }
+
+        const { $from } = selection;
+        const notionBlock = getNotionBlockParent($from);
+        if (!notionBlock) {
           return false;
         }
-        const pos = $from.before(-1);
-        return editor.commands.command(({ dispatch, tr, view }) => toggleCollapsed({ pos, dispatch, tr, view }));
+        return editor.commands.command(({ dispatch, tr }) =>
+          toggleCollapsed({ pos: notionBlock.resolvedPos.pos, dispatch, tr }),
+        );
+      },
+      'Mod-a': ({ editor }) => {
+        const { selection } = editor.state;
+        if (selection instanceof BlockSelection) {
+          return false;
+        }
+        const fromParentBlock = getNotionBlockParent(selection.$from);
+        const toParentBlock = getNotionBlockParent(selection.$to);
+        if (!fromParentBlock || !toParentBlock) {
+          return false;
+        }
+        const from = fromParentBlock.resolvedPos.pos + 2;
+        const to = toParentBlock.resolvedPos.pos + toParentBlock.node.firstChild!.nodeSize;
+
+        if (from !== selection.from || to !== selection.to) {
+          return editor.commands.setTextSelection({ from, to });
+        }
+        return false;
       },
     };
   },
 
   addProseMirrorPlugins: () => [
-    placeholderPlugin,
-    hideHandlePlugin,
+    blockBrowsingPlugin,
     collapsibleArrowsPlugin,
     collapsiblePlaceholderPlugin,
+    hideHandlePlugin,
     orderedListPlugin,
+    placeholderPlugin,
     unorderedListPlugin,
   ],
 
@@ -149,6 +194,10 @@ export const NotionBlockNode = Node.create({
   ],
 
   addCommands: () => ({
+    toggleBold: () => toggleMark('bold'),
+    toggleItalic: () => toggleMark('italic'),
+    toggleStrike: () => toggleMark('strike'),
+    toggleCode: () => toggleMark('code'),
     toggleUnorderedList: () => toggleUnorderedList,
     toggleOrderedList: () => toggleOrderedList,
   }),
