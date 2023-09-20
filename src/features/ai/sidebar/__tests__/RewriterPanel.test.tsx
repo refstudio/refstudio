@@ -1,11 +1,10 @@
-import { screen } from '@testing-library/react';
 import { createStore } from 'jotai';
 
 import { FlatSettingsSchema } from '../../../../api/api-types';
 import { askForRewrite, AskForRewriteReturn } from '../../../../api/rewrite';
 import { selectionAtom } from '../../../../atoms/selectionState';
 import { getCachedSetting } from '../../../../settings/settingsManager';
-import { setupWithJotaiProvider } from '../../../../test/test-utils';
+import { screen, setupWithJotaiProvider } from '../../../../test/test-utils';
 import { RewriteOptionsView } from '../../../components/RewriteOptionsView';
 import { RewriterPanel } from '../RewriterPanel';
 

@@ -1,7 +1,7 @@
-import { act, renderHook, waitFor } from '@testing-library/react';
 import { createStore, useAtomValue } from 'jotai';
 
 import { readFileContent } from '../../io/filesystem';
+import { act, renderHook, waitFor } from '../../test/test-utils';
 import { ReferenceItem } from '../../types/ReferenceItem';
 import { activePaneIdAtom } from '../core/activePane';
 import {
