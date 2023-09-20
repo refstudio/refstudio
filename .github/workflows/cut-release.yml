@@ -129,7 +129,7 @@ jobs:
         with:
           releaseId: ${{ needs.create-release.outputs.release_id }}
           args: --verbose --target ${{ matrix.target }}
-          includeDebug: false
+          includeDebug: true
   
   # publish-release:
   #   permissions:
