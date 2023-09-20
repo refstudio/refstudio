@@ -49,6 +49,22 @@ def setup_project_references_json(monkeypatch, tmp_path, fixtures_dir):
 
 
 @pytest.fixture
+def setup_project_references_empty(monkeypatch, tmp_path):
+    user_id = "user1"
+    project_id = "project1"
+    project_name = "project1name"
+    monkeypatch.setattr(projects_service, "WEB_STORAGE_URL", tmp_path)
+
+    projects_service.create_project(user_id, project_id, project_name)
+    write_path = storage.get_references_json_path(user_id, project_id)
+
+    write_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(write_path, "w") as f:
+        json.dump([], f)
+    return write_path
+
+
+@pytest.fixture
 def setup_project_with_uploads(monkeypatch, tmp_path, fixtures_dir):
     user_id = "user1"
     project_id = "project1"
