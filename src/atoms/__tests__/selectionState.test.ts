@@ -1,6 +1,6 @@
-import { act, renderHook } from '@testing-library/react';
 import { useAtom } from 'jotai';
 
+import { act, renderHook } from '../../test/test-utils';
 import { selectionAtom } from '../selectionState';
 
 describe('selectionState', () => {

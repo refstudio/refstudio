@@ -1,6 +1,7 @@
 import { Selection } from '@tiptap/pm/state';
 
 import { NotionBlockNode } from '../NotionBlockNode';
+import { BlockSelection } from '../selection/BlockSelection';
 import { NodeData } from './types';
 
 /**
@@ -11,6 +12,10 @@ import { NodeData } from './types';
 export function getTopLevelNodes(selection: Selection): NodeData[] {
   const { $from, to } = selection;
   const doc = $from.node(0);
+
+  if (selection instanceof BlockSelection) {
+    return selection.selectedBlocksPos.map(({ from }) => ({ node: doc.nodeAt(from)!, resolvedPos: doc.resolve(from) }));
+  }
 
   // Find the Notion Block $from points to
   let { depth } = $from;

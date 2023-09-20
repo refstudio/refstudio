@@ -4,6 +4,7 @@ import { ReplaceAroundStep, ReplaceStep } from '@tiptap/pm/transform';
 import { Command } from '@tiptap/react';
 
 import { NotionBlockNode } from '../NotionBlockNode';
+import { BlockSelection } from '../selection/BlockSelection';
 
 export function addIndentSteps(tr: Transaction, pos: number): void {
   const resolvedPos = tr.doc.resolve(pos);
@@ -19,24 +20,40 @@ export function addIndentSteps(tr: Transaction, pos: number): void {
 }
 
 export const indent: Command = ({ tr, dispatch }) => {
-  const { $from } = tr.selection;
-  if (!tr.selection.empty || $from.node(-1).type.name !== NotionBlockNode.name) {
-    return true;
-  }
+  const nodesToIndentPositions: number[] = [];
+  const { selection } = tr;
 
-  // If the current node does not have a NotionBlockNode sibling, the node cannot be indented
-  const indexInParent = $from.indexAfter(-2);
-  if (
-    ($from.node(-2).type.name === 'doc' && indexInParent < 2) ||
-    ($from.node(-2).type.name === NotionBlockNode.name && indexInParent < 3)
-  ) {
+  if (selection instanceof BlockSelection) {
     return false;
   }
 
-  if (dispatch) {
-    addIndentSteps(tr, $from.pos);
+  const { from, to } = selection;
+  tr.doc.nodesBetween(tr.selection.from, tr.selection.to, (node, pos, parent, index) => {
+    if (node.type.name === NotionBlockNode.name) {
+      if (
+        // If we have already marked nodes to be indented, this block is either a child or a sibling so it can be indented as well
+        nodesToIndentPositions.length > 0 ||
+        // If the block is at the root level, it can be indented if it has a sibling before itself
+        (parent?.type.name !== NotionBlockNode.name && index > 0) ||
+        // Otherwise, we are in a NotionBlock: index must be greater than 2 to account for the first child being the parent content
+        index > 1
+      ) {
+        // Only unindent nodes that are selected (ie their first child is selected)
+        const headerSize = node.firstChild!.nodeSize;
+        if (from <= pos + headerSize && to >= pos) {
+          nodesToIndentPositions.push(pos);
+        }
+      }
+    } else {
+      return false;
+    }
+  });
 
+  if (dispatch) {
+    nodesToIndentPositions.forEach((pos) => {
+      addIndentSteps(tr, pos + 2);
+    });
     dispatch(tr);
   }
-  return true;
+  return nodesToIndentPositions.length > 0;
 };

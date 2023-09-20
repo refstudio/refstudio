@@ -1,7 +1,7 @@
-import { act } from '@testing-library/react';
 import { createStore } from 'jotai';
 
 import { NotificationItemType } from '../../notifications/types';
+import { act } from '../../test/test-utils';
 import {
   addNotificationAtom,
   clearNotificationsAtom,
