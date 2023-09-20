@@ -120,7 +120,7 @@ export const NotionBlockNode = Node.create({
         return editor.commands.command(joinBackward);
       },
       Delete: ({ editor }) => editor.commands.command(joinForward),
-      'Cmd-Enter': ({ editor }) => {
+      'Mod-Enter': ({ editor }) => {
         const { $from } = editor.state.selection;
         const notionBlock = getNotionBlockParent($from);
         if (!notionBlock) {
