@@ -17,7 +17,7 @@ export function UploadContextMenu() {
       </Item>
       <Item
         onClick={() => {
-          emitEvent('refstudio://menu/search');
+          emitEvent('refstudio://menu/references/search');
         }}
       >
         Search Semantic Scholar

@@ -6,7 +6,7 @@ import { S2SearchModal } from './S2SearchModal';
 export function S2SearchModalOpener() {
   const [open, setOpen] = useState(false);
 
-  useListenEvent('refstudio://menu/search', () => setOpen((curr) => !curr));
+  useListenEvent('refstudio://menu/references/search', () => setOpen((curr) => !curr));
 
   if (!open) {
     return null;
