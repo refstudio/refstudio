@@ -1,5 +1,6 @@
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback, useState } from 'react';
+import { SiSemanticscholar } from 'react-icons/si';
 
 import { S2SearchResult } from '../../api/api-types';
 import { AddIcon } from '../../application/components/icons';
@@ -251,8 +252,10 @@ export function S2SearchModal({ open, onClose: onClose }: { open: boolean; onClo
         <div className="grow gap-2 overflow-auto text-modal-txt-primary">
           {!loading && !searchResultsList.length && (
             <div className="flex h-full flex-col items-center justify-center gap-2">
-              <div className="text-xl/6 font-semibold text-side-bar-txt-primary">
-                Add references from Semantic Scholar
+              <div className="flex text-xl/6 font-semibold text-side-bar-txt-primary">
+                <div>Add references from</div>
+                <SiSemanticscholar className="mx-2" size={30} />
+                <div>Semantic Scholar</div>
               </div>
               <div className="text-side-bar-txt-secondary">
                 Enter keywords above to search Semantic Scholar for references to add to your library.
