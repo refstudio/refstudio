@@ -21,7 +21,6 @@ function customRender(ui: React.ReactElement, options = {}) {
   });
 }
 
-// export * from '@testing-library/react';
 export { act, fireEvent, renderHook, screen, waitFor, within };
 
 // override render export
