@@ -1,8 +1,9 @@
 import { Fragment, Slice } from '@tiptap/pm/model';
-import { Plugin, PluginKey, TextSelection } from '@tiptap/pm/state';
+import { Plugin, PluginKey, TextSelection, Transaction } from '@tiptap/pm/state';
 import { ReplaceAroundStep } from '@tiptap/pm/transform';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
 
+import { toggleCollapsed } from '../commands/toggleCollapsed';
 import { addUnindentSteps } from '../commands/unindent';
 import { NotionBlockNode } from '../NotionBlockNode';
 import { BlockSelection } from '../selection/BlockSelection';
@@ -285,8 +286,7 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
         case 'ArrowLeft': {
           // If the block is not collapsed, collapse it
           if (selectedBlock.attrs.type === 'collapsible' && !selectedBlock.attrs.collapsed) {
-            tr.setNodeAttribute(selection.head, 'collapsed', true);
-            view.dispatch(tr);
+            toggleCollapsed({ pos: selection.head, dispatch: (t: Transaction) => view.dispatch(t), tr });
           } else {
             // Otherwise select its parent
             selection.selectParentBlock(tr, (t) => view.dispatch(t));
@@ -296,8 +296,7 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
         case 'ArrowRight': {
           if (selectedBlock.attrs.type === 'collapsible' && selectedBlock.attrs.collapsed) {
             // If the block is collapsed, uncollapse it
-            tr.setNodeAttribute(selection.head, 'collapsed', false);
-            view.dispatch(tr);
+            toggleCollapsed({ pos: selection.head, dispatch: (t: Transaction) => view.dispatch(t), tr });
           } else {
             // Otherwise select its first child
             selection.selectChildBlock(tr, (t) => view.dispatch(t));
