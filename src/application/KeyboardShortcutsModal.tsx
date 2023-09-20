@@ -54,8 +54,10 @@ const SHORTCUT_SECTIONS: ShortcutSection[] = [
       makeShortcut('Add References Citation', ['[']),
       makeShortcut('Add Aditional Reference', ['@']),
       makeShortcut('Add Collapsible Section', ['>', '␣']),
-      makeShortcut('Indent Editor Block', ['Tab']),
       makeShortcut('Toggle Block Navigation', ['Esc']),
+      makeShortcut('Indent Editor Block', ['Tab']),
+      makeShortcut('Select Adjacent Block', ['⇧', '↑/↓']),
+      makeShortcut('Move Block Up/Down', ['⌘', '⇧', '↑/↓']),
     ],
   },
 ];

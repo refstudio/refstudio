@@ -24,7 +24,7 @@ export const collapsibleArrowsPlugin = new Plugin({
     handleClick: (view, pos, event: MouseEvent) => {
       const target = event.target as HTMLElement;
       const toggleNodeCollapsed = () =>
-        toggleCollapsed({ pos: pos - 2, view, tr: view.state.tr, dispatch: (tr: Transaction) => view.dispatch(tr) });
+        toggleCollapsed({ pos: pos - 2, tr: view.state.tr, dispatch: (tr: Transaction) => view.dispatch(tr) });
       if (hasAncestor(target, '.collapsible-arrow')) {
         toggleNodeCollapsed();
       } else if (target.className.includes('empty-collapsible-placeholder')) {

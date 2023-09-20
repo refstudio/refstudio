@@ -1,9 +1,6 @@
-import { Node, ResolvedPos } from '@tiptap/pm/model';
+import { ResolvedPos } from '@tiptap/pm/model';
 
-interface NodeData {
-  resolvedPos: ResolvedPos;
-  node: Node;
-}
+import { NodeData } from './types';
 
 /**
  * Returns the parent of the node the given position points to, along with the position pointing before the parent

@@ -1,8 +1,8 @@
-import { act, waitFor } from '@testing-library/react';
 import { createStore } from 'jotai';
 import { Loadable } from 'jotai/vanilla/utils/loadable';
 
 import { readAllProjectFiles, readFileContent, writeFileContent } from '../../io/filesystem';
+import { act, waitFor } from '../../test/test-utils';
 import { activePaneAtom, closeEditorFromPaneAtom, moveEditorToPaneAtom } from '../editorActions';
 import { openFileEntryAtom } from '../fileEntryActions';
 import { useActiveEditorContentAtoms } from '../hooks/useActiveEditorContentAtoms';

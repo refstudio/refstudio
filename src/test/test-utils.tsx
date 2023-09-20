@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { UnlistenFn } from '@tauri-apps/api/event';
-import { render } from '@testing-library/react';
+import { act, fireEvent, render, renderHook, screen, waitFor, within } from '@testing-library/react';
 import { default as userEvent } from '@testing-library/user-event';
 import { createStore, Provider } from 'jotai';
 
@@ -21,7 +21,8 @@ function customRender(ui: React.ReactElement, options = {}) {
   });
 }
 
-export * from '@testing-library/react';
+export { act, fireEvent, renderHook, screen, waitFor, within };
+
 // override render export
 export { customRender as render };
 
