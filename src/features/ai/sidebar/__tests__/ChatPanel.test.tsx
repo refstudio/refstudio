@@ -1,7 +1,5 @@
-import { screen, waitFor } from '@testing-library/react';
-
 import { chatWithAiStreaming } from '../../../../api/chat';
-import { render, userEvent } from '../../../../test/test-utils';
+import { render, screen, userEvent, waitFor } from '../../../../test/test-utils';
 import { ChatbotPanel } from '../ChatPanel';
 
 vi.mock('../../../../api/chat');

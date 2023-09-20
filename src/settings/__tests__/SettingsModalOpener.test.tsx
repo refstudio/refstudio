@@ -1,7 +1,5 @@
-import { act } from '@testing-library/react';
-
 import { noop } from '../../lib/noop';
-import { mockListenEvent, render, screen } from '../../test/test-utils';
+import { act, mockListenEvent, render, screen } from '../../test/test-utils';
 import { getCachedSetting, initSettings, saveCachedSettings, setCachedSetting } from '../settingsManager';
 import { SettingsModalOpener } from '../SettingsModalOpener';
 

@@ -1,6 +1,6 @@
-import { waitFor } from '@testing-library/react';
 import { createStore } from 'jotai';
 
+import { act, waitFor } from '../../../test/test-utils';
 import { runHookWithJotaiProvider } from '../../__tests__/test-utils';
 import { createEditorContentAtoms } from '../../core/createEditorContentAtoms';
 import { editorsContentStateAtom } from '../../core/editorContent';
@@ -41,14 +41,13 @@ describe('useAnyEditorDataIsDirty', () => {
 
     expect(hookResult.current).toBeFalsy();
 
-    store.set(initialEditorsContent.get(editorId1)!.updateEditorContentBufferAtom, {
-      type: 'refstudio',
-      jsonContent: { doc: 'Updated content' },
+    act(() => {
+      store.set(initialEditorsContent.get(editorId1)!.updateEditorContentBufferAtom, {
+        type: 'refstudio',
+        jsonContent: { doc: 'Updated content' },
+      });
     });
 
-    await waitFor(() => {
-      const value = hookResult.current;
-      expect(value).toBeTruthy();
-    });
+    await waitFor(() => expect(hookResult.current).toBeTruthy());
   });
 });
