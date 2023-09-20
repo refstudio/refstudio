@@ -1,11 +1,7 @@
-import { Node, ResolvedPos } from '@tiptap/pm/model';
+import { ResolvedPos } from '@tiptap/pm/model';
 
 import { NotionBlockNode } from '../NotionBlockNode';
-
-interface NodeData {
-  resolvedPos: ResolvedPos;
-  node: Node;
-}
+import { NodeData } from './types';
 
 /**
  * Returns the resolved position of the previous sibling of the node the given position points to.

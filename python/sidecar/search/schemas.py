@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sidecar.typing import RefStudioModel, ResponseStatus
 
 
@@ -11,6 +13,7 @@ class S2SearchResult(RefStudioModel):
     abstract: str | None = None
     venue: str | None = None
     year: int | None = None
+    publicationDate: datetime | None = None
     paperId: str | None = None
     citationCount: int | None = None
     openAccessPdf: str | None = None

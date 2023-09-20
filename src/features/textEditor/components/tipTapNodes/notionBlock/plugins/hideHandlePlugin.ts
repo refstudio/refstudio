@@ -1,7 +1,7 @@
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
 
-const hideHandlePluginKey = new PluginKey<boolean>('hideHandle');
+export const hideHandlePluginKey = new PluginKey<boolean>('hideHandle');
 export const hideHandlePlugin = new Plugin({
   key: hideHandlePluginKey,
   state: {
@@ -18,7 +18,7 @@ export const hideHandlePlugin = new Plugin({
     },
   },
   props: {
-    handleKeyPress(view) {
+    handleKeyDown(view) {
       if (!this.getState(view.state)) {
         const { tr } = view.state;
         tr.setMeta(hideHandlePluginKey, true);
