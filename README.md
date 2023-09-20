@@ -1,8 +1,6 @@
-<p align="center">
-  <img src="src-tauri/icons/StoreLogo.png" />
-  <h1> Ref Studio</h1>
-  <p>An open source text editor optimized for writing that relies on references.</p>
-</p>
+<p align="center"><picture><img alt="Ref Studio Logo" src="src-tauri/icons/StoreLogo.png" /></picture></p>
+<h1 align="center">Ref Studio</h1>
+<p align="center">An open source text editor optimized for writing that relies on references.</p>
 
 <p align="center">
   <a href="https://github.com/refstudio/refstudio/actions/workflows/on-push.yml">
