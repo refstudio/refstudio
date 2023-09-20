@@ -39,22 +39,13 @@ export async function postS2Reference(projectId: string, s2SearchResult: S2Searc
     authors: formatAuthorsFromS2Result(s2SearchResult.authors),
   };
 
-  const genericRequestBody: IngestMetadataRequest = {
-    type: 'metadata',
-    metadata,
-  };
-
   const pdfRequestBody: IngestMetadataRequest = {
     type: 'metadata',
     url: s2SearchResult.openAccessPdf,
     metadata,
   };
 
-  const status = await apiPost(
-    '/api/references/{project_id}',
-    { path: { project_id: projectId } },
-    s2SearchResult.openAccessPdf ? pdfRequestBody : genericRequestBody,
-  );
+  const status = await apiPost('/api/references/{project_id}', { path: { project_id: projectId } }, pdfRequestBody);
 
   return status;
 }
