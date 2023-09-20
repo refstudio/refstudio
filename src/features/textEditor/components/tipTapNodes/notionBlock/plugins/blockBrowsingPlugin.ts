@@ -80,7 +80,7 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
       const selectedBlock = view.state.doc.nodeAt(selection.head)!;
       tr.setMeta(blockBrowsingPluginKey, true);
       const depthDifference = selection.$from.depth - selection.$to.depth;
-      const endPos = selection.to + tr.doc.nodeAt(selection.to)!.nodeSize; // end of selection
+      const endPos = selection.actualTo; // end of selection
 
       switch (event.code) {
         case 'Enter':

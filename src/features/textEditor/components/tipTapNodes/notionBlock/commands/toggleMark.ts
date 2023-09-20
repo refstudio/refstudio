@@ -9,7 +9,7 @@ export function toggleMark(mark: string): Command {
     if (!(selection instanceof BlockSelection)) {
       return dispatch ? commands.toggleMark(mark) : can().toggleMark(mark);
     }
-    const endPos = selection.to + tr.doc.nodeAt(selection.to)!.nodeSize;
+    const endPos = selection.actualTo;
     if (dispatch) {
       return chain()
         .command(() => {

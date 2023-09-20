@@ -1,5 +1,6 @@
 import './TipTapEditor.css';
 
+import { TextSelection } from '@tiptap/pm/state';
 import { Editor, EditorContent, JSONContent } from '@tiptap/react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback, useEffect, useState } from 'react';
@@ -17,6 +18,7 @@ import { useListenEvent } from '../../../hooks/useListenEvent';
 import { saveAsMarkdown } from '../saveAsMarkdown';
 import { MenuBar } from './MenuBar';
 import { EDITOR_EXTENSIONS, transformPasted } from './tipTapEditorConfigs';
+import { BlockSelection } from './tipTapNodes/notionBlock/selection/BlockSelection';
 import { MarkdownSerializer } from './tipTapNodes/refStudioDocument/serialization/MarkdownSerializer';
 import { sentenceCompletionCommand } from './tipTapNodes/sentenceCompletion/helpers/sentenceCompletionCommand';
 
@@ -77,7 +79,19 @@ export function TipTapEditor({ editorContent, editorId, isActive, saveFileInMemo
   const insertContent = useCallback(
     ({ text }: { text: string }) => {
       if (isActive) {
-        editor?.chain().insertContent(text).focus().run();
+        editor
+          ?.chain()
+          .command(({ tr, dispatch }) => {
+            const { doc, selection } = tr;
+            if (selection instanceof BlockSelection && dispatch) {
+              tr.setSelection(TextSelection.between(doc.resolve(selection.from + 2), doc.resolve(selection.actualTo)));
+              dispatch(tr);
+            }
+            return true;
+          })
+          .insertContent(text)
+          .focus()
+          .run();
       }
     },
     [editor, isActive],

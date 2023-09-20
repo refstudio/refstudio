@@ -46,10 +46,9 @@ export class BlockSelection extends Selection {
 
   content(): Slice {
     const doc = this.$from.node(0);
-    const lastNode = doc.nodeAt(this.to)!;
 
     if (this.$from.depth === this.$to.depth) {
-      return doc.slice(this.from, this.to + lastNode.nodeSize);
+      return doc.slice(this.from, this.actualTo);
     }
 
     // We treat the first node differently because its depth is higher than the last node,
@@ -58,17 +57,14 @@ export class BlockSelection extends Selection {
 
     const contentSlice = doc.slice(
       this.$from.posAtIndex(this.$from.indexAfter(this.$to.depth), this.$to.depth),
-      this.to + lastNode.nodeSize,
+      this.actualTo,
     );
 
     return new Slice(contentSlice.content.addToStart(firstNode), 0, 0);
   }
 
   replace(tr: Transaction, content?: Slice): void {
-    const lastNode = this.$from.node(0).nodeAt(this.to)!;
-    tr.replace(this.from, this.to + lastNode.nodeSize, content).setSelection(
-      Selection.near(tr.doc.resolve(this.from), -1),
-    );
+    tr.replace(this.from, this.actualTo, content).setSelection(Selection.near(tr.doc.resolve(this.from), -1));
   }
 
   replaceWith(tr: Transaction, node: Node): void {
@@ -175,7 +171,7 @@ export class BlockSelection extends Selection {
 
   isMarkActive(markType: MarkType): boolean {
     const doc = this.$from.node(0);
-    const endPos = this.to + doc.nodeAt(this.to)!.nodeSize;
+    const endPos = this.actualTo;
 
     let selectionRange = 0;
     const markRanges: MarkRange[] = [];
@@ -215,6 +211,12 @@ export class BlockSelection extends Selection {
     const range = matchedRange > 0 ? matchedRange + excludedRange : matchedRange;
 
     return range >= selectionRange;
+  }
+
+  // this.to points to the position before the selected block, actualTo points to the actual end of the selection,
+  // including the last block
+  get actualTo() {
+    return this.to + this.$to.node(0).nodeAt(this.to)!.nodeSize;
   }
 
   private get childBlock(): NodeData | null {
