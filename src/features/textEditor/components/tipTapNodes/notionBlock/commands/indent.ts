@@ -4,6 +4,7 @@ import { ReplaceAroundStep, ReplaceStep } from '@tiptap/pm/transform';
 import { Command } from '@tiptap/react';
 
 import { NotionBlockNode } from '../NotionBlockNode';
+import { BlockSelection } from '../selection/BlockSelection';
 
 export function addIndentSteps(tr: Transaction, pos: number): void {
   const resolvedPos = tr.doc.resolve(pos);
@@ -20,11 +21,16 @@ export function addIndentSteps(tr: Transaction, pos: number): void {
 
 export const indent: Command = ({ tr, dispatch }) => {
   const nodesToIndentPositions: number[] = [];
-  const { from, to } = tr.selection;
+  const { selection } = tr;
 
+  if (selection instanceof BlockSelection) {
+    return false;
+  }
+
+  const { from, to } = selection;
   tr.doc.nodesBetween(tr.selection.from, tr.selection.to, (node, pos, parent, index) => {
     if (node.type.name === NotionBlockNode.name) {
-      if ((parent?.type.name === NotionBlockNode.name && index > 1) || index > 0) {
+      if ((parent?.type.name !== NotionBlockNode.name && index > 0) || index > 1) {
         // Only unindent nodes that are selected (ie their first child is selected)
         const headerSize = node.firstChild!.nodeSize;
         if (from <= pos + headerSize && to >= pos) {
@@ -35,6 +41,8 @@ export const indent: Command = ({ tr, dispatch }) => {
       return false;
     }
   });
+
+  console.log(nodesToIndentPositions);
 
   if (dispatch) {
     nodesToIndentPositions.forEach((pos) => {
