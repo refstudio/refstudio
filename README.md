@@ -1,7 +1,8 @@
-<div style="text-align:center">
-  <h1 style="display: flex; align-items: center; justify-content:center; gap: 6px;"><img src="src-tauri/icons/StoreLogo.png" /> Ref Studio</h1>
+<p align="center">
+  <img src="src-tauri/icons/StoreLogo.png" />
+  <h1> Ref Studio</h1>
   <p>An open source text editor optimized for writing that relies on references.</p>
-</div>
+</p>
 
 <p align="center">
   <a href="https://github.com/refstudio/refstudio/actions/workflows/on-push.yml">
