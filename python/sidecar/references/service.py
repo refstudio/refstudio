@@ -1,6 +1,7 @@
 import shutil
 from collections import defaultdict
 from pathlib import Path
+from typing import Tuple
 from uuid import uuid4
 
 import requests
@@ -13,9 +14,51 @@ from sidecar.references.schemas import IngestStatus, Reference, ReferenceCreate
 from sidecar.shared import chunk_reference
 
 
+def is_fetchable_pdf(url: str) -> Tuple[bool, str]:
+    """
+    Determines if a URL points to a PDF that can be fetched.
+
+    Parameters
+    ----------
+    url : str
+        The URL of the PDF to check.
+
+    Returns
+    -------
+    bool
+        Whether the URL points to a PDF that can be fetched.
+    str
+        The reason why the PDF could not be fetched.
+    """
+    try:
+        response = requests.get(url)
+
+        if not response.ok:
+            reason = f"Unable to fetch {url}, status code {response.status_code}"
+            logger.info(reason)
+            return False, reason
+
+        if response.status_code == 302:
+            location = response.headers.get("location")
+
+            if location:
+                return is_fetchable_pdf(location)
+
+        if "application/pdf" not in response.headers.get("content-type", ""):
+            reason = f"Unable to fetch {url}, content-type is not PDF"
+            logger.info(reason)
+            return False, reason
+
+        return True, ""
+    except requests.exceptions.RequestException:
+        reason = f"Unable to fetch {url}, request exception"
+        logger.info(reason)
+        return False, reason
+
+
 def fetch_pdf_to_uploads(
     url: str, project_id: str, user_id: str, metadata: ReferenceCreate
-) -> ReferenceCreate:
+) -> Tuple[ReferenceCreate, str]:
     """
     Fetches a PDF from a URL and saves it to the project's uploads directory.
 
@@ -34,14 +77,19 @@ def fetch_pdf_to_uploads(
     -------
     ReferenceCreate
         The metadata of the reference to create.
+    str
+        The reason why the PDF could not be fetched.
     """
+    is_pdf, reason = is_fetchable_pdf(url)
+
+    if not is_pdf:
+        return metadata, reason
+
     response = requests.get(url)
 
-    if response.status_code != 200:
-        raise HTTPError(f"Unable to fetch {url} (status code: {response.status_code})")
-
     if not metadata.source_filename:
-        metadata.source_filename = f"{metadata.title[:75]}.pdf"
+        filename = shared.clean_filename(metadata.title[:75])
+        metadata.source_filename = f"{filename}.pdf"
 
     staged_filepath = projects_service.create_project_staging_filepath(
         user_id, project_id, metadata.source_filename
@@ -61,12 +109,12 @@ def fetch_pdf_to_uploads(
     staged_filepath.unlink()
 
     metadata.chunks = chunk_reference(metadata, filepath=upload_filepath)
-    return metadata
+    return metadata, ""
 
 
 def create_reference(
     project_id: str, metadata: ReferenceCreate, url: str = None
-) -> Reference:
+) -> Tuple[Reference, str]:
     """
     Creates a reference.
 
@@ -86,11 +134,12 @@ def create_reference(
     """
     user_id = "user1"
     filepath = None
+    message = ""
     store = storage.get_references_json_storage(user_id, project_id)
 
     if url:
         try:
-            metadata = fetch_pdf_to_uploads(url, project_id, user_id, metadata)
+            metadata, message = fetch_pdf_to_uploads(url, project_id, user_id, metadata)
         except HTTPError as e:
             logger.error(str(e))
 
@@ -115,7 +164,7 @@ def create_reference(
     )
     add_citation_keys_for_references([ref], store.references)
     store.add_reference(ref)
-    return store.get_reference(ref.id)
+    return store.get_reference(ref.id), message
 
 
 def add_citation_keys_for_references(

@@ -211,6 +211,7 @@ export interface ReferenceCreate {
 export interface IngestResponse {
   project_name: string;
   references: Reference[];
+  message?: string;
 }
 /**
  * A reference for an academic paper / PDF
