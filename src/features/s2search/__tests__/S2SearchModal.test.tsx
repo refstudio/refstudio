@@ -55,7 +55,8 @@ vi.mock('../../../atoms/s2SearchState', async (importOriginal) => {
   const actual: object = await importOriginal();
   return {
     ...actual,
-    loadSearchResultsAtom: atom(null, async (get, set, keywords: string, limit?: number) => {
+    loadSearchResultsAtom: atom(null, async (get, set) => {
+      await new Promise((r) => setTimeout(r));
       set(S2SearchState.searchResultsAtom, searchResults);
     }),
   };
