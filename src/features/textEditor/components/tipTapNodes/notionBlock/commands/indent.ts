@@ -30,7 +30,14 @@ export const indent: Command = ({ tr, dispatch }) => {
   const { from, to } = selection;
   tr.doc.nodesBetween(tr.selection.from, tr.selection.to, (node, pos, parent, index) => {
     if (node.type.name === NotionBlockNode.name) {
-      if ((parent?.type.name !== NotionBlockNode.name && index > 0) || index > 1) {
+      if (
+        // If we have already marked nodes to be indented, this block is either a child or a sibling so it can be indented as well
+        nodesToIndentPositions.length > 0 ||
+        // If the block is at the root level, it can be indented if it has a sibling before itself
+        (parent?.type.name !== NotionBlockNode.name && index > 0) ||
+        // Otherwise, we are in a NotionBlock: index must be greater than 2 to account for the first child being the parent content
+        index > 1
+      ) {
         // Only unindent nodes that are selected (ie their first child is selected)
         const headerSize = node.firstChild!.nodeSize;
         if (from <= pos + headerSize && to >= pos) {
