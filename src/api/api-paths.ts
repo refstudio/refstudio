@@ -259,6 +259,8 @@ export interface components {
     IngestRequestType: 'uploads' | 'metadata';
     /** IngestResponse */
     IngestResponse: {
+      /** @default */
+      message?: string;
       project_name: string;
       references: Reference[];
     };
