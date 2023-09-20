@@ -106,6 +106,14 @@ def mock_url_pdf_response(fixtures_dir):
             def status_code(self):
                 return 200
 
+            @property
+            def ok(self):
+                return True
+
+            @property
+            def headers(self):
+                return {"content-type": "application/pdf"}
+
         return MockResponse()
 
     return mock_url_pdf_response
@@ -123,6 +131,14 @@ def mock_url_pdf_response_error(fixtures_dir):
             @property
             def status_code(self):
                 return 403
+
+            @property
+            def ok(self):
+                return False
+
+            @property
+            def headers(self):
+                return {"content-type": "application/pdf"}
 
         return MockResponse()
 
