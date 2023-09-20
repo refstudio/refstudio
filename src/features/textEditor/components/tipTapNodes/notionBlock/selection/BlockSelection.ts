@@ -30,7 +30,19 @@ export class BlockSelection extends Selection {
       throw new Error('No notion block was found near this position');
     }
 
-    super(anchorParentBlock.resolvedPos, headParentBlock.resolvedPos);
+    const doc = $anchor.node(0);
+    const selectedBlocks = getSelectedBlocks(
+      doc,
+      anchorParentBlock.resolvedPos.min(headParentBlock.resolvedPos).pos,
+      anchorParentBlock.resolvedPos.max(headParentBlock.resolvedPos).pos,
+    );
+    const { from } = selectedBlocks[0];
+    const to = selectedBlocks[selectedBlocks.length - 1].from;
+
+    const resolvedAnchor = $anchor.min($head).pos === $anchor.pos ? doc.resolve(from) : doc.resolve(to);
+    const resolvedHead = $head.min($anchor).pos === $head.pos ? doc.resolve(from) : doc.resolve(to);
+
+    super(resolvedAnchor, resolvedHead);
     this.visible = false;
   }
 
@@ -86,21 +98,7 @@ export class BlockSelection extends Selection {
   }
 
   get selectedBlocksPos() {
-    const selectedBlocks: { from: number; to: number }[] = [];
-    const doc = this.$from.node(0);
-    let { from } = this;
-
-    while (from <= this.to) {
-      let node = doc.nodeAt(from);
-      while (node === null) {
-        from++;
-        node = doc.nodeAt(from);
-      }
-      const to = from + node.nodeSize;
-      selectedBlocks.push({ from, to });
-      from = to;
-    }
-    return selectedBlocks;
+    return getSelectedBlocks(this.$from.node(0), this.from, this.to);
   }
 
   selectParentBlock(tr: Transaction, dispatch: (tr: Transaction) => void): void {
@@ -283,3 +281,18 @@ export class BlockSelection extends Selection {
 }
 
 Selection.jsonID('notionBlock', BlockSelection);
+
+function getSelectedBlocks(doc: Node, from: number, to: number): { from: number; to: number }[] {
+  const selectedBlocks: { from: number; to: number }[] = [];
+
+  while (from <= to) {
+    let node = doc.nodeAt(from);
+    while (node === null) {
+      from++;
+      node = doc.nodeAt(from);
+    }
+    selectedBlocks.push({ from, to: from + node.nodeSize });
+    from += node.nodeSize;
+  }
+  return selectedBlocks;
+}
