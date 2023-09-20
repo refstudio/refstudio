@@ -129,11 +129,14 @@ const MetaData = ({ reference }: { reference: S2SearchResult }) => {
           {authors}
         </div>
         <div>{authors ? DotIcon() : ''}</div>
-        <div className="truncate" title={reference.venue}>
+        <div className="whitespace-nowrap" title={reference.venue}>
           {reference.venue}
         </div>
         <div>{reference.venue ? DotIcon() : ''}</div>
-        <div> {reference.publicationDate ? formatPublicationDate(reference.publicationDate) : reference.year}</div>
+        <div className="whitespace-nowrap">
+          {' '}
+          {reference.publicationDate ? formatPublicationDate(reference.publicationDate) : reference.year}
+        </div>
       </div>
       <div className="line-clamp-4">{reference.abstract}</div>
     </>
@@ -232,7 +235,7 @@ export function S2SearchModal({ open, onClose: onClose }: { open: boolean; onClo
           setLoading(false);
         })
         .catch(() => {
-          console.log('error');
+          console.error('error');
         });
     },
     [loadSearchResults],

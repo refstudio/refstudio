@@ -22,16 +22,9 @@ export async function postS2Reference(projectId: string, s2SearchResult: S2Searc
 
   const getBestPublicationDate = (reference: S2SearchResult) => {
     if (reference.publicationDate) {
-      const date = new Date(reference.publicationDate);
-      return (
-        date.getFullYear().toString() +
-        '-' +
-        ('0' + date.getMonth().toString()).slice(-2) +
-        '-' +
-        date.getDate().toString()
-      );
+      return new Date(reference.publicationDate).toISOString().substring(0, 10);
     } else {
-      return reference.year?.toString();
+      return reference.year ? new Date(reference.year.toString()).toISOString().substring(0, 10) : '';
     }
   };
 
