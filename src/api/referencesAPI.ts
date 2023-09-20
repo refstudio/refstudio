@@ -1,4 +1,3 @@
-import { makeUploadPath } from '../io/filesystem';
 import { ReferenceItem } from '../types/ReferenceItem';
 import { Reference } from './api-types';
 import { apiGetJson, apiPatch, apiPost } from './typed-api';
@@ -59,11 +58,11 @@ export async function getProjectReferences(projectId: string): Promise<Reference
 function parsePdfIngestionResponse(references: Reference[]): ReferenceItem[] {
   return references.map((reference) => ({
     id: reference.id,
-    source_filename: reference.source_filename,
-    filepath: makeUploadPath(reference.source_filename),
-    filename: reference.source_filename,
+    source_filename: reference.source_filename ?? '',
+    filepath: reference.filepath ?? '',
+    filename: reference.source_filename ?? '',
     citationKey: reference.citation_key ?? 'unknown',
-    title: reference.title ?? reference.source_filename.replace('.pdf', ''),
+    title: reference.title ?? reference.source_filename?.replace('.pdf', '') ?? reference.id,
     publishedDate: reference.published_date ?? '',
     abstract: reference.abstract ?? '',
     status: reference.status,

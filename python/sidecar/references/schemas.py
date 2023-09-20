@@ -23,11 +23,25 @@ class Reference(RefStudioModel):
     """A reference for an academic paper / PDF"""
 
     id: str
-    source_filename: str
     status: IngestStatus
+    source_filename: str | None = None
+    filepath: str | None = None
     citation_key: str | None = None
     doi: str | None = None
     title: str | None = None
+    abstract: str | None = None
+    contents: str | None = None
+    published_date: date | None = None
+    authors: list["Author"] = []
+    chunks: list["Chunk"] = []
+    metadata: dict[str, Any] = {}
+
+
+class ReferenceCreate(RefStudioModel):
+    title: str
+    source_filename: str | None = None
+    citation_key: str | None = None
+    doi: str | None = None
     abstract: str | None = None
     contents: str | None = None
     published_date: date | None = None
@@ -76,8 +90,23 @@ class ReferenceStatus(RefStudioModel):
     status: IngestStatus
 
 
+class IngestRequestType(StrEnum):
+    UPLOADS_DIRECTORY = "uploads"
+    METADATA = "metadata"
+
+
 class IngestRequest(RefStudioModel):
-    pdf_directory: str
+    type: IngestRequestType
+
+
+class IngestUploadsRequest(IngestRequest):
+    type: IngestRequestType = IngestRequestType.UPLOADS_DIRECTORY
+
+
+class IngestMetadataRequest(IngestRequest):
+    type: IngestRequestType = IngestRequestType.METADATA
+    metadata: ReferenceCreate
+    url: str = None
 
 
 class IngestStatusResponse(RefStudioModel):
@@ -101,4 +130,5 @@ class DeleteStatusResponse(RefStudioModel):
     message: str
 
 
+ReferenceCreate.update_forward_refs()
 Reference.update_forward_refs()

@@ -1,5 +1,11 @@
 from sidecar.references import storage
-from sidecar.references.schemas import Author, Chunk, Reference, ReferencePatch
+from sidecar.references.schemas import (
+    Author,
+    Chunk,
+    IngestStatus,
+    Reference,
+    ReferencePatch,
+)
 
 
 def test_json_storage_load(fixtures_dir):
@@ -162,9 +168,11 @@ def test_storage_delete_references(monkeypatch, tmp_path, fixtures_dir):
     assert output["message"] != ""
 
 
-def test_get_references_storage_path():
-    pass
+def test_storage_add_reference_to_initialize_storage(setup_project_storage):
+    user_id, project_id = setup_project_storage
 
-
-def test_get_references_json_storage():
-    pass
+    store = storage.get_references_json_storage(user_id, project_id)
+    store.add_reference(Reference(id="12345", status=IngestStatus.COMPLETE))
+    assert len(store.references) == 1
+    assert store.references[0].id == "12345"
+    assert store.filepath.exists()

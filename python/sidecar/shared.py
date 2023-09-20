@@ -2,12 +2,13 @@ import os
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import List
+from typing import List, Union
 
 import pypdf
+
 from sidecar import config
 from sidecar.config import logger
-from sidecar.references.schemas import Author, Chunk, Reference
+from sidecar.references.schemas import Author, Chunk, Reference, ReferenceCreate
 
 logger = logger.getChild(__name__)
 
@@ -137,7 +138,7 @@ def chunk_text(
 
 
 def chunk_reference(
-    ref: Reference,
+    ref: Union[Reference, ReferenceCreate],
     filepath: Path = None,
     chunk_size: int = 1000,
     chunk_overlap: int = 200,
@@ -162,7 +163,7 @@ def chunk_reference(
         filepath = Path(config.UPLOADS_DIR).joinpath(ref.source_filename)
 
     try:
-        reader = pypdf.PdfReader(filepath)
+        reader = pypdf.PdfReader(str(filepath))
     except FileNotFoundError:
         logger.error(f"File not found: {filepath}")
         return []
