@@ -99,7 +99,6 @@ class Searcher:
             )
             results_list.append(result)
 
-        logger.info(f"First two papers from search results: {results_list[:2]}")
         return SearchResponse(
             status=ResponseStatus.OK, message="", results=results_list
         )
