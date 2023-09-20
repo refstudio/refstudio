@@ -14,8 +14,8 @@ import {
 import { AgGridReact } from '@ag-grid-community/react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { BsFillCaretDownFill } from 'react-icons/bs';
 
-import { AddIcon } from '../../../application/components/icons';
 import { projectIdAtom } from '../../../atoms/projectState';
 import { getReferencesAtom, updateReferenceAtom } from '../../../atoms/referencesState';
 import { Button } from '../../../components/Button';
@@ -156,7 +156,8 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
         </div>
         <div className="h-8 w-px bg-content-area-border" />
         <Button
-          Action={<AddIcon />}
+          Action={<BsFillCaretDownFill />}
+          actionPosition="right"
           size="M"
           text="Add"
           type="secondary"
