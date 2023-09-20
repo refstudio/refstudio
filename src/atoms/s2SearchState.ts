@@ -8,7 +8,7 @@ import { loadReferencesAtom } from './referencesState';
 // #####################################################################################
 // Internal Atoms
 // #####################################################################################
-const searchResultsAtom = atom<S2SearchResult[]>([]);
+export const searchResultsAtom = atom<S2SearchResult[]>([]);
 
 // #####################################################################################
 // References API
@@ -18,6 +18,7 @@ export const getSearchResultsAtom = atom((get) => Object.values(get(searchResult
 
 export const loadSearchResultsAtom = atom(null, async (_get, set, keywords: string, limit?: number) => {
   const searchResults = await getS2ReferencesByKeyword(keywords, limit);
+  console.log(JSON.stringify(searchResults));
   set(searchResultsAtom, searchResults);
 });
 

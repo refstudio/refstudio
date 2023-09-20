@@ -34,7 +34,7 @@ const SearchBar = ({ onChange }: { onChange: (value: string, limit: number) => v
   </div>
 );
 
-const SearchResult = ({ reference, projectId }: { reference: S2SearchResult; projectId: string }) => {
+export const SearchResult = ({ reference, projectId }: { reference: S2SearchResult; projectId: string }) => {
   const [refStatus, setRefStatus] = useState('ready');
   const [refId, setRefId] = useState('');
 
@@ -50,8 +50,7 @@ const SearchResult = ({ reference, projectId }: { reference: S2SearchResult; pro
         setRefId(result.references[0].id);
         setRefStatus('added');
       })
-      .catch((e) => {
-        console.log(e);
+      .catch(() => {
         setRefStatus('error');
       });
   }, [projectId, reference, saveS2Reference]);
@@ -79,7 +78,7 @@ const SearchResult = ({ reference, projectId }: { reference: S2SearchResult; pro
                 {!reference.openAccessPdf && (
                   <div
                     className="flex items-center justify-center"
-                    title="This reference has no PDF. Chat functions will be limited"
+                    title="This reference has no PDF. Chat functions will be limited."
                   >
                     <NoPdfIcon />
                   </div>
