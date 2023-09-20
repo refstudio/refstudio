@@ -49,8 +49,6 @@ export const indent: Command = ({ tr, dispatch }) => {
     }
   });
 
-  console.log(nodesToIndentPositions);
-
   if (dispatch) {
     nodesToIndentPositions.forEach((pos) => {
       addIndentSteps(tr, pos + 2);
