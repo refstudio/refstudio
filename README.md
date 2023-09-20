@@ -156,14 +156,30 @@ This project version convention is based in a [Calendar Versioning](https://www.
 
 You should follow the general pattern:
 
-* `YY.N.PATCH`
+* `YY.N.PATCH[-PRE_RELEASE]`
 
 So the first version is `23.1.0` and a new release, in the same year, would be `23.2.0`, while a patch for the first version your be `23.1.1`. The first release of 2024 would be `24.1.0`.
 
+You can also append a pre-release tag using [semantic version](https://semver.org/spec/v2.0.0-rc.1.html#spec-item-10) rules by appending a dash and a series of dot separated identifiers (ex: `23.2.0-rc.1`).
+
 ## Release
 
-You can create a new Ref Studio release (ex: mac `.dmg` image files) using the following:
+### Remote (GitHub Action)
 
+To release a new version use the following steps:
+
+- update `package.json` with a new version following the [versioning](#versioning) rules.
+- run the [Cut Release workflow](https://github.com/refstudio/refstudio/actions/workflows/cut-release.yml) by pressing "Run workflow" and select the branch (should be `main` or a release PR).
+- open the [draft release](https://github.com/refstudio/refstudio/releases) created in the previous step
+- download and test the Ref Studio application
+- edit release notes to include notable changes and instalation instructions
+- publish release
+
+### Locally
+
+You can also create a new Ref Studio release (ex: mac `.dmg` image files) locally using the following steps:
+
+- `yarn python` to ensure the backend python server binary is buit.
 - `yarn tauri:build` to build all the supported binary files.
 
 If you are interested only on a specific target, you should run:
@@ -172,11 +188,3 @@ If you are interested only on a specific target, you should run:
 - `yarn tauri:build:mac:universal` to get a Universal macOS Binary (runs on both Apple silicon and Intel-based Macs).
 
 After the build you can find the `.dmg` binaries in the `/binaries` folder.
-
-
-### Release process (manual)
-
-To release a new version you should update (bump) the version in the `package.json` file and run `yarn tauri:build`.
-Then you should commit, and push, the version change and create a git tag with the new version released.
-
-After that you should use the version files located in `/binaries/refstudio_{$VERSION}_{$TARGET}.dmg` (ex: `refstudio_23.1.0_universal.dmg`) and upload them to a [new GitHub release](https://github.com/refstudio/refstudio/releases/new) using the tag created.
