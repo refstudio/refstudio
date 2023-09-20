@@ -13,7 +13,7 @@ import { unindent } from './commands/unindent';
 import { createNotionBlockInputRule } from './inputRuleHandlers/createNotionBlockInputRule';
 import { NotionBlock } from './NotionBlock';
 import { blockBrowsingPlugin } from './plugins/blockBrowsingPlugin';
-import { collapsibleArrowsPlugin } from './plugins/collapsibleArrowPlugin';
+import { collapsibleArrowsPlugin, collapsibleArrowsPluginKey } from './plugins/collapsibleArrowPlugin';
 import { collapsiblePlaceholderPlugin } from './plugins/collapsiblePlaceholderPlugin';
 import { hideHandlePlugin } from './plugins/hideHandlePlugin';
 import { orderedListPlugin } from './plugins/orderedListPlugin';
@@ -121,7 +121,33 @@ export const NotionBlockNode = Node.create({
       },
       Delete: ({ editor }) => editor.commands.command(joinForward),
       'Mod-Enter': ({ editor }) => {
-        const { $from } = editor.state.selection;
+        const { selection } = editor.state;
+
+        // BlockSelection: toggle every selected
+        if (selection instanceof BlockSelection) {
+          let success = false;
+          let collapsed: boolean | null = null;
+          selection.selectedBlocksPos.forEach(({ from: nodePos }) => {
+            const block = editor.state.doc.nodeAt(nodePos)!;
+            if (block.attrs.type === 'collapsible') {
+              if (collapsed === null) {
+                collapsed = !!block.attrs.collapsed;
+              }
+              success = true;
+              return editor.commands.command(({ tr, dispatch }) => {
+                if (dispatch) {
+                  tr.setMeta(collapsibleArrowsPluginKey, true).setNodeAttribute(nodePos, 'collapsed', !collapsed);
+                  dispatch(tr);
+                }
+                return true;
+              });
+            }
+          });
+
+          return success;
+        }
+
+        const { $from } = selection;
         const notionBlock = getNotionBlockParent($from);
         if (!notionBlock) {
           return false;
