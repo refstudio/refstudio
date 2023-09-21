@@ -1,7 +1,8 @@
-import { useAtomValue } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { useEffect, useRef, useState } from 'react';
 
 import { chatInteraction } from '../../../api/chat';
+import { chatThreadAtom } from '../../../atoms/chatState';
 import { projectIdAtom } from '../../../atoms/projectState';
 import { PanelWrapper } from '../../../components/PanelWrapper';
 import { cx } from '../../../lib/cx';
@@ -18,20 +19,7 @@ export function ChatbotPanel() {
   const projectId = useAtomValue(projectIdAtom);
   const [text, setText] = useState('');
 
-  const [chatThread, setChatThread] = useState<ChatThread>([
-    // {
-    //   id: '1',
-    //   question: 'What is your name?',
-    //   answer:
-    //     'I am an AI language model and do not have a name. How may I assist you with your query related to the given context?',
-    // },
-    // {
-    //   id: '2',
-    //   question: 'What can you tell me about hidden feedback loops in machine learning?',
-    //   answer:
-    //     'Hidden feedback loops in machine learning refer to situations where two systems indirectly influence each other through the world, leading to changes in behavior that may not be immediately visible. These loops may exist between completely disjoint systems and can make analyzing the effect of proposed changes extremely difficult, adding cost to even simple improvements. It is recommended to look carefully for hidden feedback loops and remove them whenever feasible.',
-    // },
-  ]);
+  const [chatThread, setChatThread] = useAtom(chatThreadAtom);
   const [currentChatThreadItem, setCurrentChatThreadItem] = useState<ChatThreadItem | null>(null);
 
   const handleKeyDown = (evt: React.KeyboardEvent<HTMLTextAreaElement>): void => {
