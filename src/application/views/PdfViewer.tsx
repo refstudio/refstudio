@@ -19,7 +19,7 @@ export function PdfViewer({ file }: PdfViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [pdfViewerWidth, setPdfViewerWidth] = useState<number>();
 
-  const fileData = useMemo(() => ({ data: file.binaryContent }), [file]);
+  const fileData = useMemo(() => ({ data: Uint8Array.from(file.binaryContent) }), [file]);
 
   // Update viewer's width on mount
   useLayoutEffect(() => {
