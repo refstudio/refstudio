@@ -1,5 +1,5 @@
 import { useAtomValue, useSetAtom } from 'jotai';
-import { useCallback, useState } from 'react';
+import { ReactElement, useCallback, useState } from 'react';
 import { SiSemanticscholar } from 'react-icons/si';
 
 import { S2SearchResult } from '../../api/api-types';
@@ -37,6 +37,7 @@ const SearchBar = ({ onChange }: { onChange: (value: string, limit: number) => v
 export const SearchResult = ({ reference, projectId }: { reference: S2SearchResult; projectId: string }) => {
   const [refStatus, setRefStatus] = useState('ready');
   const [refId, setRefId] = useState('');
+  const [message, setMessage] = useState('');
 
   const [showRemove, setShowRemove] = useState(false);
   const saveS2Reference = useSetAtom(addS2ReferenceAtom);
@@ -46,11 +47,15 @@ export const SearchResult = ({ reference, projectId }: { reference: S2SearchResu
     setRefStatus('adding');
     saveS2Reference(projectId, reference)
       .then((result) => {
-        console.log(result);
+        console.log('THIS IS THE MESSAGE', result.message);
         setRefId(result.references[0].id);
+        if (result.message) {
+          setMessage(result.message);
+        }
         setRefStatus('added');
       })
-      .catch(() => {
+      .catch((e) => {
+        console.log('THE ERROR', e);
         setRefStatus('error');
       });
   }, [projectId, reference, saveS2Reference]);
@@ -93,6 +98,7 @@ export const SearchResult = ({ reference, projectId }: { reference: S2SearchResu
                 showRemove={showRemove}
               />
             )}
+            {message !== '' && <RefAddedMessage message={message} />}
             {refStatus === 'error' && <CouldNotAddRef />}
             {refStatus === 'remove-error' && <CouldNotRemoveRef />}
             {refStatus === 'adding' && (
@@ -141,6 +147,37 @@ const MetaData = ({ reference }: { reference: S2SearchResult }) => {
     </>
   );
 };
+const formatMessage = (message: string): ReactElement[] => {
+  const parts = message.split(/(https?:\/\/[^\s]+)/g);
+  const formattedParts: ReactElement[] = [];
+  parts.forEach((part, index) => {
+    if (part.match(/(https?:\/\/[^\s]+)/g)) {
+      // Make an anchor link
+      formattedParts.push(
+        <a href={part} key={index} target="_new">
+          {part}
+        </a>,
+      );
+    } else {
+      // Return string
+      formattedParts.push(<span key={index}>{part}</span>);
+    }
+  });
+  return formattedParts;
+};
+
+const RefAddedMessage = ({ message }: { message: string }) => (
+  <div className="has-tooltip h-5 w-5 cursor-pointer py-[.375rem] text-[#61C554]" title={message}>
+    <SmallInfoIcon />
+    <div className="tooltip break-words text-modal-txt-primary">
+      The reference&apos;s metadata has been added to your library but we were unable to retrieve the PDF for the
+      following reason:
+      <br />
+      <br />
+      {formatMessage(message)}
+    </div>
+  </div>
+);
 
 const CouldNotAddRef = () => (
   <>
@@ -249,7 +286,7 @@ export function S2SearchModal({ open, onClose: onClose }: { open: boolean; onClo
 
   return (
     <Modal className="h-[37.5rem] w-[50rem]" open={open} onClose={onCloseHandler}>
-      <div className="flex h-[37.5rem] w-[50rem] cursor-default select-none flex-col bg-modal-bg-primary">
+      <div className="flex h-[37.5rem] w-[50rem] cursor-default flex-col bg-modal-bg-primary">
         <SearchBar onChange={debouncedOnChange} />
         <div className="grow gap-2 overflow-auto text-modal-txt-primary">
           {!loading && !searchResultsList.length && (
