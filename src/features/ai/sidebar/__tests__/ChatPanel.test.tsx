@@ -105,7 +105,7 @@ describe('ChatPanel component', () => {
     expect(screen.getByTestId('chatLoadingAnimation')).toBeInTheDocument();
   });
 
-  it.only('should render the thinking animation and then the ### reply text', async () => {
+  it('should render the thinking animation and then the ### reply text', async () => {
     let onMessageChunk: (part: string, full: string) => void = () => fail();
     let resolveFn: (text: string) => void = () => fail();
     vi.mocked(chatInteraction).mockImplementation(async (_, __, onMessage) => {
