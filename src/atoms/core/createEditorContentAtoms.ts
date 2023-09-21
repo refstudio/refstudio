@@ -60,7 +60,7 @@ export function createEditorContentAtoms(
       clearTimeout(saveTimeoutId);
     }
     saveTimeoutId = setTimeout(() => {
-      const editorData = get(editorsDataAtom).get(editorId);
+      const editorData = get(editorsDataAtom).get(get(editorIdAtom));
       if (!editorData) {
         console.log('Editor data not found, cannot save editor content');
         return;
