@@ -44,6 +44,25 @@ export const setEditorDataIsDirtyAtom = atom(
   },
 );
 
+/** Update the `isContentBeingSaved` flag of the given editor */
+export const setEditorContentIsBeingSavedAtom = atom(
+  null,
+  (get, set, { editorId, isContentBeingSaved }: { editorId: EditorId; isContentBeingSaved: boolean }) => {
+    const updatedEditorsData = new Map(get(editorsDataAtom));
+
+    const editorData = updatedEditorsData.get(editorId);
+
+    /* c8 ignore next 4 */
+    if (!editorData) {
+      console.warn('Editor is not open ', editorId);
+      return;
+    }
+
+    updatedEditorsData.set(editorId, { ...editorData, isContentBeingSaved });
+    set(editorsDataAtom, updatedEditorsData);
+  },
+);
+
 interface RenameEditorDataPayload {
   editorId: EditorId;
   newEditorId: EditorId;
