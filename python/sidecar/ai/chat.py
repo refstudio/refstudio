@@ -243,13 +243,13 @@ class Chat:
             response += elem["choices"][0]["delta"]["content"]
         return {"choices": [{"index": 0, "message": {"content": response}}]}
 
-    def yield_response(self, temperature: float = 0.7):
+    async def yield_response(self, temperature: float = 0.7):
         """
         This is a generator function that yields responses from the chat API.
         Only used for streaming chat responses to the client.
         """
         try:
-            response = self.ask_question(
+            response = await self.ask_question(
                 n_choices=1, temperature=temperature, stream=True
             )
         except AuthenticationError as e:
@@ -268,7 +268,7 @@ class Chat:
             return
 
         try:
-            for chunk in response:
+            async for chunk in response:
                 content = chunk["choices"][0]["delta"].get("content", "")
                 yield f"data: {content}\n\n"
         except ConnectionError as e:
