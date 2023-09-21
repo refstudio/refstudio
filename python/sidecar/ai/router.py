@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
-from sidecar.ai.chat import ask_question, yield_response
+from sidecar.ai.chat import ask_question, stream_response, yield_response
 from sidecar.ai.rewrite import complete_text, rewrite
 from sidecar.ai.schemas import (
     ChatRequest,
@@ -67,8 +67,10 @@ async def http_ai_chat_stream(
 ) -> StreamingResponse:
     user_id = "user1"
     user_settings = get_settings_for_user(user_id)
-    response = yield_response(req, project_id=project_id, user_settings=user_settings)
+    response = await yield_response(
+        req, project_id=project_id, user_settings=user_settings
+    )
     return StreamingResponse(
-        response,
+        stream_response(response),
         media_type="text/event-stream",
     )

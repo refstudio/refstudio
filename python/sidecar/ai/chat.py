@@ -43,12 +43,11 @@ def yield_error_message(msg_func: callable):
 
 async def stream_response(response, encoding="utf-8"):
     async for chunk in response:
-        # print(elem)
-        response += chunk["choices"][0]["delta"].get("content", "")
-        yield response.encode(encoding)
+        content = chunk["choices"][0]["delta"].get("content", "")
+        yield f"data: {content}\n\n".encode(encoding)
 
 
-def yield_response(
+async def yield_response(
     request: ChatRequest,
     project_id: str = None,
     user_settings: FlatSettingsSchema = None,
@@ -81,7 +80,7 @@ def yield_response(
 
     ranker = BM25Ranker(storage=storage)
     chat = Chat(input_text=input_text, storage=storage, ranker=ranker, model=model)
-    response = chat.yield_response(temperature=temperature)
+    response = await chat.ask_question(temperature=temperature, stream=True)
     return response
 
 
@@ -223,15 +222,3 @@ class Chat:
 
         choices = self.prepare_choices_for_client(response=response)
         return choices
-
-    async def yield_response(self, temperature: float = 0.7):
-        """
-        This is a generator function that yields responses from the chat API.
-        Only used for streaming chat responses to the client.
-        """
-        response = self.ask_question(n_choices=1, temperature=temperature, stream=True)
-
-        async for chunk in response:
-            content = chunk["choices"][0]["delta"].get("content", "")
-            yield (f"data: {content}\n\n").encode("utf-8")
-        return
