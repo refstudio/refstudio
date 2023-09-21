@@ -157,7 +157,7 @@ class Chat:
         return docs
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(1), reraise=True)
-    def call_model(
+    async def call_model(
         self,
         messages: list,
         n_choices: int = 1,
@@ -180,7 +180,7 @@ class Chat:
             params["api_base"] = "http://localhost:11434"
             params["custom_llm_provider"] = "ollama"
 
-        response = litellm.completion(**params)
+        response = await litellm.acompletion(**params)
         logger.info(f"Received response from chat API: {response}")
         return response
 
@@ -196,7 +196,7 @@ class Chat:
             for choice in response["choices"]
         ]
 
-    def ask_question(
+    async def ask_question(
         self, n_choices: int = 1, temperature: float = 0.7, stream: bool = False
     ) -> dict:
         logger.info("Fetching 5 most relevant document chunks from storage")
@@ -208,7 +208,7 @@ class Chat:
         context_str = prepare_chunks_for_prompt(chunks=docs)
         prompt = create_prompt_for_chat(query=self.input_text, context=context_str)
         messages = self.prepare_messages_for_chat(text=prompt)
-        response = self.call_model(
+        response = await self.call_model(
             messages=messages,
             n_choices=n_choices,
             temperature=temperature,
@@ -222,13 +222,13 @@ class Chat:
         choices = self.prepare_choices_for_client(response=response)
         return choices
 
-    def yield_response(self, temperature: float = 0.7):
+    async def yield_response(self, temperature: float = 0.7):
         """
         This is a generator function that yields responses from the chat API.
         Only used for streaming chat responses to the client.
         """
         try:
-            response = self.ask_question(
+            response = await self.ask_question(
                 n_choices=1, temperature=temperature, stream=True
             )
         except AuthenticationError as e:
@@ -247,7 +247,7 @@ class Chat:
             return
 
         try:
-            for chunk in response:
+            async for chunk in response:
                 content = chunk["choices"][0]["delta"].get("content", "")
                 yield f"data: {content}\n\n"
         except ConnectionError as e:
