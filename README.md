@@ -172,6 +172,7 @@ To release a new version use the following steps:
 - open the [draft release](https://github.com/refstudio/refstudio/releases) created in the previous step
 - download and test the Ref Studio application
 - edit release notes to include notable changes and instalation instructions
+- remove debug artifacts from the release
 - publish release
 
 ### Locally
