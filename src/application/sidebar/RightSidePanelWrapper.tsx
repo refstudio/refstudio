@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ImperativePanelHandle, Panel } from 'react-resizable-panels';
+import { useWindowSize } from 'usehooks-ts';
 
 import { VerticalResizeHandle } from '../../components/VerticalResizeHandle';
 import { ChatbotPanel } from '../../features/ai/sidebar/ChatPanel';
@@ -15,6 +16,9 @@ export function RightSidePanelWrapper({ disabled }: { disabled?: boolean }) {
   const rightPanelRef = useRef<ImperativePanelHandle>(null);
   const [isPanelCollapsed, setIsPanelCollapsed] = useState(true);
   const [activePanel, setActivePanel] = useState<SecondarySideBarPanel>('Rewriter');
+
+  const size = useWindowSize();
+  const minWidth = useMemo(() => (256 / size.width) * 100, [size.width]);
 
   const handleSideBarClick = useCallback(
     (clickedPanel: SecondarySideBarPanel) => {
@@ -67,6 +71,7 @@ export function RightSidePanelWrapper({ disabled }: { disabled?: boolean }) {
       <Panel
         className="z-sidebar-panel shadow-default"
         collapsible
+        minSize={Number.isFinite(minWidth) ? minWidth : undefined}
         order={3}
         ref={rightPanelRef}
         onCollapse={(collapsed) => {

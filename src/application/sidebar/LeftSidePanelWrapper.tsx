@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ImperativePanelHandle, Panel } from 'react-resizable-panels';
+import { useWindowSize } from 'usehooks-ts';
 
 import { VerticalResizeHandle } from '../../components/VerticalResizeHandle';
 import { emitEvent } from '../../events';
@@ -16,6 +17,9 @@ export function LeftSidePanelWrapper({ disabled }: { disabled?: boolean }) {
   const leftPanelRef = useRef<ImperativePanelHandle>(null);
   const [isPanelCollapsed, setIsPanelCollapsed] = useState(disabled);
   const [activePanel, setActivePanel] = useState<PrimarySideBarPanel>('Explorer');
+
+  const size = useWindowSize();
+  const minWidth = useMemo(() => (256 / size.width) * 100, [size.width]);
 
   const handleSideBarClick = useCallback(
     (clickedPane: PrimarySideBarPanel) => {
@@ -86,6 +90,7 @@ export function LeftSidePanelWrapper({ disabled }: { disabled?: boolean }) {
       <Panel
         className="z-sidebar-panel shadow-default"
         collapsible
+        minSize={Number.isFinite(minWidth) ? minWidth : undefined}
         order={1}
         ref={leftPanelRef}
         onCollapse={(collapsed) => {
