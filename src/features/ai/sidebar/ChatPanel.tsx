@@ -1,7 +1,7 @@
 import { useAtomValue } from 'jotai';
 import { useEffect, useRef, useState } from 'react';
 
-import { chatWithAiStreaming } from '../../../api/chat';
+import { chatInteraction } from '../../../api/chat';
 import { projectIdAtom } from '../../../atoms/projectState';
 import { PanelWrapper } from '../../../components/PanelWrapper';
 import { cx } from '../../../lib/cx';
@@ -51,7 +51,7 @@ export function ChatbotPanel() {
     setCurrentChatThreadItem({ id: chatId, question: text });
     setText('');
 
-    chatWithAiStreaming(projectId, question, (_, fullAnswer) => {
+    chatInteraction(projectId, question, (_, fullAnswer) => {
       setCurrentChatThreadItem({ id: chatId, question: text, answer: fullAnswer });
     })
       .then((answer) => {
