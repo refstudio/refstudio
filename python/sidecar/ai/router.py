@@ -67,7 +67,16 @@ async def http_ai_chat_stream(
 ) -> StreamingResponse:
     user_id = "user1"
     user_settings = get_settings_for_user(user_id)
+    response = await yield_response(
+        req, project_id=project_id, user_settings=user_settings
+    )
+
+    async def stream_response(response):
+        async for chunk in response:
+            item = chunk["choices"][0]["delta"].get("content", "")
+            yield f"data: {item}\n\n".encode("utf-8")
+
     return StreamingResponse(
-        yield_response(req, project_id=project_id, user_settings=user_settings),
+        stream_response(response),
         media_type="text/event-stream",
     )

@@ -58,7 +58,7 @@ def yield_error_message(msg_func: callable):
     yield f"data: {msg_func()}\n\n"
 
 
-def yield_response(
+async def yield_response(
     request: ChatRequest,
     project_id: str = None,
     user_settings: FlatSettingsSchema = None,
@@ -85,13 +85,20 @@ def yield_response(
     storage = get_references_json_storage(user_id="user1", project_id=project_id)
     logger.info(f"Loaded {len(storage.chunks)} documents from storage")
 
-    if not storage.chunks:
-        # no reference chunks available for chat
-        return yield_error_message(get_missing_references_message)
+    # if not storage.chunks:
+    #     # no reference chunks available for chat
+    #     return yield_error_message(get_missing_references_message)
 
     ranker = BM25Ranker(storage=storage)
     chat = Chat(input_text=input_text, storage=storage, ranker=ranker, model=model)
-    return chat.yield_response(temperature=temperature)
+    response = await chat.ask_question(
+        n_choices=1, temperature=temperature, stream=True
+    )
+    return response
+    # async for chunk in response:
+    #     content = chunk["choices"][0]["delta"].get("content", "")
+    #     yield f"data: {content}\n\n"
+    # return chat.yield_response(temperature=temperature)
 
 
 async def ask_question(
@@ -248,40 +255,10 @@ class Chat:
         This is a generator function that yields responses from the chat API.
         Only used for streaming chat responses to the client.
         """
-        try:
-            response = await self.ask_question(
-                n_choices=1, temperature=temperature, stream=True
-            )
-        except AuthenticationError as e:
-            # OpenAI API key is missing
-            logger.error(e)
-            yield (
-                "data: It looks like you forgot to provide an API key! "
-                "Please add one in the settings menu by clicking the gear icon in the "
-                "lower left corner of the screen.\n\n"
-            )
-            return
-        except Exception as e:
-            # something unexpected happened
-            logger.error(e)
-            yield f"data: {str(e)}\n\n"
-            return
-
-        try:
-            async for chunk in response:
-                content = chunk["choices"][0]["delta"].get("content", "")
-                yield f"data: {content}\n\n"
-        except ConnectionError as e:
-            # Ollama is not running
-            logger.error(e)
-            yield (
-                "data: It looks like you forgot to start Ollama! "
-                "Please start Ollama on your local machine and try again.\n\n"
-            )
-            return
-        except Exception as e:
-            # something unexpected happened
-            logger.error(e)
-            yield f"data: {str(e)}\n\n"
-            return
+        response = await self.ask_question(
+            n_choices=1, temperature=temperature, stream=True
+        )
+        async for chunk in response:
+            content = chunk["choices"][0]["delta"].get("content", "")
+            yield f"data: {content}\n\n"
         return
