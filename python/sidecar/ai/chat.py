@@ -14,6 +14,18 @@ from sidecar.typing import ResponseStatus
 from tenacity import retry, stop_after_attempt, wait_fixed
 
 
+def get_missing_references_message():
+    return (
+        "It looks like reference PDFs have not been ingested yet. "
+        "Chat allows you to interact with your reference PDFs, "
+        "so please add some references and try again."
+    )
+
+
+def yield_missing_references_response():
+    yield f"data: {get_missing_references_message()}\n\n"
+
+
 def yield_response(
     request: ChatRequest,
     project_id: str = None,
@@ -39,8 +51,11 @@ def yield_response(
     logger.info(f"Calling chat with the following parameters: {request.dict()}")
 
     storage = get_references_json_storage(user_id="user1", project_id=project_id)
-
     logger.info(f"Loaded {len(storage.chunks)} documents from storage")
+
+    if not storage.chunks:
+        # no reference chunks available for chat
+        return yield_missing_references_response()
 
     ranker = BM25Ranker(storage=storage)
     chat = Chat(input_text=input_text, storage=storage, ranker=ranker, model=model)
@@ -69,8 +84,16 @@ def ask_question(
     logger.info(f"Calling chat with the following parameters: {request.dict()}")
 
     storage = get_references_json_storage(user_id="user1", project_id=project_id)
-
     logger.info(f"Loaded {len(storage.chunks)} documents from storage")
+
+    if not storage.chunks:
+        # no reference chunks available for chat
+        response = ChatResponse(
+            status=ResponseStatus.ERROR,
+            message=get_missing_references_message(),
+            choices=[],
+        )
+        return response
 
     ranker = BM25Ranker(storage=storage)
     chat = Chat(input_text=input_text, storage=storage, ranker=ranker, model=model)

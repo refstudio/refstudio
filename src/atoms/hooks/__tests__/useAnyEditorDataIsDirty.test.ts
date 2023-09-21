@@ -7,7 +7,7 @@ import { editorsContentStateAtom } from '../../core/editorContent';
 import { editorsDataAtom } from '../../core/editorData';
 import { EditorContentAtoms } from '../../types/EditorContentAtoms';
 import { buildEditorId, EditorId } from '../../types/EditorData';
-import { useAnyEditorDataIsDirty } from '../useAnyEditorDataIsDirty';
+import { useSomeEditorIsBeingSaved } from '../useSomeEditorIsBeingSaved';
 
 describe('useAnyEditorDataIsDirty', () => {
   let store: ReturnType<typeof createStore>;
@@ -32,12 +32,12 @@ describe('useAnyEditorDataIsDirty', () => {
   });
 
   it('should return false when no editor is dirty', () => {
-    const { current } = runHookWithJotaiProvider(useAnyEditorDataIsDirty, store);
+    const { current } = runHookWithJotaiProvider(useSomeEditorIsBeingSaved, store);
     expect(current).toBeFalsy();
   });
 
   it('should return true when one editor is edited', async () => {
-    const hookResult = runHookWithJotaiProvider(useAnyEditorDataIsDirty, store);
+    const hookResult = runHookWithJotaiProvider(useSomeEditorIsBeingSaved, store);
 
     expect(hookResult.current).toBeFalsy();
 

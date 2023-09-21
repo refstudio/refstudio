@@ -18,13 +18,19 @@ REFERENCES_JSON_PATH = Path(os.path.join(PROJECT_DIR, ".storage", "references.js
 logging.root.setLevel(logging.NOTSET)
 
 logger = logging.getLogger()
-handler = logging.FileHandler(
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+
+stream_handler = logging.StreamHandler()
+file_handler = logging.FileHandler(
     os.path.join(os.environ.get("SIDECAR_LOG_DIR", "/tmp"), "refstudio-sidecar.log")
 )
-handler.setLevel(logging.INFO)
 
-formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-handler.setFormatter(formatter)
+stream_handler.setLevel(logging.INFO)
+file_handler.setLevel(logging.INFO)
 
-logger.addHandler(handler)
+stream_handler.setFormatter(formatter)
+file_handler.setFormatter(formatter)
+
+logger.addHandler(stream_handler)
+logger.addHandler(file_handler)
 logger.disabled = os.environ.get("SIDECAR_ENABLE_LOGGING", "false").lower() != "true"

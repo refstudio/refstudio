@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { VscCheck, VscCloud, VscRefresh } from 'react-icons/vsc';
 
-import { useAnyEditorDataIsDirty } from '../../../atoms/hooks/useAnyEditorDataIsDirty';
+import { useSomeEditorIsBeingSaved } from '../../../atoms/hooks/useSomeEditorIsBeingSaved';
 import { FooterItem } from '../../../components/footer/FooterItem';
 
 export function FooterSavingFilesItem() {
   const [showSaved, setShowSaved] = useState(false);
-  const someDirty = useAnyEditorDataIsDirty();
+  const someDirty = useSomeEditorIsBeingSaved();
 
   useEffect(() => {
     // Note: We know this will show the "All files saved" info in the first run. That's ok.
