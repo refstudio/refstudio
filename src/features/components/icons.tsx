@@ -26,7 +26,7 @@ export const LoadingIcon = () => (
 );
 
 export const SpinnerIcon = () => (
-  <div className="flex h-6 w-6 shrink-0 items-center justify-center self-center">
+  <div className="flex h-5 w-5 shrink-0 items-center justify-center self-center">
     <img alt="loading..." src={spinner} />
   </div>
 );
