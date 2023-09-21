@@ -4,6 +4,7 @@ import { ReplaceAroundStep, ReplaceStep } from '@tiptap/pm/transform';
 import { Command } from '@tiptap/react';
 
 import { NotionBlockNode } from '../NotionBlockNode';
+import { BlockSelection } from '../selection/BlockSelection';
 
 export function addUnindentSteps(tr: Transaction, pos: number): void {
   const resolvedPos = tr.doc.resolve(pos);
@@ -18,20 +19,33 @@ export function addUnindentSteps(tr: Transaction, pos: number): void {
 }
 
 export const unindent: Command = ({ tr, dispatch }) => {
-  const { $from } = tr.selection;
-  if (!tr.selection.empty || $from.node(-1).type.name !== NotionBlockNode.name) {
+  const nodesToUnindentPositions: number[] = [];
+  const { selection } = tr;
+  if (selection instanceof BlockSelection) {
     return false;
   }
 
-  // If the current node's grandparent is not a NotionBlockNode, then the node cannot be unindented
-  if ($from.depth <= 2 || $from.node(-2).type.name !== NotionBlockNode.name) {
-    return false;
-  }
+  const { from, to } = selection;
+  tr.doc.nodesBetween(tr.selection.from, tr.selection.to, (node, pos, parent) => {
+    if (node.type.name === NotionBlockNode.name) {
+      if (parent?.type.name === NotionBlockNode.name) {
+        // Only unindent nodes that are selected (ie their first child is selected)
+        const headerSize = node.firstChild!.nodeSize;
+        if (from <= pos + headerSize && to >= pos) {
+          nodesToUnindentPositions.push(pos);
+        }
+      }
+    } else {
+      return false;
+    }
+  });
 
   if (dispatch) {
-    addUnindentSteps(tr, $from.pos);
-
+    // Reverse to unindent children first
+    nodesToUnindentPositions.reverse().forEach((pos) => {
+      addUnindentSteps(tr, pos + 2);
+    });
     dispatch(tr);
   }
-  return true;
+  return nodesToUnindentPositions.length > 0;
 };
