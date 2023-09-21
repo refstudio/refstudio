@@ -6,7 +6,7 @@ import { refreshFileTreeAtom } from '../fileExplorerActions';
 import { EditorContent } from '../types/EditorContent';
 import { EditorContentAtoms } from '../types/EditorContentAtoms';
 import { EditorId, parseEditorId } from '../types/EditorData';
-import { editorsDataAtom, setEditorDataIsDirtyAtom } from './editorData';
+import { editorsDataAtom, setEditorContentIsBeingSavedAtom, setEditorDataIsDirtyAtom } from './editorData';
 
 export function createEditorContentAtoms(
   editorId: EditorId,
@@ -26,26 +26,30 @@ export function createEditorContentAtoms(
   });
 
   const saveEditorContentAtom = atom(null, async (get, set) => {
-    const editorContent = get(editorBufferAtom);
-    if (editorContent) {
-      switch (editorContent.type) {
-        case 'refstudio': {
-          const currentEditorId = get(editorIdAtom);
-          const { id: path } = parseEditorId(currentEditorId);
+    try {
+      const editorContent = get(editorBufferAtom);
+      if (editorContent) {
+        switch (editorContent.type) {
+          case 'refstudio': {
+            const currentEditorId = get(editorIdAtom);
+            const { id: path } = parseEditorId(currentEditorId);
 
-          const success = await writeFileContent(path, JSON.stringify(editorContent.jsonContent));
-          if (success) {
-            set(setEditorDataIsDirtyAtom, { editorId: currentEditorId, isDirty: false });
-            // Refresh file tree after saving file
-            void set(refreshFileTreeAtom);
+            const success = await writeFileContent(path, JSON.stringify(editorContent.jsonContent));
+            if (success) {
+              set(setEditorDataIsDirtyAtom, { editorId: currentEditorId, isDirty: false });
+              // Refresh file tree after saving file
+              void set(refreshFileTreeAtom);
+            }
+            return;
           }
-          return;
-        }
-        default: {
-          console.error('Save editor - Unsupported editor content type: ', editorContent.type);
-          return;
+          default: {
+            console.error('Save editor - Unsupported editor content type: ', editorContent.type);
+            return;
+          }
         }
       }
+    } finally {
+      set(setEditorContentIsBeingSavedAtom, { editorId: get(editorIdAtom), isContentBeingSaved: false });
     }
   });
 
@@ -54,13 +58,14 @@ export function createEditorContentAtoms(
   const updateEditorContentBufferAtom = atom(null, (get, set, payload: EditorContent) => {
     set(editorBufferAtom, payload);
     set(setEditorDataIsDirtyAtom, { editorId: get(editorIdAtom), isDirty: true });
+    set(setEditorContentIsBeingSavedAtom, { editorId: get(editorIdAtom), isContentBeingSaved: true });
 
     // Debounced auto-save of editor content
     if (saveTimeoutId) {
       clearTimeout(saveTimeoutId);
     }
     saveTimeoutId = setTimeout(() => {
-      const editorData = get(editorsDataAtom).get(editorId);
+      const editorData = get(editorsDataAtom).get(get(editorIdAtom));
       if (!editorData) {
         console.log('Editor data not found, cannot save editor content');
         return;

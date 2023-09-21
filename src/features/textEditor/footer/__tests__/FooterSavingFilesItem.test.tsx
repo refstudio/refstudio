@@ -1,17 +1,17 @@
 import { createStore } from 'jotai';
 
-import { useAnyEditorDataIsDirty } from '../../../../atoms/hooks/useAnyEditorDataIsDirty';
+import { useSomeEditorIsBeingSaved } from '../../../../atoms/hooks/useSomeEditorIsBeingSaved';
 import { screen, setupWithJotaiProvider } from '../../../../test/test-utils';
 import { FooterSavingFilesItem } from '../FooterSavingFilesItem';
 
-vi.mock('../../../../atoms/hooks/useAnyEditorDataIsDirty');
+vi.mock('../../../../atoms/hooks/useSomeEditorIsBeingSaved');
 
 describe('FooterSavingFilesItem', () => {
   let store: ReturnType<typeof createStore>;
 
   beforeEach(() => {
     store = createStore();
-    vi.mocked(useAnyEditorDataIsDirty).mockReturnValue(false);
+    vi.mocked(useSomeEditorIsBeingSaved).mockReturnValue(false);
   });
 
   afterEach(() => {
@@ -24,7 +24,7 @@ describe('FooterSavingFilesItem', () => {
   });
 
   it('should display "Saving..." when some file is dirty', () => {
-    vi.mocked(useAnyEditorDataIsDirty).mockReturnValue(true);
+    vi.mocked(useSomeEditorIsBeingSaved).mockReturnValue(true);
 
     setupWithJotaiProvider(<FooterSavingFilesItem />, store);
     expect(screen.getByText('Saving...')).toBeInTheDocument();

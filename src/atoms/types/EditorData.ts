@@ -8,6 +8,7 @@ export interface EditorData {
   id: EditorId;
   title: string;
   isDirty?: boolean;
+  isContentBeingSaved?: boolean;
 }
 
 export function parseEditorId(editorId: EditorId): { type: EditorContentType; id: string } {
