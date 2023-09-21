@@ -169,7 +169,7 @@ def create_settings_json(monkeypatch, tmp_path, request):
 
 @pytest.fixture
 def mock_call_model_is_ok(*args, **kwargs):
-    def mock_call_model_response(*args, **kwargs):
+    async def mock_call_model_response(*args, **kwargs):
         return {
             "choices": [
                 {

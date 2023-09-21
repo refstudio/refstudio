@@ -13,6 +13,23 @@ from sidecar.settings.schemas import FlatSettingsSchema, ModelProvider
 from sidecar.typing import ResponseStatus
 from tenacity import retry, stop_after_attempt, wait_fixed
 
+# def call_ollama(prompt, model: str = "llama2"):
+#     import requests
+
+#     url = "http://localhost:11434/api/generate"
+#     data = {
+#         "prompt": prompt,
+#         "model": model,
+#     }
+
+#     response = requests.post(url, json=data)
+
+#     result = ""
+#     async for chunk in response:
+#         pass
+
+#     return response
+
 
 def get_missing_references_message():
     return (
@@ -22,8 +39,23 @@ def get_missing_references_message():
     )
 
 
-def yield_missing_references_response():
-    yield f"data: {get_missing_references_message()}\n\n"
+def get_authentication_error_message():
+    return (
+        "It looks like you forgot to provide an API key! "
+        "Please add one in the settings menu by clicking the gear icon in the "
+        "lower left corner of the screen."
+    )
+
+
+def get_ollama_connection_error_message():
+    return (
+        "It looks like you forgot to start Ollama! "
+        "Please start Ollama on your local machine and try again."
+    )
+
+
+def yield_error_message(msg_func: callable):
+    yield f"data: {msg_func()}\n\n"
 
 
 def yield_response(
@@ -55,14 +87,14 @@ def yield_response(
 
     if not storage.chunks:
         # no reference chunks available for chat
-        return yield_missing_references_response()
+        return yield_error_message(get_missing_references_message)
 
     ranker = BM25Ranker(storage=storage)
     chat = Chat(input_text=input_text, storage=storage, ranker=ranker, model=model)
     return chat.yield_response(temperature=temperature)
 
 
-def ask_question(
+async def ask_question(
     request: ChatRequest,
     project_id: str = None,
     user_settings: FlatSettingsSchema = None,
@@ -99,7 +131,7 @@ def ask_question(
     chat = Chat(input_text=input_text, storage=storage, ranker=ranker, model=model)
 
     try:
-        choices = chat.ask_question(n_choices=n_choices, temperature=temperature)
+        choices = await chat.ask_question(n_choices=n_choices, temperature=temperature)
     except Exception as e:
         logger.error(e)
         response = ChatResponse(
@@ -136,7 +168,7 @@ class Chat:
         return docs
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(1), reraise=True)
-    def call_model(
+    async def call_model(
         self,
         messages: list,
         n_choices: int = 1,
@@ -159,7 +191,7 @@ class Chat:
             params["api_base"] = "http://localhost:11434"
             params["custom_llm_provider"] = "ollama"
 
-        response = litellm.completion(**params)
+        response = await litellm.acompletion(**params)
         logger.info(f"Received response from chat API: {response}")
         return response
 
@@ -175,7 +207,7 @@ class Chat:
             for choice in response["choices"]
         ]
 
-    def ask_question(
+    async def ask_question(
         self, n_choices: int = 1, temperature: float = 0.7, stream: bool = False
     ) -> dict:
         logger.info("Fetching 5 most relevant document chunks from storage")
@@ -187,19 +219,29 @@ class Chat:
         context_str = prepare_chunks_for_prompt(chunks=docs)
         prompt = create_prompt_for_chat(query=self.input_text, context=context_str)
         messages = self.prepare_messages_for_chat(text=prompt)
-        response = self.call_model(
+        response = await self.call_model(
             messages=messages,
             n_choices=n_choices,
             temperature=temperature,
             stream=stream,
         )
 
+        if self.model == "llama2" and not stream:
+            # need to unwrap response for Ollama
+            response = await self.unwrap_response(response)
+
         if stream:
-            # no need to wrap in a ChatResponse object
+            # need to unwrap response for Ollama
             return response
 
         choices = self.prepare_choices_for_client(response=response)
         return choices
+
+    async def unwrap_response(self, generator):
+        response = ""
+        async for elem in generator:
+            response += elem["choices"][0]["delta"]["content"]
+        return {"choices": [{"index": 0, "message": {"content": response}}]}
 
     def yield_response(self, temperature: float = 0.7):
         """

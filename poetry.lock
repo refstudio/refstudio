@@ -78,6 +78,14 @@ six = "*"
 test = ["astroid", "pytest"]
 
 [[package]]
+name = "async-generator"
+version = "1.10"
+description = "Async generators and context managers for Python 3.5+"
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[[package]]
 name = "async-timeout"
 version = "4.0.3"
 description = "Timeout context manager for asyncio programs"
@@ -415,7 +423,7 @@ testing = ["Django (<3.1)", "attrs", "colorama", "docopt", "pytest (<7.0.0)"]
 
 [[package]]
 name = "litellm"
-version = "0.1.690"
+version = "0.1.724"
 description = "Library to easily interface with LLM API providers"
 category = "main"
 optional = false
@@ -1032,7 +1040,7 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9, <3.12"  # pyinstaller requires Python <3.12
-content-hash = "a2f4eb1d7cf9e4b6140863baa67995910e94e5b52ec64eb5fce8283cc6f8c126"
+content-hash = "fd8ec20ee0a8a2bc2f5d6c3af1aa87e07709fdb42801310fb65e61152cbe7e56"
 
 [metadata.files]
 aiohttp = [
@@ -1143,6 +1151,10 @@ appnope = [
 asttokens = [
     {file = "asttokens-2.2.1-py2.py3-none-any.whl", hash = "sha256:6b0ac9e93fb0335014d382b8fa9b3afa7df546984258005da0b9e7095b3deb1c"},
     {file = "asttokens-2.2.1.tar.gz", hash = "sha256:4622110b2a6f30b77e1473affaa97e711bc2f07d3f10848420ff1898edbe94f3"},
+]
+async-generator = [
+    {file = "async_generator-1.10-py3-none-any.whl", hash = "sha256:01c7bf666359b4967d2cda0000cc2e4af16a0ae098cbffcb8472fb9e8ad6585b"},
+    {file = "async_generator-1.10.tar.gz", hash = "sha256:6ebb3d106c12920aaae42ccb6f787ef5eefdcdd166ea3d628fa8476abe712144"},
 ]
 async-timeout = [
     {file = "async-timeout-4.0.3.tar.gz", hash = "sha256:4640d96be84d82d02ed59ea2b7105a0f7b33abe8703703cd0ab0bf87c427522f"},
@@ -1451,8 +1463,8 @@ jedi = [
     {file = "jedi-0.19.0.tar.gz", hash = "sha256:bcf9894f1753969cbac8022a8c2eaee06bfa3724e4192470aaffe7eb6272b0c4"},
 ]
 litellm = [
-    {file = "litellm-0.1.690-py3-none-any.whl", hash = "sha256:b936b80bdeba02a4a278c94fdcf4eff22904e531af86b7e1a8c01518a5ac00a6"},
-    {file = "litellm-0.1.690.tar.gz", hash = "sha256:51271a11f4c963da23a9b7bb75dca9a8de4c5dee1b9906057e59ca9e51ac400a"},
+    {file = "litellm-0.1.724-py3-none-any.whl", hash = "sha256:2a8f49b60372fd38fcec27b474932446c3de45827016db6bea760377633387aa"},
+    {file = "litellm-0.1.724.tar.gz", hash = "sha256:154b9279aa7c135bcb7390ff07a1d4117c7caf8048e29301dc0396784e669a3d"},
 ]
 macholib = [
     {file = "macholib-1.16.2-py2.py3-none-any.whl", hash = "sha256:44c40f2cd7d6726af8fa6fe22549178d3a4dfecc35a9cd15ea916d9c83a688e0"},
