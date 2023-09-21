@@ -47,7 +47,6 @@ export const SearchResult = ({ reference, projectId }: { reference: S2SearchResu
     setRefStatus('adding');
     saveS2Reference(projectId, reference)
       .then((result) => {
-        console.log('THIS IS THE MESSAGE', result.message);
         setRefId(result.references[0].id);
         if (result.message) {
           setMessage(result.message);
@@ -55,7 +54,6 @@ export const SearchResult = ({ reference, projectId }: { reference: S2SearchResu
         setRefStatus('added');
       })
       .catch((e) => {
-        console.log('THE ERROR', e);
         setRefStatus('error');
       });
   }, [projectId, reference, saveS2Reference]);
