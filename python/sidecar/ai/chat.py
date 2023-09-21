@@ -22,8 +22,30 @@ def get_missing_references_message():
     )
 
 
-def yield_missing_references_response():
-    yield f"data: {get_missing_references_message()}\n\n"
+def get_authentication_error_message():
+    return (
+        "It looks like you forgot to provide an API key! "
+        "Please add one in the settings menu by clicking the gear icon in the "
+        "lower left corner of the screen."
+    )
+
+
+def get_ollama_connection_error_message():
+    return (
+        "It looks like you forgot to start Ollama! "
+        "Please start Ollama on your local machine and try again."
+    )
+
+
+def yield_error_message(msg_func: callable):
+    yield f"data: {msg_func()}\n\n"
+
+
+async def stream_response(response, encoding="utf-8"):
+    async for chunk in response:
+        # print(elem)
+        response += chunk["choices"][0]["delta"].get("content", "")
+        yield response.encode(encoding)
 
 
 def yield_response(
@@ -55,14 +77,15 @@ def yield_response(
 
     if not storage.chunks:
         # no reference chunks available for chat
-        return yield_missing_references_response()
+        return yield_error_message(get_missing_references_message)
 
     ranker = BM25Ranker(storage=storage)
     chat = Chat(input_text=input_text, storage=storage, ranker=ranker, model=model)
-    return chat.yield_response(temperature=temperature)
+    response = chat.yield_response(temperature=temperature)
+    return response
 
 
-def ask_question(
+async def ask_question(
     request: ChatRequest,
     project_id: str = None,
     user_settings: FlatSettingsSchema = None,
@@ -99,7 +122,7 @@ def ask_question(
     chat = Chat(input_text=input_text, storage=storage, ranker=ranker, model=model)
 
     try:
-        choices = chat.ask_question(n_choices=n_choices, temperature=temperature)
+        choices = await chat.ask_question(n_choices=n_choices, temperature=temperature)
     except Exception as e:
         logger.error(e)
         response = ChatResponse(
@@ -136,7 +159,7 @@ class Chat:
         return docs
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(1), reraise=True)
-    def call_model(
+    async def call_model(
         self,
         messages: list,
         n_choices: int = 1,
@@ -159,7 +182,7 @@ class Chat:
             params["api_base"] = "http://localhost:11434"
             params["custom_llm_provider"] = "ollama"
 
-        response = litellm.completion(**params)
+        response = await litellm.acompletion(**params)
         logger.info(f"Received response from chat API: {response}")
         return response
 
@@ -175,7 +198,7 @@ class Chat:
             for choice in response["choices"]
         ]
 
-    def ask_question(
+    async def ask_question(
         self, n_choices: int = 1, temperature: float = 0.7, stream: bool = False
     ) -> dict:
         logger.info("Fetching 5 most relevant document chunks from storage")
@@ -187,7 +210,7 @@ class Chat:
         context_str = prepare_chunks_for_prompt(chunks=docs)
         prompt = create_prompt_for_chat(query=self.input_text, context=context_str)
         messages = self.prepare_messages_for_chat(text=prompt)
-        response = self.call_model(
+        response = await self.call_model(
             messages=messages,
             n_choices=n_choices,
             temperature=temperature,
@@ -201,45 +224,14 @@ class Chat:
         choices = self.prepare_choices_for_client(response=response)
         return choices
 
-    def yield_response(self, temperature: float = 0.7):
+    async def yield_response(self, temperature: float = 0.7):
         """
         This is a generator function that yields responses from the chat API.
         Only used for streaming chat responses to the client.
         """
-        try:
-            response = self.ask_question(
-                n_choices=1, temperature=temperature, stream=True
-            )
-        except AuthenticationError as e:
-            # OpenAI API key is missing
-            logger.error(e)
-            yield (
-                "data: It looks like you forgot to provide an API key! "
-                "Please add one in the settings menu by clicking the gear icon in the "
-                "lower left corner of the screen.\n\n"
-            )
-            return
-        except Exception as e:
-            # something unexpected happened
-            logger.error(e)
-            yield f"data: {str(e)}\n\n"
-            return
+        response = self.ask_question(n_choices=1, temperature=temperature, stream=True)
 
-        try:
-            for chunk in response:
-                content = chunk["choices"][0]["delta"].get("content", "")
-                yield f"data: {content}\n\n"
-        except ConnectionError as e:
-            # Ollama is not running
-            logger.error(e)
-            yield (
-                "data: It looks like you forgot to start Ollama! "
-                "Please start Ollama on your local machine and try again.\n\n"
-            )
-            return
-        except Exception as e:
-            # something unexpected happened
-            logger.error(e)
-            yield f"data: {str(e)}\n\n"
-            return
+        async for chunk in response:
+            content = chunk["choices"][0]["delta"].get("content", "")
+            yield (f"data: {content}\n\n").encode("utf-8")
         return

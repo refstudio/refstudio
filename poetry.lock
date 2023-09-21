@@ -415,7 +415,7 @@ testing = ["Django (<3.1)", "attrs", "colorama", "docopt", "pytest (<7.0.0)"]
 
 [[package]]
 name = "litellm"
-version = "0.1.690"
+version = "0.1.724"
 description = "Library to easily interface with LLM API providers"
 category = "main"
 optional = false
@@ -1451,8 +1451,8 @@ jedi = [
     {file = "jedi-0.19.0.tar.gz", hash = "sha256:bcf9894f1753969cbac8022a8c2eaee06bfa3724e4192470aaffe7eb6272b0c4"},
 ]
 litellm = [
-    {file = "litellm-0.1.690-py3-none-any.whl", hash = "sha256:b936b80bdeba02a4a278c94fdcf4eff22904e531af86b7e1a8c01518a5ac00a6"},
-    {file = "litellm-0.1.690.tar.gz", hash = "sha256:51271a11f4c963da23a9b7bb75dca9a8de4c5dee1b9906057e59ca9e51ac400a"},
+    {file = "litellm-0.1.724-py3-none-any.whl", hash = "sha256:2a8f49b60372fd38fcec27b474932446c3de45827016db6bea760377633387aa"},
+    {file = "litellm-0.1.724.tar.gz", hash = "sha256:154b9279aa7c135bcb7390ff07a1d4117c7caf8048e29301dc0396784e669a3d"},
 ]
 macholib = [
     {file = "macholib-1.16.2-py2.py3-none-any.whl", hash = "sha256:44c40f2cd7d6726af8fa6fe22549178d3a4dfecc35a9cd15ea916d9c83a688e0"},

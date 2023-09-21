@@ -239,10 +239,6 @@ class Rewriter:
 
         response = await litellm.acompletion(**params)
 
-        if self.model == "llama2":
-            # Will only be a single choice response from Ollama
-            response = await self.unwrap_response(response)
-
         logger.info(f"Received response from {self.model} chat API: {response}")
         return response
 
@@ -251,9 +247,3 @@ class Rewriter:
             {"role": "user", "content": text},
         ]
         return messages
-
-    async def unwrap_response(self, generator):
-        response = ""
-        async for elem in generator:
-            response += elem["choices"][0]["delta"]["content"]
-        return {"choices": [{"index": 0, "message": {"content": response}}]}
