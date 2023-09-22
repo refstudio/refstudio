@@ -195,3 +195,20 @@ body > div#root {
   width: 0px;
   background-color: transparent;
 }
+
+.tooltip {
+  @apply invisible relative;
+  @apply right-[12px] top-2 -mb-[100%] bg-gray-100;
+  @apply -ml-72 w-80 rounded p-3;
+}
+
+.has-tooltip:hover .tooltip {
+  @apply visible z-50;
+}
+
+.tooltip:before {
+  content: '';
+  @apply absolute block h-0 w-0;
+  @apply border-b-8 border-l-8 border-r-8 border-b-gray-100 border-l-transparent border-r-transparent;
+  @apply -top-2 right-[1px];
+}

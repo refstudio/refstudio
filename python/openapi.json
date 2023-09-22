@@ -320,6 +320,10 @@
       },
       "IngestResponse": {
         "properties": {
+          "message": {
+            "default": "",
+            "type": "string"
+          },
           "project_name": {
             "type": "string"
           },

@@ -101,6 +101,7 @@ export function ReferencesPanel() {
               <div className="text-center text-side-bar-txt-secondary">Drag or choose your first reference here.</div>
             </div>
             <Button text="Upload References" onClick={() => emitEvent('refstudio://menu/references/upload')} />
+            <Button text="Search Semantic Scholar" onClick={() => emitEvent('refstudio://menu/references/search')} />
           </div>
         </div>
       )}

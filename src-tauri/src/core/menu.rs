@@ -5,6 +5,7 @@ pub struct AppMenu {}
 const MENU_SETTINGS: &str = /*            */ "refstudio://menu/settings";
 const MENU_REFERENCES_OPEN: &str = /*     */ "refstudio://menu/references/open";
 const MENU_REFERENCES_UPLOAD: &str = /*   */ "refstudio://menu/references/upload";
+const MENU_REFERENCES_SEARCH: &str = /*   */ "refstudio://menu/references/search";
 const MENU_FILE_SAVE: &str = /*           */ "refstudio://menu/file/save";
 const MENU_FILE_NEW: &str = /*            */ "refstudio://menu/file/new";
 const MENU_FILE_SAVE_AS_MD: &str = /*     */ "refstudio://menu/file/markdown";
@@ -92,7 +93,11 @@ impl AppMenu {
                 .add_item(
                     CustomMenuItem::new(MENU_REFERENCES_OPEN, "Open").accelerator("cmdOrControl+R"),
                 )
-                .add_item(CustomMenuItem::new(MENU_REFERENCES_UPLOAD, "Upload...")),
+                .add_item(CustomMenuItem::new(MENU_REFERENCES_UPLOAD, "Upload..."))
+                .add_item(CustomMenuItem::new(
+                    MENU_REFERENCES_SEARCH,
+                    "Search Semantic Scholar",
+                )),
         );
 
         let view_menu = Submenu::new(

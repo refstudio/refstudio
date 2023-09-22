@@ -327,6 +327,10 @@
             "$ref": "#/definitions/Reference"
           },
           "type": "array"
+        },
+        "message": {
+          "type": "string",
+          "default": ""
         }
       },
       "type": "object",

@@ -63,7 +63,7 @@ export const areReferencesLoadedAtom = atom((get) => get(referencesLoadedAtom) !
 // #####################################################################################
 // Edit operations
 // #####################################################################################
-const removeReferenceAtom = atom(null, (get, set, id: string) => {
+export const removeReferenceAtom = atom(null, (get, set, id: string) => {
   const references = get(getReferencesAtom);
   const newReferences = references.filter((ref) => ref.id !== id);
   set(setReferencesAtom, newReferences);

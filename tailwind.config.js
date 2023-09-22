@@ -16,6 +16,25 @@ export default {
         "editor-base": ["16px", "20px"],
       },
       colors: {
+        'color': {
+          "info": {
+            "10": 'rgb(var(--semantic-info-10) / <alpha-value>)',
+            "50": 'rgb(var(--semantic-info-50) / <alpha-value>)',
+          },
+          "success": {
+            "10": 'rgb(var(--semantic-success-10) / <alpha-value>)',
+            "50": 'rgb(var(--semantic-success-50) / <alpha-value>)',
+          },
+          "warning": {
+            "10": 'rgb(var(--semantic-warning-10) / <alpha-value>)',
+            "50": 'rgb(var(--semantic-warning-50) / <alpha-value>)',
+          },
+          "error": {
+            "10": 'rgb(var(--semantic-error-10) / <alpha-value>)',
+            "50": 'rgb(var(--semantic-error-50) / <alpha-value>)',
+          },
+        },
+
         'txt': {
           muted: 'rgb(var(--text-muted) / <alpha-value>)',
         },
@@ -248,7 +267,7 @@ export default {
       },
     },
   },
-  plugins: [debugPlugin(), autocompleteCustomComponentsPlugin()],
+  plugins: [debugPlugin(), autocompleteCustomComponentsPlugin()]
 };
 
 /**
