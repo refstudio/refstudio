@@ -38,19 +38,3 @@ export async function chatWithAiStreaming(
     .then(() => fullReply)
     .catch((err) => `Chat error: ${String(err)}`);
 }
-
-export async function chatInteraction(
-  projectId: string,
-  question: string,
-  onText: (part: string, full: string) => void,
-): Promise<string> {
-  if (import.meta.env.VITE_IS_WEB) {
-    return chatWithAiStreaming(projectId, question, onText);
-  }
-
-  return chatWithAI(projectId, question).then((reply) => {
-    const fullReply = reply.join('\n');
-    onText(fullReply, fullReply);
-    return fullReply;
-  });
-}
