@@ -224,8 +224,8 @@ def amock_call_model_is_ok(*args, **kwargs):
 
 
 @pytest.fixture
-def mock_call_model_is_stream(*args, **kwargs):
-    def mock_call_model_response(*args, **kwargs):
+def amock_call_model_is_stream(*args, **kwargs):
+    async def mock_call_model_response(*args, **kwargs):
         yield {
             "choices": [
                 {

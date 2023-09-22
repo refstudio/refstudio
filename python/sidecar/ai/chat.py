@@ -2,8 +2,6 @@ import os
 
 import litellm
 import openai
-from openai.error import AuthenticationError
-from requests.exceptions import ConnectionError
 from sidecar.ai.prompts import create_prompt_for_chat, prepare_chunks_for_prompt
 from sidecar.ai.ranker import BM25Ranker
 from sidecar.ai.schemas import ChatRequest, ChatResponse, ChatResponseChoice
@@ -12,23 +10,6 @@ from sidecar.references.storage import JsonStorage, get_references_json_storage
 from sidecar.settings.schemas import FlatSettingsSchema, ModelProvider
 from sidecar.typing import ResponseStatus
 from tenacity import retry, stop_after_attempt, wait_fixed
-
-# def call_ollama(prompt, model: str = "llama2"):
-#     import requests
-
-#     url = "http://localhost:11434/api/generate"
-#     data = {
-#         "prompt": prompt,
-#         "model": model,
-#     }
-
-#     response = requests.post(url, json=data)
-
-#     result = ""
-#     async for chunk in response:
-#         pass
-
-#     return response
 
 
 def get_missing_references_message():
@@ -233,13 +214,12 @@ class Chat:
             stream=stream,
         )
 
+        if stream:
+            return response
+
         if self.model == "llama2" and not stream:
             # need to unwrap response for Ollama
             response = await self.unwrap_response(response)
-
-        if stream:
-            # need to unwrap response for Ollama
-            return response
 
         choices = self.prepare_choices_for_client(response=response)
         return choices

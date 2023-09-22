@@ -55,28 +55,30 @@ async def test_chat_ask_question_is_openai_error(
     assert len(output["choices"]) == 0
 
 
-def test_chat_yield_response_is_ok(
-    monkeypatch, mock_call_model_is_stream, setup_project_references_json
+@pytest.mark.asyncio
+async def test_chat_yield_response_is_ok(
+    monkeypatch, amock_call_model_is_stream, setup_project_references_json
 ):
-    monkeypatch.setattr(chat.Chat, "call_model", mock_call_model_is_stream)
+    monkeypatch.setattr(chat.Chat, "call_model", amock_call_model_is_stream)
 
-    response = chat.yield_response(
+    response = await chat.yield_response(
         request=ChatRequest(text="This is a question about something"),
         project_id="project1",
     )
     assert isinstance(response, GeneratorType)
 
     result = ""
-    for chunk in response:
+    async for chunk in response:
         result += chunk
 
     assert result == "data: This is a mocked streaming response\n\n"
 
 
-def test_chat_yield_response_is_missing_references(
-    monkeypatch, mock_call_model_is_stream, setup_project_references_empty
+@pytest.mark.asyncio
+async def test_chat_yield_response_is_missing_references(
+    monkeypatch, amock_call_model_is_stream, setup_project_references_empty
 ):
-    response = chat.yield_response(
+    response = await chat.yield_response(
         request=ChatRequest(text="This is a question about something"),
         project_id="project1",
     )
