@@ -1,6 +1,6 @@
 import { useAtomValue } from 'jotai';
 import { Command } from 'kmenu';
-import { VscMarkdown, VscNewFile, VscSave } from 'react-icons/vsc';
+import { VscMarkdown, VscNewFile } from 'react-icons/vsc';
 
 import { useIsEditorOpen } from '../../../atoms/hooks/useIsEditorOpen';
 import { isProjectOpenAtom } from '../../../atoms/projectState';
@@ -23,18 +23,11 @@ export function useFileCommands(): Command[] {
   ];
 
   if (isRefStudioEditorOpen) {
-    fileCommands.push(
-      {
-        icon: <VscSave />,
-        text: 'Save',
-        perform: () => emitEvent('refstudio://menu/file/save'),
-      },
-      {
-        icon: <VscMarkdown />,
-        text: 'Save File as Markdown',
-        perform: () => emitEvent('refstudio://menu/file/markdown'),
-      },
-    );
+    fileCommands.push({
+      icon: <VscMarkdown />,
+      text: 'Save File as Markdown',
+      perform: () => emitEvent('refstudio://menu/file/markdown'),
+    });
   }
 
   return [
