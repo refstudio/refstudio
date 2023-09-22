@@ -47,14 +47,14 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
+            const targetTag = `${process.env.PACKAGE_VERSION}`;
             // API: https://github.com/octokit/plugin-rest-endpoint-methods.js/tree/main/docs/repos
             try {
-              const existingRelease = await github.rest.repos.getReleaseByTag({
+              const existingReleases = await github.rest.repos.listReleases({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                tag: `${process.env.PACKAGE_VERSION}`
               })
-              return existingRelease.data.id
+              return existingReleases.data.find(release => release.tag_name === targetTag).id
             } catch(err) {
               console.log("No existing release found. Creating a new release for tag: " + process.env.PACKAGE_VERSION)
             }
@@ -77,18 +77,21 @@ jobs:
     permissions:
       contents: write
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         include:
-          # - name: Linx-x86_64
-          #   target: x86_64-unknown-linux-gnu
-          #   runner: ubuntu-latest
-          - name: macOS-Apple
-            target: aarch64-apple-darwin
-            runner: macos-latest
-          - name: macOS-Intel
-            target: x86_64-apple-darwin
-            runner: macos-latest
+          - name: Windows_x86_64
+            target: i686-pc-windows-msvc
+            runner: windows-latest
+          - name: Linx-x86_64
+            target: x86_64-unknown-linux-gnu
+            runner: ubuntu-latest
+          # - name: macOS-Apple
+          #   target: aarch64-apple-darwin
+          #   runner: macos-latest
+          # - name: macOS-Intel
+          #   target: x86_64-apple-darwin
+          #   runner: macos-latest
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v3
@@ -113,7 +116,7 @@ jobs:
       
       - name: Create Python binary
         run: |
-          poetry run pyinstaller --noconfirm --distpath src-tauri/bin/python python/main.py
+          yarn python
 
       # start server in the background and verify it's working
       # the binary takes time to start up, so we need to wait a bit

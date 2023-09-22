@@ -8,13 +8,23 @@ on:
     paths:
       - 'python/**'
       - 'package.json'
+      - '.github/actions/setup-python/**'
+      - '.github/actions/setup-node/**'
+      - '.github/workflows/test-sidecar-binary.yml'
 
 jobs:
   test-binary:
+    defaults:
+      run:
+        shell: bash
     strategy:
       fail-fast: true
       matrix:
         include:
+          - name: Windows
+            runner: windows-latest
+          - name: Linx-x86_64
+            runner: ubuntu-latest
           - name: macOS
             runner: macos-latest
     runs-on: ${{ matrix.runner }}

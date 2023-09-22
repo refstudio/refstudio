@@ -1,7 +1,7 @@
 {
   "name": "refstudio",
   "private": true,
-  "version": "23.2.0-alpha.1",
+  "version": "23.2.0-alpha.2",
   "description": "An open source text editor optimized for writing that relies on references.",
   "type": "module",
   "scripts": {
