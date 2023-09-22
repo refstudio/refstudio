@@ -4,6 +4,7 @@ import { EventStreamContentType, fetchEventSource } from '@microsoft/fetch-event
 
 import { universalDelete, universalGet, universalPatch, universalPost, universalPut } from './api';
 import type { paths } from './api-paths';
+import { REFSTUDIO_HOST } from './server';
 
 type LowerMethod = 'get' | 'post' | 'put' | 'delete' | 'patch';
 
@@ -180,7 +181,8 @@ export async function apiPostStream<Path extends PathsForMethod<'post'>>(
   const [options, body, onMessage] = safeArgs.length === 3 ? safeArgs : [undefined, ...safeArgs];
   const path = options ? completePath(pathSpec, options) : pathSpec;
 
-  return fetchEventSource(path, {
+  const url = import.meta.env.VITE_IS_WEB ? path : REFSTUDIO_HOST + path;
+  return fetchEventSource(url, {
     method: 'POST',
     headers: { 'content-type': 'application/json', accept: EventStreamContentType },
     openWhenHidden: false,
