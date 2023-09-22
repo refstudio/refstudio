@@ -45,10 +45,10 @@ async def test_chat_ask_question_is_missing_references(
 
 
 @pytest.mark.asyncio
-async def test_chat_ask_question_is_openai_error(
-    monkeypatch, amock_call_model_is_error, setup_project_references_json
+async def test_chat_ask_question_is_unhandled_error(
+    monkeypatch, amock_call_model_is_unhandled_error, setup_project_references_json
 ):
-    monkeypatch.setattr(chat.Chat, "call_model", amock_call_model_is_error)
+    monkeypatch.setattr(chat.Chat, "call_model", amock_call_model_is_unhandled_error)
 
     user_settings = default_settings()
     user_settings.api_key = "1234"
@@ -61,7 +61,7 @@ async def test_chat_ask_question_is_openai_error(
     output = response.dict()
 
     assert output["status"] == "error"
-    assert output["message"] == "This is a mocked error"
+    assert output["message"] == chat.get_unhandled_error_message()
     assert len(output["choices"]) == 0
 
 

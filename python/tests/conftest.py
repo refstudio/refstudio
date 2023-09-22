@@ -259,7 +259,7 @@ def amock_call_model_is_stream(*args, **kwargs):
 
 
 @pytest.fixture
-def mock_call_model_is_error(*args, **kwargs):
+def mock_call_model_is_unhandled_error(*args, **kwargs):
     def mock_call_model_response(*args, **kwargs):
         raise Exception("This is a mocked error")
 
@@ -267,7 +267,7 @@ def mock_call_model_is_error(*args, **kwargs):
 
 
 @pytest.fixture
-def amock_call_model_is_error(*args, **kwargs):
+def amock_call_model_is_unhandled_error(*args, **kwargs):
     async def mock_call_model_response(*args, **kwargs):
         raise Exception("This is a mocked error")
 

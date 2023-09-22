@@ -30,8 +30,10 @@ async def test_rewrite_is_ok(monkeypatch, amock_call_model_is_ok):
 
 
 @pytest.mark.asyncio
-async def test_rewrite_is_error(monkeypatch, mock_call_model_is_error):
-    monkeypatch.setattr(rewrite.Rewriter, "call_model", mock_call_model_is_error)
+async def test_rewrite_is_error(monkeypatch, mock_call_model_is_unhandled_error):
+    monkeypatch.setattr(
+        rewrite.Rewriter, "call_model", mock_call_model_is_unhandled_error
+    )
 
     response = await rewrite.rewrite(RewriteRequest(text="This is a test"))
     output = response.dict()
@@ -56,8 +58,10 @@ async def test_complete_text_is_ok(monkeypatch, amock_call_model_is_ok):
 
 
 @pytest.mark.asyncio
-async def test_complete_text_is_error(monkeypatch, mock_call_model_is_error):
-    monkeypatch.setattr(rewrite.Rewriter, "call_model", mock_call_model_is_error)
+async def test_complete_text_is_error(monkeypatch, mock_call_model_is_unhandled_error):
+    monkeypatch.setattr(
+        rewrite.Rewriter, "call_model", mock_call_model_is_unhandled_error
+    )
 
     response = await rewrite.complete_text(TextCompletionRequest(text="This is a test"))
     output = response.dict()

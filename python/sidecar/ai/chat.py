@@ -3,6 +3,8 @@ from typing import AsyncGenerator
 
 import litellm
 import openai
+from openai.error import AuthenticationError
+from requests.exceptions import ConnectionError
 from sidecar.ai.prompts import create_prompt_for_chat, prepare_chunks_for_prompt
 from sidecar.ai.ranker import BM25Ranker
 from sidecar.ai.schemas import ChatRequest, ChatResponse, ChatResponseChoice
@@ -23,17 +25,28 @@ def get_missing_references_message() -> str:
 
 def get_missing_api_key_error_message() -> str:
     return (
-        "It looks like you forgot to provide an API key! "
+        "It looks like you forgot to provide an API key. "
         "Please add one in the settings menu by clicking the gear icon in the "
         "lower left corner of the screen."
     )
 
 
+def get_invalid_api_key_error_message() -> str:
+    return (
+        "I'm having an issue authenticating with your API key. "
+        "Please double check that it is correct in the settings menu."
+    )
+
+
 def get_ollama_connection_error_message() -> str:
     return (
-        "It looks like you forgot to start Ollama! "
+        "It looks like you forgot to start Ollama. "
         "Please start Ollama on your local machine and try again."
     )
+
+
+def get_unhandled_error_message() -> str:
+    return "Something went wrong. Please try again."
 
 
 async def yield_error_message(msg_func: callable) -> AsyncGenerator:
@@ -44,6 +57,12 @@ async def stream_response(response):
     async for chunk in response:
         item = chunk["choices"][0]["delta"].get("content", "")
         yield f"data: {item}\n\n"
+
+
+def create_chat_response(
+    status: ResponseStatus, message: str, choices: list[ChatResponseChoice]
+) -> ChatResponse:
+    return ChatResponse(status=status, message=message, choices=choices)
 
 
 async def yield_response(
@@ -83,9 +102,19 @@ async def yield_response(
     ranker = BM25Ranker(storage=storage)
     chat = Chat(input_text=input_text, storage=storage, ranker=ranker, model=model)
 
-    response = await chat.ask_question(
-        n_choices=1, temperature=temperature, stream=True
-    )
+    try:
+        response = await chat.ask_question(
+            n_choices=1, temperature=temperature, stream=True
+        )
+    except AuthenticationError as e:
+        logger.error(e)
+        return yield_error_message(get_invalid_api_key_error_message)
+    except ConnectionError as e:
+        logger.error(e)
+        return yield_error_message(get_ollama_connection_error_message)
+    except Exception as e:
+        logger.error(e)
+        return yield_error_message(get_unhandled_error_message)
 
     return stream_response(response)
 
@@ -114,17 +143,18 @@ async def ask_question(
     storage = get_references_json_storage(user_id="user1", project_id=project_id)
     logger.info(f"Loaded {len(storage.chunks)} documents from storage")
 
+    # no reference chunks available for chatQ
     if not storage.chunks:
-        # no reference chunks available for chat
-        response = ChatResponse(
+        response = create_chat_response(
             status=ResponseStatus.ERROR,
             message=get_missing_references_message(),
             choices=[],
         )
         return response
 
+    # no API key provided
     if user_settings.model_provider == ModelProvider.OPENAI and not openai.api_key:
-        response = ChatResponse(
+        response = create_chat_response(
             status=ResponseStatus.ERROR,
             message=get_missing_api_key_error_message(),
             choices=[],
@@ -136,22 +166,38 @@ async def ask_question(
 
     try:
         choices = await chat.ask_question(n_choices=n_choices, temperature=temperature)
+    except AuthenticationError as e:
+        logger.error(e)
+        response = create_chat_response(
+            status=ResponseStatus.ERROR,
+            message=get_invalid_api_key_error_message(),
+            choices=[],
+        )
+        return response
+    except ConnectionError as e:
+        logger.error(e)
+        response = create_chat_response(
+            status=ResponseStatus.ERROR,
+            message=get_ollama_connection_error_message(),
+            choices=[],
+        )
+        return response
     except Exception as e:
         logger.error(e)
-        response = ChatResponse(
+        response = create_chat_response(
             status=ResponseStatus.ERROR,
-            message=str(e),
+            message=get_unhandled_error_message(),
             choices=[],
         )
         return response
 
     logger.info(f"Returning {len(choices)} chat response choices to client: {choices}")
-    response = ChatResponse(
+
+    return create_chat_response(
         status=ResponseStatus.OK,
         message="",
         choices=[r.dict() for r in choices],
     )
-    return response
 
 
 class Chat:
