@@ -1,6 +1,6 @@
 import os
 import sys
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from typing import List, Union
 
@@ -11,6 +11,23 @@ from sidecar.config import logger
 from sidecar.references.schemas import Author, Chunk, Reference, ReferenceCreate
 
 logger = logger.getChild(__name__)
+
+
+def clean_filename(filename: str) -> str:
+    """
+    Cleans a filename by removing special characters
+
+    Parameters
+    ----------
+    filename : str
+        Filename to clean
+
+    Returns
+    -------
+    str
+        Cleaned filename
+    """
+    return "".join(c for c in filename if c.isalnum() or c in "_- ").strip()
 
 
 def remove_file(filepath: str) -> None:
@@ -35,6 +52,8 @@ def parse_date(date_str: str) -> datetime:
     # TODO: support more date formats
     if not date_str:
         return None
+    if isinstance(date_str, date):
+        return date_str
     try:
         return datetime.strptime(date_str, "%Y-%m-%d").date()
     except ValueError:

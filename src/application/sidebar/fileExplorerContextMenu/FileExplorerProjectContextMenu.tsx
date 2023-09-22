@@ -1,4 +1,4 @@
-import { Item, Menu, Separator } from 'react-contexify';
+import { Item, Menu } from 'react-contexify';
 
 import { emitEvent } from '../../../events';
 
@@ -14,7 +14,6 @@ export function FileExplorerProjectContextMenu() {
       >
         New File
       </Item>
-      <Separator />
       <Item
         onClick={() => {
           emitEvent('refstudio://menu/file/project/close');

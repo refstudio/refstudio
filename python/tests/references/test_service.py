@@ -25,7 +25,7 @@ def test_create_reference_with_url(
         published_date="2021-01-01",
     )
 
-    ref = create_reference(project_id=project_id, metadata=metadata, url=url)
+    ref, _ = create_reference(project_id=project_id, metadata=metadata, url=url)
 
     assert isinstance(ref, Reference)
 
@@ -51,7 +51,7 @@ def test_create_reference_with_url_error(
         published_date="2021-01-01",
     )
 
-    ref = create_reference(project_id=project_id, metadata=metadata, url=url)
+    ref, _ = create_reference(project_id=project_id, metadata=metadata, url=url)
 
     assert isinstance(ref, Reference)
 
@@ -72,7 +72,7 @@ def test_create_reference_with_only_metadata(
         authors=[Author(full_name="Frank Fakerson")],
     )
 
-    ref = create_reference(project_id=project_id, metadata=metadata)
+    ref, _ = create_reference(project_id=project_id, metadata=metadata)
 
     assert isinstance(ref, Reference)
     assert ref.citation_key == "fakerson"

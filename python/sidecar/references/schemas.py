@@ -83,6 +83,7 @@ class Chunk(RefStudioModel):
 class IngestResponse(RefStudioModel):
     project_name: str
     references: list[Reference]
+    message: str = ""
 
 
 class ReferenceStatus(RefStudioModel):

@@ -39,7 +39,7 @@ export function ReferencesList({
             <h2 className="line-clamp-1 overflow-ellipsis">{reference.title}</h2>
             <div className="line-clamp-1 overflow-ellipsis">
               {reference.authors.map((author, index) => (
-                <span key={author.fullName}>
+                <span key={index}>
                   {index > 0 && ', '}
                   <span
                     className="hover:underline"

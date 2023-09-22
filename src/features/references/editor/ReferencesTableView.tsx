@@ -14,8 +14,8 @@ import {
 import { AgGridReact } from '@ag-grid-community/react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { BsFillCaretDownFill } from 'react-icons/bs';
 
-import { AddIcon } from '../../../application/components/icons';
 import { projectIdAtom } from '../../../atoms/projectState';
 import { getReferencesAtom, updateReferenceAtom } from '../../../atoms/referencesState';
 import { Button } from '../../../components/Button';
@@ -28,6 +28,7 @@ import { ActionsCell } from './grid/ActionsCell';
 import { AuthorsEditor } from './grid/AuthorsEditor';
 import { loadColumnsState, resetColumnsState, saveColumnsState } from './grid/columnsState';
 import { authorsFormatter, firstAuthorFormatter } from './grid/formatters';
+import { useUploadContextMenu } from './UploadContextMenu';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
@@ -139,6 +140,8 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
 
   const rowData = useMemo(() => references.map((r) => ({ ...r })), [references]);
 
+  const showUploadContextMenu = useUploadContextMenu();
+
   return (
     <div className="flex flex-1 flex-col items-stretch gap-6 pb-10">
       <div className="flex items-center justify-center gap-4">
@@ -153,11 +156,15 @@ export function ReferencesTableView({ defaultFilter = '' }: { defaultFilter?: st
         </div>
         <div className="h-8 w-px bg-content-area-border" />
         <Button
-          Action={<AddIcon />}
+          Action={<BsFillCaretDownFill />}
+          actionPosition="right"
           size="M"
           text="Add"
           type="secondary"
-          onClick={() => emitEvent('refstudio://menu/references/upload')}
+          onClick={(e) => {
+            e.stopPropagation();
+            showUploadContextMenu(e);
+          }}
         />
         <div className="h-8 w-px bg-content-area-border" />
         <div className="flex items-center justify-center gap-2">

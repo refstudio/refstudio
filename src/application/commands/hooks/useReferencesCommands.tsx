@@ -1,5 +1,6 @@
 import { useAtomValue } from 'jotai';
 import { Command } from 'kmenu';
+import { SiSemanticscholar } from 'react-icons/si';
 
 import { isProjectOpenAtom } from '../../../atoms/projectState';
 import { SearchIcon } from '../../../components/icons';
@@ -33,6 +34,11 @@ export function useReferencesCommands(openPanel: (panelIndex: number) => void): 
           icon: <AddIcon />,
           text: 'Upload References',
           perform: () => emitEvent('refstudio://menu/references/upload'),
+        },
+        {
+          icon: <SiSemanticscholar />,
+          text: 'Search Semantic Scholar',
+          perform: () => emitEvent('refstudio://menu/references/search'),
         },
       ],
     },
