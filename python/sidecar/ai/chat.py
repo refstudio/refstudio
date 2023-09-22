@@ -54,9 +54,15 @@ async def yield_error_message(msg_func: callable) -> AsyncGenerator:
 
 
 async def stream_response(response):
-    async for chunk in response:
-        item = chunk["choices"][0]["delta"].get("content", "")
-        yield f"data: {item}\n\n"
+    # try/except for ConnectionError needs to happen here rather than in yield_response
+    # because of where the exception is raised within litellm (in the async generator)
+    try:
+        async for chunk in response:
+            item = chunk["choices"][0]["delta"].get("content", "")
+            yield f"data: {item}\n\n"
+    except ConnectionError as e:
+        logger.error(e)
+        yield f"data: {get_ollama_connection_error_message()}\n\n"
 
 
 def create_chat_response(

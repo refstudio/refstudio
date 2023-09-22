@@ -70,7 +70,4 @@ async def http_ai_chat_stream(
     response = await yield_response(
         req, project_id=project_id, user_settings=user_settings
     )
-    return StreamingResponse(
-        response,
-        media_type="text/event-stream",
-    )
+    return StreamingResponse(response, media_type="text/event-stream")
