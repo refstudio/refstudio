@@ -2,6 +2,7 @@ import os
 
 import litellm
 import openai
+from openai.error import AuthenticationError
 from sidecar.ai.prompts import create_prompt_for_chat, prepare_chunks_for_prompt
 from sidecar.ai.ranker import BM25Ranker
 from sidecar.ai.schemas import ChatRequest, ChatResponse, ChatResponseChoice
@@ -76,6 +77,9 @@ async def yield_response(
         # no reference chunks available for chat
         return yield_error_message(get_missing_references_message)
 
+    if user_settings.model_provider == ModelProvider.OPENAI and not openai.api_key:
+        return yield_error_message(get_authentication_error_message)
+
     ranker = BM25Ranker(storage=storage)
     chat = Chat(input_text=input_text, storage=storage, ranker=ranker, model=model)
 
@@ -115,6 +119,14 @@ async def ask_question(
         response = ChatResponse(
             status=ResponseStatus.ERROR,
             message=get_missing_references_message(),
+            choices=[],
+        )
+        return response
+
+    if user_settings.model_provider == ModelProvider.OPENAI and not openai.api_key:
+        response = ChatResponse(
+            status=ResponseStatus.ERROR,
+            message=get_authentication_error_message(),
             choices=[],
         )
         return response
@@ -211,6 +223,7 @@ class Chat:
         context_str = prepare_chunks_for_prompt(chunks=docs)
         prompt = create_prompt_for_chat(query=self.input_text, context=context_str)
         messages = self.prepare_messages_for_chat(text=prompt)
+
         response = await self.call_model(
             messages=messages,
             n_choices=n_choices,

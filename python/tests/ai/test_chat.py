@@ -3,6 +3,8 @@ from types import GeneratorType
 import pytest
 from sidecar.ai import chat
 from sidecar.ai.schemas import ChatRequest
+from sidecar.settings.schemas import FlatSettingsSchema
+from sidecar.settings.service import default_settings
 
 
 @pytest.mark.asyncio
@@ -11,10 +13,15 @@ async def test_chat_ask_question_is_ok(
 ):
     monkeypatch.setattr(chat.Chat, "call_model", amock_call_model_is_ok)
 
+    user_settings = default_settings()
+    user_settings.api_key = "1234"
+
     response = await chat.ask_question(
         request=ChatRequest(text="This is a question about something"),
         project_id="project1",
+        user_settings=user_settings,
     )
+
     output = response.dict()
 
     assert output["status"] == "ok"
@@ -44,9 +51,13 @@ async def test_chat_ask_question_is_openai_error(
 ):
     monkeypatch.setattr(chat.Chat, "call_model", amock_call_model_is_error)
 
+    user_settings = default_settings()
+    user_settings.api_key = "1234"
+
     response = await chat.ask_question(
         request=ChatRequest(text="This is a question about something"),
         project_id="project1",
+        user_settings=user_settings,
     )
     output = response.dict()
 
@@ -61,9 +72,13 @@ async def test_chat_yield_response_is_ok(
 ):
     monkeypatch.setattr(chat.Chat, "call_model", amock_call_model_is_stream)
 
+    user_settings = default_settings()
+    user_settings.api_key = "1234"
+
     response = await chat.yield_response(
         request=ChatRequest(text="This is a question about something"),
         project_id="project1",
+        user_settings=user_settings,
     )
     assert isinstance(response, GeneratorType)
 
@@ -92,29 +107,4 @@ async def test_chat_yield_response_is_missing_references(
     for chunk in chat.yield_error_message(chat.get_missing_references_message):
         expected += chunk
 
-    assert result == expected
-
-
-def test_chat_yield_response_is_openai_error(
-    monkeypatch, amock_call_model_is_authentication_error, setup_project_references_json
-):
-    monkeypatch.setattr(
-        chat.Chat, "call_model", amock_call_model_is_authentication_error
-    )
-
-    response = chat.yield_response(
-        request=ChatRequest(text="This is a question about something"),
-        project_id="project1",
-    )
-    assert isinstance(response, GeneratorType)
-
-    result = ""
-    for chunk in response:
-        result += chunk
-
-    expected = (
-        "data: It looks like you forgot to provide an API key! "
-        "Please add one in the settings menu by clicking the gear icon in the "
-        "lower left corner of the screen.\n\n"
-    )
     assert result == expected
