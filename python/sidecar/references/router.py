@@ -51,10 +51,12 @@ async def ingest_references(
         response = ingest.run_ingest(pdf_directory=uploads_dir)
 
     elif request.type == IngestRequestType.METADATA:
-        reference = create_reference(
+        reference, message = create_reference(
             project_id, metadata=request.metadata, url=request.url
         )
-        response = IngestResponse(project_name=project_id, references=[reference])
+        response = IngestResponse(
+            project_name=project_id, references=[reference], message=message
+        )
 
     return response
 

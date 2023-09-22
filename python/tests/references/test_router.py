@@ -31,8 +31,9 @@ def test_ingest_references_for_uploads_directory(setup_project_with_uploads):
 
 def test_ingest_references_for_metadata_with_pdf(setup_project_with_uploads):
     project_id = "project1"
-    return_value = Reference(
-        id="123", source_filename="fake.pdf", status=IngestStatus.COMPLETE
+    return_value = (
+        Reference(id="123", source_filename="fake.pdf", status=IngestStatus.COMPLETE),
+        "",
     )
 
     request = {

@@ -28,6 +28,27 @@ export const OpenPdfIcon = () => (
   </div>
 );
 
+export const NoPdfIcon = () => (
+  <div className="flex h-6 w-6 shrink-0 items-center justify-center">
+    <svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+      <g clipPath="url(#clip0_72_815)">
+        <path
+          clipRule="evenodd"
+          d="M20.775 6.66L15.855 1.71L15.33 1.5H3.75L3 2.25V10.5H4.5V3H13.5V8.25L14.25 9H19.5V10.5H21V7.2L20.775 6.66ZM15 7.5V3L19.5 7.5H15ZM3.75 12L3 12.75V21.75L3.75 22.5H20.25L21 21.75V12.75L20.25 12H3.75ZM19.5 19.5V21H4.5V13.5H19.5V19.5ZM7.5 18H7.02V19.5H6V15H7.59C8.715 15 9.285 15.54 9.285 16.5C9.2879 16.704 9.24649 16.9063 9.16362 17.0927C9.08074 17.2792 8.95839 17.4454 8.805 17.58C8.43327 17.8698 7.97096 18.0185 7.5 18ZM7.41 15.825H7.02V17.22H7.41C7.95 17.22 8.22 16.98 8.22 16.515C8.22 16.05 7.95 15.825 7.41 15.825ZM13.5 18.87C13.7215 18.6518 13.8948 18.3895 14.0084 18.1001C14.1221 17.8107 14.1738 17.5006 14.16 17.19C14.16 15.69 13.365 15 11.76 15H10.17V19.5H11.76C12.0773 19.5154 12.3945 19.4676 12.6932 19.3594C12.9919 19.2513 13.2661 19.0849 13.5 18.87ZM11.175 18.675V15.825H11.67C11.8613 15.8128 12.0531 15.8398 12.2336 15.9043C12.4142 15.9688 12.5797 16.0694 12.72 16.2C12.8471 16.3335 12.9459 16.4914 13.0104 16.6641C13.0748 16.8368 13.1036 17.0208 13.095 17.205C13.1175 17.6004 12.9827 17.9886 12.72 18.285C12.5827 18.4164 12.4202 18.5187 12.2423 18.5857C12.0645 18.6527 11.8749 18.6831 11.685 18.675H11.175ZM17.85 17.76H16.395V19.5H15.375V15H17.985V15.825H16.395V16.935H17.85V17.76Z"
+          fill="currentcolor"
+          fillRule="evenodd"
+        />
+        <path d="M3 1L21 22" stroke="currentcolor" strokeLinecap="round" strokeWidth="2" />
+      </g>
+      <defs>
+        <clipPath id="clip0_72_815">
+          <rect fill="white" height="24" width="24" />
+        </clipPath>
+      </defs>
+    </svg>
+  </div>
+);
+
 export const CloseIcon = () => (
   <div className="flex h-6 w-6 shrink-0 items-center justify-center">
     <svg height="12" viewBox="0 0 12 12" width="12" xmlns="http://www.w3.org/2000/svg">
@@ -133,6 +154,51 @@ export const EditIcon = () => (
         d="M14.27 5.4137L10.5493 1.73151L11.775 0.50411C12.1106 0.168037 12.5229 0 13.012 0C13.5011 0 13.9132 0.168037 14.2482 0.50411L15.4738 1.73151C15.8094 2.06758 15.9845 2.47321 15.9991 2.94838C16.0137 3.42356 15.8532 3.82889 15.5176 4.16438L14.27 5.4137ZM13.0006 6.70685L3.72072 16H0V12.274L9.27991 2.98082L13.0006 6.70685Z"
         fill="currentcolor"
       />
+    </svg>
+  </div>
+);
+
+export const DotIcon = () => (
+  <div className="flex h-5 w-5 shrink-0 items-center justify-center">
+    <svg height="16" viewBox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="8" cy="8" fill="currentcolor" r="3" />
+    </svg>
+  </div>
+);
+
+export const SmallInfoIcon = () => (
+  <div className="flex h-5 w-5 shrink-0 items-center justify-center">
+    <svg fill="none" height="20" viewBox="0 0 20 20" width="16" xmlns="http://www.w3.org/2000/svg">
+      <g clipPath="url(#clip0_63_818)">
+        <rect fill="white" height="20" width="20" />
+        <path
+          d="M10.6357 7.60352V15H9.36426V7.60352H10.6357ZM9.26855 5.6416C9.26855 5.43652 9.33008 5.26335 9.45312 5.12207C9.58073 4.98079 9.76758 4.91016 10.0137 4.91016C10.2552 4.91016 10.4398 4.98079 10.5674 5.12207C10.6995 5.26335 10.7656 5.43652 10.7656 5.6416C10.7656 5.83757 10.6995 6.00618 10.5674 6.14746C10.4398 6.28418 10.2552 6.35254 10.0137 6.35254C9.76758 6.35254 9.58073 6.28418 9.45312 6.14746C9.33008 6.00618 9.26855 5.83757 9.26855 5.6416Z"
+          fill="currentcolor"
+        />
+        <circle cx="10" cy="10" r="7.5" stroke="currentcolor" />
+      </g>
+    </svg>
+  </div>
+);
+
+export const CheckIcon = () => (
+  <div className="flex h-6 w-6 shrink-0 items-center justify-center">
+    <svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M6.5 13.5L11.5 20.5L18.5 3.5"
+        stroke="currentcolor"
+        strokeLinecap="square"
+        strokeLinejoin="bevel"
+        strokeWidth="2"
+      />
+    </svg>
+  </div>
+);
+
+export const MinusIcon = () => (
+  <div className="flex h-6 w-6 shrink-0 items-center justify-center">
+    <svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M6.5 12H17.5" stroke="currentcolor" strokeLinecap="square" strokeLinejoin="round" strokeWidth="2" />
     </svg>
   </div>
 );

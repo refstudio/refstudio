@@ -16,6 +16,7 @@ interface RefStudioEvents {
   'refstudio://menu/settings': undefined;
   'refstudio://menu/references/open': undefined;
   'refstudio://menu/references/upload': undefined;
+  'refstudio://menu/references/search': undefined;
   'refstudio://menu/references/export': undefined;
   'refstudio://menu/view/notifications': undefined;
   'refstudio://menu/view/keyboard-shortcuts': undefined;
