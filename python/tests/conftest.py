@@ -4,7 +4,6 @@ from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
-from openai.error import AuthenticationError
 from sidecar import config
 from sidecar.api import api
 from sidecar.projects import service as projects_service
