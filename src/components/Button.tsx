@@ -42,13 +42,13 @@ export function Button({
         {
           'gap-2': !size,
           'justify-center gap-2 px-5 py-3': size === 'M',
-          'justify-center gap-1 px-[.5rem] py-[.25rem]': size === 'S',
+          'justify-center gap-1 px-2 py-1': size === 'S',
         },
         {
           'pl-3': !!Action && actionPosition === 'left',
           'pr-3': !!Action && actionPosition === 'right',
-          'pl-[.25rem]': !!Action && actionPosition === 'left' && size === 'S',
-          'pr-[.25rem]': !!Action && actionPosition === 'right' && size === 'S',
+          'pl-1': !!Action && actionPosition === 'left' && size === 'S',
+          'pr-1 ': !!Action && actionPosition === 'right' && size === 'S',
         },
         {
           'bg-btn-bg-primary-default text-btn-txt-primary-default': !inheritColor && type === 'primary',
