@@ -83,7 +83,10 @@ def test_ai_completion_missing_required_request_params(
 
 
 def test_ai_chat_is_ok(
-    monkeypatch, amock_call_model_is_ok, setup_project_references_json
+    monkeypatch,
+    amock_call_model_is_ok,
+    setup_project_references_json,
+    create_settings_json,
 ):
     monkeypatch.setattr(Chat, "call_model", amock_call_model_is_ok)
 

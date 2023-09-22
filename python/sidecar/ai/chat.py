@@ -1,4 +1,5 @@
 import os
+from typing import AsyncGenerator
 
 import litellm
 import openai
@@ -12,7 +13,7 @@ from sidecar.typing import ResponseStatus
 from tenacity import retry, stop_after_attempt, wait_fixed
 
 
-def get_missing_references_message():
+def get_missing_references_message() -> str:
     return (
         "It looks like reference PDFs have not been ingested yet. "
         "Chat allows you to interact with your reference PDFs, "
@@ -20,7 +21,7 @@ def get_missing_references_message():
     )
 
 
-def get_authentication_error_message():
+def get_missing_api_key_error_message() -> str:
     return (
         "It looks like you forgot to provide an API key! "
         "Please add one in the settings menu by clicking the gear icon in the "
@@ -28,14 +29,14 @@ def get_authentication_error_message():
     )
 
 
-def get_ollama_connection_error_message():
+def get_ollama_connection_error_message() -> str:
     return (
         "It looks like you forgot to start Ollama! "
         "Please start Ollama on your local machine and try again."
     )
 
 
-def yield_error_message(msg_func: callable):
+async def yield_error_message(msg_func: callable) -> AsyncGenerator:
     yield f"data: {msg_func()}\n\n"
 
 
@@ -49,7 +50,7 @@ async def yield_response(
     request: ChatRequest,
     project_id: str = None,
     user_settings: FlatSettingsSchema = None,
-):
+) -> AsyncGenerator:
     """
     This is a generator function that yields responses from the chat API.
     Only used for streaming responses to the client.
@@ -77,7 +78,7 @@ async def yield_response(
         return yield_error_message(get_missing_references_message)
 
     if user_settings.model_provider == ModelProvider.OPENAI and not openai.api_key:
-        return yield_error_message(get_authentication_error_message)
+        return yield_error_message(get_missing_api_key_error_message)
 
     ranker = BM25Ranker(storage=storage)
     chat = Chat(input_text=input_text, storage=storage, ranker=ranker, model=model)
@@ -125,7 +126,7 @@ async def ask_question(
     if user_settings.model_provider == ModelProvider.OPENAI and not openai.api_key:
         response = ChatResponse(
             status=ResponseStatus.ERROR,
-            message=get_authentication_error_message(),
+            message=get_missing_api_key_error_message(),
             choices=[],
         )
         return response
@@ -245,16 +246,3 @@ class Chat:
         async for elem in generator:
             response += elem["choices"][0]["delta"]["content"]
         return {"choices": [{"index": 0, "message": {"content": response}}]}
-
-    async def yield_response(self, temperature: float = 0.7):
-        """
-        This is a generator function that yields responses from the chat API.
-        Only used for streaming chat responses to the client.
-        """
-        response = await self.ask_question(
-            n_choices=1, temperature=temperature, stream=True
-        )
-        async for chunk in response:
-            content = chunk["choices"][0]["delta"].get("content", "")
-            yield f"data: {content}\n\n"
-        return

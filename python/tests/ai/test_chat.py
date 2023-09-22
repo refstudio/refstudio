@@ -1,4 +1,4 @@
-from types import GeneratorType
+from typing import AsyncGenerator
 
 import pytest
 from sidecar.ai import chat
@@ -79,7 +79,7 @@ async def test_chat_yield_response_is_ok(
         project_id="project1",
         user_settings=user_settings,
     )
-    assert isinstance(response, GeneratorType)
+    assert isinstance(response, AsyncGenerator)
 
     result = ""
     async for chunk in response:
@@ -96,14 +96,14 @@ async def test_chat_yield_response_is_missing_references(
         request=ChatRequest(text="This is a question about something"),
         project_id="project1",
     )
-    assert isinstance(response, GeneratorType)
+    assert isinstance(response, AsyncGenerator)
 
     result = ""
-    for chunk in response:
+    async for chunk in response:
         result += chunk
 
     expected = ""
-    for chunk in chat.yield_error_message(chat.get_missing_references_message):
+    async for chunk in chat.yield_error_message(chat.get_missing_references_message):
         expected += chunk
 
     assert result == expected

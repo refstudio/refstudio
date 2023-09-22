@@ -225,15 +225,19 @@ def amock_call_model_is_ok(*args, **kwargs):
 @pytest.fixture
 def amock_call_model_is_stream(*args, **kwargs):
     async def mock_call_model_response(*args, **kwargs):
-        yield {
-            "choices": [
-                {
-                    "delta": {
-                        "content": "This is a mocked streaming response",
-                    }
+        class MockResponse:
+            async def __aiter__(self):
+                yield {
+                    "choices": [
+                        {
+                            "delta": {
+                                "content": "This is a mocked streaming response",
+                            }
+                        }
+                    ]
                 }
-            ]
-        }
+
+        return MockResponse()
 
     return mock_call_model_response
 
