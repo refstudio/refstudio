@@ -100,8 +100,15 @@ export function ReferencesPanel() {
               <h2 className="text-center text-xl/6 font-semibold text-side-bar-txt-primary">No References</h2>
               <div className="text-center text-side-bar-txt-secondary">Drag or choose your first reference here.</div>
             </div>
-            <Button text="Upload References" onClick={() => emitEvent('refstudio://menu/references/upload')} />
-            <Button text="Search Semantic Scholar" onClick={() => emitEvent('refstudio://menu/references/search')} />
+            <div className="flex flex-col gap-2">
+              <Button fluid text="Upload References" onClick={() => emitEvent('refstudio://menu/references/upload')} />
+              <Button
+                fluid
+                text="Search Semantic Scholar"
+                type="secondary"
+                onClick={() => emitEvent('refstudio://menu/references/search')}
+              />
+            </div>
           </div>
         </div>
       )}
