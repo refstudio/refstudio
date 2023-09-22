@@ -5,6 +5,7 @@ import { cx } from '../lib/cx';
 interface ButtonProps {
   Action?: React.ReactElement;
   actionPosition?: 'left' | 'right';
+  alignment?: 'left' | 'center';
   className?: string;
   disabled?: boolean;
   fluid?: boolean;
@@ -19,6 +20,7 @@ interface ButtonProps {
 export function Button({
   Action,
   actionPosition = 'left',
+  alignment = 'center',
   className,
   disabled,
   fluid,
@@ -40,9 +42,12 @@ export function Button({
           'w-full': fluid,
         },
         {
-          'gap-2': !size,
-          'justify-center gap-2 px-5 py-3': size === 'M',
-          'justify-center gap-1 px-2 py-1': size === 'S',
+          'justify-start': alignment === 'left',
+          'justify-center': alignment === 'center',
+        },
+        {
+          'gap-2 px-5 py-3': size === 'M',
+          'gap-1 px-2 py-1': size === 'S',
         },
         {
           'pl-3': !!Action && actionPosition === 'left',
