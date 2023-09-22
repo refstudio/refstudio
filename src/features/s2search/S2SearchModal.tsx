@@ -17,6 +17,7 @@ import { CheckIcon, DotIcon, MinusIcon, NoPdfIcon, SearchIcon, SmallInfoIcon } f
 import { Modal } from '../../components/Modal';
 import { useDebouncedCallback } from '../../hooks/useDebouncedCallback';
 import { cx } from '../../lib/cx';
+import { notifyError } from '../../notifications/notifications';
 import { LoadingIcon } from '../components/icons';
 
 const SearchBar = ({ onChange }: { onChange: (value: string, limit: number) => void }) => (
@@ -252,11 +253,10 @@ export function S2SearchModal({ open, onClose: onClose }: { open: boolean; onClo
     (searchTerm: string, limit?: number) => {
       setLoading(true);
       loadSearchResults(searchTerm, limit)
-        .then(() => {
-          setLoading(false);
-        })
-        .catch(() => {
-          console.error('error');
+        .then(() => setLoading(false))
+        .catch((err) => {
+          notifyError('Could not load search results');
+          console.error(err);
         });
     },
     [loadSearchResults],
