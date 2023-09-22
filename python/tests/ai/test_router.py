@@ -83,9 +83,12 @@ def test_ai_completion_missing_required_request_params(
 
 
 def test_ai_chat_is_ok(
-    monkeypatch, mock_call_model_is_ok, setup_project_references_json
+    monkeypatch,
+    amock_call_model_is_ok,
+    setup_project_references_json,
+    create_settings_json,
 ):
-    monkeypatch.setattr(Chat, "call_model", mock_call_model_is_ok)
+    monkeypatch.setattr(Chat, "call_model", amock_call_model_is_ok)
 
     project_id = "project1"
 
@@ -106,9 +109,9 @@ def test_ai_chat_is_ok(
 
 
 def test_ai_chat_missing_required_request_params(
-    monkeypatch, mock_call_model_is_ok, setup_project_references_json
+    monkeypatch, amock_call_model_is_ok, setup_project_references_json
 ):
-    monkeypatch.setattr(Chat, "call_model", mock_call_model_is_ok)
+    monkeypatch.setattr(Chat, "call_model", amock_call_model_is_ok)
 
     project_id = "project1"
     request = {"missing": "This is an invalid request"}
@@ -127,9 +130,12 @@ def test_ai_chat_missing_required_request_params(
 
 
 def test_ai_chat_is_streaming(
-    monkeypatch, mock_call_model_is_stream, setup_project_references_json
+    monkeypatch,
+    amock_call_model_is_stream,
+    setup_project_references_json,
+    create_settings_json,
 ):
-    monkeypatch.setattr(Chat, "call_model", mock_call_model_is_stream)
+    monkeypatch.setattr(Chat, "call_model", amock_call_model_is_stream)
 
     project_id = "project1"
 

@@ -1,18 +1,26 @@
-from types import GeneratorType
+from typing import AsyncGenerator
 
+import pytest
 from sidecar.ai import chat
 from sidecar.ai.schemas import ChatRequest
+from sidecar.settings.service import default_settings
 
 
-def test_chat_ask_question_is_ok(
-    monkeypatch, mock_call_model_is_ok, setup_project_references_json
+@pytest.mark.asyncio
+async def test_chat_ask_question_is_ok(
+    monkeypatch, amock_call_model_is_ok, setup_project_references_json
 ):
-    monkeypatch.setattr(chat.Chat, "call_model", mock_call_model_is_ok)
+    monkeypatch.setattr(chat.Chat, "call_model", amock_call_model_is_ok)
 
-    response = chat.ask_question(
+    user_settings = default_settings()
+    user_settings.api_key = "1234"
+
+    response = await chat.ask_question(
         request=ChatRequest(text="This is a question about something"),
         project_id="project1",
+        user_settings=user_settings,
     )
+
     output = response.dict()
 
     assert output["status"] == "ok"
@@ -21,12 +29,17 @@ def test_chat_ask_question_is_ok(
     assert output["choices"][0]["index"] == 0
 
 
-def test_chat_ask_question_is_missing_references(
-    monkeypatch, mock_call_model_is_ok, setup_project_references_empty
+@pytest.mark.asyncio
+async def test_chat_ask_question_is_missing_references(
+    monkeypatch, amock_call_model_is_ok, setup_project_references_empty
 ):
-    response = chat.ask_question(
+    user_settings = default_settings()
+    user_settings.api_key = "1234"
+
+    response = await chat.ask_question(
         request=ChatRequest(text="This is a question about something"),
         project_id="project1",
+        user_settings=user_settings,
     )
     output = response.dict()
 
@@ -35,80 +48,70 @@ def test_chat_ask_question_is_missing_references(
     assert len(output["choices"]) == 0
 
 
-def test_chat_ask_question_is_openai_error(
-    monkeypatch, mock_call_model_is_error, setup_project_references_json
+@pytest.mark.asyncio
+async def test_chat_ask_question_is_unhandled_error(
+    monkeypatch, amock_call_model_is_unhandled_error, setup_project_references_json
 ):
-    monkeypatch.setattr(chat.Chat, "call_model", mock_call_model_is_error)
+    monkeypatch.setattr(chat.Chat, "call_model", amock_call_model_is_unhandled_error)
 
-    response = chat.ask_question(
+    user_settings = default_settings()
+    user_settings.api_key = "1234"
+
+    response = await chat.ask_question(
         request=ChatRequest(text="This is a question about something"),
         project_id="project1",
+        user_settings=user_settings,
     )
     output = response.dict()
 
     assert output["status"] == "error"
-    assert output["message"] == "This is a mocked error"
+    assert output["message"] == chat.get_unhandled_error_message()
     assert len(output["choices"]) == 0
 
 
-def test_chat_yield_response_is_ok(
-    monkeypatch, mock_call_model_is_stream, setup_project_references_json
+@pytest.mark.asyncio
+async def test_chat_yield_response_is_ok(
+    monkeypatch, amock_call_model_is_stream, setup_project_references_json
 ):
-    monkeypatch.setattr(chat.Chat, "call_model", mock_call_model_is_stream)
+    monkeypatch.setattr(chat.Chat, "call_model", amock_call_model_is_stream)
 
-    response = chat.yield_response(
+    user_settings = default_settings()
+    user_settings.api_key = "1234"
+
+    response = await chat.yield_response(
         request=ChatRequest(text="This is a question about something"),
         project_id="project1",
+        user_settings=user_settings,
     )
-    assert isinstance(response, GeneratorType)
+    assert isinstance(response, AsyncGenerator)
 
     result = ""
-    for chunk in response:
+    async for chunk in response:
         result += chunk
 
     assert result == "data: This is a mocked streaming response\n\n"
 
 
-def test_chat_yield_response_is_missing_references(
-    monkeypatch, mock_call_model_is_stream, setup_project_references_empty
+@pytest.mark.asyncio
+async def test_chat_yield_response_is_missing_references(
+    monkeypatch, amock_call_model_is_stream, setup_project_references_empty
 ):
-    response = chat.yield_response(
+    user_settings = default_settings()
+    user_settings.api_key = "1234"
+
+    response = await chat.yield_response(
         request=ChatRequest(text="This is a question about something"),
         project_id="project1",
+        user_settings=user_settings,
     )
-    assert isinstance(response, GeneratorType)
+    assert isinstance(response, AsyncGenerator)
 
     result = ""
-    for chunk in response:
+    async for chunk in response:
         result += chunk
 
     expected = ""
-    for chunk in chat.yield_missing_references_response():
+    async for chunk in chat.yield_error_message(chat.get_missing_references_message):
         expected += chunk
 
-    assert result == expected
-
-
-def test_chat_yield_response_is_openai_error(
-    monkeypatch, mock_call_model_is_authentication_error, setup_project_references_json
-):
-    monkeypatch.setattr(
-        chat.Chat, "call_model", mock_call_model_is_authentication_error
-    )
-
-    response = chat.yield_response(
-        request=ChatRequest(text="This is a question about something"),
-        project_id="project1",
-    )
-    assert isinstance(response, GeneratorType)
-
-    result = ""
-    for chunk in response:
-        result += chunk
-
-    expected = (
-        "data: It looks like you forgot to provide an API key! "
-        "Please add one in the settings menu by clicking the gear icon in the "
-        "lower left corner of the screen.\n\n"
-    )
     assert result == expected

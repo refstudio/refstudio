@@ -23,6 +23,7 @@ httpx = "^0.24.1"
 python-multipart = "^0.0.6"
 psutil = "^5.9.5"
 litellm = "^0.1.558"
+async-generator = "^1.10"
 
 [tool.poetry.group.dev.dependencies]
 ipython = "^8.13.2"
