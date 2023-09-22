@@ -33,9 +33,13 @@ async def test_chat_ask_question_is_ok(
 async def test_chat_ask_question_is_missing_references(
     monkeypatch, amock_call_model_is_ok, setup_project_references_empty
 ):
+    user_settings = default_settings()
+    user_settings.api_key = "1234"
+
     response = await chat.ask_question(
         request=ChatRequest(text="This is a question about something"),
         project_id="project1",
+        user_settings=user_settings,
     )
     output = response.dict()
 
@@ -92,9 +96,13 @@ async def test_chat_yield_response_is_ok(
 async def test_chat_yield_response_is_missing_references(
     monkeypatch, amock_call_model_is_stream, setup_project_references_empty
 ):
+    user_settings = default_settings()
+    user_settings.api_key = "1234"
+
     response = await chat.yield_response(
         request=ChatRequest(text="This is a question about something"),
         project_id="project1",
+        user_settings=user_settings,
     )
     assert isinstance(response, AsyncGenerator)
 

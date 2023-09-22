@@ -77,15 +77,8 @@ async def rewrite(arg: RewriteRequest, user_settings: FlatSettingsSchema = None)
     n_choices = arg.n_choices
     temperature = arg.temperature
 
-    if user_settings is None:
-        # this is for local dev environment
-        openai.api_key = os.environ.get("API_KEY")
-        model = "gpt-3.5-turbo"
-    elif user_settings.model_provider == ModelProvider.OPENAI:
+    if user_settings.model_provider == ModelProvider.OPENAI:
         openai.api_key = user_settings.api_key
-        model = user_settings.model
-    elif user_settings.model_provider == ModelProvider.OLLAMA:
-        model = "llama2"
 
     # there are 1.33 tokens per word on average
     # seems reasonable to require a max_tokens roughly equivalent to our input text
@@ -95,7 +88,14 @@ async def rewrite(arg: RewriteRequest, user_settings: FlatSettingsSchema = None)
     logger.info(f"Calling rewrite with the following parameters: {arg.dict()}")
 
     prompt = create_prompt_for_rewrite(text, manner)
-    chat = Rewriter(prompt, n_choices, temperature, max_tokens, model)
+    chat = Rewriter(
+        prompt,
+        n_choices,
+        temperature,
+        max_tokens,
+        model_provider=user_settings.model_provider,
+        model=user_settings.model,
+    )
 
     try:
         choices = await chat.get_response(response_type=RewriteChoice)
@@ -120,15 +120,8 @@ async def rewrite(arg: RewriteRequest, user_settings: FlatSettingsSchema = None)
 async def complete_text(
     request: TextCompletionRequest, user_settings: FlatSettingsSchema = None
 ):
-    if user_settings is None:
-        # this is for local dev environment
-        openai.api_key = os.environ.get("API_KEY")
-        model = "gpt-3.5-turbo"
-    elif user_settings.model_provider == ModelProvider.OPENAI:
+    if user_settings.model_provider == ModelProvider.OPENAI:
         openai.api_key = user_settings.api_key
-        model = user_settings.model
-    elif user_settings.model_provider == ModelProvider.OLLAMA:
-        model = "llama2"
 
     logger.info(
         f"Calling text completion with the following parameters: {request.dict()}"
@@ -139,7 +132,8 @@ async def complete_text(
         n_choices=request.n_choices,
         temperature=request.temperature,
         max_tokens=request.max_tokens,
-        model=model,
+        model_provider=user_settings.model_provider,
+        model=user_settings.model,
     )
 
     try:
@@ -179,6 +173,8 @@ class Rewriter:
         The temperature to use when generating text. Not valid for `llama2`.
     max_tokens : int, optional, default=512
         The maximum number of tokens to generate. Not valid for `llama2`.
+    model_provider : ModelProvider, optional, default=ModelProvider.OPENAI
+        The model provider to use.
     model : str, optional, default="gpt-3.5-turbo"
         The name of the model to use (must be an OpenAI model or `llama2`).
     """
@@ -189,12 +185,14 @@ class Rewriter:
         n_choices: int = 1,
         temperature: float = 0.7,
         max_tokens: int = 512,
+        model_provider: ModelProvider = ModelProvider.OPENAI,
         model: str = "gpt-3.5-turbo",
     ):
         self.prompt = prompt
         self.n_choices = int(n_choices)
         self.temperature = temperature
         self.max_tokens = max_tokens
+        self.model_provider = model_provider
         self.model = model
 
     async def get_response(self, response_type: TextSuggestionChoice):
@@ -229,7 +227,7 @@ class Rewriter:
             "max_tokens": self.max_tokens,
         }
 
-        if self.model == "llama2":
+        if self.model_provider == ModelProvider.OLLAMA:
             # NOTE: Ollama does not support the following parameters:
             # - n
             # - max_tokens
@@ -239,7 +237,7 @@ class Rewriter:
 
         response = await litellm.acompletion(**params)
 
-        if self.model == "llama2":
+        if self.model_provider == ModelProvider.OLLAMA:
             # Will only be a single choice response from Ollama
             response = await self.unwrap_response(response)
 

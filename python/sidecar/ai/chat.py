@@ -83,15 +83,8 @@ async def yield_response(
     input_text = request.text
     temperature = request.temperature
 
-    if user_settings is None:
-        # this is for local dev environment
-        openai.api_key = os.environ.get("API_KEY")
-        model = "gpt-3.5-turbo"
-    elif user_settings.model_provider == ModelProvider.OPENAI:
+    if user_settings.model_provider == ModelProvider.OPENAI:
         openai.api_key = user_settings.api_key
-        model = user_settings.model
-    elif user_settings.model_provider == ModelProvider.OLLAMA:
-        model = "llama2"
 
     logger.info(f"Calling chat with the following parameters: {request.dict()}")
 
@@ -106,7 +99,13 @@ async def yield_response(
         return yield_error_message(get_missing_api_key_error_message)
 
     ranker = BM25Ranker(storage=storage)
-    chat = Chat(input_text=input_text, storage=storage, ranker=ranker, model=model)
+    chat = Chat(
+        input_text=input_text,
+        storage=storage,
+        ranker=ranker,
+        model_provider=user_settings.model_provider,
+        model=user_settings.model,
+    )
 
     try:
         response = await chat.ask_question(
@@ -134,15 +133,8 @@ async def ask_question(
     n_choices = request.n_choices
     temperature = request.temperature
 
-    if user_settings is None:
-        # this is for local dev environment
-        openai.api_key = os.environ.get("API_KEY")
-        model = "gpt-3.5-turbo"
-    elif user_settings.model_provider == ModelProvider.OPENAI:
+    if user_settings.model_provider == ModelProvider.OPENAI:
         openai.api_key = user_settings.api_key
-        model = user_settings.model
-    elif user_settings.model_provider == ModelProvider.OLLAMA:
-        model = "llama2"
 
     logger.info(f"Calling chat with the following parameters: {request.dict()}")
 
@@ -168,7 +160,13 @@ async def ask_question(
         return response
 
     ranker = BM25Ranker(storage=storage)
-    chat = Chat(input_text=input_text, storage=storage, ranker=ranker, model=model)
+    chat = Chat(
+        input_text=input_text,
+        storage=storage,
+        ranker=ranker,
+        model_provider=user_settings.model_provider,
+        model=user_settings.model,
+    )
 
     try:
         choices = await chat.ask_question(n_choices=n_choices, temperature=temperature)
@@ -212,11 +210,13 @@ class Chat:
         input_text: str,
         storage: JsonStorage,
         ranker: BM25Ranker,
+        model_provider: ModelProvider = ModelProvider.OPENAI,
         model: str = "gpt-3.5-turbo",
     ):
         self.input_text = input_text
         self.ranker = ranker
         self.storage = storage
+        self.model_provider = model_provider
         self.model = model
 
     def get_relevant_documents(self):
@@ -243,7 +243,7 @@ class Chat:
             "stream": stream,
         }
 
-        if self.model == "llama2":
+        if self.model_provider == ModelProvider.OLLAMA:
             params["api_base"] = "http://localhost:11434"
             params["custom_llm_provider"] = "ollama"
 
@@ -286,7 +286,7 @@ class Chat:
         if stream:
             return response
 
-        if self.model == "llama2" and not stream:
+        if self.model_provider == ModelProvider.OLLAMA:
             # need to unwrap response for Ollama
             response = await self.unwrap_response(response)
 
