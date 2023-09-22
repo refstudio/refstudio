@@ -44,6 +44,7 @@ export function LoggingSettingsPane({ config }: SettingsPaneProps) {
         <Checkbox
           checked={sidecarLoggingSettings.logging_enabled}
           data-testid={LOGGING_ACTIVE_TEST_ID}
+          disabled
           onChange={(logging_enabled) => setSidecarLoggingSettings({ ...sidecarLoggingSettings, logging_enabled })}
         />
       </div>
@@ -51,6 +52,7 @@ export function LoggingSettingsPane({ config }: SettingsPaneProps) {
         <h2 className="text-modal-txt-primary">Path</h2>
         <Input
           data-testid={LOGGING_FILEPATH_TEST_ID}
+          disabled
           value={sidecarLoggingSettings.logging_filepath}
           onChange={(logging_filepath) => setSidecarLoggingSettings({ ...sidecarLoggingSettings, logging_filepath })}
         />

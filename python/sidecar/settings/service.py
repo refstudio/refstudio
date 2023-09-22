@@ -18,7 +18,7 @@ def make_settings_json_path(user_id: str) -> Path:
 def default_settings() -> FlatSettingsSchema:
     return FlatSettingsSchema(
         active_project_id="",
-        logging_enabled=False,
+        logging_enabled=True,
         logging_filepath="/tmp/refstudio-sidecar.log",
         model_provider=ModelProvider.OPENAI,
         api_key="",

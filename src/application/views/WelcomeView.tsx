@@ -86,8 +86,14 @@ function WelcomeActions() {
       <div className="flex flex-col items-start gap-8">
         <h1 className="text-card-txt-primary">Welcome to refstudio</h1>
         <div className="flex flex-col items-center gap-2 self-stretch">
-          <Button fluid text="New Project" onClick={() => emitEvent('refstudio://menu/file/project/new')} />
           <Button
+            alignment="left"
+            fluid
+            text="New Project"
+            onClick={() => emitEvent('refstudio://menu/file/project/new')}
+          />
+          <Button
+            alignment="left"
             fluid
             text="Try Sample Project"
             type="secondary"

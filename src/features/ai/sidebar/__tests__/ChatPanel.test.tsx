@@ -1,33 +1,45 @@
+import { createStore } from 'jotai';
+
 import { chatWithAiStreaming } from '../../../../api/chat';
-import { render, screen, userEvent, waitFor } from '../../../../test/test-utils';
+import { act, screen, setupWithJotaiProvider, userEvent, waitFor } from '../../../../test/test-utils';
 import { ChatbotPanel } from '../ChatPanel';
 
 vi.mock('../../../../api/chat');
 
 describe('ChatPanel component', () => {
+  let store: ReturnType<typeof createStore>;
+
+  beforeEach(() => {
+    store = createStore();
+  });
+
   afterEach(() => {
     vi.clearAllMocks();
   });
 
   it('should render the panel without history content and a textbox', () => {
-    render(<ChatbotPanel />);
+    setupWithJotaiProvider(<ChatbotPanel />, store);
     expect(screen.getByRole('textbox')).toBeInTheDocument();
   });
 
   it('should call api if textbox has text', async () => {
     const chatWithAiMock = vi.mocked(chatWithAiStreaming).mockResolvedValue('');
     const user = userEvent.setup();
-    render(<ChatbotPanel />);
+    setupWithJotaiProvider(<ChatbotPanel />, store);
     await user.type(screen.getByRole('textbox'), 'This is a question.');
-    await user.click(screen.getByTitle('Send'));
+    await act(async () => {
+      await user.click(screen.getByTitle('Send'));
+    });
     expect(chatWithAiMock).toBeCalled();
   });
 
   it('should NOT call api if textbox has empty text', async () => {
     const chatWithAiMock = vi.mocked(chatWithAiStreaming).mockResolvedValue('');
     const user = userEvent.setup();
-    render(<ChatbotPanel />);
-    await user.click(screen.getByTitle('Send'));
+    setupWithJotaiProvider(<ChatbotPanel />, store);
+    await act(async () => {
+      await user.click(screen.getByTitle('Send'));
+    });
     expect(chatWithAiMock).not.toHaveBeenCalled();
   });
 
@@ -35,9 +47,11 @@ describe('ChatPanel component', () => {
   it('should call api on ENTER in the textbox', async () => {
     const chatWithAiMock = vi.mocked(chatWithAiStreaming).mockResolvedValue('');
     const user = userEvent.setup();
-    render(<ChatbotPanel />);
-    await user.type(screen.getByRole('textbox'), 'This is a question.');
-    await user.type(screen.getByRole('textbox'), '{enter}');
+    setupWithJotaiProvider(<ChatbotPanel />, store);
+    await act(async () => {
+      await user.type(screen.getByRole('textbox'), 'This is a question.');
+      await user.type(screen.getByRole('textbox'), '{enter}');
+    });
     expect(chatWithAiMock).toHaveBeenCalledTimes(1);
   });
 
@@ -45,9 +59,11 @@ describe('ChatPanel component', () => {
   it('should display ERROR if chatWithAI throw exception', async () => {
     const chatWithAiMock = vi.mocked(chatWithAiStreaming).mockRejectedValue('Error message.');
     const user = userEvent.setup();
-    render(<ChatbotPanel />);
-    await user.type(screen.getByRole('textbox'), 'This is a question.');
-    await user.type(screen.getByRole('textbox'), '{enter}');
+    setupWithJotaiProvider(<ChatbotPanel />, store);
+    await act(async () => {
+      await user.type(screen.getByRole('textbox'), 'This is a question.');
+      await user.type(screen.getByRole('textbox'), '{enter}');
+    });
     expect(chatWithAiMock).toHaveBeenCalledTimes(1);
     expect(screen.getByText('ERROR: Error message.')).toBeInTheDocument();
   });
@@ -55,7 +71,7 @@ describe('ChatPanel component', () => {
   it('should NOT call api on SHIFT+ENTER in the textbox', async () => {
     const chatWithAiMock = vi.mocked(chatWithAiStreaming).mockResolvedValue('');
     const user = userEvent.setup();
-    render(<ChatbotPanel />);
+    setupWithJotaiProvider(<ChatbotPanel />, store);
     await user.type(screen.getByRole('textbox'), 'This is a question.');
     await user.type(screen.getByRole('textbox'), '{Shift>}{enter}');
     expect(chatWithAiMock).toHaveBeenCalledTimes(0);
@@ -64,9 +80,11 @@ describe('ChatPanel component', () => {
   it('should render question and reply in the screen', async () => {
     const chatWithAiMock = vi.mocked(chatWithAiStreaming).mockResolvedValue('Sure!');
     const user = userEvent.setup();
-    render(<ChatbotPanel />);
+    setupWithJotaiProvider(<ChatbotPanel />, store);
     await user.type(screen.getByRole('textbox'), 'Will this test pass?');
-    await user.click(screen.getByTitle('Send'));
+    await act(async () => {
+      await user.click(screen.getByTitle('Send'));
+    });
     expect(chatWithAiMock.mock.calls.length).toBe(1);
     expect(screen.getByText('Will this test pass?')).toBeInTheDocument();
     expect(screen.getByText('Sure!')).toBeInTheDocument();
@@ -76,10 +94,12 @@ describe('ChatPanel component', () => {
     // Note: this is a promise that _don't resolve_ so that we can test the "..." below.
     vi.mocked(chatWithAiStreaming).mockImplementation(async () => new Promise<string>(() => '---'));
     const user = userEvent.setup();
-    render(<ChatbotPanel />);
+    setupWithJotaiProvider(<ChatbotPanel />, store);
 
     await user.type(screen.getByRole('textbox'), 'Will this test pass?');
-    await user.click(screen.getByTitle('Send'));
+    await act(async () => {
+      await user.click(screen.getByTitle('Send'));
+    });
 
     expect(screen.getByText('Will this test pass?')).toBeInTheDocument();
     expect(screen.getByTestId('chatLoadingAnimation')).toBeInTheDocument();
@@ -97,27 +117,29 @@ describe('ChatPanel component', () => {
       return 'Full Text';
     });
     const user = userEvent.setup();
-    render(<ChatbotPanel />);
+    setupWithJotaiProvider(<ChatbotPanel />, store);
 
     await user.type(screen.getByRole('textbox'), 'Will this test pass?');
-    await user.click(screen.getByTitle('Send'));
+    await act(async () => {
+      await user.click(screen.getByTitle('Send'));
+    });
 
     expect(screen.getByText('Will this test pass?')).toBeInTheDocument();
     expect(screen.getByTestId('chatLoadingAnimation')).toBeInTheDocument();
 
-    onMessageChunk('Some', 'Some');
+    act(() => onMessageChunk('Some', 'Some'));
 
     await waitFor(() => {
       expect(screen.getByText('Some')).toBeInTheDocument();
     });
 
-    onMessageChunk(' reply text.', 'Some reply text.');
+    act(() => onMessageChunk(' reply text.', 'Some reply text.'));
 
     await waitFor(() => {
       expect(screen.getByText('Some reply text.')).toBeInTheDocument();
     });
 
-    resolveFn('Some reply text.');
+    act(() => resolveFn('Some reply text.'));
     await waitFor(() => {
       expect(screen.getByText('Some reply text.')).toBeInTheDocument();
     });

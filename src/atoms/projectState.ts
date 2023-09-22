@@ -3,9 +3,9 @@ import { Atom, atom } from 'jotai';
 import { ProjectInfo } from '../api/projectsAPI';
 import { ensureSampleProjectFiles, setCurrentFileSystemProjectId } from '../io/filesystem';
 import { createModalAtoms } from './core/createModalAtoms';
-import { closeAllEditorsAtom } from './editorActions';
 import { refreshFileTreeAtom } from './fileExplorerActions';
-import { clearAllReferencesAtom, loadReferencesAtom } from './referencesState';
+import { loadReferencesAtom } from './referencesState';
+import { resetStateAtom } from './resetState';
 
 // #####################################################################################
 // Internal Atoms
@@ -45,9 +45,7 @@ export const closeProjectAtom = atom(null, async (get, set) => {
     set(currentProjectIdAtom, '');
     set(currentProjectNameAtom, '');
 
-    set(closeAllEditorsAtom);
-    set(clearAllReferencesAtom);
-    await set(refreshFileTreeAtom);
+    await set(resetStateAtom);
   }
 });
 

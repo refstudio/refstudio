@@ -33,4 +33,4 @@ file_handler.setFormatter(formatter)
 
 logger.addHandler(stream_handler)
 logger.addHandler(file_handler)
-logger.disabled = os.environ.get("SIDECAR_ENABLE_LOGGING", "false").lower() != "true"
+logger.disabled = False
