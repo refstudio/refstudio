@@ -3,7 +3,6 @@ from types import GeneratorType
 import pytest
 from sidecar.ai import chat
 from sidecar.ai.schemas import ChatRequest
-from sidecar.settings.schemas import FlatSettingsSchema
 from sidecar.settings.service import default_settings
 
 

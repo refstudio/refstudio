@@ -2,7 +2,6 @@ import os
 
 import litellm
 import openai
-from openai.error import AuthenticationError
 from sidecar.ai.prompts import create_prompt_for_chat, prepare_chunks_for_prompt
 from sidecar.ai.ranker import BM25Ranker
 from sidecar.ai.schemas import ChatRequest, ChatResponse, ChatResponseChoice
