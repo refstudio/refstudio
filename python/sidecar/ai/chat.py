@@ -39,6 +39,12 @@ def yield_error_message(msg_func: callable):
     yield f"data: {msg_func()}\n\n"
 
 
+async def stream_response(response):
+    async for chunk in response:
+        item = chunk["choices"][0]["delta"].get("content", "")
+        yield f"data: {item}\n\n"
+
+
 async def yield_response(
     request: ChatRequest,
     project_id: str = None,
@@ -66,20 +72,18 @@ async def yield_response(
     storage = get_references_json_storage(user_id="user1", project_id=project_id)
     logger.info(f"Loaded {len(storage.chunks)} documents from storage")
 
-    # if not storage.chunks:
-    #     # no reference chunks available for chat
-    #     return yield_error_message(get_missing_references_message)
+    if not storage.chunks:
+        # no reference chunks available for chat
+        return yield_error_message(get_missing_references_message)
 
     ranker = BM25Ranker(storage=storage)
     chat = Chat(input_text=input_text, storage=storage, ranker=ranker, model=model)
+
     response = await chat.ask_question(
         n_choices=1, temperature=temperature, stream=True
     )
-    return response
-    # async for chunk in response:
-    #     content = chunk["choices"][0]["delta"].get("content", "")
-    #     yield f"data: {content}\n\n"
-    # return chat.yield_response(temperature=temperature)
+
+    return stream_response(response)
 
 
 async def ask_question(

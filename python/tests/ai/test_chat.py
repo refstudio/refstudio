@@ -89,17 +89,17 @@ async def test_chat_yield_response_is_missing_references(
         result += chunk
 
     expected = ""
-    for chunk in chat.yield_missing_references_response():
+    for chunk in chat.yield_error_message(chat.get_missing_references_message):
         expected += chunk
 
     assert result == expected
 
 
 def test_chat_yield_response_is_openai_error(
-    monkeypatch, mock_call_model_is_authentication_error, setup_project_references_json
+    monkeypatch, amock_call_model_is_authentication_error, setup_project_references_json
 ):
     monkeypatch.setattr(
-        chat.Chat, "call_model", mock_call_model_is_authentication_error
+        chat.Chat, "call_model", amock_call_model_is_authentication_error
     )
 
     response = chat.yield_response(
