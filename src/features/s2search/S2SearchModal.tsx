@@ -147,7 +147,7 @@ const formatMessage = (message: string): ReactElement[] => {
     if (part.match(/(https?:\/\/[^\s]+)/g)) {
       // Make an anchor link
       formattedParts.push(
-        <a href={part} key={index} target="_new">
+        <a href={part} key={index} rel="noreferrer" target="_blank">
           {part}
         </a>,
       );
