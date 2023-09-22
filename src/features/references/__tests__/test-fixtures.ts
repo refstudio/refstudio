@@ -11,6 +11,10 @@ export const REFERENCES: ReferenceItem[] = [
     doi: '0000',
     authors: [{ fullName: 'Joe Doe', lastName: 'Doe' }],
     publishedDate: '2023-08-15',
+    metadata: {
+      sourceId: '1234',
+      source: 's2',
+    },
   },
   {
     id: '45722618-c4fb-4ae1-9230-7fc19a7219ed',

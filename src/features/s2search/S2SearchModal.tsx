@@ -38,7 +38,6 @@ const SearchBar = ({ onChange }: { onChange: (value: string, limit: number) => v
 );
 
 export const SearchResult = ({ s2SearchResult, projectId }: { s2SearchResult: S2SearchResult; projectId: string }) => {
-
   let refStatusDefault = 'ready';
   let refIdDefault = '';
   const refStudioIdLookup = useAtomValue(getPaperIdLookupAtom);
@@ -47,7 +46,7 @@ export const SearchResult = ({ s2SearchResult, projectId }: { s2SearchResult: S2
     refIdDefault = refStudioIdLookup[s2SearchResult.paperId];
     refStatusDefault = 'added';
   }
-  
+
   const [refStatus, setRefStatus] = useState(refStatusDefault);
   const [refId, setRefId] = useState(refIdDefault);
   const [message, setMessage] = useState('');
@@ -55,7 +54,6 @@ export const SearchResult = ({ s2SearchResult, projectId }: { s2SearchResult: S2
   const [showRemove, setShowRemove] = useState(false);
   const saveS2Reference = useSetAtom(addS2ReferenceAtom);
   const removeS2Reference = useSetAtom(removeS2ReferenceAtom);
-
 
   const addClickHandler = useCallback(() => {
     setRefStatus('adding');
@@ -262,16 +260,15 @@ export function S2SearchModal({ open, onClose: onClose }: { open: boolean; onClo
   const clearSearchResults = useSetAtom(clearSearchResultsAtom);
   const generatePaperIdLookup = useSetAtom(generatePaperIdLookupAtom);
   const [loading, setLoading] = useState(false);
-  
-  useEffect(()=> {
+
+  useEffect(() => {
     generatePaperIdLookup();
   }, [generatePaperIdLookup]);
-
 
   const handleKeyWordsEntered = useCallback(
     (searchTerm: string, limit?: number) => {
       setLoading(true);
-      
+
       loadSearchResults(searchTerm, limit)
         .then(() => {
           setLoading(false);
@@ -280,7 +277,6 @@ export function S2SearchModal({ open, onClose: onClose }: { open: boolean; onClo
           notifyError('Could not load search results');
           console.error(err);
         });
-        
     },
     [loadSearchResults],
   );

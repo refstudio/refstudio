@@ -122,12 +122,14 @@ const IconButton = ({ title, icon, onClick }: { title: string; icon: ReactElemen
   </button>
 );
 
+type ReferenceDetailsCardItem = Omit<ReferenceItem, 'metadata'>;
+
 export default function ReferenceDetailsCard({
   reference,
   handleReferenceChange,
   handleOpenPdf,
 }: {
-  reference: ReferenceItem;
+  reference: ReferenceDetailsCardItem;
   handleReferenceChange: (params: ReferenceItem) => void;
   handleOpenPdf?: (reference: ReferenceItem) => void;
 }) {
@@ -203,7 +205,7 @@ export default function ReferenceDetailsCard({
       </thead>
       <tbody className="divide-y">
         {Object.entries(referenceDetailsCardFormat).map(([key, rowData]) => {
-          const contentData = reference[key as keyof ReferenceItem];
+          const contentData = reference[key as keyof ReferenceDetailsCardItem];
 
           return (
             <tr key={key}>

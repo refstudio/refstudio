@@ -4,6 +4,7 @@ import * as s2SearchAPI from '../../../api/s2SearchAPI';
 import * as S2SearchState from '../../../atoms/s2SearchState';
 import { noop } from '../../../lib/noop';
 import { render, screen, setupWithJotaiProvider, waitFor } from '../../../test/test-utils';
+import { REFERENCES } from '../../references/__tests__/test-fixtures';
 import { S2SearchModal, SearchResult } from '../S2SearchModal';
 
 const searchResults = [
@@ -38,7 +39,7 @@ const searchResults = [
       'Neural circuits sit in a dynamic balance between excitation (E) and inhibition (I). Fluctuations in this E:I balance have been shown to influence neural computation, working memory, and information processing. While more drastic shifts and aberrant E:I patterns are implicated in numerous neurological and psychiatric disorders, current methods for measuring E:I dynamics require invasive procedures that are difficult to perform in behaving animals, and nearly impossible in humans. This has limited the ability to examine the full impact that E:I shifts have in neural computation and disease. In this study, we develop a computational model to show that E:I ratio can be estimated from the power law exponent (slope) of the electrophysiological power spectrum, and validate this relationship using previously published datasets from two species (rat local field potential and macaque electrocorticography). This simple method--one that can be applied retrospectively to existing data--removes a major hurdle in understanding a currently difficult to measure, yet fundamental, aspect of neural computation.',
     venue: 'NeuroImage',
     publicationDate: '2016-10-16T00:00:00',
-    paperId: '0a2c3202a9c4c4f7709eeed324ca53e12ad4af72',
+    paperId: '1234',
     citationCount: 357,
     openAccessPdf: 'https://www.biorxiv.org/content/biorxiv/early/2016/10/16/081125.full.pdf',
     authors: ['Richard Gao', 'E. Peterson', 'Bradley Voytek'],
@@ -49,7 +50,13 @@ global.CSS.supports = () => false;
 
 vi.mock('../../events');
 vi.mock('../../api/s2SearchAPI');
-vi.mock('../../../atoms/referencesState');
+vi.mock('../../../atoms/referencesState', async (importOriginal) => {
+  const actual: object = await importOriginal();
+  return {
+    ...actual,
+    getReferencesAtom: atom(() => REFERENCES),
+  };
+});
 
 vi.mock('../../../atoms/s2SearchState', async (importOriginal) => {
   const actual: object = await importOriginal();
@@ -111,6 +118,18 @@ describe('S2SearchModal component', () => {
 
     await waitFor(() => {
       expect(screen.getAllByTitle('This reference has no PDF. Chat functions will be limited.').length).toBe(2);
+    });
+  });
+
+  it('should show Added for references with a paperId that matches an existing reference', async () => {
+    const store = createStore();
+
+    const { user } = setupWithJotaiProvider(<S2SearchModal open onClose={noop} />, store);
+    const searchBar = screen.getByPlaceholderText('Search Semantic Scholar...');
+    await user.type(searchBar, 'voytek');
+
+    await waitFor(() => {
+      expect(screen.getByText('Added')).toBeInTheDocument();
     });
   });
 

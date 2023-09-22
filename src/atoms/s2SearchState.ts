@@ -10,7 +10,7 @@ import { getReferencesAtom, loadReferencesAtom } from './referencesState';
 // Internal Atoms
 // #####################################################################################
 export const searchResultsAtom = atom<S2SearchResult[]>([]);
-export const paperIdLookupAtom = atom<Record<string,string>>({});
+export const paperIdLookupAtom = atom<Record<string, string>>({});
 
 // #####################################################################################
 // References API
@@ -20,9 +20,9 @@ export const getSearchResultsAtom = atom((get) => Object.values(get(searchResult
 export const getPaperIdLookupAtom = atom((get) => get(paperIdLookupAtom));
 
 export const generatePaperIdLookupAtom = atom(null, (get, set) => {
-  const updatedReferencesPaperIdLookup:Record<string,string> = {};    
+  const updatedReferencesPaperIdLookup: Record<string, string> = {};
   const refStudioReferences = get(getReferencesAtom);
-  
+
   refStudioReferences.forEach((reference) => {
     if (reference.metadata?.sourceId) {
       updatedReferencesPaperIdLookup[reference.metadata.sourceId] = reference.id;
@@ -30,9 +30,7 @@ export const generatePaperIdLookupAtom = atom(null, (get, set) => {
   });
 
   set(paperIdLookupAtom, updatedReferencesPaperIdLookup);
-
 });
-
 
 export const loadSearchResultsAtom = atom(null, async (_get, set, keywords: string, limit?: number) => {
   const searchResults = await getS2ReferencesByKeyword(keywords, limit);
