@@ -43,7 +43,9 @@ async def http_ai_chat(
 ) -> ChatResponse:
     user_id = "user1"
     user_settings = get_settings_for_user(user_id)
-    response = ask_question(req, project_id=project_id, user_settings=user_settings)
+    response = await ask_question(
+        req, project_id=project_id, user_settings=user_settings
+    )
     return response
 
 
@@ -65,7 +67,7 @@ async def http_ai_chat_stream(
 ) -> StreamingResponse:
     user_id = "user1"
     user_settings = get_settings_for_user(user_id)
-    return StreamingResponse(
-        yield_response(req, project_id=project_id, user_settings=user_settings),
-        media_type="text/event-stream",
+    response = await yield_response(
+        req, project_id=project_id, user_settings=user_settings
     )
+    return StreamingResponse(response, media_type="text/event-stream")

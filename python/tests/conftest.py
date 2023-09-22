@@ -4,7 +4,6 @@ from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
-from openai.error import AuthenticationError
 from sidecar import config
 from sidecar.api import api
 from sidecar.projects import service as projects_service
@@ -185,7 +184,7 @@ def create_settings_json(monkeypatch, tmp_path, request):
 
 @pytest.fixture
 def mock_call_model_is_ok(*args, **kwargs):
-    def mock_call_model_response(*args, **kwargs):
+    async def mock_call_model_response(*args, **kwargs):
         return {
             "choices": [
                 {
@@ -240,23 +239,27 @@ def amock_call_model_is_ok(*args, **kwargs):
 
 
 @pytest.fixture
-def mock_call_model_is_stream(*args, **kwargs):
-    def mock_call_model_response(*args, **kwargs):
-        yield {
-            "choices": [
-                {
-                    "delta": {
-                        "content": "This is a mocked streaming response",
-                    }
+def amock_call_model_is_stream(*args, **kwargs):
+    async def mock_call_model_response(*args, **kwargs):
+        class MockResponse:
+            async def __aiter__(self):
+                yield {
+                    "choices": [
+                        {
+                            "delta": {
+                                "content": "This is a mocked streaming response",
+                            }
+                        }
+                    ]
                 }
-            ]
-        }
+
+        return MockResponse()
 
     return mock_call_model_response
 
 
 @pytest.fixture
-def mock_call_model_is_error(*args, **kwargs):
+def mock_call_model_is_unhandled_error(*args, **kwargs):
     def mock_call_model_response(*args, **kwargs):
         raise Exception("This is a mocked error")
 
@@ -264,15 +267,7 @@ def mock_call_model_is_error(*args, **kwargs):
 
 
 @pytest.fixture
-def mock_call_model_is_authentication_error(*args, **kwargs):
-    def mock_call_model_response(*args, **kwargs):
-        raise AuthenticationError("This is an authentication error")
-
-    return mock_call_model_response
-
-
-@pytest.fixture
-def amock_call_model_is_error(*args, **kwargs):
+def amock_call_model_is_unhandled_error(*args, **kwargs):
     async def mock_call_model_response(*args, **kwargs):
         raise Exception("This is a mocked error")
 
