@@ -71,6 +71,7 @@ function parsePdfIngestionResponse(references: Reference[]): ReferenceItem[] {
       fullName: author.full_name,
       lastName: author.surname ?? author.full_name.split(' ').pop() ?? '',
     })),
+    metadata: reference.metadata ?? {},
   }));
 }
 

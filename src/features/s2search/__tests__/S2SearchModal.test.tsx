@@ -119,7 +119,7 @@ describe('S2SearchModal component', () => {
   it('should attempt to add the reference', async () => {
     const store = createStore();
 
-    const { user } = setupWithJotaiProvider(<SearchResult projectId="000" reference={searchResults[0]} />, store);
+    const { user } = setupWithJotaiProvider(<SearchResult projectId="000" s2SearchResult={searchResults[0]} />, store);
     await user.click(screen.getByTitle('Add this reference to your references list'));
 
     await waitFor(() => {

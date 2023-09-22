@@ -9,11 +9,17 @@ export interface ReferenceItem {
   status: ReferenceItemStatus;
   authors: Author[];
   doi: string;
+  metadata?: ReferenceMetadata;
 }
 
 export interface Author {
   fullName: string;
   lastName: string;
+}
+
+export interface ReferenceMetadata {
+  sourceId?: string;
+  source?: string;
 }
 
 export type ReferenceItemStatus = 'processing' | 'failure' | 'complete';
