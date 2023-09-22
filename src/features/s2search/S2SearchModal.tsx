@@ -20,7 +20,7 @@ import { cx } from '../../lib/cx';
 import { LoadingIcon } from '../components/icons';
 
 const SearchBar = ({ onChange }: { onChange: (value: string, limit: number) => void }) => (
-  <div className="sticky top-0 flex border-b border-slate-200 bg-modal-bg-primary p-4">
+  <div className="sticky top-0 flex border-b border-input-border-active bg-modal-bg-primary p-4">
     <div className="pr-3 text-input-ico-placeholder">
       <SearchIcon />
     </div>
@@ -53,29 +53,23 @@ export const SearchResult = ({ reference, projectId }: { reference: S2SearchResu
         }
         setRefStatus('added');
       })
-      .catch((e) => {
-        setRefStatus('error');
-      });
+      .catch(() => setRefStatus('error'));
   }, [projectId, reference, saveS2Reference]);
 
   const removeClickHandler = useCallback(() => {
     removeS2Reference(projectId, refId)
-      .then(() => {
-        setRefStatus('ready');
-      })
-      .catch(() => {
-        setRefStatus('remove-error');
-      });
+      .then(() => setRefStatus('ready'))
+      .catch(() => setRefStatus('remove-error'));
   }, [projectId, refId, removeS2Reference]);
 
   return (
-    <div className="border-b border-slate-200 px-5 py-3 text-[.875rem]">
+    <div className="border-b border-modal-border px-5 py-3 text-base">
       <div className="space-y-2">
         <div className="flex">
           <div className="basis-4/5 truncate font-semibold" title={reference.title}>
             {reference.title}
           </div>
-          <div className="flex basis-1/5 justify-end space-x-1">
+          <div className="flex h-8 basis-1/5 justify-end space-x-1">
             {refStatus === 'ready' && (
               <>
                 {!reference.openAccessPdf && (
@@ -100,7 +94,7 @@ export const SearchResult = ({ reference, projectId }: { reference: S2SearchResu
             {refStatus === 'error' && <CouldNotAddRef />}
             {refStatus === 'remove-error' && <CouldNotRemoveRef />}
             {refStatus === 'adding' && (
-              <div className="flex py-[.375rem]">
+              <div className="flex gap-1 py-1.5">
                 Adding <LoadingIcon />
               </div>
             )}
@@ -165,7 +159,7 @@ const formatMessage = (message: string): ReactElement[] => {
 };
 
 const RefAddedMessage = ({ message }: { message: string }) => (
-  <div className="has-tooltip h-5 w-5 cursor-pointer py-[.375rem] text-[#61C554]" title={message}>
+  <div className="has-tooltip h-5 w-5 cursor-pointer py-1.5 text-color-warning-50" title={message}>
     <SmallInfoIcon />
     <div className="tooltip break-words text-modal-txt-primary">
       The reference&apos;s metadata has been added to your library but we were unable to retrieve the PDF for the
@@ -179,11 +173,11 @@ const RefAddedMessage = ({ message }: { message: string }) => (
 
 const CouldNotAddRef = () => (
   <>
-    <div className="py-[.375rem] text-red-400" title="Sorry, something went wrong when adding this reference.">
+    <div className="py-1.5 text-color-error-50" title="Sorry, something went wrong when adding this reference.">
       Upload Error
     </div>
     <div
-      className=" cursor-pointer py-[.375rem] text-red-400"
+      className=" text-error-50 cursor-pointer py-1.5"
       title="Sorry, something went wrong when adding this reference."
     >
       <SmallInfoIcon />
@@ -193,11 +187,11 @@ const CouldNotAddRef = () => (
 
 const CouldNotRemoveRef = () => (
   <>
-    <div className="py-[.375rem] text-red-400" title="Sorry, something went wrong when removing this reference.">
+    <div className="text-error-50 py-1.5" title="Sorry, something went wrong when removing this reference.">
       Remove Error
     </div>
     <div
-      className=" cursor-pointer py-[.375rem] text-red-400"
+      className=" text-error-50 cursor-pointer py-1.5"
       title="Sorry, something went wrong when removing this reference."
     >
       <SmallInfoIcon />
@@ -228,18 +222,11 @@ const RemoveButton = ({
   setShowRemove: (value: boolean) => void;
   removeClickHandler: () => void;
 }) => (
-  <div
-    onMouseLeave={() => {
-      setShowRemove(false);
-    }}
-    onMouseOver={() => {
-      setShowRemove(true);
-    }}
-  >
+  <div onMouseLeave={() => setShowRemove(false)} onMouseOver={() => setShowRemove(true)}>
     <Button
       Action={showRemove ? <MinusIcon /> : <CheckIcon />}
-      className={cx('bg-transparent text-[#61C554]', 'hover:bg-red-400 hover:text-white')}
-      inheritColor={true}
+      className={cx('bg-transparent text-color-success-50', 'hover:bg-color-error-50 hover:text-white')}
+      inheritColor
       size="S"
       text={showRemove ? 'Remove' : 'Added'}
       title="Remove this reference from your reference list"
