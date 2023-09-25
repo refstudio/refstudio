@@ -17,6 +17,6 @@
     "jsx": "react-jsx",
     "types": ["vitest/globals"]
   },
-  "include": ["src", ".eslintrc.cjs", "knip.ts"],
+  "include": ["src", "e2e", ".eslintrc.cjs", "knip.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

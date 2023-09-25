@@ -76,13 +76,12 @@ export default defineConfig({
       reuseExistingServer: !process.env.CI,
     },
     {
-      command: ' rm -rf /tmp/web-storage-e2e && yarn web:api',
+      command: 'yarn web:api',
       port: 8000,
       env: {
         WEB_STORAGE_URL: '/tmp/web-storage-e2e',
       },
-      reuseExistingServer: !process.env.CI,
-      stdout: 'pipe',
+      reuseExistingServer: false,
     },
   ],
 });
