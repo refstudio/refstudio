@@ -29,6 +29,7 @@
     "test:watch": "vitest --watch",
     "test:watch:ui": "vitest --watch --ui",
     "coverage": "vitest run --coverage",
+    "e2e": "yarn playwright test",
     "tauri": "tauri",
     "tauri:build:mac:apple": "bash binaries/build-target.sh aarch64-apple-darwin",
     "tauri:build:mac:intel": "bash binaries/build-target.sh x86_64-apple-darwin",
@@ -82,6 +83,7 @@
     "usehooks-ts": "^2.9.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.38.1",
     "@tauri-apps/cli": "^1.2.3",
     "@testing-library/dom": "^9.3.1",
     "@testing-library/jest-dom": "^5.16.5",
