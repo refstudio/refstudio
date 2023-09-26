@@ -5,7 +5,7 @@ import { Decoration, DecorationSet } from '@tiptap/pm/view';
 
 import { toggleCollapsed } from '../commands/toggleCollapsed';
 import { addUnindentSteps } from '../commands/unindent';
-import { NotionBlockNode } from '../NotionBlockNode';
+import { LIST_ITEM_TYPES, NotionBlockNode } from '../NotionBlockNode';
 import { BlockSelection } from '../selection/BlockSelection';
 import { addIndentBlockSteps } from '../utils/addIndentBlockSteps';
 import { collapsibleArrowsPluginKey } from './collapsibleArrowPlugin';
@@ -232,8 +232,24 @@ function moveBlocksDown({ depthDifference, endPos, selection, tr, dispatch }: Bl
   // If the last selected node has a sibling
   if (indexInParent < parent.childCount - 1) {
     const sibling = parent.child(indexInParent + 1);
-    // If the sibling is collapsed, move selection after the sibling
-    if (sibling.attrs.type === 'collapsible' && sibling.attrs.collapsed) {
+    // If the sibling is a list item, an uncollapsed collapsible block or has children, make selected blocks its child
+    if (
+      (LIST_ITEM_TYPES.includes(sibling.attrs.type as string) && !sibling.attrs.collapsed) ||
+      (!LIST_ITEM_TYPES.includes(sibling.attrs.type as string) && sibling.childCount > 1)
+    ) {
+      const sliceToMove = tr.doc.slice(selection.from + depthDifference, endPos);
+
+      tr.delete(selection.from + depthDifference, endPos);
+      const insertPos = tr.mapping.map(endPos + 1 + sibling.firstChild!.nodeSize);
+      tr.replace(insertPos, insertPos, sliceToMove);
+
+      if (selection.from === selection.anchor) {
+        tr.setSelection(new BlockSelection(tr.doc.resolve(insertPos), tr.doc.resolve(insertPos + selectionRange)));
+      } else {
+        tr.setSelection(new BlockSelection(tr.doc.resolve(insertPos + selectionRange), tr.doc.resolve(insertPos)));
+      }
+    } else {
+      // Otherwise, move selection after the sibling
       const sliceToMove = tr.doc.slice(selection.from + depthDifference, endPos);
 
       tr.delete(selection.from + depthDifference, endPos);
@@ -249,19 +265,6 @@ function moveBlocksDown({ depthDifference, endPos, selection, tr, dispatch }: Bl
         tr.setSelection(
           new BlockSelection(tr.doc.resolve(siblingEndPos + selectionRange), tr.doc.resolve(siblingEndPos)),
         );
-      }
-    } else {
-      // If the sibling is uncollapsed, make selected blocks its child
-      const sliceToMove = tr.doc.slice(selection.from + depthDifference, endPos);
-
-      tr.delete(selection.from + depthDifference, endPos);
-      const insertPos = tr.mapping.map(endPos + 1 + sibling.firstChild!.nodeSize);
-      tr.replace(insertPos, insertPos, sliceToMove);
-
-      if (selection.from === selection.anchor) {
-        tr.setSelection(new BlockSelection(tr.doc.resolve(insertPos), tr.doc.resolve(insertPos + selectionRange)));
-      } else {
-        tr.setSelection(new BlockSelection(tr.doc.resolve(insertPos + selectionRange), tr.doc.resolve(insertPos)));
       }
     }
   } else if (selection.$to.depth > 0) {
@@ -318,19 +321,11 @@ function moveBlocksUp({
     const siblingPos = selection.$from.posAtIndex(indexInParent - 1);
     const sibling = tr.doc.nodeAt(siblingPos);
 
-    if (sibling?.attrs.type === 'collapsible' && sibling.attrs.collapsed) {
-      // If the sibling is collapsed, move the block before its sibling
-      const sliceToMove = tr.doc.slice(selection.from + depthDifference, endPos);
-      tr.replace(selection.from + depthDifference, endPos);
-      tr.replace(siblingPos, siblingPos, sliceToMove);
-
-      if (selection.from === selection.anchor) {
-        tr.setSelection(new BlockSelection(tr.doc.resolve(siblingPos), tr.doc.resolve(siblingPos + selectionRange)));
-      } else {
-        tr.setSelection(new BlockSelection(tr.doc.resolve(siblingPos + selectionRange), tr.doc.resolve(siblingPos)));
-      }
-    } else {
-      // Otherwise, indent the block
+    // If the sibling is a list item, is a uncollapsed collapsible block or has children, indents the block
+    if (
+      (LIST_ITEM_TYPES.includes(sibling?.attrs.type as string) && !sibling?.attrs.collapsed) ||
+      (!LIST_ITEM_TYPES.includes(sibling?.attrs.type as string) && sibling && sibling.childCount > 1)
+    ) {
       const startPos = selection.from - 1; // End of sibling
 
       let fragment = Fragment.from(selectedBlock.copy());
@@ -347,6 +342,17 @@ function moveBlocksUp({
           0,
         ),
       );
+    } else {
+      // Otherwise, move the block before its sibling
+      const sliceToMove = tr.doc.slice(selection.from + depthDifference, endPos);
+      tr.replace(selection.from + depthDifference, endPos);
+      tr.replace(siblingPos, siblingPos, sliceToMove);
+
+      if (selection.from === selection.anchor) {
+        tr.setSelection(new BlockSelection(tr.doc.resolve(siblingPos), tr.doc.resolve(siblingPos + selectionRange)));
+      } else {
+        tr.setSelection(new BlockSelection(tr.doc.resolve(siblingPos + selectionRange), tr.doc.resolve(siblingPos)));
+      }
     }
   } else if (parent.type.name === NotionBlockNode.name) {
     // Otherwise, move block before its parent.
