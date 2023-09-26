@@ -94,7 +94,7 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
             dispatch: (t) => view.dispatch(t),
             selectedBlock,
           });
-          return;
+          return true;
         }
         case 'ArrowDown': {
           if (event.shiftKey && event.metaKey) {
@@ -114,7 +114,7 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
             // Down: Select next block
             selection.selectNextBlock(tr, (t) => view.dispatch(t));
           }
-          return;
+          return true;
         }
         case 'ArrowUp': {
           if (event.shiftKey && event.metaKey) {
@@ -134,7 +134,7 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
             // Up: Select previous block
             selection.selectPreviousBlock(tr, (t) => view.dispatch(t));
           }
-          return;
+          return true;
         }
         case 'ArrowLeft': {
           // If the block is not collapsed, collapse it
@@ -144,7 +144,7 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
             // Otherwise select its parent
             selection.selectParentBlock(tr, (t) => view.dispatch(t));
           }
-          return;
+          return true;
         }
         case 'ArrowRight': {
           if (selectedBlock.attrs.type === 'collapsible' && selectedBlock.attrs.collapsed) {
@@ -154,14 +154,14 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
             // Otherwise select its first child
             selection.selectChildBlock(tr, (t) => view.dispatch(t));
           }
-          return;
+          return true;
         }
         case 'KeyA': {
           if (event.metaKey) {
             tr.setSelection(BlockSelection.all(view.state.doc));
             view.dispatch(tr);
           }
-          return;
+          return true;
         }
         case 'Tab':
           {
@@ -187,7 +187,12 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
               });
             }
           }
-          return;
+          return true;
+        case 'Backspace':
+          // We want this shortcut to be handled by the editor
+          return false;
+        default:
+          return true;
       }
     },
   },
