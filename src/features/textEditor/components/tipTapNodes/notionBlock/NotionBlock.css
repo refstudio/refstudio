@@ -3,11 +3,18 @@
 }
 
 .notion-block > .drag-handle {
+  @apply relative;
   @apply invisible;
-  @apply flex flex-shrink-0 flex-grow-0;
-  @apply ml-2 mt-[3px] h-4 w-4;
+  @apply flex flex-shrink-0 flex-grow-0 justify-center;
+  @apply ml-2 h-5 w-5 p-0.5;
   @apply cursor-grab;
+}
+
+.notion-block > .drag-handle::after {
+  @apply absolute;
+  @apply h-4 w-4;
   @apply bg-contain bg-center bg-no-repeat;
+  content: '';
   background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 16"><path fill-opacity="0.2" d="M4 14c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zM2 6C.9 6 0 6.9 0 8s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6C.9 0 0 .9 0 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" /></svg>');
 }
 
@@ -17,18 +24,6 @@
 
 .notion-block:hover:not(:has(.notion-block:hover)) > .drag-handle {
   @apply visible;
-}
-
-.notion-block:has(> .content > div > h1) > .drag-handle {
-  @apply mt-[11px];
-}
-
-.notion-block:has(> .content > div > h2) > .drag-handle {
-  @apply mt-[9px];
-}
-
-.notion-block:has(> .content > div > h3, h4) > .drag-handle {
-  @apply mt-2;
 }
 
 .notion-block.selected > .content {
@@ -53,6 +48,7 @@
   @apply opacity-100;
   @apply inline-block;
   @apply rounded-default;
+  @apply relative -top-0.5;
 }
 
 .notion-block .collapsible-arrow > svg {
@@ -133,10 +129,63 @@
   @apply bg-[rgba(35,131,226,.28)];
 }
 
-/* Display collapsible toggle and header side-by-side */
-.notion-block *:has(> .collapsible-arrow) {
-  @apply flex flex-row gap-0.5;
+/* Display collapsible toggle on the left of content */
+.notion-block > .content > div {
+  @apply relative;
 }
-.notion-block *:has(> .collapsible-arrow) > .collapsible-arrow {
-  @apply shrink-0;
+
+.notion-block > .content > div > .collapsible-arrow {
+  @apply absolute;
+}
+
+.notion-block > .content > div > .collapsible-arrow + * {
+  @apply ml-[1.625rem];
+}
+
+.notion-block > .content > div > .collapsible-arrow:has(+ h1) {
+  @apply mt-[0.625rem];
+}
+
+.notion-block:has(> .content > div > h1) > .drag-handle {
+  @apply mt-[0.625rem];
+}
+
+.notion-block > .content > div > .collapsible-arrow:has(+ h2) {
+  @apply mt-[0.5rem];
+}
+
+.notion-block:has(> .content > div > h2) > .drag-handle {
+  @apply mt-[0.5rem];
+}
+
+.notion-block > .content > div > .collapsible-arrow:has(+ h3) {
+  @apply mt-[0.375rem];
+}
+
+.notion-block:has(> .content > div > h3) > .drag-handle {
+  @apply mt-[0.375rem];
+}
+
+.notion-block > .content > div > .collapsible-arrow:has(+ h4) {
+  @apply mt-[0.25rem];
+}
+
+.notion-block:has(> .content > div > h4) > .drag-handle {
+  @apply mt-[0.25rem];
+}
+
+.notion-block > .content > div > .collapsible-arrow:has(+ h5) {
+  @apply mt-[0.1875rem];
+}
+
+.notion-block:has(> .content > div > h5) > .drag-handle {
+  @apply mt-[0.1875rem];
+}
+
+.notion-block > .content > div > .collapsible-arrow:has(+ p) {
+  @apply mt-[0.125rem];
+}
+
+.notion-block:has(> .content > div > p) > .drag-handle {
+  @apply mt-[0.125rem];
 }

@@ -24,7 +24,7 @@ export const collapsibleArrowsPlugin = new Plugin({
     handleClick: (view, pos, event: MouseEvent) => {
       const target = event.target as HTMLElement;
       const toggleNodeCollapsed = () =>
-        toggleCollapsed({ pos: pos - 2, tr: view.state.tr, dispatch: (tr: Transaction) => view.dispatch(tr) });
+        toggleCollapsed({ pos: pos - 1, tr: view.state.tr, dispatch: (tr: Transaction) => view.dispatch(tr) });
       if (hasAncestor(target, '.collapsible-arrow')) {
         toggleNodeCollapsed();
       } else if (target.className.includes('empty-collapsible-placeholder')) {
@@ -46,8 +46,8 @@ function getCollapsibleArrowDecorations(state: EditorState): Decoration[] {
     }
 
     const isEmpty = node.childCount === 1;
-    // + 2 to add the decoration in the paragraph (...|<notionBlock><p>... --> ...<notionBlock><p>|...)
-    decorations.push(createCollapsibleArrowButtonWidget(pos + 2, isEmpty));
+    // + 1 to add the decoration in the parent div (...|<notionBlock><p>... --> ...<notionBlock>|<p>...)
+    decorations.push(createCollapsibleArrowButtonWidget(pos + 1, isEmpty));
   });
   return decorations;
 }
