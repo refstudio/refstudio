@@ -6,7 +6,7 @@
   @apply relative;
   @apply invisible;
   @apply flex flex-shrink-0 flex-grow-0 justify-center;
-  @apply ml-2 h-5 w-5 p-0.5;
+  @apply ml-1 h-5 w-5 p-0.5;
   @apply cursor-grab;
 }
 
@@ -73,7 +73,7 @@
 }
 
 .notion-block .empty-collapsible-placeholder {
-  @apply ml-[26px] mt-[5px] py-[3px] pl-0.5;
+  @apply m-0 my-0.5 ml-[1.625rem] mr-1;
   @apply cursor-pointer;
   @apply rounded;
   transition: background 20ms ease-in 0s;
@@ -85,8 +85,8 @@
 
 .notion-block .unordered-list-item {
   @apply list-item;
-  @apply list-inside;
-  @apply ml-2.5;
+  @apply list-outside;
+  @apply ml-[1.625rem];
 }
 .notion-block .unordered-list-item.circle {
   list-style-type: circle;
@@ -102,7 +102,7 @@
   content: counter(counter) '. ';
 }
 .notion-block .ordered-list-item {
-  @apply pl-[26px];
+  @apply pl-[1.625rem];
 }
 .notion-block .ordered-list-item.alpha::before {
   content: counter(counter, lower-alpha) '. ';
