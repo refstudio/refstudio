@@ -202,3 +202,5 @@ export const NotionBlockNode = Node.create({
     toggleOrderedList: () => toggleOrderedList,
   }),
 });
+
+export const LIST_ITEM_TYPES = ['collapsible', 'orderedList', 'unorederedList'];

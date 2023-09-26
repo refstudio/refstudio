@@ -5,7 +5,7 @@ import { Decoration, DecorationSet } from '@tiptap/pm/view';
 
 import { toggleCollapsed } from '../commands/toggleCollapsed';
 import { addUnindentSteps } from '../commands/unindent';
-import { NotionBlockNode } from '../NotionBlockNode';
+import { LIST_ITEM_TYPES, NotionBlockNode } from '../NotionBlockNode';
 import { BlockSelection } from '../selection/BlockSelection';
 import { addIndentBlockSteps } from '../utils/addIndentBlockSteps';
 import { collapsibleArrowsPluginKey } from './collapsibleArrowPlugin';
@@ -232,8 +232,11 @@ function moveBlocksDown({ depthDifference, endPos, selection, tr, dispatch }: Bl
   // If the last selected node has a sibling
   if (indexInParent < parent.childCount - 1) {
     const sibling = parent.child(indexInParent + 1);
-    // If the sibling is collapsed, move selection after the sibling
-    if (sibling.attrs.type === 'collapsible' && sibling.attrs.collapsed) {
+    // If the sibling is not a list item or is a collapsed collapsible block, move selection after the sibling
+    if (
+      !LIST_ITEM_TYPES.includes(sibling.attrs.type as string) ||
+      (sibling.attrs.type === 'collapsible' && sibling.attrs.collapsed)
+    ) {
       const sliceToMove = tr.doc.slice(selection.from + depthDifference, endPos);
 
       tr.delete(selection.from + depthDifference, endPos);
@@ -318,8 +321,11 @@ function moveBlocksUp({
     const siblingPos = selection.$from.posAtIndex(indexInParent - 1);
     const sibling = tr.doc.nodeAt(siblingPos);
 
-    if (sibling?.attrs.type === 'collapsible' && sibling.attrs.collapsed) {
-      // If the sibling is collapsed, move the block before its sibling
+    if (
+      !LIST_ITEM_TYPES.includes(sibling?.attrs.type as string) ||
+      (sibling?.attrs.type === 'collapsible' && sibling.attrs.collapsed)
+    ) {
+      // If the sibling is not a list item or is a collapsed collapsible block, move the block before its sibling
       const sliceToMove = tr.doc.slice(selection.from + depthDifference, endPos);
       tr.replace(selection.from + depthDifference, endPos);
       tr.replace(siblingPos, siblingPos, sliceToMove);
