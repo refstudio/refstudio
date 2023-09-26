@@ -235,7 +235,7 @@ function moveBlocksDown({ depthDifference, endPos, selection, tr, dispatch }: Bl
     // If the sibling is a list item, an uncollapsed collapsible block or has children, make selected blocks its child
     if (
       (LIST_ITEM_TYPES.includes(sibling.attrs.type as string) && !sibling.attrs.collapsed) ||
-      sibling.childCount > 1
+      (!LIST_ITEM_TYPES.includes(sibling.attrs.type as string) && sibling.childCount > 1)
     ) {
       const sliceToMove = tr.doc.slice(selection.from + depthDifference, endPos);
 
@@ -324,7 +324,7 @@ function moveBlocksUp({
     // If the sibling is a list item, is a uncollapsed collapsible block or has children, indents the block
     if (
       (LIST_ITEM_TYPES.includes(sibling?.attrs.type as string) && !sibling?.attrs.collapsed) ||
-      (sibling && sibling.childCount > 1)
+      (!LIST_ITEM_TYPES.includes(sibling?.attrs.type as string) && sibling && sibling.childCount > 1)
     ) {
       const startPos = selection.from - 1; // End of sibling
 
