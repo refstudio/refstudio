@@ -69,7 +69,7 @@ ${'#'.repeat(headingLevel)} Hello world!`,
   </notionblock>
   <notionblock>
       <paragraph>
-        <citation>Citation with a reference: <span data-type="reference" data-id="${REFERENCES[0].id}" /></citation>
+        Citation with a reference <span data-type="reference" data-id="${REFERENCES[0].id}" />
       </paragraph>
     </notionblock>`;
     editor.commands.setContent(content);
@@ -91,7 +91,7 @@ ${'#'.repeat(headingLevel)} Hello world!`,
       bibliography: bibliography.bib
       ---
 
-      [Citation with a reference: @doe2023]
+      Citation with a reference [@doe2023]
 
       ## References"
     `);
@@ -105,7 +105,7 @@ ${'#'.repeat(headingLevel)} Hello world!`,
   </notionblock>
   <notionblock>
       <paragraph>
-        <citation>Citation with an invalid reference: <span data-type="reference" data-id="testId" /></citation>
+        Citation with an invalid reference <span data-type="reference" data-id="testId" />
       </paragraph>
     </notionblock>`;
     editor.commands.setContent(content);
@@ -118,7 +118,7 @@ ${'#'.repeat(headingLevel)} Hello world!`,
       title: Title
       ---
 
-      [Citation with an invalid reference: @INVALID_REFERENCE]"
+      Citation with an invalid reference [INVALID_REFERENCE]"
     `);
   });
 

@@ -42,8 +42,6 @@ export const ReferenceNode = Mention.extend({
     allowSpaces: true,
     char: '[@',
     allowedPrefixes: null,
-    // allow: ({ state, range }) =>
-    // state.selection.empty && state.doc.resolve(range.from).parent.type.name === CitationNode.name,
     /* c8 ignore start */
     command: ({
       editor,

@@ -26,18 +26,18 @@ describe('ReferenceNode', () => {
     setUpEditorWithSelection(editor, `<p><span data-type="reference" data-id="${referenceId}"></span>|</p>`);
     setupWithJotaiProvider(<EditorContent editor={editor} />, store);
 
-    expect(screen.getByText(`@${REFERENCES[0].citationKey}`)).toBeInTheDocument();
+    expect(screen.getByText(`[@${REFERENCES[0].citationKey}]`)).toBeInTheDocument();
   });
 
   it('should render INVALID REFERENCE when the node is missing an id', () => {
     setUpEditorWithSelection(editor, '<p><span data-type="reference"></span>|</p>');
     setup(<EditorContent editor={editor} />);
 
-    expect(screen.getByText(`INVALID REFERENCE`)).toBeInTheDocument();
+    expect(screen.getByText(`[INVALID REFERENCE]`)).toBeInTheDocument();
   });
 
   it('should open references list', async () => {
-    setUpEditorWithSelection(editor, '<p><citation>Citation |</citation></p>');
+    setUpEditorWithSelection(editor, '<p>Citation |</p>');
     const { user } = setupWithJotaiProvider(<EditorContent editor={editor} />, store);
 
     await user.type(screen.getByText('Citation'), '@');
@@ -48,7 +48,7 @@ describe('ReferenceNode', () => {
   });
 
   it('should close references list', async () => {
-    setUpEditorWithSelection(editor, '<p><citation>Citation |</citation></p>');
+    setUpEditorWithSelection(editor, '<p>Citation |</p>');
     const { user } = setupWithJotaiProvider(<EditorContent editor={editor} />, store);
 
     await user.type(screen.getByText('Citation'), '@');
@@ -58,18 +58,6 @@ describe('ReferenceNode', () => {
     expect(referencePicker.getElementsByTagName('button')).toHaveLength(REFERENCES.length);
 
     await user.keyboard('{Escape}');
-    expect(screen.queryByTestId(ReferencesListPopup.displayName!)).not.toBeInTheDocument();
-  });
-
-  it('should not open the references list outside of a citation node', async () => {
-    window.Range.prototype.getClientRects = vi.fn().mockImplementation(() => []);
-    window.Range.prototype.getBoundingClientRect = vi.fn().mockImplementation(() => ({ width: 0 }));
-
-    setUpEditorWithSelection(editor, '<p>Citation |</p>');
-    const { user } = setupWithJotaiProvider(<EditorContent editor={editor} />, store);
-
-    await user.type(screen.getByText('Citation'), '@');
-
     expect(screen.queryByTestId(ReferencesListPopup.displayName!)).not.toBeInTheDocument();
   });
 });
