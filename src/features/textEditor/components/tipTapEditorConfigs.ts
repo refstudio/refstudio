@@ -9,7 +9,6 @@ import markdown from 'highlight.js/lib/languages/markdown';
 import { lowlight } from 'lowlight';
 import { Markdown } from 'tiptap-markdown';
 
-import { CitationNode } from './tipTapNodes/citation/CitationNode';
 import { NotionBlockNode } from './tipTapNodes/notionBlock/NotionBlockNode';
 import { ReferenceNode } from './tipTapNodes/references/ReferenceNode';
 import { RefStudioDocument } from './tipTapNodes/refStudioDocument/RefStudioDocument';
@@ -33,7 +32,6 @@ export const EDITOR_EXTENSIONS: Extensions = [
   // Custom extensions
   RefStudioDocument,
   NotionBlockNode,
-  CitationNode,
   ReferenceNode,
   SentenceCompletionExtension,
 ];

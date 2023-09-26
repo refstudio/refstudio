@@ -44,14 +44,14 @@ export class MarkdownSerializer {
         const referenceId = node instanceof HTMLElement ? node.getAttribute('data-id') : null;
 
         if (!referenceId) {
-          return '@INVALID_REFERENCE';
+          return '[INVALID_REFERENCE]';
         }
         const reference = this.referencesById[referenceId] as ReferenceItem | undefined;
         if (reference) {
           this.usedReferenceIds.add(referenceId);
         }
 
-        return `@${reference?.citationKey ?? 'INVALID_REFERENCE'}`;
+        return reference?.citationKey ? `[@${reference.citationKey}]` : '[INVALID_REFERENCE]';
       },
     });
   }

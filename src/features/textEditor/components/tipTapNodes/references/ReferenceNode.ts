@@ -1,8 +1,8 @@
 import Mention from '@tiptap/extension-mention';
-import { ReactNodeViewRenderer, ReactRenderer } from '@tiptap/react';
+import { TextSelection } from '@tiptap/pm/state';
+import { InputRule, ReactNodeViewRenderer, ReactRenderer } from '@tiptap/react';
 import { SuggestionKeyDownProps, SuggestionOptions } from '@tiptap/suggestion';
 
-import { CitationNode } from '../citation/CitationNode';
 import { Reference } from './Reference';
 import { ReferenceListPopupProps, ReferencesListPopup } from './ReferencesListPopup';
 
@@ -24,13 +24,26 @@ export const ReferenceNode = Mention.extend({
       },
     },
   }),
+  addInputRules: () => [
+    new InputRule({
+      find: /[[@]$/,
+      handler: ({ state, range }) => {
+        const { tr } = state;
+        const start = range.from;
+
+        tr.delete(start, start + 1)
+          .insert(start, state.schema.text('[@'))
+          .setSelection(TextSelection.create(tr.doc, state.selection.from + 2));
+      },
+    }),
+  ],
 }).configure({
   suggestion: {
     allowSpaces: true,
-    char: '@',
+    char: '[@',
     allowedPrefixes: null,
-    allow: ({ state, range }) =>
-      state.selection.empty && state.doc.resolve(range.from).parent.type.name === CitationNode.name,
+    // allow: ({ state, range }) =>
+    // state.selection.empty && state.doc.resolve(range.from).parent.type.name === CitationNode.name,
     /* c8 ignore start */
     command: ({
       editor,

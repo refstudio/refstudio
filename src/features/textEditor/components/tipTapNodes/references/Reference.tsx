@@ -23,7 +23,7 @@ export function Reference({ node }: ReferenceProps) {
 
   return (
     <NodeViewWrapper as="cite">
-      {reference?.citationKey ? `@${reference.citationKey}` : 'INVALID REFERENCE'}
+      {reference?.citationKey ? `[@${reference.citationKey}]` : '[INVALID REFERENCE]'}
     </NodeViewWrapper>
   );
 }
