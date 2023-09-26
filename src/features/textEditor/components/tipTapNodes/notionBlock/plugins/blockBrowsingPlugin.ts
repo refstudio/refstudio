@@ -188,6 +188,9 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
             }
           }
           return true;
+        case 'Backspace':
+          // We want this shortcut to be handled by the editor
+          return false;
         default:
           return true;
       }
