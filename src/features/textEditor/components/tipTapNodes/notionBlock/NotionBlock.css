@@ -132,3 +132,11 @@
 .node-notionBlock.selected > div > .notion-block > .content {
   @apply bg-[rgba(35,131,226,.28)];
 }
+
+/* Display collapsible toggle and header side-by-side */
+.notion-block *:has(> .collapsible-arrow) {
+  @apply flex flex-row gap-0.5;
+}
+.notion-block *:has(> .collapsible-arrow) > .collapsible-arrow {
+  @apply shrink-0;
+}
