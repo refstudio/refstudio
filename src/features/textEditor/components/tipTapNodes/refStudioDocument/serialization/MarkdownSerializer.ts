@@ -34,10 +34,6 @@ export class MarkdownSerializer {
       filter: ['s'],
       replacement: (content) => '~~' + content + '~~',
     });
-    this.turndownService.addRule('citation', {
-      filter: (node) => node.nodeName === 'CITATION',
-      replacement: (content) => '[' + content + ']',
-    });
     this.turndownService.addRule('reference', {
       filter: (node) => node.nodeName === 'SPAN' && node.getAttribute('data-type') === 'reference',
       replacement: (_content, node) => {
