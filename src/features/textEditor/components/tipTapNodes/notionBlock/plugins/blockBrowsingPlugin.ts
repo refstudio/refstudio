@@ -192,7 +192,8 @@ export const blockBrowsingPlugin = new Plugin<BlockBrowsingPluginState>({
           // We want this shortcut to be handled by the editor
           return false;
         default:
-          return true;
+          // Let the editor handle shortcuts (Cmd+...) and block the rest
+          return !event.metaKey;
       }
     },
   },
