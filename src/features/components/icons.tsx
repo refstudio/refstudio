@@ -21,7 +21,10 @@ export const SendIcon = () => (
 
 export const LoadingIcon = () => (
   <div className="flex h-6 w-6 shrink-0 items-center justify-center self-center">
-    <Lottie options={{ loop: true, autoplay: true, animationData: chatbotLoadingAnimationData }} />
+    <Lottie
+      isClickToPauseDisabled
+      options={{ loop: true, autoplay: true, animationData: chatbotLoadingAnimationData }}
+    />
   </div>
 );
 
