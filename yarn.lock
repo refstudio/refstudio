@@ -7004,6 +7004,7 @@ __metadata:
     react-popper: ^2.3.0
     react-resizable-panels: ^0.0.51
     react-tooltip: ^5.21.1
+    tailwind-debug-outline: ^1.0.0
     tailwindcss: ^3.3.2
     tiptap-markdown: ^0.7.2
     turndown: ^7.1.2
@@ -7669,6 +7670,15 @@ __metadata:
   version: 3.2.4
   resolution: "symbol-tree@npm:3.2.4"
   checksum: 6e8fc7e1486b8b54bea91199d9535bb72f10842e40c79e882fc94fb7b14b89866adf2fd79efa5ebb5b658bc07fb459ccce5ac0e99ef3d72f474e74aaf284029d
+  languageName: node
+  linkType: hard
+
+"tailwind-debug-outline@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "tailwind-debug-outline@npm:1.0.0"
+  peerDependencies:
+    tailwindcss: ">=2.0.0 || >=3.0.0"
+  checksum: 80b97ef1c908c424188dbba91fe302c8e5267381a1b1ac874436cdac8d482891c2e92d8d42faf6bdc8adfa1b364bcaac57bb3e640d353fc64dda1276bf0630bc
   languageName: node
   linkType: hard
 
