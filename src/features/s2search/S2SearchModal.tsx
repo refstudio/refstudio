@@ -1,5 +1,5 @@
 import { useAtomValue, useSetAtom } from 'jotai';
-import { ReactElement, useCallback, useState } from 'react';
+import { ReactElement, useCallback, useEffect, useState } from 'react';
 import { SiSemanticscholar } from 'react-icons/si';
 
 import { S2SearchResult } from '../../api/api-types';
@@ -8,6 +8,8 @@ import { projectIdAtom } from '../../atoms/projectState';
 import {
   addS2ReferenceAtom,
   clearSearchResultsAtom,
+  generatePaperIdLookupAtom,
+  getPaperIdLookupAtom,
   getSearchResultsAtom,
   loadSearchResultsAtom,
   removeS2ReferenceAtom,
@@ -35,9 +37,18 @@ const SearchBar = ({ onChange }: { onChange: (value: string, limit: number) => v
   </div>
 );
 
-export const SearchResult = ({ reference, projectId }: { reference: S2SearchResult; projectId: string }) => {
-  const [refStatus, setRefStatus] = useState('ready');
-  const [refId, setRefId] = useState('');
+export const SearchResult = ({ s2SearchResult, projectId }: { s2SearchResult: S2SearchResult; projectId: string }) => {
+  let refStatusDefault = 'ready';
+  let refIdDefault = '';
+  const refStudioIdLookup = useAtomValue(getPaperIdLookupAtom);
+
+  if (s2SearchResult.paperId && s2SearchResult.paperId in refStudioIdLookup) {
+    refIdDefault = refStudioIdLookup[s2SearchResult.paperId];
+    refStatusDefault = 'added';
+  }
+
+  const [refStatus, setRefStatus] = useState(refStatusDefault);
+  const [refId, setRefId] = useState(refIdDefault);
   const [message, setMessage] = useState('');
 
   const [showRemove, setShowRemove] = useState(false);
@@ -46,7 +57,7 @@ export const SearchResult = ({ reference, projectId }: { reference: S2SearchResu
 
   const addClickHandler = useCallback(() => {
     setRefStatus('adding');
-    saveS2Reference(projectId, reference)
+    saveS2Reference(projectId, s2SearchResult)
       .then((result) => {
         setRefId(result.references[0].id);
         if (result.message) {
@@ -55,7 +66,7 @@ export const SearchResult = ({ reference, projectId }: { reference: S2SearchResu
         setRefStatus('added');
       })
       .catch(() => setRefStatus('error'));
-  }, [projectId, reference, saveS2Reference]);
+  }, [projectId, s2SearchResult, saveS2Reference]);
 
   const removeClickHandler = useCallback(() => {
     removeS2Reference(projectId, refId)
@@ -67,13 +78,13 @@ export const SearchResult = ({ reference, projectId }: { reference: S2SearchResu
     <div className="border-b border-modal-border px-5 py-3 text-base">
       <div className="space-y-2">
         <div className="flex">
-          <div className="basis-4/5 truncate font-semibold" title={reference.title}>
-            {reference.title}
+          <div className="basis-4/5 truncate font-semibold" title={s2SearchResult.title}>
+            {s2SearchResult.title}
           </div>
           <div className="flex h-8 basis-1/5 justify-end space-x-1">
             {refStatus === 'ready' && (
               <>
-                {!reference.openAccessPdf && (
+                {!s2SearchResult.openAccessPdf && (
                   <div
                     className="flex items-center justify-center"
                     title="This reference has no PDF. Chat functions will be limited."
@@ -101,7 +112,7 @@ export const SearchResult = ({ reference, projectId }: { reference: S2SearchResu
             )}
           </div>
         </div>
-        <MetaData reference={reference} />
+        <MetaData reference={s2SearchResult} />
       </div>
     </div>
   );
@@ -140,6 +151,7 @@ const MetaData = ({ reference }: { reference: S2SearchResult }) => {
     </>
   );
 };
+
 const formatMessage = (message: string): ReactElement[] => {
   const parts = message.split(/(https?:\/\/[^\s]+)/g);
   const formattedParts: ReactElement[] = [];
@@ -246,14 +258,21 @@ export function S2SearchModal({ open, onClose: onClose }: { open: boolean; onClo
 
   const loadSearchResults = useSetAtom(loadSearchResultsAtom);
   const clearSearchResults = useSetAtom(clearSearchResultsAtom);
-
+  const generatePaperIdLookup = useSetAtom(generatePaperIdLookupAtom);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    generatePaperIdLookup();
+  }, [generatePaperIdLookup]);
 
   const handleKeyWordsEntered = useCallback(
     (searchTerm: string, limit?: number) => {
       setLoading(true);
+
       loadSearchResults(searchTerm, limit)
-        .then(() => setLoading(false))
+        .then(() => {
+          setLoading(false);
+        })
         .catch((err) => {
           notifyError('Could not load search results');
           console.error(err);
@@ -293,7 +312,7 @@ export function S2SearchModal({ open, onClose: onClose }: { open: boolean; onClo
           )}
           {!loading &&
             searchResultsList.map((reference) => (
-              <SearchResult key={reference.paperId} projectId={projectId} reference={reference} />
+              <SearchResult key={reference.paperId} projectId={projectId} s2SearchResult={reference} />
             ))}
         </div>
       </div>

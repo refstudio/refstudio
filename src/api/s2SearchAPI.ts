@@ -37,6 +37,10 @@ export async function postS2Reference(projectId: string, s2SearchResult: S2Searc
     contents: '',
     published_date: getBestPublicationDate(s2SearchResult),
     authors: formatAuthorsFromS2Result(s2SearchResult.authors),
+    metadata: {
+      sourceId: s2SearchResult.paperId,
+      source: 's2',
+    },
   };
 
   const pdfRequestBody: IngestMetadataRequest = {
